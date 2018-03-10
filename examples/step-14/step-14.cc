@@ -1945,27 +1945,26 @@ namespace Step14
 
 
       // Regarding the evaluation of the error estimator, we have one driver
-      // function that uses WorkStream::run to call the second function on every
-      // cell. The concept of using SynchronousIterators was already explained
-      // in step-9:
+      // function that uses WorkStream::run() to call the second function on every
+      // cell:
       void estimate_error (Vector<float> &error_indicators) const;
 
-      void estimate_on_one_cell (const SynchronousIterators<std::tuple<
-                                 active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
-                                 WeightedResidualScratchData                     &scratch_data,
-                                 WeightedResidualCopyData                        &copy_data,
-                                 FaceIntegrals                                   &face_integrals) const;
+      void estimate_on_one_cell (const active_cell_iterator   &cell,
+                                 WeightedResidualScratchData  &scratch_data,
+                                 WeightedResidualCopyData     &copy_data,
+                                 Vector<float>                &error_indicators,
+                                 FaceIntegrals                &face_integrals) const;
 
       // Then we have functions that do the actual integration of the error
       // representation formula. They will treat the terms on the cell
       // interiors, on those faces that have no hanging nodes, and on those
       // faces with hanging nodes, respectively:
       void
-      integrate_over_cell (const SynchronousIterators<std::tuple<
-                           active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
-                           const Vector<double>                            &primal_solution,
-                           const Vector<double>                            &dual_weights,
-                           CellData                                        &cell_data) const;
+      integrate_over_cell (const active_cell_iterator &cell,
+                           const Vector<double>       &primal_solution,
+                           const Vector<double>       &dual_weights,
+                           CellData                   &cell_data,
+                           Vector<float>              &error_indicators) const;
 
       void
       integrate_over_regular_face (const active_cell_iterator &cell,
@@ -2348,27 +2347,16 @@ namespace Step14
              ++face_no)
           face_integrals[cell->face(face_no)] = -1e20;
 
-      // Then set up the parallel iterator range just as we did in
-      // step-9, and hand it all off to WorkStream::run() to compute
-      // the estimators for all cells in parallel:
-      typedef
-      std::tuple<active_cell_iterator,Vector<float>::iterator>
-      IteratorTuple;
-
-      SynchronousIterators<IteratorTuple>
-      cell_and_error_begin(IteratorTuple (DualSolver<dim>::dof_handler.begin_active(),
-                                          error_indicators.begin()));
-      SynchronousIterators<IteratorTuple>
-      cell_and_error_end  (IteratorTuple (DualSolver<dim>::dof_handler.end(),
-                                          error_indicators.begin()));
-
-      WorkStream::run(cell_and_error_begin,
-                      cell_and_error_end,
+      // Then hand it all off to WorkStream::run() to compute the
+      // estimators for all cells in parallel:
+      WorkStream::run(DualSolver<dim>::dof_handler.begin_active(),
+                      DualSolver<dim>::dof_handler.end(),
                       std::bind(&WeightedResidual<dim>::estimate_on_one_cell,
                                 this,
                                 std::placeholders::_1,
                                 std::placeholders::_2,
                                 std::placeholders::_3,
+                                std::ref(error_indicators),
                                 std::ref(face_integrals)),
                       std::function<void (const WeightedResidualCopyData &)>(),
                       WeightedResidualScratchData (*DualSolver<dim>::fe,
@@ -2413,11 +2401,11 @@ namespace Step14
     template <int dim>
     void
     WeightedResidual<dim>::
-    estimate_on_one_cell (const SynchronousIterators<std::tuple<
-                          active_cell_iterator,Vector<float>::iterator> > &cell_and_error,
-                          WeightedResidualScratchData                       &scratch_data,
-                          WeightedResidualCopyData                          &copy_data,
-                          FaceIntegrals                                     &face_integrals) const
+    estimate_on_one_cell (const active_cell_iterator   &cell,
+                          WeightedResidualScratchData  &scratch_data,
+                          WeightedResidualCopyData     &copy_data,
+                          Vector<float>                &error_indicators,
+                          FaceIntegrals                &face_integrals) const
     {
       // Because of WorkStream, estimate_on_one_cell requires a CopyData object
       // even if it is no used. The next line silences a warning about this unused
@@ -2427,12 +2415,11 @@ namespace Step14
       // First task on each cell is to compute the cell residual
       // contributions of this cell, and put them into the
       // <code>error_indicators</code> variable:
-      active_cell_iterator cell = std::get<0>(*cell_and_error);
-
-      integrate_over_cell (cell_and_error,
+      integrate_over_cell (cell,
                            scratch_data.primal_solution,
                            scratch_data.dual_weights,
-                           scratch_data.cell_data);
+                           scratch_data.cell_data,
+                           error_indicators);
 
       // After computing the cell terms, turn to the face terms. For this,
       // loop over all faces of the present cell, and see whether
@@ -2506,17 +2493,17 @@ namespace Step14
     // the cell terms:
     template <int dim>
     void WeightedResidual<dim>::
-    integrate_over_cell (const SynchronousIterators<std::tuple<
-                         active_cell_iterator,Vector<float>::iterator> >   &cell_and_error,
-                         const Vector<double>                              &primal_solution,
-                         const Vector<double>                              &dual_weights,
-                         CellData                                          &cell_data) const
+    integrate_over_cell (const active_cell_iterator &cell,
+                         const Vector<double>       &primal_solution,
+                         const Vector<double>       &dual_weights,
+                         CellData                   &cell_data,
+                         Vector<float>              &error_indicators) const
     {
       // The tasks to be done are what appears natural from looking at the
       // error estimation formula: first get the right hand side and Laplacian
       // of the numerical solution at the quadrature points for the cell
       // residual,
-      cell_data.fe_values.reinit (std::get<0>(*cell_and_error));
+      cell_data.fe_values.reinit (cell);
       cell_data.right_hand_side
       ->value_list (cell_data.fe_values.get_quadrature_points(),
                     cell_data.rhs_values);
@@ -2534,7 +2521,7 @@ namespace Step14
         sum += ((cell_data.rhs_values[p]+cell_data.cell_laplacians[p]) *
                 cell_data.dual_weights[p] *
                 cell_data.fe_values.JxW (p));
-      *(std::get<1>(*cell_and_error)) += sum;
+      error_indicators (cell->active_cell_index()) += sum;
     }
 
 
