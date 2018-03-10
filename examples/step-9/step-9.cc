@@ -452,7 +452,10 @@ namespace Step9
   // bit. In particular, WorkStream was generally invented for cases where
   // each local computation on a cell <i>adds</i> to a global object -- for
   // example, when assembling linear systems where we add local contributions
-  // into a global matrix and right hand side. Here, however, the situation is
+  // into a global matrix and right hand side. WorkStream is designed to handle
+  // the potential conflict of multiple threads trying to do this addition at
+  // the same time, and consequently has to provide for some way to ensure that
+  // only thread gets to do this at a time. Here, however, the situation is
   // slightly different: we compute contributions from every cell
   // individually, but then all we need to do is put them into an element of
   // an output vector that is unique to each cell. Consequently, there is no
@@ -460,30 +463,11 @@ namespace Step9
   // elaborate machinery of WorkStream to avoid conflicting writes is not
   // necessary. Consequently, what we will do is this: We still need a scratch
   // object that holds, for example, the FEValues object.  However, we only
-  // create an fake, empty copy data structure. Likewise, we do need the
+  // create a fake, empty copy data structure. Likewise, we do need the
   // function that computes local contributions, but since it can already put
   // the result into its final location, we do not need a copy-local-to-global
-  // function and will instead give the WorkStream::run function an empty
+  // function and will instead give the WorkStream::run() function an empty
   // function object -- the equivalent to a NULL function pointer.
-  //
-  // The second idea to make this approach work is this: If we want to write
-  // the result into its final destination right away, then the local worker
-  // function needs to already know where this destination is. Here, this is
-  // an element of a vector -- but which element is something that the local
-  // worker function (or, if we wanted to use one, a copy-local-to-global
-  // function) can not determine easily just knowing an iterator to a cell it
-  // is supposed to work on. Consequently, in addition to a cell, we need to
-  // pass a second piece of identifying information along: the element of the
-  // output vector to write into. What this means is that the work items are
-  // identified by two iterators: to a cell, and to an output vector
-  // element. Moving from one work item to the next requires incrementing both
-  // iterators. deal.II has a class for this, called SynchronousIterators,
-  // that takes a tuple of iterator types as arguments and stores an iterator
-  // of each type. Whenever the SynchronousIterators object is incremented, it
-  // increments the stored iterators in turn. Thus, this class is exactly what
-  // we need to do our work, and we consequently use it as the first argument
-  // of the worker function. We will further down below show how to create
-  // such an object.
   class GradientEstimation
   {
   public:
@@ -503,11 +487,13 @@ namespace Step9
     struct EstimateScratchData
     {
       EstimateScratchData (const FiniteElement<dim> &fe,
-                           const Vector<double>     &solution);
+                           const Vector<double>     &solution,
+                           Vector<float>            &error_per_cell);
       EstimateScratchData (const EstimateScratchData &data);
 
-      FEValues<dim> fe_midpoint_value;
-      Vector<double> solution;
+      FEValues<dim>         fe_midpoint_value;
+      const Vector<double> &solution;
+      Vector<float>        &error_per_cell;
     };
 
     struct EstimateCopyData
@@ -515,10 +501,9 @@ namespace Step9
 
     template <int dim>
     static
-    void estimate_cell (const SynchronousIterators<std::tuple<typename DoFHandler<dim>::active_cell_iterator,
-                        Vector<float>::iterator> >     &cell,
-                        EstimateScratchData<dim>       &scratch_data,
-                        const EstimateCopyData         &copy_data);
+    void estimate_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                        EstimateScratchData<dim>                             &scratch_data,
+                        const EstimateCopyData                               &copy_data);
   };
 
 
@@ -973,12 +958,14 @@ namespace Step9
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>::
   EstimateScratchData (const FiniteElement<dim> &fe,
-                       const Vector<double>     &solution)
+                       const Vector<double>     &solution,
+                       Vector<float>            &error_per_cell)
     :
     fe_midpoint_value(fe,
                       QMidpoint<dim> (),
                       update_values | update_quadrature_points),
-    solution(solution)
+    solution(solution),
+    error_per_cell(error_per_cell)
   {}
 
 
@@ -989,7 +976,8 @@ namespace Step9
     fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
                       scratch_data.fe_midpoint_value.get_quadrature(),
                       update_values | update_quadrature_points),
-    solution(scratch_data.solution)
+    solution(scratch_data.solution),
+    error_per_cell(scratch_data.error_per_cell)
   {}
 
 
@@ -997,23 +985,13 @@ namespace Step9
   // class. The first function does not much except for delegating work to the
   // other function, but there is a bit of setup at the top.
   //
-  // Before starting with the work, we check that the vector into which the
-  // results are written has the right size. It is a common error that such
-  // parameters have the wrong size, but the resulting damage by not
-  // catching these errors are very subtle as they are usually corruption of
-  // data somewhere in memory. Often, the problems emerging from this are
-  // not reproducible, and it is well worth the effort to
-  // check for such things.
-  //
-  // The second piece is to set up the iterator that goes in lockstep over the
-  // cells of the domain and the corresponding elements of the output vector
-  // (see above where we introduced the <code>SynchronousIterators</code>
-  // class). We can abbreviate the process slightly by introducing a
-  // <code>typedef</code> that denotes a pair of iterators. This being set up,
-  // we can hand the whole thing off to WorkStream::run, keeping in mind that
-  // we do not need a copy-local-to-global function here but can get away by
-  // simply using a default-constructed function object (the equivalent to a
-  // NULL function pointer).
+  // Before starting with the work, we check that the vector into
+  // which the results are written has the right size. Programming
+  // mistakes in which one forgets to size arguments correctly at the
+  // calling site are quite common.  Because the resulting damage from
+  // not catching such errors is often subtle (e.g., corruption of
+  // data somewhere in memory, or non-reproducible results), it is
+  // well worth the effort to check for such things.
   template <int dim>
   void
   GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
@@ -1024,21 +1002,13 @@ namespace Step9
             ExcInvalidVectorLength (error_per_cell.size(),
                                     dof_handler.get_triangulation().n_active_cells()));
 
-    typedef std::tuple<typename DoFHandler<dim>::active_cell_iterator,Vector<float>::iterator>
-    IteratorTuple;
-
-    SynchronousIterators<IteratorTuple>
-    begin_sync_it (IteratorTuple (dof_handler.begin_active(),
-                                  error_per_cell.begin())),
-                                                       end_sync_it (IteratorTuple (dof_handler.end(),
-                                                           error_per_cell.end()));
-
-    WorkStream::run (begin_sync_it,
-                     end_sync_it,
+    WorkStream::run (dof_handler.begin_active(),
+                     dof_handler.end(),
                      &GradientEstimation::template estimate_cell<dim>,
                      std::function<void (const EstimateCopyData &)> (),
                      EstimateScratchData<dim> (dof_handler.get_fe(),
-                                               solution),
+                                               solution,
+                                               error_per_cell),
                      EstimateCopyData ());
   }
 
@@ -1059,7 +1029,7 @@ namespace Step9
   // the work, every time it is called for a given cell. Such an argument is
   // passed as the second argument. The third argument would be a "copy-data"
   // object (see @ref threads for more information) but we do not actually use
-  // any of these here. Because WorkStream::run insists on passing three
+  // any of these here. Because WorkStream::run() insists on passing three
   // arguments, we declare this function with three arguments, but simply
   // ignore the last one.
   //
@@ -1072,10 +1042,10 @@ namespace Step9
   // WorkStream::run the pointer to the function as we do above will not do
   // this -- the compiler will complain that a function declared to have two
   // arguments is called with three arguments.  However, we can do this by
-  // passing the following as the third argument when calling WorkStream::run
+  // passing the following as the third argument when calling WorkStream::run()
   // above:
   // @code
-  //    std::function<void (const SynchronousIterators<IteratorTuple> &,
+  //    std::function<void (const typename DoFHandler<dim>::active_cell_iterator &,
   //                        EstimateScratchData<dim>                  &,
   //                        EstimateCopyData                          &)>
   //      (std::bind (&GradientEstimation::template estimate_cell<dim>,
@@ -1091,9 +1061,8 @@ namespace Step9
   // Now for the details:
   template <int dim>
   void
-  GradientEstimation::estimate_cell (const SynchronousIterators<std::tuple<typename DoFHandler<dim>::active_cell_iterator,
-                                     Vector<float>::iterator> > &cell,
-                                     EstimateScratchData<dim>                                               &scratch_data,
+  GradientEstimation::estimate_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                     EstimateScratchData<dim>                             &scratch_data,
                                      const EstimateCopyData &)
   {
     // We need space for the tensor <code>Y</code>, which is the sum of
@@ -1109,11 +1078,9 @@ namespace Step9
     active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
                               GeometryInfo<dim>::max_children_per_face);
 
-    const typename DoFHandler<dim>::active_cell_iterator &cell_it(std::get<0>(*cell));
-
     // First initialize the <code>FEValues</code> object, as well as the
     // <code>Y</code> tensor:
-    scratch_data.fe_midpoint_value.reinit (cell_it);
+    scratch_data.fe_midpoint_value.reinit (cell);
 
     // Then allocate the vector that will be the sum over the y-vectors
     // times the approximate directional derivative:
@@ -1144,14 +1111,14 @@ namespace Step9
     // neighbors, of course.
     active_neighbors.clear ();
     for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-      if (! cell_it->at_boundary(face_no))
+      if (! cell->at_boundary(face_no))
         {
           // First define an abbreviation for the iterator to the face and
           // the neighbor
           const typename DoFHandler<dim>::face_iterator
-          face = cell_it->face(face_no);
+          face = cell->face(face_no);
           const typename DoFHandler<dim>::cell_iterator
-          neighbor = cell_it->neighbor(face_no);
+          neighbor = cell->neighbor(face_no);
 
           // Then check whether the neighbor is active. If it is, then it
           // is on the same level or one level coarser (if we are not in
@@ -1194,7 +1161,8 @@ namespace Step9
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
                   Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)
-                          ==cell_it,ExcInternalError());
+                          ==cell,
+                          ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
@@ -1205,7 +1173,7 @@ namespace Step9
                 // `behind' the subfaces of the current face
                 for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
                   active_neighbors.push_back (
-                    cell_it->neighbor_child_on_subface(face_no,subface_no));
+                    cell->neighbor_child_on_subface(face_no,subface_no));
             }
         }
 
@@ -1301,16 +1269,16 @@ namespace Step9
 
     Tensor<1,dim> gradient = Y_inverse * projected_gradient;
 
-    // The last part of this function is the one where we
-    // write into the element of the output vector what
-    // we have just computed. As above, we need to get
-    // at the second element of the pair of iterators, which requires
-    // slightly awkward syntax but is not otherwise particularly
-    // difficult:
-    *(std::get<1>(*cell)) = (std::pow(cell_it->diameter(),
-                                      1+1.0*dim/2) *
-                             std::sqrt(gradient.norm_square()));
-
+    // The last part of this function is the one where we write into
+    // the element of the output vector what we have just
+    // computed. The address of this vector has been stored in the
+    // scratch data object, and all we have to do is know how to get
+    // at the correct element inside this vector -- but we can ask the
+    // cell we're on the how-manyth active cell it is for this:
+    scratch_data.error_per_cell(cell->active_cell_index())
+      = (std::pow(cell->diameter(),
+                  1+1.0*dim/2) *
+         std::sqrt(gradient.norm_square()));
   }
 }
 
