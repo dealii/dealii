@@ -407,8 +407,18 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
       ierr = MPI_Group_union(group_source, group_dest, &group_union);
       AssertThrowMPI(ierr);
       MPI_Comm mpi_communicator_union;
-      // to create a communicator representing the union of the source and destination MPI communicator
-      // we need a communicator containing all  desired processes --> use MPI_COMM_WORLD
+
+      // to create a communicator representing the union of the source
+      // and destination MPI communicator we need a communicator that
+      // is guaranteed to contain all desired processes -- i.e.,
+      // MPI_COMM_WORLD. on the other hand, as documented in the MPI
+      // standard, MPI_Comm_create_group is not collective on all
+      // processes in the first argument, but instead is collective on
+      // only those processes listed in the group. in other words,
+      // there is really no harm in passing MPI_COMM_WORLD as the
+      // first argument, even if the program we are currently running
+      // and that is calling this function only works on a subset of
+      // processes
       ierr = MPI_Comm_create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
