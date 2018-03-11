@@ -757,7 +757,7 @@ public:
   /**
    * Move constructor.
    */
-  FiniteElement (FiniteElement<dim, spacedim> &&) = default;
+  FiniteElement (FiniteElement<dim, spacedim> &&) = default; // NOLINT
 
   /**
    * Copy constructor.

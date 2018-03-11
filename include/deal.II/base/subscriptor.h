@@ -79,7 +79,7 @@ public:
    * An object inheriting from Subscriptor can only be moved if no other
    * objects are subscribing to it.
    */
-  Subscriptor(Subscriptor &&);
+  Subscriptor(Subscriptor &&) noexcept;
 
   /**
    * Destructor, asserting that the counter is zero.
@@ -99,7 +99,7 @@ public:
    *
    * Asserts that the counter for the moved object is zero.
    */
-  Subscriptor &operator = (Subscriptor &&);
+  Subscriptor &operator = (Subscriptor &&) noexcept;
 
   /**
    * Subscribes a user of the object. The subscriber may be identified by text

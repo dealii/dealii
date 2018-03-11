@@ -492,7 +492,7 @@ public:
   /**
    * Move constructor.
    */
-  FESystem (FESystem<dim,spacedim> &&) = default;
+  FESystem (FESystem<dim,spacedim> &&) = default; // NOLINT
 
   /**
    * Destructor.

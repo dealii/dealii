@@ -200,13 +200,13 @@ public:
      * Move constructor: this creates a new Pointer by stealing the internal
      * data owned by @p p.
      */
-    Pointer(Pointer &&p) = default;
+    Pointer(Pointer &&p) noexcept = default;
 
     /**
      * Move operator: this releases the vector owned by the current Pointer
      * and then steals the internal data owned by @p p.
      */
-    Pointer &operator = (Pointer &&p) = default;
+    Pointer &operator = (Pointer &&p) noexcept = default;
 
     /**
      * Constructor. This constructor automatically allocates a vector from

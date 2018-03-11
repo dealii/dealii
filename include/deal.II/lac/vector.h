@@ -151,7 +151,7 @@ public:
    * Move constructor. Creates a new vector by stealing the internal data of
    * the vector @p v.
    */
-  Vector (Vector<Number> &&v);
+  Vector (Vector<Number> &&v) noexcept;
 
   /**
    * Copy constructor taking a vector of another data type. This will fail if
@@ -341,7 +341,7 @@ public:
    * the internal data of the vector @p v and resets @p v to the state it would
    * have after being newly default-constructed.
    */
-  Vector<Number> &operator= (Vector<Number> &&v);
+  Vector<Number> &operator= (Vector<Number> &&v) noexcept;
 
   /**
    * Copy the given vector. Resize the present vector if necessary.

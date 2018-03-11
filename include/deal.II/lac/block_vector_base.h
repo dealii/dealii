@@ -566,7 +566,7 @@ public:
    * object if the underlying <code>VectorType</code> is move-constructible,
    * otherwise they are copied.
    */
-  BlockVectorBase (BlockVectorBase &&/*V*/) = default;
+  BlockVectorBase (BlockVectorBase &&/*V*/) noexcept = default;
 
   /**
    * Update internal structures after resizing vectors. Whenever you reinited
@@ -751,7 +751,7 @@ public:
    * vector into the current object if `VectorType` is
    * move-constructible, otherwise copy them.
    */
-  BlockVectorBase &operator= (BlockVectorBase &&/*V*/) = default;
+  BlockVectorBase &operator= (BlockVectorBase &&/*V*/) = default; // NOLINT
 
   /**
    * Copy operator for template arguments of different types.

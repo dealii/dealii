@@ -98,13 +98,13 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  Particle<dim,spacedim>::Particle (Particle<dim,spacedim> &&particle)
-    :
-    location (particle.location),
-    reference_location(particle.reference_location),
-    id (particle.id),
-    property_pool(particle.property_pool),
-    properties(particle.properties)
+  Particle<dim,spacedim>::Particle (Particle<dim,spacedim> &&particle) noexcept
+:
+  location (std::move(particle.location)),
+           reference_location(std::move(particle.reference_location)),
+           id (std::move(particle.id)),
+           property_pool(std::move(particle.property_pool)),
+           properties(std::move(particle.properties))
   {
     particle.properties = PropertyPool::invalid_handle;
   }
@@ -140,7 +140,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim,spacedim> &
-  Particle<dim,spacedim>::operator=(Particle<dim,spacedim> &&particle)
+  Particle<dim,spacedim>::operator=(Particle<dim,spacedim> &&particle) noexcept
   {
     if (this != &particle)
       {

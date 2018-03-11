@@ -257,7 +257,7 @@ public:
    * Move constructor. We cannot rely on the move constructor for `Quadrature`,
    * since it does not know about the additional member `fraction` of this class.
    */
-  QGaussLogR(QGaussLogR<dim> &&) = default;
+  QGaussLogR(QGaussLogR<dim> &&) noexcept = default;
 
 protected:
   /**
@@ -548,7 +548,7 @@ public:
    * Move constructor. We cannot rely on the move constructor for `Quadrature`,
    * since it does not know about the additional member `ep` of this class.
    */
-  QGaussRadauChebyshev(QGaussRadauChebyshev<dim> &&) = default;
+  QGaussRadauChebyshev(QGaussRadauChebyshev<dim> &&) noexcept = default;
 
 private:
   const EndPoint ep;

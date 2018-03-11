@@ -78,7 +78,7 @@ public:
    * Move constructor. Initialize a new object by stealing the internal data of
    * another BlockIndices object.
    */
-  BlockIndices (BlockIndices &&b);
+  BlockIndices (BlockIndices &&b) noexcept;
 
   /**
    * Copy constructor.
@@ -180,7 +180,7 @@ public:
    * Move assignment operator. Move another BlockIndices object onto the
    * current one by transferring its contents.
    */
-  BlockIndices &operator = (BlockIndices &&);
+  BlockIndices &operator = (BlockIndices &&) noexcept;
 
   /**
    * Compare whether two objects are the same, i.e. whether the number of
@@ -304,10 +304,10 @@ BlockIndices::BlockIndices (const std::vector<size_type> &block_sizes)
 
 
 inline
-BlockIndices::BlockIndices (BlockIndices &&b)
-  :
-  n_blocks(b.n_blocks),
-  start_indices(std::move(b.start_indices))
+BlockIndices::BlockIndices (BlockIndices &&b) noexcept
+:
+n_blocks(b.n_blocks),
+         start_indices(std::move(b.start_indices))
 {
   b.n_blocks = 0;
   b.start_indices = std::vector<size_type>(1, 0);
@@ -423,7 +423,7 @@ BlockIndices::operator = (const BlockIndices &b)
 
 inline
 BlockIndices &
-BlockIndices::operator = (BlockIndices &&b)
+BlockIndices::operator = (BlockIndices &&b) noexcept
 {
   start_indices = std::move(b.start_indices);
   n_blocks = b.n_blocks;

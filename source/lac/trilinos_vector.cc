@@ -92,8 +92,9 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector (Vector &&v)
-      : Vector()
+    Vector::Vector (Vector &&v) noexcept
+:
+    Vector()
     {
       // initialize a minimal, valid object and swap
       swap(v);
@@ -467,7 +468,7 @@ namespace TrilinosWrappers
 
 
 
-    Vector &Vector::operator= (Vector &&v)
+    Vector &Vector::operator= (Vector &&v) noexcept
     {
       swap(v);
       return *this;

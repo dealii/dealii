@@ -3188,7 +3188,7 @@ namespace GridTools
       {
         CellId::binary_type value;
         ar &value;
-        cell_ids.emplace_back(std::move(value));
+        cell_ids.emplace_back(value);
       }
     ar &data;
   }

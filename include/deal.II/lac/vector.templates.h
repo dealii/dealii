@@ -60,13 +60,13 @@ Vector<Number>::Vector (const Vector<Number> &v)
 
 
 template <typename Number>
-Vector<Number>::Vector (Vector<Number> &&v)
-  :
-  Subscriptor(std::move(v)),
-  vec_size(v.vec_size),
-  max_vec_size(v.max_vec_size),
-  values(std::move(v.values)),
-  thread_loop_partitioner(std::move(v.thread_loop_partitioner))
+Vector<Number>::Vector (Vector<Number> &&v) noexcept
+:
+Subscriptor(std::move(v)),
+            vec_size(v.vec_size),
+            max_vec_size(v.max_vec_size),
+            values(std::move(v.values)),
+            thread_loop_partitioner(std::move(v.thread_loop_partitioner))
 {
   v.vec_size = 0;
   v.max_vec_size = 0;
@@ -223,7 +223,7 @@ Vector<Number>::operator= (const Vector<Number> &v)
 template <typename Number>
 inline
 Vector<Number> &
-Vector<Number>::operator= (Vector<Number> &&v)
+Vector<Number>::operator= (Vector<Number> &&v) noexcept
 {
   Subscriptor::operator=(std::move(v));
 
