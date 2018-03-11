@@ -1,0 +1,4 @@
+New: The testsuite can be run using valgrind via
+'ctest -S ../tests/run_memorycheck.cmake'.
+<br>
+(Daniel Arndt, 2018/03/11)
