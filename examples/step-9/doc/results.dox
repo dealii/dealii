@@ -3,7 +3,7 @@
 
 The results of this program are not particularly spectacular. They
 consist of the console output, some grid files, and the solution on
-the finest grid. First for the console output:
+each of these grids. First for the console output:
 @code
 Cycle 0:
    Number of active cells:       256
@@ -34,13 +34,14 @@ displayed in the following picture:
 
 
 The structure of the grid will be understandable by looking at the
-solution itself:
+final solution itself:
 
 
 <img src="https://www.dealii.org/images/steps/developer/step-9.solution.png" alt="">
 
-
-
+(This image was generated using an earlier version of the program that
+still generated gmv instead of VTK output, and so is visualized
+using gmv.)
 Note that the solution is created by that part that is transported
 along the wiggly advection field from the left and lower boundaries
 to the top right, and the part that is created by the source in the

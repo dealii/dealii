@@ -562,22 +562,33 @@ void Step6<dim>::refine_grid ()
 // next cycle with mesh refinement, we want to output the results from this
 // cycle.
 //
-// In the present program, we will not write the solution (except for in the
-// last step, see the next function), but only the meshes that we generated,
-// as a two-dimensional Encapsulated Postscript (EPS) file.
+// We have already seen in step-1 how this can be achieved for the
+// mesh itself. The only thing we have to change is the generation of
+// the file name, since it should contain the number of the present
+// refinement cycle provided to this function as an argument. To this
+// end, we simply append the number of the refinement cycle as a
+// string to the file name.
 //
-// We have already seen in step-1 how this can be achieved. The only thing we
-// have to change is the generation of the file name, since it should contain
-// the number of the present refinement cycle provided to this function as an
-// argument. To this end, we simply append the number of the refinement cycle
-// as a string to the file name.
+// We also output the solution in the same way as we did before, with
+// a similarly constructed file name.
 template <int dim>
 void Step6<dim>::output_results (const unsigned int cycle) const
 {
-  std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
+  {
+    GridOut grid_out;
+    std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
+    grid_out.write_eps (triangulation, output);
+  }
 
-  GridOut grid_out;
-  grid_out.write_eps (triangulation, output);
+  {
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution, "solution");
+    data_out.build_patches ();
+
+    std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
+    data_out.write_vtk (output);
+  }
 }
 
 
@@ -641,24 +652,6 @@ void Step6<dim>::run ()
       solve ();
       output_results (cycle);
     }
-
-  // After we have finished computing the solution on the finest mesh, and
-  // writing all the grids to disk, we want to also write the actual solution
-  // on this final mesh to a file. As already done in one of the previous
-  // examples, we use the EPS format for output, and to obtain a reasonable
-  // view on the solution, we rescale the z-axis by a factor of four.
-  DataOutBase::EpsFlags eps_flags;
-  eps_flags.z_scaling = 4;
-
-  DataOut<dim> data_out;
-  data_out.set_flags (eps_flags);
-
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
-  data_out.build_patches ();
-
-  std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);
 }
 
 

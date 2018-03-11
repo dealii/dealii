@@ -514,41 +514,32 @@ namespace Step8
   // valued. The <code>DataOut</code> class takes care of this automatically,
   // but we have to give each component of the solution vector a different
   // name.
+  //
+  // To do this, the DataOut::add_vector() function wants a vector of
+  // strings. Since the number of components is the same as the number
+  // of dimensions we are working in, we use the <code>switch</code>
+  // statement below.
+  //
+  // We note that some graphics programs have restriction on what
+  // characters are allowed in the names of variables. deal.II therefore
+  // supports only the minimal subset of these characters that is supported
+  // by all programs. Basically, these are letters, numbers, underscores,
+  // and some other characters, but in particular no whitespace and
+  // minus/hyphen. The library will throw an exception otherwise, at least
+  // if in debug mode.
+  //
+  // After listing the 1d, 2d, and 3d case, it is good style to let the
+  // program die if we run upon a case which we did not consider. Remember
+  // that the <code>Assert</code> macro generates an exception if the
+  // condition in the first parameter is not satisfied. Of course, the
+  // condition <code>false</code> can never be satisfied, so the program
+  // will always abort whenever it gets to the default statement:
   template <int dim>
   void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   {
-    std::string filename = "solution-";
-    filename += ('0' + cycle);
-    Assert (cycle < 10, ExcInternalError());
-
-    filename += ".vtk";
-    std::ofstream output (filename.c_str());
-
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
 
-
-
-    // As said above, we need a different name for each component of the
-    // solution function. To pass one name for each component, a vector of
-    // strings is used. Since the number of components is the same as the
-    // number of dimensions we are working in, the following
-    // <code>switch</code> statement is used.
-    //
-    // We note that some graphics programs have restriction as to what
-    // characters are allowed in the names of variables. The library therefore
-    // supports only the minimal subset of these characters that is supported
-    // by all programs. Basically, these are letters, numbers, underscores,
-    // and some other characters, but in particular no whitespace and
-    // minus/hyphen. The library will throw an exception otherwise, at least
-    // if in debug mode.
-    //
-    // After listing the 1d, 2d, and 3d case, it is good style to let the
-    // program die if we run upon a case which we did not consider. Remember
-    // that the <code>Assert</code> macro generates an exception if the
-    // condition in the first parameter is not satisfied. Of course, the
-    // condition <code>false</code> can never be satisfied, so the program
-    // will always abort whenever it gets to the default statement:
     std::vector<std::string> solution_names;
     switch (dim)
       {
@@ -568,16 +559,18 @@ namespace Step8
         Assert (false, ExcNotImplemented());
       }
 
-    // After setting up the names for the different components of the solution
-    // vector, we can add the solution vector to the list of data vectors
-    // scheduled for output. Note that the following function takes a vector
-    // of strings as second argument, whereas the one which we have used in
-    // all previous examples accepted a string there. In fact, the latter
-    // function is only a shortcut for the function which we call here: it
-    // puts the single string that is passed to it into a vector of strings
-    // with only one element and forwards that to the other function.
+    // After setting up the names for the different components of the
+    // solution vector, we can add the solution vector to the list of
+    // data vectors scheduled for output. Note that the following
+    // function takes a vector of strings as second argument, whereas
+    // the one which we have used in all previous examples accepted a
+    // string there. (In fact, the function we had used before would
+    // convert the single string into a vector with only one element
+    // and forwards that to the other function.)
     data_out.add_data_vector (solution, solution_names);
     data_out.build_patches ();
+
+    std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
     data_out.write_vtk (output);
   }
 
