@@ -15,7 +15,7 @@
 
 
 // Test Chebyshev filter on Diagonal matrix with equidistance eigenvalues in (-1,1).
-// Example is taken from Seciton 2.2. in
+// Example is taken from Section 2.2. in
 // Pieper et al, Journal of Computational Physics 325 (2016), 226-243
 //
 // The test exploits the fact that:

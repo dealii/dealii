@@ -52,7 +52,7 @@ void test ()
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
   deallog << "Number of entries: " << sp.n_nonzero_elements() << std::endl;
   deallog << "Number of rows: " << sp.n_rows() << std::endl;
-  deallog << "Number of colums: " << sp.n_cols() << std::endl;
+  deallog << "Number of columns: " << sp.n_cols() << std::endl;
 
   deallog << "Checks: ";
   IndexSet stored_rows = sp.locally_owned_range_indices();

@@ -176,7 +176,7 @@ double NeumanBC<dim>::get_c() const
 }
 
 // helper function to get diagonal and
-// area of the squared element with lenght h
+// area of the squared element with length h
 template <int dim>
 void get_h_area(double &h, double &a, const double L);
 

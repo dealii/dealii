@@ -78,7 +78,7 @@ void check()
 
     //All selected
     ComponentMask component_mask1(dim+1, true);
-    //Partially selecetd
+    //Partially selected
     ComponentMask component_mask2(dim+1, true);
     component_mask2.set(dim, false);
 
@@ -94,7 +94,7 @@ void check()
 
     //All selected
     ComponentMask component_mask1(dim+1, true);
-    //Partially selecetd
+    //Partially selected
     ComponentMask component_mask2(dim+1, true);
     component_mask2.set(dim, false);
 

@@ -35,7 +35,7 @@ namespace internal
      *
      * If @p skip_interface_dofs is false, the mapping will also contain
      * DoFs at the interface between levels. This is desirable when
-     * transfering solution vectors instead of residuals.
+     * transferring solution vectors instead of residuals.
      */
     template <int dim, int spacedim>
     void fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,

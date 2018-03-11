@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check LinearAlgebra::CUDAWrappers::Vector assignement and import
+// Check LinearAlgebra::CUDAWrappers::Vector assignment and import
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>

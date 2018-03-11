@@ -21,7 +21,7 @@
 #include <iostream>
 #include <vector>
 
-// Check LinearAlgebra::EpetraWrappers::Vector assignement and import
+// Check LinearAlgebra::EpetraWrappers::Vector assignment and import
 
 
 void test()

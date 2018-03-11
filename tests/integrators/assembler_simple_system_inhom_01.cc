@@ -564,7 +564,7 @@ void MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
 }
 
 /*
- * Assemble matrix and vector seperately
+ * Assemble matrix and vector separately
  */
 template <int dim>
 void MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()

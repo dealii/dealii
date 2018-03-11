@@ -55,12 +55,12 @@ int main (int argc, char **argv)
 
     TrilinosWrappers::MPI::BlockVector v;
     v = u;
-    PRINTBLOCK("copy assignemnt", v);
+    PRINTBLOCK("copy assignment", v);
     PRINTBLOCK("old object", u);
 
     v.reinit(0);
     v = std::move(u);
-    PRINTBLOCK("move assignemnt", v);
+    PRINTBLOCK("move assignment", v);
     deallog << "old object size: " << u.n_blocks() << std::endl;
   }
 }

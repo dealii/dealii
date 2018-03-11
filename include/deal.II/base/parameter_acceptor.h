@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A parameter acceptor base class. This class is used to define a public
- * interface for classes wich want to use a single global ParameterHandler to
+ * interface for classes which want to use a single global ParameterHandler to
  * handle parameters. This class declares one static ParameterHandler, and two
  * static functions (declare_all_parameters() and parse_all_parameters()) that
  * manage all of the derived classes.
@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * ParameterAcceptor::declare_parameters() for each of the registered classes,
  * reads the file `file.prm` and subsequently calls the method
  * ParameterAcceptor::parse_parameters(), again for each of the registered
- * classes. The method log_info() can be used to extract informations about the
+ * classes. The method log_info() can be used to extract information about the
  * classes that have been derived from ParameterAcceptor, and that will be
  * parsed when calling ParameterAcceptor::initialize().
  *
@@ -362,7 +362,7 @@ public:
    * default values, and don't want to read external files to use a class
    * derived from ParameterAcceptor.
    *
-   * If outfilename is not the emtpy string, then write the content that was
+   * If outfilename is not the empty string, then write the content that was
    * read in to the outfilename. The format of both input and output files are
    * selected using the extensions of the files themselves. This can be either
    * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check MGTransferBlockMatrixFree::copy_[from|to]_mg by comparision to non-block
+// check MGTransferBlockMatrixFree::copy_[from|to]_mg by comparison to non-block
 // MGTransferMatrixFree
 
 #include "../tests.h"

@@ -599,7 +599,7 @@ public:
  *
  * For finite elements based on quadrilaterals and hexahedra, a QSimplex
  * quadrature formula is not very useful on its own. This class is typically
- * used in conjuction with other classes, like QSplit, to patch the reference
+ * used in conjunction with other classes, like QSplit, to patch the reference
  * element using several QSimplex quadrature formulas.
  *
  * Such quadrature formulas are useful to integrate functions with
@@ -711,7 +711,7 @@ public:
  * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
  * Such transformation maps the reference square $[0,1]\times[0,1]$ to the
  * reference simplex, by collapsing the left side of the square and squeezing
- * quadrature points towards the orgin, and then shearing the resulting
+ * quadrature points towards the origin, and then shearing the resulting
  * triangle to the reference one. This transformation shows good convergence
  * properties when $\beta = 1$ with singularities of order $1/R$ in the origin,
  * but different $\beta$ values can be selected to increase convergence and/or

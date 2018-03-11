@@ -6,7 +6,7 @@ DEAL::SP::is_compressed(): 0
 DEAL::SP::is_compressed(): 1
 DEAL::Number of entries: 11
 DEAL::Number of rows: 5
-DEAL::Number of colums: 7
+DEAL::Number of columns: 7
 DEAL::Local size: 5
 DEAL::Max row length: 3
 DEAL::SP::row_length(0): 2

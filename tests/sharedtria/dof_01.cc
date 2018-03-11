@@ -91,7 +91,7 @@ void test()
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
 
-      // avoid outputing any partitioning info until Parmetis gives reproducable results
+      // avoid outputting any partitioning info until Parmetis gives reproducible results
       deallog
           << "n_dofs: " << dof_handler.n_dofs() << std::endl;
 //          << "n_locally_owned_dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;

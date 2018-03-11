@@ -159,7 +159,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
             << "\tquadrature_formula.size(): " << quadrature_formula.size()
             << std::endl;
 
-  // constant stress and constant gamma distribution accross cell
+  // constant stress and constant gamma distribution across cell
   const double stress_value = 125.0;
   const double gamma_value = 1.0;
 

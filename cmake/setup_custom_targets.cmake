@@ -33,7 +33,7 @@ IF("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
     ADD_CUSTOM_TARGET(${_name})
   ENDMACRO()
 
-  # Print precise informations about the convenience targets:
+  # Print precise information about the convenience targets:
   SET(_description_string "build")
 ELSE()
   MACRO(_add_custom_target _name)
@@ -45,7 +45,7 @@ ELSE()
       )
   ENDMACRO()
 
-  # Print precise informations about the convenience targets:
+  # Print precise information about the convenience targets:
   SET(_description_string "build and install")
 ENDIF()
 

@@ -135,7 +135,7 @@ namespace CUDAWrappers
 
     /**
      * Write a value to the field containing the values on quadrature points
-     * with component @p q_point. Access to the same fiels as through @p
+     * with component @p q_point. Access to the same fields as through @p
      * get_value(), This specifies the value which is tested by all basis
      * function on the current cell and integrated over.
      */

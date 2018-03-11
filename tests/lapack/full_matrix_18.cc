@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::invert() wth SPD Cholesky by comparing to FullMatrix
+// test LAPACKFullMatrix::invert() with SPD Cholesky by comparing to FullMatrix
 
 #include "../tests.h"
 #include "create_matrix.h"

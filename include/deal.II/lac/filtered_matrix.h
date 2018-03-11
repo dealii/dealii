@@ -442,7 +442,7 @@ public:
    *
    * @note The result vector of this multiplication will have the constraint
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
-   * We excpect that in most cases this is the required behavior.
+   * We expect that in most cases this is the required behavior.
    */
   void vmult_add (VectorType       &dst,
                   const VectorType &src) const;
@@ -452,7 +452,7 @@ public:
    *
    * @note The result vector of this multiplication will have the constraint
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
-   * We excpect that in most cases this is the required behavior.
+   * We expect that in most cases this is the required behavior.
    */
   void Tvmult_add (VectorType       &dst,
                    const VectorType &src) const;

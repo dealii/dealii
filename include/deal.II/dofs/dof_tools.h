@@ -1185,7 +1185,7 @@ namespace DoFTools
    * respecting the relative orientation of the two faces.
    *
    * @note: This function is a convenience wrapper. It internally calls
-   * GridTools::collect_periodic_faces() with the supplied paramaters and
+   * GridTools::collect_periodic_faces() with the supplied parameters and
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *
@@ -1223,7 +1223,7 @@ namespace DoFTools
    * @ref GlossFaceOrientation "standard orientation".
    *
    * @note: This function is a convenience wrapper. It internally calls
-   * GridTools::collect_periodic_faces() with the supplied paramaters and
+   * GridTools::collect_periodic_faces() with the supplied parameters and
    * feeds the output to above make_periodicity_constraints() variant. If you
    * need more functionality use GridTools::collect_periodic_faces() directly.
    *

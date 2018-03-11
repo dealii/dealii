@@ -116,7 +116,7 @@
 #   )
 #
 # SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
-#   "Set the rpath of the library to the external link pathes on installation"
+#   "Set the rpath of the library to the external link paths on installation"
 #   )
 #
 # SET(DEAL_II_WITH_64BIT_INDICES "OFF" CACHE BOOL
@@ -582,7 +582,7 @@
 #
 # Platform introspection:
 #
-# deal.II has some platform dependend tests and configuration options.
+# deal.II has some platform dependent tests and configuration options.
 # They can be enabled/disabled with DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 # (see above)
 #

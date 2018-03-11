@@ -164,7 +164,7 @@ check ()
       this_error *= scaling_factor;
 
       // copy the result into error2. since
-      // every invokation of the kelly
+      // every invocation of the kelly
       // estimator should only operate on
       // the cells of one subdomain,
       // whenever there is something in

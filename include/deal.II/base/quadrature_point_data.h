@@ -529,7 +529,7 @@ void CellDataStorage<CellIteratorType,DataType>::clear()
   auto it = map.begin();
   while (it != map.end())
     {
-      // loop over all objects and see if noone is using them
+      // loop over all objects and see if no one is using them
       for (unsigned int i = 0; i < it->second.size(); i++)
         {
           Assert(it->second[i].unique(),

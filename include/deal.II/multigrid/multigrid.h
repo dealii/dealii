@@ -293,7 +293,7 @@ private:
   SmartPointer<const MGCoarseGridBase<VectorType>,Multigrid<VectorType> > coarse;
 
   /**
-   * Object for grid tranfer.
+   * Object for grid transfer.
    */
   SmartPointer<const MGTransferBase<VectorType>,Multigrid<VectorType> > transfer;
 
@@ -461,7 +461,7 @@ private:
   SmartPointer<Multigrid<VectorType>,PreconditionMG<dim,VectorType,TRANSFER> > multigrid;
 
   /**
-   * Object for grid tranfer.
+   * Object for grid transfer.
    */
   SmartPointer<const TRANSFER,PreconditionMG<dim,VectorType,TRANSFER> > transfer;
 

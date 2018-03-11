@@ -4081,7 +4081,7 @@ inline
 std::ostream &operator << (std::ostream &out,
                            const SymmetricTensor<2,dim,Number> &t)
 {
-  //make out lives a bit simpler by outputing
+  //make our lives a bit simpler by outputting
   //the tensor through the operator for the
   //general Tensor class
   Tensor<2,dim,Number> tt;
@@ -4109,7 +4109,7 @@ inline
 std::ostream &operator << (std::ostream &out,
                            const SymmetricTensor<4,dim,Number> &t)
 {
-  //make out lives a bit simpler by outputing
+  //make our lives a bit simpler by outputting
   //the tensor through the operator for the
   //general Tensor class
   Tensor<4,dim,Number> tt;

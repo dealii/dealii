@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Test the ouput of MatrixFree::is_supported for various FiniteElements
+// Test the output of MatrixFree::is_supported for various FiniteElements
 
 #include "../tests.h"
 

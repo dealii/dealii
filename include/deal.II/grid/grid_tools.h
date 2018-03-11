@@ -2378,12 +2378,12 @@ namespace GridTools
   struct CellDataTransferBuffer
   {
     /**
-     * A vector to store IDs of cells to be transfered.
+     * A vector to store IDs of cells to be transferred.
      */
     std::vector<CellId> cell_ids;
 
     /**
-     * A vector of cell data to be transfered.
+     * A vector of cell data to be transferred.
      */
     std::vector<T> data;
 

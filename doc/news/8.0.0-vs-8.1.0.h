@@ -599,7 +599,7 @@ inconvenience this causes.
   </li>
 
   <li>
-  Fixed: SolutionTransfer used to crash whenever one transfered in the hp
+  Fixed: SolutionTransfer used to crash whenever one transferred in the hp
   context between cells that use FE_Nothing and FE_Q. This is now fixed.
   <br>
   (Krzyszof Bzowski, Wolfgang Bangerth, 2013/08/18)

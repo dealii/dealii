@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check DoFRenumbering::hierachical changes nothing for a regular refined mesh
+// Check DoFRenumbering::hierarchical changes nothing for a regular refined mesh
 
 #include "../tests.h"
 #include <deal.II/base/function_lib.h>

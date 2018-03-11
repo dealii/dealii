@@ -283,7 +283,7 @@ unsigned int checksum(const IT &begin, const IT &end)
 
 
 /*
- * Replace all occurences of ' &' by '& ' from the given file to hopefully be
+ * Replace all occurrences of ' &' by '& ' from the given file to hopefully be
  * more compiler independent with respect to __PRETTY_FUNCTION__
  *
  * Also, while GCC prepends the name by "virtual " if the function is virtual,

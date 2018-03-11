@@ -188,7 +188,7 @@ namespace FETools
       // Problem: The function extrapolates a polynomial
       // function from a finer mesh of size $h$ to a polynmial
       // function of higher degree but on a coarser mesh of
-      // size $2h$. Therefor the mesh has to consist of patches
+      // size $2h$. Therefore the mesh has to consist of patches
       // of four (2d) or eight (3d) cells and the function requires
       // that the mesh is refined globally at least once.
       // The algorithm starts on the coarsest level of the grid,

@@ -172,7 +172,7 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
-     * @p precondtioner are an operator.
+     * @p preconditioner are an operator.
      * This function can be used when both <tt>A</tt> and the @p preconditioner
      * are LinearOperators derived from a TrilinosPayload.
      * Depending on the information provided by derived classes and the object
@@ -202,7 +202,7 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
-     * @p precondtioner are an operator, and the vectors @p x and @p b are
+     * @p preconditioner are an operator, and the vectors @p x and @p b are
      * native Trilinos vector types.
      * This function can be used when both <tt>A</tt> and the @p preconditioner
      * are LinearOperators derived from a TrilinosPayload.

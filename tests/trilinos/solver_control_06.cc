@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
   problem.run();
 
   // Trilinos dumps the output into std::cout
-  // We catch this output and it is written to the stdout logile
+  // We catch this output and it is written to the stdout logfile
   // Since we're interested in this output we read it back in and
   // write parts of it to the logstream
   std::ifstream inputfile;

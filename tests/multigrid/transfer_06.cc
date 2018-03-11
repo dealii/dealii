@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check MGTransferBlockMatrixFree::copy_[from|to]_mg by comparision to non-block
+// check MGTransferBlockMatrixFree::copy_[from|to]_mg by comparison to non-block
 // MGTransferMatrixFree. This is similar to transfer_05 but using
 // a separate DoFHandler for each block
 

@@ -11,7 +11,7 @@ DEAL::[block 1 ]  10.0000 11.0000
 DEAL::[block 2 ]  20.0000 21.0000 
 DEAL::[block 3 ]  30.0000 31.0000 
 DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::Block vector: copy assignemnt:
+DEAL::Block vector: copy assignment:
 DEAL::[block 0 ]  0.00000 1.00000 
 DEAL::[block 1 ]  10.0000 11.0000 
 DEAL::[block 2 ]  20.0000 21.0000 
@@ -23,7 +23,7 @@ DEAL::[block 1 ]  10.0000 11.0000
 DEAL::[block 2 ]  20.0000 21.0000 
 DEAL::[block 3 ]  30.0000 31.0000 
 DEAL::[block 4 ]  40.0000 41.0000 
-DEAL::Block vector: move assignemnt:
+DEAL::Block vector: move assignment:
 DEAL::[block 0 ]  0.00000 1.00000 
 DEAL::[block 1 ]  10.0000 11.0000 
 DEAL::[block 2 ]  20.0000 21.0000 

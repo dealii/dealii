@@ -5,5 +5,5 @@ DEAL::SP::is_compressed(): 0
 DEAL::SP::is_compressed(): 1
 DEAL::Number of entries: 32
 DEAL::Number of rows: 8
-DEAL::Number of colums: 12
+DEAL::Number of columns: 12
 DEAL::Checks: OK

@@ -45,12 +45,12 @@ int main (int argc, char **argv)
 
     TrilinosWrappers::MPI::Vector v;
     v = u;
-    PRINTME("copy assignemnt", v);
+    PRINTME("copy assignment", v);
     PRINTME("old object", u);
 
     v.clear();
     v = std::move(u);
-    PRINTME("move assignemnt", v);
+    PRINTME("move assignment", v);
     deallog << "old object size: " << u.size() << std::endl;
   }
 }

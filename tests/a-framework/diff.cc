@@ -15,7 +15,7 @@
 
 
 
-// test the testsuite framework. this test is supposed to run succesfully
+// test the testsuite framework. this test is supposed to run successfully
 // but to miscompare
 
 #include "../tests.h"

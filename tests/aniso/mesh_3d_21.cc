@@ -129,7 +129,7 @@ void check (Triangulation<3> &tria_org)
 
 
 // perform an additional check: simulate an isotropic refinement of a given cell
-// via several anisotropic refeinements. Then, perfom the usual checks. This
+// via several anisotropic refinements. Then, perform the usual checks. This
 // went wrong at some time, so check that it works now.
 void check2 (Triangulation<3> &orig_tria)
 {

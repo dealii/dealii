@@ -103,7 +103,7 @@ namespace CUDAWrappers
        */
       unsigned int n_colors;
       /**
-       * Parallelization scheme used, parallization over degrees of freedom or
+       * Parallelization scheme used, parallelization over degrees of freedom or
        * over cells.
        */
       ParallelizationScheme parallelization_scheme;
@@ -194,7 +194,7 @@ namespace CUDAWrappers
 
   private:
     /**
-     * Parallelization scheme used, parallization over degrees of freedom or
+     * Parallelization scheme used, parallelization over degrees of freedom or
      * over cells.
      */
     ParallelizationScheme parallelization_scheme;

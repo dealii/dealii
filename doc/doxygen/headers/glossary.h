@@ -1859,7 +1859,7 @@
  *  On the other hand, the Z order corresponds to a particular
  *  depth-first traversal of the tree. Namely: start with a cell, and if it
  *  has children then iterate over these cell's children; this rule is
- *  recursively applied as long as a child has childen.
+ *  recursively applied as long as a child has children.
  *
  *  For the given mesh above, this yields the following order: 0.0 -> 1.0 -> 2.4
  *  -> 2.5 -> 2.6 -> 2.7 -> 1.1 -> 1.2 -> 1.3 -> 1.4 -> 2.0 -> 2.1 -> 2.2 -> 2.3.

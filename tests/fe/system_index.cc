@@ -53,7 +53,7 @@ check_fe(const FiniteElement<dim> &fe)
   for (unsigned int i=0; i<n_dofs; ++i)
     {
       deallog << std::setw(3) << i;
-      // Cehck consistency of
+      // Check consistency of
       // functions and inverse
       std::pair<unsigned int, unsigned int> p;
       if (fe.is_primitive(i))

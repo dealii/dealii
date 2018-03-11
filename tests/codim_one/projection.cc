@@ -15,7 +15,7 @@
 
 
 
-// continous projection of a function on the surface of a hypersphere
+// continuous projection of a function on the surface of a hypersphere
 
 #include "../tests.h"
 
@@ -86,10 +86,10 @@ int main ()
 
   for (unsigned int n=1; n<5; n++)
     {
-      deallog << "Test<1,2>, continous finite element q_" << n << std::endl;
+      deallog << "Test<1,2>, continuous finite element q_" << n << std::endl;
       test<1,2>(SOURCE_DIR "/grids/circle_2.inp",n);
 
-      deallog << "Test<2,3>, continous finite element q_" << n << std::endl;
+      deallog << "Test<2,3>, continuous finite element q_" << n << std::endl;
       test<2,3>(SOURCE_DIR "/grids/sphere_2.inp",n);
     }
   return 0;

@@ -334,7 +334,7 @@
  *   <tr valign="top">
  *       <td>step-39</td>
  *       <td> Solving Poisson's equation once more, this time with the
- *       interior penalty method, one of the discontinous Galerkin
+ *       interior penalty method, one of the discontinuous Galerkin
  *       methods developed for this problem. Error estimator, adaptive
  *       meshes, and multigrid preconditioner, all using the MeshWorker
  *       framework.

@@ -15,7 +15,7 @@
 
 
 
-// test manual repartitioning and transfering data
+// test manual repartitioning and transferring data
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>

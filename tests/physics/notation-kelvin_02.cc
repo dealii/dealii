@@ -73,7 +73,7 @@ void initialize (Tensor<3,dim,Number> &x)
         }
 }
 
-// A specialised constructor mimicing the construction
+// A specialised constructor mimicking the construction
 // of a rank-3 tensor with two symmetric components
 template<int dim, typename Number>
 void initialize (Tensor<3,dim,Number> &x,

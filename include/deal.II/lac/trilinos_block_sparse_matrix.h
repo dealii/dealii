@@ -591,7 +591,7 @@ namespace TrilinosWrappers
        * that the correct Payload type for each subblock has been chosen
        * correctly. Further extensions to the class may be necessary in the
        * future in order to add further functionality to BlockLinearOperators
-       * while retaining compatability with the Trilinos sparse matrix and
+       * while retaining compatibility with the Trilinos sparse matrix and
        * preconditioner classes.
        *
        * @author Jean-Paul Pelteret, 2016

@@ -309,7 +309,7 @@ inconvenience this causes.
 
   <li> <p>New: a configuration parameter <tt>--with-boost</tt> has been
 	introduced, allowing the selection of a previously installed boost
-	library instead of the contibuted.
+	library instead of the contributed.
 	<br>
 	(GK 2006/03/23)
 	</p> 

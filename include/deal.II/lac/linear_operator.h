@@ -266,7 +266,7 @@ public:
    * Initializes a vector v of the Range space to be directly usable as the
    * destination parameter in an application of vmult. Similar to the reinit
    * functions of the vector classes, the boolean determines whether a fast
-   * initalization is done, i.e., if it is set to false the content of the
+   * initialization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
   std::function<void(Range &v, bool omit_zeroing_entries)> reinit_range_vector;
@@ -275,7 +275,7 @@ public:
    * Initializes a vector of the Domain space to be directly usable as the
    * source parameter in an application of vmult. Similar to the reinit
    * functions of the vector classes, the boolean determines whether a fast
-   * initalization is done, i.e., if it is set to false the content of the
+   * initialization is done, i.e., if it is set to false the content of the
    * vector is set to 0.
    */
   std::function<void(Domain &v, bool omit_zeroing_entries)> reinit_domain_vector;
@@ -874,7 +874,7 @@ namespace internal
        * Initializes a vector v of the Range space to be directly usable as
        * the destination parameter in an application of vmult. Similar to the
        * reinit functions of the vector classes, the boolean determines
-       * whether a fast initalization is done, i.e., if it is set to false the
+       * whether a fast initialization is done, i.e., if it is set to false the
        * content of the vector is set to 0.
        *
        * The generic version of this class just calls
@@ -892,7 +892,7 @@ namespace internal
        * Initializes a vector of the Domain space to be directly usable as the
        * source parameter in an application of vmult. Similar to the reinit
        * functions of the vector classes, the boolean determines whether a
-       * fast initalization is done, i.e., if it is set to false the content
+       * fast initialization is done, i.e., if it is set to false the content
        * of the vector is set to 0.
        *
        * The generic version of this class just calls
