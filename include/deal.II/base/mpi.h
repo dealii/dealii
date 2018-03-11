@@ -357,24 +357,45 @@ namespace Utilities
     /**
      * A class that is used to initialize the MPI system at the beginning of a
      * program and to shut it down again at the end. It also allows you to
-     * control the number threads used in each MPI task.
+     * control the number of threads used within each MPI process.
      *
-     * If deal.II is configured with PETSc, the library will be
-     * initialized in the beginning and destroyed at the end automatically
-     * (internally by calling PetscInitialize() and PetscFinalize()).
+     * If deal.II is configured with PETSc, PETSc will be initialized
+     * via `PetscInitialize` in the beginning (constructor of this
+     * class) and de-initialized via `PetscFinalize` at the end (i.e.,
+     * in the destructor of this class). The same is true for SLEPc.
      *
      * If deal.II is configured with p4est, that library will also be
-     * initialized in the beginning, and destroyed at the end automatically
-     * (internally by calling sc_init(), p4est_init(), and sc_finalize()).
+     * initialized in the beginning, and de-initialized at the end
+     * (by calling sc_init(), p4est_init(), and sc_finalize()).
      *
-     * If a program uses MPI one would typically just create an object of this
-     * type at the beginning of <code>main()</code>. The constructor of this
-     * class then runs <code>MPI_Init()</code> with the given arguments. At
-     * the end of the program, the compiler will invoke the destructor of this
-     * object which in turns calls <code>MPI_Finalize</code> to shut down the
-     * MPI system.
+     * If a program uses MPI one would typically just create an object
+     * of this type at the beginning of <code>main()</code>. The
+     * constructor of this class then runs <code>MPI_Init()</code>
+     * with the given arguments and also initializes the other
+     * libraries mentioned above. At the end of the program, the
+     * compiler will invoke the destructor of this object which in
+     * turns calls <code>MPI_Finalize</code> to shut down the MPI
+     * system.
      *
-     * This class is used in step-32, for example.
+     * This class is used in step-17, step-18, step-40, step-32, and
+     * several others.
+     *
+     * @note This class performs initialization of the MPI subsystem
+     * as well as the dependent libraries listed above through the
+     * `MPI_COMM_WORLD` communicator. This means that you will have to
+     * create an MPI_InitFinalize object on <i>all</i> MPI processes,
+     * whether or not you intend to use deal.II on a given
+     * processor. In most use cases, one will of course want to work
+     * on all MPI processes using essentially the same program, and so
+     * this is not an issue. But if you plan to run deal.II-based work
+     * on only a subset of MPI processes, using an @ ref
+     * GlossMPICommunicator "MPI communicator" that is a subset of
+     * `MPI_COMM_WORLD` (for example, in client-server settings where
+     * only a subset of processes is responsible for the finite
+     * element communications and the remaining processes do other
+     * things), then you still need to create this object here on all
+     * MPI processes at the beginning of the program because it uses
+     * `MPI_COMM_WORLD` during initialization.
      */
     class MPI_InitFinalize
     {
