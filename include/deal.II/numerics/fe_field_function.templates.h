@@ -451,13 +451,13 @@ namespace Functions
   {
     // Calling the GridTools routine and preparing output
     auto cell_qpoint_map = GridTools::compute_point_locations(cache,points,cell_hint.get());
-    const auto &tria_cells = std::get<0>(cell_qpoint_map);
+    const auto &tria_cells = cell_qpoint_map.cells;
     cells.resize(tria_cells.size());
     unsigned int i = 0;
     for (const auto &c: tria_cells)
       cells[i++] = typename DoFHandlerType::cell_iterator(*c,dh);
-    qpoints = std::get<1>(cell_qpoint_map);
-    maps = std::get<2>(cell_qpoint_map);
+    qpoints = cell_qpoint_map.qpoints;
+    maps = cell_qpoint_map.maps;
     return cells.size();
   }
 
