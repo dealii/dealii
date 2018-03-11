@@ -85,11 +85,22 @@ namespace Utilities
                   << "Can't convert the string " << arg1
                   << " to the desired type");
 
+
+  std::string
+  dealii_version_string ()
+  {
+    return DEAL_II_PACKAGE_NAME " version " DEAL_II_PACKAGE_VERSION;
+  }
+
+
+
   std::string
   int_to_string (const unsigned int value, const unsigned int digits)
   {
     return to_string(value,digits);
   }
+
+
 
   template <typename number>
   std::string

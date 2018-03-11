@@ -61,6 +61,13 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace Utilities
 {
+  /**
+   * Return a string of the form "deal.II version x.y.z" where "x.y.z"
+   * identifies the version of deal.II you are using. This information
+   * is also provided by the DEAL_II_PACKAGE_NAME and
+   * DEAL_II_PACKAGE_VERSION preprocessor variables.
+   */
+  std::string dealii_version_string ();
 
   /**
    * Convert a number @p value to a string, with as many digits as given to
