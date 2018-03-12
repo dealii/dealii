@@ -964,6 +964,15 @@ public:
   virtual void parse_input_from_xml (std::istream &input);
 
   /**
+   * Parse input from a JSON stream to populate known parameter fields. This
+   * could be from a file originally written by the print_parameters() function
+   * using the JSON output style and then modified by hand as necessary, or from
+   * a separate program that knows how to write JSON format for ParameterHandler
+   * input.
+   */
+  virtual void parse_input_from_json (std::istream &input);
+
+  /**
    * Clear all contents.
    */
   void clear ();
@@ -1477,17 +1486,6 @@ private:
    * store indices into this array in order to reference specific actions.
    */
   std::vector<std::function<void (const std::string &)> > actions;
-
-  /**
-   * Mangle a string so that it doesn't contain any special characters or
-   * spaces.
-   */
-  static std::string mangle (const std::string &s);
-
-  /**
-   * Unmangle a string into its original form.
-   */
-  static std::string demangle (const std::string &s);
 
   /**
    * Given a list of directories and subdirectories that identify

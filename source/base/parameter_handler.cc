@@ -46,181 +46,178 @@ ParameterHandler::ParameterHandler ()
 {}
 
 
-
-std::string
-ParameterHandler::mangle (const std::string &s)
+namespace
 {
-  std::string u;
+  std::string
+  mangle (const std::string &s)
+  {
+    std::string u;
 
-  // reserve the minimum number of characters we will need. it may
-  // be more but this is the least we can do
-  u.reserve (s.size());
+    // reserve the minimum number of characters we will need. it may
+    // be more but this is the least we can do
+    u.reserve (s.size());
 
-  // see if the name is special and if so mangle the whole thing
-  const bool mangle_whole_string = (s == "value");
+    // see if the name is special and if so mangle the whole thing
+    const bool mangle_whole_string = (s == "value");
 
-  // for all parts of the string, see
-  // if it is an allowed character or
-  // not
-  for (unsigned int i=0; i<s.size(); ++i)
-    {
-      static const std::string allowed_characters
-      ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    // for all parts of the string, see
+    // if it is an allowed character or
+    // not
+    for (unsigned int i=0; i<s.size(); ++i)
+      {
+        static const std::string allowed_characters
+        ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
-      if ((! mangle_whole_string)
-          &&
-          (allowed_characters.find (s[i]) != std::string::npos))
+        if ((! mangle_whole_string)
+            &&
+            (allowed_characters.find (s[i]) != std::string::npos))
+          u.push_back (s[i]);
+        else
+          {
+            u.push_back ('_');
+            static const char hex[16]
+              = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+            u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
+            u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
+          }
+      }
+
+    return u;
+  }
+
+
+
+  std::string
+  demangle (const std::string &s)
+  {
+    std::string u;
+    u.reserve (s.size());
+
+    for (unsigned int i=0; i<s.size(); ++i)
+      if (s[i] != '_')
         u.push_back (s[i]);
       else
         {
-          u.push_back ('_');
-          static const char hex[16]
-            = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-          u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
-          u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
+          Assert (i+2 < s.size(),
+                  ExcMessage ("Trying to demangle an invalid string."));
+
+          unsigned char c = 0;
+          switch (s[i+1])
+            {
+            case '0':
+              c = 0 * 16;
+              break;
+            case '1':
+              c = 1 * 16;
+              break;
+            case '2':
+              c = 2 * 16;
+              break;
+            case '3':
+              c = 3 * 16;
+              break;
+            case '4':
+              c = 4 * 16;
+              break;
+            case '5':
+              c = 5 * 16;
+              break;
+            case '6':
+              c = 6 * 16;
+              break;
+            case '7':
+              c = 7 * 16;
+              break;
+            case '8':
+              c = 8 * 16;
+              break;
+            case '9':
+              c = 9 * 16;
+              break;
+            case 'a':
+              c = 10 * 16;
+              break;
+            case 'b':
+              c = 11 * 16;
+              break;
+            case 'c':
+              c = 12 * 16;
+              break;
+            case 'd':
+              c = 13 * 16;
+              break;
+            case 'e':
+              c = 14 * 16;
+              break;
+            case 'f':
+              c = 15 * 16;
+              break;
+            default:
+              Assert (false, ExcInternalError());
+            }
+          switch (s[i+2])
+            {
+            case '0':
+              c += 0;
+              break;
+            case '1':
+              c += 1;
+              break;
+            case '2':
+              c += 2;
+              break;
+            case '3':
+              c += 3;
+              break;
+            case '4':
+              c += 4;
+              break;
+            case '5':
+              c += 5;
+              break;
+            case '6':
+              c += 6;
+              break;
+            case '7':
+              c += 7;
+              break;
+            case '8':
+              c += 8;
+              break;
+            case '9':
+              c += 9;
+              break;
+            case 'a':
+              c += 10;
+              break;
+            case 'b':
+              c += 11;
+              break;
+            case 'c':
+              c += 12;
+              break;
+            case 'd':
+              c += 13;
+              break;
+            case 'e':
+              c += 14;
+              break;
+            case 'f':
+              c += 15;
+              break;
+            default:
+              Assert (false, ExcInternalError());
+            }
+
+          u.push_back (static_cast<char>(c));
+
+          // skip the two characters
+          i += 2;
         }
-    }
 
-  return u;
-}
+    return u;
+  }
 
-
-
-std::string
-ParameterHandler::demangle (const std::string &s)
-{
-  std::string u;
-  u.reserve (s.size());
-
-  for (unsigned int i=0; i<s.size(); ++i)
-    if (s[i] != '_')
-      u.push_back (s[i]);
-    else
-      {
-        Assert (i+2 < s.size(),
-                ExcMessage ("Trying to demangle an invalid string."));
-
-        unsigned char c = 0;
-        switch (s[i+1])
-          {
-          case '0':
-            c = 0 * 16;
-            break;
-          case '1':
-            c = 1 * 16;
-            break;
-          case '2':
-            c = 2 * 16;
-            break;
-          case '3':
-            c = 3 * 16;
-            break;
-          case '4':
-            c = 4 * 16;
-            break;
-          case '5':
-            c = 5 * 16;
-            break;
-          case '6':
-            c = 6 * 16;
-            break;
-          case '7':
-            c = 7 * 16;
-            break;
-          case '8':
-            c = 8 * 16;
-            break;
-          case '9':
-            c = 9 * 16;
-            break;
-          case 'a':
-            c = 10 * 16;
-            break;
-          case 'b':
-            c = 11 * 16;
-            break;
-          case 'c':
-            c = 12 * 16;
-            break;
-          case 'd':
-            c = 13 * 16;
-            break;
-          case 'e':
-            c = 14 * 16;
-            break;
-          case 'f':
-            c = 15 * 16;
-            break;
-          default:
-            Assert (false, ExcInternalError());
-          }
-        switch (s[i+2])
-          {
-          case '0':
-            c += 0;
-            break;
-          case '1':
-            c += 1;
-            break;
-          case '2':
-            c += 2;
-            break;
-          case '3':
-            c += 3;
-            break;
-          case '4':
-            c += 4;
-            break;
-          case '5':
-            c += 5;
-            break;
-          case '6':
-            c += 6;
-            break;
-          case '7':
-            c += 7;
-            break;
-          case '8':
-            c += 8;
-            break;
-          case '9':
-            c += 9;
-            break;
-          case 'a':
-            c += 10;
-            break;
-          case 'b':
-            c += 11;
-            break;
-          case 'c':
-            c += 12;
-            break;
-          case 'd':
-            c += 13;
-            break;
-          case 'e':
-            c += 14;
-            break;
-          case 'f':
-            c += 15;
-            break;
-          default:
-            Assert (false, ExcInternalError());
-          }
-
-        u.push_back (static_cast<char>(c));
-
-        // skip the two characters
-        i += 2;
-      }
-
-  return u;
-}
-
-
-
-namespace
-{
   /**
    * Return whether a given node is a parameter node (as opposed
    * to being a subsection or alias node)
@@ -580,6 +577,21 @@ void ParameterHandler::parse_input_from_xml (std::istream &in)
   &my_entries = single_node_tree.get_child("ParameterHandler");
 
   read_xml_recursively (my_entries, "", path_separator, patterns, *entries);
+}
+
+
+void ParameterHandler::parse_input_from_json (std::istream &in)
+{
+  AssertThrow(in, ExcIO());
+
+  boost::property_tree::ptree node_tree;
+  // This boost function will raise an exception if this is not a valid JSON
+  // file.
+  read_json (in, node_tree);
+
+  // The xml function is reused to read in the xml into the paramter file.
+  // This means that only mangled files can be read.
+  read_xml_recursively (node_tree, "", path_separator, patterns, *entries);
 }
 
 
