@@ -3677,22 +3677,15 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  std::tuple<
-  std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
-      std::vector< std::vector< Point<dim> > >,
-      std::vector< std::vector<unsigned int> > >
-      compute_point_locations(const Cache<dim,spacedim>                 &cache,
-                              const std::vector<Point<spacedim> >       &points,
-                              const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint)
+  PointLocations<dim, spacedim>
+  compute_point_locations(const Cache<dim,spacedim>                 &cache,
+                          const std::vector<Point<spacedim> >       &points,
+                          const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint)
   {
     // How many points are here?
     const unsigned int np = points.size();
 
-    std::tuple<
-    std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
-        std::vector< std::vector< Point<dim> > >,
-        std::vector< std::vector<unsigned int> > >
-        cell_qpoint_map;
+    PointLocations<dim, spacedim> cell_qpoint_map;
 
     // Now the easy case.
     if (np==0) return cell_qpoint_map;
@@ -3707,15 +3700,15 @@ next_cell:
       my_pair = GridTools::find_active_cell_around_point
                 (cache, points[0]);
 
-    std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
-    std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
-    std::get<2>(cell_qpoint_map).emplace_back(1, 0);
+    cell_qpoint_map.cells.emplace_back(my_pair.first);
+    cell_qpoint_map.qpoints.emplace_back(1, my_pair.second);
+    cell_qpoint_map.maps.emplace_back(1, 0);
 
     // Now the second easy case.
     if (np==1) return cell_qpoint_map;
     // Computing the cell center and diameter
-    Point<spacedim> cell_center = std::get<0>(cell_qpoint_map)[0]->center();
-    double cell_diameter = std::get<0>(cell_qpoint_map)[0]->diameter()*
+    Point<spacedim> cell_center = cell_qpoint_map.cells[0]->center();
+    double cell_diameter = cell_qpoint_map.cells[0]->diameter()*
                            (0.5 + std::numeric_limits<double>::epsilon() );
 
     // Cycle over all points left
@@ -3725,54 +3718,54 @@ next_cell:
         // case calling find active cell with a cell hint
         if ( cell_center.distance(points[p]) < cell_diameter )
           my_pair  = GridTools::find_active_cell_around_point
-                     (cache, points[p],std::get<0>(cell_qpoint_map).back());
+                     (cache, points[p],cell_qpoint_map.cells.back());
         else
           my_pair  = GridTools::find_active_cell_around_point
                      (cache, points[p]);
 
         // Assuming the cell is probably the last cell added
-        if ( my_pair.first == std::get<0>(cell_qpoint_map).back() )
+        if ( my_pair.first == cell_qpoint_map.cells.back() )
           {
             // Found in the last cell: adding the data
-            std::get<1>(cell_qpoint_map).back().emplace_back(my_pair.second);
-            std::get<2>(cell_qpoint_map).back().emplace_back(p);
+            cell_qpoint_map.qpoints.back().emplace_back(my_pair.second);
+            cell_qpoint_map.maps.back().emplace_back(p);
           }
         else
           {
             // Check if it is in another cell already found
             typename std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>::iterator
-            cells_it = std::find(std::get<0>(cell_qpoint_map).begin(),std::get<0>(cell_qpoint_map).end()-1,my_pair.first);
+            cells_it = std::find(cell_qpoint_map.cells.begin(),cell_qpoint_map.cells.end()-1,my_pair.first);
 
-            if ( cells_it == std::get<0>(cell_qpoint_map).end()-1 )
+            if ( cells_it == cell_qpoint_map.cells.end()-1 )
               {
                 // Cell not found: adding a new cell
-                std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
-                std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
-                std::get<2>(cell_qpoint_map).emplace_back(1, p);
+                cell_qpoint_map.cells.emplace_back(my_pair.first);
+                cell_qpoint_map.qpoints.emplace_back(1, my_pair.second);
+                cell_qpoint_map.maps.emplace_back(1, p);
                 // Updating center and radius of the cell
-                cell_center = std::get<0>(cell_qpoint_map).back()->center();
-                cell_diameter = std::get<0>(cell_qpoint_map).back()->diameter()*
+                cell_center = cell_qpoint_map.cells.back()->center();
+                cell_diameter = cell_qpoint_map.cells.back()->diameter()*
                                 (0.5 + std::numeric_limits<double>::epsilon() );
               }
             else
               {
-                unsigned int current_cell = cells_it - std::get<0>(cell_qpoint_map).begin();
+                unsigned int current_cell = cells_it - cell_qpoint_map.cells.begin();
                 // Cell found: just adding the point index and qpoint to the list
-                std::get<1>(cell_qpoint_map)[current_cell].emplace_back(my_pair.second);
-                std::get<2>(cell_qpoint_map)[current_cell].emplace_back(p);
+                cell_qpoint_map.qpoints[current_cell].emplace_back(my_pair.second);
+                cell_qpoint_map.maps[current_cell].emplace_back(p);
               }
           }
       }
 
     // Debug Checking
-    Assert(std::get<0>(cell_qpoint_map).size() == std::get<2>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(), std::get<2>(cell_qpoint_map).size()));
+    Assert(cell_qpoint_map.cells.size() == cell_qpoint_map.maps.size(),
+           ExcDimensionMismatch(cell_qpoint_map.cells.size(), cell_qpoint_map.maps.size()));
 
-    Assert(std::get<0>(cell_qpoint_map).size() == std::get<1>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(), std::get<1>(cell_qpoint_map).size()));
+    Assert(cell_qpoint_map.cells.size() == cell_qpoint_map.qpoints.size(),
+           ExcDimensionMismatch(cell_qpoint_map.cells.size(), cell_qpoint_map.qpoints.size()));
 
 #ifdef DEBUG
-    unsigned int c = std::get<0>(cell_qpoint_map).size();
+    unsigned int c = cell_qpoint_map.cells.size();
     unsigned int qps = 0;
     // The number of points in all
     // the cells must be the same as
@@ -3780,11 +3773,11 @@ next_cell:
     // started off from.
     for (unsigned int n=0; n<c; ++n)
       {
-        Assert(std::get<1>(cell_qpoint_map)[n].size() ==
-               std::get<2>(cell_qpoint_map)[n].size(),
-               ExcDimensionMismatch(std::get<1>(cell_qpoint_map)[n].size(),
-                                    std::get<2>(cell_qpoint_map)[n].size()));
-        qps += std::get<1>(cell_qpoint_map)[n].size();
+        Assert(cell_qpoint_map.qpoints[n].size() ==
+               cell_qpoint_map.maps[n].size(),
+               ExcDimensionMismatch(cell_qpoint_map.qpoints[n].size(),
+                                    cell_qpoint_map.maps[n].size()));
+        qps += cell_qpoint_map.qpoints[n].size();
       }
     Assert(qps == np,
            ExcDimensionMismatch(qps, np));
@@ -4143,31 +4136,18 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  std::tuple<
-  std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
-      std::vector< std::vector< Point<dim> > >,
-      std::vector< std::vector< unsigned int > >,
-      std::vector< std::vector< Point<spacedim> > >,
-      std::vector< std::vector< unsigned int > >
-      >
-      distributed_compute_point_locations
-      (const GridTools::Cache<dim,spacedim>                &cache,
-       const std::vector<Point<spacedim> >                 &local_points,
-       const std::vector< BoundingBox<spacedim> >          &local_bbox)
+  DistributedPointLocations<dim, spacedim>
+  distributed_compute_point_locations
+  (const GridTools::Cache<dim,spacedim>                &cache,
+   const std::vector<Point<spacedim> >                 &local_points,
+   const std::vector< BoundingBox<spacedim> >          &local_bbox)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)cache;
     (void)local_points;
     (void)local_bbox;
     Assert(false, ExcMessage("GridTools::distributed_compute_point_locations() requires MPI."));
-    std::tuple<
-    std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
-        std::vector< std::vector< Point<dim> > >,
-        std::vector< std::vector< unsigned int > >,
-        std::vector< std::vector< Point<spacedim> > >,
-        std::vector< std::vector< unsigned int > >
-        > tup;
-    return tup;
+    return {};
 #else
     // Recovering the mpi communicator used to create the triangulation
     const auto &tria_mpi =
@@ -4176,13 +4156,7 @@ next_cell:
     Assert(tria_mpi, ExcMessage("GridTools::distributed_compute_point_locations() requires a parallel triangulation."));
     auto mpi_communicator = tria_mpi->get_communicator();
     // Preparing the output tuple
-    std::tuple<
-    std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
-        std::vector< std::vector< Point<dim> > >,
-        std::vector< std::vector< unsigned int > >,
-        std::vector< std::vector< Point<spacedim> > >,
-        std::vector< std::vector< unsigned int > >
-        >                                                           output_tuple;
+    DistributedPointLocations<dim, spacedim> output_tuple;
 
     // Preparing the temporary unordered map
     std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -4341,11 +4315,11 @@ next_cell:
     // Copying data from the unordered map to the tuple
     // and returning output
     unsigned int size_output = temporary_unmap.size();
-    auto &out_cells   = std::get<0>(output_tuple);
-    auto &out_qpoints = std::get<1>(output_tuple);
-    auto &out_maps    = std::get<2>(output_tuple);
-    auto &out_points  = std::get<3>(output_tuple);
-    auto &out_ranks   = std::get<4>(output_tuple);
+    auto &out_cells   = output_tuple.cells;
+    auto &out_qpoints = output_tuple.qpoints;
+    auto &out_maps    = output_tuple.maps;
+    auto &out_points  = output_tuple.points;
+    auto &out_ranks   = output_tuple.owners;
 
     out_cells.resize(size_output);
     out_qpoints.resize(size_output);

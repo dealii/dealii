@@ -69,20 +69,20 @@ void test_compute_pt_loc(unsigned int n_points)
   auto my_pair = GridTools::find_active_cell_around_point
                  (cache, points[0]);
   auto cell_qpoint_map = GridTools::compute_point_locations(cache,points,my_pair.first);
-  size_t n_cells = std::get<0>(cell_qpoint_map).size();
+  size_t n_cells = cell_qpoint_map.cells.size();
 
   deallog << "Points found in " << n_cells << " cells" << std::endl;
 
   // testing if the transformation is correct:
   // For each cell check if the quadrature points in the i-th FE
-  // are the same as std::get<2>(cell_qpoint_map)[i]
-  for (unsigned int i=0; i<std::get<0>(cell_qpoint_map).size(); ++i)
+  // are the same as cell_qpoint_map.maps[i]
+  for (unsigned int i=0; i<cell_qpoint_map.cells.size(); ++i)
     {
-      auto &cell = std::get<0>(cell_qpoint_map)[i];
-      auto &quad = std::get<1>(cell_qpoint_map)[i];
-      auto &local_map = std::get<2>(cell_qpoint_map)[i];
+      auto &cell = cell_qpoint_map.cells[i];
+      auto &quad = cell_qpoint_map.qpoints[i];
+      auto &local_map = cell_qpoint_map.maps[i];
 
-      // Given the std::get<1>(cell_qpoint_map) of the current cell, compute the real points
+      // Given the cell_qpoint_map.qpoints of the current cell, compute the real points
       FEValues<dim> fev(fe, quad, update_quadrature_points);
       fev.reinit(cell);
       const auto &real_quad = fev.get_quadrature_points();

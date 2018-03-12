@@ -310,9 +310,9 @@ namespace Particles
     GridTools::Cache<dim,spacedim> cache(*triangulation, *mapping);
     auto point_locations = GridTools::compute_point_locations(cache, positions);
 
-    auto &cells = std::get<0>(point_locations);
-    auto &local_positions = std::get<1>(point_locations);
-    auto &index_map = std::get<2>(point_locations);
+    auto &cells = point_locations.cells;
+    auto &local_positions = point_locations.qpoints;
+    auto &index_map = point_locations.maps;
 
     if (cells.size() == 0)
       return;

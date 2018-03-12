@@ -366,7 +366,7 @@ namespace GridTools
    * \f]
    * subject to prescribed constraints. The minimizer is obtained by solving the Laplace equation
    * of the dim components of a displacement field that maps the current
-   * domain into one described by @p new_points . Linear finite elements with
+   * domain into one described by @p new_points. Linear finite elements with
    * four Gaussian quadrature points in each direction are used. The difference
    * between the vertex positions specified in @p new_points and their current
    * value in @p tria therefore represents the prescribed values of this
@@ -620,18 +620,36 @@ namespace GridTools
   /*@{*/
 
   /**
+   * This struct provides the return value for the compute_point_locations()
+   * function below.
+   */
+  template <int dim, int spacedim>
+  struct PointLocations
+  {
+    /**
+     * A vector of a vector cells of the all cells
+     * containing at least one of the given points.
+     */
+    std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator > cells;
+
+    /**
+     * A vector of vector of points holding for each cell
+     * the reference positions of all the contained points.
+     */
+    std::vector< std::vector< Point<dim> > > qpoints;
+
+    /**
+     * A vector indices of vector of integers, containing the mapping
+     * between local numbering in qpoints, and global index in points.
+     */
+    std::vector< std::vector<unsigned int> > maps;
+  };
+
+  /**
    * Given a Triangulation's @p cache and a list of @p points create the quadrature rules.
    *
    * @param[in] cache The triangulation's GridTools::Cache .
    * @param[in] points The point's vector.
-   *
-   * @param[out] Tuple containing the following information:
-   *  - Cells, is a vector of a vector cells of the all cells
-   *   containing at least one of the @p points .
-   *  - A vector qpoints of vector of points, containing in @p qpoints[i]
-   *   the reference positions of all points that fall within the cell @P cells[i] .
-   *  - A vector indices of vector of integers, containing the mapping between
-   *   local numbering in qpoints, and global index in points
    *
    * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
    * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
@@ -648,14 +666,52 @@ namespace GridTools
    * @author Giovanni Alzetta, 2017
    */
   template <int dim, int spacedim>
-  std::tuple<
-  std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
-      std::vector< std::vector< Point<dim> > >,
-      std::vector< std::vector<unsigned int> > >
-      compute_point_locations(const Cache<dim,spacedim>                                         &cache,
-                              const std::vector<Point<spacedim> >                               &points,
-                              const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint
-                              = typename Triangulation<dim, spacedim>::active_cell_iterator());
+  PointLocations<dim, spacedim>
+  compute_point_locations(const Cache<dim,spacedim>                                         &cache,
+                          const std::vector<Point<spacedim> >                               &points,
+                          const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint
+                          = typename Triangulation<dim, spacedim>::active_cell_iterator());
+
+  /**
+   * This struct provides the return value for the
+   * distributed_compute_point_locations() function below.
+   */
+  template <int dim, int spacedim>
+  struct DistributedPointLocations
+  {
+    /**
+     * A vector of cells containing at least a point.
+     */
+    std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator > cells;
+
+    /**
+     * A vector of vector of points; holding for each cell
+     * the reference positions of all the contained points.
+     */
+    std::vector< std::vector< Point<dim> > > qpoints;
+
+    /**
+     * A vector of vector of integers containing the mapping between
+     * the numbering in qpoints, and the vector
+     * of local points of the process owning the points.
+     */
+    std::vector< std::vector< unsigned int > > maps;
+
+    /**
+     * A vector of vector of points. <code>points[i][j]</code> is the point
+     * in the real space corresponding to <code>qpoints[i][j]</code>.
+     * Notice that these points are lying on the locally owned part of the mesh;
+     * thus these can be either copies of local points or points received from
+     * other processes, i.e. local points for other processes.
+     */
+    std::vector< std::vector< Point<spacedim> > > points;
+
+    /**
+     * A vector of vectors; <code>owners[i][j]</code> contains the rank of
+     * the process owning the <code>point[i][j]<code>.
+     */
+    std::vector< std::vector< unsigned int > > owners;
+  };
 
   /**
    * Given a @p cache and a list of
@@ -675,22 +731,6 @@ namespace GridTools
    *  GridTools::compute_mesh_predicate_bounding_box
    * @param[out] tuple containing the quadrature information
    *
-   * The elements of the output tuple are:
-   * - cells : a vector of cells of the all cells containing at
-   *  least a point.
-   * - qpoints : a vector of vector of points; containing in @p qpoints[i]
-   *   the reference positions of all points that fall within the cell @P cells[i] .
-   * - maps : a vector of vector of integers, containing the mapping between
-   *  the numbering in qpoints (previous element of the tuple), and the vector
-   *  of local points of the process owning the points.
-   * - points : a vector of vector of points. @p points[i][j] is the point in the
-   *  real space corresponding.
-   *  to @p qpoints[i][j] . Notice @p points are the points lying on the locally
-   *  owned part of the mesh; thus these can be either copies of @p local_points
-   *  or points received from other processes i.e. local_points for other processes
-   * - owners : a vector of vectors; @p owners[i][j] contains the rank of
-   *  the process owning the point[i][j] (previous element of the tuple).
-   *
    * The function uses the triangulation's mpi communicator: for this reason it
    * throws an assert error if the Triangulation is not derived from
    * parallel::Triangulation .
@@ -701,17 +741,11 @@ namespace GridTools
    * @author Giovanni Alzetta, 2017-2018
    */
   template <int dim, int spacedim>
-  std::tuple<
-  std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
-      std::vector< std::vector< Point<dim> > >,
-      std::vector< std::vector< unsigned int > >,
-      std::vector< std::vector< Point<spacedim> > >,
-      std::vector< std::vector< unsigned int > >
-      >
-      distributed_compute_point_locations
-      (const GridTools::Cache<dim,spacedim>                &cache,
-       const std::vector<Point<spacedim> >                 &local_points,
-       const std::vector< BoundingBox<spacedim> >          &local_bbox);
+  DistributedPointLocations<dim, spacedim>
+  distributed_compute_point_locations
+  (const GridTools::Cache<dim,spacedim>                &cache,
+   const std::vector<Point<spacedim> >                 &local_points,
+   const std::vector< BoundingBox<spacedim> >          &local_bbox);
 
   /**
    * Return a map of index:Point<spacedim>, containing the used vertices of the

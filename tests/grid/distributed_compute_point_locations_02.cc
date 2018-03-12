@@ -125,10 +125,10 @@ void test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
   auto output_tuple = distributed_compute_point_locations
                       (cache,loc_owned_points,local_bbox);
   deallog << "Comparing results" << std::endl;
-  const auto &output_cells = std::get<0>(output_tuple);
-  const auto &output_qpoints = std::get<1>(output_tuple);
-  const auto &output_points = std::get<3>(output_tuple);
-  const auto &output_ranks = std::get<4>(output_tuple);
+  const auto &output_cells = output_tuple.cells;
+  const auto &output_qpoints = output_tuple.qpoints;
+  const auto &output_points = output_tuple.points;
+  const auto &output_ranks = output_tuple.owners;
 
   // Comparing the output with the previously computed computed result
   bool test_passed = true;
