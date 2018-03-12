@@ -625,7 +625,7 @@ namespace GridTools
    * @param[in] cache The triangulation's GridTools::Cache .
    * @param[in] points The point's vector.
    *
-   * @param[out] Tuple containing the following information:
+   * @return A tuple containing the following information:
    *  - Cells, is a vector of a vector cells of the all cells
    *   containing at least one of the @p points .
    *  - A vector qpoints of vector of points, containing in @p qpoints[i]
@@ -645,13 +645,27 @@ namespace GridTools
    * Pre-sorting points, trying to minimize distances between them, might make the function
    * extremely faster.
    *
+   * @note The actual return type of this function, i.e., the type referenced
+   * above as @p return_type, is
+   * @code
+   *   std::tuple<
+   *   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
+   *       std::vector< std::vector< Point<dim> > >,
+   *       std::vector< std::vector<unsigned int> > >
+   * @endcode
+   * The type is abbreviated above to improve readability of this page.
+   *
    * @author Giovanni Alzetta, 2017
    */
   template <int dim, int spacedim>
+#ifndef DOXYGEN
   std::tuple<
   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
       std::vector< std::vector< Point<dim> > >,
       std::vector< std::vector<unsigned int> > >
+#else
+  return_type
+#endif
       compute_point_locations(const Cache<dim,spacedim>                                         &cache,
                               const std::vector<Point<spacedim> >                               &points,
                               const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint
@@ -673,7 +687,7 @@ namespace GridTools
    * @param[in] local_bbox the description of the locally owned part of the mesh made
    *  with bounding boxes. It can be obtained from
    *  GridTools::compute_mesh_predicate_bounding_box
-   * @param[out] tuple containing the quadrature information
+   * @return A tuple containing the quadrature information
    *
    * The elements of the output tuple are:
    * - cells : a vector of cells of the all cells containing at
@@ -698,9 +712,23 @@ namespace GridTools
    * In a serial execution the first three elements of the tuple are the same
    * as in GridTools::compute_point_locations .
    *
+   * @note The actual return type of this function, i.e., the type referenced
+   * above as @p return_type, is
+   * @code
+   * std::tuple<
+   *   std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+   *       std::vector< std::vector< Point<dim> > >,
+   *       std::vector< std::vector< unsigned int > >,
+   *       std::vector< std::vector< Point<spacedim> > >,
+   *       std::vector< std::vector< unsigned int > >
+   *       >
+   * @endcode
+   * The type is abbreviated above to improve readability of this page.
+   *
    * @author Giovanni Alzetta, 2017-2018
    */
   template <int dim, int spacedim>
+#ifndef DOXYGEN
   std::tuple<
   std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
       std::vector< std::vector< Point<dim> > >,
@@ -708,6 +736,9 @@ namespace GridTools
       std::vector< std::vector< Point<spacedim> > >,
       std::vector< std::vector< unsigned int > >
       >
+#else
+  return_type
+#endif
       distributed_compute_point_locations
       (const GridTools::Cache<dim,spacedim>                &cache,
        const std::vector<Point<spacedim> >                 &local_points,
@@ -1352,7 +1383,7 @@ namespace GridTools
    *  mesh with a property for each process.
    * @param[in] points Array of points to test.
    *
-   * @param[out] A tuple containing the following information:
+   * @return A tuple containing the following information:
    *  - A vector indicized with ranks of processes. For each rank it contains
    *   a vector of the indices of points it might own.
    *  - A map from the index <code>unsigned int</code> of the point in @p points
@@ -1360,12 +1391,25 @@ namespace GridTools
    *  - A map from the index <code>unsigned int</code> of the point in @p points
    *   to the ranks of the guessed owners.
    *
+   * @note The actual return type of this function, i.e., the type referenced
+   * above as @p return_type, is
+   * @code
+   *   std::tuple< std::vector< std::vector< unsigned int > >,
+   *       std::map< unsigned int, unsigned int>,
+   *       std::map< unsigned int, std::vector< unsigned int > > >
+   * @endcode
+   * The type is abbreviated above to improve readability of this page.
+   *
    * @author Giovanni Alzetta, 2017
    */
   template <int spacedim>
+#ifndef DOXYGEN
   std::tuple< std::vector< std::vector< unsigned int > >,
       std::map< unsigned int, unsigned int>,
       std::map< unsigned int, std::vector< unsigned int > > >
+#else
+  return_type
+#endif
       guess_point_owner (const std::vector< std::vector< BoundingBox<spacedim> > >
                          &global_bboxes,
                          const std::vector< Point<spacedim> >    &points);
