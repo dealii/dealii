@@ -1,0 +1,31 @@
+
+DEAL::dim: 1, spacedim: 1
+DEAL::FE      : FE_Q<1>(1)
+DEAL::Space FE: FESystem<1>[FE_Q<1>(1)^2]
+DEAL::Dofs      : 3
+DEAL::Space dofs: 10
+DEAL::Error on constants: 0.00000
+DEAL::dim: 1, spacedim: 2
+DEAL::FE      : FE_Q<1,2>(1)
+DEAL::Space FE: FESystem<2>[FE_Q<2>(1)^3]
+DEAL::Dofs      : 3
+DEAL::Space dofs: 75
+DEAL::Error on constants: 0.00000
+DEAL::dim: 2, spacedim: 2
+DEAL::FE      : FE_Q<2>(1)
+DEAL::Space FE: FESystem<2>[FE_Q<2>(1)^3]
+DEAL::Dofs      : 9
+DEAL::Space dofs: 75
+DEAL::Error on constants: 1.14304e-15
+DEAL::dim: 2, spacedim: 3
+DEAL::FE      : FE_Q<2,3>(1)
+DEAL::Space FE: FESystem<3>[FE_Q<3>(1)^4]
+DEAL::Dofs      : 9
+DEAL::Space dofs: 500
+DEAL::Error on constants: 7.19507e-16
+DEAL::dim: 3, spacedim: 3
+DEAL::FE      : FE_Q<3>(1)
+DEAL::Space FE: FESystem<3>[FE_Q<3>(1)^4]
+DEAL::Dofs      : 27
+DEAL::Space dofs: 500
+DEAL::Error on constants: 1.07909e-14
