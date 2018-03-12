@@ -579,7 +579,7 @@ namespace Step9
   // seen that assembling in parallel does not take an incredible
   // amount of extra code as long as you diligently describe what the
   // scratch and copy data objects are, and if you define suitable
-  // functios for the local assembly and the copy operation from local
+  // functions for the local assembly and the copy operation from local
   // contributions to global objects. This done, the following will do
   // all the heavy lifting to get these operations done on multiple
   // threads on as many cores as you have in your system:

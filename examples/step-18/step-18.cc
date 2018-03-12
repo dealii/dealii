@@ -348,7 +348,7 @@ namespace Step18
   // good number of more member functions now, which we will explain below.
   //
   // The external interface of the class, however, is unchanged: it has a
-  // public constructor and desctructor, and it has a <code>run</code>
+  // public constructor and destructor, and it has a <code>run</code>
   // function that initiated all the work.
   template <int dim>
   class TopLevel
@@ -1388,7 +1388,7 @@ namespace Step18
 
         // Finally, we write the paraview record, that references all .pvtu files and
         // their respective time. Note that the variable times_and_names is declared
-        // static, so it will retain the entries from the pervious timesteps.
+        // static, so it will retain the entries from the previous timesteps.
         static std::vector<std::pair<double,std::string> > times_and_names;
         times_and_names.push_back (std::pair<double,std::string> (present_time, pvtu_master_filename));
         std::ofstream pvd_output ("solution.pvd");

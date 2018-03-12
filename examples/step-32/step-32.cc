@@ -1171,7 +1171,7 @@ namespace Step32
   // The constructor of the problem is very similar to the constructor in
   // step-31. What is different is the %parallel communication: Trilinos uses
   // a message passing interface (MPI) for data distribution. When entering
-  // the BoussinesqFlowProblem class, we have to decide how the parallization
+  // the BoussinesqFlowProblem class, we have to decide how the parallelization
   // is to be done. We choose a rather simple strategy and let all processors
   // that are running the program work together, specified by the communicator
   // <code>MPI_COMM_WORLD</code>. Next, we create the output stream (as we
@@ -1659,7 +1659,7 @@ namespace Step32
   // concept). Here we chose to keep things simple (keeping in mind that this
   // function is also only called once at the beginning of the program, not in
   // every time step), and generating the right hand side is cheap anyway so
-  // we won't even notice that this part is not parallized by threads.
+  // we won't even notice that this part is not parallelized by threads.
   //
   // Regarding the implementation of inhomogeneous Dirichlet boundary
   // conditions: Since we use the temperature ConstraintMatrix, we could apply

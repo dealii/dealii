@@ -1450,7 +1450,7 @@ namespace DoFTools
     Assert(dof_handler.n_dofs() > 0, ExcInternalError());
 
     // In case this function is executed with parallel::shared::Triangulation
-    // with possibly artifical cells, we need to take "true" subdomain IDs (i.e. without
+    // with possibly artificial cells, we need to take "true" subdomain IDs (i.e. without
     // artificial cells). Otherwise we are good to use subdomain_id as stored
     // in cell->subdomain_id().
     std::vector<types::subdomain_id> cell_owners (dof_handler.get_triangulation().n_active_cells());

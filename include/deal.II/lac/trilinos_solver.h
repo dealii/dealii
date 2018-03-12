@@ -638,14 +638,14 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the
-     * package set in intialize(). Note the matrix is not refactorized during
+     * package set in initialize(). Note the matrix is not refactorized during
      * this call.
      */
     void solve (MPI::Vector &x, const MPI::Vector &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the package set in
-     * intialize() for deal.II's own parallel vectors. Note the matrix is not
+     * initialize() for deal.II's own parallel vectors. Note the matrix is not
      * refactorized during this call.
      */
     void

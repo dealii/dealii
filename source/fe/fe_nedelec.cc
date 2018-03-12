@@ -2013,7 +2013,7 @@ FE_Nedelec<dim>::get_dpo_vector (const unsigned int degree, bool dg)
 // Data field initialization
 //---------------------------------------------------------------------------
 
-// Chech wheter a given shape
+// Check whether a given shape
 // function has support on a
 // given face.
 

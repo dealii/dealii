@@ -704,7 +704,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
             in >> cells.back().vertices[i];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::material_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
@@ -735,7 +735,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
           in >> subcelldata.boundary_lines.back().vertices[0]
              >> subcelldata.boundary_lines.back().vertices[1];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
@@ -776,7 +776,7 @@ void GridIn<dim, spacedim>::read_ucd (std::istream                            &i
              >> subcelldata.boundary_quads.back().vertices[2]
              >> subcelldata.boundary_quads.back().vertices[3];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
@@ -1430,7 +1430,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
           for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
             in >> cells.back().vertices[i];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::material_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to numbers::invalid_material_id-1
@@ -1459,7 +1459,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
           in >> subcelldata.boundary_lines.back().vertices[0]
              >> subcelldata.boundary_lines.back().vertices[1];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1
@@ -1496,7 +1496,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
              >> subcelldata.boundary_quads.back().vertices[2]
              >> subcelldata.boundary_quads.back().vertices[3];
 
-          // to make sure that the cast wont fail
+          // to make sure that the cast won't fail
           Assert(material_id<= std::numeric_limits<types::boundary_id>::max(),
                  ExcIndexRange(material_id,0,std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to numbers::internal_face_boundary_id-1

@@ -40,7 +40,7 @@ namespace python
     PointWrapper(boost::python::list list);
 
     /**
-     * Constructor. Intialize PointWrapper using a Point.
+     * Constructor. Initialize PointWrapper using a Point.
      */
     template <int dim>
     PointWrapper(const Point<dim> &p);

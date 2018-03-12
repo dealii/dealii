@@ -2302,7 +2302,7 @@ namespace TrilinosWrappers
 
 
   // As of now, no particularly neat
-  // ouput is generated in case of
+  // output is generated in case of
   // multiple processors.
   void
   SparseMatrix::print (std::ostream &out,

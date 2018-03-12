@@ -2080,8 +2080,8 @@ namespace Step31
     temperature_solution = tmp[0];
     old_temperature_solution = tmp[1];
 
-    // After the solution has been transfered we then enforce the constraints
-    // on the transfered solution.
+    // After the solution has been transferred we then enforce the constraints
+    // on the transferred solution.
     temperature_constraints.distribute(temperature_solution);
     temperature_constraints.distribute(old_temperature_solution);
 

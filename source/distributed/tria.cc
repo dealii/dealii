@@ -491,7 +491,7 @@ namespace
                 {
                   // no, this child is locally not available in the p4est.
                   // delete all its children but, because this may not be
-                  // successfull, make sure to mark all children recursively
+                  // successful, make sure to mark all children recursively
                   // as not local.
                   delete_all_children<dim,spacedim> (dealii_cell->child(c));
                   dealii_cell->child(c)

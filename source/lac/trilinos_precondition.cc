@@ -720,7 +720,7 @@ namespace TrilinosWrappers
     // What follows just configures a dummy preconditioner that
     // sets up the domain and range maps, as well as the communicator.
     // It is never used as the vmult, Tvmult operations are
-    // given a custom defintion.
+    // given a custom definition.
     // Note: This is only required in order to wrap this
     // preconditioner in a LinearOperator without an exemplar
     // matrix.
