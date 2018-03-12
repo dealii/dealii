@@ -964,11 +964,11 @@ public:
   virtual void parse_input_from_xml (std::istream &input);
 
   /**
-   * Parse input from an JSON stream to populate known parameter fields. This
+   * Parse input from a JSON stream to populate known parameter fields. This
    * could be from a file originally written by the print_parameters() function
-   * using the XML output style and then modified by hand as necessary, or from
-   * a file written using this method and then modified by the graphical
-   * parameter GUI (see the general documentation of this class).
+   * using the JSON output style and then modified by hand as necessary, or from
+   * a separate program that knows how to write JSON format for ParameterHandler
+   * input.
    */
   virtual void parse_input_from_json (std::istream &input);
 
