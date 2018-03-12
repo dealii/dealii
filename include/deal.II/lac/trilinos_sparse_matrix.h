@@ -2403,7 +2403,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          *
          * @note This function will only be operable if the payload has been
-         * initialised with an InverseOperator, or is a wrapper to a preconditioner.
+         * initialized with an InverseOperator, or is a wrapper to a preconditioner.
          * If not, then using this function will lead to an error being thrown.
          * @note The intended operation depends on the status of the internal
          * transpose flag. If this flag is set to true, the result will be
