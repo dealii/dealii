@@ -1,0 +1,3 @@
+SET(TRACK "Experimental")
+SET(MEMORYCHECK TRUE)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/run_testsuite.cmake)
