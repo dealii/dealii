@@ -461,7 +461,7 @@ namespace Utilities
    *  However, the converse does not:
    *  @code
    *    array = Utilities::unpack<double[3]>(buffer);
-   *  @code
+   *  @endcode
    *  This is because C++ does not allow functions to return arrays.
    *  Consequently, there is a separate unpack() function for arrays, see
    *  below.
@@ -489,12 +489,12 @@ namespace Utilities
    *  However, the converse does not:
    *  @code
    *    array = Utilities::unpack<double[3]>(buffer);
-   *  @code
+   *  @endcode
    *  This is because C++ does not allow functions to return arrays.
    *  The current function therefore allows to write
    *  @code
    *    Utilities::unpack(buffer, array);
-   *  @code
+   *  @endcode
    *  Note that unlike the other unpack() function, it is not necessary
    *  to explicitly specify the template arguments since they can be
    *  deduced from the second argument.
