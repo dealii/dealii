@@ -280,7 +280,7 @@ namespace Functions
     // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_values);
-    // Now gather all the informations we need
+    // Now gather all the information we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
         AssertThrow (!cells[i]->is_artificial(),
@@ -343,7 +343,7 @@ namespace Functions
     // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_gradients);
-    // Now gather all the informations we need
+    // Now gather all the information we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
         AssertThrow (!cells[i]->is_artificial(),
@@ -410,7 +410,7 @@ namespace Functions
     // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_hessians);
-    // Now gather all the informations we need
+    // Now gather all the information we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
         AssertThrow (!cells[i]->is_artificial(),

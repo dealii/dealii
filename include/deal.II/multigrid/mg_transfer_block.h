@@ -397,7 +397,7 @@ public:
   /**
    * Transfer a block from a vector on the global grid to multilevel vectors.
    * Only the values for the active degrees of freedom of the block selected are
-   * transfered. In particular, for a globally refined mesh only the finest
+   * transferred. In particular, for a globally refined mesh only the finest
    * level in @p dst is filled as a plain copy of @p src. All the other level
    * objects are left untouched.
    */

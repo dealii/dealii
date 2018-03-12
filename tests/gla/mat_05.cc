@@ -96,7 +96,7 @@ void test ()
   {
     deallog << "* copy_from():" << std::endl;
     typename LA::MPI::SparseMatrix mat2;
-    // PETSc needs a reinit() befor copy_from()
+    // PETSc needs a reinit() before copy_from()
     mat2.reinit (local_active, local_active, csp, MPI_COMM_WORLD);
     mat2.copy_from(mat);
     deallog << "l1-norm: " << mat2.l1_norm() << std::endl;

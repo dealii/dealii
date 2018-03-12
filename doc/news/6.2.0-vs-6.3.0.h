@@ -1036,7 +1036,7 @@ inconvenience this causes.
   <li>
   <p>
   New: The DoFTools::make_sparsity_pattern functions have acquired a
-  new paramater <code>subdomain_id</code>. If a value other than the
+  new parameter <code>subdomain_id</code>. If a value other than the
   default value is passed for it, the function only assembles the
   sparsity pattern on those cells that have the given subdomain id.
   This is useful, for example, in conjunction with the

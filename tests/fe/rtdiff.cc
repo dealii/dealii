@@ -16,7 +16,7 @@
 
 // compare the FE_RaviartThomasNodal and FE_RaviartThomas elements
 
-// compare the shape funcions and shape values after converting to the
+// compare the shape functions and shape values after converting to the
 // same basis.
 
 // Summary: the different Raviart-Thomas implementations use the same
@@ -49,7 +49,7 @@ initialize_node_matrix (const FiniteElement<dim> &other,
 
   const std::vector<Point<dim> > &unit_support_points = nodes.get_generalized_support_points();
 
-  // The curent node functional index
+  // The current node functional index
   unsigned int current = 0;
 
   // For each face and all quadrature

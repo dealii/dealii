@@ -40,7 +40,7 @@ namespace internal
     typedef adouble type;
   };
 
-  // Typedefs for "adub"s are all thats necessary to ensure that no temporary Adol-C types
+  // Typedefs for "adub"s are all that's necessary to ensure that no temporary Adol-C types
   // "adub" are created when a scalar product is performed.
   // If this is not done, then intermediate tensors are filled with unconstructable types.
   template <>

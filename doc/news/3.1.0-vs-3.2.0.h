@@ -97,7 +97,7 @@ All entries are signed with the names of the author.
        classes have been redesigned from scratch to allow also
        elements that depend on the actual cell shape, like
        Raviart-Thomas, BDM or edge elements. We have implemented
-       continuous Lagrange elements up to degree four and discontinous
+       continuous Lagrange elements up to degree four and discontinuous
        Lagrange elements up to degree 10. They can be easily extended
        to higher degree.
        </p>
@@ -567,7 +567,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Removed: The explicite instantiations of <code
+       Removed: The explicit instantiations of <code
        class="class">SparseMatrix&lt;long double&gt;</code> are
        removed as a prerelease of gcc3.0 fails to compile it. A user
        of <code>SparseMatrix&lt;long double&gt;</code>
@@ -725,7 +725,7 @@ All entries are signed with the names of the author.
        Changed: the  <code>GeometryInfo</code> class
        has been reverted from a general template that calculates the
        values of its member variables by recursion/induction to a set
-       of explicitely specialized classes. This seemed necessary since
+       of explicitly specialized classes. This seemed necessary since
        most compilers objected to the old implementation as the
        declaration of the values of the class required knowledge of
        the elements of the class with one lower dimension which was,
@@ -907,7 +907,7 @@ All entries are signed with the names of the author.
        For backward compatibility there exist second versions of
        each of these functions that still don't have a <code
        class="class">Mapping</code> argument. These functions
-       implicitely use a mapping of the class <code
+       implicitly use a mapping of the class <code
        class="class">MappingQ1</code>.
        <br>
        (RH 2001/04/05)
@@ -1016,7 +1016,7 @@ All entries are signed with the names of the author.
        For backward compatibility there exist second versions of
        each of these functions that still don't have a <code
        class="class">Mapping</code> argument. These functions
-       implicitely use a mapping of the class <code
+       implicitly use a mapping of the class <code
        class="class">MappingQ1</code>.
        <br>
        (RH 2001/03/27)
@@ -1154,7 +1154,7 @@ All entries are signed with the names of the author.
   <li> <p>
        Changed: We now unconditionally include
        <code>deal.II/include/grid/tria_accessor.templates.h</code>
-       (which containts some inline functions for triangulation
+       (which contains some inline functions for triangulation
        accessor classes) into 
        <code>deal.II/include/grid/tria_accessor.h</code> to work
        around a problem with gcc3.0 which does not place a copy of

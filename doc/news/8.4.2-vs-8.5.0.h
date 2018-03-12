@@ -1251,7 +1251,7 @@ inconvenience this causes.
  <li>
   New: There is now a function FEEvaluation::JxW() to return the Jacobian
   determinant times the quadrature weight in the matrix-free evaluation
-  routines similary to FEValues.
+  routines similarly to FEValues.
   <br>
   (Martin Kronbichler, 2016/10/14)
  </li>
@@ -1917,7 +1917,7 @@ inconvenience this causes.
 
  <li>
   New: Added New option in the read_ucd function of the GridIn class.
-  A flag can now be assigned to the function, to decide wether the
+  A flag can now be assigned to the function, to decide whether the
   indicators specified in a UCD file should be interpreted as
   boundary_ids or as manifold_ids. This is particularly useful
   when the indicators refer to internal faces, for which

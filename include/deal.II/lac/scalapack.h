@@ -593,7 +593,7 @@ private:
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors.
    * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
-   * or a range of values @p value_limits for the eigenvalues. The funtion will throw an exception
+   * or a range of values @p value_limits for the eigenvalues. The function will throw an exception
    * if both ranges are prescribed (meaning that both ranges differ from the default value)
    * as this ambiguity is prohibited.
    * If successful, the computed eigenvalues are arranged in ascending order.

@@ -3274,7 +3274,7 @@ protected:
    *
    * The flags are stored in a binary format: for each @p true, a @p 1 bit is
    * stored, a @p 0 bit otherwise.  The bits are stored as <tt>unsigned
-   * char</tt>, thus avoiding endianess. They are written to @p out in plain
+   * char</tt>, thus avoiding endianness. They are written to @p out in plain
    * text, thus amounting to 3.6 bits in the output per bits in the input on
    * the average. Other information (magic numbers and number of elements of
    * the input vector) is stored as plain text as well. The format should

@@ -105,7 +105,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p> 
-       Removed: The explicite instantiations of <code
+       Removed: The explicit instantiations of <code
        class="class">SparseMatrix&lt;long double&gt;</code> are removed as a
        prerelease of gcc3.0 fails to compile it. Now the user of <code
        class="class">SparseMatrix&lt;long double&gt;</code> needs to include

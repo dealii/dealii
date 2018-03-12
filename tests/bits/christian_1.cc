@@ -157,7 +157,7 @@ int main()
   both_constraints.close();
   both_constraints.distribute(both_sol);
 
-  // reference output using DataOut to create seperate files
+  // reference output using DataOut to create separate files
   DataOut<2> data_out;
   data_out.attach_dof_handler(dof);
   data_out.add_data_vector(sol, "base");

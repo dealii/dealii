@@ -1006,7 +1006,7 @@ namespace TrilinosWrappers
 
 
   // As of now, no particularly neat
-  // ouput is generated in case of
+  // output is generated in case of
   // multiple processors.
   void
   SparsityPattern::print (std::ostream &out,

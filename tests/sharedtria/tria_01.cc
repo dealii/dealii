@@ -90,7 +90,7 @@ void test()
     deallog << v[i] << " ";
     deallog << std::endl;*/
 
-  // untill parmetis is stable, do not output partitioning
+  // until parmetis is stable, do not output partitioning
   //deallog << "subdomains: ";
   typename  parallel::shared::Triangulation<dim>::active_cell_iterator it=tr.begin_active();
   for (unsigned int index=0; it!=tr.end(); ++it,++index)

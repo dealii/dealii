@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// distibute mg dofs on a shared and distributed mesh and compare
-// Note: this doesnt pass for all meshes since, for some complicated refinement
+// distribute mg dofs on a shared and distributed mesh and compare
+// Note: this doesn't pass for all meshes since, for some complicated refinement
 //       schemes, cells may be traversed in different order in a distributed
 //       triangulation as opposed to a shared triangulation.
 

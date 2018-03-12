@@ -1123,9 +1123,9 @@ public:
    * set as true to view each level of a multilevel method. The input
    * <tt>include_artificial</tt> can be set as true to view the artificial cells for
    * each processor. Each .vtu and .pvtu file will have the attributes subdomain,
-   * level_subdomain, level, and proc_writing. The level value can be used to seperate the
+   * level_subdomain, level, and proc_writing. The level value can be used to separate the
    * image into the view of the grid on each level of a multilevel method and the
-   * proc_writing value can be used to seperate the image into each processor's owned and
+   * proc_writing value can be used to separate the image into each processor's owned and
    * ghost cells.
    * This is accomplished by applying the "warp by scalar" filter in paraview
    * to each of the values. After opening the .pvtu file of a mesh where the input
@@ -1136,7 +1136,7 @@ public:
    * then click Apply. This will give you the following image.
    * @image html write_mesh_vtu_levels.png
    * If the <tt>view_levels</tt> remains at false, thereby only giving the mesh for the active
-   * level, it is enough to seperate the image into the views written by different processors.
+   * level, it is enough to separate the image into the views written by different processors.
    * This is shown in the following image where the <tt>include_artificial</tt> input is set as true.
    * @image html write_mesh_vtu_active.png
    * Note: Depending on the size of the mesh you may need to increase the "Scale Factor" input

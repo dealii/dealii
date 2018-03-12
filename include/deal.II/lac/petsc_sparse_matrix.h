@@ -205,7 +205,7 @@ namespace PETScWrappers
     size_t m() const;
 
     /**
-     * Return the number of coloumns of this matrix.
+     * Return the number of columns of this matrix.
      */
     size_t n() const;
 

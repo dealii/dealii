@@ -240,7 +240,7 @@ public:
    * Release all data that is no more needed once @p build_patches was called
    * and all other transactions for a given parameter value are done.
    *
-   * Couterpart of @p new_parameter_value.
+   * Counterpart of @p new_parameter_value.
    */
   void finish_parameter_value ();
 

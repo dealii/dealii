@@ -472,7 +472,7 @@ namespace PETScWrappers
       // have to count how many of the
       // entries in the sparsity pattern lie
       // in the column area we have locally,
-      // and how many arent. for this, we
+      // and how many aren't. for this, we
       // first have to know which areas are
       // ours
       size_type local_row_start = 0;

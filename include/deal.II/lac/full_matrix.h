@@ -202,7 +202,7 @@ public:
     Accessor accessor;
   };
   /**
-   * @name Constructors and initalization.  See also the base class Table.
+   * @name Constructors and initialization.  See also the base class Table.
    */
 //@{
 

@@ -225,7 +225,7 @@ refinement scheme discussed above.
 <h4>Stabilization</h4>
 
 The numerical scheme we have chosen is not particularly
-stable when the artificial viscosity is samll while is too diffusive when
+stable when the artificial viscosity is small while is too diffusive when
 the artificial viscosity is large. Furthermore, it is known there are more
 advanced techniques to stabilize the solution, for example streamline
 diffusion, least-squares stabilization terms, entropy viscosity.
@@ -260,7 +260,7 @@ faster.
 
 <h4>Cache the explicit part of residual</h4>
 
-The residual calulated in ConservationLaw::assemble_cell_term function
+The residual calculated in ConservationLaw::assemble_cell_term function
 reads 
    $R_i = \left(\frac{\mathbf{w}^{k}_{n+1} - \mathbf{w}_n}{\delta t}
     , \mathbf{z}_i \right)_K  +

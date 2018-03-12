@@ -187,7 +187,7 @@ ParameterAcceptor::get_section_path() const
     Utilities::split_string_list(my_section_name, sep);
 
   // Split string list removes trailing empty strings, but not
-  // preceeding ones. Make sure that if we had an absolute path,
+  // preceding ones. Make sure that if we had an absolute path,
   // we don't store as first section the empty string.
   if (is_absolute)
     sections.erase(sections.begin());

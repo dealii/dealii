@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  * cases they can be used in two dimensions as well, and the third dimension
  * will be set to zero.
  *
- * If you whish to use these tools when the dimension of the space is two, then
+ * If you wish to use these tools when the dimension of the space is two, then
  * make sure your CAD files are actually flat and that all z coordinates are equal
  * to zero, as otherwise you will get many exceptions.
  *
@@ -193,7 +193,7 @@ namespace OpenCASCADE
    * set to true, then the curve will be C2 at all points except the first
    * (where only C1 continuity will be given), and it will be a closed curve.
    *
-   * The curve is garanteed to be at distance @p tolerance from the input
+   * The curve is guaranteed to be at distance @p tolerance from the input
    * points. If the algorithm fails in generating such a curve, an exception
    * is thrown.
    */

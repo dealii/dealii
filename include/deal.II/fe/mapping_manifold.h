@@ -252,7 +252,7 @@ public:
      * we call this function with a Quadrature formula constructed
      * using the vertices of the current cell, and the values of the
      * basis functions of an FE_Q(1) finite element evaluated at the
-     * quadrature point itslef. While the vertices of the cell change
+     * quadrature point itself. While the vertices of the cell change
      * for every cell, the weights can be computed once for each
      * quadrature point. We store this information in the following
      * variable, where the first index runs through the quadrature

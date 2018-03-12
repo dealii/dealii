@@ -88,7 +88,7 @@ void create_triangulation(const unsigned int case_no,
       // vertices 0 and 3 are moved
       // such that the initial guess for the ball
       // (with its diameter as the largest diagonal (between vertices 1-2))
-      // doesnot enclose vertex 3
+      // doesn't enclose vertex 3
       //
       //  y^  2--------+3
       //   |  |        |

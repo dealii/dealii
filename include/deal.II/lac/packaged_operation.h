@@ -573,7 +573,7 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
   PackagedOperation<Range> return_comp;
 
   // ensure to have valid PackagedOperation objects by catching op by value
-  // u is catched by reference
+  // u is caught by reference
 
   return_comp.reinit_vector = [&u](Range &x, bool omit_zeroing_entries)
   {

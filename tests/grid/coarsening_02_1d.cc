@@ -15,7 +15,7 @@
 
 
 
-// Test extracted orginally from coarsening_02 on the
+// Test extracted originally from coarsening_02 on the
 // branch_distributed_grids. we have a triangulation with
 // Triangulation<dim>::limit_level_difference_at_vertices set, but produce a
 // mesh in which this isn't honored

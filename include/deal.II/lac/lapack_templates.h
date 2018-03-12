@@ -615,7 +615,7 @@ potrf (const char *uplo, const types::blas_int *n, float *A, const types::blas_i
 
 
 
-/// Tempalte wrapper for trcon
+/// Template wrapper for trcon
 template <typename number>
 inline void
 trcon(const char * /*norm*/, const char * /*uplo*/, const char * /*diag*/,

@@ -159,7 +159,7 @@ namespace CUDAWrappers
     /**
      * Matrix-vector multiplication: let $dst = M^T \cdot src$ with
      * $M$ being this matrix. This function does the same as vmult() but
-     * takes thes transposed matrix.
+     * takes this transposed matrix.
      */
     void Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
                 const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;

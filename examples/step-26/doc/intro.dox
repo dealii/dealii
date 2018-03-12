@@ -422,7 +422,7 @@ Here,
   \end{array}
   \right.
 @f}
-In other words, in every period of lenght $\tau$, the right hand side first
+In other words, in every period of length $\tau$, the right hand side first
 flashes on in domain 1, then off completely, then on in domain 2, then off
 completely again. This pattern is probably best observed via the little
 animation of the solution shown in the <a href="#Results">results

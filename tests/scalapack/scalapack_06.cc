@@ -73,7 +73,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
       for (unsigned int j = 0; j < size; ++j)
         lapack_A[i*size+j] = full_A(i,j);
 
-    int info; //Variable containing information about the successfull exit of the lapack routine
+    int info; //Variable containing information about the successful exit of the lapack routine
     char jobz = 'V';  //'V': all eigenpairs of A are computed
     char uplo = 'U';  //storage format of the matrix A; not so important as matrix is symmetric
     int LDA = size;   //leading dimension of the matrix A

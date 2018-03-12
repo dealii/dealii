@@ -1160,7 +1160,7 @@ int main ()
   // in the previous example, and you
   // then know that it contains the
   // file and line number of where
-  // the exception occured, and some
+  // the exception occurred, and some
   // other information. This is also
   // what the following statements
   // would print.

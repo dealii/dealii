@@ -56,7 +56,7 @@ int main ()
             function.initialize(variables,
                                 expressions,
                                 constants);
-            deallog << "Initialize Succeded with dim = 2, "
+            deallog << "Initialize Succeeded with dim = 2, "
                     << i << " components, "
                     << expressions.size() << " expressions, "
                     << variables << " as variables." << std::endl;
@@ -77,7 +77,7 @@ int main ()
             function_bis.initialize(variables,
                                     concatenated,
                                     constants);
-            deallog << "Initialize Succeded with dim = 2, "
+            deallog << "Initialize Succeeded with dim = 2, "
                     << i << " components, "
                     << concatenated << " as function and "
                     << variables << " as variables." << std::endl;

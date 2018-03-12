@@ -319,7 +319,7 @@ namespace MGTools
     // We loop over cells and go from
     // cells to lower dimensional
     // objects. This is the only way to
-    // cope withthe fact, that an
+    // cope with the fact, that an
     // unknown number of cells may
     // share an object of dimension
     // smaller than dim-1.

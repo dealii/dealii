@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check generic contract variants tha allow to specifiy the indices which
+// check generic contract variants tha allow to specify the indices which
 // will be contracted.
 
 #include "../tests.h"

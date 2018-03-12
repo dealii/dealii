@@ -3481,7 +3481,7 @@ namespace DataOutBase
         }
     }
 
-    // max. and min. heigth of solution
+    // max. and min. height of solution
     Assert(patches.size()>0, ExcInternalError());
     double hmin=patches[0].data(0,0);
     double hmax=patches[0].data(0,0);

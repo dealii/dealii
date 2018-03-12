@@ -787,7 +787,7 @@ namespace VectorTools
     // same level and at least one has to
     // be active.
     //
-    // Therefor, loop over all cells
+    // Therefore, loop over all cells
     // (active and inactive) of the source
     // grid ..
     typename DoFHandlerType<dim,spacedim>::cell_iterator       cell1 = dof1.begin();

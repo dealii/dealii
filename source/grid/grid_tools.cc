@@ -2024,7 +2024,7 @@ next_cell:
 #ifndef DEAL_II_WITH_MPI
 
     // without MPI, this function doesn't make sense because on cannot
-    // use parallel::distributed::Triangulation in any meaninful
+    // use parallel::distributed::Triangulation in any meaningful
     // way
     (void)triangulation;
     Assert (false, ExcMessage ("This function does not make any sense "

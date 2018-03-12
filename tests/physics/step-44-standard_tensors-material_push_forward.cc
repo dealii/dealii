@@ -488,7 +488,7 @@ namespace Step44
     }
     SymmetricTensor<2, dim> get_S_iso() const
     {
-      // Expansion of stress defintion via chain rule
+      // Expansion of stress definition via chain rule
       return get_S_bar()*Physics::Elasticity::StandardTensors<dim>::Dev_P(F);
     }
     SymmetricTensor<2, dim> get_S_bar() const

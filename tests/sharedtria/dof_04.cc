@@ -15,7 +15,7 @@
 
 
 
-// check number cache for shared_tria with artifical cells and renumbering
+// check number cache for shared_tria with artificial cells and renumbering
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>

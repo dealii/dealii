@@ -46,7 +46,7 @@ namespace GeometricUtilities
     /**
      * Return spherical coordinates of a Cartesian point @p point.
      * The returned array is filled with radius, azimuth angle $\in [0,2 \pi)$
-     * and polar/inclination angle $ \in [0,\pi]$ (ommited in 2D).
+     * and polar/inclination angle $ \in [0,\pi]$ (omitted in 2D).
      *
      * In 3D the transformation is given by
      * @f{align*}{
@@ -63,7 +63,7 @@ namespace GeometricUtilities
      * Return the Cartesian coordinates of a spherical point defined by @p scoord
      * which is filled with radius $r \in [0,\infty)$, azimuth angle
      * $\theta \in [0,2 \pi)$ and polar/inclination angle $\phi \in [0,\pi]$
-     * (ommited in 2D).
+     * (omitted in 2D).
      *
      * In 3D the transformation is given by
      * @f{align*}{

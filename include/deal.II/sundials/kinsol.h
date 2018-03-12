@@ -310,7 +310,7 @@ namespace SUNDIALS
        * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
-       * will occurr if you destroy this class, and then parse a parameter file
+       * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
       void add_parameters(ParameterHandler &prm)
@@ -460,7 +460,7 @@ namespace SUNDIALS
     ~KINSOL();
 
     /**
-     * Solve the non linear sytem. Return the number of nonlinear steps taken
+     * Solve the non linear system. Return the number of nonlinear steps taken
      * to converge. KINSOL uses the content of `initial_guess_and_solution` as
      * initial guess, and stores the final solution in the same vector.
      */

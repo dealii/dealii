@@ -482,7 +482,7 @@ represents a <b>linear</b> operator.
 In our matrix-free code, the right hand side computation where the
 contribution of inhomogeneous conditions ends up is completely decoupled from
 the matrix operator and handled by a different function above. Thus, we need
-to explicity generate the data that enters the right hand side rather than
+to explicitly generate the data that enters the right hand side rather than
 using a byproduct of the matrix assembly. Since we already know how to apply
 the operator on a vector, we could try to use those facilities for a vector
 where we only set the Dirichlet values:

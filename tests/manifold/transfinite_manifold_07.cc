@@ -54,7 +54,7 @@ void concentric_disks(Triangulation<2>          &tria,
                      n_vert = (2 + nlay) * vlayer + 1,
                      n_cell = 3 + (1 + nlay) * lcells + 1; // 19
 
-  int fc = 4; // fv = 1,  f: fixed, displacement of index on the vertexes and
+  int fc = 4; // fv = 1,  f: fixed, displacement of index on the vertices and
   // cells ... inner objects
 
   // geometric information-----------------------

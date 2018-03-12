@@ -15,7 +15,7 @@
 
 
 
-// continous projection of a function on the surface of a hypersphere
+// continuous projection of a function on the surface of a hypersphere
 
 #include "../tests.h"
 #include <deal.II/grid/tria.h>

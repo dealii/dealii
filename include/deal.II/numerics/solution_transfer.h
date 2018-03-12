@@ -282,7 +282,7 @@ DEAL_II_NAMESPACE_OPEN
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
  * calling ConstraintMatrix::distribute() on the vector obtained by
- * transfering the solution.
+ * transferring the solution.
  *
  * @ingroup numerics
  * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth,

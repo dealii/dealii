@@ -43,7 +43,7 @@ void test ()
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
   deallog << "Number of entries: " << sp.n_nonzero_elements() << std::endl;
   deallog << "Number of rows: " << sp.n_rows() << std::endl;
-  deallog << "Number of colums: " << sp.n_cols() << std::endl;
+  deallog << "Number of columns: " << sp.n_cols() << std::endl;
   deallog << "Local size: " << sp.local_size() << std::endl;
   deallog << "Max row length: " << sp.max_entries_per_row() << std::endl;
   deallog << "SP::row_length(0): " << sp.row_length(0) << std::endl;

@@ -39,7 +39,7 @@
 
 
 #
-# Determine the Endianess of the platform:
+# Determine the Endianness of the platform:
 #
 IF(CMAKE_C_COMPILER_WORKS)
   INCLUDE(TestBigEndian)

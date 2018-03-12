@@ -184,7 +184,7 @@ namespace python
 
     /**
      * A subdivided parallelepided, i.e., the same as above, but where the
-     * number of subdivisions in each ot the @tparam dim directsions may vary.
+     * number of subdivisions in each of the @tparam dim directions may vary.
      * Colorizing is done according to hyper_rectangle().
      */
     void generate_varying_subdivided_parallelepiped(boost::python::list &n_subdivisions,
@@ -231,7 +231,7 @@ namespace python
      * Generate a hyper-ball intersected with the positive orthant relate to @p
      * center, which contains three elements in 2d and four in 3d. The boundary
      * indicators for the final triangulations are 0 for the curved boundary
-     * and 1 for the cut plane. The appropiate boundary class is
+     * and 1 for the cut plane. The appropriate boundary class is
      * HyperBallBoundary.
      */
     void generate_quarter_hyper_ball(PointWrapper &center,
@@ -328,7 +328,7 @@ namespace python
 
   private:
     /**
-     * Helper function for the contructors.
+     * Helper function for the constructors.
      */
     void setup(const std::string &dimension, const std::string &spacedimension);
 

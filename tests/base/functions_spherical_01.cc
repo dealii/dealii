@@ -15,7 +15,7 @@
 
 
 // test value, gradient and hessian of a Functions::Spherical as
-// compared to radially symmetric fucntion.
+// compared to radially symmetric function.
 
 #include "../tests.h"
 #include <deal.II/base/function_spherical.h>

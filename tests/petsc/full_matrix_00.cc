@@ -22,13 +22,13 @@
 #include <deal.II/lac/petsc_full_matrix.h>
 #include <iostream>
 
-// Simply take an already intialised full matrix, fill in some of the
+// Simply take an already initialized full matrix, fill in some of the
 // elements, reinitialise it to a different size and fill in some
 // elements again. To be sure this generates the correct results the
 // test is verbose (and uses tiny matrices).
 void test (PETScWrappers::FullMatrix &m)
 {
-  // asign some matrix elements
+  // assign some matrix elements
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
       m.set (i, j, i+2*j);

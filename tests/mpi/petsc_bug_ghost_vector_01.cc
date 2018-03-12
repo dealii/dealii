@@ -100,7 +100,7 @@ void test ()
     const unsigned int v_space_cells=5;;
     const double cell_size_x=0.1;
     const double cell_size_y=0.1;
-    const double lenght = solid_cells_x*cell_size_x,
+    const double length = solid_cells_x*cell_size_x,
                  height= static_cast<double>(h_cells*cell_size_y),
                  h_distance=static_cast<double>(cell_size_x*inflow_cells),
                  v_distance=static_cast<double>(cell_size_y*v_space_cells),
@@ -132,7 +132,7 @@ void test ()
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
                                               step_sizes,
                                               Point<2>(h_distance,0),
-                                              Point<2>(lenght+h_distance,v_distance),
+                                              Point<2>(length+h_distance,v_distance),
                                               false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
@@ -153,7 +153,7 @@ void test ()
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
                                               step_sizes,
                                               Point<2>(h_distance,solid_top),
-                                              Point<2>(h_distance+lenght,height),
+                                              Point<2>(h_distance+length,height),
                                               false);
 
     tmp_tria_buffer.copy_triangulation(tmp_tria_fluid);
@@ -172,7 +172,7 @@ void test ()
       step_sizes[1].push_back(cell_size_y);
     GridGenerator::subdivided_hyper_rectangle(tmp_rectangle,
                                               step_sizes,
-                                              Point<2>(h_distance+lenght,0),
+                                              Point<2>(h_distance+length,0),
                                               Point<2>(total_length,height),
                                               false);
 

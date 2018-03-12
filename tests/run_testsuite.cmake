@@ -213,7 +213,7 @@ IF("${CTEST_CMAKE_GENERATOR}" STREQUAL "")
     SET(CTEST_CMAKE_GENERATOR "Unix Makefiles")
   ENDIF()
 ELSE()
-  # ensure that CTEST_CMAKE_GENERATOR (that was apparantly set) is
+  # ensure that CTEST_CMAKE_GENERATOR (that was apparently set) is
   # compatible with the build directory:
   IF( NOT "${CTEST_CMAKE_GENERATOR}" STREQUAL "${_generator}"
       AND NOT "${_generator}" STREQUAL "" )

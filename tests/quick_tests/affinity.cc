@@ -99,7 +99,7 @@ int main ()
     }
   if (env != -1 && nprocs != tbbprocs)
     {
-      printf("Warning: number of threads is set to %d in envirnoment using DEAL_II_NUM_THREADS.\n", env);
+      printf("Warning: number of threads is set to %d in environment using DEAL_II_NUM_THREADS.\n", env);
       return 0; // do not return an error!
     }
   if (nprocs != tbbprocs)

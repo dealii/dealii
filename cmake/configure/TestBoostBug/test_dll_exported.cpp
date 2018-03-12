@@ -9,9 +9,9 @@
 // should pass compilation and execution
 
 // This is an overly complex test.  The purpose of this test is to
-// demostrate and test the ability to serialize a hiarchy of class
-// through a base class pointer even though those class might be
-// implemente in different dlls and use different extended type info
+// demonstrate and test the ability to serialize a hierarchy of class
+// through a base class pointer even though that class might be
+// implemented in different dlls and use different extended type info
 // systems.
 //
 // polymorphic_ base is locally declared and defined.  It use the

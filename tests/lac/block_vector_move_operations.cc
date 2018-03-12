@@ -44,18 +44,18 @@ int main()
 
     BlockVector<double> v;
     v = u;
-    PRINTME("copy assignemnt", v);
+    PRINTME("copy assignment", v);
     PRINTME("old object", u);
 
     v = 0.;
     v = std::move(u);
-    PRINTME("move assignemnt", v);
+    PRINTME("move assignment", v);
     deallog << "old object size: " << u.n_blocks() << std::endl;
 
     // and swap again with different sizes
     BlockVector<double> w;
     w = std::move(v);
-    PRINTME("move assignemnt", w);
+    PRINTME("move assignment", w);
     deallog << "old object size: " << v.n_blocks() << std::endl;
   }
 }

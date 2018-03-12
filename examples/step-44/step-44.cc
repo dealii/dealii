@@ -1194,7 +1194,7 @@ namespace Step44
 
 // @sect4{Threading-building-blocks structures}
 
-// The first group of private member functions is related to parallization.
+// The first group of private member functions is related to parallelization.
 // We use the Threading Building Blocks library (TBB) to perform as many
 // computationally intensive distributed tasks as possible. In particular, we
 // assemble the tangent matrix and right hand side vector, the static

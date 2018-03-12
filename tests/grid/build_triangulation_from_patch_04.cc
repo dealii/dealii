@@ -45,7 +45,7 @@ void test()
   triangulation.execute_coarsening_and_refinement();
 
   // Apply distortion here, note that distort_random
-  // is designed to be reproducable, each time you apply
+  // is designed to be reproducible, each time you apply
   // it to the same triangulation, you get the same
   // random distortion.  Thus the output is consistent
   // for the test to be run multiple times.

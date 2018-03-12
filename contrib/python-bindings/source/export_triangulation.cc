@@ -182,7 +182,7 @@ namespace python
 
   const char generate_varying_subdivided_parallelepiped_docstring [] =
     "A subdivided parallelepided, i.e., the same as above, but where the    \n"
-    "number of subdivisions in each ot the dim directsions may vary.        \n"
+    "number of subdivisions in each of the dim directions may vary.         \n"
     "Colorizing is done according to hyper_rectangle().                     \n"
     ;
 
@@ -226,7 +226,7 @@ namespace python
     "Generate a hyper-ball intersected with the positive orthant relate to  \n"
     "center, which contains three elements in 2d and four in 3d. The        \n"
     "boundary indicators for the final triangulations are 0 for the curved  \n" 
-    "boundary and 1 for the cut plane. The appropiate boundary class is     \n"
+    "boundary and 1 for the cut plane. The appropriate boundary class is    \n"
     "HyperBallBoundary.                                                     \n"
     ;
 

@@ -56,7 +56,7 @@ All entries are signed with the names of the author.
        been added. It can be used by choosing output format «dx» (not
        yet for grid output). The data format is very basic now, but it
        is planned to improve this to make use of the excellent
-       capabilites of OpenDX.
+       capabilities of OpenDX.
        </p>
        <p>
        Additionally, a directory <tt>contrib/dx</tt> has been added,
@@ -144,9 +144,9 @@ All entries are signed with the names of the author.
 
   <li> <p>
        Improved: The cut-off functions <code
-       class="class">Functios::CutOffFunctionLinfty</code>, <code
-       class="class">Functios::CutOffFunctionW1</code>, and <code
-       class="class">Functios::CutOffFunctionCinfty</code> can be
+       class="class">Functions::CutOffFunctionLinfty</code>, <code
+       class="class">Functions::CutOffFunctionW1</code>, and <code
+       class="class">Functions::CutOffFunctionCinfty</code> can be
        vector-valued now and optionally only a single componente can
        be selected.
        <br>

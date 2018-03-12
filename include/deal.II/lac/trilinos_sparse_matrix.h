@@ -2369,7 +2369,7 @@ namespace TrilinosWrappers
          * @note This does not reshape the matrix to transposed form directly,
          * so care should be taken when using this flag. When the flag is set to
          * true (either here or directly on the underlying Trilinos object
-         * itself), this object is no longer thread-safe. In essense, it is not
+         * itself), this object is no longer thread-safe. In essence, it is not
          * possible ensure that the transposed state of the LinearOperator and
          * the underlying Trilinos object remain synchronized throughout all
          * operations that may occur on different threads simultaneously.
@@ -2403,7 +2403,7 @@ namespace TrilinosWrappers
          * Epetra_Operator.
          *
          * @note This function will only be operable if the payload has been
-         * initalised with an InverseOperator, or is a wrapper to a preconditioner.
+         * initialized with an InverseOperator, or is a wrapper to a preconditioner.
          * If not, then using this function will lead to an error being thrown.
          * @note The intended operation depends on the status of the internal
          * transpose flag. If this flag is set to true, the result will be

@@ -1094,7 +1094,7 @@ next_cell:
                     // to the next
                   }
               }
-            //udpate the number of cells searched
+            //update the number of cells searched
             cells_searched += adjacent_cells.size();
             // if we have not found the cell in
             // question and have not yet searched every
@@ -1392,7 +1392,7 @@ next_cell:
     // uniqueness of cell iterators. std::set does this
     // automatically for us.  Later after it is all
     // constructed, we will copy to a map of vectors
-    // since that is the prefered output for other
+    // since that is the preferred output for other
     // functions.
     std::map< types::global_dof_index,std::set<typename DoFHandlerType::active_cell_iterator> > dof_to_set_of_cells_map;
 

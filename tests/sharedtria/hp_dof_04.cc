@@ -15,7 +15,7 @@
 
 
 
-// check number cache for shared_tria with artifical cells and renumbering
+// check number cache for shared_tria with artificial cells and renumbering
 //
 // this test is just like the one without hp_ but uses an
 // hp::DoFHandler instead of a regular DoFHandler (but with only one

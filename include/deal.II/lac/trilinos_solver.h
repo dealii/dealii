@@ -172,7 +172,7 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
-     * @p precondtioner are an operator.
+     * @p preconditioner are an operator.
      * This function can be used when both <tt>A</tt> and the @p preconditioner
      * are LinearOperators derived from a TrilinosPayload.
      * Depending on the information provided by derived classes and the object
@@ -202,7 +202,7 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
-     * @p precondtioner are an operator, and the vectors @p x and @p b are
+     * @p preconditioner are an operator, and the vectors @p x and @p b are
      * native Trilinos vector types.
      * This function can be used when both <tt>A</tt> and the @p preconditioner
      * are LinearOperators derived from a TrilinosPayload.
@@ -638,14 +638,14 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the
-     * package set in intialize(). Note the matrix is not refactorized during
+     * package set in initialize(). Note the matrix is not refactorized during
      * this call.
      */
     void solve (MPI::Vector &x, const MPI::Vector &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the package set in
-     * intialize() for deal.II's own parallel vectors. Note the matrix is not
+     * initialize() for deal.II's own parallel vectors. Note the matrix is not
      * refactorized during this call.
      */
     void

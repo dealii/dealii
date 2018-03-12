@@ -1707,7 +1707,7 @@ namespace DataOutBase
    * Bezier patch. It consists of 16 Points describing the surface. The 4
    * corner points are touched by the object, while the other 12 points pull
    * and stretch the patch into shape. One <tt>bicubic_patch</tt> is generated
-   * on each patch. Therefor the number of subdivisions has to be 3 to provide
+   * on each patch. Therefore the number of subdivisions has to be 3 to provide
    * the patch with 16 points. A bicubic patch is not exact but generates very
    * smooth images.
    *

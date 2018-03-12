@@ -766,7 +766,7 @@ namespace PETScWrappers
 
         /**
          * get the factored matrix F from the preconditioner context.  This
-         * routine is valid only for LU, ILU, Cholesky, and imcomplete
+         * routine is valid only for LU, ILU, Cholesky, and incomplete
          * Cholesky
          */
         ierr = PCFactorGetMatrix(solver_data->pc, &F);

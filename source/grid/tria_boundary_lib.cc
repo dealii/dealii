@@ -1420,7 +1420,7 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &lin
   offset[1]=0;
 
   //Take care for periodic conditions & negative angles, see
-  //get_new_point_on_line() above. Because we dont have a symmetric
+  //get_new_point_on_line() above. Because we don't have a symmetric
   //interpolation (just the middle) we need to add 2*Pi to each almost zero
   //and negative angles.
   for (unsigned int i=0; i<2; i++)
@@ -1474,7 +1474,7 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
   offset[1]=0;
 
   //Take care for periodic conditions & negative angles, see
-  //get_new_point_on_line() above.  Because we dont have a symmetric
+  //get_new_point_on_line() above.  Because we don't have a symmetric
   //interpolation (just the middle) we need to add 2*Pi to each almost zero
   //and negative angles.
   for (unsigned int i=0; i<2; i++)
