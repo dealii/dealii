@@ -21,6 +21,7 @@
 
 #ifdef DEAL_II_WITH_CUDA
 
+#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/grid/filtered_iterator.h>
@@ -28,7 +29,6 @@
 #include <cuda_runtime_api.h>
 #include <functional>
 
-#define BLOCK_SIZE 128
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -37,10 +37,10 @@ namespace CUDAWrappers
   namespace internal
   {
     // These variables are stored in the device constant memory.
-    // TODO: use a template parameter instead of a macro
-#define MAX_ELEM_DEGREE 10
-    __constant__ double global_shape_values[(MAX_ELEM_DEGREE+1) * (MAX_ELEM_DEGREE+1)];
-    __constant__ double global_shape_gradients[(MAX_ELEM_DEGREE+1) * (MAX_ELEM_DEGREE+1)];
+    // TODO: use a template parameter
+    constexpr unsigned int max_elem_degree = 10;
+    __constant__ double global_shape_values[(max_elem_degree+1) * (max_elem_degree+1)];
+    __constant__ double global_shape_gradients[(max_elem_degree+1) * (max_elem_degree+1)];
 
     template <typename Number>
     using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
@@ -523,13 +523,13 @@ namespace CUDAWrappers
       {
 
         const unsigned int constraint_n_blocks = std::ceil(static_cast<double>(n_constrained_dofs) /
-                                                           static_cast<double>(BLOCK_SIZE));
+                                                           static_cast<double>(block_size));
         const unsigned int constraint_x_n_blocks = std::round(std::sqrt(constraint_n_blocks));
         const unsigned int constraint_y_n_blocks = std::ceil(static_cast<double>(constraint_n_blocks) /
                                                              static_cast<double>(constraint_x_n_blocks));
 
         constraint_grid_dim = dim3(constraint_x_n_blocks, constraint_y_n_blocks);
-        constraint_block_dim = dim3(BLOCK_SIZE);
+        constraint_block_dim = dim3(block_size);
 
         std::vector<dealii::types::global_dof_index> constrained_dofs_host(n_constrained_dofs);
 
