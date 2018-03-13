@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/exceptions.h>
+
 #include <deal.II/non_matching/coupling.h>
 
 #include <deal.II/lac/sparsity_pattern.h>
@@ -36,6 +38,9 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
+
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
@@ -52,6 +57,8 @@ namespace NonMatching
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
+    Assert((dynamic_cast<const parallel::distributed::Triangulation<dim1,spacedim> *>
+            (&immersed_dh.get_triangulation()) == 0), ExcNotImplemented());
 
     const auto &space_fe = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -112,17 +119,21 @@ namespace NonMatching
             // Get the ones in the current outer cell
             typename DoFHandler<dim0,spacedim>::cell_iterator
             ocell(*cells[c], &space_dh);
-            ocell->get_dof_indices(odofs);
-            for (unsigned int i=0; i<odofs.size(); ++i)
+            // Make sure we act only on locally_owned cells
+            if (ocell->is_locally_owned())
               {
-                const auto comp_i = space_fe.system_to_component_index(i).first;
-                if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+                ocell->get_dof_indices(odofs);
+                for (unsigned int i=0; i<odofs.size(); ++i)
                   {
-                    for (unsigned int j=0; j<dofs.size(); ++j)
+                    const auto comp_i = space_fe.system_to_component_index(i).first;
+                    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
                       {
-                        const auto comp_j = immersed_fe.system_to_component_index(j).first;
-                        if (immersed_gtl[comp_j] == space_gtl[comp_i])
-                          sparsity.add(odofs[i],dofs[j]);
+                        for (unsigned int j=0; j<dofs.size(); ++j)
+                          {
+                            const auto comp_j = immersed_fe.system_to_component_index(j).first;
+                            if (immersed_gtl[comp_j] == space_gtl[comp_i])
+                              sparsity.add(odofs[i],dofs[j]);
+                          }
                       }
                   }
               }
@@ -146,6 +157,8 @@ namespace NonMatching
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
+    Assert((dynamic_cast<const parallel::distributed::Triangulation<dim1,spacedim>*>
+            (&immersed_dh.get_triangulation()) == 0), ExcNotImplemented());
 
     const auto &space_fe = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -213,39 +226,43 @@ namespace NonMatching
             // Get the ones in the current outer cell
             typename DoFHandler<dim0,spacedim>::active_cell_iterator
             ocell(*cells[c], &space_dh);
-            const std::vector< Point<dim0> > &qps = qpoints[c];
-            const std::vector< unsigned int > &ids = maps[c];
-
-            FEValues<dim0,spacedim> o_fe_v(space_mapping, space_dh.get_fe(), qps,
-                                           update_values);
-            o_fe_v.reinit(ocell);
-            ocell->get_dof_indices(odofs);
-
-            // Reset the matrices.
-            cell_matrix = 0;
-
-            for (unsigned int i=0; i<space_dh.get_fe().dofs_per_cell; ++i)
+            // Make sure we act only on locally_owned cells
+            if (ocell->is_locally_owned())
               {
-                const auto comp_i = space_dh.get_fe().system_to_component_index(i).first;
-                if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
-                  for (unsigned int j=0; j<immersed_dh.get_fe().dofs_per_cell; ++j)
-                    {
-                      const auto comp_j = immersed_dh.get_fe().system_to_component_index(j).first;
-                      if (space_gtl[comp_i] == immersed_gtl[comp_j])
-                        for (unsigned int oq=0; oq<o_fe_v.n_quadrature_points; ++oq)
-                          {
-                            // Get the corrisponding q point
-                            const unsigned int q=ids[oq];
+                const std::vector< Point<dim0> > &qps = qpoints[c];
+                const std::vector< unsigned int > &ids = maps[c];
 
-                            cell_matrix(i,j) += ( fe_v.shape_value(j,q) *
-                                                  o_fe_v.shape_value(i,oq) *
-                                                  fe_v.JxW(q) );
-                          }
-                    }
+                FEValues<dim0,spacedim> o_fe_v(space_mapping, space_dh.get_fe(), qps,
+                                               update_values);
+                o_fe_v.reinit(ocell);
+                ocell->get_dof_indices(odofs);
+
+                // Reset the matrices.
+                cell_matrix = 0;
+
+                for (unsigned int i=0; i<space_dh.get_fe().dofs_per_cell; ++i)
+                  {
+                    const auto comp_i = space_dh.get_fe().system_to_component_index(i).first;
+                    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+                      for (unsigned int j=0; j<immersed_dh.get_fe().dofs_per_cell; ++j)
+                        {
+                          const auto comp_j = immersed_dh.get_fe().system_to_component_index(j).first;
+                          if (space_gtl[comp_i] == immersed_gtl[comp_j])
+                            for (unsigned int oq=0; oq<o_fe_v.n_quadrature_points; ++oq)
+                              {
+                                // Get the corrisponding q point
+                                const unsigned int q=ids[oq];
+
+                                cell_matrix(i,j) += ( fe_v.shape_value(j,q) *
+                                                      o_fe_v.shape_value(i,oq) *
+                                                      fe_v.JxW(q) );
+                              }
+                        }
+                  }
+
+                // Now assemble the matrices
+                constraints.distribute_local_to_global (cell_matrix, odofs, dofs, matrix);
               }
-
-            // Now assemble the matrices
-            constraints.distribute_local_to_global (cell_matrix, odofs, dofs, matrix);
           }
       }
   }
