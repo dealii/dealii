@@ -2157,107 +2157,111 @@ namespace FETools
       mass.gauss_jordan();
     }
 
-    // loop over all possible
-    // refinement cases
+
+    auto compute_one_case =
+      [&fe,&q_fine,n,nd,nq](const unsigned int               ref_case,
+                            const FullMatrix<double>        &inverse_mass_matrix,
+                            std::vector<FullMatrix<double>> &matrices)
+    {
+      const unsigned int
+      nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+
+      for (unsigned int i=0; i<nc; ++i)
+        {
+          Assert(matrices[i].n() == n,
+                 ExcDimensionMismatch(matrices[i].n(),n));
+          Assert(matrices[i].m() == n,
+                 ExcDimensionMismatch(matrices[i].m(),n));
+        }
+
+      // create a respective refinement on the triangulation
+      Triangulation<dim,spacedim> tr;
+      GridGenerator::hyper_cube (tr, 0, 1);
+      tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
+      tr.execute_coarsening_and_refinement();
+
+      FEValues<dim,spacedim> fine (StaticMappingQ1<dim,spacedim>::mapping, fe, q_fine,
+                                   update_quadrature_points | update_JxW_values |
+                                   update_values);
+
+      typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
+        = tr.begin(0);
+
+      Vector<number> v_coarse(n);
+      Vector<number> v_fine(n);
+
+      for (unsigned int cell_number=0; cell_number<nc; ++cell_number)
+        {
+          FullMatrix<double> &this_matrix = matrices[cell_number];
+
+          // Compute right hand side, which is a fine level basis
+          // function tested with the coarse level functions.
+          fine.reinit(coarse_cell->child(cell_number));
+          const std::vector<Point<spacedim> > &q_points_fine = fine.get_quadrature_points();
+          std::vector<Point<dim> > q_points_coarse(q_points_fine.size());
+          for (unsigned int q=0; q<q_points_fine.size(); ++q)
+            for (unsigned int j=0; j<dim; ++j)
+              q_points_coarse[q](j) = q_points_fine[q](j);
+          Quadrature<dim> q_coarse (q_points_coarse,
+                                    fine.get_JxW_values());
+          FEValues<dim,spacedim> coarse (StaticMappingQ1<dim,spacedim>::mapping, fe, q_coarse,
+                                         update_values);
+          coarse.reinit(coarse_cell);
+
+          // Build RHS
+
+          const std::vector<double> &JxW = fine.get_JxW_values();
+
+          // Outer loop over all fine grid shape functions phi_j
+          for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+            {
+              for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                {
+                  if (fe.is_primitive())
+                    {
+                      const double *coarse_i = &coarse.shape_value(i,0);
+                      const double *fine_j = &fine.shape_value(j,0);
+
+                      double update = 0;
+                      for (unsigned int k=0; k<nq; ++k)
+                        update += JxW[k] * coarse_i[k] * fine_j[k];
+                      v_fine(i) = update;
+                    }
+                  else
+                    {
+                      double update = 0;
+                      for (unsigned int d=0; d<nd; ++d)
+                        for (unsigned int k=0; k<nq; ++k)
+                          update += JxW[k] * coarse.shape_value_component(i,k,d)
+                                    * fine.shape_value_component(j,k,d);
+                      v_fine(i) = update;
+                    }
+                }
+
+              // RHS ready. Solve system and enter row into matrix
+              inverse_mass_matrix.vmult (v_coarse, v_fine);
+              for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                this_matrix(i,j) = v_coarse(i);
+            }
+
+          // Remove small entries from the matrix
+          for (unsigned int i=0; i<this_matrix.m(); ++i)
+            for (unsigned int j=0; j<this_matrix.n(); ++j)
+              if (std::fabs(this_matrix(i,j)) < 1e-12)
+                this_matrix(i,j) = 0.;
+        }
+    };
+
+
+    // finally loop over all possible refinement cases
+    Threads::TaskGroup<> tasks;
     unsigned int ref_case = (isotropic_only)
                             ? RefinementCase<dim>::isotropic_refinement
                             : RefinementCase<dim>::cut_x;
     for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
-      {
-        const unsigned int
-        nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+      tasks += Threads::new_task ([ &,ref_case]() { compute_one_case(ref_case, mass, matrices[ref_case-1]); });
 
-        for (unsigned int i=0; i<nc; ++i)
-          {
-            Assert(matrices[ref_case-1][i].n() == n,
-                   ExcDimensionMismatch(matrices[ref_case-1][i].n(),n));
-            Assert(matrices[ref_case-1][i].m() == n,
-                   ExcDimensionMismatch(matrices[ref_case-1][i].m(),n));
-          }
-
-        // create a respective refinement on the
-        // triangulation
-        Triangulation<dim,spacedim> tr;
-        GridGenerator::hyper_cube (tr, 0, 1);
-        tr.begin_active()->set_refine_flag(RefinementCase<dim>(ref_case));
-        tr.execute_coarsening_and_refinement();
-
-        FEValues<dim,spacedim> fine (StaticMappingQ1<dim,spacedim>::mapping, fe, q_fine,
-                                     update_quadrature_points | update_JxW_values |
-                                     update_values);
-
-        typename Triangulation<dim,spacedim>::cell_iterator coarse_cell
-          = tr.begin(0);
-
-        Vector<number> v_coarse(n);
-        Vector<number> v_fine(n);
-
-        for (unsigned int cell_number=0; cell_number<nc; ++cell_number)
-          {
-            FullMatrix<double> &this_matrix = matrices[ref_case-1][cell_number];
-
-            // Compute right hand side,
-            // which is a fine level basis
-            // function tested with the
-            // coarse level functions.
-            fine.reinit(coarse_cell->child(cell_number));
-            const std::vector<Point<spacedim> > &q_points_fine = fine.get_quadrature_points();
-            std::vector<Point<dim> > q_points_coarse(q_points_fine.size());
-            for (unsigned int q=0; q<q_points_fine.size(); ++q)
-              for (unsigned int j=0; j<dim; ++j)
-                q_points_coarse[q](j) = q_points_fine[q](j);
-            Quadrature<dim> q_coarse (q_points_coarse,
-                                      fine.get_JxW_values());
-            FEValues<dim,spacedim> coarse (StaticMappingQ1<dim,spacedim>::mapping, fe, q_coarse, update_values);
-            coarse.reinit(coarse_cell);
-
-            // Build RHS
-
-            const std::vector<double> &JxW = fine.get_JxW_values();
-
-            // Outer loop over all fine
-            // grid shape functions phi_j
-            for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-              {
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  {
-                    if (fe.is_primitive())
-                      {
-                        const double *coarse_i = &coarse.shape_value(i,0);
-                        const double *fine_j = &fine.shape_value(j,0);
-
-                        double update = 0;
-                        for (unsigned int k=0; k<nq; ++k)
-                          update += JxW[k] * coarse_i[k] * fine_j[k];
-                        v_fine(i) = update;
-                      }
-                    else
-                      {
-                        double update = 0;
-                        for (unsigned int d=0; d<nd; ++d)
-                          for (unsigned int k=0; k<nq; ++k)
-                            update += JxW[k] * coarse.shape_value_component(i,k,d)
-                                      * fine.shape_value_component(j,k,d);
-                        v_fine(i) = update;
-                      }
-                  }
-
-                // RHS ready. Solve system
-                // and enter row into
-                // matrix
-                mass.vmult (v_coarse, v_fine);
-                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-                  this_matrix(i,j) = v_coarse(i);
-              }
-
-            // Remove small entries from
-            // the matrix
-            for (unsigned int i=0; i<this_matrix.m(); ++i)
-              for (unsigned int j=0; j<this_matrix.n(); ++j)
-                if (std::fabs(this_matrix(i,j)) < 1e-12)
-                  this_matrix(i,j) = 0.;
-          }
-      }
+    tasks.join_all();
   }
 
 
