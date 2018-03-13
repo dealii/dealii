@@ -67,6 +67,11 @@ namespace NonMatching
    * For both spaces, it is possible to specify a custom Mapping, which
    * defaults to StaticMappingQ1 for both.
    *
+   * This function will also work in parallel, provided that the immersed
+   * triangulation is of type parallel::shared::Triangulation<dim1,spacedim>.
+   * An exception is thrown if you use an immersed
+   * parallel::distributed::Triangulation<dim1,spacedim>.
+   *
    * @author Luca Heltai, 2018
    */
   template<int dim0, int dim1, int spacedim, typename Sparsity>
@@ -114,6 +119,11 @@ namespace NonMatching
    *
    * For both spaces, it is possible to specify a custom Mapping, which
    * defaults to StaticMappingQ1 for both.
+   *
+   * This function will also work in parallel, provided that the immersed
+   * triangulation is of type parallel::shared::Triangulation<dim1,spacedim>.
+   * An exception is thrown if you use an immersed
+   * parallel::distributed::Triangulation<dim1,spacedim>.
    *
    * @author Luca Heltai, 2018
    */
