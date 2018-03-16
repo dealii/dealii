@@ -112,7 +112,7 @@ void test()
   {
     QGauss<dim> quad(4);
     FEValues<dim,spacedim> fev(fe, quad, update_values|update_JxW_values);
-    std::vector<unsigned int> dofs(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
     FullMatrix<double> cell_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
     ConstraintMatrix constraints;
 
