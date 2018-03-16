@@ -136,6 +136,19 @@ public:
   operator/= (const number factor);
 
   /**
+   * Set a particular entry of the matrix to a @p value.
+   * Thus, calling <code>A.set(1,2,3.141);</code> is entirely equivalent to the operation <code>A(1,2) = 3.141;</code>.
+   * This function exists for compatibility with the various sparse matrix objects.
+   *
+   * @param i The row index of the element to be set.
+   * @param j The column index of the element to be set.
+   * @param value The value to be written into the element.
+   */
+  void set (const size_type i,
+            const size_type j,
+            const number value);
+
+  /**
    * Simple addition of a scaled matrix, i.e. <tt>*this += a*A</tt>.
    */
   void add (const number                    a,
@@ -908,6 +921,16 @@ private:
 };
 
 /*---------------------- Inline functions -----------------------------------*/
+
+template <typename number>
+inline
+void LAPACKFullMatrix<number>::set (const size_type i,
+                                    const size_type j,
+                                    const number value)
+{
+  (*this)(i,j) = value;
+}
+
 
 template <typename number>
 inline
