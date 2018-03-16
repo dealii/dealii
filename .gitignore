@@ -1,2 +1,13 @@
-build*
-code-gallery
+/*build*
+/code-gallery
+
+# eclipse
+/.cproject
+/.project
+
+# visual studio code
+/.vscode
+
+# misc
+/compile_commands.json
+/.clang_complete
