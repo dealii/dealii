@@ -32,7 +32,6 @@ check ()
 {
   FullMatrix<std::complex<number> > m;
   make_complex_matrix (m);
-  m.add_col (2, 3.141, 4, 2.718, 3);
+  m.add_col (2, 3.141, 1, 2.718, 3);
   print_matrix (m);
 }
-

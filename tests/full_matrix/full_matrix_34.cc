@@ -30,7 +30,6 @@ check ()
 {
   FullMatrix<number> m;
   make_matrix (m);
-  m.swap_col (2, 4);
+  m.swap_col (2, 3);
   print_matrix (m);
 }
-
