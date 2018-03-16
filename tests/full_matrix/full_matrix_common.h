@@ -34,43 +34,87 @@ template <typename number>
 void
 check ();
 
+static constexpr int n_rows = 5;
+static constexpr int n_cols = 4;
+
+
+template <typename number>
+void make_square_matrix (FullMatrix<number> &m)
+{
+  m.reinit (n_rows, n_rows);
+  for (unsigned int i=0; i<n_rows; ++i)
+    for (unsigned int j=0; j<n_rows; ++j)
+      m(i,j) = (i+1)*(j+2);
+}
+
 
 
 template <typename number>
 void make_matrix (FullMatrix<number> &m)
 {
-  m.reinit (5,5);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
+  m.reinit (n_rows, n_cols);
+  for (unsigned int i=0; i<n_rows; ++i)
+    for (unsigned int j=0; j<n_cols; ++j)
       m(i,j) = (i+1)*(j+2);
+}
+
+
+template <typename number>
+void make_complex_square_matrix (FullMatrix<std::complex<number> > &m)
+{
+  m.reinit (n_rows, n_rows);
+  for (unsigned int i=0; i<n_rows; ++i)
+    for (unsigned int j=0; j<n_rows; ++j)
+      m(i,j) = std::complex<number>((i+1)*(j+2), (i+3)*(j+4));
 }
 
 
 template <typename number>
 void make_complex_matrix (FullMatrix<std::complex<number> > &m)
 {
-  m.reinit (5,5);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
+  m.reinit (n_rows, n_cols);
+  for (unsigned int i=0; i<n_rows; ++i)
+    for (unsigned int j=0; j<n_cols; ++j)
       m(i,j) = std::complex<number>((i+1)*(j+2), (i+3)*(j+4));
 }
 
 
 template <typename number>
-void make_vector (Vector<number> &v)
+void make_domain_vector (Vector<number> &v)
 {
-  v.reinit (5);
-  for (unsigned int i=0; i<5; ++i)
+  v.reinit (n_cols);
+  for (unsigned int i=0; i<n_cols; ++i)
     v(i) = (i+1);
 }
 
 
 
 template <typename number>
-void make_complex_vector (Vector<std::complex<number> > &v)
+void make_range_vector (Vector<number> &v)
 {
-  v.reinit (5);
-  for (unsigned int i=0; i<5; ++i)
+  v.reinit (n_rows);
+  for (unsigned int i=0; i<n_rows; ++i)
+    v(i) = (i+1);
+}
+
+
+
+template <typename number>
+void make_complex_domain_vector (Vector<std::complex<number> > &v)
+{
+  v.reinit (n_cols);
+  for (unsigned int i=0; i<n_cols; ++i)
+    v(i) = std::complex<number>(i+1, i+3);
+}
+
+
+
+
+template <typename number>
+void make_complex_range_vector (Vector<std::complex<number> > &v)
+{
+  v.reinit (n_rows);
+  for (unsigned int i=0; i<n_rows; ++i)
     v(i) = std::complex<number>(i+1, i+3);
 }
 
