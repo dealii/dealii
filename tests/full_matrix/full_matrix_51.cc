@@ -29,13 +29,12 @@ void
 check ()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_square_matrix (m);
   Vector<number> x, y;
-  make_vector (x);
-  make_vector (y);
+  make_range_vector (x);
+  make_range_vector (y);
 
   m.forward (x, y);
   print_vector (x);
   print_vector (y);
 }
-

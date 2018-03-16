@@ -31,7 +31,6 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   deallog << m.trace() << std::endl;
 }
-

@@ -31,8 +31,7 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   m.diagadd (3.141);
   print_matrix (m);
 }
-

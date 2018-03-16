@@ -31,10 +31,9 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   Vector<std::complex<number> > v;
-  make_complex_vector (v);
+  make_complex_range_vector (v);
 
   deallog << m.matrix_norm_square (v) << std::endl;
 }
-

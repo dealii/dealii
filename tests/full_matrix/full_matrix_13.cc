@@ -29,10 +29,9 @@ void
 check ()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_square_matrix (m);
   Vector<number> v;
-  make_vector (v);
+  make_range_vector (v);
 
   deallog << m.matrix_norm_square (v) << std::endl;
 }
-

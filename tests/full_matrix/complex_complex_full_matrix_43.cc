@@ -31,9 +31,9 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m, n, o;
-  make_complex_matrix (m);
-  make_complex_matrix (n);
-  make_complex_matrix (o);
+  make_complex_square_matrix (m);
+  make_complex_square_matrix (n);
+  make_complex_square_matrix (o);
 
   m.mmult (n, o, true);
   print_matrix (m);
@@ -45,4 +45,3 @@ check ()
   print_matrix (n);
   print_matrix (o);
 }
-
