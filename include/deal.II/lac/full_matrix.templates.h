@@ -108,7 +108,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator = (const LAPACKFullMatrix<number2> &M)
 {
   Assert (this->m() == M.n_rows(), ExcDimensionMismatch(this->m(), M.n_rows()));
-  Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_rows()));
+  Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_cols()));
   for (size_type i=0; i<this->m(); ++i)
     for (size_type j=0; j<this->n(); ++j)
       (*this)(i,j) = M(i,j);
@@ -932,7 +932,7 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert(m() == u.size(), ExcDimensionMismatch(m(),u.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   number2 sum = 0.;
