@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
 //Forward type declarations to allow MPI sums over tensorial types
 template <int rank, int dim, typename Number> class Tensor;
 template <int rank, int dim, typename Number> class SymmetricTensor;
-
+template <typename Number> class SparseMatrix;
 
 namespace Utilities
 {
@@ -195,6 +195,20 @@ namespace Utilities
     Tensor<rank,dim,Number>
     sum (const Tensor<rank,dim,Number> &local,
          const MPI_Comm &mpi_communicator);
+
+    /**
+     * Perform an MPI sum of the entries of a SparseMatrix.
+     *
+     * @note @p local and @p global should have the same sparsity
+     * pattern and it should be the same for all MPI processes.
+     *
+     * @relatesalso SparseMatrix
+     */
+    template <typename Number>
+    void
+    sum (const SparseMatrix<Number> &local,
+         const MPI_Comm &mpi_communicator,
+         SparseMatrix<Number> &global);
 
     /**
      * Return the maximum over all processors of the value @p t. This function
