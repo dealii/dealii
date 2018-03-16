@@ -29,7 +29,7 @@ void
 check ()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_square_matrix (m);
 
 
   for (typename FullMatrix<number>::const_iterator
@@ -38,4 +38,3 @@ check ()
             << p->value()
             << std::endl;
 }
-

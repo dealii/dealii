@@ -29,13 +29,12 @@ void
 check ()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_square_matrix (m);
   Vector<number> v, w;
-  make_vector (v);
-  make_vector (w);
+  make_range_vector (v);
+  make_range_vector (w);
 
   m.precondition_Jacobi (v, w, 3.141);
   print_vector (v);
   print_vector (w);
 }
-

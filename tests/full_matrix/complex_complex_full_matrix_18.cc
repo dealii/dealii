@@ -31,7 +31,6 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   deallog << m.relative_symmetry_norm2() << std::endl;
 }
-

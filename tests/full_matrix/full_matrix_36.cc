@@ -29,8 +29,7 @@ void
 check ()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_square_matrix (m);
   m.diagadd (3.141);
   print_matrix (m);
 }
-

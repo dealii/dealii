@@ -31,13 +31,12 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   Vector<std::complex<number> > v, w;
-  make_complex_vector (v);
-  make_complex_vector (w);
+  make_complex_range_vector (v);
+  make_complex_range_vector (w);
 
   m.precondition_Jacobi (v, w, 3.141);
   print_vector (v);
   print_vector (w);
 }
-

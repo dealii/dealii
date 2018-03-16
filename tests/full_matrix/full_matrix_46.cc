@@ -31,11 +31,10 @@ check ()
   FullMatrix<number> m;
   make_matrix (m);
   Vector<number> v, w;
-  make_vector (v);
-  make_vector (w);
+  make_range_vector (v);
+  make_domain_vector (w);
 
   m.vmult_add (v, w);
   print_vector (v);
   print_vector (w);
 }
-

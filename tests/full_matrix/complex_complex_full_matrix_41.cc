@@ -31,9 +31,8 @@ void
 check ()
 {
   FullMatrix<std::complex<number> > m;
-  make_complex_matrix (m);
+  make_complex_square_matrix (m);
   m(0,0) = m(1,1) = m(2,2) = m(3,3) = m(4,4) = 50;
   m.gauss_jordan ();
   print_matrix (m);
 }
-

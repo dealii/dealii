@@ -33,13 +33,12 @@ check ()
   FullMatrix<std::complex<number> > m;
   make_matrix (m);
   Vector<std::complex<number> > v, w, x;
-  make_vector (v);
-  make_vector (w);
-  make_vector (x);
+  make_range_vector (v);
+  make_domain_vector (w);
+  make_range_vector (x);
 
   m.residual (v, w, x);
   print_vector (v);
   print_vector (w);
   print_vector (x);
 }
-

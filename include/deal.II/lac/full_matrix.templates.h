@@ -108,7 +108,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator = (const LAPACKFullMatrix<number2> &M)
 {
   Assert (this->m() == M.n_rows(), ExcDimensionMismatch(this->m(), M.n_rows()));
-  Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_rows()));
+  Assert (this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_cols()));
   for (size_type i=0; i<this->m(); ++i)
     for (size_type j=0; j<this->n(); ++j)
       (*this)(i,j) = M(i,j);
@@ -255,10 +255,10 @@ number FullMatrix<number>::residual (Vector<number2> &dst,
   number res = 0.;
   const size_type size_m = m(),
                   size_n = n();
-  for (size_type i=0; i<size_n; ++i)
+  for (size_type i=0; i<size_m; ++i)
     {
       number s = number(right(i));
-      for (size_type j=0; j<size_m; ++j)
+      for (size_type j=0; j<size_n; ++j)
         s -= number(src(j)) * (*this)(i,j);
       dst(i) = s;
       res += s*s;
@@ -364,7 +364,7 @@ void FullMatrix<number>::add_row (const size_type i,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  for (size_type k=0; k<m(); ++k)
+  for (size_type k=0; k<n(); ++k)
     (*this)(i,k) += s*(*this)(j,k);
 }
 
@@ -378,7 +378,7 @@ void FullMatrix<number>::add_row (const size_type i,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  const size_type size_m = m();
+  const size_type size_m = n();
   for (size_type l=0; l<size_m; ++l)
     (*this)(i,l) += s*(*this)(j,l) + t*(*this)(k,l);
 }
@@ -390,7 +390,7 @@ void FullMatrix<number>::add_col (const size_type i, const number s,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  for (size_type k=0; k<n(); ++k)
+  for (size_type k=0; k<m(); ++k)
     (*this)(k,i) += s*(*this)(k,j);
 }
 
@@ -402,7 +402,7 @@ void FullMatrix<number>::add_col (const size_type i, const number s,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  for (size_t l=0; l<n(); ++l)
+  for (size_t l=0; l<m(); ++l)
     (*this)(l,i) += s*(*this)(l,j) + t*(*this)(l,k);
 }
 
@@ -932,7 +932,7 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == u.size(), ExcDimensionMismatch(m(),v.size()));
+  Assert(m() == u.size(), ExcDimensionMismatch(m(),u.size()));
   Assert(n() == v.size(), ExcDimensionMismatch(n(),v.size()));
 
   number2 sum = 0.;
