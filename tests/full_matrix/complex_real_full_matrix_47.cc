@@ -33,8 +33,8 @@ check ()
   FullMatrix<std::complex<number> > m;
   make_matrix (m);
   Vector<std::complex<number> > v, w;
-  make_vector (v);
-  make_vector (w);
+  make_domain_vector (v);
+  make_range_vector (w);
 
   m.Tvmult (v, w, true);
   print_vector (v);
@@ -44,4 +44,3 @@ check ()
   print_vector (v);
   print_vector (w);
 }
-
