@@ -2999,7 +2999,8 @@ namespace FETools
 
   template <int dim>
   void
-  hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int> &h2l)
+  hierarchic_to_lexicographic_numbering (const unsigned int degree,
+                                         std::vector<unsigned int> &h2l)
   {
     // number of support points in each direction
     const unsigned int n = degree+1;
@@ -3181,7 +3182,7 @@ namespace FETools
     Assert (fe.n_components() == 1, ExcInvalidFE());
     std::vector<unsigned int> h2l(fe.dofs_per_cell);
     hierarchic_to_lexicographic_numbering<dim> (fe.dofs_per_line+1, h2l);
-    return (h2l);
+    return h2l;
   }
 
 
