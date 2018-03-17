@@ -1535,52 +1535,46 @@ namespace FETools
                                       fe1.dofs_per_cell));
     matrix = 0;
 
-    unsigned int n1 = fe1.dofs_per_cell;
-    unsigned int n2 = fe2.dofs_per_cell;
+    const unsigned int n1 = fe1.dofs_per_cell;
+    const unsigned int n2 = fe2.dofs_per_cell;
 
-    // First, create a local mass matrix for
-    // the unit cell
+    // First, create a local mass matrix for the unit cell
     Triangulation<dim,spacedim> tr;
     GridGenerator::hyper_cube(tr);
 
-    // Choose a quadrature rule
-    // Gauss is exact up to degree 2n-1
+    // Choose a Gauss quadrature rule that is exact up to degree 2n-1
     const unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
     Assert (degree != numbers::invalid_unsigned_int,
             ExcNotImplemented());
+    const QGauss<dim> quadrature(degree+1);
 
-    QGauss<dim> quadrature(degree+1);
     // Set up FEValues.
     const UpdateFlags flags = update_values | update_quadrature_points | update_JxW_values;
     FEValues<dim> val1 (fe1, quadrature, update_values);
     val1.reinit (tr.begin_active());
+
     FEValues<dim> val2 (fe2, quadrature, flags);
     val2.reinit (tr.begin_active());
 
-    // Integrate and invert mass matrix
-    // This happens in the target space
+    // Integrate and invert mass matrix. This happens in the target space
     FullMatrix<double> mass (n2, n2);
 
     for (unsigned int k=0; k<quadrature.size(); ++k)
       {
-        const double w = val2.JxW(k);
+        const double dx = val2.JxW(k);
         for (unsigned int i=0; i<n2; ++i)
           {
             const double v = val2.shape_value(i,k);
             for (unsigned int j=0; j<n2; ++j)
-              mass(i,j) += w*v * val2.shape_value(j,k);
+              mass(i,j) += v * val2.shape_value(j,k) * dx;
           }
       }
-    // Gauss-Jordan should be
-    // sufficient since we expect the
-    // mass matrix to be
-    // well-conditioned
+    // Invert the matrix. Gauss-Jordan should be sufficient since we expect the
+    // mass matrix to be well-conditioned
     mass.gauss_jordan();
 
-    // Now, test every function of fe1
-    // with test functions of fe2 and
-    // compute the projection of each
-    // unit vector.
+    // Now, test every function of fe1 with test functions of fe2 and
+    // compute the projection of each unit vector.
     Vector<double> b(n2);
     Vector<double> x(n2);
 
@@ -1590,10 +1584,10 @@ namespace FETools
         for (unsigned int i=0; i<n2; ++i)
           for (unsigned int k=0; k<quadrature.size(); ++k)
             {
-              const double w = val2.JxW(k);
+              const double dx = val2.JxW(k);
               const double u = val1.shape_value(j,k);
               const double v = val2.shape_value(i,k);
-              b(i) += u*v*w;
+              b(i) += u*v*dx;
             }
 
         // Multiply by the inverse
