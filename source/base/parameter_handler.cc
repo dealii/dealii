@@ -589,7 +589,7 @@ void ParameterHandler::parse_input_from_json (std::istream &in)
   // file.
   read_json (in, node_tree);
 
-  // The xml function is reused to read in the xml into the paramter file.
+  // The xml function is reused to read in the xml into the parameter file.
   // This means that only mangled files can be read.
   read_xml_recursively (node_tree, "", path_separator, patterns, *entries);
 }
