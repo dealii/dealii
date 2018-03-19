@@ -526,7 +526,7 @@ public:
    * Class that represents an iterator pointing to a contiguous interval
    * $[a,b[$ as returned by IndexSet::begin_interval().
    */
-  class IntervalIterator : public std::iterator<std::forward_iterator_tag,IntervalAccessor>
+  class IntervalIterator
   {
   public:
     /**
@@ -598,6 +598,17 @@ public:
      */
     int operator - (const IntervalIterator &p) const;
 
+    /**
+     * Mark the class as forward iterator and declare some typedefs which are
+     * standard for iterators and are used by algorithms to enquire about the
+     * specifics of the iterators they work on.
+     */
+    typedef std::forward_iterator_tag iterator_category;
+    typedef IntervalAccessor          value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef IntervalAccessor         *pointer;
+    typedef IntervalAccessor         &reference;
+
   private:
     /**
      * Accessor that contains what IndexSet and interval we are pointing at.
@@ -609,7 +620,7 @@ public:
    * Class that represents an iterator pointing to a single element in the
    * IndexSet as returned by IndexSet::begin().
    */
-  class ElementIterator : public std::iterator<std::forward_iterator_tag,size_type>
+  class ElementIterator
   {
   public:
     /**
@@ -670,6 +681,17 @@ public:
      * value).
      */
     std::ptrdiff_t operator - (const ElementIterator &p) const;
+
+    /**
+     * Mark the class as forward iterator and declare some typedefs which are
+     * standard for iterators and are used by algorithms to enquire about the
+     * specifics of the iterators they work on.
+     */
+    typedef std::forward_iterator_tag iterator_category;
+    typedef size_type                 value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef size_type                *pointer;
+    typedef size_type                &reference;
 
   private:
     /**
