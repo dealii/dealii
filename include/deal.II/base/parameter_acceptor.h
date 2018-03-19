@@ -50,15 +50,19 @@ DEAL_II_NAMESPACE_OPEN
  * classes that have been derived from ParameterAcceptor, and that will be
  * parsed when calling ParameterAcceptor::initialize().
  *
- * ParameterAcceptor can be used in two different ways: by overloading the
+ * ParameterAcceptor can be used in three different ways: by overloading the
  * ParameterAcceptor::declare_parameters() and
- * ParameterAcceptor::parse_parameters() methods, or by calling its
+ * ParameterAcceptor::parse_parameters() methods, by calling its
  * ParameterAcceptor::add_parameter() method for each parameter we want to
- * have. This in turns makes sure that the given parameter is registered in the
- * global parameter handler (by calling ParameterHandler::add_parameter()), at
- * the correct path. If you define all your parameters using the
- * ParameterAcceptor::add_parameter() method, then you don't need to overload
- * any of the virtual methods of this class.
+ * have, or by constructing a ParameterAcceptorProxy class with your own class,
+ * provided that your class implements the @p declare_parameters and
+ * @p parse_parameters functions (the first can be a static member in this case).
+ *
+ * By using the add_parameter method, ParameterAcceptor makes sure that the
+ * given parameter is registered in the global parameter handler (by calling
+ * ParameterHandler::add_parameter()), at the correct path. If you define all
+ * your parameters using the ParameterAcceptor::add_parameter() method, then
+ * you don't need to overload any of the virtual methods of this class.
  *
  * If some post processing is required on the parsed values, the user can
  * attach a signal to ParameterAcceptor::declare_parameters_call_back and
@@ -483,7 +487,6 @@ public:
    */
   static ParameterHandler prm;
 
-private:
   /**
    * Make sure we enter the right subsection of the given parameter.
    */
@@ -495,6 +498,7 @@ private:
    */
   void leave_my_subsection(ParameterHandler &prm);
 
+private:
   /**
    * A list containing all constructed classes of type
    * ParameterAcceptor.
@@ -516,6 +520,82 @@ protected:
 
 
 
+/**
+ * A proxy ParameterAcceptor wrapper for classes that have a static member
+ * function @p declare_parameters, and a non virtual @p parse_parameters method.
+ *
+ * If you cannot or do not want to derive your "parameter accepting" class from
+ * ParameterAcceptor, for example if by design you are required to have a
+ * static member function @p declare_parameters and a member @p
+ * parse_parameters, or if someone has already implemented such a class for
+ * you, and only provides you with an API that you cannot modify, then you may
+ * be able to use ParameterAcceptor facilities nonetheless, by wrapping your
+ * class into ParameterAcceptorProxy.
+ *
+ * This class implements the public interface of ParameterAcceptor, and at the
+ * same time it derives from the template class @p SourceClass, allowing you to
+ * register your existing @p SourceClass as a ParameterAcceptor class, without
+ * requiring you to explicitly derive your @p SourceClass from
+ * ParameterAcceptor.
+ *
+ * An example usage is given by the following snippet of code, using
+ * Functions::ParsedFunction as an example source class:
+ *
+ * @code
+ * ParameterAcceptorProxy<Functions::ParsedFunction<2> > fun("Some function");
+ * ParameterAcceptor::initialize("test.prm");
+ * @endcode
+ *
+ * The above snippet of code will initialize ParameterAcceptor::prm with a
+ * section "Some function", and will correctly parse and assign to the object
+ * `fun` the expression parsed from the file `test.prm`. If non-existent, the
+ * program will exit, and generate it for you (here you can see the resulting
+ * short text version of the parameter file generated with the above snippet):
+ *
+ * @code
+ * # Parameter file generated with
+ * # DEAL_II_PACKAGE_VERSION = 9.0.0-pre
+ * subsection Some function
+ *   set Function constants  =
+ *   set Function expression = 0
+ *   set Variable names      = x,y,t
+ * end
+ * @endcode
+ *
+ * The resulting `fun` object, is both a ParsedFunction object and a
+ * ParameterAcceptor one, allowing you to use it as a replacement of the
+ * ParsedFunction class, with automatic declaration and parsing of parameter
+ * files.
+ *
+ * @author Luca Heltai, 2018
+ */
+template<class SourceClass>
+class ParameterAcceptorProxy : public SourceClass, public ParameterAcceptor
+{
+public:
+  /**
+   * Default constructor. The argument `section_name` is forwarded to the
+   * constructor of the ParameterAcceptor class, while all other arguments
+   * are passed to the SourceClass constructor.
+   */
+  template<typename... Args>
+  ParameterAcceptorProxy(const std::string section_name, Args... args);
+
+  /**
+   * Overloads the ParameterAcceptor::declare_parameters function, by calling
+   * @p SourceClass::declare_parameters with @p prm as an argument.
+   */
+  virtual void declare_parameters(ParameterHandler &prm);
+
+  /**
+   * Overloads the ParameterAcceptor::parse_parameters function, by calling
+   * @p SourceClass::parse_parameters with @p prm as an argument.
+   */
+  virtual void parse_parameters(ParameterHandler &prm);
+};
+
+
+
 // Inline and template functions
 template<class ParameterType>
 void ParameterAcceptor::add_parameter(const std::string &entry,
@@ -530,6 +610,30 @@ void ParameterAcceptor::add_parameter(const std::string &entry,
 }
 
 
+
+template<class SourceClass>
+template<typename... Args>
+ParameterAcceptorProxy<SourceClass>::
+ParameterAcceptorProxy(const std::string section_name, Args... args) :
+  SourceClass(args...),
+  ParameterAcceptor(section_name)
+{};
+
+
+
+template<class SourceClass>
+void  ParameterAcceptorProxy<SourceClass>::declare_parameters(ParameterHandler &prm)
+{
+  SourceClass::declare_parameters(prm);
+}
+
+
+
+template<class SourceClass>
+void  ParameterAcceptorProxy<SourceClass>::parse_parameters(ParameterHandler &prm)
+{
+  SourceClass::parse_parameters(prm);
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
