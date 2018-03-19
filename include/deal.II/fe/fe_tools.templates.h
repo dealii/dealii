@@ -1512,10 +1512,8 @@ namespace FETools
     FullMatrix<number> interpolation_matrix(fe1.dofs_per_cell);
     get_back_interpolation_matrix(fe1, fe2, interpolation_matrix);
 
-    for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
-      difference_matrix(i,i) = 1.;
-
     // compute difference
+    difference_matrix = IdentityMatrix(fe1.dofs_per_cell);
     difference_matrix.add (-1, interpolation_matrix);
   }
 

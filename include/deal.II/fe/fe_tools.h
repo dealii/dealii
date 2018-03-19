@@ -210,14 +210,15 @@ namespace FETools
                                 FullMatrix<number> &interpolation_matrix);
 
   /**
-   * Compute the identity matrix minus the back interpolation matrix.  The @p
-   * difference_matrix needs to be of size <tt>(fe1.dofs_per_cell,
-   * fe1.dofs_per_cell)</tt>.
+   * Compute the identity matrix minus the back interpolation matrix.
+   * The @p difference_matrix will be of size <tt>(fe1.dofs_per_cell,
+   * fe1.dofs_per_cell)</tt> after this function. Previous content
+   * of the argument will be overwritten.
    *
    * This function computes the matrix that transforms a @p fe1 function $z$ to
    * $z-I_hz$ where $I_h$ denotes the interpolation operator from the @p fe1
-   * space to the @p fe2 space. This matrix hence is useful to evaluate error-
-   * representations where $z$ denotes the dual solution.
+   * space to the @p fe2 space. This matrix hence is useful to evaluate
+   * error-representations where $z$ denotes the dual solution.
    */
   template <int dim, typename number, int spacedim>
   void
