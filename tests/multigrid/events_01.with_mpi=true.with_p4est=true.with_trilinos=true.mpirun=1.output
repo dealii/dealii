@@ -1,0 +1,82 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       147
+DEAL::   Number of degrees of freedom: 1406 (by level: 361, 1369, 49)
+DEAL::Event:  T=start name=transfer_to_mg lvl=0
+DEAL::Event:  T=end name=transfer_to_mg lvl=0
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_down_to lvl=1
+DEAL::Event:  T=end name=transfer_down_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_down_to lvl=0
+DEAL::Event:  T=end name=transfer_down_to lvl=0
+DEAL::Event:  T=start name=coarse_solve lvl=0
+DEAL::Event:  T=end name=coarse_solve lvl=0
+DEAL::Event:  T=start name=transfer_up_to lvl=1
+DEAL::Event:  T=end name=transfer_up_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_up_to lvl=2
+DEAL::Event:  T=end name=transfer_up_to lvl=2
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_to_global lvl=0
+DEAL::Event:  T=end name=transfer_to_global lvl=0
+DEAL::check residual: 0.00154307
+DEAL::coarse iterations: 31
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       487
+DEAL::   Number of degrees of freedom: 4526 (by level: 1156, 4489, 49)
+DEAL::Event:  T=start name=transfer_to_mg lvl=0
+DEAL::Event:  T=end name=transfer_to_mg lvl=0
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_down_to lvl=1
+DEAL::Event:  T=end name=transfer_down_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_down_to lvl=0
+DEAL::Event:  T=end name=transfer_down_to lvl=0
+DEAL::Event:  T=start name=coarse_solve lvl=0
+DEAL::Event:  T=end name=coarse_solve lvl=0
+DEAL::Event:  T=start name=transfer_up_to lvl=1
+DEAL::Event:  T=end name=transfer_up_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_up_to lvl=2
+DEAL::Event:  T=end name=transfer_up_to lvl=2
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_to_global lvl=0
+DEAL::Event:  T=end name=transfer_to_global lvl=0
+DEAL::check residual: 0.000788123
+DEAL::coarse iterations: 56
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       1027
+DEAL::   Number of degrees of freedom: 9446 (by level: 2401, 9409, 49)
+DEAL::Event:  T=start name=transfer_to_mg lvl=0
+DEAL::Event:  T=end name=transfer_to_mg lvl=0
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_down_to lvl=1
+DEAL::Event:  T=end name=transfer_down_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_down_to lvl=0
+DEAL::Event:  T=end name=transfer_down_to lvl=0
+DEAL::Event:  T=start name=coarse_solve lvl=0
+DEAL::Event:  T=end name=coarse_solve lvl=0
+DEAL::Event:  T=start name=transfer_up_to lvl=1
+DEAL::Event:  T=end name=transfer_up_to lvl=1
+DEAL::Event:  T=start name=smoother_step lvl=1
+DEAL::Event:  T=end name=smoother_step lvl=1
+DEAL::Event:  T=start name=transfer_up_to lvl=2
+DEAL::Event:  T=end name=transfer_up_to lvl=2
+DEAL::Event:  T=start name=smoother_step lvl=2
+DEAL::Event:  T=end name=smoother_step lvl=2
+DEAL::Event:  T=start name=transfer_to_global lvl=0
+DEAL::Event:  T=end name=transfer_to_global lvl=0
+DEAL::check residual: 0.000522658
+DEAL::coarse iterations: 81

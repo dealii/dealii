@@ -116,16 +116,27 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
 
   if (level == minlevel)
     {
+      if (!this->signal_notification.empty())
+        this->signal_notification(Event({Event::start, Event::coarse_solve, level}));
+
       if (debug>0)
         deallog << "Coarse level           " << level << std::endl;
       (*coarse)(level, solution[level], defect[level]);
+
+      if (!this->signal_notification.empty())
+        this->signal_notification(Event({Event::end, Event::coarse_solve, level}));
       return;
     }
 
   // smoothing of the residual
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
+
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::start, Event::smoother_step, level}));
   pre_smooth->apply(level, solution[level], defect[level]);
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::end, Event::smoother_step, level}));
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -154,13 +165,23 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
       edge_down->vmult(level, t[level-1], solution[level]);
       defect[level-1] -= t[level-1];
     }
+
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::start, Event::transfer_down_to, level-1}));
   transfer->restrict_and_add(level, defect[level-1], t[level]);
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::end, Event::transfer_down_to, level-1}));
 
   // do recursion
   level_v_step(level-1);
 
   // do coarse grid correction
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::start, Event::transfer_up_to, level}));
   transfer->prolongate(level, t[level], solution[level-1]);
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::end, Event::transfer_up_to, level}));
+
   if (debug>2)
     deallog << "Prolongate norm        " << t[level].l2_norm() << std::endl;
   solution[level] += t[level];
@@ -184,7 +205,11 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   // post-smoothing
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::start, Event::smoother_step, level}));
   post_smooth->smooth(level, solution[level], defect[level]);
+  if (!this->signal_notification.empty())
+    this->signal_notification(Event({Event::end, Event::smoother_step, level}));
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -364,6 +389,15 @@ Multigrid<VectorType>::vcycle()
       t[level].reinit(defect[level], level>minlevel);
     }
   level_v_step (maxlevel);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::connect_notification_signal(const std::function<void (const Event &)> &slot)
+{
+  return this->signal_notification.connect(slot);
 }
 
 
