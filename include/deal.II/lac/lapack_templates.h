@@ -221,6 +221,25 @@ extern "C"
                 dealii::types::blas_int *m, float *w, float *z,
                 const dealii::types::blas_int *ldz, float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
                 dealii::types::blas_int *ifail, dealii::types::blas_int *info);
+  // Same functionality as dsyev_ but using MRRR algorithm and with more options:
+  // E.g. compute only eigenvalues in a specific dealii::types::blas_interval,
+  // Compute only eigenvalues with a specific index.
+  void dsyevr_(const char *jobz, const char *range,
+               const char *uplo, const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
+               const double *vl, const double *vu,
+               const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const double *abstol,
+               dealii::types::blas_int *m, double *w, double *z,
+               const dealii::types::blas_int *ldz, dealii::types::blas_int *isuppz,
+               double *work, dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+               dealii::types::blas_int *liwork, dealii::types::blas_int *info);
+  void ssyevr_(const char *jobz, const char *range,
+               const char *uplo, const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
+               const float *vl, const float *vu,
+               const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const float *abstol,
+               dealii::types::blas_int *m, float *w, float *z,
+               const dealii::types::blas_int *ldz, dealii::types::blas_int *isuppz,
+               float *work, dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+               dealii::types::blas_int *liwork, dealii::types::blas_int *info);
 // Generalized eigenvalues and eigenvectors of
 // 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
 // A and B are symmetric and B is definite
@@ -336,6 +355,9 @@ extern "C"
                float *A,
                const dealii::types::blas_int *lda,
                dealii::types::blas_int *info);
+// dlamch and slamch help determining machine precision
+  double dlamch_(const char *chmach);
+  float slamch_(const char *chmach);
 }
 
 DEAL_II_NAMESPACE_OPEN
@@ -1326,6 +1348,145 @@ syevx (const char *, const char *, const char *, const types::blas_int *, float 
 #endif
 
 
+// Template wrapper for LAPACK functions dsyevr and ssyevr
+template <typename number>
+inline void
+syevr(const char * /*jobz*/,
+      const char * /*range*/,
+      const char * /*uplo*/,
+      const types::blas_int * /*n*/,
+      number * /*A*/,
+      const types::blas_int * /*lda*/,
+      const number * /*vl*/,
+      const number * /*vu*/,
+      const types::blas_int * /*il*/,
+      const types::blas_int * /*iu*/,
+      const number * /*abstol*/,
+      types::blas_int * /*m*/,
+      number * /*w*/,
+      number * /*z*/,
+      const types::blas_int * /*ldz*/,
+      types::blas_int * /*isuppz*/,
+      number * /*work*/,
+      types::blas_int * /*lwork*/,
+      types::blas_int * /*iwork*/,
+      types::blas_int * /*liwork*/,
+      types::blas_int * /*info*/)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+syevr(const char *jobz,
+      const char *range,
+      const char *uplo,
+      const types::blas_int *n,
+      double *A,
+      const types::blas_int *lda,
+      const double *vl,
+      const double *vu,
+      const types::blas_int *il,
+      const types::blas_int *iu,
+      const double *abstol,
+      types::blas_int *m,
+      double *w,
+      double *z,
+      const types::blas_int *ldz,
+      types::blas_int *isuppz,
+      double *work,
+      types::blas_int *lwork,
+      types::blas_int *iwork,
+      types::blas_int *liwork,
+      types::blas_int *info)
+{
+  dsyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
+}
+#else
+inline void
+syevr(const char * /*jobz*/,
+      const char * /*range*/,
+      const char * /*uplo*/,
+      const types::blas_int * /*n*/,
+      double * /*A*/,
+      const types::blas_int * /*lda*/,
+      const double * /*vl*/,
+      const double * /*vu*/,
+      const types::blas_int * /*il*/,
+      const types::blas_int * /*iu*/,
+      const double * /*abstol*/,
+      types::blas_int * /*m*/,
+      double * /*w*/,
+      double * /*z*/,
+      const types::blas_int * /*ldz*/,
+      types::blas_int * /*isuppz*/,
+      double * /*work*/,
+      types::blas_int * /*lwork*/,
+      types::blas_int * /*iwork*/,
+      types::blas_int * /*liwork*/,
+      types::blas_int * /*info*/)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dsyevr"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+syevr(const char *jobz,
+      const char *range,
+      const char *uplo,
+      const types::blas_int *n,
+      float *A,
+      const types::blas_int *lda,
+      const float *vl,
+      const float *vu,
+      const types::blas_int *il,
+      const types::blas_int *iu,
+      const float *abstol,
+      types::blas_int *m,
+      float *w,
+      float *z,
+      const types::blas_int *ldz,
+      types::blas_int *isuppz,
+      float *work,
+      types::blas_int *lwork,
+      types::blas_int *iwork,
+      types::blas_int *liwork,
+      types::blas_int *info)
+{
+  ssyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
+}
+#else
+inline void
+syevr(const char * /*jobz*/,
+      const char * /*range*/,
+      const char * /*uplo*/,
+      const types::blas_int * /*n*/,
+      float * /*A*/,
+      const types::blas_int * /*lda*/,
+      const float * /*vl*/,
+      const float * /*vu*/,
+      const types::blas_int * /*il*/,
+      const types::blas_int * /*iu*/,
+      const float * /*abstol*/,
+      types::blas_int * /*m*/,
+      float * /*w*/,
+      float * /*z*/,
+      const types::blas_int * /*ldz*/,
+      types::blas_int * /*isuppz*/,
+      float * /*work*/,
+      types::blas_int * /*lwork*/,
+      types::blas_int * /*iwork*/,
+      types::blas_int * /*liwork*/,
+      types::blas_int * /*info*/)
+{
+  Assert (false, LAPACKSupport::ExcMissing("ssyevr"));
+}
+#endif
+
+
 /// Template wrapper for LAPACK functions dsygv and ssygv
 template <typename number1, typename number2, typename number3, typename number4>
 inline void
@@ -1619,6 +1780,42 @@ lascl(const char *, const types::blas_int *, const types::blas_int *, const floa
 }
 #endif
 
+
+/// Template wrapper for LAPACK functions dlamch and slamch
+template <typename number>
+inline void
+lamch(const char * /*chmach*/, number & /*precision*/)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+lamch(const char *chmach, double &precision)
+{
+  precision = dlamch_(chmach);
+}
+#else
+inline void
+lamch(const char * /*chmach*/, double & /*precision*/)
+{
+  Assert(false, LAPACKSupport::ExcMissing("dlamch"));
+}
+#endif
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+lamch(const char *chmach, float &precision)
+{
+  precision = slamch_(chmach);
+}
+#else
+inline void
+lamch(const char * /*chmach*/, float & /*precision*/)
+{
+  Assert(false, LAPACKSupport::ExcMissing("slamch"));
+}
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
