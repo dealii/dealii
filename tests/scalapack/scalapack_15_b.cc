@@ -132,7 +132,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
     {
       const NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
-      //the requirement for alignment of the eigenvectors has to be released (primarily for floats)
+      //the requirement for alignment of the eigenvectors has to be released
       AssertThrow (std::abs(std::abs(product)-1) < tol*10,
                    ExcInternalError());
     }

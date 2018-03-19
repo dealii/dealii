@@ -423,7 +423,7 @@ public:
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
-   * matrix $A \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    *
    * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
    *
@@ -439,7 +439,8 @@ public:
                                                              const bool compute_eigenvectors);
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors using the MRRR algorithm.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    * The eigenvalues/eigenvectors are selected by prescribing a range of values @p value_limits for the eigenvalues.
    *
    * If successful, the computed eigenvalues are arranged in ascending order.
@@ -635,14 +636,19 @@ private:
                                                  std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
 
   /**
-   * Computing selected eigenvalues and, optionally, the eigenvectors using the MRRR algorithm.
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
    * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
    * or a range of values @p value_limits for the eigenvalues. The function will throw an exception
    * if both ranges are prescribed (meaning that both ranges differ from the default value)
    * as this ambiguity is prohibited.
+   *
+   * By calling this function the original content of the matrix will be overwritten.
+   * If requested, the eigenvectors are stored in the columns of the matrix.
+   * Also in the case that just the eigenvalues are required,
+   * the content of the matrix will be overwritten.
+   *
    * If successful, the computed eigenvalues are arranged in ascending order.
-   * The eigenvectors are stored in the columns of the matrix, thereby
-   * overwriting the original content of the matrix.
    */
   std::vector<NumberType> eigenpairs_symmetric_MRRR(const bool compute_eigenvectors,
                                                     const std::pair<unsigned int,unsigned int> &index_limits=

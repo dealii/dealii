@@ -1403,36 +1403,7 @@ syevr(const char *jobz,
 {
   dsyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
 }
-#else
-inline void
-syevr(const char * /*jobz*/,
-      const char * /*range*/,
-      const char * /*uplo*/,
-      const types::blas_int * /*n*/,
-      double * /*A*/,
-      const types::blas_int * /*lda*/,
-      const double * /*vl*/,
-      const double * /*vu*/,
-      const types::blas_int * /*il*/,
-      const types::blas_int * /*iu*/,
-      const double * /*abstol*/,
-      types::blas_int * /*m*/,
-      double * /*w*/,
-      double * /*z*/,
-      const types::blas_int * /*ldz*/,
-      types::blas_int * /*isuppz*/,
-      double * /*work*/,
-      types::blas_int * /*lwork*/,
-      types::blas_int * /*iwork*/,
-      types::blas_int * /*liwork*/,
-      types::blas_int * /*info*/)
-{
-  Assert (false, LAPACKSupport::ExcMissing("dsyevr"));
-}
-#endif
 
-
-#ifdef DEAL_II_WITH_LAPACK
 inline void
 syevr(const char *jobz,
       const char *range,
@@ -1457,32 +1428,6 @@ syevr(const char *jobz,
       types::blas_int *info)
 {
   ssyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
-}
-#else
-inline void
-syevr(const char * /*jobz*/,
-      const char * /*range*/,
-      const char * /*uplo*/,
-      const types::blas_int * /*n*/,
-      float * /*A*/,
-      const types::blas_int * /*lda*/,
-      const float * /*vl*/,
-      const float * /*vu*/,
-      const types::blas_int * /*il*/,
-      const types::blas_int * /*iu*/,
-      const float * /*abstol*/,
-      types::blas_int * /*m*/,
-      float * /*w*/,
-      float * /*z*/,
-      const types::blas_int * /*ldz*/,
-      types::blas_int * /*isuppz*/,
-      float * /*work*/,
-      types::blas_int * /*lwork*/,
-      types::blas_int * /*iwork*/,
-      types::blas_int * /*liwork*/,
-      types::blas_int * /*info*/)
-{
-  Assert (false, LAPACKSupport::ExcMissing("ssyevr"));
 }
 #endif
 
@@ -1795,25 +1740,11 @@ lamch(const char *chmach, double &precision)
 {
   precision = dlamch_(chmach);
 }
-#else
-inline void
-lamch(const char * /*chmach*/, double & /*precision*/)
-{
-  Assert(false, LAPACKSupport::ExcMissing("dlamch"));
-}
-#endif
 
-#ifdef DEAL_II_WITH_LAPACK
 inline void
 lamch(const char *chmach, float &precision)
 {
   precision = slamch_(chmach);
-}
-#else
-inline void
-lamch(const char * /*chmach*/, float & /*precision*/)
-{
-  Assert(false, LAPACKSupport::ExcMissing("slamch"));
 }
 #endif
 

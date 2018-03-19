@@ -915,14 +915,14 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_ind
     const bool compute_eigenvectors)
 {
   // Check validity of index limits.
-  Assert (index_limits.first < (unsigned int)n_rows,ExcIndexRange(index_limits.first,0,n_rows));
-  Assert (index_limits.second < (unsigned int)n_rows,ExcIndexRange(index_limits.second,0,n_rows));
+  AssertIndexRange(index_limits.first,static_cast<unsigned int>(n_rows));
+  AssertIndexRange(index_limits.second,static_cast<unsigned int>(n_rows));
 
-  std::pair<unsigned int,unsigned int> idx = std::make_pair(std::min(index_limits.first,index_limits.second),
-                                                            std::max(index_limits.first,index_limits.second));
+  const std::pair<unsigned int,unsigned int> idx = std::make_pair(std::min(index_limits.first,index_limits.second),
+                                                   std::max(index_limits.first,index_limits.second));
 
   // Compute all eigenvalues/eigenvectors.
-  if (idx.first==0 && idx.second==(unsigned int)n_rows-1)
+  if (idx.first==0 && idx.second==static_cast<unsigned int>(n_rows-1))
     return eigenpairs_symmetric_MRRR(compute_eigenvectors);
   else
     return eigenpairs_symmetric_MRRR(compute_eigenvectors,idx);
@@ -934,10 +934,10 @@ template <typename NumberType>
 std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value_MRRR(const std::pair<NumberType,NumberType> &value_limits,
     const bool compute_eigenvectors)
 {
-  Assert (!std::isnan(value_limits.first),ExcMessage("value_limits.first is NaN"));
-  Assert (!std::isnan(value_limits.second),ExcMessage("value_limits.second is NaN"));
+  AssertIsFinite(value_limits.first);
+  AssertIsFinite(value_limits.second);
 
-  std::pair<unsigned int,unsigned int> indices = std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int);
+  const std::pair<unsigned int,unsigned int> indices = std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int);
 
   return eigenpairs_symmetric_MRRR(compute_eigenvectors,indices,value_limits);
 }
@@ -960,7 +960,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(const bool compute_eigenv
   const bool use_values = (std::isnan(eigenvalue_limits.first) || std::isnan(eigenvalue_limits.second)) ? false : true;
   const bool use_indices = ((eigenvalue_idx.first==numbers::invalid_unsigned_int) || (eigenvalue_idx.second==numbers::invalid_unsigned_int)) ? false : true;
 
-  Assert(!(use_values && use_indices),ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
+  Assert(!(use_values && use_indices),
+         ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
 
   // If computation of eigenvectors is not required, use a sufficiently small distributed matrix.
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors = compute_eigenvectors ?
@@ -983,9 +984,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(const bool compute_eigenv
        * For jobz==N only eigenvalues are computed, for jobz='V' also the eigenvectors of the matrix are computed.
        */
       char jobz = compute_eigenvectors ? 'V' : 'N';
-      char range='A';
       // Default value is to compute all eigenvalues and optionally eigenvectors.
-      bool all_eigenpairs=true;
+      char range='A';
       NumberType vl=NumberType(),vu=NumberType();
       int il=1,iu=1;
 
@@ -996,12 +996,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(const bool compute_eigenv
           if (!use_values)
             {
               range = 'A';
-              all_eigenpairs = true;
             }
           else
             {
               range = 'V';
-              all_eigenpairs = false;
               vl = std::min(eigenvalue_limits.first,eigenvalue_limits.second);
               vu = std::max(eigenvalue_limits.first,eigenvalue_limits.second);
             }
@@ -1009,7 +1007,6 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(const bool compute_eigenv
       else
         {
           range = 'I';
-          all_eigenpairs = false;
           // As Fortran starts counting/indexing from 1 unlike C/C++, where it starts from 0.
           il = std::min(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
           iu = std::max(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
