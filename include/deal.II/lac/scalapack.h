@@ -422,6 +422,34 @@ public:
                                                         const bool compute_eigenvectors);
 
   /**
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $A \in \mathbb{R}^{M \times M}$ using the MRRR algorithm.
+   *
+   * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
+   *
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
+   *
+   * If all eigenvalues/eigenvectors have to be computed, pass the closed interval $ \left[ 0, M-1 \right] $ in @p index_limits.
+   *
+   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest eigenvalues/eigenvectors are desired.
+   */
+  std::vector<NumberType> eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int,unsigned int> &index_limits,
+                                                             const bool compute_eigenvectors);
+
+  /**
+   * Computing selected eigenvalues and, optionally, the eigenvectors using the MRRR algorithm.
+   * The eigenvalues/eigenvectors are selected by prescribing a range of values @p value_limits for the eigenvalues.
+   *
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
+   */
+  std::vector<NumberType> eigenpairs_symmetric_by_value_MRRR(const std::pair<NumberType,NumberType> &value_limits,
+                                                             const bool compute_eigenvectors);
+
+  /**
   * Computing the singular value decomposition (SVD) of a
   * matrix $A \in \mathbb{R}^{M \times N}$, optionally computing the left and/or right
   * singular vectors. The SVD is written as $A = U * \Sigma * V^T$
@@ -605,6 +633,22 @@ private:
                                                  std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int),
                                                const std::pair<NumberType,NumberType> &value_limits=
                                                  std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
+
+  /**
+   * Computing selected eigenvalues and, optionally, the eigenvectors using the MRRR algorithm.
+   * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
+   * or a range of values @p value_limits for the eigenvalues. The function will throw an exception
+   * if both ranges are prescribed (meaning that both ranges differ from the default value)
+   * as this ambiguity is prohibited.
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
+   */
+  std::vector<NumberType> eigenpairs_symmetric_MRRR(const bool compute_eigenvectors,
+                                                    const std::pair<unsigned int,unsigned int> &index_limits=
+                                                      std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int),
+                                                    const std::pair<NumberType,NumberType> &value_limits=
+                                                      std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
 
   /*
    * Stores the distributed matrix in @p filename
