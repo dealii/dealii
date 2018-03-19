@@ -143,7 +143,7 @@ DEAL_II_NAMESPACE_OPEN
  * in the main function @p approximate.
  *
  * Due to this way of operation, the class may be easily extended for higher
- * oder derivatives than are presently implemented. Basically, only an
+ * order derivatives than are presently implemented. Basically, only an
  * additional class along the lines of the derivative descriptor classes @p
  * Gradient and @p SecondDerivative has to be implemented, with the respective
  * typedefs and functions replaced by the appropriate analogues for the

@@ -250,7 +250,7 @@ namespace NonMatching
                           if (space_gtl[comp_i] == immersed_gtl[comp_j])
                             for (unsigned int oq=0; oq<o_fe_v.n_quadrature_points; ++oq)
                               {
-                                // Get the corrisponding q point
+                                // Get the corresponding q point
                                 const unsigned int q=ids[oq];
 
                                 cell_matrix(i,j) += ( fe_v.shape_value(j,q) *

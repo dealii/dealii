@@ -59,7 +59,7 @@ namespace NonMatching
    * on. If one of the two masks has more non-zero than the other, then the
    * excess components will be ignored.
    *
-   * If the domain $B$ does not fall withing $\Omega$, an exception will be
+   * If the domain $B$ does not fall within $\Omega$, an exception will be
    * thrown by the algorithm that computes the quadrature point locations. In
    * particular, notice that this function only makes sens for `dim1` lower or
    * equal than `dim0`. A static assert guards that this is actually the case.
@@ -112,7 +112,7 @@ namespace NonMatching
    * on. If one of the two masks has more non-zero entries non-zero than the
    * other, then the excess components will be ignored.
    *
-   * If the domain $B$ does not fall withing $\Omega$, an exception will be
+   * If the domain $B$ does not fall within $\Omega$, an exception will be
    * thrown by the algorithm that computes the quadrature point locations. In
    * particular, notice that this function only makes sens for `dim1` lower or
    * equal than `dim0`. A static assert guards that this is actually the case.
