@@ -43,6 +43,9 @@ template <int N>
 class TableIndices
 {
 public:
+  static_assert (N > 0,
+                 "TableIndices objects need to represent at least one index.");
+
 
   /**
    * Default constructor. This constructor sets all indices to zero.
@@ -182,8 +185,6 @@ protected:
 template <int N>
 TableIndices<N>::TableIndices()
 {
-  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
-
   for (unsigned int i=0; i<N; ++i)
     indices[i] = 0;
 }
@@ -271,8 +272,6 @@ TableIndices<N>::TableIndices(const std::size_t index0,
                               const std::size_t index7,
                               const std::size_t index8)
 {
-  Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
-
   switch (N)
     {
     case 1:
