@@ -31,7 +31,7 @@ namespace Particles
    * of the particle class and the particle container.
    */
   template<int dim, int spacedim=dim>
-  class ParticleIterator: public std::iterator<std::bidirectional_iterator_tag,ParticleAccessor<dim,spacedim> >
+  class ParticleIterator
   {
   public:
     /**
@@ -112,6 +112,17 @@ namespace Particles
      * previously pointed to.
      */
     ParticleIterator operator -- (int);
+
+    /**
+     * Mark the class as bidirectional iterator and declare some typedefs which
+     * are standard for iterators and are used by algorithms to enquire about
+     * the specifics of the iterators they work on.
+     */
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef ParticleAccessor<dim,spacedim>  value_type;
+    typedef std::ptrdiff_t                  difference_type;
+    typedef ParticleAccessor<dim,spacedim> *pointer;
+    typedef ParticleAccessor<dim,spacedim> &reference;
 
   private:
     /**

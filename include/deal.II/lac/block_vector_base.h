@@ -214,9 +214,7 @@ namespace internal
      * @author Wolfgang Bangerth, 2001
      */
     template <class BlockVectorType, bool Constness>
-    class Iterator :
-      public std::iterator<std::random_access_iterator_tag,
-      typename Types<BlockVectorType,Constness>::value_type>
+    class Iterator
     {
     public:
       /**
@@ -238,7 +236,7 @@ namespace internal
        * by algorithms to enquire about the specifics of the iterators they
        * work on.
        */
-      typedef std::random_access_iterator_tag               iterator_type;
+      typedef std::random_access_iterator_tag               iterator_category;
       typedef std::ptrdiff_t                                difference_type;
       typedef typename BlockVectorType::reference           reference;
       typedef value_type                                   *pointer;

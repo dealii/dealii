@@ -2972,7 +2972,7 @@ namespace internal
               {
                 // use the rotate defined
                 // in <algorithms>
-                rotate(line_counterclock, line_counterclock+1, line_counterclock+4);
+                std::rotate(line_counterclock, line_counterclock+1, line_counterclock+4);
                 // update the quads with
                 // rotated lines (i runs in
                 // lexicographic ordering)

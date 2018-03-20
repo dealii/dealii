@@ -121,8 +121,7 @@ public:
    * A class that implements the semantics of iterators over iterators as
    * discussed in the design sections of the IteratorRange class.
    */
-  class IteratorOverIterators : public std::iterator<std::forward_iterator_tag, Iterator,
-    typename Iterator::difference_type>
+  class IteratorOverIterators
   {
   public:
     /**
@@ -171,6 +170,17 @@ public:
      * object than the iterator represented by the argument.
      */
     bool operator != (const IteratorOverIterators &i_o_i);
+
+    /**
+     * Mark the class as forward iterator and declare some typedefs which are
+     * standard for iterators and are used by algorithms to enquire about the
+     * specifics of the iterators they work on.
+     */
+    typedef std::forward_iterator_tag          iterator_category;
+    typedef Iterator                           value_type;
+    typedef typename Iterator::difference_type difference_type;
+    typedef Iterator                          *pointer;
+    typedef Iterator                          &reference;
 
   private:
     /**
