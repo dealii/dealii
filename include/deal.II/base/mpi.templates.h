@@ -123,13 +123,13 @@ namespace Utilities
 #ifdef DEBUG
             {
               const unsigned int rank = this_mpi_process(mpi_communicator);
-              const int size = values.size();
-              int size_min = 0;
-              int size_max = 0;
+              unsigned int size = values.size();
+              unsigned int size_min = 0;
+              unsigned int size_max = 0;
               int ierr2 = 0;
-              ierr2 = MPI_Reduce(&size, &size_min, 1, MPI_INT, MPI_MIN, 0, mpi_communicator);
+              ierr2 = MPI_Reduce(&size, &size_min, 1, MPI_UNSIGNED, MPI_MIN, 0, mpi_communicator);
               AssertThrowMPI(ierr2);
-              ierr2 = MPI_Reduce(&size, &size_max, 1, MPI_INT, MPI_MAX, 0, mpi_communicator);
+              ierr2 = MPI_Reduce(&size, &size_max, 1, MPI_UNSIGNED, MPI_MAX, 0, mpi_communicator);
               AssertThrowMPI(ierr2);
               if (rank==0)
                 Assert (size_min == size_max, ExcMessage("values has different size across MPI processes."));
