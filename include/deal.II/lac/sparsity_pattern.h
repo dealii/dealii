@@ -496,11 +496,11 @@ public:
   SparsityPattern &operator = (const SparsityPattern &);
 
   /**
-   * Reallocate memory and set up data structures for a new matrix with <tt>m
-   * </tt>rows and <tt>n</tt> columns, with at most <tt>max_per_row</tt>
+   * Reallocate memory and set up data structures for a new matrix with @p m
+   * rows and @p n columns, with at most @p max_per_row
    * nonzero entries per row.
    *
-   * This function simply maps its operations to the other <tt>reinit</tt>
+   * This function simply maps its operations to the other reinit()
    * function.
    */
   void reinit (const size_type m,
@@ -509,9 +509,9 @@ public:
 
 
   /**
-   * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
-   * entries for each row is taken from the array <tt>row_lengths</tt> which
-   * has to give this number of each row <tt>i=1...m</tt>.
+   * Reallocate memory for a matrix of size @p m times @p n. The number of
+   * entries for each row is taken from the array @p row_lengths which
+   * has to give this number of each row $i=1\ldots m#.
    *
    * If <tt>m*n==0</tt> all memory is freed, resulting in a total
    * reinitialization of the object. If it is nonzero, new memory is only
