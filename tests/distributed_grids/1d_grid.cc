@@ -33,6 +33,6 @@ int main(int argc, char *argv[])
     }
   catch (const std::exception &exc)
     {
-      deallog << exc.what() << std::endl;
+      deallog << "This test has to throw an exception" << std::endl;
     }
 }
