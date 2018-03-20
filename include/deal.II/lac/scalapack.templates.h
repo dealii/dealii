@@ -192,6 +192,29 @@ extern "C"
                 const int *DESCA,
                 int *INFO);
 
+  /**
+   * Computes an LU factorization of a general distributed matrix sub( A )
+   * using partial pivoting with row interchanges.
+   *
+   * http://www.netlib.org/scalapack/explore-html/df/dfe/pdgetrf_8f_source.html
+   * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgetrf.htm
+   */
+  void pdgetrf_(const int *m,
+                const int *n,
+                double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                int *ipiv,
+                int *INFO);
+  void psgetrf_(const int *m,
+                const int *n,
+                float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                int *ipiv,
+                int *INFO);
 
   /**
    * Compute the inverse of a real symmetric positive definite
@@ -217,6 +240,38 @@ extern "C"
                 const int *JA,
                 const int *DESCA,
                 int *INFO);
+
+  /**
+   * PDGETRI computes the inverse of a distributed matrix using the LU
+   * factorization computed by PDGETRF. This method inverts U and then
+   * computes the inverse of sub( A ) = A(IA:IA+N-1,JA:JA+N-1) denoted
+   * InvA by solving the system InvA*L = inv(U) for InvA.
+   *
+   * http://www.netlib.org/scalapack/explore-html/d3/df3/pdgetri_8f_source.html
+   * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgetri.htm
+   */
+  void pdgetri_(const int *N,
+                double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const int *ipiv,
+                double *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *info);
+  void psgetri_(const int *N,
+                float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const int *ipiv,
+                float *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *info);
 
   /**
    * Estimate the reciprocal of the condition number (in the
@@ -857,6 +912,44 @@ inline void ppotrf(const char *UPLO,
 
 
 template <typename number>
+inline void pgetrf(const int * /*m*/,
+                   const int * /*n*/,
+                   number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   int * /*ipiv*/,
+                   int * /*INFO*/)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgetrf(const int *m,
+                   const int *n,
+                   double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *ipiv,
+                   int *INFO)
+{
+  pdgetrf_(m,n,A,IA,JA,DESCA,ipiv,INFO);
+}
+
+inline void pgetrf(const int *m,
+                   const int *n,
+                   float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *ipiv,
+                   int *INFO)
+{
+  psgetrf_(m,n,A,IA,JA,DESCA,ipiv,INFO);
+}
+
+
+template <typename number>
 inline void ppotri(const char * /*UPLO*/,
                    const int * /*N*/,
                    number * /*A*/,
@@ -888,6 +981,53 @@ inline void ppotri(const char *UPLO,
                    int *INFO)
 {
   pspotri_(UPLO, N, A, IA, JA, DESCA, INFO);
+}
+
+
+template <typename number>
+inline void pgetri(const int * /*N*/,
+                   number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   const int * /*ipiv*/,
+                   number * /*work*/,
+                   int * /*lwork*/,
+                   int * /*iwork*/,
+                   int * /*liwork*/,
+                   int * /*info*/)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgetri(const int *N,
+                   double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const int *ipiv,
+                   double *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *info)
+{
+  pdgetri_(N,A,IA,JA,DESCA,ipiv,work,lwork,iwork,liwork,info);
+}
+
+inline void pgetri(const int *N,
+                   float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const int *ipiv,
+                   float *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *info)
+{
+  psgetri_(N,A,IA,JA,DESCA,ipiv,work,lwork,iwork,liwork,info);
 }
 
 

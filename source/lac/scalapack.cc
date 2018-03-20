@@ -656,8 +656,10 @@ void ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType> &C,
 template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
-  Assert (n_columns == n_rows,
-          ExcMessage("Cholesky factorization can be applied to SPD matrices only."));
+  Assert (n_columns==n_rows && property == LAPACKSupport::Property::symmetric,
+          ExcMessage("Cholesky factorization can be applied to symmetric matrices only."));
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
 
   if (grid->mpi_process_is_active)
     {
@@ -667,8 +669,32 @@ void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
       ppotrf(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotrf", info));
     }
-  property = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
   state = LAPACKSupport::cholesky;
+  property = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::compute_lu_factorization()
+{
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+
+  if (grid->mpi_process_is_active)
+    {
+      int info = 0;
+      NumberType *A_loc = &this->values[0];
+
+      const int iarow = indxg2p_(&submatrix_row, &row_block_size, &(grid->this_process_row), &first_process_row, &(grid->n_process_rows));
+      const int mp = numroc_(&n_rows, &row_block_size, &(grid->this_process_row), &iarow, &(grid->n_process_rows));
+      ipiv.resize(mp+row_block_size);
+
+      pgetrf(&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,ipiv.data(),&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgetrf", info));
+    }
+  state = LAPACKSupport::State::lu;
+  property = LAPACKSupport::Property::general;
 }
 
 
@@ -676,17 +702,52 @@ void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::invert()
 {
-  if (state == LAPACKSupport::matrix)
-    compute_cholesky_factorization();
+  // Check whether matrix is symmetric and save flag.
+  // If a Cholesky factorization has been applied previously,
+  // the original matrix was symmetric.
+  const bool is_symmetric = (property == LAPACKSupport::symmetric || state == LAPACKSupport::State::cholesky);
 
+  // Matrix is neither in Cholesky nor LU state.
+  // Compute the required factorizations based on the property of the matrix.
+  if ( !(state==LAPACKSupport::State::lu || state==LAPACKSupport::State::cholesky) )
+    {
+      if (is_symmetric)
+        compute_cholesky_factorization();
+      else
+        compute_lu_factorization();
+    }
   if (grid->mpi_process_is_active)
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
-      ppotri (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotri", info));
+
+      if (is_symmetric)
+        {
+          ppotri(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &info);
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotri", info));
+        }
+      else
+        {
+          int lwork=-1, liwork=-1;
+          work.resize(1);
+          iwork.resize(1);
+
+          pgetri(&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
+                 ipiv.data(), work.data(), &lwork, iwork.data(), &liwork, &info);
+
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgetri", info));
+          lwork=work[0];
+          liwork=iwork[0];
+          work.resize(lwork);
+          iwork.resize(liwork);
+
+          pgetri(&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
+                 ipiv.data(), work.data(), &lwork, iwork.data(), &liwork, &info);
+
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgetri", info));
+        }
     }
-  state = LAPACKSupport::inverse_matrix;
+  state = LAPACKSupport::State::inverse_matrix;
 }
 
 
