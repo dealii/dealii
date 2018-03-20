@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOutRotation
+  namespace DataOutRotationImplementation
   {
     template <int dim, int spacedim>
     ParallelData<dim,spacedim>::
@@ -57,7 +57,7 @@ namespace internal
                   const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags)
       :
-      internal::DataOut::
+      internal::DataOutImplementation::
       ParallelDataBase<dim,spacedim> (n_datasets,
                                       n_subdivisions,
                                       n_postprocessor_outputs,
@@ -94,7 +94,7 @@ template <int dim, typename DoFHandlerType>
 void
 DataOutRotation<dim,DoFHandlerType>::
 build_one_patch (const cell_iterator                                                 *cell,
-                 internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
+                 internal::DataOutRotationImplementation::ParallelData<dimension, space_dimension> &data,
                  std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >     &my_patches)
 {
   if (dim == 3)
@@ -204,15 +204,15 @@ build_one_patch (const cell_iterator                                            
                       // value, gradient etc.
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                      internal::DataOut::ComponentExtractor::real_part,
+                                                                      internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                       data.patch_values_scalar.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
-                                                                         internal::DataOut::ComponentExtractor::real_part,
+                                                                         internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                          data.patch_values_scalar.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
-                                                                        internal::DataOut::ComponentExtractor::real_part,
+                                                                        internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                         data.patch_values_scalar.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
@@ -236,15 +236,15 @@ build_one_patch (const cell_iterator                                            
                       // its derivative...
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                      internal::DataOut::ComponentExtractor::real_part,
+                                                                      internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                       data.patch_values_system.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
-                                                                         internal::DataOut::ComponentExtractor::real_part,
+                                                                         internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                          data.patch_values_system.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
-                                                                        internal::DataOut::ComponentExtractor::real_part,
+                                                                        internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                         data.patch_values_system.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
@@ -294,7 +294,7 @@ build_one_patch (const cell_iterator                                            
               else if (n_components == 1)
                 {
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                internal::DataOut::ComponentExtractor::real_part,
+                                                                internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                 data.patch_values_scalar.solution_values);
 
                   switch (dimension)
@@ -327,7 +327,7 @@ build_one_patch (const cell_iterator                                            
                 {
                   data.resize_system_vectors(n_components);
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
-                                                                internal::DataOut::ComponentExtractor::real_part,
+                                                                internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                 data.patch_values_system.solution_values);
 
                   for (unsigned int component=0; component<n_components;
@@ -375,7 +375,7 @@ build_one_patch (const cell_iterator                                            
                                  typename Triangulation<dimension,space_dimension>::active_cell_iterator(*cell));
               const double value
                 = this->cell_data[dataset]->get_cell_data_value (cell_number,
-                                                                 internal::DataOut::ComponentExtractor::real_part);
+                                                                 internal::DataOutImplementation::ComponentExtractor::real_part);
               switch (dimension)
                 {
                 case 1:
@@ -416,13 +416,13 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
   // template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));
   Assert (this->triangulation != nullptr,
-          Exceptions::DataOut::ExcNoTriangulationSelected());
+          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
                                       ? nnnn_subdivisions
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   this->validate_dataset_names();
 
@@ -465,7 +465,7 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
     else
       n_postprocessor_outputs[dataset] = 0;
 
-  internal::DataOutRotation::ParallelData<dimension, space_dimension>
+  internal::DataOutRotationImplementation::ParallelData<dimension, space_dimension>
   thread_data (n_datasets,
                n_subdivisions, n_patches_per_circle,
                n_postprocessor_outputs,
@@ -486,7 +486,7 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
                    &all_cells[0]+all_cells.size(),
                    std::bind(&DataOutRotation<dim,DoFHandlerType>::build_one_patch,
                              this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
-                   std::bind(&internal::DataOutRotation
+                   std::bind(&internal::DataOutRotationImplementation
                              ::append_patch_to_list<dim,space_dimension>,
                              std::placeholders::_1, std::ref(this->patches)),
                    thread_data,

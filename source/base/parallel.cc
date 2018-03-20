@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Vector
+  namespace VectorImplementation
   {
     // set minimum grain size. this value has been determined by experiments
     // with the actual dealii::Vector implementation and takes vectorization
@@ -35,7 +35,7 @@ namespace internal
   }
 
 
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     // set this value to 1/16 of the value of the minimum grain size of
     // vectors (a factor of 4 because we assume that sparse matrix-vector

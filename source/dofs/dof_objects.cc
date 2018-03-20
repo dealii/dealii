@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     template <int dim>
     std::size_t
@@ -64,7 +64,7 @@ namespace internal
 // explicit instantiations
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
 #include "dof_objects.inst"
   }

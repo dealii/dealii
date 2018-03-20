@@ -1602,7 +1602,7 @@ QProjector<dim>::project_to_subface(const SubQuadrature       &quadrature,
 
 namespace internal
 {
-  namespace QIterated
+  namespace QIteratedImplementation
   {
     namespace
     {
@@ -1743,7 +1743,7 @@ template <>
 QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
                          const unsigned int   n_copies)
   :
-  Quadrature<1> (internal::QIterated::uses_both_endpoints(base_quadrature) ?
+  Quadrature<1> (internal::QIteratedImplementation::uses_both_endpoints(base_quadrature) ?
                  (base_quadrature.size()-1) * n_copies + 1 :
                  base_quadrature.size() * n_copies)
 {
@@ -1751,7 +1751,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
   Assert (base_quadrature.size() > 0, ExcNotInitialized());
   Assert (n_copies > 0, ExcZero());
 
-  if (!internal::QIterated::uses_both_endpoints(base_quadrature))
+  if (!internal::QIteratedImplementation::uses_both_endpoints(base_quadrature))
     // we don't have to skip some
     // points in order to get a
     // reasonable quadrature formula

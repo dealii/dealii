@@ -1084,7 +1084,7 @@ const unsigned int TriaAccessorBase<structdim, dim, spacedim>::structure_dimensi
 template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::
-set (const internal::Triangulation::TriaObject<structdim> &object) const
+set (const internal::TriangulationImplementation::TriaObject<structdim> &object) const
 {
   this->objects().cells[this->present_index] = object;
 }

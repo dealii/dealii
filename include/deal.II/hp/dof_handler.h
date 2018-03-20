@@ -41,7 +41,7 @@ template <int dim, int spacedim> class Triangulation;
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     struct Implementation;
 
@@ -56,7 +56,7 @@ namespace internal
   {
     class DoFLevel;
 
-    namespace DoFHandler
+    namespace DoFHandlerImplementation
     {
       struct Implementation;
     }
@@ -65,12 +65,12 @@ namespace internal
 
 namespace internal
 {
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     struct Implementation;
   }
 
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     struct Implementation;
   }
@@ -162,8 +162,8 @@ namespace hp
   template <int dim, int spacedim=dim>
   class DoFHandler : public Subscriptor
   {
-    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
-    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
+    typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
+    typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
   public:
     typedef typename ActiveSelector::CellAccessor         cell_accessor;
     typedef typename ActiveSelector::FaceAccessor         face_accessor;
@@ -833,7 +833,7 @@ namespace hp
      * An object that describes how degrees of freedom should be distributed and
      * renumbered.
      */
-    std::unique_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+    std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> > policy;
 
 
     /**
@@ -892,14 +892,14 @@ namespace hp
      * For most members of this structure, there is an accessor function in
      * this class that returns its value.
      */
-    dealii::internal::DoFHandler::NumberCache number_cache;
+    dealii::internal::DoFHandlerImplementation::NumberCache number_cache;
 
     /**
      * A structure that contains all sorts of numbers that characterize the
      * degrees of freedom on multigrid levels. Since multigrid is not currently
      * supported, this table is not filled with valid entries.
      */
-    std::vector<dealii::internal::DoFHandler::NumberCache> mg_number_cache;
+    std::vector<dealii::internal::DoFHandlerImplementation::NumberCache> mg_number_cache;
 
     /**
      * Array to store the indices for degrees of freedom located at vertices.
@@ -948,16 +948,16 @@ namespace hp
      */
     template <int, class, bool> friend class dealii::DoFAccessor;
     template <class, bool> friend class dealii::DoFCellAccessor;
-    friend struct dealii::internal::DoFAccessor::Implementation;
-    friend struct dealii::internal::DoFCellAccessor::Implementation;
+    friend struct dealii::internal::DoFAccessorImplementation::Implementation;
+    friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 
     /**
      * Likewise for DoFLevel objects since they need to access the vertex dofs
      * in the functions that set and retrieve vertex dof indices.
      */
     template <int> friend class dealii::internal::hp::DoFIndicesOnFacesOrEdges;
-    friend struct dealii::internal::hp::DoFHandler::Implementation;
-    friend struct dealii::internal::DoFHandler::Policy::Implementation;
+    friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+    friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
   };
 
 
@@ -996,7 +996,7 @@ namespace internal
    * Defined in source/dofs/dof_handler.cc.
    */
   template <int dim, int spacedim>
-  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
+  std::string policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> &policy);
 }
 
 

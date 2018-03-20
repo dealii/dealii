@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     namespace Policy
     {
@@ -641,13 +641,13 @@ namespace internal
                 (include_vertex[vertex_index] == true))
               {
                 const unsigned int n_active_fe_indices
-                  = dealii::internal::DoFAccessor::Implementation::
+                  = dealii::internal::DoFAccessorImplementation::Implementation::
                     n_active_vertex_fe_indices (dof_handler, vertex_index);
                 if (n_active_fe_indices > 1)
                   {
                     const unsigned int
                     first_fe_index
-                      = dealii::internal::DoFAccessor::Implementation::
+                      = dealii::internal::DoFAccessorImplementation::Implementation::
                         nth_active_vertex_fe_index (dof_handler, vertex_index, 0);
 
                     // loop over all the other FEs with which we want
@@ -656,7 +656,7 @@ namespace internal
                       {
                         const unsigned int
                         other_fe_index
-                          = dealii::internal::DoFAccessor::Implementation::
+                          = dealii::internal::DoFAccessorImplementation::Implementation::
                             nth_active_vertex_fe_index (dof_handler, vertex_index, f);
 
                         // make sure the entry in the equivalence
@@ -679,13 +679,13 @@ namespace internal
                         for (unsigned int i=0; i<identities.size(); ++i)
                           {
                             const types::global_dof_index lower_dof_index
-                              = dealii::internal::DoFAccessor::Implementation::
+                              = dealii::internal::DoFAccessorImplementation::Implementation::
                                 get_vertex_dof_index (dof_handler,
                                                       vertex_index,
                                                       first_fe_index,
                                                       identities[i].first);
                             const types::global_dof_index higher_dof_index
-                              = dealii::internal::DoFAccessor::Implementation::
+                              = dealii::internal::DoFAccessorImplementation::Implementation::
                                 get_vertex_dof_index (dof_handler,
                                                       vertex_index,
                                                       other_fe_index,
@@ -1653,7 +1653,7 @@ namespace internal
                ++vertex_index)
             {
               const unsigned int n_active_fe_indices
-                = dealii::internal::DoFAccessor::Implementation::
+                = dealii::internal::DoFAccessorImplementation::Implementation::
                   n_active_vertex_fe_indices (dof_handler, vertex_index);
 
               // if this vertex is unused, then we really ought not to have allocated
@@ -1669,13 +1669,13 @@ namespace internal
               for (unsigned int f=0; f<n_active_fe_indices; ++f)
                 {
                   const unsigned int fe_index
-                    = dealii::internal::DoFAccessor::Implementation::
+                    = dealii::internal::DoFAccessorImplementation::Implementation::
                       nth_active_vertex_fe_index (dof_handler, vertex_index, f);
 
                   for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_vertex; ++d)
                     {
                       const types::global_dof_index old_dof_index
-                        = dealii::internal::DoFAccessor::Implementation::
+                        = dealii::internal::DoFAccessorImplementation::Implementation::
                           get_vertex_dof_index(dof_handler,
                                                vertex_index,
                                                fe_index,
@@ -1694,7 +1694,7 @@ namespace internal
                                 ExcInternalError());
 
                       if (old_dof_index != numbers::invalid_dof_index)
-                        dealii::internal::DoFAccessor::Implementation::
+                        dealii::internal::DoFAccessorImplementation::Implementation::
                         set_vertex_dof_index (dof_handler,
                                               vertex_index,
                                               fe_index,

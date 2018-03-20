@@ -53,7 +53,7 @@ test_preconditioner (const MATRIX &A,
   const auto lo_A = linear_operator<VECTOR>(A);
   // Note: The above should be equivalent to the following:
   //
-  //  typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+  //  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
   //  const auto lo_A = linear_operator<VECTOR,VECTOR,PAYLOAD>(A);
 
   PRECONDITIONER preconditioner;
@@ -97,7 +97,7 @@ test_preconditioner (const MATRIX &A,
     const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR>(A, preconditioner);
     // Note: The above should be equivalent to the following:
     //
-    //    typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+    //    typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
     //    const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR,PAYLOAD>(A, preconditioner);
 
     // Singular operation
@@ -121,7 +121,7 @@ test_preconditioner (const MATRIX &A,
   {
     // Stand-alone
     deallog.push("S.A.");
-    typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+    typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
     const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR,PAYLOAD>(preconditioner);
 
     // Singular operation
@@ -153,7 +153,7 @@ test_solver (const MATRIX &A,
   const auto lo_A = linear_operator<VECTOR>(A);
   // Note: The above should be equivalent to the following:
   //
-  //  typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+  //  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
   //  const auto lo_A = linear_operator<VECTOR,VECTOR,PAYLOAD>(A);
 
   SolverControl solver_control (100, 1.0e-10);
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     //   // test_solver<SLVR> (A, b);
     //
     //   typedef dealii::TrilinosWrappers::MPI::Vector VectorType;
-    //   typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PayloadType;
+    //   typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PayloadType;
     //   // TODO: Full template expansion required for composite operator. Can one prevent this?
     //   //       i.e. is 'const auto lo_A = linear_operator<VectorType>(A);' possible?
     //   const auto lo_A = linear_operator<VectorType,VectorType,PayloadType>(A);

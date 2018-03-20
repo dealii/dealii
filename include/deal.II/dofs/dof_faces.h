@@ -32,7 +32,7 @@ namespace internal
    *
    * @ingroup dofs
    */
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
 
     /**
@@ -113,7 +113,7 @@ namespace internal
       /**
        * The object containing the data of DoFs on lines.
        */
-      internal::DoFHandler::DoFObjects<1> lines;
+      internal::DoFHandlerImplementation::DoFObjects<1> lines;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
@@ -143,12 +143,12 @@ namespace internal
       /**
        * The object containing the data of DoFs on lines.
        */
-      internal::DoFHandler::DoFObjects<1> lines;
+      internal::DoFHandlerImplementation::DoFObjects<1> lines;
 
       /**
        * The object containing the data of DoFs on quads.
        */
-      internal::DoFHandler::DoFObjects<2> quads;
+      internal::DoFHandlerImplementation::DoFObjects<2> quads;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this

@@ -2521,7 +2521,7 @@ get_interpolated_dof_values (const IndexSet &,
 
 namespace internal
 {
-  namespace FEValues
+  namespace FEValuesImplementation
   {
     template <int dim, int spacedim>
     void

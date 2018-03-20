@@ -260,7 +260,7 @@ FE_DGPNonparametric<dim,spacedim>::
 get_data (const UpdateFlags                                                    update_flags,
           const Mapping<dim,spacedim> &,
           const Quadrature<dim> &,
-          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // generate a new data object
   typename FiniteElement<dim,spacedim>::InternalDataBase *data
@@ -287,9 +287,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const Quadrature<dim> &,
                 const Mapping<dim,spacedim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,
-                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   Assert (fe_internal.update_each & update_quadrature_points, ExcInternalError());
 
@@ -333,9 +333,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const Quadrature<dim-1>                                             &,
                      const Mapping<dim,spacedim> &,
                      const typename Mapping<dim,spacedim>::InternalDataBase &,
-                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                      const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   Assert (fe_internal.update_each & update_quadrature_points, ExcInternalError());
 
@@ -380,9 +380,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const Quadrature<dim-1>                                             &,
                         const Mapping<dim,spacedim> &,
                         const typename Mapping<dim,spacedim>::InternalDataBase &,
-                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                         const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   Assert (fe_internal.update_each & update_quadrature_points, ExcInternalError());
 

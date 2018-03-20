@@ -467,7 +467,7 @@ void swap (BlockVector<Number> &u,
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
     template <typename> class ReinitHelper;
 

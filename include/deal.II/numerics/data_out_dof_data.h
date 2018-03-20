@@ -41,7 +41,7 @@ namespace Exceptions
    * A namespace for exceptions that are used throughout the DataOut*
    * collection of classes.
    */
-  namespace DataOut
+  namespace DataOutImplementation
   {
     /**
      * Exception
@@ -143,7 +143,7 @@ namespace Exceptions
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     /**
      * The DataEntry classes abstract away the concrete data type of vectors
@@ -865,12 +865,12 @@ protected:
   /**
    * List of data elements with vectors of values for each degree of freedom.
    */
-  std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  dof_data;
+  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<DoFHandlerType> > >  dof_data;
 
   /**
    * List of data elements with vectors of values for each cell.
    */
-  std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >  cell_data;
+  std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<DoFHandlerType> > >  cell_data;
 
   /**
    * This is a list of patches that is created each time build_patches() is
@@ -942,7 +942,7 @@ add_data_vector
  const DataVectorType                      type,
  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
-  Assert (triangulation != nullptr, Exceptions::DataOut::ExcNoTriangulationSelected ());
+  Assert (triangulation != nullptr, Exceptions::DataOutImplementation::ExcNoTriangulationSelected ());
   std::vector<std::string> names(1, name);
   add_data_vector_internal (dofs, vec, names, type, data_component_interpretation, true);
 }
@@ -959,7 +959,7 @@ add_data_vector
  const DataVectorType                      type,
  const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
 {
-  Assert (triangulation != nullptr, Exceptions::DataOut::ExcNoTriangulationSelected ());
+  Assert (triangulation != nullptr, Exceptions::DataOutImplementation::ExcNoTriangulationSelected ());
   add_data_vector_internal(dofs, vec, names, type, data_component_interpretation, false);
 }
 
@@ -1003,7 +1003,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 add_data_vector (const VectorType                       &vec,
                  const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
 {
-  Assert (dofs != nullptr, Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+  Assert (dofs != nullptr, Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected ());
   add_data_vector(*dofs, vec, data_postprocessor);
 }
 
@@ -1028,17 +1028,17 @@ merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> 
   // check equality of component
   // names
   Assert (get_dataset_names() == source.get_dataset_names(),
-          Exceptions::DataOut::ExcIncompatibleDatasetNames());
+          Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
   // make sure patches are compatible. we'll
   // assume that if the first respective
   // patches are ok that all the other ones
   // are ok as well
   Assert (patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-          Exceptions::DataOut::ExcIncompatiblePatchLists());
+          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-          Exceptions::DataOut::ExcIncompatiblePatchLists());
+          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
   Assert (patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-          Exceptions::DataOut::ExcIncompatiblePatchLists());
+          Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
   // specifications

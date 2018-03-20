@@ -35,7 +35,7 @@ template <int, int> class DoFHandler;
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     struct NumberCache;
 

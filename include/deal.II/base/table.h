@@ -1966,7 +1966,7 @@ TableBase<N,T>::empty () const
 
 namespace internal
 {
-  namespace Table
+  namespace TableImplementation
   {
     template <typename InputIterator, typename T>
     void fill_Fortran_style (InputIterator  entries,
@@ -2026,7 +2026,7 @@ TableBase<N,T>::fill (InputIterator entries,
          p != values.end(); ++p)
       *p = *entries++;
   else
-    internal::Table::fill_Fortran_style (entries, *this);
+    internal::TableImplementation::fill_Fortran_style (entries, *this);
 }
 
 

@@ -37,12 +37,12 @@ template <int, int> class FiniteElement;
 
 namespace internal
 {
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     struct Implementation;
   }
 
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     struct Implementation;
     namespace Policy
@@ -53,7 +53,7 @@ namespace internal
 
   namespace hp
   {
-    namespace DoFHandler
+    namespace DoFHandlerImplementation
     {
       struct Implementation;
     }
@@ -68,7 +68,7 @@ namespace internal
 
 namespace internal
 {
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     /**
      * This is a switch class which only declares a @p typedef. It is meant to
@@ -198,7 +198,7 @@ namespace internal
  * 2012, 2013
  */
 template <int structdim, typename DoFHandlerType, bool level_dof_access>
-class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::BaseClass
+class DoFAccessor : public dealii::internal::DoFAccessorImplementation::Inheritance<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::BaseClass
 {
 public:
 
@@ -219,7 +219,7 @@ public:
    * exception classes simpler.
    */
   typedef
-  typename dealii::internal::DoFAccessor::Inheritance<structdim, dimension, space_dimension>::BaseClass
+  typename dealii::internal::DoFAccessorImplementation::Inheritance<structdim, dimension, space_dimension>::BaseClass
   BaseClass;
 
   /**
@@ -345,7 +345,7 @@ public:
    * a line itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType, level_dof_access>::line_iterator
+  typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType, level_dof_access>::line_iterator
   line (const unsigned int i) const;
 
   /**
@@ -353,7 +353,7 @@ public:
    * a quad itself, then the only valid index is @p i equals to zero, and the
    * function returns an iterator to itself.
    */
-  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType, level_dof_access>::quad_iterator
+  typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType, level_dof_access>::quad_iterator
   quad (const unsigned int i) const;
 
   /**
@@ -690,11 +690,11 @@ private:
   template <int dim, int spacedim> friend class DoFHandler;
   template <int dim, int spacedim> friend class hp::DoFHandler;
 
-  friend struct dealii::internal::DoFHandler::Policy::Implementation;
-  friend struct dealii::internal::DoFHandler::Implementation;
-  friend struct dealii::internal::hp::DoFHandler::Implementation;
-  friend struct dealii::internal::DoFCellAccessor::Implementation;
-  friend struct dealii::internal::DoFAccessor::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
+  friend struct dealii::internal::DoFAccessorImplementation::Implementation;
 };
 
 
@@ -855,7 +855,7 @@ public:
    * Since meshes with dimension 1 do not have quads this method just throws
    * an exception.
    */
-  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
+  typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
   line (const unsigned int i) const;
 
   /**
@@ -864,7 +864,7 @@ public:
    * Since meshes with dimension 1 do not have quads this method just throws
    * an exception.
    */
-  typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
+  typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
   quad (const unsigned int i) const;
 
   /**
@@ -1135,10 +1135,10 @@ protected:
   template <int, int> friend class DoFHandler;
   template <int, int> friend class hp::DoFHandler;
 
-  friend struct dealii::internal::DoFHandler::Policy::Implementation;
-  friend struct dealii::internal::DoFHandler::Implementation;
-  friend struct dealii::internal::hp::DoFHandler::Implementation;
-  friend struct dealii::internal::DoFCellAccessor::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 };
 
 
@@ -1835,7 +1835,7 @@ private:
    * update_cell_dof_indices_cache() function
    */
   template <int dim, int spacedim> friend class DoFHandler;
-  friend struct dealii::internal::DoFCellAccessor::Implementation;
+  friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 };
 
 

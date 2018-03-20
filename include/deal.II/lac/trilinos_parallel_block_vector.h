@@ -423,7 +423,7 @@ namespace TrilinosWrappers
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
     template <typename> class ReinitHelper;
 

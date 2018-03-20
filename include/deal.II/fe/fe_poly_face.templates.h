@@ -79,9 +79,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const Quadrature<dim> &,
                 const Mapping<dim,spacedim> &,
                 const typename Mapping<dim,spacedim>::InternalDataBase &,
-                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase &,
-                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &) const
 {
   // Do nothing, since we do not have
   // values in the interior
@@ -97,9 +97,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const Quadrature<dim-1>                                             &quadrature,
                      const Mapping<dim,spacedim> &,
                      const typename Mapping<dim,spacedim>::InternalDataBase &,
-                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
                      const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -166,9 +166,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const Quadrature<dim-1>                                             &quadrature,
                         const Mapping<dim,spacedim> &,
                         const typename Mapping<dim,spacedim>::InternalDataBase &,
-                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &,
                         const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with

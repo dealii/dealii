@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <int dim>
     void
@@ -204,8 +204,8 @@ namespace internal
 }
 
 
-template class internal::Triangulation::TriaLevel<1>;
-template class internal::Triangulation::TriaLevel<2>;
+template class internal::TriangulationImplementation::TriaLevel<1>;
+template class internal::TriangulationImplementation::TriaLevel<2>;
 
 DEAL_II_NAMESPACE_CLOSE
 

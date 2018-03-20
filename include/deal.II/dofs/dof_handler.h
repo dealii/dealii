@@ -45,7 +45,7 @@ template <int dim, int spacedim> class Triangulation;
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     struct Implementation;
 
@@ -56,12 +56,12 @@ namespace internal
     }
   }
 
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     struct Implementation;
   }
 
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     struct Implementation;
   }
@@ -88,7 +88,7 @@ namespace internal
  * matrices also refer to all degrees of freedom and some kind of condensation
  * is needed to restrict the systems of equations to the unconstrained degrees
  * of freedom only. The actual layout of storage of the indices is described
- * in the dealii::internal::DoFHandler::DoFLevel class documentation.
+ * in the dealii::internal::DoFHandlerImplementation::DoFLevel class documentation.
  *
  * The class offers iterators to traverse all cells, in much the same way as
  * the Triangulation class does. Using the begin() and end() functions (and
@@ -191,8 +191,8 @@ namespace internal
 template <int dim, int spacedim=dim>
 class DoFHandler  :  public Subscriptor
 {
-  typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
-  typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
+  typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
+  typedef dealii::internal::DoFHandlerImplementation::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
 public:
   typedef typename ActiveSelector::CellAccessor         cell_accessor;
   typedef typename ActiveSelector::FaceAccessor         face_accessor;
@@ -1043,7 +1043,7 @@ private:
    * An object that describes how degrees of freedom should be distributed and
    * renumbered.
    */
-  std::unique_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> > policy;
 
   /**
    * A structure that contains all sorts of numbers that characterize the
@@ -1052,12 +1052,12 @@ private:
    * For most members of this structure, there is an accessor function in this
    * class that returns its value.
    */
-  dealii::internal::DoFHandler::NumberCache number_cache;
+  dealii::internal::DoFHandlerImplementation::NumberCache number_cache;
 
   /**
    * Data structure like number_cache, but for each multigrid level.
    */
-  std::vector<dealii::internal::DoFHandler::NumberCache> mg_number_cache;
+  std::vector<dealii::internal::DoFHandlerImplementation::NumberCache> mg_number_cache;
 
   /**
    * A data structure that is used to store the DoF indices associated with a
@@ -1171,29 +1171,29 @@ private:
    * Space to store the DoF numbers for the different levels. Analogous to the
    * <tt>levels[]</tt> tree of the Triangulation objects.
    */
-  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim> > > levels;
 
-  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > mg_levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFLevel<dim> > > mg_levels;
 
   /**
    * Space to store DoF numbers of faces. They are not stored in
    * <tt>levels</tt> since faces are not organized hierarchically, but in a
    * flat array.
    */
-  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > faces;
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim> > faces;
 
-  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > mg_faces;
+  std::unique_ptr<dealii::internal::DoFHandlerImplementation::DoFFaces<dim> > mg_faces;
 
   /**
    * Make accessor objects friends.
    */
   template <int, class, bool> friend class DoFAccessor;
   template <class, bool> friend class DoFCellAccessor;
-  friend struct dealii::internal::DoFAccessor::Implementation;
-  friend struct dealii::internal::DoFCellAccessor::Implementation;
+  friend struct dealii::internal::DoFAccessorImplementation::Implementation;
+  friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
 
-  friend struct dealii::internal::DoFHandler::Implementation;
-  friend struct dealii::internal::DoFHandler::Policy::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Implementation;
+  friend struct dealii::internal::DoFHandlerImplementation::Policy::Implementation;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
@@ -1386,7 +1386,7 @@ namespace internal
    * Defined in dof_handler.cc.
    */
   template <int dim, int spacedim>
-  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
+  std::string policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> &policy);
 }
 
 
@@ -1452,7 +1452,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   levels.resize(size);
   for (unsigned int i = 0; i < levels.size(); ++i)
     {
-      std::unique_ptr<internal::DoFHandler::DoFLevel<dim>> level;
+      std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<dim>> level;
       ar &level;
       levels[i] = std::move(level);
     }

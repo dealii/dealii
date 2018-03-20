@@ -394,7 +394,7 @@ namespace CellSimilarity
 
 namespace internal
 {
-  namespace FEValues
+  namespace FEValuesImplementation
   {
     /**
      * A class that stores all of the mapping related data used in

@@ -65,7 +65,7 @@ namespace LinearAlgebra
           free(val);
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
-        if (new_alloc_size >= 4*dealii::internal::Vector::minimum_parallel_grain_size)
+        if (new_alloc_size >= 4*dealii::internal::VectorImplementation::minimum_parallel_grain_size)
           thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       }
   }

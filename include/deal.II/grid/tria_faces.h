@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     /**
      * General template for information belonging to the faces of a

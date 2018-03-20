@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace FESystem
+  namespace FESystemImplementation
   {
     namespace
     {
@@ -97,7 +97,7 @@ InternalData::set_fe_data (const unsigned int base_no,
 
 
 template <int dim, int spacedim>
-internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
 FESystem<dim,spacedim>::
 InternalData::get_fe_output_object (const unsigned int base_no) const
 {
@@ -277,7 +277,7 @@ FESystem<dim,spacedim>::FESystem (
   FiniteElement<dim,spacedim> (FETools::Compositing::multiply_dof_numbers(fes, multiplicities),
                                FETools::Compositing::compute_restriction_is_additive_flags (fes, multiplicities),
                                FETools::Compositing::compute_nonzero_components(fes, multiplicities)),
-  base_elements(internal::FESystem::count_nonzeros(multiplicities))
+  base_elements(internal::FESystemImplementation::count_nonzeros(multiplicities))
 {
   initialize(fes, multiplicities);
 }
@@ -888,7 +888,7 @@ FESystem<dim,spacedim>::
 get_data (const UpdateFlags                                                    flags,
           const Mapping<dim,spacedim>                                         &mapping,
           const Quadrature<dim>                                               &quadrature,
-          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -914,7 +914,7 @@ get_data (const UpdateFlags                                                    f
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+      internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_element(base_no).requires_update_flags(flags));
@@ -944,7 +944,7 @@ FESystem<dim,spacedim>::
 get_face_data (const UpdateFlags                                                    flags,
                const Mapping<dim,spacedim>                                         &mapping,
                const Quadrature<dim-1>                                             &quadrature,
-               dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+               dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -970,7 +970,7 @@ get_face_data (const UpdateFlags                                                
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+      internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_element(base_no).requires_update_flags(flags));
@@ -1002,7 +1002,7 @@ FESystem<dim,spacedim>::
 get_subface_data (const UpdateFlags                                                    flags,
                   const Mapping<dim,spacedim>                                         &mapping,
                   const Quadrature<dim-1>                                             &quadrature,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // create an internal data object and set the update flags we will need
   // to deal with. the current object does not make use of these flags,
@@ -1028,7 +1028,7 @@ get_subface_data (const UpdateFlags                                             
   // function is called
   for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
-      internal::FEValues::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
+      internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &base_fe_output_object
         = data->get_fe_output_object(base_no);
       base_fe_output_object.initialize (quadrature.size(), base_element(base_no),
                                         flags | base_element(base_no).requires_update_flags(flags));
@@ -1059,9 +1059,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator       
                 const Quadrature<dim>                                               &quadrature,
                 const Mapping<dim,spacedim>                                         &mapping,
                 const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill(mapping, cell, invalid_face_number, invalid_face_number,
                quadrature, cell_similarity, mapping_internal, fe_internal,
@@ -1078,9 +1078,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
                      const Quadrature<dim-1>                                             &quadrature,
                      const Mapping<dim,spacedim>                                         &mapping,
                      const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                      const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
                 CellSimilarity::none, mapping_internal, fe_internal,
@@ -1099,9 +1099,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const Quadrature<dim-1>                                             &quadrature,
                         const Mapping<dim,spacedim>                                         &mapping,
                         const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                         const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   compute_fill (mapping, cell, face_no, sub_no, quadrature,
                 CellSimilarity::none, mapping_internal, fe_internal,
@@ -1122,8 +1122,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
               const CellSimilarity::Similarity                  cell_similarity,
               const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
               const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-              const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-              internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+              const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &mapping_data,
+              internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -1157,7 +1157,7 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
         base_fe      = base_element(base_no);
         typename FiniteElement<dim,spacedim>::InternalDataBase &
         base_fe_data = fe_data.get_fe_data(base_no);
-        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+        internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
         base_data    = fe_data.get_fe_output_object(base_no);
 
         // fill_fe_face_values needs argument Quadrature<dim-1> for both cases
@@ -1478,7 +1478,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
           ExcDimensionMismatch (fes.size(), multiplicities.size()) );
   Assert (fes.size() > 0,
           ExcMessage ("Need to pass at least one finite element."));
-  Assert (internal::FESystem::count_nonzeros(multiplicities) > 0,
+  Assert (internal::FESystemImplementation::count_nonzeros(multiplicities) > 0,
           ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
   // Note that we need to skip every fe with multiplicity 0 in the following block of code

@@ -43,7 +43,7 @@ template <int, int, int> class TriaAccessor;
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
 
     /**

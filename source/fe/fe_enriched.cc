@@ -335,7 +335,7 @@ typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Enriched<dim,spacedim>::get_face_data (const UpdateFlags      update_flags,
                                           const Mapping<dim,spacedim>    &mapping,
                                           const Quadrature<dim-1> &quadrature,
-                                          internal::FEValues::FiniteElementRelatedData< dim, spacedim >        &output_data) const
+                                          internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >        &output_data) const
 {
   return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_face_data(update_flags,mapping,quadrature,output_data)),
                     update_flags,
@@ -348,7 +348,7 @@ typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Enriched<dim,spacedim>::get_subface_data (const UpdateFlags      update_flags,
                                              const Mapping<dim,spacedim>    &mapping,
                                              const Quadrature<dim-1> &quadrature,
-                                             dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                                             dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_subface_data(update_flags,mapping,quadrature,output_data)),
                     update_flags,
@@ -361,7 +361,7 @@ typename FiniteElement<dim,spacedim>::InternalDataBase *
 FE_Enriched<dim,spacedim>::get_data (const UpdateFlags      flags,
                                      const Mapping<dim,spacedim>    &mapping,
                                      const Quadrature<dim> &quadrature,
-                                     internal::FEValues::FiniteElementRelatedData< dim, spacedim >   &output_data) const
+                                     internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >   &output_data) const
 {
   return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_data(flags,mapping,quadrature,output_data)),
                     flags,
@@ -463,9 +463,9 @@ FE_Enriched<dim,spacedim>::fill_fe_values (const typename Triangulation< dim, sp
                                            const Quadrature< dim > &quadrature,
                                            const Mapping< dim, spacedim > &mapping,
                                            const typename Mapping< dim, spacedim >::InternalDataBase &mapping_internal,
-                                           const dealii::internal::FEValues::MappingRelatedData< dim, spacedim > &mapping_data,
+                                           const dealii::internal::FEValuesImplementation::MappingRelatedData< dim, spacedim > &mapping_data,
                                            const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-                                           internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
+                                           internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim > &output_data
                                           ) const
 {
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
@@ -499,9 +499,9 @@ FE_Enriched<dim,spacedim>::fill_fe_face_values
  const Quadrature< dim-1 > &quadrature,
  const Mapping< dim, spacedim > &mapping,
  const typename Mapping< dim, spacedim >::InternalDataBase &mapping_internal,
- const dealii::internal::FEValues::MappingRelatedData< dim, spacedim > &mapping_data,
+ const dealii::internal::FEValuesImplementation::MappingRelatedData< dim, spacedim > &mapping_data,
  const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
- internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
+ internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim > &output_data
 ) const
 {
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
@@ -536,9 +536,9 @@ FE_Enriched<dim,spacedim>::fill_fe_subface_values
  const Quadrature< dim-1 > &quadrature,
  const Mapping< dim, spacedim > &mapping,
  const typename Mapping< dim, spacedim >::InternalDataBase &mapping_internal,
- const dealii::internal::FEValues::MappingRelatedData< dim, spacedim > &mapping_data,
+ const dealii::internal::FEValuesImplementation::MappingRelatedData< dim, spacedim > &mapping_data,
  const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
- internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data
+ internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim > &output_data
 ) const
 {
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr,
@@ -572,9 +572,9 @@ void
 FE_Enriched<dim,spacedim>::multiply_by_enrichment
 (const Quadrature<dim_1> &quadrature,
  const InternalData &fe_data,
- const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
+ const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &mapping_data,
  const typename Triangulation< dim, spacedim >::cell_iterator &cell,
- internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const
+ internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &output_data) const
 {
   // mapping_data will contain quadrature points on the real element.
   // fe_internal is needed to get update flags
@@ -602,7 +602,7 @@ FE_Enriched<dim,spacedim>::multiply_by_enrichment
         base_fe      = base_element(base_no);
         typename FiniteElement<dim,spacedim>::InternalDataBase &
         base_fe_data = fe_data.get_fe_data(base_no);
-        internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+        internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
         base_data    = fe_data.get_fe_output_object(base_no);
 
         const UpdateFlags base_flags = base_fe_data.update_each;
@@ -942,7 +942,7 @@ InternalData::get_fe_data (const unsigned int base_no) const
 
 
 template <int dim, int spacedim>
-internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
 FE_Enriched<dim,spacedim>::
 InternalData::get_fe_output_object (const unsigned int base_no) const
 {

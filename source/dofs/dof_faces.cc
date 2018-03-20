@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     std::size_t
     DoFFaces<1>::memory_consumption () const

@@ -44,7 +44,7 @@ namespace internal
   /**
    * A namespace for a helper class to the GMRES solver.
    */
-  namespace SolverGMRES
+  namespace SolverGMRESImplementation
   {
     /**
      * Class to hold temporary vectors.  This class automatically allocates a
@@ -289,7 +289,7 @@ public:
    */
   boost::signals2::connection
   connect_krylov_space_slot(
-    const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot);
+    const std::function<void (const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)> &slot);
 
 
   /**
@@ -353,7 +353,7 @@ protected:
    * Signal used to retrieve the Krylov space basis vectors. Called once
    * when all iterations are ended.
    */
-  boost::signals2::signal<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> krylov_space_signal;
+  boost::signals2::signal<void (const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)> krylov_space_signal;
 
   /**
    * Signal used to retrieve a notification
@@ -386,7 +386,7 @@ protected:
    */
   static double
   modified_gram_schmidt
-  (const internal::SolverGMRES::TmpVectors<VectorType> &orthogonal_vectors,
+  (const internal::SolverGMRESImplementation::TmpVectors<VectorType> &orthogonal_vectors,
    const unsigned int                                  dim,
    const unsigned int                                  accumulated_iterations,
    VectorType                                          &vv,
@@ -521,7 +521,7 @@ private:
 #ifndef DOXYGEN
 namespace internal
 {
-  namespace SolverGMRES
+  namespace SolverGMRESImplementation
   {
     template <class VectorType>
     inline
@@ -654,7 +654,7 @@ template <class VectorType>
 inline
 double
 SolverGMRES<VectorType>::modified_gram_schmidt
-(const internal::SolverGMRES::TmpVectors<VectorType> &orthogonal_vectors,
+(const internal::SolverGMRESImplementation::TmpVectors<VectorType> &orthogonal_vectors,
  const unsigned int                                  dim,
  const unsigned int                                  accumulated_iterations,
  VectorType                                          &vv,
@@ -746,7 +746,7 @@ SolverGMRES<VectorType>::compute_eigs_and_cond
             eigenvalues[i] = mat_eig.eigenvalue(i);
           //Sort eigenvalues for nicer output.
           std::sort(eigenvalues.begin(), eigenvalues.end(),
-                    internal::SolverGMRES::complex_less_pred);
+                    internal::SolverGMRESImplementation::complex_less_pred);
           eigenvalues_signal(eigenvalues);
         }
       //Calculate condition number, avoid calculating the svd if a slot
@@ -781,7 +781,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
   // Generate an object where basis vectors are stored.
-  internal::SolverGMRES::TmpVectors<VectorType> tmp_vectors (n_tmp_vectors, this->memory);
+  internal::SolverGMRESImplementation::TmpVectors<VectorType> tmp_vectors (n_tmp_vectors, this->memory);
 
   // number of the present iteration; this
   // number is not reset to zero upon a
@@ -1111,7 +1111,7 @@ SolverGMRES<VectorType>::connect_hessenberg_slot
 template <class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_krylov_space_slot
-(const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot)
+(const std::function<void (const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)> &slot)
 {
   return krylov_space_signal.connect(slot);
 }
@@ -1177,8 +1177,8 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
   const unsigned int basis_size = additional_data.max_basis_size;
 
   // Generate an object where basis vectors are stored.
-  typename internal::SolverGMRES::TmpVectors<VectorType> v (basis_size, this->memory);
-  typename internal::SolverGMRES::TmpVectors<VectorType> z (basis_size, this->memory);
+  typename internal::SolverGMRESImplementation::TmpVectors<VectorType> v (basis_size, this->memory);
+  typename internal::SolverGMRESImplementation::TmpVectors<VectorType> z (basis_size, this->memory);
 
   // number of the present iteration; this number is not reset to zero upon a
   // restart

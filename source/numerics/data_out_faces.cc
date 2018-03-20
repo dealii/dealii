@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOutFaces
+  namespace DataOutFacesImplementation
   {
     template <int dim, int spacedim>
     ParallelData<dim,spacedim>::
@@ -43,7 +43,7 @@ namespace internal
                   const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
                   const UpdateFlags update_flags)
       :
-      internal::DataOut::
+      internal::DataOutImplementation::
       ParallelDataBase<dim,spacedim> (n_datasets,
                                       n_subdivisions,
                                       n_postprocessor_outputs,
@@ -87,7 +87,7 @@ template <int dim, typename DoFHandlerType>
 void
 DataOutFaces<dim,DoFHandlerType>::
 build_one_patch (const FaceDescriptor *cell_and_face,
-                 internal::DataOutFaces::ParallelData<dimension, dimension> &data,
+                 internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
                  DataOutBase::Patch<dimension-1,space_dimension>  &patch)
 {
   Assert (cell_and_face->first->is_locally_owned(),
@@ -155,15 +155,15 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                   // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::real_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                   data.patch_values_scalar.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     internal::DataOut::ComponentExtractor::real_part,
+                                                                     internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                      data.patch_values_scalar.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    internal::DataOut::ComponentExtractor::real_part,
+                                                                    internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                     data.patch_values_scalar.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -189,15 +189,15 @@ build_one_patch (const FaceDescriptor *cell_and_face,
                   data.resize_system_vectors(n_components);
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::real_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                   data.patch_values_system.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     internal::DataOut::ComponentExtractor::real_part,
+                                                                     internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                      data.patch_values_system.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    internal::DataOut::ComponentExtractor::real_part,
+                                                                    internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                     data.patch_values_system.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -230,7 +230,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
             if (n_components == 1)
               {
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              internal::DataOut::ComponentExtractor::real_part,
+                                                              internal::DataOutImplementation::ComponentExtractor::real_part,
                                                               data.patch_values_scalar.solution_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = data.patch_values_scalar.solution_values[q];
@@ -239,7 +239,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
               {
                 data.resize_system_vectors(n_components);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              internal::DataOut::ComponentExtractor::real_part,
+                                                              internal::DataOutImplementation::ComponentExtractor::real_part,
                                                               data.patch_values_system.solution_values);
                 for (unsigned int component=0; component<n_components;
                      ++component)
@@ -267,7 +267,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 
           const double value
             = this->cell_data[dataset]->get_cell_data_value (cell_number,
-                                                             internal::DataOut::ComponentExtractor::real_part);
+                                                             internal::DataOutImplementation::ComponentExtractor::real_part);
           for (unsigned int q=0; q<n_q_points; ++q)
             patch.data(dataset+offset,q) = value;
         }
@@ -297,10 +297,10 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
                                       : this->default_subdivisions;
 
   Assert (n_subdivisions >= 1,
-          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   Assert (this->triangulation != nullptr,
-          Exceptions::DataOut::ExcNoTriangulationSelected());
+          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   this->validate_dataset_names();
 
@@ -339,7 +339,7 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
       update_flags |= this->dof_data[i]->postprocessor->get_needed_update_flags();
   update_flags |= update_quadrature_points;
 
-  internal::DataOutFaces::ParallelData<dimension, space_dimension>
+  internal::DataOutFacesImplementation::ParallelData<dimension, space_dimension>
   thread_data (n_datasets,
                n_subdivisions,
                n_postprocessor_outputs,
@@ -356,7 +356,7 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
                    &all_faces[0]+all_faces.size(),
                    std::bind(&DataOutFaces<dim,DoFHandlerType>::build_one_patch,
                              this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
-                   std::bind(&internal::DataOutFaces::
+                   std::bind(&internal::DataOutFacesImplementation::
                              append_patch_to_list<dim,space_dimension>,
                              std::placeholders::_1, std::ref(this->patches)),
                    thread_data,

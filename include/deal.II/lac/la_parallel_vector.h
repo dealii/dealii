@@ -1548,7 +1548,7 @@ struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std::f
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
     template <typename> class ReinitHelper;
 

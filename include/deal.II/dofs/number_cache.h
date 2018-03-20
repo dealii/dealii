@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     /**
      * A structure used by the DoFHandler classes to store information about

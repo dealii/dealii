@@ -2599,10 +2599,10 @@ protected:
    * FEValues object for a given mapping and finite element object. The
    * returned object will later be passed to FiniteElement::fill_fe_values()
    * for a concrete cell, which will itself place its output into an object of
-   * type internal::FEValues::FiniteElementRelatedData. Since there may be
+   * type internal::FEValuesImplementation::FiniteElementRelatedData. Since there may be
    * data that can already be computed in its <i>final</i> form on the
    * reference cell, this function also receives a reference to the
-   * internal::FEValues::FiniteElementRelatedData object as its last argument.
+   * internal::FEValuesImplementation::FiniteElementRelatedData object as its last argument.
    * This output argument is guaranteed to always be the same one when used
    * with the InternalDataBase object returned by this function. In other
    * words, the subdivision of scratch data and final data in the returned
@@ -2664,7 +2664,7 @@ protected:
   get_data (const UpdateFlags                                                    update_flags,
             const Mapping<dim,spacedim>                                         &mapping,
             const Quadrature<dim>                                               &quadrature,
-            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2712,7 +2712,7 @@ protected:
   get_face_data (const UpdateFlags                                                    update_flags,
                  const Mapping<dim,spacedim>                                         &mapping,
                  const Quadrature<dim-1>                                             &quadrature,
-                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2760,7 +2760,7 @@ protected:
   get_subface_data (const UpdateFlags                                                    update_flags,
                     const Mapping<dim,spacedim>                                         &mapping,
                     const Quadrature<dim-1>                                             &quadrature,
-                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Compute information about the shape functions on the cell denoted by the
@@ -2849,9 +2849,9 @@ protected:
                   const Quadrature<dim>                                               &quadrature,
                   const Mapping<dim,spacedim>                                         &mapping,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                   const InternalDataBase                                              &fe_internal,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -2902,9 +2902,9 @@ protected:
                        const Quadrature<dim-1>                                             &quadrature,
                        const Mapping<dim,spacedim>                                         &mapping,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const InternalDataBase                                              &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -2959,9 +2959,9 @@ protected:
                           const Quadrature<dim-1>                                             &quadrature,
                           const Mapping<dim,spacedim>                                         &mapping,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const InternalDataBase                                              &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   friend class InternalDataBase;
   friend class FEValuesBase<dim,spacedim>;

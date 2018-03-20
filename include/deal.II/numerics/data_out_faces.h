@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOutFaces
+  namespace DataOutFacesImplementation
   {
     /**
      * A derived class for use in the DataOutFaces class. This is a class for
@@ -36,7 +36,7 @@ namespace internal
      * documentation of the WorkStream context.
      */
     template <int dim, int spacedim>
-    struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
+    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim,spacedim>
     {
       ParallelData (const unsigned int n_datasets,
                     const unsigned int n_subdivisions,
@@ -227,7 +227,7 @@ private:
    * Build one patch. This function is called in a WorkStream context.
    */
   void build_one_patch (const FaceDescriptor *cell_and_face,
-                        internal::DataOutFaces::ParallelData<dimension, dimension> &data,
+                        internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
                         DataOutBase::Patch<dimension-1,space_dimension> &patch);
 };
 

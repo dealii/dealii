@@ -27,7 +27,7 @@ template <int, int> class DoFHandler;
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     template <int> class DoFLevel;
     template <int> class DoFFaces;

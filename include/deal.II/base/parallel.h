@@ -753,7 +753,7 @@ namespace parallel
 
 namespace internal
 {
-  namespace Vector
+  namespace VectorImplementation
   {
     /**
      * If we do computations on vectors in parallel (say, we add two vectors
@@ -773,10 +773,10 @@ namespace internal
   }
 
 
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     /**
-     * Like internal::Vector::minimum_parallel_grain_size, but now denoting
+     * Like internal::VectorImplementation::minimum_parallel_grain_size, but now denoting
      * the number of rows of a matrix that should be worked on as a minimum.
      */
     extern unsigned int minimum_parallel_grain_size;

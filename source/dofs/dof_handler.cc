@@ -64,17 +64,17 @@ namespace internal
 namespace internal
 {
   template <int dim, int spacedim>
-  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy)
+  std::string policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> &policy)
   {
     std::string policy_name;
-    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::DoFHandler<dim,spacedim> >*>(&policy)
-        || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
+    if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::Sequential<dealii::DoFHandler<dim,spacedim> >*>(&policy)
+        || dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::Sequential<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::Sequential<";
-    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dealii::DoFHandler<dim,spacedim> >*>(&policy)
-             || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
+    else if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::ParallelDistributed<dealii::DoFHandler<dim,spacedim> >*>(&policy)
+             || dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::ParallelDistributed<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
-    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::DoFHandler<dim,spacedim> >*>(&policy)
-             || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
+    else if (dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::ParallelShared<dealii::DoFHandler<dim,spacedim> >*>(&policy)
+             || dynamic_cast<const typename dealii::internal::DoFHandlerImplementation::Policy::ParallelShared<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
@@ -84,7 +84,7 @@ namespace internal
   }
 
 
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     // access class
     // dealii::DoFHandler instead of
@@ -280,7 +280,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.levels.emplace_back (new internal::DoFHandlerImplementation::DoFLevel<1>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -306,7 +306,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.levels.emplace_back (new internal::DoFHandlerImplementation::DoFLevel<2>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -319,7 +319,7 @@ namespace internal
                      numbers::invalid_dof_index);
           }
 
-        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<2>> ();
+        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFFaces<2>> ();
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
           {
@@ -342,7 +342,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.levels.emplace_back (new internal::DoFHandlerImplementation::DoFLevel<3>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -354,7 +354,7 @@ namespace internal
                      dof_handler.get_fe().dofs_per_cell,
                      numbers::invalid_dof_index);
           }
-        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<3>> ();
+        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFFaces<3>> ();
 
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
@@ -383,7 +383,7 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandlerImplementation::DoFLevel<1>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, numbers::invalid_dof_index);
           }
 
@@ -439,11 +439,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandler::DoFLevel<2>> ());
+            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFLevel<2>> ());
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, numbers::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<2>> ();
+        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFFaces<2>> ();
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -498,11 +498,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandler::DoFLevel<3>> ());
+            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFLevel<3>> ());
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, numbers::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<3>> ();
+        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandlerImplementation::DoFFaces<3>> ();
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
         dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, numbers::invalid_dof_index);
 
@@ -552,8 +552,8 @@ namespace internal
       types::global_dof_index
       get_dof_index (
         const DoFHandler<1, spacedim> &dof_handler,
-        const std::unique_ptr<internal::DoFHandler::DoFLevel<1> > &mg_level,
-        const std::unique_ptr<internal::DoFHandler::DoFFaces<1> > &,
+        const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<1> > &mg_level,
+        const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<1> > &,
         const unsigned int obj_index,
         const unsigned int fe_index,
         const unsigned int local_index,
@@ -565,7 +565,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<2> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<2> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
+      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
       {
         return mg_faces->lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -573,7 +573,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<2> > &mg_level, const std::unique_ptr<internal::DoFHandler::DoFFaces<2> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
+      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2> > &mg_level, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
       {
         return mg_level->dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -581,7 +581,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
       {
         return mg_faces->lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -589,7 +589,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
       {
         return mg_faces->quads.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -597,49 +597,49 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &mg_level, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 3>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &mg_level, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 3>)
       {
         return mg_level->dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<1> > &mg_level, const std::unique_ptr<internal::DoFHandler::DoFFaces<1> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
+      void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<1> > &mg_level, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<1> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_level->dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<2> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<2> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_faces->lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<2> > &mg_level, const std::unique_ptr<internal::DoFHandler::DoFFaces<2> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<2> > &mg_level, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<2> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
       {
         mg_level->dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_faces->lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
       {
         mg_faces->quads.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandler::DoFLevel<3> > &mg_level, const std::unique_ptr<internal::DoFHandler::DoFFaces<3> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 3>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, const std::unique_ptr<internal::DoFHandlerImplementation::DoFLevel<3> > &mg_level, const std::unique_ptr<internal::DoFHandlerImplementation::DoFFaces<3> > &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 3>)
       {
         mg_level->dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
@@ -661,13 +661,13 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
       != nullptr)
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
            == nullptr)
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
   else
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
 }
 
 
@@ -707,11 +707,11 @@ initialize(const Triangulation<dim,spacedim> &t,
 
   // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&t) != nullptr)
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&t) != nullptr)
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
   else
-    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
+    policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
 
   distribute_dofs(fe);
 }
@@ -1022,7 +1022,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   // know them on some cell (i.e. get
   // back invalid_dof_index)
   clear_space ();
-  internal::DoFHandler::Implementation::reserve_space (*this);
+  internal::DoFHandlerImplementation::Implementation::reserve_space (*this);
 
   // hand things off to the policy
   number_cache = policy->distribute_dofs ();
@@ -1056,7 +1056,7 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs ()
 
   clear_mg_space();
 
-  internal::DoFHandler::Implementation::reserve_space_mg (*this);
+  internal::DoFHandlerImplementation::Implementation::reserve_space_mg (*this);
   mg_number_cache = policy->distribute_mg_dofs ();
 
   // initialize the block info object
@@ -1192,7 +1192,7 @@ template <int dim, int spacedim>
 unsigned int
 DoFHandler<dim,spacedim>::max_couplings_between_dofs () const
 {
-  return internal::DoFHandler::Implementation::max_couplings_between_dofs (*this);
+  return internal::DoFHandlerImplementation::Implementation::max_couplings_between_dofs (*this);
 }
 
 
@@ -1258,10 +1258,10 @@ DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
                                           const unsigned int fe_index,
                                           const unsigned int local_index) const
 {
-  return internal::DoFHandler::Implementation::get_dof_index (*this, this->mg_levels[obj_level],
-                                                              this->mg_faces, obj_index,
-                                                              fe_index, local_index,
-                                                              std::integral_constant<int, structdim> ());
+  return internal::DoFHandlerImplementation::Implementation::get_dof_index (*this, this->mg_levels[obj_level],
+         this->mg_faces, obj_index,
+         fe_index, local_index,
+         std::integral_constant<int, structdim> ());
 }
 
 
@@ -1274,14 +1274,14 @@ void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
                                                const unsigned int local_index,
                                                const types::global_dof_index global_index) const
 {
-  internal::DoFHandler::Implementation::set_dof_index (*this,
-                                                       this->mg_levels[obj_level],
-                                                       this->mg_faces,
-                                                       obj_index,
-                                                       fe_index,
-                                                       local_index,
-                                                       global_index,
-                                                       std::integral_constant<int, structdim> ());
+  internal::DoFHandlerImplementation::Implementation::set_dof_index (*this,
+      this->mg_levels[obj_level],
+      this->mg_faces,
+      obj_index,
+      fe_index,
+      local_index,
+      global_index,
+      std::integral_constant<int, structdim> ());
 }
 
 

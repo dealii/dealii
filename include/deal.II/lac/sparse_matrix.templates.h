@@ -166,7 +166,7 @@ SparseMatrix<number>::~SparseMatrix ()
 
 namespace internal
 {
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     typedef types::global_dof_index size_type;
 
@@ -201,11 +201,11 @@ SparseMatrix<number>::operator = (const double d)
   // per row on average.
   const std::size_t matrix_size = cols->n_nonzero_elements();
   const size_type grain_size =
-    internal::SparseMatrix::minimum_parallel_grain_size *
+    internal::SparseMatrixImplementation::minimum_parallel_grain_size *
     (cols->n_nonzero_elements()+m()) / m();
   if (matrix_size>grain_size)
     parallel::apply_to_subranges (0U, matrix_size,
-                                  std::bind(&internal::SparseMatrix::template
+                                  std::bind(&internal::SparseMatrixImplementation::template
                                             zero_subrange<number>,
                                             std::placeholders::_1, std::placeholders::_2,
                                             val.get()),
@@ -463,7 +463,7 @@ SparseMatrix<number>::add (const number factor,
 
 namespace internal
 {
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
@@ -759,7 +759,7 @@ SparseMatrix<number>::vmult (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std::bind (&internal::SparseMatrixImplementation::vmult_on_subrange
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
                                            val.get(),
@@ -768,7 +768,7 @@ SparseMatrix<number>::vmult (OutVector &dst,
                                            std::cref(src),
                                            std::ref(dst),
                                            false),
-                                internal::SparseMatrix::minimum_parallel_grain_size);
+                                internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
 
@@ -814,7 +814,7 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
 
   parallel::apply_to_subranges (0U, m(),
-                                std::bind (&internal::SparseMatrix::vmult_on_subrange
+                                std::bind (&internal::SparseMatrixImplementation::vmult_on_subrange
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
                                            val.get(),
@@ -823,7 +823,7 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
                                            std::cref(src),
                                            std::ref(dst),
                                            true),
-                                internal::SparseMatrix::minimum_parallel_grain_size);
+                                internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
 
@@ -852,7 +852,7 @@ SparseMatrix<number>::Tvmult_add (OutVector &dst,
 
 namespace internal
 {
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
@@ -900,7 +900,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
 
   return
     parallel::accumulate_from_subranges<somenumber>
-    (std::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
+    (std::bind (&internal::SparseMatrixImplementation::matrix_norm_sqr_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
                 val.get(),
@@ -908,14 +908,14 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
                 cols->colnums.get(),
                 std::cref(v)),
      0, m(),
-     internal::SparseMatrix::minimum_parallel_grain_size);
+     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
 
 
 namespace internal
 {
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
@@ -965,7 +965,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
 
   return
     parallel::accumulate_from_subranges<somenumber>
-    (std::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
+    (std::bind (&internal::SparseMatrixImplementation::matrix_scalar_product_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
                 val.get(),
@@ -974,7 +974,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
                 std::cref(u),
                 std::cref(v)),
      0, m(),
-     internal::SparseMatrix::minimum_parallel_grain_size);
+     internal::SparseMatrixImplementation::minimum_parallel_grain_size);
 }
 
 
@@ -1271,7 +1271,7 @@ SparseMatrix<number>::frobenius_norm () const
 
 namespace internal
 {
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     /**
      * Perform a vmult using the SparseMatrix data structures, but only using
@@ -1327,7 +1327,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 
   return
     std::sqrt (parallel::accumulate_from_subranges<somenumber>
-               (std::bind (&internal::SparseMatrix::residual_sqr_on_subrange
+               (std::bind (&internal::SparseMatrixImplementation::residual_sqr_on_subrange
                            <number,Vector<somenumber>,Vector<somenumber> >,
                            std::placeholders::_1, std::placeholders::_2,
                            val.get(),
@@ -1337,7 +1337,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
                            std::cref(b),
                            std::ref(dst)),
                 0, m(),
-                internal::SparseMatrix::minimum_parallel_grain_size));
+                internal::SparseMatrixImplementation::minimum_parallel_grain_size));
 }
 
 

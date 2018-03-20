@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace FE_FaceQ
+  namespace FE_FaceQImplementation
   {
     namespace
     {
@@ -49,7 +49,7 @@ template <int dim, int spacedim>
 FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
   :
   FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
-  (TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(internal::FE_FaceQ::get_QGaussLobatto_points(degree))),
+  (TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(internal::FE_FaceQImplementation::get_QGaussLobatto_points(degree))),
    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
    std::vector<bool>(1,true))
 {
@@ -62,7 +62,7 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
       this->unit_face_support_points[0][d] = 0.5;
   else
     {
-      std::vector<Point<1> > points = internal::FE_FaceQ::get_QGaussLobatto_points(degree);
+      std::vector<Point<1> > points = internal::FE_FaceQImplementation::get_QGaussLobatto_points(degree);
 
       unsigned int k=0;
       for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
@@ -681,9 +681,9 @@ fill_fe_values(const typename Triangulation<1,spacedim>::cell_iterator &,
                const Quadrature<1> &,
                const Mapping<1,spacedim> &,
                const typename Mapping<1,spacedim>::InternalDataBase &,
-               const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
+               const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &,
                const typename FiniteElement<1,spacedim>::InternalDataBase &,
-               dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &) const
+               dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &) const
 {
   // Do nothing, since we do not have values in the interior
 }
@@ -698,9 +698,9 @@ fill_fe_face_values (const typename Triangulation<1,spacedim>::cell_iterator &,
                      const Quadrature<0> &,
                      const Mapping<1,spacedim> &,
                      const typename Mapping<1,spacedim>::InternalDataBase &,
-                     const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
+                     const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &,
                      const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                     dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const
+                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const
 {
   const unsigned int foffset = face;
   if (fe_internal.update_each & update_values)
@@ -721,9 +721,9 @@ fill_fe_subface_values (const typename Triangulation<1,spacedim>::cell_iterator 
                         const Quadrature<0> &,
                         const Mapping<1,spacedim> &,
                         const typename Mapping<1,spacedim>::InternalDataBase &,
-                        const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &,
                         const typename FiniteElement<1,spacedim>::InternalDataBase &,
-                        dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &) const
 {
   Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
 }

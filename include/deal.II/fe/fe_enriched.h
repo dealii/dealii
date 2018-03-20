@@ -490,7 +490,7 @@ protected:
      * <code>base_no</code>th base element will write its output when calling
      * FiniteElement::fill_fe_values() and similar functions.
      */
-    internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
     get_fe_output_object (const unsigned int base_no) const;
 
     /**
@@ -567,19 +567,19 @@ protected:
   get_data (const UpdateFlags      flags,
             const Mapping<dim,spacedim>    &mapping,
             const Quadrature<dim> &quadrature,
-            dealii::internal::FEValues::FiniteElementRelatedData< dim, spacedim > &output_data) const;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim > &output_data) const;
 
   virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags      update_flags,
                  const Mapping<dim,spacedim>    &mapping,
                  const Quadrature<dim-1> &quadrature,
-                 dealii::internal::FEValues::FiniteElementRelatedData< dim, spacedim >        &output_data) const;
+                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >        &output_data) const;
 
   virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags      update_flags,
                     const Mapping<dim,spacedim>    &mapping,
                     const Quadrature<dim-1> &quadrature,
-                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void fill_fe_values (const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -587,9 +587,9 @@ protected:
                        const Quadrature<dim> &quadrature,
                        const Mapping<dim, spacedim> &mapping,
                        const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data
                       ) const;
 
   virtual
@@ -599,9 +599,9 @@ protected:
                         const Quadrature<dim-1> &quadrature,
                         const Mapping<dim, spacedim> &mapping,
                         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                         const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data
                       ) const;
 
   virtual
@@ -612,9 +612,9 @@ protected:
                           const Quadrature<dim-1> &quadrature,
                           const Mapping<dim, spacedim> &mapping,
                           const typename Mapping< dim, spacedim >::InternalDataBase &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data
                          ) const;
 
 private:
@@ -639,9 +639,9 @@ private:
   void
   multiply_by_enrichment (const Quadrature<dim_1>                                       &quadrature,
                           const InternalData                                            &fe_data,
-                          const internal::FEValues::MappingRelatedData<dim,spacedim>    &mapping_data,
+                          const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>    &mapping_data,
                           const typename Triangulation< dim, spacedim >::cell_iterator  &cell,
-                          internal::FEValues::FiniteElementRelatedData<dim,spacedim>    &output_data) const;
+                          internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim>    &output_data) const;
 };
 
 //}

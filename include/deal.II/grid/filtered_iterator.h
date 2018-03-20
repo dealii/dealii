@@ -775,7 +775,7 @@ make_filtered_iterator (const BaseIterator &i,
 
 namespace internal
 {
-  namespace FilteredIterator
+  namespace FilteredIteratorImplementation
   {
     // The following classes create a nested sequence of
     // FilteredIterator<FilteredIterator<...<BaseIterator>...>> with as many
@@ -881,7 +881,7 @@ filter_iterators (IteratorRange<BaseIterator> i,
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
-IteratorRange<typename internal::FilteredIterator::
+IteratorRange<typename internal::FilteredIteratorImplementation::
 NestFilteredIterators<BaseIterator,std::tuple<Predicate, Targs...> >::type>
 filter_iterators (IteratorRange<BaseIterator> i,
                   const Predicate &p,

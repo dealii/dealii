@@ -24,7 +24,7 @@ for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
 
     namespace internal
     \{
-    namespace SymmetricTensor
+    namespace SymmetricTensorImplementation
     \{
     template
     void
@@ -81,7 +81,7 @@ for (number : REAL_SCALARS)
 {
     namespace internal
     \{
-    namespace SymmetricTensor
+    namespace SymmetricTensorImplementation
     \{
     template
     struct Inverse<4,3,number>;
@@ -120,7 +120,7 @@ for (number : REAL_SCALARS)
 
     namespace internal
     \{
-    namespace SymmetricTensor
+    namespace SymmetricTensorImplementation
     \{
     template
     std::array<std::pair<number, Tensor<1,2,number> >,2>

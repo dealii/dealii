@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace MappingQGeneric
+  namespace MappingQGenericImplementation
   {
     namespace
     {
@@ -223,7 +223,7 @@ namespace internal
         const std::vector<unsigned int>
         renumber (FETools::
                   lexicographic_to_hierarchic_numbering
-                  (FiniteElementData<dim> (internal::MappingQGeneric::get_dpo_vector<dim>
+                  (FiniteElementData<dim> (internal::MappingQGenericImplementation::get_dpo_vector<dim>
                                            (data.polynomial_degree), 1, data.polynomial_degree)));
 
         std::vector<double> values;
@@ -737,7 +737,7 @@ initialize (const UpdateFlags      update_flags,
 
               const unsigned int n_shape_values = fe.n_dofs_per_cell();
               const unsigned int max_size = std::max(n_q_points,n_shape_values);
-              const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+              const unsigned int vec_length = dealii::VectorizedArray<double>::n_array_elements;
               const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
 
               scratch.resize((dim-1)*max_size);
@@ -918,7 +918,7 @@ compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
 
 namespace internal
 {
-  namespace MappingQGeneric
+  namespace MappingQGenericImplementation
   {
     namespace
     {
@@ -1265,7 +1265,7 @@ namespace internal
                 mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
 
                 // f(x)
-                Point<spacedim> p_real_trial = internal::MappingQGeneric::compute_mapped_location_of_point<dim,spacedim>(mdata);
+                Point<spacedim> p_real_trial = internal::MappingQGenericImplementation::compute_mapped_location_of_point<dim,spacedim>(mdata);
                 const Tensor<1,spacedim> f_trial = p_real_trial-p;
 
 #ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
@@ -2114,8 +2114,8 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   polynomial_degree(p),
   line_support_points(this->polynomial_degree+1),
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr),
-  support_point_weights_perimeter_to_interior (internal::MappingQGeneric::compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
-  support_point_weights_cell (internal::MappingQGeneric::compute_support_point_weights_cell<dim>(this->polynomial_degree))
+  support_point_weights_perimeter_to_interior (internal::MappingQGenericImplementation::compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
+  support_point_weights_cell (internal::MappingQGenericImplementation::compute_support_point_weights_cell<dim>(this->polynomial_degree))
 {
   Assert (p >= 1, ExcMessage ("It only makes sense to create polynomial mappings "
                               "with a polynomial degree greater or equal to one."));
@@ -2171,7 +2171,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   const std::vector<unsigned int>
   renumber (FETools::
             lexicographic_to_hierarchic_numbering
-            (FiniteElementData<dim> (internal::MappingQGeneric::get_dpo_vector<dim>
+            (FiniteElementData<dim> (internal::MappingQGenericImplementation::get_dpo_vector<dim>
                                      (polynomial_degree), 1, polynomial_degree)));
 
   const std::vector<Point<spacedim> > support_points
@@ -2240,7 +2240,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -2266,7 +2266,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -2292,7 +2292,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -2318,7 +2318,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -2344,7 +2344,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -2603,7 +2603,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&internal_data) != nullptr,
@@ -2634,7 +2634,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   if (dim>1 && data.tensor_product_quadrature)
     {
-      internal::MappingQGeneric::maybe_update_q_points_Jacobians_and_grads_tensor<dim, spacedim>
+      internal::MappingQGenericImplementation::maybe_update_q_points_Jacobians_and_grads_tensor<dim, spacedim>
       (computed_cell_similarity,
        data,
        output_data.quadrature_points,
@@ -2642,48 +2642,48 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     }
   else
     {
-      internal::MappingQGeneric::maybe_compute_q_points<dim,spacedim>
+      internal::MappingQGenericImplementation::maybe_compute_q_points<dim,spacedim>
       (QProjector<dim>::DataSetDescriptor::cell (),
        data,
        output_data.quadrature_points);
 
-      internal::MappingQGeneric::maybe_update_Jacobians<dim,spacedim>
+      internal::MappingQGenericImplementation::maybe_update_Jacobians<dim,spacedim>
       (computed_cell_similarity,
        QProjector<dim>::DataSetDescriptor::cell (),
        data);
 
-      internal::MappingQGeneric::maybe_update_jacobian_grads<dim,spacedim>
+      internal::MappingQGenericImplementation::maybe_update_jacobian_grads<dim,spacedim>
       (computed_cell_similarity,
        QProjector<dim>::DataSetDescriptor::cell (),
        data,
        output_data.jacobian_grads);
     }
 
-  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_grads<dim,spacedim>
+  internal::MappingQGenericImplementation::maybe_update_jacobian_pushed_forward_grads<dim,spacedim>
   (computed_cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data,
    output_data.jacobian_pushed_forward_grads);
 
-  internal::MappingQGeneric::maybe_update_jacobian_2nd_derivatives<dim,spacedim>
+  internal::MappingQGenericImplementation::maybe_update_jacobian_2nd_derivatives<dim,spacedim>
   (computed_cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data,
    output_data.jacobian_2nd_derivatives);
 
-  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim>
+  internal::MappingQGenericImplementation::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim>
   (computed_cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data,
    output_data.jacobian_pushed_forward_2nd_derivatives);
 
-  internal::MappingQGeneric::maybe_update_jacobian_3rd_derivatives<dim,spacedim>
+  internal::MappingQGenericImplementation::maybe_update_jacobian_3rd_derivatives<dim,spacedim>
   (computed_cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data,
    output_data.jacobian_3rd_derivatives);
 
-  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim>
+  internal::MappingQGenericImplementation::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim>
   (computed_cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data,
@@ -2810,7 +2810,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 namespace internal
 {
-  namespace MappingQGeneric
+  namespace MappingQGenericImplementation
   {
     namespace
     {
@@ -2832,7 +2832,7 @@ namespace internal
                                const unsigned int               n_q_points,
                                const std::vector<double>        &weights,
                                const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
-                               internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
+                               internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>         &output_data)
       {
         const UpdateFlags update_flags = data.update_each;
 
@@ -2983,7 +2983,7 @@ namespace internal
                               const typename QProjector<dim>::DataSetDescriptor                  data_set,
                               const Quadrature<dim-1>                                           &quadrature,
                               const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                              internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
+                              internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>              &output_data)
       {
         if (dim>1 && data.tensor_product_quadrature)
           {
@@ -3045,7 +3045,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                     internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
@@ -3068,7 +3068,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       data.cell_of_current_support_points = cell;
     }
 
-  internal::MappingQGeneric::do_fill_fe_face_values
+  internal::MappingQGenericImplementation::do_fill_fe_face_values
   (*this,
    cell, face_no, numbers::invalid_unsigned_int,
    QProjector<dim>::DataSetDescriptor::face (face_no,
@@ -3091,7 +3091,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int                                         subface_no,
                         const Quadrature<dim-1>                                   &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                        internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
@@ -3114,7 +3114,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       data.cell_of_current_support_points = cell;
     }
 
-  internal::MappingQGeneric::do_fill_fe_face_values
+  internal::MappingQGenericImplementation::do_fill_fe_face_values
   (*this,
    cell, face_no, subface_no,
    QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
@@ -3132,7 +3132,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 namespace internal
 {
-  namespace MappingQGeneric
+  namespace MappingQGenericImplementation
   {
     namespace
     {
@@ -3465,7 +3465,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            const ArrayView<Tensor<1, spacedim> >                   &output) const
 {
-  internal::MappingQGeneric::transform_fields(input, mapping_type, mapping_data, output);
+  internal::MappingQGenericImplementation::transform_fields(input, mapping_type, mapping_data, output);
 }
 
 
@@ -3478,7 +3478,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase   &mapping_data,
            const ArrayView<Tensor<2, spacedim> >                    &output) const
 {
-  internal::MappingQGeneric::transform_differential_forms(input, mapping_type, mapping_data, output);
+  internal::MappingQGenericImplementation::transform_differential_forms(input, mapping_type, mapping_data, output);
 }
 
 
@@ -3494,13 +3494,13 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
   switch (mapping_type)
     {
     case mapping_contravariant:
-      internal::MappingQGeneric::transform_fields(input, mapping_type, mapping_data, output);
+      internal::MappingQGenericImplementation::transform_fields(input, mapping_type, mapping_data, output);
       return;
 
     case mapping_piola_gradient:
     case mapping_contravariant_gradient:
     case mapping_covariant_gradient:
-      internal::MappingQGeneric::transform_gradients(input, mapping_type, mapping_data, output);
+      internal::MappingQGenericImplementation::transform_gradients(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
@@ -3571,7 +3571,7 @@ transform (const ArrayView<const  Tensor<3,dim> >                  &input,
     case mapping_piola_hessian:
     case mapping_contravariant_hessian:
     case mapping_covariant_hessian:
-      internal::MappingQGeneric::transform_hessians(input, mapping_type, mapping_data, output);
+      internal::MappingQGenericImplementation::transform_hessians(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());

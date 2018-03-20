@@ -2114,7 +2114,7 @@ namespace TrilinosWrappers
       }
     }
 
-    namespace LinearOperator
+    namespace LinearOperatorImplementation
     {
 
       /**
@@ -2129,7 +2129,7 @@ namespace TrilinosWrappers
        * reference to the <tt>vmult</tt> and <tt>Tvmult</tt> functions. This
        * object is not thread-safe when the transpose flag is set on it or the
        * Trilinos object to which it refers. See the docuemtation for the
-       * TrilinosWrappers::internal::LinearOperator::TrilinosPayload::SetUseTranspose()
+       * TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload::SetUseTranspose()
        * function for further details.
        *
        * @author Jean-Paul Pelteret, 2016
@@ -3179,7 +3179,7 @@ namespace TrilinosWrappers
 
   namespace internal
   {
-    namespace LinearOperator
+    namespace LinearOperatorImplementation
     {
       template <typename Solver, typename Preconditioner>
       typename std::enable_if<

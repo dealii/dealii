@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     /**
      * Store all information which belongs to one level of the multilevel

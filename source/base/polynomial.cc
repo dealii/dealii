@@ -706,7 +706,7 @@ namespace Polynomials
 
   namespace internal
   {
-    namespace LagrangeEquidistant
+    namespace LagrangeEquidistantImplementation
     {
       std::vector<Point<1> >
       generate_equidistant_unit_points (const unsigned int n)
@@ -725,7 +725,7 @@ namespace Polynomials
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
                                             const unsigned int support_point)
     :
-    Polynomial<double> (internal::LagrangeEquidistant::
+    Polynomial<double> (internal::LagrangeEquidistantImplementation::
                         generate_equidistant_unit_points (n),
                         support_point)
   {
