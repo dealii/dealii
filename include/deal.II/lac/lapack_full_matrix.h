@@ -47,7 +47,7 @@ template <typename number> class SparseMatrix;
  * usually the names chosen for the arguments in the LAPACK documentation.
  *
  * @ingroup Matrix1
- * @author Guido Kanschat, 2005, Denis Davydov, 2017
+ * @author Guido Kanschat, 2005, Denis Davydov, 2017, 2018
  */
 template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
@@ -61,7 +61,7 @@ public:
 
   /**
    * Constructor. Initialize the matrix as a square matrix with dimension
-   * <tt>n</tt>.
+   * @p size.
    *
    * In order to avoid the implicit conversion of integers and other types to
    * a matrix, this constructor is declared <tt>explicit</tt>.
@@ -72,7 +72,7 @@ public:
 
 
   /**
-   * Constructor. Initialize the matrix as a rectangular matrix.
+   * Constructor. Initialize the matrix as a rectangular matrix $\rm{rows} \times \rm{cols}$.
    */
   LAPACKFullMatrix (const size_type rows,
                     const size_type cols);
@@ -84,7 +84,7 @@ public:
    * function arguments are passed by value rather than by reference.
    * Unfortunately, we can't mark this copy constructor <tt>explicit</tt>,
    * since that prevents the use of this class in containers, such as
-   * <tt>std::vector</tt>. The responsibility to check performance of programs
+   * <code>std::vector</code>. The responsibility to check performance of programs
    * must therefore remain with the user of this class.
    */
   LAPACKFullMatrix (const LAPACKFullMatrix &);
@@ -118,19 +118,19 @@ public:
   /**
    * This operator assigns a scalar to a matrix. To avoid confusion with
    * constructors, zero (when cast to the @p number type) is the only
-   * value allowed for <tt>d</tt>
+   * value allowed for @p d.
    */
   LAPACKFullMatrix<number> &
   operator = (const number d);
 
   /**
-   * This operator multiplies all entries by a fixed factor.
+   * This operator multiplies all entries by a fixed @p factor.
    */
   LAPACKFullMatrix<number> &
   operator*= (const number factor);
 
   /**
-   * This operator divides all entries by a fixed factor.
+   * This operator divides all entries by a fixed @p factor.
    */
   LAPACKFullMatrix<number> &
   operator/= (const number factor);
@@ -149,14 +149,14 @@ public:
             const number value);
 
   /**
-   * Simple addition of a scaled matrix, i.e. <tt>*this += a*A</tt>.
+   * Simple addition of a scaled matrix, i.e. $\mathbf A \mathrel{+}= a \, \mathbf B$.
    */
   void add (const number                    a,
-            const LAPACKFullMatrix<number> &A);
+            const LAPACKFullMatrix<number> &B);
 
   /**
    * Perform a rank-1 update of a symmetric matrix
-   * $ A \leftarrow A + a \, \rm v \rm v^T $.
+   * $ \mathbf A \leftarrow \mathbf A + a \, \mathbf v \mathbf v^T $.
    *
    * This function also works for Cholesky factorization.
    * In that case, updating ($a>0$) is
@@ -297,12 +297,11 @@ public:
    * finally with the left transformation matrix.
    * </ul>
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>w</tt> or added to <tt>w</tt>.
-   *
-   * if (adding) <i>w += A*v</i>
-   *
-   * if (!adding) <i>w = A*v</i>
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the vector
+   * $\mathbf w = \mathbf A \cdot \mathbf v$
+   * or added to it
+   * $\mathbf w \mathrel{+}= \mathbf A \cdot \mathbf v$.
    *
    * @note Source and destination must not be the same vector.
    *
@@ -324,7 +323,7 @@ public:
               const bool            adding = false) const;
 
   /**
-   * Adding Matrix-vector-multiplication.  <i>w += A*v</i>
+   * Adding Matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A \cdot \mathbf v$.
    *
    * See the documentation of vmult() for details on the implementation.
    */
@@ -341,12 +340,11 @@ public:
   /**
    * Transpose matrix-vector-multiplication.
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>w</tt> or added to <tt>w</tt>.
-   *
-   * if (adding) <i>w += A<sup>T</sup>*v</i>
-   *
-   * if (!adding) <i>w = A<sup>T</sup>*v</i>
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the vector
+   * $\mathbf w = \mathbf A^T \cdot \mathbf v$
+   * or added to it
+   * $\mathbf w \mathrel{+}= \mathbf A^T \cdot \mathbf v$.
    *
    * See the documentation of vmult() for details on the implementation.
    */
@@ -363,8 +361,7 @@ public:
                const bool            adding=false) const;
 
   /**
-   * Adding transpose matrix-vector-multiplication. <i>w +=
-   * A<sup>T</sup>*v</i>
+   * Adding transpose matrix-vector-multiplication $\mathbf w \mathrel{+}= \mathbf A^T \cdot \mathbf v$.
    *
    * See the documentation of vmult() for details on the implementation.
    */
@@ -382,17 +379,16 @@ public:
   /**
    * Matrix-matrix-multiplication.
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the matrix
+   * $\mathbf C            = \mathbf A \cdot \mathbf B$
+   * or added to it
+   * $\mathbf C \mathrel{+}= \mathbf A \cdot \mathbf B$.
    *
-   * if (adding) <i>C += A*B</i>
+   * @note It is assumed that @p A and @p B have compatible sizes and that
+   * @p C already has the right size.
    *
-   * if (!adding) <i>C = A*B</i>
-   *
-   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
-   * <tt>C</tt> already has the right size.
-   *
-   * This function uses the BLAS function Xgemm.
+   * @p This function uses the BLAS function Xgemm.
    */
   void mmult (LAPACKFullMatrix<number>       &C,
               const LAPACKFullMatrix<number> &B,
@@ -409,17 +405,16 @@ public:
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt>.
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the matrix
+   * $\mathbf C = \mathbf A^T \cdot \mathbf B$
+   * or added to it
+   * $\mathbf C \mathrel{+}= \mathbf A^T \cdot \mathbf B$.
    *
-   * if (adding) <i>C += A<sup>T</sup>*B</i>
+   * @note It is assumed that @p A and @p B have compatible sizes and that
+   * @p C already has the right size.
    *
-   * if (!adding) <i>C = A<sup>T</sup>*B</i>
-   *
-   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
-   * <tt>C</tt> already has the right size.
-   *
-   * This function uses the BLAS function Xgemm.
+   * @note This function uses the BLAS function Xgemm.
    */
   void Tmmult (LAPACKFullMatrix<number>       &C,
                const LAPACKFullMatrix<number> &B,
@@ -438,13 +433,13 @@ public:
    * diagonal vector @p V.
    *
    * If the <code>adding=false</code> then the result is stored in the matrix
-   * $C = A^T \rm{diag}(V) B$
-   * otherwise it is added $C \mathrel{+}= A^T \rm{diag}(V) B$.
+   * $\mathbf C = \mathbf A^T \cdot \rm{diag}(\mathbf V) \cdot \mathbf B$
+   * otherwise it is added $\mathbf C \mathrel{+}= \mathbf A^T \cdot \rm{diag}(\mathbf V) \cdot \mathbf B$.
    *
    * @note It is assumed that @p A, @p B and @p V have compatible sizes and that
    * @p C already has the right size.
    *
-   * @note This function is not provided by LAPACK. The function first forms $BV$ product and
+   * @note This function is not provided by LAPACK. The function first forms $\rm{diag}(\mathbf V) \cdot \mathbf B$ product and
    * then uses Xgemm function.
    */
   void Tmmult (LAPACKFullMatrix<number>       &C,
@@ -453,19 +448,18 @@ public:
                const bool                      adding=false) const;
 
   /**
-   * Matrix-matrix-multiplication using transpose of <tt>B</tt>.
+   * Matrix-matrix-multiplication using transpose of @p B.
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the matrix
+   * $\mathbf C = \mathbf A \cdot \mathbf B^T$
+   * or added to it
+   * $\mathbf C \mathrel{+}= \mathbf A \cdot \mathbf B^T$.
    *
-   * if (adding) <i>C += A*B<sup>T</sup></i>
+   * @note It is assumed that @p A and @p B have compatible sizes and that
+   * @p C already has the right size.
    *
-   * if (!adding) <i>C = A*B<sup>T</sup></i>
-   *
-   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
-   * <tt>C</tt> already has the right size.
-   *
-   * This function uses the BLAS function Xgemm.
+   * @note This function uses the BLAS function Xgemm.
    */
   void mTmult (LAPACKFullMatrix<number>       &C,
                const LAPACKFullMatrix<number> &B,
@@ -481,19 +475,18 @@ public:
 
   /**
    * Matrix-matrix-multiplication using transpose of <tt>this</tt> and
-   * <tt>B</tt>.
+   * @p B.
    *
-   * The optional parameter <tt>adding</tt> determines, whether the result is
-   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   * The optional parameter @p adding determines, whether the result is
+   * stored in the matrix
+   * $\mathbf C = \mathbf A^T \cdot \mathbf B^T$
+   * or added to it
+   * $\mathbf C \mathrel{+}= \mathbf A^T \cdot \mathbf B^T$.
    *
-   * if (adding) <i>C += A<sup>T</sup>*B<sup>T</sup></i>
+   * @note It is assumed that @p A and @p B have compatible sizes and that
+   * @p C already has the right size.
    *
-   * if (!adding) <i>C = A<sup>T</sup>*B<sup>T</sup></i>
-   *
-   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
-   * <tt>C</tt> already has the right size.
-   *
-   * This function uses the BLAS function Xgemm.
+   * @note This function uses the BLAS function Xgemm.
    */
   void TmTmult (LAPACKFullMatrix<number>       &C,
                 const LAPACKFullMatrix<number> &B,
@@ -509,7 +502,7 @@ public:
 
   /**
    * Scale rows of this matrix by @p V . This is equivalent to premultiplication
-   * with a diagonal matrix $A\leftarrow {\rm diag}(V)A$.
+   * with a diagonal matrix $\mathbf A\leftarrow {\rm diag}(\mathbf V)\mathbf A$.
    */
   void scale_rows(const Vector<number> &V);
 
@@ -526,11 +519,11 @@ public:
   void compute_cholesky_factorization ();
 
   /**
-   * Estimate the reciprocal of the condition number $1/k(A)$ in $L_1$ norm ($1/(||A||_1 ||A^{-1}||_1)$)
+   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm ($1/(||\mathbf A||_1 ||\mathbf A^{-1}||_1)$)
    * of a symmetric positive definite matrix using Cholesky factorization. This function can only
    * be called if the matrix is already factorized.
    *
-   * @note The condition number $k(A)$ can be used to estimate the numerical
+   * @note The condition number $k(\mathbf A)$ can be used to estimate the numerical
    * error related to the matrix inversion or the solution of the
    * system of linear algebraic equations as
    * <code>error = std::numeric_limits<Number>::epsilon * k</code>.
@@ -546,7 +539,7 @@ public:
   number reciprocal_condition_number(const number l1_norm) const;
 
   /**
-   * Estimate the reciprocal of the condition number $1/k(A)$ in $L_1$ norm
+   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm
    * for triangular matrices. The matrix has to have
    * the LAPACKSupport::Property set to either LAPACKSupport::Property::upper_triangular
    * or LAPACKSupport::Property::lower_triangular, see set_property().
@@ -657,21 +650,20 @@ public:
 
   /**
    * Compute eigenvalues and eigenvectors of a real symmetric matrix. Only
-   * eigenvalues in the interval (lower_bound, upper_bound] are computed with
+   * eigenvalues in the interval $(lower_bound, upper_bound]$ are computed with
    * the absolute tolerance abs_accuracy. An approximate eigenvalue is
-   * accepted as converged when it is determined to lie in an interval [a,b]
-   * of width less than or equal to abs_accuracy + eps * max( |a|,|b| ), where
-   * eps is the machine precision.  If abs_accuracy is less than or equal to
-   * zero, then eps*|t| will be used in its place, where |t| is the 1-norm of
-   * the tridiagonal matrix obtained by reducing A to tridiagonal form.
-   * Eigenvalues will be computed most accurately when abs_accuracy is set to
+   * accepted as converged when it is determined to lie in an interval $[a,b]$
+   * of width less than or equal to $abs_accuracy + eps * max(|a|,|b|)$, where
+   * $eps$ is the machine precision.  If $abs_accuracy$ is less than or equal to
+   * zero, then $eps*|t|$ will be used in its place, where $|t|$ is the 1-norm of
+   * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
+   * Eigenvalues will be computed most accurately when $abs_accuracy$ is set to
    * twice the underflow threshold, not zero.  After this routine has been
-   * called, all eigenvalues in (lower_bound, upper_bound] will be stored in
+   * called, all eigenvalues in $(lower_bound, upper_bound]$ will be stored in
    * eigenvalues and the corresponding eigenvectors will be stored in the
    * columns of eigenvectors, whose dimension is set accordingly.
    *
-   * @note Calls the LAPACK function Xsyevx. For this to work, deal.II must be
-   * configured to use LAPACK.
+   * @note Calls the LAPACK function Xsyevx.
    */
   void compute_eigenvalues_symmetric (const number        lower_bound,
                                       const number        upper_bound,
@@ -681,24 +673,26 @@ public:
 
   /**
    * Compute generalized eigenvalues and eigenvectors of a real generalized
-   * symmetric eigenproblem of the form itype = 1: $Ax=\lambda B x$ itype = 2:
-   * $ABx=\lambda x$ itype = 3: $BAx=\lambda x$, where A is this matrix.  A
-   * and B are assumed to be symmetric, and B has to be positive definite.
-   * Only eigenvalues in the interval (lower_bound, upper_bound] are computed
-   * with the absolute tolerance abs_accuracy.  An approximate eigenvalue is
-   * accepted as converged when it is determined to lie in an interval [a,b]
-   * of width less than or equal to abs_accuracy + eps * max( |a|,|b| ), where
-   * eps is the machine precision.  If abs_accuracy is less than or equal to
-   * zero, then eps*|t| will be used in its place, where |t| is the 1-norm of
-   * the tridiagonal matrix obtained by reducing A to tridiagonal form.
-   * Eigenvalues will be computed most accurately when abs_accuracy is set to
-   * twice the underflow threshold, not zero.  After this routine has been
-   * called, all eigenvalues in (lower_bound, upper_bound] will be stored in
+   * symmetric eigenproblem of the form
+   * - itype = 1: $\mathbf A \cdot \mathbf x=\lambda \mathbf B \cdot x$
+   * - itype = 2: $\mathbf A \cdot \mathbf B \cdot \mathbf x=\lambda \mathbf x$
+   * - itype = 3: $\mathbf B \cdot \mathbf A \cdot \mathbf x=\lambda \mathbf x$
+   * where $\mathbf A$ is this matrix. $\mathbf A$
+   * and $\mathbf B$ are assumed to be symmetric, and $\mathbf B$ has to be positive definite.
+   * Only eigenvalues in the interval $(lower_bound, upper_bound]$ are computed
+   * with the absolute tolerance $abs_accuracy$.  An approximate eigenvalue is
+   * accepted as converged when it is determined to lie in an interval $[a,b]$
+   * of width less than or equal to $abs_accuracy + eps * max( |a|,|b| )$, where
+   * $eps$ is the machine precision. If $abs_accuracy$ is less than or equal to
+   * zero, then $eps*|t|$ will be used in its place, where $|t|$ is the 1-norm of
+   * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
+   * Eigenvalues will be computed most accurately when $abs_accuracy$ is set to
+   * twice the underflow threshold, not zero. After this routine has been
+   * called, all eigenvalues in $(lower_bound, upper_bound]$ will be stored in
    * eigenvalues and the corresponding eigenvectors will be stored in
    * eigenvectors, whose dimension is set accordingly.
    *
-   * @note Calls the LAPACK function Xsygvx. For this to work, deal.II must be
-   * configured to use LAPACK.
+   * @note Calls the LAPACK function Xsygvx.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
                                                   const number                  lower_bound,
@@ -721,8 +715,7 @@ public:
    * be retrieved using the eigenvalue() function.  The number of computed
    * eigenvectors is equal to eigenvectors.size()
    *
-   * @note Calls the LAPACK function Xsygv. For this to work, deal.II must be
-   * configured to use LAPACK.
+   * @note Calls the LAPACK function Xsygv.
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
                                                   std::vector<Vector<number> > &eigenvectors,
@@ -751,10 +744,10 @@ public:
    * does not have maximal rank, singular values 0 are not touched, thus
    * computing the minimal norm right inverse of the matrix.
    *
-   * The parameter <tt>threshold</tt> determines, when a singular value should
+   * The parameter @p threshold determines, when a singular value should
    * be considered zero. It is the ratio of the smallest to the largest
-   * nonzero singular value <i>s</i><sub>max</sub>. Thus, the inverses of all
-   * singular values less than <i>s</i><sub>max</sub>/<tt>threshold</tt> will
+   * nonzero singular value $s_{max}$. Thus, the inverses of all
+   * singular values less than  $s_{max}/threshold$ will
    * be set to zero.
    */
   void compute_inverse_svd (const double threshold = 0.);
@@ -783,21 +776,21 @@ public:
    *
    * The parameters allow for a flexible setting of the output format:
    *
-   * @arg <tt>precision</tt> denotes the number of trailing digits.
+   * @param precision denotes the number of trailing digits.
    *
-   * @arg <tt>scientific</tt> is used to determine the number format, where
-   * <tt>scientific</tt> = <tt>false</tt> means fixed point notation.
+   * @param scientific is used to determine the number format, where
+   * <code>scientific = false</code> means fixed point notation.
    *
-   * @arg <tt>width</tt> denotes the with of each column. A zero entry for
-   * <tt>width</tt> makes the function compute a width, but it may be changed
+   * @param width denotes the with of each column. A zero entry for
+   * @p width makes the function compute a width, but it may be changed
    * to a positive value, if output is crude.
    *
-   * @arg <tt>zero_string</tt> specifies a string printed for zero entries.
+   * @param zero_string specifies a string printed for zero entries.
    *
-   * @arg <tt>denominator</tt> Multiply the whole matrix by this common
+   * @param denominator Multiply the whole matrix by this common
    * denominator to get nicer numbers.
    *
-   * @arg <tt>threshold</tt>: all entries with absolute value smaller than
+   * @param threshold all entries with absolute value smaller than
    * this are considered zero.
    *
    * @note The entries stored resemble a matrix only if the state is either
@@ -875,14 +868,14 @@ private:
   std::vector<number> vr;
 
   /**
-   * The matrix <i>U</i> in the singular value decomposition
-   * <i>USV<sup>T</sup></i>.
+   * The matrix $\mathbf U$ in the singular value decomposition
+   * $\mathbf U \cdot \mathbf S \cdot \mathbf V^T$.
    */
   std::unique_ptr<LAPACKFullMatrix<number> > svd_u;
 
   /**
-   * The matrix <i>V<sup>T</sup></i> in the singular value decomposition
-   * <i>USV<sup>T</sup></i>.
+   * The matrix $\mathbf V^T$  in the singular value decomposition
+   * $\mathbf U \cdot \mathbf S \cdot \mathbf V^T$.
    */
   std::unique_ptr<LAPACKFullMatrix<number> > svd_vt;
 
