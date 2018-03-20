@@ -24,6 +24,9 @@
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/vector_operation.h>
+#ifdef DEAL_II_WITH_MPI
+#include <mpi.h>
+#endif
 
 #include <memory>
 
@@ -34,6 +37,15 @@ template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <typename Matrix> class BlockMatrixBase;
 template <typename number> class SparseILU;
+#ifdef DEAL_II_WITH_MPI
+namespace Utilities
+{
+  namespace MPI
+  {
+    template <typename Number> void sum (const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
+  }
+}
+#endif
 
 #ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
@@ -974,8 +986,14 @@ public:
    * classes instead, since they are tailored better to a sparse matrix
    * structure.
    */
-  number operator () (const size_type i,
-                      const size_type j) const;
+  const number &operator () (const size_type i,
+                             const size_type j) const;
+
+  /**
+   * In contrast to the one above, this function allows modifying the object.
+   */
+  number &operator () (const size_type i,
+                       const size_type j);
 
   /**
    * This function is mostly like operator()() in that it returns the value of
@@ -1628,6 +1646,13 @@ private:
    */
   template <typename,bool> friend class SparseMatrixIterators::Iterator;
   template <typename,bool> friend class SparseMatrixIterators::Accessor;
+
+#ifdef DEAL_II_WITH_MPI
+  /**
+   * Give access to internal datastructures to perform MPI operations.
+   */
+  template <typename Number> friend void Utilities::MPI::sum (const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
+#endif
 };
 
 #ifndef DOXYGEN
@@ -1868,8 +1893,21 @@ SparseMatrix<number>::operator /= (const number factor)
 
 template <typename number>
 inline
-number SparseMatrix<number>::operator () (const size_type i,
-                                          const size_type j) const
+const number &SparseMatrix<number>::operator () (const size_type i,
+                                                 const size_type j) const
+{
+  Assert (cols != nullptr, ExcNotInitialized());
+  Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,
+          ExcInvalidIndex(i,j));
+  return val[cols->operator()(i,j)];
+}
+
+
+
+template <typename number>
+inline
+number &SparseMatrix<number>::operator () (const size_type i,
+                                           const size_type j)
 {
   Assert (cols != nullptr, ExcNotInitialized());
   Assert (cols->operator()(i,j) != SparsityPattern::invalid_entry,

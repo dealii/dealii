@@ -24,6 +24,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 #include <vector>
 
@@ -119,6 +120,21 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
+#ifdef DEBUG
+            {
+              const unsigned int rank = this_mpi_process(mpi_communicator);
+              unsigned int size = values.size();
+              unsigned int size_min = 0;
+              unsigned int size_max = 0;
+              int ierr2 = 0;
+              ierr2 = MPI_Reduce(&size, &size_min, 1, MPI_UNSIGNED, MPI_MIN, 0, mpi_communicator);
+              AssertThrowMPI(ierr2);
+              ierr2 = MPI_Reduce(&size, &size_max, 1, MPI_UNSIGNED, MPI_MAX, 0, mpi_communicator);
+              AssertThrowMPI(ierr2);
+              if (rank==0)
+                Assert (size_min == size_max, ExcMessage("values has different size across MPI processes."));
+            }
+#endif
             const int ierr = MPI_Allreduce
                              (values != output
                               ?
@@ -235,7 +251,7 @@ namespace Utilities
          const MPI_Comm &mpi_communicator)
     {
       Tensor<rank, dim, Number> sums;
-      dealii::Utilities::MPI::sum(local, mpi_communicator, sums);
+      sum(local, mpi_communicator, sums);
       return sums;
     }
 
@@ -253,13 +269,36 @@ namespace Utilities
         entries[i] = local[ local.unrolled_to_component_indices(i) ];
 
       Number global_entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
-      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
+      sum( entries, mpi_communicator, global_entries );
 
       SymmetricTensor<rank,dim,Number> global;
       for (unsigned int i=0; i< n_entries; ++i)
         global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
 
       return global;
+    }
+
+
+
+    template <typename Number>
+    void
+    sum (const SparseMatrix<Number> &local,
+         const MPI_Comm &mpi_communicator,
+         SparseMatrix<Number> &global)
+    {
+      Assert(local.get_sparsity_pattern() == global.get_sparsity_pattern(),
+             ExcMessage("The sparsity pattern of the local and the global matrices should match."));
+#ifdef DEAL_II_WITH_MPI
+      // makes use of the fact that the matrix stores its data in a
+      // contiguous array.
+      sum(ArrayView<const Number> (&local.val[0], local.n_nonzero_elements()),
+          mpi_communicator,
+          ArrayView<Number>(&global.val[0], global.n_nonzero_elements()));
+#else
+      (void)mpi_communicator;
+      if (!PointerComparison::equal (&local, &global))
+        global = local;
+#endif
     }
 
 
