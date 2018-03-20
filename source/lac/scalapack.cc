@@ -78,7 +78,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
                                              const LAPACKSupport::Property property)
   :
   TransposeTable<NumberType> (),
-  state (LAPACKSupport::unusable),
+  state (LAPACKSupport::matrix),
   property(property),
   grid (process_grid),
   n_rows(n_rows_),
@@ -508,6 +508,7 @@ void ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
              &beta,B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
              &alpha,A_loc,&submatrix_row,&submatrix_column,descriptor);
     }
+  state = LAPACKSupport::matrix;
 }
 
 
@@ -597,6 +598,7 @@ void ScaLAPACKMatrix<NumberType>::mult(const NumberType b,
             B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
             &c,C_loc,&C.submatrix_row,&C.submatrix_column,C.descriptor);
     }
+  C.state = LAPACKSupport::matrix;
 }
 
 
