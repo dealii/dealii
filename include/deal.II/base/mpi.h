@@ -314,19 +314,34 @@ namespace Utilities
     {
       /**
        * The sum over all values contributed by the processors that
-       * participate in the call to min_max_avg(), as well as the
-       * minimum and maximum value.
+       * participate in the call to min_max_avg().
        */
       double sum;
+
+      /**
+       * The minimum value over all values contributed by the processors that
+       * participate in the call to min_max_avg().
+       */
       double min;
+
+      /**
+       * The maximum value over all values contributed by the processors that
+       * participate in the call to min_max_avg().
+       */
       double max;
 
       /**
-       * The indices (i.e., @ref GlossMPIRank "MPI rank" within an
+       * One of the ranks (i.e., @ref GlossMPIRank "MPI rank" within an
        * @ref GlossMPICommunicator "MPI communicator") of the
-       * processors that hold the minimal and maximal values.
+       * processors that hold the minimal value.
        */
       unsigned int min_index;
+
+      /**
+       * One of the ranks (i.e., @ref GlossMPIRank "MPI rank" within an
+       * @ref GlossMPICommunicator "MPI communicator") of the
+       * processors that hold the maximal value.
+       */
       unsigned int max_index;
 
       /**
