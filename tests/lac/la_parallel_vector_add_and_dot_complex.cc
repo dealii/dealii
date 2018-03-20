@@ -65,11 +65,8 @@ void check ()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog << std::fixed;
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
-
+  initlog();
+  deallog << std::setprecision(8);
   check<float>();
   check<double>();
   deallog << "OK" << std::endl;
