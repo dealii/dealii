@@ -17,7 +17,7 @@
 
 
 // check DynamicSparsityPattern::compute_mmult_pattern(). Test if multiplication
-// of two pattern yield the right DynamicSparsityPattern.
+// of two patterns yield the right DynamicSparsityPattern.
 
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
