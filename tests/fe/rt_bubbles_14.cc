@@ -80,6 +80,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(8);
   deallog << std::fixed;
 
   for (unsigned int i=1; i<4; ++i)
