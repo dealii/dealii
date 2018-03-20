@@ -238,7 +238,7 @@ namespace NonMatching
                 ocell->get_dof_indices(odofs);
 
                 // Reset the matrices.
-                cell_matrix = 0;
+                cell_matrix = typename Matrix::value_type();
 
                 for (unsigned int i=0; i<space_dh.get_fe().dofs_per_cell; ++i)
                   {
