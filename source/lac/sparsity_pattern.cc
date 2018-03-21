@@ -572,8 +572,12 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
   // but there are cases where it matters -- so we may as well be
   // gentler and hand over a whole row of entries at a time
   std::vector<size_type> column_indices;
-  column_indices.reserve (*std::max_element (entries_per_row.begin(),
-                                             entries_per_row.end()));
+  column_indices.reserve (entries_per_row.size() > 0
+                          ?
+                          *std::max_element (entries_per_row.begin(),
+                                             entries_per_row.end())
+                          :
+                          0);
   for (size_type row=0; row<matrix.m(); ++row)
     {
       column_indices.resize(entries_per_row[row]);
