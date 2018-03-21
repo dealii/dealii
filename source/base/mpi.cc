@@ -61,6 +61,26 @@ namespace Utilities
 
   namespace MPI
   {
+    void wait(const MPI_Comm &mpi_communicator)
+    {
+      // see https://www.open-mpi.org/faq/?category=debugging#serial-debuggers
+      std::cout << "PID " << ::getpid()
+                << " rank " << Utilities::MPI::this_mpi_process(mpi_communicator)
+                << " on " << Utilities::System::get_hostname()
+                << " ready for attach." << std::endl;
+
+      char a;
+      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+        {
+          std::cout << "Type any character and press Enter/Return to start: " << std::flush;
+          std::cin >> a;
+        }
+
+#ifdef DEAL_II_WITH_MPI
+      MPI_Barrier(mpi_communicator);
+#endif
+    }
+
 #ifdef DEAL_II_WITH_MPI
     unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator)
     {

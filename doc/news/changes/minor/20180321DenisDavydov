@@ -1,0 +1,4 @@
+New: Add Utilities::MPI::wait(const MPI_Comm &mpi_communicator) to
+facilitate debugging MPI programs.
+<br>
+(Denis Davydov, 2018/03/21)
