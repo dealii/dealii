@@ -1409,9 +1409,13 @@ inline
 std::size_t
 SparsityPattern::n_nonzero_elements () const
 {
-  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
   Assert (compressed, ExcNotCompressed());
-  return rowstart[rows]-rowstart[0];
+
+  if ((rowstart!=nullptr) && (colnums!=nullptr))
+    return rowstart[rows]-rowstart[0];
+  else
+    // the object is empty or has zero size
+    return 0;
 }
 
 

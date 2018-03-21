@@ -356,7 +356,12 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::compress ()
 {
-  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
+  // nothing to do if the object corresponds to an empty matrix
+  if ((rowstart==nullptr) && (colnums==nullptr))
+    {
+      compressed = true;
+      return;
+    }
 
   // do nothing if already compressed
   if (compressed)
