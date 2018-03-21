@@ -1298,7 +1298,7 @@ namespace Step35
             ((dim + 1)*dof_handler_velocity.n_dofs() +
              dof_handler_pressure.n_dofs()),
             ExcInternalError());
-    static Vector<double> joint_solution (joint_dof_handler.n_dofs());
+    Vector<double> joint_solution (joint_dof_handler.n_dofs());
     std::vector<types::global_dof_index> loc_joint_dof_indices (joint_fe.dofs_per_cell),
         loc_vel_dof_indices (fe_velocity.dofs_per_cell),
         loc_pres_dof_indices (fe_pressure.dofs_per_cell);
