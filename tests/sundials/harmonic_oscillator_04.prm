@@ -2,8 +2,8 @@ set Final time                        = 10
 set Initial time                      = 0
 set Time interval between each output = 0.1
 subsection Error control
-  set Absolute error tolerance = 0.000001
-  set Relative error tolerance = 0.000010
+  set Absolute error tolerance = 0.00000001
+  set Relative error tolerance = 0.00000001
 end
 subsection Running parameters
   set Implicit function is linear            = true
