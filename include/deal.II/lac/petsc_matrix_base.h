@@ -1111,15 +1111,16 @@ namespace PETScWrappers
 
       ++accessor.a_index;
 
-      // if at end of line: do one step, then
-      // cycle until we find a row with a
-      // nonzero number of entries
+      // if at end of line: do one step, then cycle until we find a
+      // row with a nonzero number of entries
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;
           ++accessor.a_row;
 
           while ((accessor.a_row < accessor.matrix->m())
+                 &&
+                 (accessor.a_row < accessor.matrix->local_range().second)
                  &&
                  (accessor.matrix->row_length(accessor.a_row) == 0))
             ++accessor.a_row;
@@ -1492,7 +1493,9 @@ namespace PETScWrappers
   MatrixBase::const_iterator
   MatrixBase::begin(const size_type r) const
   {
-    Assert (r < m(), ExcIndexRange(r, 0, m()));
+    Assert (in_local_range(r),
+            ExcIndexRange(r, local_range().first, local_range().second));
+
     if (row_length(r) > 0)
       return const_iterator(this, r, 0);
     else
@@ -1504,13 +1507,21 @@ namespace PETScWrappers
   MatrixBase::const_iterator
   MatrixBase::end(const size_type r) const
   {
-    Assert (r < m(), ExcIndexRange(r, 0, m()));
+    Assert (in_local_range(r),
+            ExcIndexRange(r, local_range().first, local_range().second));
 
-    // place the iterator on the first entry
-    // past this line, or at the end of the
-    // matrix
+    // place the iterator on the first entry past this line, or at the
+    // end of the matrix
+    //
+    // in the parallel case, we need to put it on the first entry of
+    // the first row after the locally owned range. this of course
+    // doesn't exist, but we can nevertheless create such an
+    // iterator. we need to check whether 'i' is past the locally
+    // owned range of rows first, before we ask for the length of the
+    // row since the latter query leads to an exception in case we ask
+    // for a row that is not locally owned
     for (size_type i=r+1; i<m(); ++i)
-      if (row_length(i) > 0)
+      if (i == local_range().second || (row_length(i) > 0))
         return const_iterator(this, i, 0);
 
     // if there is no such line, then take the
