@@ -1091,11 +1091,11 @@ namespace VectorTools
       }
 
       // now invert the matrix
-      // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
+      // Allow for a maximum of 6*n steps to reduce the residual by 10^-12. n
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl     control(5.*rhs.size(), 0., 1e-12, false, false);
+      ReductionControl     control(6.*rhs.size(), 0., 1e-12, false, false);
       SolverCG<LinearAlgebra::distributed::Vector<Number> > cg(control);
       PreconditionJacobi<MatrixType> preconditioner;
       preconditioner.initialize(mass_matrix, 1.);
