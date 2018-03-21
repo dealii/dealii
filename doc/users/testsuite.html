@@ -149,6 +149,17 @@ Total Test time (real) =   1.72 sec</pre>
     </p>
 
     <p>
+      <i>Remark:</i> If the parameter file ends in <code>.prm.in</code>
+      instead of <code>.prm</code>, it will be configured/preprocessed to a
+      test.prm file. This is done with the CMake macro
+      <code>CONFIGURE_FILE</code> that replaces all strings
+      <code>@VARIABLE@</code> with the contents of the corresponding CMake
+      variable. This is useful in particular to conveniently substitute
+      <code>@SOURCE_DIR@</code> with the full source directory path of the
+      test.
+    </p>
+
+    <p>
       <i>Remark:</i> The test driver will compare the combined output
       stream of stdout and stderr against the comparison file. If the test
       creates a file <code>output</code> and writes to it, the comparison
