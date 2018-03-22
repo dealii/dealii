@@ -64,14 +64,23 @@ namespace Utilities
     void wait(const MPI_Comm &mpi_communicator)
     {
       // see https://www.open-mpi.org/faq/?category=debugging#serial-debuggers
-      std::cout << "PID " << ::getpid()
-                << " rank " << Utilities::MPI::this_mpi_process(mpi_communicator)
-                << " on " << Utilities::System::get_hostname()
-                << " ready for attach." << std::endl;
-
-      char a;
-      if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      const unsigned int np = Utilities::MPI::n_mpi_processes(mpi_communicator);
+      const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_communicator);
+      for (unsigned int p =0; p < np; ++p )
         {
+          if (p==myid)
+            std::cout << "PID " << ::getpid()
+                      << " rank " << myid
+                      << " on " << Utilities::System::get_hostname()
+                      << " ready for attach." << std::endl;
+#ifdef DEAL_II_WITH_MPI
+          MPI_Barrier(mpi_communicator);
+#endif
+        }
+
+      if (myid == 0)
+        {
+          char a;
           std::cout << "Type any character and press Enter/Return to start: " << std::flush;
           std::cin >> a;
         }
