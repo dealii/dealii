@@ -1,0 +1,50 @@
+
+DEAL::Accessors refer to the same entry: 1
+DEAL::dealii::TransposeTable<double>
+DEAL::++it == it:           false
+DEAL::++it != it:           true
+DEAL::it++ == it:           true
+DEAL::it++ != it + 1:       true
+DEAL::++(++it) == it + 2:   true
+DEAL::it++ == it + 1:       false
+DEAL::--(++it) == it:       true
+DEAL::(it--)-- == it:       true
+DEAL::end - 5 <= end:       true
+DEAL::end <= end:           true
+DEAL::end >= end:           true
+DEAL::begin + 5 >= begin:   true
+DEAL::begin + 5 <= begin:   false
+DEAL::end - begin:          12
+DEAL::begin - end:          -12
+DEAL::(begin + 2) - begin:  2
+DEAL::begin + 6 < begin:    false
+DEAL::begin < begin + 1:    true
+DEAL::end - 5 < begin:      false
+DEAL::it+5 == (t2 = (it+5)):true
+DEAL::end - 5 position:     1, 2
+DEAL::begin + 5 position:   2, 1
+DEAL::dealii::TransposeTable<dealii::TransposeTable<double> >
+DEAL::++it == it:           false
+DEAL::++it != it:           true
+DEAL::it++ == it:           true
+DEAL::it++ != it + 1:       true
+DEAL::++(++it) == it + 2:   true
+DEAL::it++ == it + 1:       false
+DEAL::--(++it) == it:       true
+DEAL::(it--)-- == it:       true
+DEAL::end - 5 <= end:       true
+DEAL::end <= end:           true
+DEAL::end >= end:           true
+DEAL::begin + 5 >= begin:   true
+DEAL::begin + 5 <= begin:   false
+DEAL::end - begin:          12
+DEAL::begin - end:          -12
+DEAL::(begin + 2) - begin:  2
+DEAL::begin + 6 < begin:    false
+DEAL::begin < begin + 1:    true
+DEAL::end - 5 < begin:      false
+DEAL::it+5 == (t2 = (it+5)):true
+DEAL::end - 5 position:     1, 2
+DEAL::begin + 5 position:   2, 1
+DEAL::converted iterators are equal: true
+DEAL::OK

@@ -22,6 +22,7 @@
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/aligned_vector.h>
+#include <deal.II/base/linear_index_iterator.h>
 
 #include <cstddef>
 #include <algorithm>
@@ -31,6 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 // forward declaration
 template <int N, typename T> class TableBase;
 template <int N, typename T> class Table;
+template <typename T> class TransposeTable;
 template <typename T> class Table<1,T>;
 template <typename T> class Table<2,T>;
 template <typename T> class Table<3,T>;
@@ -1500,6 +1502,202 @@ public:
 
 
 /**
+ * A namespace for iterators for TransposeTable. TransposeTable is unique in
+ * that it stores entries in column-major order.
+ */
+namespace TransposeTableIterators
+{
+  // Forward declaration of the iterator class.
+  template <typename T, bool Constness>
+  class Iterator;
+
+  /**
+   * Accessor class template. This will be partially specialized for both
+   * values of <code>Constness</code>.
+   */
+  template <typename T, bool Constness>
+  class Accessor;
+
+  /**
+   * Accessor base class. Stores a const pointer when <code>Constness ==
+   * true</code> and a non-const pointer when <code>Constness == false</code>.
+   */
+  template <typename T, bool Constness>
+  class AccessorBase
+  {
+  public:
+    /**
+     * Type of the stored pointer to the TransposeTable.
+     */
+    typedef typename std::conditional<Constness, const TransposeTable<T>*, TransposeTable<T>*>::type
+    container_pointer_type;
+
+    /**
+     * Default constructor.
+     */
+    AccessorBase();
+
+    /**
+     * Constructor setting up the end iterator.
+     */
+    AccessorBase(const container_pointer_type table);
+
+    /**
+     * Copy constructor from a non-const Accessor.
+     */
+    AccessorBase(const AccessorBase<T, false> &);
+
+    /**
+     * Constructor taking an array index. Note that TransposeTable stores data
+     * in column-major order.
+     */
+    AccessorBase(const container_pointer_type table,
+                 const std::ptrdiff_t linear_index);
+
+    /**
+     * Get a constant reference to the value of the element represented by
+     * this object.
+     */
+    const T &value() const;
+
+    /**
+     * Numerical type of the row and column indices of the TransposeTable.
+     */
+    typedef typename TransposeTable<T>::size_type size_type;
+
+    /**
+     * Access the row of the current entry.
+     */
+    size_type row() const;
+
+    /**
+     * Access the column of the current entry.
+     */
+    size_type column() const;
+
+  protected:
+    /**
+     * Pointer to the TransposeTable.
+     */
+    container_pointer_type container;
+
+    /**
+     * Current index.
+     */
+    std::ptrdiff_t linear_index;
+
+    /**
+     * Make the const version a friend for copying.
+     */
+    friend class AccessorBase<T, true>;
+
+    /**
+     * Make the underlying iterator class a friend.
+     */
+    friend class LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>;
+  };
+
+  /**
+   * Constant Accessor. Same as the base class.
+   */
+  template <typename T>
+  class Accessor<T, true> : public AccessorBase<T, true>
+  {
+  public:
+    /**
+     * Inherit the base class constructors.
+     */
+    using AccessorBase<T, true>::AccessorBase;
+  };
+
+  /**
+   * Accessor class for non-constant tables. Defines a few extra operations
+   * for modifying values.
+   */
+  template <typename T>
+  class Accessor<T, false> : public AccessorBase<T, false>
+  {
+  public:
+    /**
+     * Inherit the base class constructors.
+     */
+    using AccessorBase<T, false>::AccessorBase;
+
+    /**
+     * Assignment operator. This assigns a new value to the table entry at the
+     * current row and column coordinates.
+     */
+    const Accessor<T, false> &operator = (const T &) const;
+
+    /**
+     * Move assignment operator. This assigns a new value to the table entry at the
+     * current row and column coordinates.
+     */
+    const Accessor<T, false> &operator = (T&&) const;
+
+    /**
+     * Since we overload value() we have to explicitly use the base class
+     * version.
+     */
+    using AccessorBase<T, false>::value;
+
+    /**
+     * Get a reference to the value of the element represented by
+     * this object.
+     */
+    T &value() const;
+  };
+
+  /**
+   * Iterator class for TransposeTable.
+   */
+  template <typename T, bool Constness>
+  class Iterator : public LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>
+  {
+  public:
+    /**
+     * Size type used by TransposeTable.
+     */
+    typedef typename TransposeTable<T>::size_type size_type;
+
+    /**
+     * Type of the stored pointer to the TransposeTable.
+     */
+    typedef typename std::conditional<Constness, const TransposeTable<T>*, TransposeTable<T>*>::type
+    container_pointer_type;
+
+    /**
+     * Constructor from an accessor.
+     */
+    Iterator (const Accessor<T, Constness> &accessor);
+
+    /**
+     * Constructor. Create the end iterator for a table.
+     */
+    Iterator (const container_pointer_type object);
+
+    /**
+     * Constructor for a particular table entry.
+     */
+    Iterator (const container_pointer_type object,
+              const size_type row,
+              const size_type column);
+
+    /**
+     * Copy constructor from a non-const iterator.
+     */
+    Iterator(const Iterator<T, false> &i);
+
+    /**
+     * Constructor for an entry with a particular linear index.
+     */
+    Iterator (const container_pointer_type container,
+              const std::ptrdiff_t         linear_index);
+  };
+}
+
+
+/**
  * A class representing a transpose two-dimensional table, i.e. a matrix of
  * objects (not necessarily only numbers) in column first numbering (FORTRAN
  * convention). The only real difference is therefore really in the storage
@@ -1522,6 +1720,32 @@ public:
   typedef typename TableBase<2,T>::size_type size_type;
 
   /**
+   * Typedef for the values in the table.
+   */
+  typedef typename AlignedVector<T>::value_type value_type;
+
+  /**
+   * Typedef for the references in the table.
+   */
+  typedef typename AlignedVector<T>::reference reference;
+
+  /**
+   * Typedef for the constant references in the table.
+   */
+  typedef typename AlignedVector<T>::const_reference const_reference;
+
+  /**
+   * Typedef for a constant iterator that traverses the table in column-major
+   * order.
+   */
+  typedef TransposeTableIterators::Iterator<T, true> const_iterator;
+
+  /**
+   * Typedef for an iterator that traverses the table in column-major order.
+   */
+  typedef TransposeTableIterators::Iterator<T, false> iterator;
+
+  /**
    * Default constructor. Set all dimensions to zero.
    */
   TransposeTable () = default;
@@ -1539,7 +1763,7 @@ public:
    */
   void reinit (const size_type size1,
                const size_type size2,
-               const bool         omit_default_initialization = false);
+               const bool      omit_default_initialization = false);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1547,8 +1771,8 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j) const;
+  const_reference operator () (const size_type i,
+                               const size_type j) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1556,8 +1780,8 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j);
+  reference operator () (const size_type i,
+                         const size_type j);
 
   /**
    * Number of rows. This function really makes only sense since we have a
@@ -1571,6 +1795,26 @@ public:
    */
   size_type n_cols () const;
 
+  /**
+   * Return an iterator pointing to the first entry.
+   */
+  iterator begin ();
+
+  /**
+   * Return a constant iterator pointing to the first entry.
+   */
+  const_iterator begin () const;
+
+  /**
+   * Return an iterator pointing to one past the last entry.
+   */
+  iterator end ();
+
+  /**
+   * Return a constant iterator pointing to one past the last entry.
+   */
+  const_iterator end () const;
+
 protected:
   /**
    * Return a read-write reference to the element <tt>(i,j)</tt>.
@@ -1582,8 +1826,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::reference el (const size_type i,
-                                           const size_type j);
+  reference el (const size_type i,
+                const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -1599,8 +1843,21 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::const_reference el (const size_type i,
-                                                 const size_type j) const;
+  const_reference el (const size_type i,
+                      const size_type j) const;
+
+  /**
+   * Make the AccessorBase class a friend so that it may directly index into
+   * the array.
+   */
+  friend class TransposeTableIterators::AccessorBase<T, true>;
+  friend class TransposeTableIterators::AccessorBase<T, false>;
+
+  /**
+   * Make the mutable accessor class a friend so that we can write to array
+   * entries with iterators.
+   */
+  friend class TransposeTableIterators::Accessor<T, false>;
 };
 
 
@@ -2368,6 +2625,178 @@ Table<2,T>::n_cols () const
 
 
 //---------------------------------------------------------------------------
+namespace TransposeTableIterators
+{
+  template <typename T, bool Constness>
+  inline
+  AccessorBase<T, Constness>::AccessorBase()
+    :
+    container(nullptr),
+    linear_index(std::numeric_limits<decltype(linear_index)>::max())
+  {}
+
+
+
+  template <typename T, bool Constness>
+  inline
+  AccessorBase<T, Constness>::AccessorBase(const container_pointer_type table)
+    :
+    container(table),
+    linear_index(container->values.size())
+  {}
+
+
+
+  template <typename T, bool Constness>
+  inline
+  AccessorBase<T, Constness>::AccessorBase(const AccessorBase<T, false> &a)
+    :
+    container(a.container),
+    linear_index(a.linear_index)
+  {}
+
+
+
+  template <typename T, bool Constness>
+  inline
+  AccessorBase<T, Constness>::AccessorBase(const container_pointer_type table,
+                                           const std::ptrdiff_t         index)
+    :
+    container(table),
+    linear_index(index)
+  {
+    Assert(0 <= linear_index && linear_index < container->values.size() + 1,
+           ExcMessage("The current iterator points outside of the table and is "
+                      "not the end iterator."));
+  }
+
+
+
+  template <typename T, bool Constness>
+  inline
+  const T &
+  AccessorBase<T, Constness>::value() const
+  {
+    Assert(0 <= linear_index && linear_index < container->values.size(),
+           ExcMessage("The current iterator points outside of the table."));
+    return this->container->values[linear_index];
+  }
+
+
+
+  template <typename T, bool Constness>
+  inline
+  typename AccessorBase<T, Constness>::size_type
+  AccessorBase<T, Constness>::AccessorBase::row() const
+  {
+    Assert(!container->empty(), ExcMessage("An empty table has no rows or columns."));
+    const auto row_n = linear_index % container->n_rows();
+    Assert(0 <= row_n && row_n < container->n_rows(),
+           ExcMessage("The current iterator points outside the table."));
+    return row_n;
+  }
+
+
+
+  template <typename T, bool Constness>
+  inline
+  typename AccessorBase<T, Constness>::size_type
+  AccessorBase<T, Constness>::AccessorBase::column() const
+  {
+    Assert(!container->empty(), ExcMessage("An empty table has no rows or columns."));
+    const auto column_n = linear_index/container->n_rows();
+    Assert(0 <= column_n && column_n < container->n_cols(),
+           ExcMessage("The current iterator points outside the table."));
+    return column_n;
+  }
+
+
+  template <typename T>
+  inline
+  const Accessor<T, false> &
+  Accessor<T, false>::operator = (const T &t) const
+  {
+    Assert(0 <= this->linear_index && this->linear_index < this->container->values.size(),
+           ExcMessage("The current iterator points outside of the table."));
+    this->container->values[this->linear_index] = t;
+    return *this;
+  }
+
+
+
+  template <typename T>
+  inline
+  const Accessor<T, false> &
+  Accessor<T, false>::operator = (T &&t) const
+  {
+    Assert(0 <= this->linear_index && this->linear_index < this->container->values.size(),
+           ExcMessage("The current iterator points outside of the table."));
+    this->container->values[this->linear_index] = t;
+    return *this;
+  }
+
+
+
+  template <typename T>
+  inline
+  T &
+  Accessor<T, false>::value() const
+  {
+    Assert(0 <= this->linear_index && this->linear_index < this->container->values.size(),
+           ExcMessage("The current iterator points outside of the table."));
+    return this->container->values[this->linear_index];
+  }
+
+
+
+  template <typename T, bool Constness>
+  Iterator<T, Constness>::Iterator(const Accessor<T, Constness> &a)
+    :
+    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(a)
+  {}
+
+
+
+  template <typename T, bool Constness>
+  Iterator<T, Constness>::Iterator(const container_pointer_type table)
+    :
+    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(Accessor<T, Constness>(table))
+  {}
+
+
+
+  template <typename T, bool Constness>
+  Iterator<T, Constness>::Iterator(const Iterator<T, false> &i)
+    :
+    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>(*i)
+  {}
+
+
+
+
+  template <typename T, bool Constness>
+  Iterator<T, Constness>::Iterator(const container_pointer_type table,
+                                   const size_type              row_n,
+                                   const size_type              col_n)
+    :
+    Iterator(table, table->n_rows()*col_n + row_n)
+  {}
+
+
+
+  template <typename T, bool Constness>
+  Iterator<T, Constness>::Iterator
+  (const container_pointer_type table,
+   const std::ptrdiff_t         linear_index)
+    :
+    LinearIndexIterator<Iterator<T, Constness>, Accessor<T, Constness>>
+        (Accessor<T, Constness>(table, linear_index))
+  {}
+}
+
+
+
+//---------------------------------------------------------------------------
 template <typename T>
 inline
 TransposeTable<T>::TransposeTable (const size_type size1,
@@ -2392,7 +2821,7 @@ TransposeTable<T>::reinit (const size_type size1,
 
 template <typename T>
 inline
-typename AlignedVector<T>::const_reference
+typename TransposeTable<T>::const_reference
 TransposeTable<T>::operator () (const size_type i,
                                 const size_type j) const
 {
@@ -2405,7 +2834,7 @@ TransposeTable<T>::operator () (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::reference
+typename TransposeTable<T>::reference
 TransposeTable<T>::operator () (const size_type i,
                                 const size_type j)
 {
@@ -2418,7 +2847,7 @@ TransposeTable<T>::operator () (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::const_reference
+typename TransposeTable<T>::const_reference
 TransposeTable<T>::el (const size_type i,
                        const size_type j) const
 {
@@ -2429,7 +2858,7 @@ TransposeTable<T>::el (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::reference
+typename TransposeTable<T>::reference
 TransposeTable<T>::el (const size_type i,
                        const size_type j)
 {
@@ -2458,6 +2887,43 @@ TransposeTable<T>::n_cols () const
 
 
 
+template <typename T>
+inline
+typename TransposeTable<T>::iterator
+TransposeTable<T>::begin ()
+{
+  return typename TransposeTable<T>::iterator(this, 0, 0);
+}
+
+
+
+template <typename T>
+inline
+typename TransposeTable<T>::const_iterator
+TransposeTable<T>::begin () const
+{
+  return typename TransposeTable<T>::const_iterator(this, 0, 0);
+}
+
+
+
+template <typename T>
+inline
+typename TransposeTable<T>::iterator
+TransposeTable<T>::end ()
+{
+  return typename TransposeTable<T>::iterator(this);
+}
+
+
+
+template <typename T>
+inline
+typename TransposeTable<T>::const_iterator
+TransposeTable<T>::end () const
+{
+  return typename TransposeTable<T>::const_iterator(this);
+}
 //---------------------------------------------------------------------------
 
 
