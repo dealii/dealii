@@ -53,6 +53,14 @@ namespace Utilities
      * information is gathered once when constructing the partitioner, which
      * obviates subsequent global communication steps when exchanging data.
      *
+     * The figure below gives an example of index space $[0,74)$ being split into
+     * four processes.
+     * @image html partitioner.png
+     * Here process 0 will import 5 DoFs from process 1 (first pair of import targets),
+     * which corresponds to the first 3 elements of its import indices. Whereas
+     * process 2 will import 3 DoFs from process 0, which corresponds to the first
+     * two elements of its import indices.
+     *
      * The partitioner includes a mechanism for converting global to local and
      * local to global indices. Internally, this class stores vector elements
      * using the convention as follows: The local range is associated with
