@@ -86,6 +86,36 @@ namespace Utilities
     unsigned int this_mpi_process (const MPI_Comm &mpi_communicator);
 
     /**
+     * This function will print process id and host name on each MPI process
+     * and wait until the user enters any character before proceeding.
+     * It is intended to facilitate attachment of serial debuggers to MPI programs,
+     * see https://www.open-mpi.org/faq/?category=debugging#serial-debuggers .
+     *
+     * After adding this function, one would typically run an executable with
+     * \code{.sh}
+     * mpiexec -np 2 xterm -e <path-to-exec>
+     * \endcode
+     * to get process IDs and then attach a debugger. For example, in
+     * Visual Studio Code on macOS you can achieve this via the following _attach_ configuration:
+     * \code{.json}
+     * {
+     *  "version": "0.2.0",
+     *  "configurations": [
+     *    {
+     *      "name": "(lldb) Attach",
+     *      "type": "cppdbg",
+     *      "request": "attach",
+     *      "program": "<path-to-exec>",
+     *      "processId": "\${command:pickProcess}",
+     *      "MIMode": "lldb"
+     *    }
+     *  ]
+     * }
+     * \endcode
+     */
+    void wait(const MPI_Comm &mpi_communicator);
+
+    /**
      * Consider an unstructured communication pattern where every process in
      * an MPI universe wants to send some data to a subset of the other
      * processors. To do that, the other processors need to know who to expect
