@@ -29,9 +29,9 @@ void check ()
 
   Triangulation<dim> triangulation;
   GridGenerator::truncated_cone (triangulation);
-  GridTools::transform ([](const Point<dim> &p)
+  GridTools::transform ([](const Point<3> &p)
   {
-    return Point<dim> (-p[1], p[0], p[2]);
+    return Point<3> (-p[1], p[0], p[2]);
   },
   triangulation);
   static const CylindricalManifold<dim> boundary(1);
