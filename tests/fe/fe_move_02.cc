@@ -30,7 +30,6 @@ check(const FiniteElement<dim> &fe)
   deallog << "blocks: " << fe.n_blocks() << std::endl;
   deallog << "conforms H1: " << fe.conforms(FiniteElementData<dim>::H1) << std::endl;
   deallog << "n_base_elements: " << fe.n_base_elements() << std::endl;
-  deallog << "memory consumption: " << fe.memory_consumption() << std::endl;
   deallog << std::endl;
 }
 
