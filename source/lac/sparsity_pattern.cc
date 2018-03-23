@@ -356,7 +356,12 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::compress ()
 {
-  Assert ((rowstart!=nullptr) && (colnums!=nullptr), ExcEmptyObject());
+  // nothing to do if the object corresponds to an empty matrix
+  if ((rowstart==nullptr) && (colnums==nullptr))
+    {
+      compressed = true;
+      return;
+    }
 
   // do nothing if already compressed
   if (compressed)
@@ -545,13 +550,15 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
   // first init with the number of entries per row. if this matrix is square
   // then we also have to allocate memory for the diagonal entry, unless we
   // have already counted it
+  const bool matrix_is_square = (matrix.m() == matrix.n());
+
   std::vector<unsigned int> entries_per_row (matrix.m(), 0);
   for (size_type row=0; row<matrix.m(); ++row)
     {
       for (size_type col=0; col<matrix.n(); ++col)
         if (matrix(row,col) != 0)
           ++entries_per_row[row];
-      if ((matrix.m() == matrix.n())
+      if (matrix_is_square
           &&
           (matrix(row,row) == 0))
         ++entries_per_row[row];
@@ -559,11 +566,47 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 
   reinit (matrix.m(), matrix.n(), entries_per_row);
 
-  // now set entries
+  // now set entries. if we enter entries row by row, then we'll get
+  // quadratic complexity in the number of entries per row. this is
+  // not usually a problem (we don't usually create dense matrices),
+  // but there are cases where it matters -- so we may as well be
+  // gentler and hand over a whole row of entries at a time
+  std::vector<size_type> column_indices;
+  column_indices.reserve (entries_per_row.size() > 0
+                          ?
+                          *std::max_element (entries_per_row.begin(),
+                                             entries_per_row.end())
+                          :
+                          0);
   for (size_type row=0; row<matrix.m(); ++row)
-    for (size_type col=0; col<matrix.n(); ++col)
-      if (matrix(row,col) != 0)
-        add (row,col);
+    {
+      column_indices.resize(entries_per_row[row]);
+
+      size_type current_index = 0;
+      for (size_type col=0; col<matrix.n(); ++col)
+        if (matrix(row,col) != 0)
+          {
+            column_indices[current_index] = col;
+            ++current_index;
+          }
+        else
+          // the (row,col) entry is zero; check if we need to add it
+          // anyway because it's the diagonal entry of a square
+          // matrix
+          if (matrix_is_square
+              &&
+              (col == row))
+            {
+              column_indices[current_index] = row;
+              ++current_index;
+            }
+
+      // check that we really added the correct number of indices
+      Assert (current_index == entries_per_row[row], ExcInternalError());
+
+      // now bulk add all of these entries
+      add_entries(row, column_indices.begin(), column_indices.end(), true);
+    }
 
   // finally compress
   compress ();
