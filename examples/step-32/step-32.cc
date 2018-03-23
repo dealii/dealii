@@ -1972,10 +1972,25 @@ namespace Step32
   // locale (which we get using the constructor call
   // <code>std::locale("")</code>) implies printing numbers with a comma
   // separator for every third digit (i.e., thousands, millions, billions).
+  //
+  // In this function as well as many below, we measure how much time
+  // we spend here and collect that in a section called "Setup dof
+  // systems" across function invokations. This is done using an
+  // TimerOutput::Scope object that gets a timer going in the section
+  // with above name of the `computing_timer` object upon construction
+  // of the local variable; the timer is stopped again when the
+  // destructor of the `timing_section` variable is called.  This, of
+  // course, happens either at the end of the function, or if we leave
+  // the function through a `return` statement or when an exception is
+  // thrown somewhere -- in other words, whenever we leave this
+  // function in any way. The use of such "scope" objects therefore
+  // makes sure that we do not have to manually add code that tells
+  // the timer to stop at every location where this function may be
+  // left.
   template <int dim>
   void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
-    computing_timer.enter_section("Setup dof systems");
+    TimerOutput::Scope timing_section (computing_timer, "Setup dof systems");
 
     std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
     stokes_sub_blocks[dim] = 1;
@@ -2117,8 +2132,6 @@ namespace Step32
     rebuild_stokes_preconditioner      = true;
     rebuild_temperature_matrices       = true;
     rebuild_temperature_preconditioner = true;
-
-    computing_timer.exit_section();
   }
 
 
@@ -2311,7 +2324,7 @@ namespace Step32
     if (rebuild_stokes_preconditioner == false)
       return;
 
-    computing_timer.enter_section ("   Build Stokes preconditioner");
+    TimerOutput::Scope timer_section (computing_timer, "   Build Stokes preconditioner");
     pcout << "   Rebuilding Stokes preconditioner..." << std::flush;
 
     assemble_stokes_preconditioner ();
@@ -2339,7 +2352,6 @@ namespace Step32
     rebuild_stokes_preconditioner = false;
 
     pcout << std::endl;
-    computing_timer.exit_section();
   }
 
 
@@ -2448,7 +2460,7 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
   {
-    computing_timer.enter_section ("   Assemble Stokes system");
+    TimerOutput::Scope timer_section (computing_timer, "   Assemble Stokes system");
 
     if (rebuild_stokes_matrix == true)
       stokes_matrix=0;
@@ -2498,7 +2510,6 @@ namespace Step32
     rebuild_stokes_matrix = false;
 
     pcout << std::endl;
-    computing_timer.exit_section();
   }
 
 
@@ -2572,7 +2583,7 @@ namespace Step32
     if (rebuild_temperature_matrices == false)
       return;
 
-    computing_timer.enter_section ("   Assemble temperature matrices");
+    TimerOutput::Scope timer_section (computing_timer, "   Assemble temperature matrices");
     temperature_mass_matrix = 0;
     temperature_stiffness_matrix = 0;
 
@@ -2607,8 +2618,6 @@ namespace Step32
 
     rebuild_temperature_matrices = false;
     rebuild_temperature_preconditioner = true;
-
-    computing_timer.exit_section();
   }
 
 
@@ -2959,9 +2968,9 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::solve ()
   {
-    computing_timer.enter_section ("   Solve Stokes system");
-
     {
+      TimerOutput::Scope timer_section (computing_timer, "   Solve Stokes system");
+
       pcout << "   Solving Stokes system... " << std::flush;
 
       TrilinosWrappers::MPI::BlockVector
@@ -3033,7 +3042,6 @@ namespace Step32
       pcout << n_iterations  << " iterations."
             << std::endl;
     }
-    computing_timer.exit_section();
 
 
     // Now let's turn to the temperature part: First, we compute the time step
@@ -3054,8 +3062,9 @@ namespace Step32
     // produce some output (for example in order to help us choose the
     // stabilization constants, as discussed in the introduction). The only
     // difference is that we need to exchange maxima over all processors.
-    computing_timer.enter_section ("   Assemble temperature rhs");
     {
+      TimerOutput::Scope timer_section (computing_timer, "   Assemble temperature rhs");
+
       old_time_step = time_step;
 
       const double scaling = (dim==3 ? 0.25 : 1.0);
@@ -3076,10 +3085,10 @@ namespace Step32
       temperature_solution = old_temperature_solution;
       assemble_temperature_system (maximal_velocity);
     }
-    computing_timer.exit_section ();
 
-    computing_timer.enter_section ("   Solve temperature system");
     {
+      TimerOutput::Scope timer_section (computing_timer, "   Solve temperature system");
+
       SolverControl solver_control (temperature_matrix.m(),
                                     1e-12*temperature_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
@@ -3097,7 +3106,6 @@ namespace Step32
       pcout << "   "
             << solver_control.last_step()
             << " CG iterations for temperature" << std::endl;
-      computing_timer.exit_section();
 
       double temperature[2] = { std::numeric_limits<double>::max(),
                                 -std::numeric_limits<double>::max()
@@ -3315,7 +3323,7 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::output_results ()
   {
-    computing_timer.enter_section ("Postprocessing");
+    TimerOutput::Scope timer_section (computing_timer, "Postprocessing");
 
     const FESystem<dim> joint_fe (stokes_fe, 1,
                                   temperature_fe, 1);
@@ -3432,7 +3440,6 @@ namespace Step32
         DataOutBase::write_visit_record (visit_master, filenames);
       }
 
-    computing_timer.exit_section ();
     out_index++;
   }
 
@@ -3464,99 +3471,103 @@ namespace Step32
   template <int dim>
   void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   {
-    computing_timer.enter_section ("Refine mesh structure, part 1");
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
-    KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-                                        QGauss<dim-1>(parameters.temperature_degree+1),
-                                        typename FunctionMap<dim>::type(),
-                                        temperature_solution,
-                                        estimated_error_per_cell,
-                                        ComponentMask(),
-                                        nullptr,
-                                        0,
-                                        triangulation.locally_owned_subdomain());
-
-    parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_fraction (triangulation,
-                                       estimated_error_per_cell,
-                                       0.3, 0.1);
-
-    if (triangulation.n_levels() > max_grid_level)
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active(max_grid_level);
-           cell != triangulation.end(); ++cell)
-        cell->clear_refine_flag ();
-
-    // With all flags marked as necessary, we set up the
-    // parallel::distributed::SolutionTransfer object to transfer the
-    // solutions for the current time level and the next older one. The syntax
-    // is similar to the non-%parallel solution transfer (with the exception
-    // that here a pointer to the vector entries is enough). The remainder of
-    // the function is concerned with setting up the data structures again
-    // after mesh refinement and restoring the solution vectors on the new
-    // mesh.
-    std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature (2);
-    x_temperature[0] = &temperature_solution;
-    x_temperature[1] = &old_temperature_solution;
-    std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes (2);
-    x_stokes[0] = &stokes_solution;
-    x_stokes[1] = &old_stokes_solution;
-
     parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
     temperature_trans(temperature_dof_handler);
     parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector>
     stokes_trans(stokes_dof_handler);
 
-    triangulation.prepare_coarsening_and_refinement();
-    temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
-    stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
+    {
+      TimerOutput::Scope timer_section (computing_timer, "Refine mesh structure, part 1");
 
-    triangulation.execute_coarsening_and_refinement ();
-    computing_timer.exit_section();
+      Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+      KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
+                                          QGauss<dim-1>(parameters.temperature_degree+1),
+                                          typename FunctionMap<dim>::type(),
+                                          temperature_solution,
+                                          estimated_error_per_cell,
+                                          ComponentMask(),
+                                          nullptr,
+                                          0,
+                                          triangulation.locally_owned_subdomain());
+
+      parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_fraction (triangulation,
+                                         estimated_error_per_cell,
+                                         0.3, 0.1);
+
+      if (triangulation.n_levels() > max_grid_level)
+        for (typename Triangulation<dim>::active_cell_iterator
+             cell = triangulation.begin_active(max_grid_level);
+             cell != triangulation.end(); ++cell)
+          cell->clear_refine_flag ();
+
+      // With all flags marked as necessary, we can then tell the
+      // parallel::distributed::SolutionTransfer objects to get ready to transfer
+      // data from one mesh to the next, which they will do when notified by
+      // Triangulation as part of the @p execute_coarsening_and_refinement() call.
+      // The syntax is similar to the non-%parallel solution transfer (with the exception
+      // that here a pointer to the vector entries is enough). The remainder of
+      // the function further down below is then concerned with setting up the data
+      // structures again after mesh refinement and restoring the solution
+      // vectors on the new mesh.
+      std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature (2);
+      x_temperature[0] = &temperature_solution;
+      x_temperature[1] = &old_temperature_solution;
+      std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes (2);
+      x_stokes[0] = &stokes_solution;
+      x_stokes[1] = &old_stokes_solution;
+
+      triangulation.prepare_coarsening_and_refinement();
+
+      temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
+      stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
+
+      triangulation.execute_coarsening_and_refinement ();
+    }
 
     setup_dofs ();
 
-    computing_timer.enter_section ("Refine mesh structure, part 2");
-
     {
-      TrilinosWrappers::MPI::Vector distributed_temp1 (temperature_rhs);
-      TrilinosWrappers::MPI::Vector distributed_temp2 (temperature_rhs);
+      TimerOutput::Scope timer_section (computing_timer, "Refine mesh structure, part 2");
 
-      std::vector<TrilinosWrappers::MPI::Vector *> tmp (2);
-      tmp[0] = &(distributed_temp1);
-      tmp[1] = &(distributed_temp2);
-      temperature_trans.interpolate(tmp);
+      {
+        TrilinosWrappers::MPI::Vector distributed_temp1 (temperature_rhs);
+        TrilinosWrappers::MPI::Vector distributed_temp2 (temperature_rhs);
 
-      // enforce constraints to make the interpolated solution conforming on
-      // the new mesh:
-      temperature_constraints.distribute(distributed_temp1);
-      temperature_constraints.distribute(distributed_temp2);
+        std::vector<TrilinosWrappers::MPI::Vector *> tmp (2);
+        tmp[0] = &(distributed_temp1);
+        tmp[1] = &(distributed_temp2);
+        temperature_trans.interpolate(tmp);
 
-      temperature_solution     = distributed_temp1;
-      old_temperature_solution = distributed_temp2;
+        // enforce constraints to make the interpolated solution conforming on
+        // the new mesh:
+        temperature_constraints.distribute(distributed_temp1);
+        temperature_constraints.distribute(distributed_temp2);
+
+        temperature_solution     = distributed_temp1;
+        old_temperature_solution = distributed_temp2;
+      }
+
+      {
+        TrilinosWrappers::MPI::BlockVector distributed_stokes (stokes_rhs);
+        TrilinosWrappers::MPI::BlockVector old_distributed_stokes (stokes_rhs);
+
+        std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp (2);
+        stokes_tmp[0] = &(distributed_stokes);
+        stokes_tmp[1] = &(old_distributed_stokes);
+
+        stokes_trans.interpolate (stokes_tmp);
+
+        // enforce constraints to make the interpolated solution conforming on
+        // the new mesh:
+        stokes_constraints.distribute(distributed_stokes);
+        stokes_constraints.distribute(old_distributed_stokes);
+
+        stokes_solution     = distributed_stokes;
+        old_stokes_solution = old_distributed_stokes;
+      }
     }
-
-    {
-      TrilinosWrappers::MPI::BlockVector distributed_stokes (stokes_rhs);
-      TrilinosWrappers::MPI::BlockVector old_distributed_stokes (stokes_rhs);
-
-      std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp (2);
-      stokes_tmp[0] = &(distributed_stokes);
-      stokes_tmp[1] = &(old_distributed_stokes);
-
-      stokes_trans.interpolate (stokes_tmp);
-
-      // enforce constraints to make the interpolated solution conforming on
-      // the new mesh:
-      stokes_constraints.distribute(distributed_stokes);
-      stokes_constraints.distribute(old_distributed_stokes);
-
-      stokes_solution     = distributed_stokes;
-      old_stokes_solution = old_distributed_stokes;
-    }
-
-    computing_timer.exit_section();
   }
 
 
