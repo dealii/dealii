@@ -42,7 +42,6 @@ namespace Utilities
                                                const ArrayView<Number>       &ghost_array,
                                                std::vector<MPI_Request>      &requests) const
     {
-      AssertDimension(locally_owned_array.size(), local_size());
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
@@ -51,6 +50,9 @@ namespace Utilities
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets = ghost_targets_data.size();
+
+      if (n_import_targets>0)
+        AssertDimension(locally_owned_array.size(), local_size());
 
       Assert(requests.size() == 0,
              ExcMessage("Another operation seems to still be running. "
@@ -316,7 +318,6 @@ namespace Utilities
                                                   const ArrayView<Number>       &ghost_array,
                                                   std::vector<MPI_Request>      &requests) const
     {
-      AssertDimension(locally_owned_array.size(), local_size());
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
@@ -353,6 +354,7 @@ namespace Utilities
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
         {
+          AssertDimension(locally_owned_array.size(), local_size());
           const int ierr = MPI_Waitall (n_import_targets, requests.data(),
                                         MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
