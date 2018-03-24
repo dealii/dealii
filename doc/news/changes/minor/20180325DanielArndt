@@ -1,0 +1,5 @@
+Fixed: GridTools::minimal_cell_diameter() and GridTools::maximal_cell_diameter()
+return the maximal respectively minimal cell diameter of the non-artifical part
+of a Triangulation object.
+<br>
+(Daniel Arndt, 2018/03/25)

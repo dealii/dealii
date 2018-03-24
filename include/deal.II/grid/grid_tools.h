@@ -154,15 +154,16 @@ namespace GridTools
                  const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
-   * Return the diameter of the smallest active cell of a triangulation. See
-   * step-24 for an example of use of this function.
+   * Return the diameter of the smallest active cell of the non-artificial part
+   * of a triangulation. See step-24 for an example of use of this function.
    */
   template <int dim, int spacedim>
   double
   minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Return the diameter of the largest active cell of a triangulation.
+   * Return the diameter of the largest active cell of the non-artificial part
+   * of a triangulation.
    */
   template <int dim, int spacedim>
   double
