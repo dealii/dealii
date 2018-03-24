@@ -92,6 +92,18 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
+          #
+          # In case CMake is instructed to add rpaths to the library and
+          # exectuble on installation, make sure that we add an additional
+          # rpath to the library location as well:
+          #
+          IF(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+            SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+              PROPERTIES
+              INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
+              )
+          ENDIF()
+
           ADD_DEPENDENCIES(examples ${_name}.${_build_lowercase})
           INSTALL(TARGETS ${_name}.${_build_lowercase}
             DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/${_name}
