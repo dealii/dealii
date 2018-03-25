@@ -189,6 +189,27 @@ namespace OpenCASCADE
         average_normal /= average_normal.norm();
         break;
       }
+      case 4:
+      {
+        Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
+        Tensor<1,3> v = surrounding_points[2]-surrounding_points[0];
+        const double n1_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
+        Tensor<1,3> n1(n1_coords);
+        n1 = n1/n1.norm();
+        u = surrounding_points[2]-surrounding_points[3];
+        v = surrounding_points[1]-surrounding_points[3];
+        const double n2_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
+        Tensor<1,3> n2(n2_coords);
+        n2 = n2/n2.norm();
+
+        average_normal = (n1+n2)/2.0;
+
+        Assert(average_normal.norm() > tolerance,
+               ExcMessage("Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
+
+        average_normal /= average_normal.norm();
+        break;
+      }
       case 8:
       {
         Tensor<1,3> u = surrounding_points[1]-surrounding_points[0];
@@ -211,10 +232,6 @@ namespace OpenCASCADE
         const double n4_coords[3] = {u[1] *v[2]-u[2] *v[1],u[2] *v[0]-u[0] *v[2],u[0] *v[1]-u[1] *v[0]};
         Tensor<1,3> n4(n4_coords);
         n4 = n4/n4.norm();
-        //for (unsigned int i=0; i<surrounding_points.size(); ++i)
-        //    cout<<surrounding_points[i]<<endl;
-        //cout<<"-"<<endl;
-        //cout<<n1<<endl;cout<<n2<<endl;cout<<n3<<endl;cout<<n4<<endl;
 
         average_normal = (n1+n2+n3+n4)/4.0;
 
