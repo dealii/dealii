@@ -519,7 +519,7 @@ public:
   void compute_cholesky_factorization ();
 
   /**
-   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm ($1/(||\mathbf A||_1 ||\mathbf A^{-1}||_1)$)
+   * Estimate the reciprocal of the condition number $1/k(\mathbf A)$ in $L_1$ norm ($1/(||\mathbf A||_1 \, ||\mathbf A^{-1}||_1)$)
    * of a symmetric positive definite matrix using Cholesky factorization. This function can only
    * be called if the matrix is already factorized.
    *
@@ -650,16 +650,16 @@ public:
 
   /**
    * Compute eigenvalues and eigenvectors of a real symmetric matrix. Only
-   * eigenvalues in the interval $(lower_bound, upper_bound]$ are computed with
-   * the absolute tolerance abs_accuracy. An approximate eigenvalue is
+   * eigenvalues in the interval $(\rm{lower\_bound}, \rm{upper\_bound}]$ are computed with
+   * the absolute tolerance $\rm abs\_accuracy$. An approximate eigenvalue is
    * accepted as converged when it is determined to lie in an interval $[a,b]$
-   * of width less than or equal to $abs_accuracy + eps * max(|a|,|b|)$, where
-   * $eps$ is the machine precision.  If $abs_accuracy$ is less than or equal to
-   * zero, then $eps*|t|$ will be used in its place, where $|t|$ is the 1-norm of
+   * of width less than or equal to $\rm{abs\_accuracy} + eps * \rm{max}(|a|,|b|)$, where
+   * $eps$ is the machine precision.  If $\rm{abs\_accuracy}$ is less than or equal to
+   * zero, then $eps\,|\mathbf{T}|_1$ will be used in its place, where $|\mathbf{T}|_1$ is the 1-norm of
    * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
-   * Eigenvalues will be computed most accurately when $abs_accuracy$ is set to
+   * Eigenvalues will be computed most accurately when $\rm{abs\_accuracy}$ is set to
    * twice the underflow threshold, not zero.  After this routine has been
-   * called, all eigenvalues in $(lower_bound, upper_bound]$ will be stored in
+   * called, all eigenvalues in $(\rm{lower\_bound}, \rm{upper\_bound}]$ will be stored in
    * eigenvalues and the corresponding eigenvectors will be stored in the
    * columns of eigenvectors, whose dimension is set accordingly.
    *
@@ -674,21 +674,22 @@ public:
   /**
    * Compute generalized eigenvalues and eigenvectors of a real generalized
    * symmetric eigenproblem of the form
-   * - itype = 1: $\mathbf A \cdot \mathbf x=\lambda \mathbf B \cdot x$
+   * - itype = 1: $\mathbf A \cdot \mathbf x=\lambda \mathbf B \cdot \mathbf x$
    * - itype = 2: $\mathbf A \cdot \mathbf B \cdot \mathbf x=\lambda \mathbf x$
    * - itype = 3: $\mathbf B \cdot \mathbf A \cdot \mathbf x=\lambda \mathbf x$
+   *
    * where $\mathbf A$ is this matrix. $\mathbf A$
    * and $\mathbf B$ are assumed to be symmetric, and $\mathbf B$ has to be positive definite.
-   * Only eigenvalues in the interval $(lower_bound, upper_bound]$ are computed
-   * with the absolute tolerance $abs_accuracy$.  An approximate eigenvalue is
+   * Only eigenvalues in the interval $(\rm{lower\_bound}, \rm{upper\_bound}]$ are computed
+   * with the absolute tolerance $\rm{abs\_accuracy}$.  An approximate eigenvalue is
    * accepted as converged when it is determined to lie in an interval $[a,b]$
-   * of width less than or equal to $abs_accuracy + eps * max( |a|,|b| )$, where
-   * $eps$ is the machine precision. If $abs_accuracy$ is less than or equal to
-   * zero, then $eps*|t|$ will be used in its place, where $|t|$ is the 1-norm of
+   * of width less than or equal to $\rm{abs\_accuracy} + eps * \rm{max}( |a|,|b| )$, where
+   * $eps$ is the machine precision. If $\rm{abs\_accuracy}$ is less than or equal to
+   * zero, then $eps \, |\mathbf{T}|_1$ will be used in its place, where $|\mathbf{T}|_1$ is the 1-norm of
    * the tridiagonal matrix obtained by reducing $\mathbf A$ to tridiagonal form.
-   * Eigenvalues will be computed most accurately when $abs_accuracy$ is set to
+   * Eigenvalues will be computed most accurately when $\rm{abs\_accuracy}$ is set to
    * twice the underflow threshold, not zero. After this routine has been
-   * called, all eigenvalues in $(lower_bound, upper_bound]$ will be stored in
+   * called, all eigenvalues in $(\rm{lower\_bound}, \rm{upper\_bound}]$ will be stored in
    * eigenvalues and the corresponding eigenvectors will be stored in
    * eigenvectors, whose dimension is set accordingly.
    *
@@ -747,7 +748,7 @@ public:
    * The parameter @p threshold determines, when a singular value should
    * be considered zero. It is the ratio of the smallest to the largest
    * nonzero singular value $s_{max}$. Thus, the inverses of all
-   * singular values less than  $s_{max}/threshold$ will
+   * singular values less than  $s_{max}/\rm{threshold}$ will
    * be set to zero.
    */
   void compute_inverse_svd (const double threshold = 0.);
