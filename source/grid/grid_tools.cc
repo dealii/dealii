@@ -2712,7 +2712,18 @@ next_cell:
       if (!cell->is_artificial())
         min_diameter = std::min (min_diameter,
                                  cell->diameter());
-    return min_diameter;
+
+    double global_min_diameter = 0;
+
+#ifdef DEAL_II_WITH_MPI
+    if (const parallel::Triangulation<dim,spacedim> *p_tria
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&triangulation))
+      global_min_diameter = Utilities::MPI::min (min_diameter, p_tria->get_communicator());
+    else
+#endif
+      global_min_diameter = min_diameter;
+
+    return global_min_diameter;
   }
 
 
@@ -2726,7 +2737,18 @@ next_cell:
       if (!cell->is_artificial())
         max_diameter = std::max (max_diameter,
                                  cell->diameter());
-    return max_diameter;
+
+    double global_max_diameter = 0;
+
+#ifdef DEAL_II_WITH_MPI
+    if (const parallel::Triangulation<dim,spacedim> *p_tria
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim>*>(&triangulation))
+      global_max_diameter = Utilities::MPI::max (max_diameter, p_tria->get_communicator());
+    else
+#endif
+      global_max_diameter = max_diameter;
+
+    return global_max_diameter;
   }
 
 
