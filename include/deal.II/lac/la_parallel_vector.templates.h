@@ -560,8 +560,9 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
       vector_is_ghosted = false;
 
-      if (compress_requests.size() == 0)
-        return;
+      // in order to zero ghost part of the vector, we need to call
+      // import_from_ghosted_array_finish() regardless of
+      // compress_requests.size() == 0
 
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);

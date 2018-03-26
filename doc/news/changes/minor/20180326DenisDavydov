@@ -1,0 +1,4 @@
+Fixed: LinearAlgebra::distributed::Vector::compress(VectorOperation::insert) now flashes
+ghost part of the vector in Release mode.
+<br>
+(Denis Davydov, 2018/03/17)
