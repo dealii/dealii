@@ -1,6 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 INCLUDE(../setup_testsubproject.cmake)
 PROJECT(testsuite CXX)
+
+ADD_EXECUTABLE(dummy dummy.cc)
+SET(TEST_TARGET "dummy")
 DEAL_II_PICKUP_TESTS()
 
 #
