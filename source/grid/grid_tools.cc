@@ -2707,12 +2707,11 @@ next_cell:
   double
   minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation)
   {
-    double min_diameter = triangulation.begin_active()->diameter();
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator
-         cell = triangulation.begin_active(); cell != triangulation.end();
-         ++cell)
-      min_diameter = std::min (min_diameter,
-                               cell->diameter());
+    double min_diameter = std::numeric_limits<double>::max();
+    for (const auto cell: triangulation.active_cell_iterators())
+      if (!cell->is_artificial())
+        min_diameter = std::min (min_diameter,
+                                 cell->diameter());
     return min_diameter;
   }
 
@@ -2722,12 +2721,11 @@ next_cell:
   double
   maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation)
   {
-    double max_diameter = triangulation.begin_active()->diameter();
-    for (typename Triangulation<dim, spacedim>::active_cell_iterator
-         cell = triangulation.begin_active(); cell != triangulation.end();
-         ++cell)
-      max_diameter = std::max (max_diameter,
-                               cell->diameter());
+    double max_diameter = 0.;
+    for (const auto cell: triangulation.active_cell_iterators())
+      if (!cell->is_artificial())
+        max_diameter = std::max (max_diameter,
+                                 cell->diameter());
     return max_diameter;
   }
 
