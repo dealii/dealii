@@ -62,9 +62,9 @@
 #                            directory (without actually running the
 #                            testsuite)
 #
-#       "Regression Tests" - Reserved for the "official" regression tester
+#       "Regression Tests" - Reserved for "official" regression testers
 #
-#       "Continuous"       - Reserved for the "official" regression tester
+#       "Continuous"       - Reserved for "official" regression testers
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../doc/users/config.sample)
@@ -243,11 +243,10 @@ ENDIF()
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
-IF( TRACK MATCHES "^(Regression Tests|Continuous)$"
-    AND NOT CTEST_SITE MATCHES "^(simserv04|tester)$" )
+IF(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester$")
   MESSAGE(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
-The TRACK \"Regression Tests\" or \"Continuous\" is not for you.
+The TRACK \"Regression Tests\" is not for you.
 "
     )
 ENDIF()
