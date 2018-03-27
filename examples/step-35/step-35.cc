@@ -1310,8 +1310,8 @@ namespace Step35
     for (; joint_cell != joint_endc; ++joint_cell, ++vel_cell, ++pres_cell)
       {
         joint_cell->get_dof_indices (loc_joint_dof_indices);
-        vel_cell->get_dof_indices (loc_vel_dof_indices),
-                 pres_cell->get_dof_indices (loc_pres_dof_indices);
+        vel_cell->get_dof_indices (loc_vel_dof_indices);
+        pres_cell->get_dof_indices (loc_pres_dof_indices);
         for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
           switch (joint_fe.system_to_base_index(i).first.first)
             {
