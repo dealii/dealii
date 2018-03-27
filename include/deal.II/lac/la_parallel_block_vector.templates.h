@@ -241,15 +241,22 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
     {
-      // start all requests for all blocks before finishing the transfers as
-      // this saves repeated synchronizations. In order to avoid conflict with
-      // possible other ongoing communication requests (from
-      // LA::distributed::Vector that supports unfinished requests), add an
-      // arbitrary number 8273 to the communication tag
-      for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).compress_start(block + 8273, operation);
-      for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).compress_finish(operation);
+      const unsigned int n_chunks = (this->n_blocks()+communication_block_size-1)/communication_block_size;
+      for (unsigned int c = 0; c < n_chunks; ++c)
+        {
+          const unsigned int start = c*communication_block_size;
+          const unsigned int end   = std::min(start+communication_block_size, this->n_blocks());
+
+          // start all requests for all blocks before finishing the transfers as
+          // this saves repeated synchronizations. In order to avoid conflict with
+          // possible other ongoing communication requests (from
+          // LA::distributed::Vector that supports unfinished requests), add an
+          // arbitrary number 8273 to the communication tag
+          for (unsigned int block=start; block<end; ++block)
+            this->block(block).compress_start(block + 8273 - start, operation);
+          for (unsigned int block=start; block<end; ++block)
+            this->block(block).compress_finish(operation);
+        }
     }
 
 
@@ -258,13 +265,20 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::update_ghost_values () const
     {
-      // In order to avoid conflict with possible other ongoing communication
-      // requests (from LA::distributed::Vector that supports unfinished
-      // requests), add an arbitrary number 9923 to the communication tag
-      for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).update_ghost_values_start(block + 9923);
-      for (unsigned int block=0; block<this->n_blocks(); ++block)
-        this->block(block).update_ghost_values_finish();
+      const unsigned int n_chunks = (this->n_blocks()+communication_block_size-1)/communication_block_size;
+      for (unsigned int c = 0; c < n_chunks; ++c)
+        {
+          const unsigned int start = c*communication_block_size;
+          const unsigned int end   = std::min(start+communication_block_size, this->n_blocks());
+
+          // In order to avoid conflict with possible other ongoing communication
+          // requests (from LA::distributed::Vector that supports unfinished
+          // requests), add an arbitrary number 9923 to the communication tag
+          for (unsigned int block=start; block<end; ++block)
+            this->block(block).update_ghost_values_start(block - start + 9923);
+          for (unsigned int block=start; block<end; ++block)
+            this->block(block).update_ghost_values_finish();
+        }
     }
 
 

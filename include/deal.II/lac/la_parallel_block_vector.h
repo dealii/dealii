@@ -81,7 +81,13 @@ namespace LinearAlgebra
     class BlockVector : public BlockVectorBase<Vector<Number> >,
       public VectorSpaceVector<Number>
     {
+      /**
+       * The chunks size to split communication in update_ghost_values()
+       * and compress() calls.
+       */
+      static constexpr unsigned int communication_block_size = 20;
     public:
+
       /**
        * Typedef the base class for simpler access to its own typedefs.
        */
