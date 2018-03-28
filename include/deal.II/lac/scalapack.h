@@ -387,9 +387,21 @@ public:
   void compute_cholesky_factorization ();
 
   /**
-   * Invert the matrix by first computing a Cholesky factorization and then
-   * building the actual inverse using <code>pXpotri</code>. The inverse is stored
-   * in this object.
+   * Compute the LU factorization of the matrix using ScaLAPACK
+   * function <code>pXgetrf</code> and partial pivoting with row interchanges.
+   * The result of the factorization is stored in this object.
+   */
+  void compute_lu_factorization ();
+
+  /**
+   * Invert the matrix by first computing a Cholesky for symmetric matrices
+   * or a LU factorization for general matrices and then
+   * building the actual inverse using <code>pXpotri</code> or <code>pXgetri</code>.
+   *
+   * If a Cholesky or LU factorization has been applied previously,
+   * <code>pXpotri</code> or <code>pXgetri</code> are called directly.
+   *
+   * The inverse is stored in this object.
    */
   void invert();
 
@@ -694,6 +706,12 @@ private:
    * Integer workspace array.
    */
   mutable std::vector<int> iwork;
+
+  /**
+   * Integer array holding pivoting information required
+   * by ScaLAPACK's matrix factorization routines.
+   */
+  std::vector<int> ipiv;
 
   /**
    * A character to define where elements are stored in case
