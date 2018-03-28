@@ -81,7 +81,20 @@ namespace LinearAlgebra
     class BlockVector : public BlockVectorBase<Vector<Number> >,
       public VectorSpaceVector<Number>
     {
+      /**
+       * The chunks size to split communication in update_ghost_values()
+       * and compress() calls.
+       *
+       * Most common MPI implementations will get slow when too many
+       * messages/requests are outstanding. Even when messages are small,
+       * say 1 kB only, we should collect enough data with @p communication_block_size
+       * to cover typical infiniband latencies which are around a few microseconds.
+       * Sending 20 kB at a throughput of 5 GB/s takes 4 microseconds,
+       * so we should arrive at the bandwidth dominated regime then which is good enough.
+       */
+      static constexpr unsigned int communication_block_size = 20;
     public:
+
       /**
        * Typedef the base class for simpler access to its own typedefs.
        */
