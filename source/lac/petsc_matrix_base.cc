@@ -34,11 +34,10 @@ namespace PETScWrappers
     MatrixBase::const_iterator::Accessor::
     visit_present_row ()
     {
-      // if we are asked to visit the
-      // past-the-end line, then simply
-      // release all our caches and go on
-      // with life
-      if (this->a_row == matrix->m())
+      // if we are asked to visit the past-the-end line (or a line that is not
+      // stored on the current processor), then simply release all our caches
+      // and go on with life
+      if (matrix->in_local_range(this->a_row) == false)
         {
           colnum_cache.reset ();
           value_cache.reset ();
