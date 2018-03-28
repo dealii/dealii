@@ -47,7 +47,7 @@ IF( NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN"
     "Always use the bundled tbb library instead of an external one."
     OFF)
 
-  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb41_20130401oss")
+  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb-2018_U2")
 ENDIF()
 
 #
