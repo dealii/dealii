@@ -297,19 +297,22 @@ private:
    * It returns an empty variable type of @ InternalDataBase and updates @ update_flags,
    * and computes trivially zero Hessian for each cell if it is needed.
    */
-  virtual FiniteElement<2,2>::InternalDataBase *
+  virtual
+  std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
             const Quadrature<2> &quadrature,
             dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
 
-  virtual FiniteElement<2,2>::InternalDataBase *
+  virtual
+  std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
   get_face_data (const UpdateFlags update_flags,
                  const Mapping<2,2> &,
                  const Quadrature<1> &quadrature,
                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
 
-  virtual FiniteElement<2,2>::InternalDataBase *
+  virtual
+  std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
   get_subface_data (const UpdateFlags update_flags,
                     const Mapping<2,2> &,
                     const Quadrature<1> &quadrature,

@@ -124,13 +124,13 @@ FE_P1NC::get_linear_shape_coefficients (const Triangulation<2,2>::cell_iterator 
 
 
 
-FiniteElement<2,2>::InternalDataBase *
+std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
 FE_P1NC::get_data (const UpdateFlags update_flags,
                    const Mapping<2,2> &,
                    const Quadrature<2> &quadrature,
                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
-  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+  auto data = std_cxx14::make_unique<FiniteElement<2,2>::InternalDataBase>();
 
   data->update_each = requires_update_flags(update_flags);
 
@@ -146,13 +146,13 @@ FE_P1NC::get_data (const UpdateFlags update_flags,
 
 
 
-FiniteElement<2,2>::InternalDataBase *
+std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
 FE_P1NC::get_face_data (const UpdateFlags update_flags,
                         const Mapping<2,2> &,
                         const Quadrature<1> &quadrature,
                         dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
-  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+  auto data = std_cxx14::make_unique<FiniteElement<2,2>::InternalDataBase>();
 
   data->update_each = requires_update_flags(update_flags);
 
@@ -168,13 +168,13 @@ FE_P1NC::get_face_data (const UpdateFlags update_flags,
 
 
 
-FiniteElement<2,2>::InternalDataBase *
+std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
 FE_P1NC::get_subface_data (const UpdateFlags update_flags,
                            const Mapping<2,2> &,
                            const Quadrature<1> &quadrature,
                            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
-  FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
+  auto data = std_cxx14::make_unique<FiniteElement<2,2>::InternalDataBase>();
 
   data->update_each = requires_update_flags(update_flags);
 

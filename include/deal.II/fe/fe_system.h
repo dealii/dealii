@@ -959,21 +959,22 @@ public:
 
 protected:
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
+  virtual
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data (const UpdateFlags                                                    update_flags,
             const Mapping<dim,spacedim>                                         &mapping,
             const Quadrature<dim>                                               &quadrature,
             dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_face_data (const UpdateFlags                                                    update_flags,
                  const Mapping<dim,spacedim>                                         &mapping,
                  const Quadrature<dim-1>                                             &quadrature,
                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_subface_data (const UpdateFlags                                                    update_flags,
                     const Mapping<dim,spacedim>                                         &mapping,
                     const Quadrature<dim-1>                                             &quadrature,
@@ -1115,7 +1116,7 @@ private:
      * base_noth base element.
      */
     void set_fe_data(const unsigned int                        base_no,
-                     typename FiniteElement<dim,spacedim>::InternalDataBase *);
+                     std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>);
 
     /**
      * Give read-access to the pointer to a @p InternalData of the @p
@@ -1144,7 +1145,7 @@ private:
      * necessarily the same, we only need as many of these objects as there
      * are base elements, irrespective of their multiplicity.
      */
-    typename std::vector<typename FiniteElement<dim,spacedim>::InternalDataBase *> base_fe_datas;
+    typename std::vector<std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase > > base_fe_datas;
 
     /**
      * A collection of objects to which the base elements will write their

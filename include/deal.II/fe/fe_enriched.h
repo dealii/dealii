@@ -552,7 +552,7 @@ protected:
    * enrichment functions at each quadrature point depending on @p flags.
    */
   template <int dim_1>
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
               const UpdateFlags      flags,
               const Quadrature<dim_1> &quadrature) const;
@@ -563,19 +563,19 @@ protected:
    * (FEValues) then has to assume ownership (which includes destruction when it is no
    * more needed).
    */
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
+  virtual std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data (const UpdateFlags      flags,
             const Mapping<dim,spacedim>    &mapping,
             const Quadrature<dim> &quadrature,
             dealii::internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim > &output_data) const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
+  virtual std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_face_data (const UpdateFlags      update_flags,
                  const Mapping<dim,spacedim>    &mapping,
                  const Quadrature<dim-1> &quadrature,
                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >        &output_data) const;
 
-  virtual typename FiniteElement<dim,spacedim>::InternalDataBase *
+  virtual std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_subface_data (const UpdateFlags      update_flags,
                     const Mapping<dim,spacedim>    &mapping,
                     const Quadrature<dim-1> &quadrature,

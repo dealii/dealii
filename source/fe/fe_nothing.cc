@@ -99,7 +99,7 @@ FE_Nothing<dim,spacedim>::shape_value (const unsigned int /*i*/,
 
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_Nothing<dim,spacedim>::get_data (const UpdateFlags                                                    /*update_flags*/,
                                     const Mapping<dim,spacedim>                                         &/*mapping*/,
                                     const Quadrature<dim>                                               &/*quadrature*/,
@@ -108,9 +108,7 @@ FE_Nothing<dim,spacedim>::get_data (const UpdateFlags                           
   // Create a default data object.  Normally we would then
   // need to resize things to hold the appropriate numbers
   // of dofs, but in this case all data fields are empty.
-  typename FiniteElement<dim,spacedim>::InternalDataBase *data
-    = new typename FiniteElement<dim,spacedim>::InternalDataBase();
-  return data;
+  return std_cxx14::make_unique<typename FiniteElement<dim,spacedim>::InternalDataBase>();
 }
 
 

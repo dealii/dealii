@@ -22,6 +22,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 
 
@@ -208,7 +209,7 @@ protected:
   /* NOTE: The following function has its definition inlined into the class declaration
      because we otherwise run into a compiler error with MS Visual Studio. */
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data(const UpdateFlags                                                    update_flags,
            const Mapping<dim,spacedim>                                         &/*mapping*/,
            const Quadrature<dim>                                               &quadrature,
@@ -216,7 +217,7 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    InternalData *data = new InternalData;
+    auto data = std_cxx14::make_unique<InternalData>();
     data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
@@ -328,7 +329,7 @@ protected:
             }
 
         }
-    return data;
+    return std::move(data);
   }
 
   virtual

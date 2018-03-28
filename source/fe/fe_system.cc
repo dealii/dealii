@@ -63,11 +63,7 @@ FESystem<dim,spacedim>::InternalData::~InternalData()
 {
   // delete pointers and set them to zero to avoid inadvertent use
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
-    if (base_fe_datas[i])
-      {
-        delete base_fe_datas[i];
-        base_fe_datas[i] = nullptr;
-      }
+    base_fe_datas[i].reset();
 }
 
 
@@ -87,11 +83,11 @@ template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
 InternalData::set_fe_data (const unsigned int base_no,
-                           typename FiniteElement<dim,spacedim>::InternalDataBase *ptr)
+                           std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> ptr)
 {
   Assert(base_no<base_fe_datas.size(),
          ExcIndexRange(base_no,0,base_fe_datas.size()));
-  base_fe_datas[base_no]=ptr;
+  base_fe_datas[base_no]=std::move(ptr);
 }
 
 
@@ -883,7 +879,7 @@ FESystem<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FESystem<dim,spacedim>::
 get_data (const UpdateFlags                                                    flags,
           const Mapping<dim,spacedim>                                         &mapping,
@@ -897,7 +893,7 @@ get_data (const UpdateFlags                                                    f
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  InternalData *data = new InternalData(this->n_base_elements());
+  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
@@ -925,21 +921,21 @@ get_data (const UpdateFlags                                                    f
       // out of the base output object into the system output object,
       // but we can't because we can't know what the elements already
       // copied and/or will want to update on every cell
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+      auto base_fe_data =
         base_element(base_no).get_data (flags, mapping, quadrature,
                                         base_fe_output_object);
 
-      data->set_fe_data(base_no, base_fe_data);
+      data->set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return data;
+  return std::move(data);
 }
 
 // The following function is a clone of get_data, with the exception
 // that get_face_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FESystem<dim,spacedim>::
 get_face_data (const UpdateFlags                                                    flags,
                const Mapping<dim,spacedim>                                         &mapping,
@@ -953,7 +949,7 @@ get_face_data (const UpdateFlags                                                
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  InternalData *data = new InternalData(this->n_base_elements());
+  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
@@ -981,14 +977,14 @@ get_face_data (const UpdateFlags                                                
       // out of the base output object into the system output object,
       // but we can't because we can't know what the elements already
       // copied and/or will want to update on every cell
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+      auto base_fe_data =
         base_element(base_no).get_face_data (flags, mapping, quadrature,
                                              base_fe_output_object);
 
-      data->set_fe_data(base_no, base_fe_data);
+      data->set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return data;
+  return std::move(data);
 }
 
 
@@ -997,7 +993,7 @@ get_face_data (const UpdateFlags                                                
 // that get_subface_data of the base elements is called.
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FESystem<dim,spacedim>::
 get_subface_data (const UpdateFlags                                                    flags,
                   const Mapping<dim,spacedim>                                         &mapping,
@@ -1011,7 +1007,7 @@ get_subface_data (const UpdateFlags                                             
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  InternalData *data = new InternalData(this->n_base_elements());
+  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
   data->update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
@@ -1039,14 +1035,14 @@ get_subface_data (const UpdateFlags                                             
       // out of the base output object into the system output object,
       // but we can't because we can't know what the elements already
       // copied and/or will want to update on every cell
-      typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
+      auto base_fe_data =
         base_element(base_no).get_subface_data (flags, mapping, quadrature,
                                                 base_fe_output_object);
 
-      data->set_fe_data(base_no, base_fe_data);
+      data->set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return data;
+  return std::move(data);
 }
 
 
