@@ -195,22 +195,29 @@ namespace SLEPcWrappers
       for (unsigned int i = 0; i < *n_converged; i++)
         {
           double residual_norm_i = 0.0;
-          // EPSComputeResidualNorm is L2-norm and is not consistent with the stopping criteria
-          // used during the solution process.
-          // Yet, this is the norm which gives error bounds (Saad, 1992, ch3):
-          //   | \lambda - \widehat\lambda | <= ||r||_2
-          ierr = EPSComputeResidualNorm (eps, i, &residual_norm_i);
-
-          // EPSComputeRelativeError may not be consistent with the stopping criteria
-          // used during the solution process. Given EPS_CONV_ABS set above,
-          // this can be either the l2 norm or the mass-matrix induced norm
-          // when EPS_GHEP is set.
-          // ierr = EPSComputeRelativeError (solver_data->eps, i, &residual_norm_i);
-
-          // EPSGetErrorEstimate is consistent with the residual norm
-          // used during the solution process. However, it is not guaranteed to
-          // be derived from the residual even when EPSSetTrueResidual is set.
-          // ierr = EPSGetErrorEstimate (solver_data->eps, i, &residual_norm_i);
+          // EPSComputeError (or, in older versions of SLEPc,
+          // EPSComputeResidualNorm) uses an L2-norm and is not consistent
+          // with the stopping criterion used during the solution process (see
+          // the SLEPC manual, section 2.5). However, the norm that gives error
+          // bounds (Saad, 1992, ch3) is (for Hermitian problems)
+          // | \lambda - \widehat\lambda | <= ||r||_2
+          //
+          // Similarly, EPSComputeRelativeError may not be consistent with the
+          // stopping criterion used in the solution process.
+          //
+          // EPSGetErrorEstimate is (according to the SLEPc manual) consistent
+          // with the residual norm used during the solution process. However,
+          // it is not guaranteed to be derived from the residual even when
+          // EPSSetTrueResidual is set: see the discussion in the thread
+          //
+          // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-November/023509.html
+          //
+          // for more information.
+#if DEAL_II_SLEPC_VERSION_GTE(3, 6, 0)
+          ierr = EPSComputeError(eps, i, EPS_ERROR_ABSOLUTE, &residual_norm_i);
+#else
+          ierr = EPSComputeResidualNorm(eps, i, &residual_norm_i);
+#endif
 
           AssertThrow (ierr == 0, ExcSLEPcError(ierr));
           residual_norm = std::max (residual_norm, residual_norm_i);
