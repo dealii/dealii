@@ -17,6 +17,7 @@
 #define dealii_filtered_iterator_h
 
 
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/iterator_range.h>
@@ -703,7 +704,7 @@ private:
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual PredicateBase *clone () const = 0;
+    virtual std::unique_ptr<PredicateBase> clone () const = 0;
   };
 
 
@@ -727,13 +728,13 @@ private:
     /**
      * Evaluate the iterator with the stored copy of the predicate.
      */
-    virtual bool operator () (const BaseIterator &bi) const;
+    virtual bool operator () (const BaseIterator &bi) const override;
 
     /**
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual PredicateBase *clone () const;
+    virtual std::unique_ptr<PredicateBase> clone () const override;
 
   private:
     /**
@@ -746,7 +747,7 @@ private:
    * Pointer to an object that encapsulated the actual data type of the
    * predicate given to the constructor.
    */
-  const PredicateBase *predicate;
+  std::unique_ptr<const PredicateBase> predicate;
 
 };
 
@@ -944,8 +945,7 @@ inline
 FilteredIterator<BaseIterator>::
 ~FilteredIterator ()
 {
-  delete predicate;
-  predicate = nullptr;
+  predicate.reset();
 }
 
 
@@ -1178,11 +1178,11 @@ operator () (const BaseIterator &bi) const
 
 template <typename BaseIterator>
 template <typename Predicate>
-typename FilteredIterator<BaseIterator>::PredicateBase *
+std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
 clone () const
 {
-  return new PredicateTemplate (predicate);
+  return std_cxx14::make_unique<PredicateTemplate> (predicate);
 }
 
 
