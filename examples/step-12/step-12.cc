@@ -88,7 +88,7 @@ namespace Step12
   class BoundaryValues:  public Function<dim>
   {
   public:
-    BoundaryValues () {};
+    BoundaryValues () {}
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<double> &values,
                              const unsigned int component=0) const;
@@ -662,7 +662,7 @@ int main ()
                 << "----------------------------------------------------"
                 << std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
