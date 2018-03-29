@@ -1278,8 +1278,12 @@ namespace internal
  * @ingroup Exceptions
  * @author Bruno Turcksin, 2016
  */
+#ifdef DEBUG
 #define AssertCuda(error_code) Assert(error_code == cudaSuccess, \
                                       dealii::ExcCudaError(cudaGetErrorString(error_code)))
+#else
+#define AssertCuda(error_code) { (void) (error_code); }
+#endif
 
 /**
  * An assertion that checks that the error code produced by calling a cuSPARSE
@@ -1288,10 +1292,15 @@ namespace internal
  * @ingroup Exceptions
  * @author Bruno Turcksin, 2018
  */
+#ifdef DEBUG
 #define AssertCusparse(error_code) Assert(error_code == CUSPARSE_STATUS_SUCCESS, \
                                           dealii::ExcCusparseError( \
                                               dealii::deal_II_exceptions::internals:: \
                                               get_cusparse_error_string(error_code)))
+#else
+#define AssertCusparse(error_code) { (void) (error_code); }
+#endif
+
 #endif
 
 using namespace StandardExceptions;
