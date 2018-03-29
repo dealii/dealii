@@ -351,16 +351,13 @@ namespace Step12
     // the current point.
     for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
       {
-        Point<dim> beta;
-        beta(0) = -fe_values.quadrature_point(point)(1);
-        beta(1) = fe_values.quadrature_point(point)(0);
-        beta /= beta.norm();
+        const Tensor<1,dim> beta_at_q_point = beta (fe_values.quadrature_point(point));
 
         // We solve a homogeneous equation, thus no right hand side shows up
         // in the cell term.  What's left is integrating the matrix entries.
         for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
           for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-            local_matrix(i,j) += -beta *
+            local_matrix(i,j) += -beta_at_q_point *
                                  fe_values.shape_grad(i,point) *
                                  fe_values.shape_value(j,point) *
                                  JxW[point];
