@@ -1094,6 +1094,7 @@ namespace Step37
 
     time.reset();
     time.start();
+    constraints.set_zero(solution);
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
 
