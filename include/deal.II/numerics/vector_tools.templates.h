@@ -7089,7 +7089,8 @@ namespace VectorTools
             {
               Number sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += data.psi_values[q](k) * data.weight_vectors[q](k);
+                if (data.weight_vectors[q](k) != 0)
+                  sum += data.psi_values[q](k) * data.weight_vectors[q](k);
               diff_mean += sum * fe_values.JxW(q);
             }
           break;
@@ -7102,9 +7103,10 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += std::pow(
-                         static_cast<double>(numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k))),
-                         exponent/2.) * data.weight_vectors[q](k);
+                if (data.weight_vectors[q](k) != 0)
+                  sum += std::pow(static_cast<double>(numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k))),
+                                  exponent/2.) *
+                         data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
 
@@ -7120,8 +7122,9 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k)) *
-                       data.weight_vectors[q](k);
+                if (data.weight_vectors[q](k) != 0)
+                  sum += numbers::NumberTraits<Number>::abs_square(data.psi_values[q](k)) *
+                         data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           // Compute the root only, if no derivative values are added later
@@ -7133,8 +7136,9 @@ namespace VectorTools
         case W1infty_norm:
           for (unsigned int q=0; q<n_q_points; ++q)
             for (unsigned int k=0; k<n_components; ++k)
-              diff = std::max (diff, double(std::abs(data.psi_values[q](k)*
-                                                     data.weight_vectors[q](k))));
+              if (data.weight_vectors[q](k) != 0)
+                diff = std::max (diff, double(std::abs(data.psi_values[q](k)*
+                                                       data.weight_vectors[q](k))));
           break;
 
         case H1_seminorm:
@@ -7158,9 +7162,10 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += std::pow(
-                         data.psi_grads[q][k].norm_square(),
-                         exponent/2.) * data.weight_vectors[q](k);
+                if (data.weight_vectors[q](k) != 0)
+                  sum += std::pow(
+                           data.psi_grads[q][k].norm_square(),
+                           exponent/2.) * data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           diff = std::pow(diff, 1./exponent);
@@ -7172,8 +7177,9 @@ namespace VectorTools
             {
               double sum = 0;
               for (unsigned int k=0; k<n_components; ++k)
-                sum += data.psi_grads[q][k].norm_square() *
-                       data.weight_vectors[q](k);
+                if (data.weight_vectors[q](k) != 0)
+                  sum += data.psi_grads[q][k].norm_square() *
+                         data.weight_vectors[q](k);
               diff += sum * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
@@ -7197,7 +7203,8 @@ namespace VectorTools
               Number sum = 0;
               // take the trace of the derivatives scaled by the weight and square it
               for (unsigned int k=idx; k<idx+dim; ++k)
-                sum += data.psi_grads[q][k][k-idx] * std::sqrt(data.weight_vectors[q](k));
+                if (data.weight_vectors[q](k) != 0)
+                  sum += data.psi_grads[q][k][k-idx] * std::sqrt(data.weight_vectors[q](k));
               diff += numbers::NumberTraits<Number>::abs_square(sum) * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
@@ -7209,10 +7216,11 @@ namespace VectorTools
           double t = 0;
           for (unsigned int q=0; q<n_q_points; ++q)
             for (unsigned int k=0; k<n_components; ++k)
-              for (unsigned int d=0; d<dim; ++d)
-                t = std::max(t,
-                             double(std::abs(data.psi_grads[q][k][d]) *
-                                    data.weight_vectors[q](k)));
+              if (data.weight_vectors[q](k) != 0)
+                for (unsigned int d=0; d<dim; ++d)
+                  t = std::max(t,
+                               double(std::abs(data.psi_grads[q][k][d]) *
+                                      data.weight_vectors[q](k)));
 
           // then add seminorm to norm if that had previously been computed
           diff += t;
