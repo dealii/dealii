@@ -692,16 +692,18 @@ namespace Threads
     private:
       RT value;
     public:
+      typedef RT &reference_type;
+
       inline return_value () : value() {}
 
-      inline RT get () const
+      inline reference_type get ()
       {
         return value;
       }
 
-      inline void set (RT v)
+      inline void set (RT &&v)
       {
-        value = v;
+        value = std::move(v);
       }
     };
 
@@ -720,14 +722,17 @@ namespace Threads
     private:
       RT *value;
     public:
+      typedef RT &reference_type;
+
       inline return_value ()
         : value(nullptr)
       {}
 
-      inline RT &get () const
+      inline reference_type get () const
       {
         return *value;
       }
+
       inline void set (RT &v)
       {
         value = &v;
@@ -745,6 +750,8 @@ namespace Threads
      */
     template <> struct return_value<void>
     {
+      typedef void reference_type;
+
       static inline void get () {}
     };
   }
@@ -1025,7 +1032,8 @@ namespace Threads
      * Get the return value of the function of the thread. Since this is only
      * available once the thread finishes, this implicitly also calls join().
      */
-    RT return_value ()
+    typename internal::return_value<RT>::reference_type
+    return_value ()
     {
       join ();
       return thread_descriptor->ret_val->get();
@@ -1702,7 +1710,7 @@ namespace Threads
      * constructor of this class and have not assigned a task object to it. In
      * other words, the function joinable() must return true.
      */
-    RT return_value ()
+    typename internal::return_value<RT>::reference_type return_value ()
     {
       join ();
       return task_descriptor->ret_val.get();
