@@ -1,0 +1,18 @@
+
+DEAL::L2_norm:
+DEAL::computed: 0.00000
+DEAL::H1_seminorm:
+DEAL::computed: 0.00000
+DEAL::H1_norm:
+DEAL::computed: 0.00000
+DEAL::L1_norm:
+DEAL::computed: 0.00000
+DEAL::Linfty_norm:
+DEAL::computed: 0.00000
+DEAL::mean:
+DEAL::computed: 0.00000
+DEAL::Lp_norm:
+DEAL::computed: 0.00000
+DEAL::W1p_seminorm:
+DEAL::computed: 0.00000
+DEAL::OK
