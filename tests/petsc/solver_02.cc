@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     // Chebychev is a tricky smoother for the kind of FD matrix we use in
     // this test. So, simply test that we're able to reduce the residual to
     // a reasonably small value of 1.e-3.
-    SolverControl control(2500, 1.e-3);
+    SolverControl control(2500, 1.5e-3);
 
     PETScWrappers::SolverChebychev solver(control);
     PETScWrappers::PreconditionJacobi preconditioner(A);
