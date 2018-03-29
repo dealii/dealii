@@ -3964,8 +3964,8 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->mapping,
                                    quadrature,
                                    this->finite_element_output);
-  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase * >
-  mapping_get_data;
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      mapping_get_data;
   if (flags & update_mapping)
     mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
                                           *this->mapping,
@@ -3977,7 +3977,7 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
-    this->mapping_data.reset (mapping_get_data.return_value());
+    this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }
@@ -4214,8 +4214,8 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->mapping,
                                    this->quadrature,
                                    this->finite_element_output);
-  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
-  mapping_get_data;
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      mapping_get_data;
   if (flags & update_mapping)
     mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_face_data,
                                           *this->mapping,
@@ -4227,7 +4227,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
-    this->mapping_data.reset (mapping_get_data.return_value());
+    this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }
@@ -4382,8 +4382,8 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
                                    *this->mapping,
                                    this->quadrature,
                                    this->finite_element_output);
-  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
-  mapping_get_data;
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      mapping_get_data;
   if (flags & update_mapping)
     mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_subface_data,
                                           *this->mapping,
@@ -4395,7 +4395,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // then collect answers from the two task above
   this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
-    this->mapping_data.reset (mapping_get_data.return_value());
+    this->mapping_data = std::move(mapping_get_data.return_value());
   else
     this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }

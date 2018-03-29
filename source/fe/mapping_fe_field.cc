@@ -476,45 +476,45 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename
-MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_data (const UpdateFlags      update_flags,
     const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
+  auto data = std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   this->compute_data (update_flags, quadrature,
                       quadrature.size(), *data);
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
-typename Mapping<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_face_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
+  auto data = std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.size(), *data);
 
-  return data;
+  return std::move(data);
 }
 
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
-typename Mapping<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_subface_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
+  auto data = std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.size(), *data);
 
-  return data;
+  return std::move(data);
 }
 
 
@@ -1779,12 +1779,16 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 //  the right size and transformation shape values already computed at point
 //  p.
   const Quadrature<dim> point_quadrature(p);
-  std::unique_ptr<InternalData> mdata (get_data(update_quadrature_points | update_jacobians,
-                                                point_quadrature));
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
+  mdata (get_data(update_quadrature_points | update_jacobians,
+                  point_quadrature));
+  Assert (dynamic_cast<InternalData *>(mdata.get()) != nullptr,
+          ExcInternalError());
 
-  update_internal_dofs(cell, *mdata);
+  update_internal_dofs(cell,
+                       dynamic_cast<InternalData &>(*mdata));
 
-  return do_transform_unit_to_real_cell(*mdata);
+  return do_transform_unit_to_real_cell(dynamic_cast<InternalData &>(*mdata));
 }
 
 
@@ -1840,12 +1844,15 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData>
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
   mdata (get_data(update_flags,point_quadrature));
+  Assert (dynamic_cast<InternalData *>(mdata.get()) != nullptr,
+          ExcInternalError());
 
-  update_internal_dofs(cell, *mdata);
+  update_internal_dofs(cell, dynamic_cast<InternalData &>(*mdata));
 
-  return do_transform_real_to_unit_cell(cell, p, initial_p_unit, *mdata);
+  return do_transform_real_to_unit_cell(cell, p, initial_p_unit,
+                                        dynamic_cast<InternalData &>(*mdata));
 
 }
 

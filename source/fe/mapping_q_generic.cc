@@ -2233,8 +2233,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                point_quadrature));
+  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
+                                       point_quadrature).release()));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2259,8 +2259,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                point_quadrature));
+  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
+                                       point_quadrature).release()));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2285,8 +2285,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                point_quadrature));
+  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
+                                       point_quadrature).release()));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2294,6 +2294,8 @@ transform_real_to_unit_cell_internal
   // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
 }
+
+
 
 template <>
 Point<1>
@@ -2311,8 +2313,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                point_quadrature));
+  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
+                                       point_quadrature).release()));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2320,6 +2322,8 @@ transform_real_to_unit_cell_internal
   // spacedim=dim+1, etc
   return internal::MappingQGenericImplementation::do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
 }
+
+
 
 template <>
 Point<2>
@@ -2337,8 +2341,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (get_data(update_flags,
-                                                point_quadrature));
+  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
+                                       point_quadrature).release()));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2554,44 +2558,44 @@ MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
 
 
 template <int dim, int spacedim>
-typename MappingQGeneric<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQGeneric<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                          const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
   data->initialize (this->requires_update_flags(update_flags), q, q.size());
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingQGeneric<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingQGeneric<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQGeneric<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData(polynomial_degree);
+  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
 
-  return data;
+  return std::move(data);
 }
 
 

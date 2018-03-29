@@ -300,44 +300,44 @@ MappingManifold<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
 
 
 template <int dim, int spacedim>
-typename MappingManifold<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingManifold<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                          const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData();
+  auto data = std_cxx14::make_unique<InternalData>();
   data->initialize (this->requires_update_flags(update_flags), q, q.size());
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingManifold<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingManifold<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData();
+  auto data = std_cxx14::make_unique<InternalData>();
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_faces(quadrature),
                          quadrature.size());
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingManifold<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingManifold<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData();
+  auto data = std_cxx14::make_unique<InternalData>();
   data->initialize_face (this->requires_update_flags(update_flags),
                          QProjector<dim>::project_to_all_subfaces(quadrature),
                          quadrature.size());
 
-  return data;
+  return std::move(data);
 }
 
 
