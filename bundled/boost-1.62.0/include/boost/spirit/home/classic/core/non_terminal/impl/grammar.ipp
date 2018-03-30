@@ -291,18 +291,10 @@ struct grammar_definition
         helper_list_t&  helpers =
         grammartract_helper_list::do_(self);
 
-# if defined(BOOST_INTEL_CXX_VERSION)
         typedef typename helper_list_t::vector_t::reverse_iterator iterator_t;
 
         for (iterator_t i = helpers.rbegin(); i != helpers.rend(); ++i)
             (*i)->undefine(self);
-# else
-        typedef impl::grammar_helper_base<GrammarT> helper_base_t;
-
-        std::for_each(helpers.rbegin(), helpers.rend(),
-            std::bind2nd(std::mem_fun(&helper_base_t::undefine), self));
-# endif
-
 #else
         (void)self;
 #endif
