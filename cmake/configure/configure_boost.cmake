@@ -53,6 +53,33 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
     LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_CXX11_HDR_UNORDERED_MAP")
   ENDIF()
 
+  # Some standard library implementations do not implement std::auto_ptr
+  # (anymore) which was deprecated for C++11 and removed in the C++17 standard.
+  # Older boost versions can't know about this but provide a possibility to
+  # circumvent the issue. Hence, we just check ourselves.
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  PUSH_CMAKE_REQUIRED("-Werror")
+
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <memory>
+
+    int main()
+    {
+      int *i = new int;
+      std::auto_ptr<int> x(i);
+      return 0;
+    }
+    "
+    DEAL_II_HAS_AUTO_PTR)
+
+  RESET_CMAKE_REQUIRED()
+
+  IF( NOT DEAL_II_HAS_AUTO_PTR )
+    LIST(APPEND BOOST_DEFINITIONS "BOOST_NO_AUTO_PTR")
+    LIST(APPEND BOOST_USER_DEFINITIONS "BOOST_NO_AUTO_PTR")
+  ENDIF()
+
   ENABLE_IF_SUPPORTED(BOOST_CXX_FLAGS "-Wno-unused-local-typedefs")
 ENDMACRO()
 
