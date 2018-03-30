@@ -8119,7 +8119,6 @@ namespace VectorTools
 
     if ( fe.has_support_points() )
       {
-        typename DoFHandlerType<dim,spacedim>::active_cell_iterator cell;
         const Quadrature<dim> quad(fe.get_unit_support_points());
 
         MappingQ<dim,spacedim> map_q(fe.degree);
@@ -8129,19 +8128,20 @@ namespace VectorTools
         AssertDimension(fe.dofs_per_cell, fe.get_unit_support_points().size());
         Assert(fe.is_primitive(), ExcMessage("FE is not Primitive! This won't work."));
 
-        for (cell = dh.begin_active(); cell != dh.end(); ++cell)
-          {
-            fe_v.reinit(cell);
-            cell->get_dof_indices(dofs);
-            const std::vector<Point<spacedim> > &points = fe_v.get_quadrature_points();
-            for (unsigned int q = 0; q < points.size(); ++q)
-              {
-                unsigned int comp = fe.system_to_component_index(q).first;
-                if (fe_mask[comp])
-                  ::dealii::internal::ElementAccess<VectorType>::set(
-                    points[q][fe_to_real[comp]], dofs[q], vector);
-              }
-          }
+        for (const auto &cell : dh.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              fe_v.reinit(cell);
+              cell->get_dof_indices(dofs);
+              const std::vector<Point<spacedim> > &points = fe_v.get_quadrature_points();
+              for (unsigned int q = 0; q < points.size(); ++q)
+                {
+                  const unsigned int comp = fe.system_to_component_index(q).first;
+                  if (fe_mask[comp])
+                    ::dealii::internal::ElementAccess<VectorType>::set(
+                      points[q][fe_to_real[comp]], dofs[q], vector);
+                }
+            }
       }
     else
       {
