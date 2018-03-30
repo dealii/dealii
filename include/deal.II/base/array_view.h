@@ -439,7 +439,7 @@ namespace internal
     {
       const auto n = std::distance(first, last);
       for (typename std::decay<decltype(n)>::type i = 0; i < n; ++i)
-        if (*(std::next(first, i)) != *(std::next(std::addressof(*first), i)))
+        if (std::addressof(*(std::next(first, i))) != std::next(std::addressof(*first), i))
           return false;
       return true;
     }
