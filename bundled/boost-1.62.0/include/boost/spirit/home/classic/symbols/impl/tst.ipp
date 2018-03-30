@@ -62,7 +62,11 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
         tst_node*
         clone() const
         {
+#if defined(BOOST_NO_CXX11_SMART_PTR)
             std::auto_ptr<tst_node> copy(new tst_node(value));
+#else
+            std::unique_ptr<tst_node> copy(new tst_node(value));
+#endif
 
             if (left)
                 copy->left = left->clone();
@@ -75,7 +79,11 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
             }
             else
             {
+#if defined(BOOST_NO_CXX11_SMART_PTR)
                 std::auto_ptr<T> mid_data(new T(*middle.data));
+#else
+                std::unique_ptr<T> mid_data(new T(*middle.data));
+#endif
                 copy->middle.data = mid_data.release();
             }
 
