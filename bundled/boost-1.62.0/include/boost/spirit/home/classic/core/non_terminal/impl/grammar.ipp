@@ -156,8 +156,13 @@ struct grammar_definition
             if (definitions[id]!=0)
                 return *definitions[id];
 
+#if defined(BOOST_NO_CXX11_SMART_PTR)
             std::auto_ptr<definition_t>
                 result(new definition_t(target_grammar->derived()));
+#else
+            std::unique_ptr<definition_t>
+                result(new definition_t(target_grammar->derived()));
+#endif
 
 #ifdef BOOST_SPIRIT_THREADSAFE
             boost::unique_lock<boost::mutex> lock(helpers.mutex());

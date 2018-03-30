@@ -77,7 +77,11 @@ public:
 
 extern "C" void * lw_thread_routine( void * pv )
 {
+#if defined(BOOST_NO_CXX11_SMART_PTR)
     std::auto_ptr<lw_abstract_thread> pt( static_cast<lw_abstract_thread *>( pv ) );
+#else
+    std::unique_ptr<lw_abstract_thread> pt( static_cast<lw_abstract_thread *>( pv ) );
+#endif
 
     pt->run();
 
@@ -88,7 +92,11 @@ extern "C" void * lw_thread_routine( void * pv )
 
 unsigned __stdcall lw_thread_routine( void * pv )
 {
+#if defined(BOOST_NO_CXX11_SMART_PTR)
     std::auto_ptr<lw_abstract_thread> pt( static_cast<lw_abstract_thread *>( pv ) );
+#else
+    std::unique_ptr<lw_abstract_thread> pt( static_cast<lw_abstract_thread *>( pv ) );
+#endif
 
     pt->run();
 
@@ -117,7 +125,11 @@ private:
 
 template<class F> int lw_thread_create( pthread_t & pt, F f )
 {
+#if defined(BOOST_NO_CXX11_SMART_PTR)
     std::auto_ptr<lw_abstract_thread> p( new lw_thread_impl<F>( f ) );
+#else
+    std::unique_ptr<lw_abstract_thread> p( new lw_thread_impl<F>( f ) );
+#endif
 
     int r = pthread_create( &pt, 0, lw_thread_routine, p.get() );
 

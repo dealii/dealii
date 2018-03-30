@@ -243,8 +243,13 @@ private:
             pback_size != -1 ?
                 pback_size :
                 pimpl_->pback_size_;
+#if defined(BOOST_NO_CXX11_SMART_PTR)
         std::auto_ptr<streambuf_t>
             buf(new streambuf_t(t, buffer_size, pback_size));
+#else
+        std::unique_ptr<streambuf_t>
+            buf(new streambuf_t(t, buffer_size, pback_size));
+#endif
         list().push_back(buf.get());
         buf.release();
         if (is_device<component_type>::value) {
