@@ -770,10 +770,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
                                 const VectorType         &b,
                                 const PreconditionerType &preconditioner)
 {
-  // this code was written a very long time ago by people not associated with
-  // deal.II. we don't make any guarantees to its optimality or that it even
-  // works as expected...
-
 //TODO:[?] Check, why there are two different start residuals.
 //TODO:[GK] Make sure the parameter in the constructor means maximum basis size
 
