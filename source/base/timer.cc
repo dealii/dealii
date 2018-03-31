@@ -355,13 +355,14 @@ TimerOutput::~TimerOutput()
       {
         while (active_sections.size() > 0)
           leave_subsection();
+        // don't print unless we leave all subsections
+        if ((output_frequency == summary ||
+             output_frequency == every_call_and_summary)
+            && output_is_enabled == true)
+          print_summary();
       }
     catch (...)
       {}
-
-    if ( (output_frequency == summary || output_frequency == every_call_and_summary)
-         && output_is_enabled == true)
-      print_summary();
   };
 
   // avoid communicating with other processes if there is an uncaught
