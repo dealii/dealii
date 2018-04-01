@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/fe/fe.h>
 
 
@@ -81,17 +82,16 @@ protected:
 
 
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data (const UpdateFlags                                                    /*update_flags*/,
             const Mapping<dim,spacedim>                                         &/*mapping*/,
             const Quadrature<dim>                                               &/*quadrature*/,
             dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
   {
-    InternalData *data = new InternalData;
-    return data;
+    return std_cxx14::make_unique<InternalData>();
   }
 
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_face_data(const UpdateFlags                                                    update_flags,
                 const Mapping<dim,spacedim>                                         &/*mapping*/,
                 const Quadrature<dim-1>                                             &quadrature,
@@ -99,7 +99,7 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    InternalData *data = new InternalData;
+    auto data = std_cxx14::make_unique<InternalData>();
     data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
@@ -137,10 +137,10 @@ protected:
         Assert(false, ExcNotImplemented());
       }
 
-    return data;
+    return std::move(data);
   }
 
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_subface_data(const UpdateFlags                                                    update_flags,
                    const Mapping<dim,spacedim>                                         &mapping,
                    const Quadrature<dim-1>                                             &quadrature,

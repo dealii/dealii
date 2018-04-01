@@ -3957,14 +3957,14 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. we can do this in parallel
-  Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *>
+  Threads::Task<std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> >
   fe_get_data = Threads::new_task (&FiniteElement<dim,spacedim>::get_data,
                                    *this->fe,
                                    flags,
                                    *this->mapping,
                                    quadrature,
                                    this->finite_element_output);
-  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase *>
+  Threads::Task<typename Mapping<dim,spacedim>::InternalDataBase * >
   mapping_get_data;
   if (flags & update_mapping)
     mapping_get_data = Threads::new_task (&Mapping<dim,spacedim>::get_data,
@@ -3975,7 +3975,7 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->update_flags = flags;
 
   // then collect answers from the two task above
-  this->fe_data.reset (fe_get_data.return_value());
+  this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else
@@ -4207,7 +4207,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. this can be done in parallel
-  Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *>
+  Threads::Task<std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> >
   fe_get_data = Threads::new_task (&FiniteElement<dim,spacedim>::get_face_data,
                                    *this->fe,
                                    flags,
@@ -4225,7 +4225,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->update_flags = flags;
 
   // then collect answers from the two task above
-  this->fe_data.reset (fe_get_data.return_value());
+  this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else
@@ -4375,7 +4375,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // then get objects into which the FE and the Mapping can store
   // intermediate data used across calls to reinit. this can be done
   // in parallel
-  Threads::Task<typename FiniteElement<dim,spacedim>::InternalDataBase *>
+  Threads::Task<std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> >
   fe_get_data = Threads::new_task (&FiniteElement<dim,spacedim>::get_subface_data,
                                    *this->fe,
                                    flags,
@@ -4393,7 +4393,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   this->update_flags = flags;
 
   // then collect answers from the two task above
-  this->fe_data.reset (fe_get_data.return_value());
+  this->fe_data = std::move(fe_get_data.return_value());
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else

@@ -19,6 +19,7 @@
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -218,7 +219,7 @@ protected:
 
 
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data(const UpdateFlags                                                    update_flags,
            const Mapping<dim,spacedim>                                         &/*mapping*/,
            const Quadrature<dim>                                               &quadrature,
@@ -226,7 +227,7 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    InternalData *data = new InternalData;
+    auto data = std_cxx14::make_unique<InternalData>();
     data->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
@@ -321,7 +322,7 @@ protected:
             for (unsigned int k=0; k<this->dofs_per_cell; ++k)
               data->shape_3rd_derivatives[k][i] = third_derivatives[k];
         }
-    return data;
+    return std::move(data);
   }
 
   virtual

@@ -255,7 +255,7 @@ FE_DGPNonparametric<dim,spacedim>::requires_update_flags (const UpdateFlags flag
 //---------------------------------------------------------------------------
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_DGPNonparametric<dim,spacedim>::
 get_data (const UpdateFlags                                                    update_flags,
           const Mapping<dim,spacedim> &,
@@ -263,14 +263,13 @@ get_data (const UpdateFlags                                                    u
           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
 {
   // generate a new data object
-  typename FiniteElement<dim,spacedim>::InternalDataBase *data
-    = new typename FiniteElement<dim,spacedim>::InternalDataBase;
+  auto data = std_cxx14::make_unique<typename FiniteElement<dim,spacedim>::InternalDataBase>();
   data->update_each = requires_update_flags(update_flags);
 
   // other than that, there is nothing we can add here as discussed
   // in the general documentation of this class
 
-  return data;
+  return std::move(data);
 }
 
 

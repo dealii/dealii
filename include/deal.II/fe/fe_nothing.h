@@ -167,7 +167,7 @@ public:
    * no meaningful data exists for this element.
    */
   virtual
-  typename FiniteElement<dim,spacedim>::InternalDataBase *
+  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
   get_data (const UpdateFlags                                                    update_flags,
             const Mapping<dim,spacedim>                                         &mapping,
             const Quadrature<dim>                                               &quadrature,

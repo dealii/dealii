@@ -288,7 +288,7 @@ FE_Enriched<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 
 template <int dim, int spacedim>
 template <int dim_1>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
                                        const UpdateFlags      flags,
                                        const Quadrature<dim_1> &quadrature) const
@@ -300,7 +300,7 @@ FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<di
   // that fes_data points to, to the new InternalData object.
   typename FESystem<dim,spacedim>::InternalData *data_fesystem =
     static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.release());
-  InternalData *data = new InternalData(std::unique_ptr<typename FESystem<dim,spacedim>::InternalData>(data_fesystem));
+  auto data = std_cxx14::make_unique<InternalData>(std::unique_ptr<typename FESystem<dim,spacedim>::InternalData>(data_fesystem));
 
   // copy update_each from FESystem data:
   data->update_each = data_fesystem->update_each;
@@ -326,12 +326,12 @@ FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<di
         }
     }
 
-  return data;
+  return std::move(data);
 }
 
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_Enriched<dim,spacedim>::get_face_data (const UpdateFlags      update_flags,
                                           const Mapping<dim,spacedim>    &mapping,
                                           const Quadrature<dim-1> &quadrature,
@@ -344,7 +344,7 @@ FE_Enriched<dim,spacedim>::get_face_data (const UpdateFlags      update_flags,
 
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_Enriched<dim,spacedim>::get_subface_data (const UpdateFlags      update_flags,
                                              const Mapping<dim,spacedim>    &mapping,
                                              const Quadrature<dim-1> &quadrature,
@@ -357,7 +357,7 @@ FE_Enriched<dim,spacedim>::get_subface_data (const UpdateFlags      update_flags
 
 
 template <int dim, int spacedim>
-typename FiniteElement<dim,spacedim>::InternalDataBase *
+std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
 FE_Enriched<dim,spacedim>::get_data (const UpdateFlags      flags,
                                      const Mapping<dim,spacedim>    &mapping,
                                      const Quadrature<dim> &quadrature,
