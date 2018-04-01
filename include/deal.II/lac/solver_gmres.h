@@ -197,7 +197,8 @@ public:
     /**
      * Maximum number of temporary vectors. This parameter controls the size
      * of the Arnoldi basis, which for historical reasons is
-     * #max_n_tmp_vectors-2.
+     * #max_n_tmp_vectors-2. SolverGMRES assumes that there are at least three
+     * temporary vectors, so this value must be greater than or equal to three.
      */
     unsigned int    max_n_tmp_vectors;
 
@@ -598,7 +599,10 @@ AdditionalData (const unsigned int max_n_tmp_vectors,
   right_preconditioning(right_preconditioning),
   use_default_residual(use_default_residual),
   force_re_orthogonalization(force_re_orthogonalization)
-{}
+{
+  Assert(3 <= max_n_tmp_vectors, ExcMessage("SolverGMRES needs at least three "
+                                            "temporary vectors."));
+}
 
 
 
@@ -770,15 +774,14 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
                                 const VectorType         &b,
                                 const PreconditionerType &preconditioner)
 {
-  // this code was written a very long time ago by people not associated with
-  // deal.II. we don't make any guarantees to its optimality or that it even
-  // works as expected...
-
 //TODO:[?] Check, why there are two different start residuals.
 //TODO:[GK] Make sure the parameter in the constructor means maximum basis size
 
   LogStream::Prefix prefix("GMRES");
-  const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
+
+  // extra call to std::max to placate static analyzers: coverity rightfully
+  // complains that data.max_n_tmp_vectors - 2 may overflow
+  const unsigned int n_tmp_vectors = std::max(additional_data.max_n_tmp_vectors, 3u);
 
   // Generate an object where basis vectors are stored.
   internal::SolverGMRESImplementation::TmpVectors<VectorType> tmp_vectors (n_tmp_vectors, this->memory);
