@@ -1958,7 +1958,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
     }
   else
     {
-      Assert(fe_other_system != nullptr, ExcInternalError());
+      // we should have caught this at the start, but check again anyway
+      Assert(fe_other_system != nullptr, (typename FiniteElement<dim,spacedim>::
+                                          ExcInterpolationNotImplemented()));
     }
 }
 
