@@ -189,7 +189,8 @@ public:
    *
    *
    * If it is necessary to copy complete matrices with an identical block-cyclic distribution,
-   * use copy_to(ScaLAPACKMatrix<NumberType> &dest) with only one argument to avoid communication.
+   * use ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest)
+   * with only one argument to avoid communication.
    *
    * The underlying process grids of the matrices @p A and @p B must have been built
    * with the same MPI communicator.
@@ -225,7 +226,7 @@ public:
 
   /**
    * Matrix-addition:
-   * $\mathbf{A} = \mathbf{A} + b \mathbf{B}$
+   * $\mathbf{A} = \mathbf{A} + b\, \mathbf{B}$
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    *
@@ -236,7 +237,7 @@ public:
 
   /**
    * Matrix-addition:
-   * $\mathbf{A} = \mathbf{A} + b \mathbf{B}^T$
+   * $\mathbf{A} = \mathbf{A} + b\, \mathbf{B}^T$
    *
    * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
    *
@@ -407,7 +408,7 @@ public:
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
-   * matrix $A \in \mathbb{R}^{M \times M}$.
+   * matrix $\mathbf{A} \in \mathbb{R}^{M \times M}$.
    *
    * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
    *
@@ -435,22 +436,22 @@ public:
 
   /**
   * Computing the singular value decomposition (SVD) of a
-  * matrix $A \in \mathbb{R}^{M \times N}$, optionally computing the left and/or right
-  * singular vectors. The SVD is written as $A = U * \Sigma * V^T$
-  * with $\Sigma \in \mathbb{R}^{M \times N}$ as a diagonal matrix,
-  * $U \in \mathbb{R}^{M \times M}$ and $U \in \mathbb{R}^{M \times M}$
-  * as orthogonal matrices. The diagonal elements of $\Sigma$
-  * are the singular values of $A$ and the columns of $U$ and $V$ are the
+  * matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, optionally computing the left and/or right
+  * singular vectors. The SVD is written as $\mathbf{A} = \mathbf{U} \cdot \mathbf{\Sigma} \cdot \mathbf{V}^T$
+  * with $\mathbf{\Sigma} \in \mathbb{R}^{M \times N}$ as a diagonal matrix,
+  * $\mathbf{U} \in \mathbb{R}^{M \times M}$ and $\mathbf{V} \in \mathbb{R}^{M \times M}$
+  * as orthogonal matrices. The diagonal elements of $\mathbf{\Sigma}$
+  * are the singular values of $A$ and the columns of $\mathbf{U}$ and $\mathbf{V}$ are the
   * corresponding left and right singular vectors, respectively. The
   * singular values are returned in decreasing order and only the first $\min(M,N)$
-  * columns of $U$ and rows of VT = $V^T$ are computed.
+  * columns of $\mathbf{U}$ and rows of $\mathbf{V}^T$ are computed.
   *
   * Upon return the content of the matrix is unusable.
-  * The matrix A must have identical block cyclic distribution for the rows and column.
+  * The matrix $\mathbf{A}$ must have identical block cyclic distribution for the rows and column.
   *
-  * If left singular vectors are required matrices $A$ and $U$
+  * If left singular vectors are required matrices $\mathbf{A}$ and $\mathbf{U}$
   * have to be constructed with the same process grid and block cyclic distribution.
-  * If right singular vectors are required matrices $A$ and $V^T$
+  * If right singular vectors are required matrices $\mathbf{A}$ and $\mathbf{V}^T$
   * have to be constructed with the same process grid  and block cyclic distribution.
   *
   * To avoid computing the left and/or right singular vectors the function accepts <code>nullptr</code>
@@ -461,33 +462,33 @@ public:
 
   /**
   * Solving overdetermined or underdetermined real linear
-  * systems involving matrix $A \in \mathbb{R}^{M \times N}$, or its transpose $A^T$,
-  * using a QR or LQ factorization of $A$ for $N_{\rm RHS}$ RHS vectors in the columns of matrix $B$
+  * systems involving matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$, or its transpose $\mathbf{A}^T$,
+  * using a QR or LQ factorization of $\mathbf{A}$ for $N_{\rm RHS}$ RHS vectors in the columns of matrix $\mathbf{B}$
   *
-  * It is assumed that $A$ has full rank: $rank(A) = \min(M,N)$.
+  * It is assumed that $\mathbf{A}$ has full rank: $\rm{rank}(\mathbf{A}) = \min(M,N)$.
   *
   * The following options are supported:
   * -# If(!transpose) and $M \geq N$: least squares solution of overdetermined system
-  *    $\min \Vert B - A*X\Vert$.\n
-  *    Upon exit the rows $0$ to $N-1$ of $B$ contain the least square solution vectors. The residual sum of squares
+  *    $\min \Vert \mathbf{B} - \mathbf{A}\cdot \mathbf{X}\Vert$.\n
+  *    Upon exit the rows $0$ to $N-1$ of $\mathbf{B}$ contain the least square solution vectors. The residual sum of squares
   *    for each column is given by the sum of squares of elements $N$ to $M-1$ in that column.
   *
   * -# If(!transpose) and $M < N$: find minimum norm solutions of underdetermined systems
-  *    $A * X = B$.\n
-  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
+  *    $\mathbf{A} \cdot \mathbf{X} = \mathbf{B}$.\n
+  *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution vectors.
   *
   * -# If(transpose) and $M \geq N$: find minimum norm solutions of underdetermined system
-  *    $ A^\top X = B$.\n
-  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
+  *    $ \mathbf{A}^\top \cdot \mathbf{X} = \mathbf{B}$.\n
+  *    Upon exit the columns of $\mathbf{B}$ contain the minimum norm solution vectors.
   *
   * -# If(transpose) and $M < N$: least squares solution of overdetermined system
-  *    $\min \Vert B - A^\top X\Vert$.\n
+  *    $\min \Vert \mathbf{B} - \mathbf{A}^\top \cdot \mathbf{X}\Vert$.\n
   *    Upon exit the rows $0$ to $M-1$ contain the least square solution vectors. The residual sum of squares
   *    for each column is given by the sum of squares of elements $M$ to $N-1$ in that column.
   *
-  * If(!tranpose) then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
-  * otherwise $B \in \mathbb{R}^{N \times N_{\rm RHS}}}$.
-  * The matrices $A$ and $B$ must have an identical block cyclic distribution for rows and columns.
+  * If(!tranpose) then $\mathbf{B} \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+  * otherwise $\mathbf{B} \in \mathbb{R}^{N \times N_{\rm RHS}}$.
+  * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have an identical block cyclic distribution for rows and columns.
   */
   void least_squares(ScaLAPACKMatrix<NumberType> &B,
                      const bool transpose=false);
@@ -503,7 +504,7 @@ public:
    * Cholesky factorization (see l1_norm()).
    *
    * @note An alternative is to compute the inverse of the matrix
-   * explicitly and manually construct $k_1 = ||A||_1 ||A^{-1}||_1$.
+   * explicitly and manually construct $k_1 = ||\mathbf{A}||_1 \, ||\mathbf{A}^{-1}||_1$.
    */
   NumberType reciprocal_condition_number(const NumberType a_norm) const;
 
