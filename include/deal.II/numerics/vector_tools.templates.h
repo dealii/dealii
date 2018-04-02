@@ -6625,7 +6625,7 @@ namespace VectorTools
     struct PointComparator
     {
       bool operator ()(const std::array<types::global_dof_index,dim> &p1,
-                       const std::array<types::global_dof_index,dim> &p2)
+                       const std::array<types::global_dof_index,dim> &p2) const
       {
         for (unsigned int d=0; d<dim; ++d)
           if (p1[d] < p2[d])
