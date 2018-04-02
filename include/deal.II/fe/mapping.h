@@ -646,7 +646,7 @@ protected:
    * the returned object, knowing its real (derived) type.
    */
   virtual
-  InternalDataBase *
+  std::unique_ptr<InternalDataBase>
   get_data (const UpdateFlags      update_flags,
             const Quadrature<dim> &quadrature) const = 0;
 
@@ -678,7 +678,7 @@ protected:
    * the returned object, knowing its real (derived) type.
    */
   virtual
-  InternalDataBase *
+  std::unique_ptr<InternalDataBase>
   get_face_data (const UpdateFlags        update_flags,
                  const Quadrature<dim-1> &quadrature) const = 0;
 
@@ -711,7 +711,7 @@ protected:
    * the returned object, knowing its real (derived) type.
    */
   virtual
-  InternalDataBase *
+  std::unique_ptr<InternalDataBase>
   get_subface_data (const UpdateFlags        update_flags,
                     const Quadrature<dim-1> &quadrature) const = 0;
 

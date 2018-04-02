@@ -341,19 +341,19 @@ public:
 
   // documentation can be found in Mapping::get_data()
   virtual
-  InternalData *
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
   get_data (const UpdateFlags,
             const Quadrature<dim> &quadrature) const override;
 
   // documentation can be found in Mapping::get_face_data()
   virtual
-  InternalData *
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
   get_face_data (const UpdateFlags flags,
                  const Quadrature<dim-1>& quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual
-  InternalData *
+  std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
   get_subface_data (const UpdateFlags flags,
                     const Quadrature<dim-1>& quadrature) const override;
 

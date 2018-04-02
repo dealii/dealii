@@ -89,29 +89,28 @@ MappingCartesian<dim, spacedim>::requires_update_flags (const UpdateFlags in) co
 
 
 template <int dim, int spacedim>
-typename Mapping<dim, spacedim>::InternalDataBase *
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_data (const UpdateFlags      update_flags,
                                            const Quadrature<dim> &q) const
 {
-  InternalData *data = new InternalData (q);
+  auto data = std_cxx14::make_unique<InternalData> (q);
 
   // store the flags in the internal data object so we can access them
   // in fill_fe_*_values(). use the transitive hull of the required
   // flags
   data->update_each = requires_update_flags(update_flags);
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename Mapping<dim, spacedim>::InternalDataBase *
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
                                                 const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data
-    = new InternalData (QProjector<dim>::project_to_all_faces(quadrature));
+  auto data = std_cxx14::make_unique<InternalData> (QProjector<dim>::project_to_all_faces(quadrature));
 
   // verify that we have computed the transitive hull of the required
   // flags and that FEValues has faithfully passed them on to us
@@ -122,18 +121,17 @@ MappingCartesian<dim, spacedim>::get_face_data (const UpdateFlags update_flags,
   // in fill_fe_*_values()
   data->update_each = update_flags;
 
-  return data;
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename Mapping<dim, spacedim>::InternalDataBase *
+std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                    const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data
-    = new InternalData (QProjector<dim>::project_to_all_subfaces(quadrature));
+  auto data = std_cxx14::make_unique<InternalData> (QProjector<dim>::project_to_all_subfaces(quadrature));
 
   // verify that we have computed the transitive hull of the required
   // flags and that FEValues has faithfully passed them on to us
@@ -144,7 +142,7 @@ MappingCartesian<dim, spacedim>::get_subface_data (const UpdateFlags update_flag
   // in fill_fe_*_values()
   data->update_each = update_flags;
 
-  return data;
+  return std::move(data);
 }
 
 

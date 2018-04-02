@@ -144,73 +144,79 @@ MappingQ<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 
 
 template <int dim, int spacedim>
-typename MappingQ<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData;
+  auto data = std_cxx14::make_unique<InternalData>();
 
   // build the Q1 and Qp internal data objects in parallel
-  Threads::Task<typename MappingQGeneric<dim,spacedim>::InternalData *>
-  do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_data,
-                                   *qp_mapping,
-                                   update_flags,
-                                   quadrature);
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_data,
+                                       *qp_mapping,
+                                       update_flags,
+                                       quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (q1_mapping->get_data (update_flags, quadrature));
+    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                                 (q1_mapping->get_data (update_flags, quadrature).release()));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (do_get_data.return_value());
-  return data;
+  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                               (do_get_data.return_value().release()));
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingQ<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData;
+  auto data = std_cxx14::make_unique<InternalData>();
 
   // build the Q1 and Qp internal data objects in parallel
-  Threads::Task<typename MappingQGeneric<dim,spacedim>::InternalData *>
-  do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_face_data,
-                                   *qp_mapping,
-                                   update_flags,
-                                   quadrature);
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_face_data,
+                                       *qp_mapping,
+                                       update_flags,
+                                       quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (q1_mapping->get_face_data (update_flags, quadrature));
+    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                                 (q1_mapping->get_face_data (update_flags, quadrature).release()));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (do_get_data.return_value());
-  return data;
+  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                               (do_get_data.return_value().release()));
+  return std::move(data);
 }
 
 
 
 template <int dim, int spacedim>
-typename MappingQ<dim,spacedim>::InternalData *
+std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
 {
-  InternalData *data = new InternalData;
+  auto data = std_cxx14::make_unique<InternalData>();
 
   // build the Q1 and Qp internal data objects in parallel
-  Threads::Task<typename MappingQGeneric<dim,spacedim>::InternalData *>
-  do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_subface_data,
-                                   *qp_mapping,
-                                   update_flags,
-                                   quadrature);
+  Threads::Task<std::unique_ptr<typename Mapping<dim,spacedim>::InternalDataBase>>
+      do_get_data = Threads::new_task (&MappingQGeneric<dim,spacedim>::get_subface_data,
+                                       *qp_mapping,
+                                       update_flags,
+                                       quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (q1_mapping->get_subface_data (update_flags, quadrature));
+    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                                 (q1_mapping->get_subface_data (update_flags, quadrature).release()));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (do_get_data.return_value());
-  return data;
+  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
+                               (do_get_data.return_value().release()));
+  return std::move(data);
 }
 
 
