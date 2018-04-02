@@ -203,9 +203,6 @@ namespace SparsityTools
       ZOLTAN_ID_PTR nextNborGID = nborGID;
       int *nextNborProc = nborProc;
 
-      Assert( nextNborGID != nullptr , ExcInternalError() );
-      Assert( nextNborProc != nullptr , ExcInternalError() );
-
       //Loop through rows corresponding to indices in globalID implicitly
       for (SparsityPattern::size_type i=0; i < static_cast<SparsityPattern::size_type>(num_obj); ++i)
         {
@@ -215,6 +212,9 @@ namespace SparsityTools
             //Ignore diagonal entries. Not needed for partitioning.
             if ( i != col->column() )
               {
+                Assert( nextNborGID != nullptr , ExcInternalError() );
+                Assert( nextNborProc != nullptr , ExcInternalError() );
+
                 *nextNborGID++ = col->column();
                 *nextNborProc++ = 0;    //All the vertices on processor 0
               }
