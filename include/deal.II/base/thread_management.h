@@ -683,9 +683,10 @@ namespace Threads
     /**
      * @internal
      *
-     * Given an arbitrary type RT, store an element of it and grant access to
-     * it through functions get() and set(). There are specializations for
-     * reference types (which cannot be set), and for type void.
+     * Given an arbitrary type RT, store an element of it and grant
+     * access to it through functions get() and set(). There are
+     * specializations for reference types (which need to be stored as
+     * pointers to the object being referenced), and for type void.
      */
     template <typename RT> struct return_value
     {
@@ -713,8 +714,8 @@ namespace Threads
      *
      * Given an arbitrary type RT, store an element of it and grant access to
      * it through functions get() and set(). This is the specialization for
-     * reference types: since they cannot be set after construction time, we
-     * store a pointer instead, that holds the address of the object being
+     * reference types: since references cannot be set after construction time, we
+     * store a pointer instead, which holds the address of the object being
      * referenced.
      */
     template <typename RT> struct return_value<RT &>
@@ -1029,8 +1030,43 @@ namespace Threads
     }
 
     /**
-     * Get the return value of the function of the thread. Since this is only
-     * available once the thread finishes, this implicitly also calls join().
+     * Get the return value of the function of the thread. Since it
+     * is only available once the thread finishes, this function
+     * internally also calls join(). You can call this function
+     * multiple times as long as the object refers to the same task,
+     * and expect to get the same return value every time. (With the
+     * exception of the case where the returned object has been moved;
+     * see below.)
+     *
+     * @note The function returns a <i>non-@p const reference</i> to
+     * the returned object, instead of the returned object. This
+     * allows writing code such as
+     * @code
+     *   Threads::Thread<int> t = Threads::new_thread (...function returning an int...);
+     *   t.return_value() = 42;      // overwrite returned value
+     *   int i = t.return_value();   // i is now 42
+     * @endcode
+     * You will rarely have a need to write such code. On the other hand,
+     * the function needs to return a writable (non-@p const) reference to support
+     * code such as this:
+     * @code
+     *   std::unique_ptr<int> create_int (const std::string &s) { ... }
+     *
+     *   void f()
+     *   {
+     *     Threads::Thread<std::unique_ptr<int>>
+     *       t = Threads::new_thread (&create_int, "42");
+     *
+     *     std::unique_ptr<int> i = std::move(t.return_value());
+     *     ...
+     *   }
+     * @endcode
+     * Here, it is necessary to `std::move` the returned object (namely,
+     * the <code>std::unique_ptr</code> object) because
+     * <code>std::unique_ptr</code> objects can not be copied. In other words,
+     * to get the pointer out of the object returned from the thread, it needs
+     * to be moved, and in order to be moved, the current function needs to
+     * return a writable (non-@p const) reference.
      */
     typename internal::return_value<RT>::reference_type
     return_value ()
@@ -1701,16 +1737,50 @@ namespace Threads
 
 
     /**
-     * Get the return value of the function of the task. Since this is only
-     * available once the task finishes, this implicitly also calls join().
-     * You can call this function multiple times as long as the object refers
-     * to the same task, and expect to get the same return value every time.
+     * Get the return value of the function of the task. Since it is
+     * only available once the thread finishes, this function
+     * internally also calls join(). You can call this function
+     * multiple times as long as the object refers to the same task,
+     * and expect to get the same return value every time. (With the
+     * exception of the case where the returned object has been moved;
+     * see below.)
+     *
+     * @note The function returns a <i>non-@p const reference</i> to
+     * the returned object, instead of the returned object. This
+     * allows writing code such as
+     * @code
+     *   Threads::Task<int> t = Threads::new_task (...function returning an int...);
+     *   t.return_value() = 42;      // overwrite returned value
+     *   int i = t.return_value();   // i is now 42
+     * @endcode
+     * You will rarely have a need to write such code. On the other hand,
+     * the function needs to return a writable (non-@p const) reference to support
+     * code such as this:
+     * @code
+     *   std::unique_ptr<int> create_int (const std::string &s) { ... }
+     *
+     *   void f()
+     *   {
+     *     Threads::Task<std::unique_ptr<int>>
+     *       t = Threads::new_task (&create_int, "42");
+     *
+     *     std::unique_ptr<int> i = std::move(t.return_value());
+     *     ...
+     *   }
+     * @endcode
+     * Here, it is necessary to `std::move` the returned object (namely,
+     * the <code>std::unique_ptr</code> object) because
+     * <code>std::unique_ptr</code> objects can not be copied. In other words,
+     * to get the pointer out of the object returned from the task, it needs
+     * to be moved, and in order to be moved, the current function needs to
+     * return a writable (non-@p const) reference.
      *
      * @pre You can't call this function if you have used the default
      * constructor of this class and have not assigned a task object to it. In
      * other words, the function joinable() must return true.
      */
-    typename internal::return_value<RT>::reference_type return_value ()
+    typename internal::return_value<RT>::reference_type
+    return_value ()
     {
       join ();
       return task_descriptor->ret_val.get();
