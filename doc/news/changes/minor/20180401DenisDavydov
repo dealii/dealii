@@ -1,0 +1,3 @@
+Improved: VectorTools::get_position_vector() now supports parallel triangulations.
+<br>
+(Denis Davydov, 2018/04/01)
