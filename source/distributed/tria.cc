@@ -1707,6 +1707,8 @@ namespace parallel
       this->update_number_cache ();
     }
 
+
+
     template <int dim, int spacedim>
     bool
     Triangulation<dim,spacedim>::has_hanging_nodes () const
@@ -2584,7 +2586,7 @@ namespace parallel
                 }
             }
 
-          // check mesh for ghostcells, refine as necessary.  iterate over
+          // check mesh for ghost cells, refine as necessary. iterate over
           // every ghostquadrant, find corresponding deal coarsecell and
           // recurse.
           typename dealii::internal::p4est::types<dim>::quadrant *quadr;
