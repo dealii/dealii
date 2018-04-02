@@ -1047,7 +1047,7 @@ namespace Threads
      *   int i = t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
-     * the function needs to return a writable reference to support
+     * the function needs to return a writable (non-@p const) reference to support
      * code such as this:
      * @code
      *   std::unique_ptr<int> create_int (const std::string &s) { ... }
@@ -1066,7 +1066,7 @@ namespace Threads
      * <code>std::unique_ptr</code> objects can not be copied. In other words,
      * to get the pointer out of the object returned from the thread, it needs
      * to be moved, and in order to be moved, the current function needs to
-     * return a writable reference.
+     * return a writable (non-@p const) reference.
      */
     typename internal::return_value<RT>::reference_type
     return_value ()
@@ -1754,7 +1754,7 @@ namespace Threads
      *   int i = t.return_value();   // i is now 42
      * @endcode
      * You will rarely have a need to write such code. On the other hand,
-     * the function needs to return a writable reference to support
+     * the function needs to return a writable (non-@p const) reference to support
      * code such as this:
      * @code
      *   std::unique_ptr<int> create_int (const std::string &s) { ... }
@@ -1773,7 +1773,7 @@ namespace Threads
      * <code>std::unique_ptr</code> objects can not be copied. In other words,
      * to get the pointer out of the object returned from the task, it needs
      * to be moved, and in order to be moved, the current function needs to
-     * return a writable reference.
+     * return a writable (non-@p const) reference.
      *
      * @pre You can't call this function if you have used the default
      * constructor of this class and have not assigned a task object to it. In
