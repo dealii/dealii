@@ -61,6 +61,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalDa
 (const FiniteElement<dim,spacedim> &fe,
  const ComponentMask                &mask)
   :
+  unit_tangentials (),
   n_shape_functions (fe.dofs_per_cell),
   mask (mask),
   local_dof_indices(fe.dofs_per_cell),

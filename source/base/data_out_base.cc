@@ -6496,7 +6496,8 @@ namespace DataOutBase
 
 template <int dim, int spacedim>
 DataOutInterface<dim,spacedim>::DataOutInterface ()
-  : default_subdivisions(1)
+  : default_subdivisions(1),
+    default_fmt(DataOutBase::default_format)
 {}
 
 

@@ -723,7 +723,12 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::~ReadWriteVector ()
   {
-    resize_val(0);
+    try
+      {
+        resize_val(0);
+      }
+    catch (...)
+      {}
   }
 
 
