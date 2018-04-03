@@ -53,7 +53,8 @@ void test_compute_pt_loc(unsigned int n_points)
   // Computing the description of the locally owned part of the mesh
   IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
   std::vector< BoundingBox<dim> > local_bbox = GridTools::compute_mesh_predicate_bounding_box
-                                               (cache.get_triangulation(), locally_owned_cell_predicate,
+                                               (cache.get_triangulation(),
+                                                std::function<bool (const typename Triangulation<dim>::active_cell_iterator &)>(locally_owned_cell_predicate),
                                                 1, true, 4); // These options should be passed
   // Using the distributed version of compute point location
 
