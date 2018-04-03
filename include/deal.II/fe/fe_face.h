@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A finite element, which is a tensor product polynomial on each face and
+ * A finite element that is a tensor product polynomial on each face and
  * undefined in the interior of the cells. The basis functions on the faces
  * are Lagrange polynomials based on the support points of the
  * (dim-1)-dimensional Gauss--Lobatto quadrature rule. For element degree one
@@ -39,10 +39,13 @@ DEAL_II_NAMESPACE_OPEN
  * demonstrated in the step-51 tutorial program.
  *
  * @note Since this element is defined only on faces, only FEFaceValues and
- * FESubfaceValues will be able to extract reasonable values from any face
- * polynomial. In order to make the use of FESystem simpler, using a (cell)
- * FEValues object will not fail using this finite element space, but all
- * shape function values extracted will be equal to zero.
+ * FESubfaceValues will provide useful information. On the other hand, if you
+ * use this element with FEValues for cell integration, then the values
+ * and derivatives of shape functions will have invalid values and will not
+ * likely produce anything useful. In order to make the use of this element
+ * as part of an FESystem simpler, using a (cell) FEValues object will not fail
+ * outright, but those components of shape functions of the combined element
+ * that correspond to FE_FaceQ will have the invalid values mentioned above.
  *
  * @ingroup fe
  * @author Guido Kanschat, Martin Kronbichler
@@ -426,7 +429,7 @@ private:
 
 
 /**
- * A finite element, which is a Legendre element of complete polynomials on
+ * A finite element that is a Legendre element of complete polynomials on
  * each face (i.e., it is the face equivalent of what FE_DGP is on cells) and
  * undefined in the interior of the cells. The basis functions on the faces
  * are from Polynomials::Legendre.
@@ -437,10 +440,13 @@ private:
  * hybridizes methods can be found in the step-51 tutorial program.
  *
  * @note Since this element is defined only on faces, only FEFaceValues and
- * FESubfaceValues will be able to extract reasonable values from any face
- * polynomial. In order to make the use of FESystem simpler, using a (cell)
- * FEValues object will not fail using this finite element space, but all
- * shape function values extracted will be equal to zero.
+ * FESubfaceValues will provide useful information. On the other hand, if you
+ * use this element with FEValues for cell integration, then the values
+ * and derivatives of shape functions will have invalid values and will not
+ * likely produce anything useful. In order to make the use of this element
+ * as part of an FESystem simpler, using a (cell) FEValues object will not fail
+ * outright, but those components of shape functions of the combined element
+ * that correspond to FE_FaceP will have the invalid values mentioned above.
  *
  * @ingroup fe
  * @author Martin Kronbichler
@@ -539,6 +545,7 @@ private:
 
 /**
  * FE_FaceP in 1D, i.e., with degrees of freedom on the element vertices.
+ * See the documentation of the general template for more information.
  */
 template <int spacedim>
 class FE_FaceP<1,spacedim> : public FE_FaceQ<1,spacedim>
