@@ -1804,9 +1804,11 @@ next_cell:
   template < class MeshType >
   std::vector< BoundingBox<MeshType::space_dimension> >
   compute_mesh_predicate_bounding_box
-  (const MeshType &mesh,
+  (const MeshType                                                              &mesh,
    const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
-   const unsigned int &refinement_level,  const bool &allow_merge, const unsigned int &max_boxes)
+   const unsigned int                                                          &refinement_level,
+   const bool                                                                  &allow_merge,
+   const unsigned int                                                          &max_boxes)
   {
     // Algorithm brief description: begin with creating bounding boxes of all cells at
     // refinement_level (and coarser levels if there are active cells) which have the predicate
@@ -1853,7 +1855,7 @@ next_cell:
         std::vector<unsigned int> merged_boxes_idx;
         bool found_neighbors = true;
 
-        // We merge only nighbors which can be expressed by a single bounding box
+        // We merge only neighbors which can be expressed by a single bounding box
         // e.g. in 1d [0,1] and [1,2] can be described with [0,2] without losing anything
         while (found_neighbors)
           {
