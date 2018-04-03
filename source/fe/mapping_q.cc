@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx11/unique_ptr.h>
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature.h>
@@ -158,12 +159,13 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                        quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                                 (q1_mapping->get_data (update_flags, quadrature).release()));
+    data->mapping_q1_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                            (std::move(q1_mapping->get_data (update_flags, quadrature)));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                               (do_get_data.return_value().release()));
+  data->mapping_qp_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                          (std::move(do_get_data.return_value()));
+
   return std::move(data);
 }
 
@@ -184,12 +186,12 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                                 (q1_mapping->get_face_data (update_flags, quadrature).release()));
+    data->mapping_q1_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                            (std::move(q1_mapping->get_face_data (update_flags, quadrature)));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                               (do_get_data.return_value().release()));
+  data->mapping_qp_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                          (std::move(do_get_data.return_value()));
   return std::move(data);
 }
 
@@ -210,12 +212,12 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                        quadrature);
 
   if (!use_mapping_q_on_all_cells)
-    data->mapping_q1_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                                 (q1_mapping->get_subface_data (update_flags, quadrature).release()));
+    data->mapping_q1_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                            (std::move(q1_mapping->get_subface_data (update_flags, quadrature)));
 
   // wait for the task above to finish and use returned value
-  data->mapping_qp_data.reset (dynamic_cast<typename MappingQGeneric<dim,spacedim>::InternalData *>
-                               (do_get_data.return_value().release()));
+  data->mapping_qp_data = dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
+                          (std::move(do_get_data.return_value()));
   return std::move(data);
 }
 
