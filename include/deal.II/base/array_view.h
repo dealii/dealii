@@ -573,7 +573,7 @@ make_array_view (ArrayView<Number> &array_view)
  * because they contain immutable elements. Consequently, the return type of
  * this function is a view to a set of @p const objects.
  *
- * @param[in] vector The Tensor for which we want to have an array view
+ * @param[in] tensor The Tensor for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> object but the
  * order in which the entries are presented in the array is an implementation
  * detail and should not be relied upon.
@@ -599,7 +599,7 @@ make_array_view (const Tensor<rank, dim, Number> &tensor)
  * Such objects contain elements that can be written to. Consequently,
  * the return type of this function is a view to a set of writable objects.
  *
- * @param[in] vector The Tensor for which we want to have an array view
+ * @param[in] tensor The Tensor for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> object but the
  * order in which the entries are presented in the array is an implementation
  * detail and should not be relied upon.
@@ -625,7 +625,7 @@ make_array_view (Tensor<rank, dim, Number> &tensor)
  * type because they contain immutable elements. Consequently, the return type
  * of this function is a view to a set of @p const objects.
  *
- * @param[in] vector The SymmetricTensor for which we want to have an array
+ * @param[in] tensor The SymmetricTensor for which we want to have an array
  * view object. The array view corresponds to the <em>entire</em> object but
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.
@@ -652,7 +652,7 @@ make_array_view (const SymmetricTensor<rank, dim, Number> &tensor)
  * Consequently, the return type of this function is a view to a set of writable
  * objects.
  *
- * @param[in] vector The SymmetricTensor for which we want to have an array
+ * @param[in] tensor The SymmetricTensor for which we want to have an array
  * view object. The array view corresponds to the <em>entire</em> object but
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.
