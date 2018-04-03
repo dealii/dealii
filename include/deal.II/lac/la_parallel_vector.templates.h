@@ -839,8 +839,8 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::add (const Number a,
-                         const VectorSpaceVector<Number> &vv)
+    Vector<Number>::add_local (const Number a,
+                               const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
       Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
@@ -857,6 +857,16 @@ namespace LinearAlgebra
       internal::VectorOperations::Vectorization_add_av<Number> vector_add(values.get(), v.values.get(), a);
       internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::add (const Number a,
+                         const VectorSpaceVector<Number> &vv)
+    {
+      add_local(a,vv);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -930,9 +940,9 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::sadd (const Number x,
-                          const Number a,
-                          const VectorSpaceVector<Number> &vv)
+    Vector<Number>::sadd_local (const Number x,
+                                const Number a,
+                                const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
       Assert(dynamic_cast<const Vector<Number> *>(&vv)!=nullptr,
@@ -946,6 +956,17 @@ namespace LinearAlgebra
       internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd(values.get(), v.values.get(), a, x);
       internal::VectorOperations::parallel_for(vector_sadd, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
+    }
+
+
+
+    template <typename Number>
+    void
+    Vector<Number>::sadd (const Number x,
+                          const Number a,
+                          const VectorSpaceVector<Number> &vv)
+    {
+      sadd_local(x,a,vv);
 
       if (vector_is_ghosted)
         update_ghost_values();

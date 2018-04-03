@@ -1060,6 +1060,20 @@ namespace LinearAlgebra
                       << "that this vector can access.");
 
     private:
+
+      /**
+       * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>
+       * without MPI communication.
+       */
+      void add_local(const Number a, const VectorSpaceVector<Number> &V);
+
+      /**
+       * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
+       * s*(*this)+a*V</tt> without MPI communication.
+       */
+      void sadd_local(const Number s, const Number a,
+                      const VectorSpaceVector<Number> &V);
+
       /**
        * Local part of all_zero().
        */
