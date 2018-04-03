@@ -31,8 +31,11 @@ for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimensio
     template
     std::vector < BoundingBox< deal_II_space_dimension > >
     compute_mesh_predicate_bounding_box< X >
-    (const X &, const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &,
-     const unsigned int &, const bool&, const unsigned int &);
+    (const X &,
+     const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &,
+     const unsigned int,
+     const bool,
+     const unsigned int);
     \}
 
 #endif

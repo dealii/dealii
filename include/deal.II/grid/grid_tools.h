@@ -1372,9 +1372,9 @@ namespace GridTools
   compute_mesh_predicate_bounding_box
   ( const MeshType                                                              &mesh,
     const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
-    const unsigned int                                                          &refinement_level = 0,
-    const bool                                                                  &allow_merge = false,
-    const unsigned int                                                          &max_boxes = numbers::invalid_unsigned_int);
+    const unsigned int                                                           refinement_level = 0,
+    const bool                                                                   allow_merge = false,
+    const unsigned int                                                           max_boxes = numbers::invalid_unsigned_int);
 
   /**
    * Given an array of points, use the global bounding box description obtained using

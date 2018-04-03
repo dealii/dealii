@@ -1806,9 +1806,9 @@ next_cell:
   compute_mesh_predicate_bounding_box
   (const MeshType                                                              &mesh,
    const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
-   const unsigned int                                                          &refinement_level,
-   const bool                                                                  &allow_merge,
-   const unsigned int                                                          &max_boxes)
+   const unsigned int                                                           refinement_level,
+   const bool                                                                   allow_merge,
+   const unsigned int                                                           max_boxes)
   {
     // Algorithm brief description: begin with creating bounding boxes of all cells at
     // refinement_level (and coarser levels if there are active cells) which have the predicate
