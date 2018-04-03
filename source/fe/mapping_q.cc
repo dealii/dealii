@@ -164,7 +164,6 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
   // wait for the task above to finish and use returned value
   data->mapping_qp_data = Utilities::dynamic_unique_cast<typename MappingQGeneric<dim,spacedim>::InternalData>
                           (std::move(do_get_data.return_value()));
-
   return std::move(data);
 }
 

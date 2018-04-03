@@ -289,21 +289,17 @@ FE_Enriched<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 template <int dim, int spacedim>
 template <int dim_1>
 std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
+FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FESystem<dim,spacedim>::InternalData> fes_data,
                                        const UpdateFlags      flags,
                                        const Quadrature<dim_1> &quadrature) const
 {
-  Assert ((dynamic_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get()) != nullptr),
-          ExcInternalError());
-
   // Pass ownership of the FiniteElement::InternalDataBase object
   // that fes_data points to, to the new InternalData object.
-  typename FESystem<dim,spacedim>::InternalData *data_fesystem =
-    static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.release());
-  auto data = std_cxx14::make_unique<InternalData>(std::unique_ptr<typename FESystem<dim,spacedim>::InternalData>(data_fesystem));
+  auto update_each_flags = fes_data->update_each;
+  auto data = std_cxx14::make_unique<InternalData>(std::move(fes_data));
 
   // copy update_each from FESystem data:
-  data->update_each = data_fesystem->update_each;
+  data->update_each = update_each_flags;
 
   // resize cache array according to requested flags
   data->enrichment.resize(this->n_base_elements());
@@ -337,7 +333,8 @@ FE_Enriched<dim,spacedim>::get_face_data (const UpdateFlags      update_flags,
                                           const Quadrature<dim-1> &quadrature,
                                           internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >        &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_face_data(update_flags,mapping,quadrature,output_data)),
+  auto data = fe_system->get_face_data(update_flags,mapping,quadrature,output_data);
+  return setup_data(Utilities::dynamic_unique_cast<typename FESystem<dim,spacedim>::InternalData>(std::move(data)),
                     update_flags,
                     quadrature);
 }
@@ -350,7 +347,8 @@ FE_Enriched<dim,spacedim>::get_subface_data (const UpdateFlags      update_flags
                                              const Quadrature<dim-1> &quadrature,
                                              dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_subface_data(update_flags,mapping,quadrature,output_data)),
+  auto data = fe_system->get_subface_data(update_flags,mapping,quadrature,output_data);
+  return setup_data(Utilities::dynamic_unique_cast<typename FESystem<dim,spacedim>::InternalData>(std::move(data)),
                     update_flags,
                     quadrature);
 }
@@ -363,7 +361,8 @@ FE_Enriched<dim,spacedim>::get_data (const UpdateFlags      flags,
                                      const Quadrature<dim> &quadrature,
                                      internal::FEValuesImplementation::FiniteElementRelatedData< dim, spacedim >   &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_data(flags,mapping,quadrature,output_data)),
+  auto data = fe_system->get_data(flags,mapping,quadrature,output_data);
+  return setup_data(Utilities::dynamic_unique_cast<typename FESystem<dim,spacedim>::InternalData>(std::move(data)),
                     flags,
                     quadrature);
 }

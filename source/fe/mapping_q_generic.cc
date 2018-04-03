@@ -2222,8 +2222,8 @@ Point<1>
 MappingQGeneric<1,1>::
 transform_real_to_unit_cell_internal
 (const Triangulation<1,1>::cell_iterator &cell,
- const Point<1>                            &p,
- const Point<1>                                 &initial_p_unit) const
+ const Point<1>                          &p,
+ const Point<1>                          &initial_p_unit) const
 {
   const int dim = 1;
   const int spacedim = 1;
@@ -2233,8 +2233,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
-                                       point_quadrature).release()));
+  auto mdata = Utilities::dynamic_unique_cast<InternalData>(get_data(update_flags,
+                                                            point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2248,8 +2248,8 @@ Point<2>
 MappingQGeneric<2, 2>::
 transform_real_to_unit_cell_internal
 (const Triangulation<2, 2>::cell_iterator &cell,
- const Point<2>                            &p,
- const Point<2>                                 &initial_p_unit) const
+ const Point<2>                           &p,
+ const Point<2>                           &initial_p_unit) const
 {
   const int dim = 2;
   const int spacedim = 2;
@@ -2259,8 +2259,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
-                                       point_quadrature).release()));
+  auto mdata = Utilities::dynamic_unique_cast<InternalData>(get_data(update_flags,
+                                                            point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2285,8 +2285,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
-                                       point_quadrature).release()));
+  auto mdata = Utilities::dynamic_unique_cast<InternalData>(get_data(update_flags,
+                                                            point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2313,8 +2313,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
-                                       point_quadrature).release()));
+  auto mdata = Utilities::dynamic_unique_cast<InternalData>(get_data(update_flags,
+                                                            point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
@@ -2341,8 +2341,8 @@ transform_real_to_unit_cell_internal
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
   if (spacedim>dim)
     update_flags |= update_jacobian_grads;
-  std::unique_ptr<InternalData> mdata (dynamic_cast<InternalData *>(get_data(update_flags,
-                                       point_quadrature).release()));
+  auto mdata = Utilities::dynamic_unique_cast<InternalData>(get_data(update_flags,
+                                                            point_quadrature));
 
   mdata->mapping_support_points = this->compute_mapping_support_points (cell);
 
