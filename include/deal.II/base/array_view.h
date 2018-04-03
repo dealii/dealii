@@ -575,8 +575,8 @@ make_array_view (ArrayView<Number> &array_view)
  *
  * @param[in] vector The Tensor for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is undefined and can
- * not be relied upon.
+ * order in which the entries are presented in the array is an implementation
+ * detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -601,8 +601,8 @@ make_array_view (const Tensor<rank, dim, Number> &tensor)
  *
  * @param[in] vector The Tensor for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is undefined and can
- * not be relied upon.
+ * order in which the entries are presented in the array is an implementation
+ * detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -627,8 +627,8 @@ make_array_view (Tensor<rank, dim, Number> &tensor)
  *
  * @param[in] vector The SymmetricTensor for which we want to have an array
  * view object. The array view corresponds to the <em>entire</em> object but
- * the order in which the entries are presented in the array is undefined and
- * can not be relied upon.
+ * the order in which the entries are presented in the array is an
+ * implementation detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -652,10 +652,10 @@ make_array_view (const SymmetricTensor<rank, dim, Number> &tensor)
  * Consequently, the return type of this function is a view to a set of writable
  * objects.
  *
- * @param[in] vector The SymmetricTensor for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is undefined and can
- * not be relied upon.
+ * @param[in] vector The SymmetricTensor for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> object but
+ * the order in which the entries are presented in the array is an
+ * implementation detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -897,8 +897,8 @@ make_array_view (Table<2,ElementType>                           &table,
  *
  * @param[in] table The Table for which we want to have an array view object.
  * The array view corresponds to the <em>entire</em> table but the order in
- * which the entries are presented in the array is undefined and can not be
- * relied upon.
+ * which the entries are presented in the array is an implementation detail
+ * and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -923,8 +923,8 @@ make_array_view (Table<2,ElementType> &table)
  *
  * @param[in] table The Table for which we want to have an array view object.
  * The array view corresponds to the <em>entire</em> table but the order in
- * which the entries are presented in the array is undefined and can not be
- * relied upon.
+ * which the entries are presented in the array is an implementation detail
+ * and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -947,10 +947,10 @@ make_array_view (const Table<2,ElementType> &table)
  * Consequently, the return type of this function is a view to a set of
  * @p non-const objects.
  *
- * @param[in] table The LAPACKFullMatrix for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is undefined and can
- * not be relied upon.
+ * @param[in] table The LAPACKFullMatrix for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> object but
+ * the order in which the entries are presented in the array is an
+ * implementation detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
@@ -973,10 +973,10 @@ make_array_view (LAPACKFullMatrix<ElementType> &matrix)
  * type because they contain immutable elements. Consequently, the return type
  * of this function is a view to a set of @p const objects.
  *
- * @param[in] table The LAPACKFullMatrix for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object but the
- * order in which the entries are presented in the array is undefined and can
- * not be relied upon.
+ * @param[in] table The LAPACKFullMatrix for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> object but
+ * the order in which the entries are presented in the array is an
+ * implementation detail and should not be relied upon.
  *
  * @relatesalso ArrayView
  */
