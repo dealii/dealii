@@ -432,9 +432,7 @@ the set of all nodes. The set $\mathcal N_D\subset \mathcal N$ is the subset
 of the nodes that are subject to Dirichlet boundary conditions where the
 solution is forced to equal $u_i = g_i = g(\mathbf{x}_i)$ as the interpolation
 of boundary values on the Dirichlet-constrained node points $i\in \mathcal
-N_D$. In this formula, where we have assumed that the degrees of freedom are
-numbered such that the ones subject to a Dirichlet condition are all appended
-to the end of the list of degrees of freedom. We then insert this solution
+N_D$. We then insert this solution
 representation into the weak form, e.g. the Laplacian shown above, and move
 the known quantities to the right hand side:
 @f{eqnarray*}
@@ -447,7 +445,7 @@ In this formula, the equations are tested for all basis functions $\varphi_i$
 with $i\in N \setminus \mathcal N_D$ that are not related to the nodes
 constrained by Dirichlet conditions.
 
-In the implementation in deal.II, the integrals $(\varphi_i,\varphi_j)_\Omega$
+In the implementation in deal.II, the integrals $(\nabla \varphi_i,\nabla \varphi_j)_\Omega$
 on the right hand side are already contained in the local matrix contributions
 we assemble on each cell. When using
 ConstraintMatrix::distributed_local_to_global() as first described in the
