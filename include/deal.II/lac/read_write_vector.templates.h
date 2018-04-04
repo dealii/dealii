@@ -54,17 +54,15 @@ namespace LinearAlgebra
   {
     if (new_alloc_size == 0)
       {
-        if (val != nullptr)
-          free(val);
-        val = nullptr;
+        values.reset ();
         thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       }
     else
       {
-        if (val != nullptr)
-          free(val);
+        Number *new_values;
+        Utilities::System::posix_memalign ((void **)&new_values, 64, sizeof(Number)*new_alloc_size);
+        values.reset (new_values);
 
-        Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
         if (new_alloc_size >= 4*dealii::internal::VectorImplementation::minimum_parallel_grain_size)
           thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       }
@@ -154,7 +152,7 @@ namespace LinearAlgebra
     int ierr = trilinos_vec.trilinos_vector().ExtractView (&start_ptr, &leading_dimension);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-    std::copy(start_ptr, start_ptr + leading_dimension, val);
+    std::copy(start_ptr, start_ptr + leading_dimension, values.get());
 
     // reset the communication pattern
     source_stored_elements.clear();
@@ -186,7 +184,7 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(in_vector.val, val);
+    dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(in_vector.values.get(), values.get());
     dealii::internal::VectorOperations::parallel_for(copier, 0, n_elements(), thread_loop_partitioner);
 
     return *this;
@@ -203,7 +201,7 @@ namespace LinearAlgebra
     if (n_elements() != in_vector.n_elements())
       reinit(in_vector, true);
 
-    dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(in_vector.val, val);
+    dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(in_vector.values.get(), values.get());
     dealii::internal::VectorOperations::parallel_for(copier, 0, n_elements(), thread_loop_partitioner);
 
     return *this;
@@ -221,7 +219,7 @@ namespace LinearAlgebra
     const size_type this_size = n_elements();
     if (this_size>0)
       {
-        dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), val);
+        dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), values.get());
         dealii::internal::VectorOperations::parallel_for(setter, 0, this_size, thread_loop_partitioner);
       }
 
@@ -376,12 +374,12 @@ namespace LinearAlgebra
         AssertThrow(err == 0, ExcMessage("Epetra Import() failed with error code: "
                                          + Utilities::to_string(err)));
 
-        const double *values = target_vector.Values();
+        const double *new_values = target_vector.Values();
         const int size = target_vector.MyLength();
         Assert(size==0 || values != nullptr, ExcInternalError("Import failed."));
 
         for (int i=0; i<size; ++i)
-          val[i] = values[i];
+          values[i] = new_values[i];
       }
     else if (operation==VectorOperation::add)
       {
@@ -389,12 +387,12 @@ namespace LinearAlgebra
         AssertThrow(err == 0, ExcMessage("Epetra Import() failed with error code: "
                                          + Utilities::to_string(err)));
 
-        const double *values = target_vector.Values();
+        const double *new_values = target_vector.Values();
         const int size = target_vector.MyLength();
         Assert(size==0 || values != nullptr, ExcInternalError("Import failed."));
 
         for (int i=0; i<size; ++i)
-          val[i] += values[i];
+          values[i] += new_values[i];
       }
     else
       AssertThrow(false, ExcNotImplemented());
@@ -441,7 +439,7 @@ namespace LinearAlgebra
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)
       {
-        cudaError_t error_code = cudaMemcpy(val, cuda_vec.get_values(),
+        cudaError_t error_code = cudaMemcpy(values.get(), cuda_vec.get_values(),
                                             n_elements*sizeof(Number),
                                             cudaMemcpyDeviceToHost);
         AssertCuda(error_code);
@@ -457,7 +455,7 @@ namespace LinearAlgebra
 
         // Add the two vectors
         for (unsigned int i=0; i<n_elements; ++i)
-          val[i] += tmp[i];
+          values[i] += tmp[i];
       }
   }
 #endif
@@ -469,7 +467,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::swap (ReadWriteVector<Number> &v)
   {
     std::swap(stored_elements, v.stored_elements);
-    std::swap(val, v.val);
+    std::swap(values, v.values);
   }
 
 
@@ -508,7 +506,7 @@ namespace LinearAlgebra
     out << std::endl;
     unsigned int i=0;
     for (const auto &idx : this->stored_elements)
-      out << "[" << idx << "]: " << val[i++] << '\n';
+      out << "[" << idx << "]: " << values[i++] << '\n';
     out << std::flush;
 
     AssertThrow (out, ExcIO());
