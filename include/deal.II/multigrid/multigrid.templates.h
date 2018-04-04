@@ -160,17 +160,17 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
       defect[level-1] -= t[level-1];
     }
 
-  this->signals.transfer_down_to(true, level);
+  this->signals.restriction(true, level);
   transfer->restrict_and_add(level, defect[level-1], t[level]);
-  this->signals.transfer_down_to(false, level);
+  this->signals.restriction(false, level);
 
   // do recursion
   level_v_step(level-1);
 
   // do coarse grid correction
-  this->signals.transfer_up_to(true, level);
+  this->signals.prolongation(true, level);
   transfer->prolongate(level, t[level], solution[level-1]);
-  this->signals.transfer_up_to(false, level);
+  this->signals.prolongation(false, level);
 
   if (debug>2)
     deallog << "Prolongate norm        " << t[level].l2_norm() << std::endl;
@@ -394,9 +394,9 @@ connect_coarse_solve(const std::function<void (const bool, const unsigned int)> 
 template <typename VectorType>
 boost::signals2::connection
 Multigrid<VectorType>::
-connect_transfer_down_to(const std::function<void (const bool, const unsigned int)> &slot)
+connect_restriction(const std::function<void (const bool, const unsigned int)> &slot)
 {
-  return this->signals.transfer_down_to.connect(slot);
+  return this->signals.restriction.connect(slot);
 }
 
 
@@ -404,9 +404,9 @@ connect_transfer_down_to(const std::function<void (const bool, const unsigned in
 template <typename VectorType>
 boost::signals2::connection
 Multigrid<VectorType>::
-connect_transfer_up_to(const std::function<void (const bool, const unsigned int)> &slot)
+connect_prolongation(const std::function<void (const bool, const unsigned int)> &slot)
 {
-  return this->signals.transfer_up_to.connect(slot);
+  return this->signals.prolongation.connect(slot);
 }
 
 

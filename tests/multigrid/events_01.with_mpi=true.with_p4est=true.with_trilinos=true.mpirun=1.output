@@ -6,20 +6,20 @@ DEAL::transfer_to_mg started
 DEAL::transfer_to_mg finished
 DEAL::pre_smoother_step started on level 2
 DEAL::pre_smoother_step finished on level 2
-DEAL::transfer_down_to started on level 2
-DEAL::transfer_down_to finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
 DEAL::pre_smoother_step started on level 1
 DEAL::pre_smoother_step finished on level 1
-DEAL::transfer_down_to started on level 1
-DEAL::transfer_down_to finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
 DEAL::coarse_solve started on level 0
 DEAL::coarse_solve finished on level 0
-DEAL::transfer_up_to started on level 1
-DEAL::transfer_up_to finished on level 1
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
 DEAL::post_smoother_step started on level 1
 DEAL::post_smoother_step finished on level 1
-DEAL::transfer_up_to started on level 2
-DEAL::transfer_up_to finished on level 2
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
 DEAL::post_smoother_step started on level 2
 DEAL::post_smoother_step finished on level 2
 DEAL::transfer_to_global started
@@ -33,20 +33,20 @@ DEAL::transfer_to_mg started
 DEAL::transfer_to_mg finished
 DEAL::pre_smoother_step started on level 2
 DEAL::pre_smoother_step finished on level 2
-DEAL::transfer_down_to started on level 2
-DEAL::transfer_down_to finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
 DEAL::pre_smoother_step started on level 1
 DEAL::pre_smoother_step finished on level 1
-DEAL::transfer_down_to started on level 1
-DEAL::transfer_down_to finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
 DEAL::coarse_solve started on level 0
 DEAL::coarse_solve finished on level 0
-DEAL::transfer_up_to started on level 1
-DEAL::transfer_up_to finished on level 1
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
 DEAL::post_smoother_step started on level 1
 DEAL::post_smoother_step finished on level 1
-DEAL::transfer_up_to started on level 2
-DEAL::transfer_up_to finished on level 2
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
 DEAL::post_smoother_step started on level 2
 DEAL::post_smoother_step finished on level 2
 DEAL::transfer_to_global started
@@ -60,20 +60,20 @@ DEAL::transfer_to_mg started
 DEAL::transfer_to_mg finished
 DEAL::pre_smoother_step started on level 2
 DEAL::pre_smoother_step finished on level 2
-DEAL::transfer_down_to started on level 2
-DEAL::transfer_down_to finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
 DEAL::pre_smoother_step started on level 1
 DEAL::pre_smoother_step finished on level 1
-DEAL::transfer_down_to started on level 1
-DEAL::transfer_down_to finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
 DEAL::coarse_solve started on level 0
 DEAL::coarse_solve finished on level 0
-DEAL::transfer_up_to started on level 1
-DEAL::transfer_up_to finished on level 1
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
 DEAL::post_smoother_step started on level 1
 DEAL::post_smoother_step finished on level 1
-DEAL::transfer_up_to started on level 2
-DEAL::transfer_up_to finished on level 2
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
 DEAL::post_smoother_step started on level 2
 DEAL::post_smoother_step finished on level 2
 DEAL::transfer_to_global started

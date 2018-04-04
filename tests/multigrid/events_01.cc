@@ -402,16 +402,16 @@ namespace Step50
 
     };
 
-    auto print_transfer_down_to  = [](const bool start, const unsigned int level)
+    auto print_restriction  = [](const bool start, const unsigned int level)
     {
-      deallog << "transfer_down_to " << (start?"started":"finished")
+      deallog << "restriction " << (start?"started":"finished")
               << " on level " << level << std::endl;
 
     };
 
-    auto print_transfer_up_to  = [](const bool start, const unsigned int level)
+    auto print_prolongation  = [](const bool start, const unsigned int level)
     {
-      deallog << "transfer_up_to " << (start?"started":"finished")
+      deallog << "prolongation " << (start?"started":"finished")
               << " on level " << level << std::endl;
     };
 
@@ -436,8 +436,8 @@ namespace Step50
     preconditioner.connect_transfer_to_global(print_transfer_to_global);
 
     mg.connect_coarse_solve(print_coarse_solve);
-    mg.connect_transfer_down_to(print_transfer_down_to);
-    mg.connect_transfer_up_to(print_transfer_up_to);
+    mg.connect_restriction(print_restriction);
+    mg.connect_prolongation(print_prolongation);
     mg.connect_pre_smoother_step(print_pre_smoother_step);
     mg.connect_post_smoother_step(print_post_smoother_step);
 
