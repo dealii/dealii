@@ -8880,7 +8880,12 @@ template <int dim, int spacedim>
 Triangulation<dim, spacedim>::~Triangulation ()
 {
   // notify listeners that the triangulation is going down...
-  signals.clear();
+  try
+    {
+      signals.clear();
+    }
+  catch (...)
+    {}
 
   levels.clear ();
 

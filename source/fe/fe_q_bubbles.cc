@@ -386,7 +386,8 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                 x_source_fe.dofs_per_cell));
 
   //Provide a short cut in case we are just inquiring the identity
-  if (dynamic_cast<const FEQBUBBLES *>(&x_source_fe)->degree == this->degree)
+  auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
+  if (casted_fe != nullptr && casted_fe->degree == this->degree)
     for (unsigned int i=0; i<interpolation_matrix.m(); ++i)
       interpolation_matrix.set(i,i,1.);
   //else we need to do more...

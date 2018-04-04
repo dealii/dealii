@@ -2684,6 +2684,7 @@ FEValuesBase<dim,spacedim>::FEValuesBase (const unsigned int n_q_points,
   dofs_per_cell (dofs_per_cell),
   mapping(&mapping, typeid(*this).name()),
   fe(&fe, typeid(*this).name()),
+  cell_similarity(CellSimilarity::Similarity::none),
   fe_values_views_cache (*this)
 {
   Assert (n_q_points > 0,
