@@ -386,25 +386,25 @@
  * execute it.
  *
  * An example of how to use these functions are vector operations like
- * the addition in $z = x+y$ where all three objects are of type Vector:
+ * the addition in $z = x+y$ where all three objects are of type Vector<Number>:
  * @code
      parallel::transform (x.begin(), x.end(),
                           y.begin(),
                           z.begin(),
-                          (boost::lambda::_1 + boost::lambda::_2),
+                          [](const Number first, const Number second)
+                          {
+                            return first+second;
+                          },
                           1000);
  * @endcode
  *
- * In this example, we used the <a
- * href="http://www.boost.org/doc/libs/1_37_0/doc/html/lambda.html">Boost
- * Lambda</a> library to construct, on the fly, a function object that
- * takes two arguments and returns the sum of the two. This is exactly
- * what we needed when we want to add the individual elements of
+ * In this example, we used a <i>lambda expression</i> to construct, on the fly,
+ * a function object that takes two arguments and returns the sum of the two.
+ * This is exactly what we needed when we want to add the individual elements of
  * vectors $x$ and $y$ and write the sum of the two into the elements
- * of $z$. Because of the way Boost Lambda is written, the function
- * object that we get here is completely known to the compiler and
- * when it expands the loop that results from parallel::transform will
- * be as if we had written the loop in its obvious form:
+ * of $z$. The function object that we get here is completely known to the
+ * compiler and when it expands the loop that results from parallel::transform
+ * will be as if we had written the loop in its obvious form:
  * @code
        InputIterator1 in_1 = x.begin();
        InputIterator2 in_2 = y.begin();
@@ -413,9 +413,6 @@
        for (; in_1 != x.end(); ++in_1, ++in_2, ++out)
          *out = *in_1 + *in_2;
  * @endcode
- * The next C++ standard will contain a more elegant way to achieve the
- * same effect shown above using the Boost library, through a
- * mechanism known as <i>lambda expressions</i> and <i>closures</i>.
  *
  * Note also that we have made sure that no CPU ever gets a chunk of
  * the whole loop that is smaller than 1000 iterations (unless the
@@ -425,13 +422,11 @@
  * @anchor MTComplexLoops
  * <h3>Abstractions for tasks: More complex loops</h3>
  *
- * The scheme shown in the previous section is effective if the
- * operation done in each iteration is such that it does not require
- * significant setup costs and can be inlined by the compiler. Lambda
- * expressions are exactly of this kind because the compiler knows
- * everything about the lambda expression and can inline it, thereby
- * eliminating the overhead of calling an external function. However,
- * there are cases where it is inefficient to call some object or
+ * The scheme shown in the previous section is effective if the operation done
+ * in each iteration is such that it does not require significant setup costs
+ * and can be inlined by the compiler. <i>Lambda expressions</i> are exactly of
+ * this kind, thereby eliminating the overhead of calling an external function.
+ * However, there are cases where it is inefficient to call some object or
  * function within each iteration.
  *
  * An example for this case is sparse matrix-vector multiplication. If you
@@ -486,31 +481,29 @@
                               Vector       &dst) const
     {
       parallel::transform (dst.begin(), dst.end(),
-                           std_cxx11::bind (&SparseMatrix::vmult_one_row,
-                                        this,
-                                        std_cxx11::cref(src),
-                                        std_cxx11::ref(dst),
-                                        std_cxx11::_1),
+                           std::bind (&SparseMatrix::vmult_one_row,
+                                      this,
+                                      std::cref(src),
+                                      std::ref(dst),
+                                      std::_1),
                            200);
     }
  * @endcode
- * Note how we use <a
- * href="http://www.boost.org/doc/libs/1_62_0/libs/bind/bind.html">std_cxx11::bind</a>
- * to <i>bind</i> certain arguments to the <code>vmult_one_row</code>
- * function, leaving one argument open and thus allowing the
- * parallel::transform function to consider the passed function argument as
- * unary. Also note that we need to make the source and destination vectors as
- * (const) references to prevent std_cxx11::bind from passing them by value
- * (implying a copy for <code>src</code> and writing the result into a
- * temporary copy of <code>dst</code>, neither of which is what we desired).
- * Finally, notice the grainsize of a minimum of 200 rows of a matrix that
- * should be processed by an individual CPU core.
+ * Note how we use <code>std::bind</code> to <i>bind</i> certain arguments to
+ * the <code>vmult_one_row</code> function, leaving one argument open and thus
+ * allowing the parallel::transform function to consider the passed function
+ * argument as unary. Also note that we need to make the source and destination
+ * vectors as (const) references to prevent <code>std::bind</code> from passing
+ * them by value (implying a copy for <code>src</code> and writing the result
+ * into a temporary copy of <code>dst</code>, neither of which is what we
+ * desired). Finally, notice the grainsize of a minimum of 200 rows of a matrix
+ * that should be processed by an individual CPU core.
  *
  * The point is that while this is correct, it is not efficient: we have to
  * set up the <code>row, val_ptr, colnum_ptr</code> variables in each
  * iteration of the loop. Furthermore, since now the function object to be
- * called on each row is not a simple Boost Lambda expression any more, there
- * is an implied function call including argument passing in each iteration of
+ * called on each row is not a simple <i>lambda expression</i> any more, there
+ * is an implicit function call including argument passing in each iteration of
  * the loop.
  *
  * A more efficient way is to let TBB split the original range into
@@ -542,11 +535,11 @@
                               Vector       &dst) const
     {
        parallel::apply_to_subranges (0, n_rows(),
-                                     std_cxx11::bind (vmult_on_subrange,
-                                                  this,
-                                                  std_cxx11::_1, std_cxx11::_2,
-                                                  std_cxx11::cref(src),
-                                                  std_cxx11::ref(dst)),
+                                     std::bind (vmult_on_subrange,
+                                                this,
+                                                std::_1, std::_2,
+                                                std::cref(src),
+                                                std::ref(dst)),
                                      200);
     }
  * @endcode
@@ -617,10 +610,10 @@
       return
         std::sqrt
         (parallel::accumulate_from_subranges (0, n_rows(),
-                                              std_cxx11::bind (mat_norm_sqr_on_subrange,
-                                                           this,
-                                                           std_cxx11::_1, std_cxx11::_2,
-                                                           std_cxx11::cref(x)),
+                                              std::bind (mat_norm_sqr_on_subrange,
+                                                         this,
+                                                         std::_1, std::_2,
+                                                         std::cref(x)),
                                               200));
     }
  * @endcode
@@ -1028,25 +1021,25 @@
      // ...is the same as:
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx11::bind(&MyClass<dim>::assemble_on_one_cell,
-                                      *this,
-                                      std_cxx11::_1,
-                                      std_cxx11::_2,
-                                      std_cxx11::_3),
-                      std_cxx11::bind(&MyClass<dim>::copy_local_to_global,
-                                      *this,
-                                      std_cxx11::_1),
+                      std::bind(&MyClass<dim>::assemble_on_one_cell,
+                                *this,
+                                std::_1,
+                                std::_2,
+                                std::_3),
+                      std::bind(&MyClass<dim>::copy_local_to_global,
+                                *this,
+                                std::_1),
                       per_task_data);
  * @endcode
- * Note how <code>std_cxx11::bind</code> produces a function object that takes three
+ * Note how <code>std::bind</code> produces a function object that takes three
  * arguments by binding the member function to the <code>*this</code>
- * object. <code>std_cxx11::_1, std_cxx11::_2</code> and <code>std_cxx11::_3</code> are placeholders for the first,
+ * object. <code>std::_1, std::_2</code> and <code>std::_3</code> are placeholders for the first,
  * second and third argument that can be specified later on. In other words, for
  * example if <code>p</code> is the result of the first call to
- * <code>std_cxx11::bind</code>, then the call <code>p(cell, scratch_data,
+ * <code>std::bind</code>, then the call <code>p(cell, scratch_data,
  * per_task_data)</code> will result in executing
  * <code>this-@>assemble_on_one_cell (cell, scratch_data, per_task_data)</code>,
- * i.e. <code>std_cxx11::bind</code> has bound the object to the function pointer
+ * i.e. <code>std::bind</code> has bound the object to the function pointer
  * but left the three arguments open for later.
  *
  * Similarly, let us assume that <code>MyClass::assemble_on_one_cell</code>
@@ -1068,24 +1061,24 @@
  * @code
      WorkStream::run (dof_handler.begin_active(),
                       dof_handler.end(),
-                      std_cxx11::bind(&MyClass<dim>::assemble_on_one_cell,
-                                      *this,
-                                      current_solution,
-                                      std_cxx11::_1,
-                                      std_cxx11::_2,
-                                      std_cxx11::_3,
-                                      previous_time+time_step),
-                      std_cxx11::bind(&MyClass<dim>::copy_local_to_global,
-                                      *this,
-                                      std_cxx11::_1),
+                      std::bind(&MyClass<dim>::assemble_on_one_cell,
+                                *this,
+                                current_solution,
+                                std::_1,
+                                std::_2,
+                                std::_3,
+                                previous_time+time_step),
+                      std::bind(&MyClass<dim>::copy_local_to_global,
+                                *this,
+                                std::_1),
                       per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
  * current time argument to the function before we hand it off to
  * WorkStream::run(). WorkStream::run() will then simply call the
  * function with the cell and scratch and per task objects which will be filled
- * in at the positions indicated by <code>std_cxx11::_1, std_cxx11::_2</code>
- * and <code>std_cxx11::_3</code>.
+ * in at the positions indicated by <code>std::_1, std::_2</code>
+ * and <code>std::_3</code>.
  *
  * There are refinements to the WorkStream::run function shown above.
  * For example, one may realize that the basic idea above can only scale
