@@ -426,7 +426,7 @@ namespace LinearAlgebra
     // If necessary, resize the vector during a read operation
     if (this->size()!=current_size)
       this->reinit(this->size());
-    ar &boost::serialization::make_array(this->val,this->size());
+    ar &boost::serialization::make_array(this->values.get(),this->size());
   }
 
 
