@@ -33,11 +33,6 @@ SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
 
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
-  IF(POLICY CMP0037)
-    # allow to override "test" target for quick tests
-    CMAKE_POLICY(SET CMP0037 OLD)
-  ENDIF()
-
   #
   # If this CMakeLists.txt file is called from within the deal.II build
   # system, set up quick tests as well:
