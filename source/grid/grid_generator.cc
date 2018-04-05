@@ -4044,12 +4044,34 @@ namespace GridGenerator
     Assert(n_slices>=2,
            ExcMessage("The number of slices for extrusion must be at least 2."));
 
+    const double delta_h = height / (n_slices-1);
+    std::vector<double> slices_z_values;
+    for (unsigned int i=0; i<n_slices; ++i)
+      slices_z_values.push_back(i*delta_h);
+    extrude_triangulation(input, slices_z_values, result);
+  }
+
+  void
+  extrude_triangulation (const Triangulation<2,2> &input,
+                         const std::vector<double> &slice_coordinates,
+                         Triangulation<3,3> &result)
+  {
+    Assert (input.n_levels() == 1,
+            ExcMessage ("The input triangulation must be a coarse mesh, i.e., it must "
+                        "not have been refined."));
+    Assert(result.n_cells()==0,
+           ExcMessage("The output triangulation object needs to be empty."));
+    Assert(slice_coordinates.size()>=2,
+           ExcMessage("The number of slices for extrusion must be at least 2."));
+    const unsigned int n_slices = slice_coordinates.size();
+    Assert(std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
+           ExcMessage("Slice z-coordinates should be in ascending order"));
     std::vector<Point<3> > points(n_slices*input.n_vertices());
     std::vector<CellData<3> > cells;
     cells.reserve((n_slices-1)*input.n_active_cells());
 
     // copy the array of points as many times as there will be slices,
-    // one slice at a time
+    // one slice at a time. The z-axis value are defined in slices_coordinates
     for (unsigned int slice=0; slice<n_slices; ++slice)
       {
         for (unsigned int i=0; i<input.n_vertices(); ++i)
@@ -4057,7 +4079,7 @@ namespace GridGenerator
             const Point<2> &v = input.get_vertices()[i];
             points[slice*input.n_vertices()+i](0) = v(0);
             points[slice*input.n_vertices()+i](1) = v(1);
-            points[slice*input.n_vertices()+i](2) = height * slice / (n_slices-1);
+            points[slice*input.n_vertices()+i](2) = slice_coordinates[slice];
           }
       }
 
@@ -4150,6 +4172,7 @@ namespace GridGenerator
     result.create_triangulation (points,
                                  cells,
                                  s);
+
   }
 
 

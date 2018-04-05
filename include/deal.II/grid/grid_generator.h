@@ -1038,7 +1038,6 @@ namespace GridGenerator
                                            const std::set<typename Triangulation<dim, spacedim>::active_cell_iterator> &cells_to_remove,
                                            Triangulation<dim, spacedim>       &result);
 
-
   /**
    * Take a 2d Triangulation that is being extruded in z direction by the
    * total height of @p height using @p n_slices slices (minimum is 2). The
@@ -1054,6 +1053,26 @@ namespace GridGenerator
                          const unsigned int         n_slices,
                          const double               height,
                          Triangulation<3,3>        &result);
+
+  /**
+   * Overload of the previous function. Take a 2d Triangulation that is being
+   * extruded. Differing from the previous function taking height and number of
+   * slices for uniform extrusion, this function takes z-axis values
+   * @p slice_coordinates where the slicing will happen. The boundary indicators
+   * of the faces of @p input are going to be assigned to the corresponding side
+   * walls in z direction. The bottom and top get the next two free boundary
+   * indicators.
+   *
+   * @note The 2d input triangulation @p input must be a coarse mesh that has
+   * no refined cells.
+   *
+   * @author Weixiong Zheng, 2018
+   */
+  void
+  extrude_triangulation (const Triangulation<2, 2>             &input,
+                         const std::vector<double> &slice_coordinates,
+                         Triangulation<3,3>                   &result);
+
 
   /**
    * Given an input triangulation @p in_tria, this function makes a new flat
