@@ -1031,11 +1031,11 @@ public:
   /**
    * Return a constant reference to the manifold object used for this object.
    *
-   * As explained in
-   * @ref boundary "Boundary and manifold description for triangulations",
-   * the process involved in finding the appropriate manifold description
-   * involves querying both the manifold or boundary indicators. See there for
-   * more information.
+   * As explained in the
+   * @ref manifold
+   * module, the process involved in finding the appropriate manifold
+   * description involves querying both the manifold or boundary
+   * indicators. See there for more information.
    */
   const Manifold<dim,spacedim> &get_manifold () const;
 

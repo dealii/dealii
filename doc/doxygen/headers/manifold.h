@@ -79,18 +79,6 @@
  * reasonable implementations. More complicated examples can be described
  * using the techniques shown in step-53 and step-54.
  *
- * The boundary of a Triangulation is a special case of Manifold, for
- * which additional information can be useful in user codes, such as
- * normal vectors to surfaces or to curves. If your coarse mesh is reasonably
- * shaped, you might be interested in only attaching a manifold
- * description to boundary portion of your domain. This can be done
- * using the Triangulation::set_boundary() function, which take as arguments a Boundary
- * object (derived from Manifold). Notice that Triangulation uses only
- * the Manifold interface, not the Boundary interface. Other tools,
- * however, might need to compute exact normals at quadrature points,
- * and therefore a wrapper to query Boundary objects is provided.
- *
- *
  * <h3>An example</h3>
  *
  * A simple example why dealing with curved geometries is already provided
@@ -208,7 +196,7 @@
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
- *  const HyperShellBoundary<2> boundary_description(center);
+ *  const SphericalManifold<2> boundary_description(center);
  *  triangulation.set_all_manifold_ids_on_boundary(0);
  *  triangulation.set_manifold (0, boundary_description);
  *

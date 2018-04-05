@@ -25,7 +25,6 @@
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
-// Ignore deprecation warnings for auto_ptr.
 #include <boost/signals2.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
@@ -946,54 +945,81 @@ namespace internal
  * been called.
  *
  *
- * <h3>%Boundary approximation</h3>
+ * <h3>Describing curved geometries</h3>
  *
- * You can specify a class describing the boundary for each boundary component.
- * If a new vertex is created on a side or face at the boundary, this class is
- * used to compute where it will be placed. The manifold indicator of the face
- * will be used to determine the proper component. See Manifold for the details.
- * Usage with the Triangulation object is then like this (let @p Ball be a
- * class derived from Manifold<tt><2></tt>):
+ * deal.II implements all geometries (curved and otherwise) with classes
+ * inheriting from Manifold; see the documentation of Manifold, step-49, or
+ * the
+ * @ref manifold
+ * module for examples and a complete description of the algorithms. By
+ * default, all cells in a Triangulation have a flat geometry, meaning that
+ * all lines in the Triangulation are assumed to be straight. If a cell has a
+ * manifold_id that is not equal to numbers::flat_manifold_id then the
+ * Triangulation uses the associated Manifold object for computations on that
+ * cell (e.g., cell refinement). Here is a quick example, taken from the
+ * implementation of GridGenerator::hyper_ball(), that sets up a polar grid:
  *
- *   @code
- *     int main ()
+ * @code
+ * int main ()
+ * {
+ *   Triangulation<2> triangulation;
+ *   const Point<2> vertices[8] = {Point<2>(-1,-1),
+ *                                 Point<2>(+1,-1),
+ *                                 Point<2>(-1,-1)*0.5,
+ *                                 Point<2>(+1,-1)*0.5,
+ *                                 Point<2>(-1,+1)*0.5,
+ *                                 Point<2>(+1,+1)*0.5,
+ *                                 Point<2>(-1,+1),
+ *                                 Point<2>(+1,+1)};
+ *   const int cell_vertices[5][4] = {{0, 1, 2, 3},
+ *                                    {0, 2, 6, 4},
+ *                                    {2, 3, 4, 5},
+ *                                    {1, 7, 3, 5},
+ *                                    {6, 4, 7, 5}};
+ *
+ *   std::vector<CellData<2>> cells(5, CellData<2>());
+ *   for (unsigned int i=0; i<5; ++i)
+ *     for (unsigned int j=0; j<4; ++j)
+ *       cells[i].vertices[j] = cell_vertices[i][j];
+ *
+ *   triangulation.create_triangulation ({std::begin(vertices), std::end(vertices)},
+ *                                       cells,
+ *                                       SubCellData());
+ *   triangulation.set_all_manifold_ids_on_boundary(42);
+ *   // set_manifold stores a copy of its second argument, so a temporary is okay
+ *   triangulation.set_manifold(42, PolarManifold<2>());
+ *   for (unsigned int i = 0; i < 4; ++i)
  *     {
- *       Triangulation<2> tria;
- *                                        // set the boundary function
- *                                        // for all boundaries with
- *                                        // boundary indicator 0
- *       Ball ball;
- *       tria.set_manifold (0, ball);
- *
- *   // read some coarse grid
- *
- *
- *   Triangulation<2>::active_cell_iterator cell, endc;
- *   for (int i=0; i<8; ++i)
- *     {
- *       cell = tria.begin_active();
- *       endc = tria.end();
- *
  *       // refine all boundary cells
- *       for (; cell!=endc; ++cell)
+ *       for (const auto &cell : triangulation.active_cell_iterators())
  *         if (cell->at_boundary())
  *           cell->set_refine_flag();
  *
- *       tria.execute_coarsening_and_refinement();
+ *       triangulation.execute_coarsening_and_refinement();
  *     }
  * }
  * @endcode
  *
+ * This will set up a grid where the boundary lines will be refined by
+ * performing calculations in polar coordinates. When the mesh is refined the
+ * cells adjacent to the boundary will use this new line midpoint (as well as
+ * the other three midpoints and original cell vertices) to calculate the cell
+ * midpoint with a transfinite interpolation: this propagates the curved
+ * boundary into the interior in a smooth way. It is possible to generate a
+ * better grid (which interpolates across all cells between two different
+ * Manifold descriptions, instead of just going one cell at a time) by using
+ * TransfiniteInterpolationManifold; see the documentation of that class for
+ * more information.
+ *
  * You should take note of one caveat: if you have concave boundaries, you
  * must make sure that a new boundary vertex does not lie too much inside the
  * cell which is to be refined. The reason is that the center vertex is placed
- * at the point which is the arithmetic mean of the vertices of the original
- * cell. Therefore if your new boundary vertex is too near the center of the
- * old quadrilateral or hexahedron, the distance to the midpoint vertex will
- * become too small, thus generating distorted cells. This issue is discussed
- * extensively in
- * @ref GlossDistorted "distorted cells".
- *
+ * at the point which is a weighted average of the vertices of the original
+ * cell, new face midpoints, and (in 3D) new line midpoints. Therefore if your
+ * new boundary vertex is too near the center of the old quadrilateral or
+ * hexahedron, the distance to the midpoint vertex will become too small, thus
+ * generating distorted cells. This issue is discussed extensively in @ref
+ * GlossDistorted "distorted cells".
  *
  * <h3>Getting notice when a triangulation changes</h3>
  *
