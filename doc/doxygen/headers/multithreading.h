@@ -433,8 +433,8 @@
  * know how data is stored in compressed row format like in the SparseMatrix
  * class, then a matrix-vector product function looks like this:
  * @code
-    void SparseMatrix::vmult_one_row (const Vector &src,
-                                      Vector       &dst) const
+    void SparseMatrix::vmult (const Vector &src,
+                              Vector       &dst) const
     {
       const double       *val_ptr    = &values[0];
       const unsigned int *colnum_ptr = &colnums[0];
@@ -461,9 +461,9 @@
  * Using the parallel::transform function above, we could in principle write
  * this code as follows:
  * @code
-    void SparseMatrix::vmult (const Vector     &src,
-                              Vector           &dst,
-                              Vector::iterator &dst_row) const
+    void SparseMatrix::vmult_one_row (const Vector     &src,
+                                      Vector           &dst,
+                                      Vector::iterator &dst_row) const
     {
       const unsigned int  row = (dst_row - dst.begin());
 
@@ -634,10 +634,10 @@
  * evaluating an error estimator on each cell; or postprocessing on
  * each cell computed data for output fall into this class. These
  * cases can be treated using a software design pattern we call
- * "%WorkStream". In the following, we will walk through the rationale
+ * WorkStream. In the following, we will walk through the rationale
  * for this pattern and its implementation; more details as well as
  * examples for the speedup that can be achieved with it are given in
- * the @ref workstream_paper .
+ * the @ref workstream_paper "WorkStream paper".
  *
  * Code like this could then be written like this:
  * @code
@@ -676,7 +676,7 @@
  *
  * In the following, let us lay out a rationale for why the functions in the
  * WorkStream namespace are implemented the way they are. More information on
- * their implementation can be found in the @ref workstream_paper .
+ * their implementation can be found in the @ref workstream_paper "WorkStream paper".
  * To see the WorkStream class used in practice on tasks like the ones
  * outlined above, take a look at the step-9, step-13, step-14, step-32, step-35 or step-37
  * tutorial programs.
@@ -1091,8 +1091,8 @@
  * is a third version of WorkStream::run that doesn't just take a
  * range of iterators, but instead a vector of vectors consisting of
  * elements that can be worked on at the same time. This concept
- * is explained in great detail in the @ref workstream_paper , along
- * with performance evaluations for common examples.
+ * is explained in great detail in the @ref workstream_paper "WorkStream paper",
+ * along with performance evaluations for common examples.
  *
  *
  * @anchor MTTaskSynchronization
