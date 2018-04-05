@@ -1022,8 +1022,11 @@ public:
    * Return a constant reference to the manifold object used for this object.
    * This function exists for backward compatibility and calls get_manifold()
    * internally.
+   *
+   * @deprecated The classes derived from Boundary have been deprecated in
+   * favor of the Manifold classes.
    */
-  const Boundary<dim,spacedim> &get_boundary () const;
+  DEAL_II_DEPRECATED const Boundary<dim,spacedim> &get_boundary () const;
 
   /**
    * Return a constant reference to the manifold object used for this object.
