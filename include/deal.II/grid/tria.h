@@ -3165,7 +3165,7 @@ public:
 
   /**
    * Declare the (coarse) face pairs given in the argument of this function as
-   * periodic. This way it it possible to obtain neighbors across periodic
+   * periodic. This way it is possible to obtain neighbors across periodic
    * boundaries.
    *
    * The vector can be filled by the function

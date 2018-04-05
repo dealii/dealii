@@ -438,7 +438,7 @@ namespace TrilinosWrappers
        * class for more information.
        *
        * In case the provided IndexSet forms an overlapping partitioning,
-       * it it not clear which elements are owned by which process and
+       * it is not clear which elements are owned by which process and
        * locally_owned_elements() will return an IndexSet of size zero.
        *
        * @see
