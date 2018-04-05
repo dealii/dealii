@@ -985,7 +985,7 @@ namespace FETools
                                  &p4est_cell,
                                  dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-      // if neither this cell nor one one of it's children belongs to us, don't do anything
+      // if neither this cell nor one of it's children belongs to us, don't do anything
       if (idx == -1 && (dealii::internal::p4est::functions<dim>::
                         quadrant_overlaps_tree (const_cast<typename dealii::internal::p4est::types<dim>::tree *>(&tree),
                                                 &p4est_cell)

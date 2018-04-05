@@ -494,7 +494,7 @@ public:
                      const bool transpose=false);
 
   /**
-   * Estimate the the condition number of a SPD matrix in the $l_1$-norm.
+   * Estimate the condition number of a SPD matrix in the $l_1$-norm.
    * The matrix has to be in the Cholesky state (see compute_cholesky_factorization()).
    * The reciprocal of the
    * condition number is returned in order to avoid the possibility of

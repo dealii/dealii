@@ -442,7 +442,7 @@ public:
    * cell, via the first argument. Not all of the member vectors of this
    * argument will be filled with data -- in fact, derivatives and other
    * quantities will only be contain valid data if the corresponding flags
-   * are returned by by an overloaded version of the get_needed_update_flags()
+   * are returned by an overridden version of the get_needed_update_flags()
    * function (implemented in a user's derived class).
    * Otherwise those vectors will be in an unspecified state.
    *
@@ -992,7 +992,7 @@ private:
  *   };
  * @endcode
  *
- * Using this class in in step-8 leads to the following visualization:
+ * Using this class in step-8 leads to the following visualization:
  *
  * @image html data_postprocessor_tensor_2.png
  *

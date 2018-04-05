@@ -393,7 +393,7 @@ $
   =
   \beta
   \|\mathbf{u}\|_{L^\infty(K)} h_K
-$ to eliminate the effect of of the constant $c_R$ (we know that
+$ to eliminate the effect of the constant $c_R$ (we know that
 solutions are stable by using this version of $\nu(T)$ as an artificial
 viscosity, but that we can improve things -- i.e. make the solution
 sharper -- by using the more complicated formula for this artificial

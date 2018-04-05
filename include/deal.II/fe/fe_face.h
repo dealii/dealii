@@ -86,7 +86,7 @@ public:
                                                           std::vector<double>                &nodal_values) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -98,7 +98,7 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -236,7 +236,7 @@ public:
   requires_update_flags (const UpdateFlags update_flags) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -248,7 +248,7 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -475,7 +475,7 @@ public:
   virtual std::string get_name () const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -487,7 +487,7 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same

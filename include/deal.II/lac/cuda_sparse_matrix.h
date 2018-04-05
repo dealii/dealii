@@ -180,7 +180,7 @@ namespace CUDAWrappers
                     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
-     * Return the square of the norm of the vector $v$ with respect to the the
+     * Return the square of the norm of the vector $v$ with respect to the
      * norm induced by this matrix, i.e., $\left(v,Mv\right)$. This is useful,
      * e.g., in the finite context, where the $L_2$ norm of a function equals
      * the matrix norm with respect to the mass matrix of the vector

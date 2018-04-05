@@ -1838,7 +1838,7 @@ namespace VectorTools
    * There are cases where one cell contributes two tangential directions and
    * another one only one; for example, this would happen if both top and
    * front faces of the left cell belong to the boundary selected whereas only
-   * the top face of the right cell belongs to it, maybe indicating the the
+   * the top face of the right cell belongs to it, maybe indicating that the
    * entire front part of the domain is a smooth manifold whereas the top
    * really forms two separate manifolds that meet in a ridge, and that
    * normal-flux boundary conditions are only desired on the front manifold

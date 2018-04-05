@@ -254,7 +254,7 @@ DeclExceptionMsg (ExcMeshNotOrientable,
  * which we could order as <tt>(9 6 7 10)</tt> above). However, since opposite
  * lines have to have the same direction, this in turn would force us to
  * rotate the cell left of it, and then the one left to that, and so on until
- * we reach the left end of the grid. This is therefore an example we we have
+ * we reach the left end of the grid. This is therefore an example we have
  * to track back right until the first column of three cells to find a
  * consistent ordering, if we had initially ordered them uniformly.
  *
@@ -288,7 +288,7 @@ DeclExceptionMsg (ExcMeshNotOrientable,
  * These two examples demonstrate that if we have added a certain number of
  * cells in some orientation of faces and can't add the next one without
  * introducing faces that had already been added in another direction, then it
- * might not be sufficient to only rotate cells in the neighborhood of the the
+ * might not be sufficient to only rotate cells in the neighborhood of the
  * cell that we failed to add. It might be necessary to go back a long way and
  * rotate cells that have been entered long ago.
  *

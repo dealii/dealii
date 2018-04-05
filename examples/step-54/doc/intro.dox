@@ -109,7 +109,7 @@ does. In a second step, all the new nodes will be projected onto the
 normal projection is available, the point which is closest to the
 shape---typically lying on the shape boundary---is selected.  If the shape is
 composed of several sub-shapes, the projection is carried out onto every
-single sub-shape, and the closest projection point point is selected.
+single sub-shape, and the closest projection point is selected.
 
 <img src="https://www.dealii.org/images/steps/developer/step-54.NormalProjectionEdge.png" alt="" width="500">
 <img src="https://www.dealii.org/images/steps/developer/step-54.NormalProjection.png" alt="" width="500">

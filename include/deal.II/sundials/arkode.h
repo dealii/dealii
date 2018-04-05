@@ -647,7 +647,7 @@ namespace SUNDIALS
      *
      * @param[out] j_is_current: a boolean to be filled in by setup_jacobian(). The value
      * should be set to `true` if the Jacobian data is current after the call,
-     * and should be set set to `false` if its Jacobian data is not current. If
+     * and should be set to `false` if its Jacobian data is not current. If
      * setup_jacobian() calls for re-evaluation of Jacobian data (based on
      * convfail and ARKode state data), then it should set `j_is_current` to
      * `true` unconditionally, otherwise an infinite loop can result.

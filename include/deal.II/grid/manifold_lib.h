@@ -147,7 +147,7 @@ private:
  * south poles.  Consider for instance the pair of points
  * $x_1=(1,\pi/3,0)$ and $x_2=(1,\pi/3,\pi)$ in polar
  * coordinates (lying on the surface of a sphere with radius one, on
- * a parallel at at height $\pi/3$). In this case connecting the points
+ * a parallel at height $\pi/3$). In this case connecting the points
  * with a straight line in polar coordinates would take the long road
  * around the globe, without passing through the north pole.
  *

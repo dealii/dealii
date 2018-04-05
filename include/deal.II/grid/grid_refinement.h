@@ -310,7 +310,7 @@ namespace GridRefinement
    * threshold for refinement, but only flag up to @p max_to_mark cells.
    *
    * The vector @p criteria contains a nonnegative value for each active cell,
-   * ordered in the canonical order of of Triangulation::active_cell_iterator.
+   * ordered in the canonical order of Triangulation::active_cell_iterator.
    *
    * The cells are only flagged for refinement, they are not actually refined.
    * To do so, you have to call
@@ -330,7 +330,7 @@ namespace GridRefinement
    * threshold for coarsening.
    *
    * The vector @p criteria contains a nonnegative value for each active cell,
-   * ordered in the canonical order of of Triangulation::active_cell_iterator.
+   * ordered in the canonical order of Triangulation::active_cell_iterator.
    *
    * The cells are only flagged for coarsening, they are not actually
    * coarsened. To do so, you have to call

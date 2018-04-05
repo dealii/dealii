@@ -358,8 +358,8 @@ namespace Utilities
   /**
    * Optimized replacement for <tt>std::lower_bound</tt> for searching within
    * the range of column indices. Slashes execution time by approximately one
-   * half for the present application, partly because because the binary
-   * search is replaced by a linear search for small loop lengths.
+   * half for the present application, partly because the binary search is
+   * replaced by a linear search for small loop lengths.
    *
    * Another reason for this function is rather obscure: when using the GCC
    * libstdc++ function std::lower_bound, complexity is O(log(N)) as required.

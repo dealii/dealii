@@ -239,7 +239,7 @@ public:
    * single child cell is returned here.
    *
    * The matrix @p P is the concatenation, not the sum of the cell matrices @p
-   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in two
    * different child matrices @p P_i, the value should be the same in both
    * matrices and it is copied into the matrix @p P only once.
    *

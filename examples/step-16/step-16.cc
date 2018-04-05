@@ -599,7 +599,7 @@ namespace Step16
 
   // @sect4{LaplaceProblem::run}
 
-  // Like several of the functions above, this is almost exactly a copy of of
+  // Like several of the functions above, this is almost exactly a copy of
   // the corresponding function in step-6. The only difference is the call to
   // <code>assemble_multigrid</code> that takes care of forming the matrices
   // on every level that we need in the multigrid method.
