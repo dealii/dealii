@@ -1389,15 +1389,17 @@ namespace Patterns
                                    const std::unique_ptr<Patterns::PatternBase>
                                    &p = Convert<T>::to_pattern())
       {
-        std::string str;
-        if (std::is_same<T, unsigned char>() || std::is_same<T, signed char>())
-          str = std::to_string((int)value);
+        std::stringstream str;
+        if (std::is_same<T, unsigned char>::value ||
+            std::is_same<T, signed char>::value   ||
+            std::is_same<T, char>::value)
+          str << (int)value;
         else  if (std::is_same<T,bool>::value)
-          str = value ? "true" : "false";
+          str << (value ? "true" : "false");
         else
-          str = std::to_string(value);
-        AssertThrow(p->match(str), ExcNoMatch(str, *p));
-        return str;
+          str << value;
+        AssertThrow(p->match(str.str()), ExcNoMatch(str.str(), *p));
+        return str.str();
       }
 
       static T to_value(const std::string &s,
@@ -1411,7 +1413,9 @@ namespace Patterns
         else
           {
             std::istringstream is(s);
-            if (std::is_same<T, unsigned char>::value || std::is_same<T, signed char>::value)
+            if (std::is_same<T, unsigned char>::value ||
+                std::is_same<T, signed char>::value   ||
+                std::is_same<T, char>::value)
               {
                 int i;
                 is >> i;
