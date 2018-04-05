@@ -207,9 +207,7 @@ void run_tests(const enum SymmetricTensorEigenvectorMethod method)
     // Non-diagonal (large difference)
     deallog.push("Test 2e");
     {
-      const double tol = (
-                           method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts
-                           ? 1e-11 : 1e-12);
+      const double tol = 1e-10;
       test_dim_2(method,
                  7.2956e8, Tensor<1,2>({3,2}),
                  -5.284e3, tol );
@@ -287,11 +285,7 @@ void run_tests(const enum SymmetricTensorEigenvectorMethod method)
     // Non-diagonal (2 large difference)
     deallog.push("Test 3g");
     {
-      const double tol = (
-                           method == SymmetricTensorEigenvectorMethod::hybrid ?
-                           1e-8 :
-                           (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts ?
-                            1e-7 : 2.5e-10));
+      const double tol = 1.e-7;
       test_dim_3(method,
                  9.274e7, Tensor<1,3>({2,-0.7,1.4}),
                  2.59343, Tensor<1,3>({0.5,-0.22,-1.42}),

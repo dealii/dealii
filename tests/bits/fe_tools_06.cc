@@ -60,6 +60,7 @@ check_this (const FiniteElement<dim> &fe1,
   Vector<double> out (dof1->n_dofs());
 
   FETools::back_interpolate (*dof1, cm1, in, *dof2, cm2, out);
+  deallog.precision(10);
   output_vector (out);
 }
 
