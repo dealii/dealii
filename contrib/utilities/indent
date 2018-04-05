@@ -31,7 +31,7 @@
 #
 
 # Add the location 'setup_astyle.sh' installs astyle to to the local PATH.
-THIS_PATH="$(dirname $0)"            # relative
+THIS_PATH="$(dirname $0)"              # relative
 THIS_PATH="$( cd $THIS_PATH && pwd )"  # absolutized and normalized
 export PATH=$THIS_PATH/programs/astyle/build/gcc/bin/:$PATH
 

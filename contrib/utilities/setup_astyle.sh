@@ -33,8 +33,13 @@ if [ ! -d "$PRG/astyle" ]
 then
     echo "Downloading and installing astyle."
     mkdir "$PRG/astyle"
-    wget http://downloads.sourceforge.net/project/astyle/astyle/astyle%202.04/astyle_2.04_linux.tar.gz  > /dev/null
-    tar xfz astyle_2.04_linux.tar.gz -C "$PRG" > /dev/null
-    cd "$PRG/astyle/build/gcc"
-    make -j4 > /dev/null
+    wget https://downloads.sourceforge.net/project/astyle/astyle/astyle%202.04/astyle_2.04_linux.tar.gz  > /dev/null
+    if echo "70b37f4853c418d1e2632612967eebf1bdb93dfbe558c51d7d013c9b4e116b60 astyle_2.04_linux.tar.gz" | sha256sum -c; then
+      tar xfz astyle_2.04_linux.tar.gz -C "$PRG" > /dev/null
+      cd "$PRG/astyle/build/gcc" || exit 1
+      make -j4 > /dev/null
+    else
+      echo "*** The downloaded file has the wrong SHA256 checksum!"
+      exit 1
+    fi
 fi
