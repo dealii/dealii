@@ -1297,6 +1297,20 @@ namespace GridGenerator
     const bool                    copy_manifold_ids           = false);
 
   /**
+   * Given a triangulation, replicate the basic triangulation @p basic_tria with
+   * diagonal points given in @p diagonals by however many time  along each axis
+   * specified by repetitions @repetitions.
+   *
+   * @author Weixiong Zheng, 2018
+   */
+  template <int dim, int spacedim>
+  void
+  replicate_triangulation (const Triangulation<dim, spacedim> &basic_tria,
+                           const std::array<Point<spacedim>, 2> &diagonals,
+                           const std::array<unsigned int, dim> &repetitions,
+                           Triangulation<dim, spacedim> &result);
+
+  /**
    * Given the two triangulations specified as the first two arguments, create
    * the triangulation that contains the finest cells of both triangulation
    * and store it in the third parameter. Previous content of @p result will

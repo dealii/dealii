@@ -4403,6 +4403,96 @@ namespace GridGenerator
 
 
   template <int dim, int spacedim>
+  void replicate_triangulation(const Triangulation<dim, spacedim> &basic_tria,
+                               const std::array<Point<spacedim>, 2> &diagonals,
+                               const std::array<unsigned int, dim> &repetitions,
+                               Triangulation<dim, spacedim> &result)
+  {
+    Assert(basic_tria.n_levels()== 1,
+           ExcMessage("The input triangulations must be coarse meshes."));
+    const Point<spacedim> p1=diagonals.front(), p2=diagonals.back();
+
+    // side lengths
+    std::vector<double> sides;
+    for (unsigned int i=0; i<spacedim; ++i)
+      sides.push_back(std::fabs(std::max(p1[i],p2[i])-std::min(p1[i], p2[i])));
+
+    std::vector<unsigned int> reps(repetitions.begin(), repetitions.end());
+    if (reps.size()<3) reps.insert(reps.end(), 3-dim, 1);
+    const unsigned int x_rep=reps[0], y_rep=reps[1], z_rep=reps[2];
+
+    // vertices vector for new triangulation
+    std::vector<Point<spacedim>> vertices(basic_tria.get_vertices());
+    const unsigned int vsize = vertices.size();
+
+    // all cell data
+    std::vector<CellData<dim>> cells;
+    //std::vector<CellData<dim>> cells(basic_tria.n_cells()*x_rep*y_rep*z_rep);
+    cells.reserve(basic_tria.n_cells()*x_rep*y_rep*z_rep);
+
+    // shifting counter
+    unsigned int offset = 0;
+    for (unsigned int k=0; k<z_rep; ++k)
+      for (unsigned int j=0; j<y_rep; ++j)
+        for (unsigned int i=0; i<x_rep; ++i)
+          {
+            for (unsigned int vn=0; vn<vsize; ++vn)
+              if (offset>0)
+                {
+                  Point<spacedim> vertex(vertices[vn]);
+                  // shift the vertex
+                  switch (spacedim)
+                    {
+                    case 1:
+                      vertex[0] += i*sides[0];
+                      break;
+                    case 2:
+                      vertex[0] += i*sides[0];
+                      vertex[1] += j*sides[1];
+                      break;
+                    case 3:
+                      vertex[0] += i*sides[0];
+                      vertex[1] += j*sides[1];
+                      vertex[2] += k*sides[2];
+                      break;
+                    default:
+                      break;
+                    }
+                  vertices.push_back(vertex);
+                }
+
+            // calculate vertex indices offset and increase offset afterwards
+            auto vtx_idx_offset = vsize * offset++;
+
+            // create cell data in duplicate triangulation
+            for (typename Triangulation<dim,spacedim>::cell_iterator
+                 cell=basic_tria.begin(); cell!=basic_tria.end(); ++cell)
+              {
+                CellData<dim> duplicate_cell;
+
+                // shifting the vertex indices by offset*vert_per_cell
+                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+                  duplicate_cell.vertices[v] = (cell->vertex_index(v) +
+                                                vtx_idx_offset);
+
+                duplicate_cell.material_id = cell->material_id();
+                cells.push_back(duplicate_cell);
+              }
+          }
+
+    // same as merge_triangulation
+    SubCellData subcell_data;
+    std::vector<unsigned int> considered_vertices;
+    GridTools::delete_duplicated_vertices(vertices, cells,
+                                          subcell_data, considered_vertices);
+    GridReordering<dim, spacedim>::reorder_cells(cells, true);
+
+    result.clear();
+    result.create_triangulation (vertices, cells, subcell_data);
+  }
+
+
+  template <int dim, int spacedim>
   void
   create_union_triangulation(
     const Triangulation<dim, spacedim> &triangulation_1,
