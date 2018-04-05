@@ -751,7 +751,7 @@ namespace internal
  * cells are flagged for refinement to smooth the grid. This enlarges the
  * number of resulting cells but makes the grid more regular, thus leading to
  * better approximation properties and, above all, making the handling of data
- * structures and algorithms much much easier. To be honest, this is mostly an
+ * structures and algorithms much easier. To be honest, this is mostly an
  * algorithmic step than one needed by the finite element method.
  *
  * To coarsen a grid, the same way as above is possible by using

@@ -410,7 +410,7 @@ namespace Step22
   // reduces the bandwidth of the matrix, or maybe more importantly: in such a
   // way that the ILU is as close as possible to a real LU decomposition. On
   // the other hand, we need to preserve the block structure of velocity and
-  // pressure already seen in in step-20 and step-21. This is done in two
+  // pressure already seen in step-20 and step-21. This is done in two
   // steps: First, all dofs are renumbered to improve the ILU and then we
   // renumber once again by components. Since
   // <code>DoFRenumbering::component_wise</code> does not touch the

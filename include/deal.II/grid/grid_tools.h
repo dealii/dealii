@@ -208,7 +208,7 @@ namespace GridTools
   /**
    * Return the point on the geometrical object @object closest to the given
    * point @p trial_point. For example, if @p object is a one-dimensional line
-   * or edge, then the the returned point will be a point on the geodesic that
+   * or edge, then the returned point will be a point on the geodesic that
    * connects the vertices as the manifold associated with the object sees it
    * (i.e., the geometric line may be curved if it lives in a higher
    * dimensional space). If the iterator points to a quadrilateral in a higher

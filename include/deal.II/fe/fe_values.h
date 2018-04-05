@@ -1137,7 +1137,7 @@ namespace FEValuesViews
 
     /**
      * A typedef for the type of the divergence of the view this class
-     * represents. Here, for a set of of <code>(dim*dim + dim)/2</code> unique
+     * represents. Here, for a set of <code>(dim*dim + dim)/2</code> unique
      * components of the finite element representing a symmetric second-order
      * tensor, the divergence of course is a * <code>Tensor@<1,dim@></code>.
      *

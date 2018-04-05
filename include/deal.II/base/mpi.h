@@ -703,7 +703,7 @@ namespace Utilities
                     &(size_all_data[0]), 1, MPI_INT,
                     comm);
 
-      // Now computing the the displacement, relative to recvbuf,
+      // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
       std::vector<int> rdispls(n_procs);
       rdispls[0] = 0;

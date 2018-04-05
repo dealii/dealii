@@ -125,7 +125,7 @@ public:
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically. In case of a a tensor of rank 0 this is just the scalar
+   * type statically. In case of a tensor of rank 0 this is just the scalar
    * number type Number.
    */
   typedef Number array_type;

@@ -47,7 +47,7 @@ namespace CUDAWrappers
    * quadrature points and cell integrations. In functionality, this class is
    * similar to FEValues<dim>.
    *
-   * This class class has five template arguments:
+   * This class has five template arguments:
    *
    * @ptaram dim Dimension in which this class is to be used
    *

@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * [0,1]x[0,1], etc.
  *
  * There are a number of derived classes, denoting concrete integration
- * formulae. Their names names prefixed by <tt>Q</tt>. Refer to the list of
+ * formulae. Their names are prefixed by <tt>Q</tt>. Refer to the list of
  * derived classes for more details.
  *
  * The schemes for higher dimensions are typically tensor products of the one-

@@ -931,7 +931,7 @@ namespace DoFRenumbering
    *
    * The cells are sorted such that the centers of cells numbered higher are further
    * downstream with respect to the constant vector @p direction than the
-   * centers of of cells numbered lower. Even if this yields a downstream numbering with
+   * centers of cells numbered lower. Even if this yields a downstream numbering with
    * respect to the flux on the edges for fairly general grids, this might not
    * be guaranteed for all meshes.
    *

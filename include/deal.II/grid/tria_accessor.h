@@ -805,7 +805,7 @@ public:
 
   /**
    * Return whether the face with index @p face is rotated by 180 degrees (@p
-   * true) or or not (@p false). In 1d and 2d, this is always @p false, but in
+   * true) or not (@p false). In 1d and 2d, this is always @p false, but in
    * 3d it may be different, see the respective discussion in the
    * documentation of the GeometryInfo class.
    *
@@ -816,7 +816,7 @@ public:
 
   /**
    * Return whether the face with index @p face is rotated by 90 degrees (@p
-   * true) or or not (@p false). In 1d and 2d, this is always @p false, but in
+   * true) or not (@p false). In 1d and 2d, this is always @p false, but in
    * 3d it may be different, see the respective discussion in the
    * documentation of the GeometryInfo class.
    *

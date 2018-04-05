@@ -386,7 +386,7 @@ public:
                             FullMatrix<double>           &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then @p
    * dofs_per_face times <tt>source.dofs_per_face</tt>.
    *
@@ -401,7 +401,7 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then @p
    * dofs_per_face times <tt>source.dofs_per_face</tt>.
    *

@@ -134,7 +134,7 @@ public:
                             FullMatrix<double>           &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
    *
@@ -149,7 +149,7 @@ public:
                                  FullMatrix<double>       &matrix) const;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
    *
@@ -194,7 +194,7 @@ public:
    * single child cell is returned here.
    *
    * The matrix @p P is the concatenation, not the sum of the cell matrices @p
-   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in two
    * different child matrices @p P_i, the value should be the same in both
    * matrices and it is copied into the matrix @p P only once.
    *

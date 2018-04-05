@@ -38,8 +38,8 @@ struct CPUClock
 {
   /**
    * Duration type. Windows measures CPU times, by default, in multiples of
-   * 1/64th of a second and and POSIX uses microseconds, so go with
-   * microseconds for uniformity.
+   * 1/64th of a second and POSIX uses microseconds, so go with microseconds
+   * for uniformity.
    */
   typedef std::chrono::microseconds duration;
 
