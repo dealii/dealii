@@ -30,7 +30,7 @@ echo "Downloading images (press ctrl-c to cancel) ..."
 cd images
 {
 trap "echo \"(skipping)\"" SIGINT
-wget -q -nd -A svg,png,gif -m -l 1 -np http://www.dealii.org/images/steps/developer/
+wget -q -nd -A svg,png,gif -m -l 1 -np https://www.dealii.org/images/steps/developer/
 }
 rm robots.txt*
 cd ..
