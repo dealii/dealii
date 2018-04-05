@@ -1569,8 +1569,8 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
             if (n_timesteps-(step-look_back) <= n_timesteps)
               timesteps[n_timesteps-(step-look_back)-1]->sleep(look_back);
             break;
-          };
-    };
+          }
+    }
 
   // make the last few timesteps sleep
   for (int step=n_timesteps;
