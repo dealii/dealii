@@ -17,8 +17,8 @@
 # Find Python:
 #
 
-INCLUDE(FindPythonLibs)
 INCLUDE(FindPythonInterp)
+INCLUDE(FindPythonLibs)
 
 IF(FEATURE_BOOST_BUNDLED_CONFIGURED)
   MESSAGE(FATAL_ERROR
