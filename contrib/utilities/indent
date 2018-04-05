@@ -30,15 +30,14 @@
 # from a build directory.
 #
 
-# Add the location 'setup_astyle.sh' installs astyle to to the local PATH.
-THIS_PATH="$(dirname $0)"              # relative
-THIS_PATH="$( cd $THIS_PATH && pwd )"  # absolutized and normalized
-export PATH=$THIS_PATH/programs/astyle/build/gcc/bin/:$PATH
-
 if test ! -d source -o ! -d include -o ! -d examples ; then
   echo "*** This script must be run from the top-level directory of deal.II."
   exit 1
 fi
+
+# Add the location 'setup_astyle.sh' installs astyle to to the local PATH.
+ASTYLE_PATH="$(realpath contrib/utilities)/programs/astyle/build/gcc/bin"
+export PATH=$ASTYLE_PATH:$PATH
 
 if test ! -f contrib/styles/astyle.rc ; then
   echo "*** No style file contrib/styles/astyle.rc found."
