@@ -22,7 +22,6 @@
 #ifdef DEAL_II_WITH_OPENCASCADE
 
 #include <deal.II/opencascade/utilities.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/manifold.h>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...

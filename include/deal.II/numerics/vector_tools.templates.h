@@ -47,7 +47,6 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/dofs/dof_accessor.h>

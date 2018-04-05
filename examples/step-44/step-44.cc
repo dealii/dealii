@@ -42,7 +42,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_q.h>
