@@ -13,13 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-// Test GridGenerator::extrude. 2d meshes are always correctly
-// edge-oriented, and so if we stack them one on top of the other, we
-// should also get a 3d mesh for which both edge and face orientations
-// are correct -- or so I thought, but this turns out to not be true,
-// see https://github.com/dealii/dealii/issues/1013
+// Test GridGenerator::extrude_triangulation taking slice z-coordinate values.
+// This test is just a replicate of the one in extrude_orientation_02.cc except
+// that the newly created overload of GridGenerator::extrude_triangulation is
+// tested for face and edge orientations for the resulting 3d mesh.
+// See https://github.com/dealii/dealii/issues/6158.
 //
 // test this for a circle extruded to a cylinder
 
@@ -43,7 +41,8 @@ void test()
     }
 
   Triangulation<3> tr3;
-  GridGenerator::extrude_triangulation(tr, 2, 1.0, tr3);
+  std::vector<double> slice_points = {0, 0.1, 0.5};
+  GridGenerator::extrude_triangulation(tr, slice_points, tr3);
 
   for (Triangulation<3>::active_cell_iterator c=tr3.begin_active();
        c!=tr3.end(); ++c)
