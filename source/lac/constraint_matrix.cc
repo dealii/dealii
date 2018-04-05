@@ -838,8 +838,8 @@ void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
                     if ((new_col < column) && (old_rowlength != new_rowlength))
                       ++j;
                     old_rowlength = new_rowlength;
-                  };
-              };
+                  }
+              }
           }
       else
         // row must be distributed
@@ -864,8 +864,8 @@ void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
                   sparsity.add (lines[distribute[row]].entries[p].first,
                                 lines[distribute[sparsity.column_number(row,j)]]
                                 .entries[q].first);
-          };
-    };
+          }
+    }
 }
 
 
@@ -1049,9 +1049,9 @@ void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
                            .entries.size(); ++q)
                         sparsity.add (row,
                                       lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
+                    }
+                }
+            }
         }
       else
         {
@@ -1086,11 +1086,11 @@ void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
                           sparsity.add (lines[distribute[row]].entries[p].first,
                                         lines[distribute[global_col]].entries[q].first);
-                    };
-                };
-            };
-        };
-    };
+                    }
+                }
+            }
+        }
+    }
 }
 
 
