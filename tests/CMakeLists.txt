@@ -34,6 +34,16 @@ SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
   #
+  # We have to repeat the policy statement here because the new
+  # CMAKE_MINIMUM_REQUIRED call resets our previous policy set in the main
+  # CMakeLists.txt file.
+  #
+  IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
+    # allow to override "test" target for quick tests
+    CMAKE_POLICY(SET CMP0037 OLD)
+  ENDIF()
+
+  #
   # If this CMakeLists.txt file is called from within the deal.II build
   # system, set up quick tests as well:
   #
