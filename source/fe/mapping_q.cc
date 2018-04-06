@@ -373,10 +373,9 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
            const ArrayView<Tensor<1,spacedim> >                   &output) const
 {
   AssertDimension (input.size(), output.size());
-  Assert ((dynamic_cast<const typename MappingQ<dim,spacedim>::InternalData *> (&mapping_data)
-           != nullptr),
-          ExcInternalError());
+
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
+  Assert (data != nullptr, ExcInternalError());
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
