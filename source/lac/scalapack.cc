@@ -1123,6 +1123,54 @@ void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
 
 
 template <typename NumberType>
+unsigned int ScaLAPACKMatrix<NumberType>::pseudoinverse(const NumberType ratio)
+{
+  Assert(state == LAPACKSupport::matrix,
+         ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert(row_block_size==column_block_size,
+         ExcMessage("Use identical block sizes for rows and columns of matrix A"));
+  Assert(ratio>0. && ratio<1.,
+         ExcMessage("input parameter ratio has to be larger than zero and smaller than 1"));
+
+  ScaLAPACKMatrix<NumberType> U(n_rows,n_rows,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  ScaLAPACKMatrix<NumberType> VT(n_columns,n_columns,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  std::vector<NumberType> sv = this->compute_SVD(&U,&VT);
+  AssertThrow(sv[0]>std::numeric_limits<NumberType>::min(),ExcMessage("Matrix has rank 0"));
+
+  // Get number of singular values fulfilling the following: sv[i] > sv[0] * ratio
+  // Obviously, 0-th element already satisfies sv[0] > sv[0] * ratio
+  // The singular values in sv are ordered by descending value so we break out of the loop
+  // if a singular value is smaller than sv[0] * ratio.
+  unsigned int n_sv=1;
+  std::vector<NumberType> inv_sigma;
+  inv_sigma.push_back(1/sv[0]);
+
+  for (unsigned int i=1; i<sv.size(); ++i)
+    if (sv[i] > sv[0] * ratio)
+      {
+        ++n_sv;
+        inv_sigma.push_back(1/sv[i]);
+      }
+    else break;
+
+  // For the matrix multiplication we use only the columns of U and rows of VT which are associated
+  // with singular values larger than the limit.
+  // That saves computational time for matrices with rank significantly smaller than min(n_rows,n_columns)
+  ScaLAPACKMatrix<NumberType> U_R(n_rows,n_sv,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  ScaLAPACKMatrix<NumberType> VT_R(n_sv,n_columns,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  U.copy_to(U_R,std::make_pair(0,0),std::make_pair(0,0),std::make_pair(n_rows,n_sv));
+  VT.copy_to(VT_R,std::make_pair(0,0),std::make_pair(0,0),std::make_pair(n_sv,n_columns));
+
+  VT_R.scale_rows(inv_sigma);
+  this->reinit(n_columns,n_rows,this->grid,row_block_size,column_block_size,LAPACKSupport::Property::general);
+  VT_R.mult(1,U_R,0,*this,true,true);
+  state = LAPACKSupport::State::inverse_matrix;
+  return n_sv;
+}
+
+
+
+template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const NumberType a_norm) const
 {
   Assert (state == LAPACKSupport::cholesky,

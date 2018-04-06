@@ -513,6 +513,26 @@ public:
                      const bool transpose=false);
 
   /**
+   * Compute the pseudoinverse $\mathbf{A}^+ \in \mathbb{R}^{N \times M}$ (Moore-Penrose inverse)
+   * of a real matrix $\mathbf{A} \in \mathbb{R}^{M \times N}$ using the singular value decomposition
+   * $\mathbf{A} = \mathbf{U} \cdot \mathbf{\Sigma} \cdot \mathbf{V}^T$.
+   *
+   * Unlike the inverse, the pseudoinverse $\mathbf{A}^+ = \mathbf{V} \cdot \mathbf{\Sigma}^+ \cdot \mathbf{U}^T$
+   * exists for both rectangular as well as singular matrices $\mathbf{A}$.
+   *
+   * For a rectangular $\mathbf{\Sigma}$ the pseudoinverse is computed by taking the reciprocal
+   * of each non-zero element on the diagonal, leaving the zeros in place, and then transposing $\mathbf{\Sigma}$.
+   * For the numerical computation only the singular values $\sigma_i > \sigma_{\text{max}} \, \text{ratio}$
+   * are taken into account. Upon successful exit, the function returns the number of singular values
+   * fulfilling that condition. That value can be interpreted as the rank of $\mathbf{A}$.
+   *
+   * Upon return this object contains the pseudoinverse $\mathbf{A}^+ \in \mathbb{R}^{N \times M}$.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A = NB_A$.
+   */
+  unsigned int pseudoinverse(const NumberType ratio);
+
+  /**
    * Estimate the condition number of a SPD matrix in the $l_1$-norm.
    * The matrix has to be in the Cholesky state (see compute_cholesky_factorization()).
    * The reciprocal of the
