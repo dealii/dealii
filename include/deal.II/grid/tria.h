@@ -834,13 +834,13 @@ namespace internal
  * to pertain to a particular region of the domain, material ids are inherited
  * by child cells from their parent upon mesh refinement.
  *
- * Boundary indicators on lower dimensional objects (these have no material
+ * %Boundary indicators on lower dimensional objects (these have no material
  * id) indicate the number of a boundary component. The weak formulation of the
  * partial differential equation may have different boundary conditions on
  * different parts of the boundary. The boundary indicator can be used in
  * creating the matrix or the right hand side vector to indicate these
  * different parts of the model (this use is like the material id of cells).
- * Boundary indicators may be in the range from zero to
+ * %Boundary indicators may be in the range from zero to
  * numbers::internal_face_boundary_id-1. The value
  * numbers::internal_face_boundary_id is reserved to denote interior lines (in
  * 2D) and interior lines and quads (in 3D), which do not have a boundary

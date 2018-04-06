@@ -364,7 +364,7 @@
  * VectorTools::interpolate_boundary_values,
  * VectorTools::compute_no_normal_flux_constraints.
  *
- * @note Boundary indicators are inherited from mother faces and edges to
+ * @note %Boundary indicators are inherited from mother faces and edges to
  * their children upon mesh refinement. Some more information about boundary
  * indicators is also presented in a section of the documentation of the
  * Triangulation class.
