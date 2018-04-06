@@ -322,7 +322,7 @@ namespace parallel
     {
     public:
       static_assert(std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-                    "User's DataType class should be derived from QPData");
+                    "User's DataType class should be derived from TransferableQuadraturePointData");
 
       /**
        * A typedef for a cell.
