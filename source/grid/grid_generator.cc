@@ -4172,7 +4172,6 @@ namespace GridGenerator
     result.create_triangulation (points,
                                  cells,
                                  s);
-
   }
 
 
