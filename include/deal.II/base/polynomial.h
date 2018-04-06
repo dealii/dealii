@@ -709,6 +709,43 @@ namespace Polynomials
     static std::vector<Polynomial<double> >
     generate_complete_basis (const unsigned int degree);
   };
+
+
+
+  /*
+   * Evaluate a Jacobi polynomial $ P_n^{\alpha, \beta}(x) $ specified by the
+   * parameters @p alpha, @p beta, @p n, where @p n is the degree of the
+   * Jacobi polynomial.
+   *
+   * @note The Jacobi polynomials are not orthonormal and are defined on the
+   * unit interval $[0, 1]$ as usual for deal.II, rather than $[-1, +1]$ often
+   * used in literature. @p x is the point of evaluation.
+   */
+  template <typename Number>
+  Number
+  jacobi_polynomial_value(const unsigned int degree,
+                          const int alpha,
+                          const int beta,
+                          const Number x);
+
+
+  /**
+   * Compute the roots of the Jacobi polynomials on the unit interval $[0, 1]$
+   * of the given degree. These roots are used in several places inside the
+   * deal.II library, such as the Gauss-Lobatto quadrature formula or for the
+   * Hermite-like interpolation.
+   *
+   * The algorithm uses a Newton algorithm, using the zeros of the Chebyshev
+   * polynomials as an initial guess. This code has been tested for alpha and
+   * beta equal to zero (Legendre case), one (Gauss-Lobatto case) as well as
+   * two, so be careful when using it for other values as the Newton iteration
+   * might or might not converge.
+   */
+  template <typename Number>
+  std::vector<Number>
+  jacobi_polynomial_roots(const unsigned int degree,
+                          const int alpha,
+                          const int beta);
 }
 
 
@@ -788,6 +825,126 @@ namespace Polynomials
     ar &in_lagrange_product_form;
     ar &lagrange_support_points;
     ar &lagrange_weight;
+  }
+
+
+
+  template <typename Number>
+  Number
+  jacobi_polynomial_value(const unsigned int degree,
+                          const int alpha,
+                          const int beta,
+                          const Number x)
+  {
+    Assert(alpha >=0 && beta >= 0,
+           ExcNotImplemented("Negative alpha/beta coefficients not supported"));
+    // the Jacobi polynomial is evaluated using a recursion formula.
+    Number p0, p1;
+
+    // The recursion formula is defined for the interval [-1, 1], so rescale
+    // to that interval here
+    const Number xeval = Number(-1) + 2. * x;
+
+    // initial values P_0(x), P_1(x):
+    p0 = 1.0;
+    if (degree==0)
+      return p0;
+    p1 = ((alpha+beta+2)*xeval + (alpha-beta))/2;
+    if (degree==1)
+      return p1;
+
+    for (unsigned int i=1; i<degree; ++i)
+      {
+        const Number v  = 2*i + (alpha + beta);
+        const Number a1 = 2*(i+1)*(i + (alpha + beta + 1))*v;
+        const Number a2 = (v + 1)*(alpha*alpha - beta*beta);
+        const Number a3 = v*(v + 1)*(v + 2);
+        const Number a4 = 2*(i+alpha)*(i+beta)*(v + 2);
+
+        const Number pn = ((a2 + a3*xeval)*p1 - a4*p0)/a1;
+        p0 = p1;
+        p1 = pn;
+      }
+    return p1;
+  }
+
+
+
+  template <typename Number>
+  std::vector<Number>
+  jacobi_polynomial_roots(const unsigned int degree,
+                          const int alpha,
+                          const int beta)
+  {
+    std::vector<Number> x(degree, 0.5);
+
+    // compute zeros with a Newton algorithm.
+
+    // Set tolerance. For long double we might not always get the additional
+    // precision in a run time environment (e.g. with valgrind), so we must
+    // limit the tolerance to double. Since we do a Newton iteration, doing
+    // one more iteration after the residual has indicated convergence will be
+    // enough for all number types due to the quadratic convergence of
+    // Newton's method
+
+    const Number tolerance
+      = 4 * std::max(static_cast<Number>(std::numeric_limits<double>::epsilon()),
+                     std::numeric_limits<Number>::epsilon());
+
+    // The following implementation follows closely the one given in the
+    // appendix of the book by Karniadakis and Sherwin: Spectral/hp element
+    // methods for computational fluid dynamics (Oxford University Press,
+    // 2005)
+
+    // If symmetric, we only need to compute the half of points
+    const unsigned int n_points = (alpha == beta ? degree/2 : degree);
+    for (unsigned int k=0; k<n_points; ++k)
+      {
+        // we take the zeros of the Chebyshev polynomial (alpha=beta=-0.5) as
+        // initial values, corrected by the initial value
+        Number r = 0.5-0.5*std::cos(static_cast<Number> (2*k+1)/(2*degree) *
+                                    numbers::PI );
+        if (k>0)
+          r = (r + x[k-1])/2;
+
+        unsigned int converged = numbers::invalid_unsigned_int;
+        for (unsigned int i=1; i<1000; ++i)
+          {
+            Number s = 0.;
+            for (unsigned int i=0; i<k; ++i)
+              s += 1./(r - x[i]);
+
+            // derivative of P_n^{alpha,beta}, rescaled to [0, 1]
+            const Number J_x = (alpha+beta+degree+1)*
+                               jacobi_polynomial_value(degree-1, alpha+1,
+                                                       beta+1, r);
+
+            // value of P_n^{alpha,beta}
+            const Number f = jacobi_polynomial_value(degree, alpha, beta, r);
+            const Number delta = f/(f*s - J_x);
+            r += delta;
+            if (converged == numbers::invalid_unsigned_int &&
+                std::abs(delta) < tolerance)
+              converged = i;
+
+            // do one more iteration to ensure accuracy also for tighter
+            // types than double (e.g. long double)
+            if (i == converged + 1)
+              break;
+          }
+
+        Assert(converged != numbers::invalid_unsigned_int,
+               ExcMessage("Newton iteration for zero of Jacobi polynomial "
+                          "did not converge."));
+
+        x[k] = r;
+      }
+
+    // in case we assumed symmetry, fill up the missing values
+    for (unsigned int k=n_points; k<degree; ++k)
+      x[k] = 1.0-x[degree-k-1];
+
+    return x;
   }
 
 }
