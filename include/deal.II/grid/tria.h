@@ -3538,8 +3538,7 @@ private:
    * Collection of manifold objects. We store only objects, which are not of
    * type FlatManifold.
    */
-  std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >  manifold;
-
+  std::map<types::manifold_id, std::unique_ptr<const Manifold<dim,spacedim> > > manifold;
 
   /**
    * Flag indicating whether anisotropic refinement took place.
