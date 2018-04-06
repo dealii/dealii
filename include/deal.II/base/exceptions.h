@@ -241,6 +241,7 @@ namespace deal_II_exceptions
      * error message provided by @p exc and calling <tt>std::abort()</tt>, or
      * throws @p exc instead.
      */
+    [[noreturn]]
     void abort (const ExceptionBase &exc);
 
     /**
