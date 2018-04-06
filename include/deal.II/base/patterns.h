@@ -1265,7 +1265,43 @@ namespace Patterns
                           Convert<T>::to_pattern()) = delete;
     };
 
+    /**
+     * A utility function that simplify the convertion to strings of arbitrarily
+     * complex types.
+     *
+     * This function calls the method Convert<T>::to_string() with the default
+     * pattern. An example usage is the following:
+     *
+     * @code
+     * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
+     * auto s = Patterns::Tools::to_string(t);
+     *
+     * std::cout << s; // will print "1 % 1 : ciao
+     * @endcode
+     *
+     * @author Luca Heltai, 2018
+     */
+    template<typename T>
+    std::string to_string(const T &t);
 
+    /**
+     * A utility function that simplify the convertion from strings to arbitrary
+     * types.
+     *
+     * This function calls the method Convert<T>::to_value() with the default
+     * pattern. An example usage is the following:
+     *
+     * @code
+     * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
+     * to_value("2 % 3 : mondo", t);
+     * auto s = Patterns::Tools::to_string(t);
+     * std::cout << s; // will print "2 % 3 : mondo
+     * @endcode
+     *
+     * @author Luca Heltai, 2018
+     */
+    template<typename T>
+    void to_value(const std::string &s, T &t);
 
     /**
      * @addtogroup Exceptions
@@ -2019,6 +2055,19 @@ namespace Patterns
       }
     };
 
+    // Utility function with default Pattern
+    template<typename T>
+    std::string to_string(const T &t)
+    {
+      return Convert<T>::to_string(t);
+    }
+
+    // Utility function with default Pattern
+    template<typename T>
+    void to_value(const std::string &s, T &t)
+    {
+      t = Convert<T>::to_value(s);
+    }
   }
 }
 
