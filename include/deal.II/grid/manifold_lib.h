@@ -72,12 +72,17 @@ public:
   PolarManifold(const Point<spacedim> center = Point<spacedim>());
 
   /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+  /**
    * Pull back the given point from the Euclidean space. Will return the polar
    * coordinates associated with the point @p space_point. Only used when
    * spacedim = 2.
    */
   virtual Point<spacedim>
-  pull_back(const Point<spacedim> &space_point) const;
+  pull_back(const Point<spacedim> &space_point) const override;
 
   /**
    * Given a point in the spherical coordinate system, this method returns the
@@ -85,7 +90,7 @@ public:
    * Only used when spacedim = 3.
    */
   virtual Point<spacedim>
-  push_forward(const Point<spacedim> &chart_point) const;
+  push_forward(const Point<spacedim> &chart_point) const override;
 
   /**
    * Given a point in the spacedim dimensional Euclidean space, this
@@ -101,7 +106,7 @@ public:
    */
   virtual
   DerivativeForm<1,spacedim,spacedim>
-  push_forward_gradient(const Point<spacedim> &chart_point) const;
+  push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
   /**
    * The center of the spherical coordinate system.
@@ -219,6 +224,11 @@ public:
    * The Constructor takes the center of the spherical coordinates.
    */
   SphericalManifold(const Point<spacedim> center = Point<spacedim>());
+
+  /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Given any two points in space, first project them on the surface
@@ -389,6 +399,11 @@ public:
                        const double tolerance = 1e-10);
 
   /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+  /**
    * Compute the Cartesian coordinates for a point given in cylindrical
    * coordinates.
    */
@@ -510,12 +525,17 @@ public:
   ~FunctionManifold();
 
   /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+  /**
    * Given a point in the @p chartdim coordinate system, uses the
    * push_forward_function to compute the push_forward of points in @p
    * chartdim space dimensions to @p spacedim space dimensions.
    */
   virtual Point<spacedim>
-  push_forward(const Point<chartdim> &chart_point) const;
+  push_forward(const Point<chartdim> &chart_point) const override;
 
   /**
    * Given a point in the chartdim dimensional Euclidean space, this
@@ -539,7 +559,7 @@ public:
    */
   virtual
   DerivativeForm<1,chartdim,spacedim>
-  push_forward_gradient(const Point<chartdim> &chart_point) const;
+  push_forward_gradient(const Point<chartdim> &chart_point) const override;
 
   /**
    * Given a point in the spacedim coordinate system, uses the
@@ -547,7 +567,7 @@ public:
    * space dimensions to @p chartdim space dimensions.
    */
   virtual Point<chartdim>
-  pull_back(const Point<spacedim> &space_point) const;
+  pull_back(const Point<spacedim> &space_point) const override;
 
 private:
   /**
@@ -582,7 +602,33 @@ private:
    * pointers.
    */
   const bool owns_pointers;
+
+  /**
+   * The expresssion used to construct the push_forward function.
+   */
+  const std::string push_forward_expression;
+
+  /**
+   * The expresssion used to construct the pull_back function.
+   */
+  const std::string pull_back_expression;
+
+  /**
+   * Variable names in the chart domain.
+   */
+  const std::string chart_vars;
+
+  /**
+   * Variable names in the space domain.
+   */
+  const std::string space_vars;
+
+  /**
+   * The finite difference step to use internally.
+   */
+  const double finite_difference_step;
 };
+
 
 
 
@@ -615,23 +661,28 @@ public:
   TorusManifold (const double R, const double r);
 
   /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim, 3> > clone() const override;
+
+  /**
    * Pull back operation.
    */
   virtual Point<3>
-  pull_back(const Point<3> &p) const;
+  pull_back(const Point<3> &p) const override;
 
   /**
    * Push forward operation.
    */
   virtual Point<3>
-  push_forward(const Point<3> &chart_point) const;
+  push_forward(const Point<3> &chart_point) const override;
 
   /**
    * Gradient.
    */
   virtual
   DerivativeForm<1,3,3>
-  push_forward_gradient(const Point<3> &chart_point) const;
+  push_forward_gradient(const Point<3> &chart_point) const override;
 
 private:
   double r, R;
@@ -780,6 +831,11 @@ public:
    * Constructor.
    */
   TransfiniteInterpolationManifold();
+
+  /**
+   * Make a clone of this Manifold object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Initializes the manifold with a coarse mesh. The prerequisite for using

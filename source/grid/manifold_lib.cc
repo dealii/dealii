@@ -122,6 +122,15 @@ PolarManifold<dim,spacedim>::PolarManifold(const Point<spacedim> center):
 
 
 
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+PolarManifold<dim,spacedim>::clone() const
+{
+  return std::unique_ptr<Manifold<dim,spacedim> >(new PolarManifold<dim,spacedim>(center));
+}
+
+
+
 template <int dim, int spacedim>
 Tensor<1,spacedim>
 PolarManifold<dim,spacedim>::get_periodicity()
@@ -265,6 +274,15 @@ SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center)
   center(center),
   polar_manifold(center)
 {}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+SphericalManifold<dim,spacedim>::clone() const
+{
+  return std::unique_ptr<Manifold<dim,spacedim> >(new SphericalManifold<dim,spacedim>(center));
+}
 
 
 
@@ -948,6 +966,16 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Tensor<1, spacedim
 
 
 
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+CylindricalManifold<dim,spacedim>::clone() const
+{
+  return std::unique_ptr<Manifold<dim,spacedim> >
+         (new CylindricalManifold<dim,spacedim>(direction, point_on_axis, tolerance));
+}
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
@@ -1077,7 +1105,8 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   push_forward_function(&push_forward_function),
   pull_back_function(&pull_back_function),
   tolerance(tolerance),
-  owns_pointers(false)
+  owns_pointers(false),
+  finite_difference_step(0)
 {
   AssertDimension(push_forward_function.n_components, spacedim);
   AssertDimension(pull_back_function.n_components, chartdim);
@@ -1098,7 +1127,12 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   ChartManifold<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
   tolerance(tolerance),
-  owns_pointers(true)
+  owns_pointers(true),
+  push_forward_expression(push_forward_expression),
+  pull_back_expression(pull_back_expression),
+  chart_vars(chart_vars),
+  space_vars(space_vars),
+  finite_difference_step(h)
 {
   FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim, 0.0, h);
   FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim, 0.0, h);
@@ -1123,6 +1157,32 @@ FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
       pull_back_function = nullptr;
       delete pb;
     }
+}
+
+
+
+template<int dim, int spacedim, int chartdim>
+std::unique_ptr<Manifold<dim, spacedim> >
+FunctionManifold<dim,spacedim,chartdim>::clone() const
+{
+  if (owns_pointers == true)
+    {
+      return std::unique_ptr<Manifold<dim,spacedim> >
+             (new FunctionManifold<dim,spacedim,chartdim>(push_forward_expression,
+                                                          pull_back_expression,
+                                                          this->get_periodicity(),
+                                                          const_map,
+                                                          chart_vars,
+                                                          space_vars,
+                                                          tolerance,
+                                                          finite_difference_step));
+    }
+  else
+    return std::unique_ptr<Manifold<dim,spacedim> >
+           (new FunctionManifold<dim,spacedim,chartdim>(*push_forward_function,
+                                                        *pull_back_function,
+                                                        this->get_periodicity(),
+                                                        tolerance));
 }
 
 
@@ -1229,6 +1289,15 @@ TorusManifold<dim>::TorusManifold (const double R, const double r)
 
 
 
+template<int dim>
+std::unique_ptr<Manifold<dim, 3> >
+TorusManifold<dim>::clone() const
+{
+  return std::unique_ptr<Manifold<dim,3> >(new TorusManifold<dim>(R,r));
+}
+
+
+
 template <int dim>
 DerivativeForm<1,3,3>
 TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
@@ -1266,6 +1335,18 @@ TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold
   level_coarse (-1)
 {
   AssertThrow(dim > 1, ExcNotImplemented());
+}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+TransfiniteInterpolationManifold<dim,spacedim>::clone() const
+{
+  auto ptr = new TransfiniteInterpolationManifold<dim,spacedim>();
+  if (triangulation)
+    ptr->initialize(*triangulation);
+  return std::unique_ptr<Manifold<dim,spacedim> >(ptr);
 }
 
 
