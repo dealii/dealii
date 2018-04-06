@@ -75,30 +75,55 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
                                              const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
                                              const size_type row_block_size_,
                                              const size_type column_block_size_,
-                                             const LAPACKSupport::Property property)
+                                             const LAPACKSupport::Property property_)
   :
-  TransposeTable<NumberType> (),
-  state (LAPACKSupport::matrix),
-  property(property),
-  grid (process_grid),
-  n_rows(n_rows_),
-  n_columns(n_columns_),
-  row_block_size(row_block_size_),
-  column_block_size(column_block_size_),
   uplo('L'), // for non-symmetric matrices this is not needed
   first_process_row(0),
   first_process_column(0),
   submatrix_row(1),
   submatrix_column(1)
 {
-  Assert (row_block_size > 0,
+  reinit(n_rows_, n_columns_, process_grid, row_block_size_, column_block_size_, property_);
+}
+
+
+
+template <typename NumberType>
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
+                                             const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                                             const size_type block_size,
+                                             const LAPACKSupport::Property property)
+  :
+  ScaLAPACKMatrix<NumberType>(size, size, process_grid, block_size, block_size, property)
+{}
+
+
+
+template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::reinit(const size_type n_rows_,
+                                    const size_type n_columns_,
+                                    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+                                    const size_type row_block_size_,
+                                    const size_type column_block_size_,
+                                    const LAPACKSupport::Property property_)
+{
+  Assert (row_block_size_ > 0,
           ExcMessage("Row block size has to be positive."));
-  Assert (column_block_size > 0,
+  Assert (column_block_size_ > 0,
           ExcMessage("Column block size has to be positive."));
-  Assert (row_block_size <= n_rows,
+  Assert (row_block_size_ <= n_rows_,
           ExcMessage("Row block size can not be greater than the number of rows of the matrix"));
-  Assert (column_block_size <= n_columns,
+  Assert (column_block_size_ <= n_columns_,
           ExcMessage("Column block size can not be greater than the number of columns of the matrix"));
+
+  state = LAPACKSupport::State::matrix;
+  property = property_;
+  grid = process_grid;
+  n_rows = n_rows_;
+  n_columns = n_columns_;
+  row_block_size = row_block_size_;
+  column_block_size = column_block_size_;
 
   if (grid->mpi_process_is_active)
     {
@@ -116,7 +141,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
                 &(grid->blacs_context), &lda, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("descinit_", info));
 
-      this->reinit(n_local_rows, n_local_columns);
+      this->TransposeTable<NumberType>::reinit(n_local_rows, n_local_columns);
     }
   else
     {
@@ -131,18 +156,14 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
 
 
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
-                                             const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-                                             const size_type block_size,
-                                             const LAPACKSupport::Property property)
-  :
-  ScaLAPACKMatrix<NumberType>(size,
-                              size,
-                              process_grid,
-                              block_size,
-                              block_size,
-                              property)
-{}
+void
+ScaLAPACKMatrix<NumberType>::reinit(const size_type size,
+                                    const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                                    const size_type block_size,
+                                    const LAPACKSupport::Property property)
+{
+  reinit(size, size, process_grid, block_size, block_size, property);
+}
 
 
 

@@ -137,6 +137,25 @@ public:
   ~ScaLAPACKMatrix() = default;
 
   /**
+   * Initialize the rectangular matrix with @p n_rows and @p n_cols
+   * and distributed using the grid @p process_grid.
+   */
+  void reinit(const size_type n_rows,
+              const size_type n_columns,
+              const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+              const size_type row_block_size = 32,
+              const size_type column_block_size = 32,
+              const LAPACKSupport::Property property = LAPACKSupport::Property::general);
+
+  /**
+   * Initialize the square matrix of size @p size and distributed using the grid @p process_grid.
+   */
+  void reinit(const size_type size,
+              const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+              const size_type block_size = 32,
+              const LAPACKSupport::Property property = LAPACKSupport::Property::symmetric);
+
+  /**
    * Assign @p property to this matrix.
    */
   void set_property(const LAPACKSupport::Property property);
