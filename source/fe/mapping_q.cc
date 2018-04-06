@@ -235,46 +235,55 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr, ExcInternalError());
-  const InternalData &data = static_cast<const InternalData &> (internal_data);
+  const auto *data = dynamic_cast<const InternalData *>(&internal_data);
+  if (data != nullptr)
+    {
+      // check whether this cell needs the full mapping or can be treated by a
+      // reduced Q1 mapping, e.g. if the cell is in the interior of the domain
+      data->use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
+                                               || cell->has_boundary_lines());
 
-  // check whether this cell needs the full mapping or can be treated by a
-  // reduced Q1 mapping, e.g. if the cell is in the interior of the domain
-  data.use_mapping_q1_on_current_cell = !(use_mapping_q_on_all_cells
-                                          || cell->has_boundary_lines());
 
+      // call the base class. we need to ensure that the flag indicating
+      // whether we can use some similarity has to be modified - for a general
+      // MappingQ, the data needs to be recomputed anyway since then the
+      // mapping changes the data. this needs to be known also for later
+      // operations, so modify the variable here. this also affects the
+      // calculation of the next cell -- if we use Q1 data on the next cell,
+      // the data will still be invalid.
+      const CellSimilarity::Similarity updated_cell_similarity
+        = ((data->use_mapping_q1_on_current_cell == false)
+           &&
+           (this->polynomial_degree > 1)
+           ?
+           CellSimilarity::invalid_next_cell
+           :
+           cell_similarity);
 
-  // call the base class. we need to ensure that the flag indicating whether
-  // we can use some similarity has to be modified - for a general MappingQ,
-  // the data needs to be recomputed anyway since then the mapping changes the
-  // data. this needs to be known also for later operations, so modify the
-  // variable here. this also affects the calculation of the next cell -- if
-  // we use Q1 data on the next cell, the data will still be invalid.
-  const CellSimilarity::Similarity updated_cell_similarity
-    = ((data.use_mapping_q1_on_current_cell == false)
-       &&
-       (this->polynomial_degree > 1)
-       ?
-       CellSimilarity::invalid_next_cell
-       :
-       cell_similarity);
+      // depending on the results above, decide whether the Q1 mapping or
+      // the Qp mapping needs to handle this cell
+      if (data->use_mapping_q1_on_current_cell)
+        q1_mapping->fill_fe_values (cell,
+                                    updated_cell_similarity,
+                                    quadrature,
+                                    *data->mapping_q1_data,
+                                    output_data);
+      else
+        qp_mapping->fill_fe_values(cell,
+                                   updated_cell_similarity,
+                                   quadrature,
+                                   *data->mapping_qp_data,
+                                   output_data);
 
-  // depending on the results above, decide whether the Q1 mapping or
-  // the Qp mapping needs to handle this cell
-  if (data.use_mapping_q1_on_current_cell)
-    q1_mapping->fill_fe_values (cell,
-                                updated_cell_similarity,
-                                quadrature,
-                                *data.mapping_q1_data,
-                                output_data);
+      return updated_cell_similarity;
+    }
   else
-    qp_mapping->fill_fe_values(cell,
-                               updated_cell_similarity,
-                               quadrature,
-                               *data.mapping_qp_data,
-                               output_data);
+    {
+      Assert (dynamic_cast<const InternalData *> (&internal_data) != nullptr, ExcInternalError());
+    }
 
-  return updated_cell_similarity;
+  // bogus return to placate compiler
+  return CellSimilarity::Similarity::none;
 }
 
 
