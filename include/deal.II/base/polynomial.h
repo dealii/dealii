@@ -687,8 +687,6 @@ namespace Polynomials
    * performance of some iterative schemes like conjugate gradients with
    * point-Jacobi.
    *
-   * @note This class requires LAPACK support.
-   *
    * @author Martin Kronbichler
    * @date 2018
    */
