@@ -78,6 +78,11 @@ namespace OpenCASCADE
                              const double tolerance=1e-7);
 
     /**
+     * Clone the current Manifold.
+     */
+    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+    /**
      * Perform the actual projection onto the manifold. This function, in
      * debug mode, checks that each of the @p surrounding_points is within
      * tolerance from the given TopoDS_Shape. If this is not the case, an
@@ -88,7 +93,7 @@ namespace OpenCASCADE
      */
     virtual Point<spacedim>
     project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const;
+                         const Point<spacedim>                  &candidate) const override;
 
 
   private:
@@ -140,6 +145,11 @@ namespace OpenCASCADE
                                   const double tolerance=1e-7);
 
     /**
+     * Clone the current Manifold.
+     */
+    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+    /**
      * Perform the actual projection onto the manifold. This function, in
      * debug mode, checks that each of the @p surrounding_points is within
      * tolerance from the given TopoDS_Shape. If this is not the case, an
@@ -150,7 +160,7 @@ namespace OpenCASCADE
      */
     virtual Point<spacedim>
     project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const;
+                         const Point<spacedim>                  &candidate) const override;
 
   private:
     /**
@@ -230,6 +240,11 @@ namespace OpenCASCADE
                                    const double tolerance=1e-7);
 
     /**
+     * Clone the current Manifold.
+     */
+    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+    /**
      * Perform the actual projection onto the manifold. This function, in
      * debug mode, checks that each of the @p surrounding_points is within
      * tolerance from the given TopoDS_Shape. If this is not the case, an
@@ -237,7 +252,7 @@ namespace OpenCASCADE
      */
     virtual Point<spacedim>
     project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const;
+                         const Point<spacedim>                  &candidate) const override;
 
   private:
     /**
@@ -284,20 +299,30 @@ namespace OpenCASCADE
                                     const double tolerance=1e-7);
 
     /**
+     * Clone the current Manifold.
+     */
+    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+    /**
      * Given a point on real space, find its arclength parameter. Throws an
      * error in debug mode, if the point is not on the TopoDS_Edge given at
      * construction time.
      */
     virtual Point<1>
-    pull_back(const Point<spacedim> &space_point) const;
+    pull_back(const Point<spacedim> &space_point) const override;
 
     /**
      * Given an arclength parameter, find its image in real space.
      */
     virtual Point<spacedim>
-    push_forward(const Point<1> &chart_point) const;
+    push_forward(const Point<1> &chart_point) const override;
 
   private:
+    /**
+     * The actual shape used to build this object.
+     */
+    const TopoDS_Shape sh;
+
     /**
      * A Curve adaptor. This is the one which is used in the computations, and
      * it points to the right one above.
@@ -335,18 +360,23 @@ namespace OpenCASCADE
     NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
 
     /**
+     * Clone the current Manifold.
+     */
+    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+    /**
      * Pull back the given point from the Euclidean space. Will return the uv
      * coordinates associated with the point @p space_point.
      */
     virtual Point<2>
-    pull_back(const Point<spacedim> &space_point) const;
+    pull_back(const Point<spacedim> &space_point) const override;
 
     /**
      * Given a @p chart_point in the uv coordinate system, this method returns the
      * Euclidean coordinates associated.
      */
     virtual Point<spacedim>
-    push_forward(const Point<2> &chart_point) const;
+    push_forward(const Point<2> &chart_point) const override;
 
     /**
      * Given a point in the spacedim dimensional Euclidean space, this
@@ -362,7 +392,7 @@ namespace OpenCASCADE
      */
     virtual
     DerivativeForm<1,2,spacedim>
-    push_forward_gradient(const Point<2> &chart_point) const;
+    push_forward_gradient(const Point<2> &chart_point) const override;
 
   private:
     /**
