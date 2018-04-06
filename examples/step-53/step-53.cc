@@ -210,11 +210,13 @@ namespace Step53
   public:
     virtual
     Point<3>
-    pull_back(const Point<3> &space_point) const;
+    pull_back(const Point<3> &space_point) const override;
 
     virtual
     Point<3>
-    push_forward(const Point<3> &chart_point) const;
+    push_forward(const Point<3> &chart_point) const override;
+
+    virtual std::unique_ptr<Manifold<3,3> > clone() const override;
 
   private:
     static const double    R;
@@ -248,6 +250,15 @@ namespace Step53
   AfricaGeometry::push_forward(const Point<3> &chart_point) const
   {
     return push_forward_wgs84 (push_forward_topo (chart_point));
+  }
+
+
+  // This function is required by the interface of the Manifold base
+  // class, and allows you to clone the AfricaGeometry class:
+  std::unique_ptr<Manifold<3,3> >
+  AfricaGeometry::clone() const
+  {
+    return std::unique_ptr<Manifold<3,3> >(new AfricaGeometry());
   }
 
 
