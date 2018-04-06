@@ -512,6 +512,15 @@ FlatManifold<dim,spacedim>::FlatManifold (const Tensor<1,spacedim> &periodicity,
 
 
 
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+FlatManifold<dim,spacedim>::clone() const
+{
+  return std::unique_ptr<Manifold<dim,spacedim> >(new FlatManifold<dim,spacedim>(periodicity, tolerance));
+}
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 FlatManifold<dim, spacedim>::
