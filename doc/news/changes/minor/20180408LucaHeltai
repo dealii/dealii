@@ -1,0 +1,5 @@
+New: The Manifold class now requires the implementation of a Manifold::clone() method to 
+all derived classes. 
+<br>
+(Luca Heltai, 2018/04/08)
+
