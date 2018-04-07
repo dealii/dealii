@@ -956,9 +956,6 @@ FE_Q_Base<PolynomialType,dim,spacedim>::initialize_quad_dof_index_permutation ()
   const unsigned int n=q_degree-1;
   Assert(n*n==this->dofs_per_quad, ExcInternalError());
 
-  // alias for the table to fill
-  Table<2,int> &data=this->adjust_quad_dof_index_for_face_orientation_table;
-
   // the dofs on a face are connected to a n x n matrix. for example, for
   // degree==4 we have the following dofs on a quad
 
@@ -985,26 +982,26 @@ FE_Q_Base<PolynomialType,dim,spacedim>::initialize_quad_dof_index_permutation ()
                    j=local/n;
 
       // face_orientation=false, face_flip=false, face_rotation=false
-      data(local,0)=j       + i      *n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,0)=j       + i      *n - local;
       // face_orientation=false, face_flip=false, face_rotation=true
-      data(local,1)=i       + (n-1-j)*n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,1)=i       + (n-1-j)*n - local;
       // face_orientation=false, face_flip=true,  face_rotation=false
-      data(local,2)=(n-1-j) + (n-1-i)*n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,2)=(n-1-j) + (n-1-i)*n - local;
       // face_orientation=false, face_flip=true,  face_rotation=true
-      data(local,3)=(n-1-i) + j      *n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,3)=(n-1-i) + j      *n - local;
       // face_orientation=true,  face_flip=false, face_rotation=false
-      data(local,4)=0;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,4)=0;
       // face_orientation=true,  face_flip=false, face_rotation=true
-      data(local,5)=j       + (n-1-i)*n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,5)=j       + (n-1-i)*n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=false
-      data(local,6)=(n-1-i) + (n-1-j)*n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,6)=(n-1-i) + (n-1-j)*n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=true
-      data(local,7)=(n-1-j) + i      *n - local;
+      this->adjust_quad_dof_index_for_face_orientation_table(local,7)=(n-1-j) + i      *n - local;
     }
 
   // additionally initialize reordering of line dofs
   for (unsigned int i=0; i<this->dofs_per_line; ++i)
-    this->adjust_line_dof_index_for_line_orientation_table[i]=this->dofs_per_line-1-i - i;
+    this->adjust_line_dof_index_for_line_orientation_table[i] = this->dofs_per_line-1-i - i;
 }
 
 
