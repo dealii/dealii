@@ -30,6 +30,7 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/tria.h>
