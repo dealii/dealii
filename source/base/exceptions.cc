@@ -392,6 +392,7 @@ namespace StandardExceptions
 
 namespace
 {
+  [[noreturn]]
   void internal_abort (const ExceptionBase &exc) noexcept
   {
     // first print the error
@@ -464,6 +465,7 @@ namespace deal_II_exceptions
 
 
 
+    [[noreturn]]
     void abort (const ExceptionBase &exc)
     {
       if (dealii::deal_II_exceptions::abort_on_exception)
