@@ -75,30 +75,55 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
                                              const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
                                              const size_type row_block_size_,
                                              const size_type column_block_size_,
-                                             const LAPACKSupport::Property property)
+                                             const LAPACKSupport::Property property_)
   :
-  TransposeTable<NumberType> (),
-  state (LAPACKSupport::matrix),
-  property(property),
-  grid (process_grid),
-  n_rows(n_rows_),
-  n_columns(n_columns_),
-  row_block_size(row_block_size_),
-  column_block_size(column_block_size_),
   uplo('L'), // for non-symmetric matrices this is not needed
   first_process_row(0),
   first_process_column(0),
   submatrix_row(1),
   submatrix_column(1)
 {
-  Assert (row_block_size > 0,
+  reinit(n_rows_, n_columns_, process_grid, row_block_size_, column_block_size_, property_);
+}
+
+
+
+template <typename NumberType>
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
+                                             const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                                             const size_type block_size,
+                                             const LAPACKSupport::Property property)
+  :
+  ScaLAPACKMatrix<NumberType>(size, size, process_grid, block_size, block_size, property)
+{}
+
+
+
+template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::reinit(const size_type n_rows_,
+                                    const size_type n_columns_,
+                                    const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
+                                    const size_type row_block_size_,
+                                    const size_type column_block_size_,
+                                    const LAPACKSupport::Property property_)
+{
+  Assert (row_block_size_ > 0,
           ExcMessage("Row block size has to be positive."));
-  Assert (column_block_size > 0,
+  Assert (column_block_size_ > 0,
           ExcMessage("Column block size has to be positive."));
-  Assert (row_block_size <= n_rows,
+  Assert (row_block_size_ <= n_rows_,
           ExcMessage("Row block size can not be greater than the number of rows of the matrix"));
-  Assert (column_block_size <= n_columns,
+  Assert (column_block_size_ <= n_columns_,
           ExcMessage("Column block size can not be greater than the number of columns of the matrix"));
+
+  state = LAPACKSupport::State::matrix;
+  property = property_;
+  grid = process_grid;
+  n_rows = n_rows_;
+  n_columns = n_columns_;
+  row_block_size = row_block_size_;
+  column_block_size = column_block_size_;
 
   if (grid->mpi_process_is_active)
     {
@@ -116,7 +141,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
                 &(grid->blacs_context), &lda, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("descinit_", info));
 
-      this->reinit(n_local_rows, n_local_columns);
+      this->TransposeTable<NumberType>::reinit(n_local_rows, n_local_columns);
     }
   else
     {
@@ -131,18 +156,14 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
 
 
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
-                                             const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
-                                             const size_type block_size,
-                                             const LAPACKSupport::Property property)
-  :
-  ScaLAPACKMatrix<NumberType>(size,
-                              size,
-                              process_grid,
-                              block_size,
-                              block_size,
-                              property)
-{}
+void
+ScaLAPACKMatrix<NumberType>::reinit(const size_type size,
+                                    const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                                    const size_type block_size,
+                                    const LAPACKSupport::Property property)
+{
+  reinit(size, size, process_grid, block_size, block_size, property);
+}
 
 
 
@@ -1097,6 +1118,54 @@ void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
     }
   state = LAPACKSupport::State::unusable;
+}
+
+
+
+template <typename NumberType>
+unsigned int ScaLAPACKMatrix<NumberType>::pseudoinverse(const NumberType ratio)
+{
+  Assert(state == LAPACKSupport::matrix,
+         ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert(row_block_size==column_block_size,
+         ExcMessage("Use identical block sizes for rows and columns of matrix A"));
+  Assert(ratio>0. && ratio<1.,
+         ExcMessage("input parameter ratio has to be larger than zero and smaller than 1"));
+
+  ScaLAPACKMatrix<NumberType> U(n_rows,n_rows,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  ScaLAPACKMatrix<NumberType> VT(n_columns,n_columns,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  std::vector<NumberType> sv = this->compute_SVD(&U,&VT);
+  AssertThrow(sv[0]>std::numeric_limits<NumberType>::min(),ExcMessage("Matrix has rank 0"));
+
+  // Get number of singular values fulfilling the following: sv[i] > sv[0] * ratio
+  // Obviously, 0-th element already satisfies sv[0] > sv[0] * ratio
+  // The singular values in sv are ordered by descending value so we break out of the loop
+  // if a singular value is smaller than sv[0] * ratio.
+  unsigned int n_sv=1;
+  std::vector<NumberType> inv_sigma;
+  inv_sigma.push_back(1/sv[0]);
+
+  for (unsigned int i=1; i<sv.size(); ++i)
+    if (sv[i] > sv[0] * ratio)
+      {
+        ++n_sv;
+        inv_sigma.push_back(1/sv[i]);
+      }
+    else break;
+
+  // For the matrix multiplication we use only the columns of U and rows of VT which are associated
+  // with singular values larger than the limit.
+  // That saves computational time for matrices with rank significantly smaller than min(n_rows,n_columns)
+  ScaLAPACKMatrix<NumberType> U_R(n_rows,n_sv,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  ScaLAPACKMatrix<NumberType> VT_R(n_sv,n_columns,grid,row_block_size,row_block_size,LAPACKSupport::Property::general);
+  U.copy_to(U_R,std::make_pair(0,0),std::make_pair(0,0),std::make_pair(n_rows,n_sv));
+  VT.copy_to(VT_R,std::make_pair(0,0),std::make_pair(0,0),std::make_pair(n_sv,n_columns));
+
+  VT_R.scale_rows(inv_sigma);
+  this->reinit(n_columns,n_rows,this->grid,row_block_size,column_block_size,LAPACKSupport::Property::general);
+  VT_R.mult(1,U_R,0,*this,true,true);
+  state = LAPACKSupport::State::inverse_matrix;
+  return n_sv;
 }
 
 
