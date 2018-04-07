@@ -19,6 +19,12 @@
 # The installed binary is used in the 'indent' script in case astyle is
 # installed by this script.
 #
+# This script only works on Linux, and also puts the 'astyle'
+# executable into a very specific place. This is not a general purpose
+# solution. A better solution is to essentially execute the commands
+# below in a shell and make sure that the executable is installed into
+# a central directory -- say, /usr/bin or /usr/local/bin.
+#
 
 PRG=$PWD/programs
 
