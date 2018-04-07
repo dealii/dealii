@@ -1087,6 +1087,7 @@ namespace internal
   namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
+    inline DEAL_II_ALWAYS_INLINE
     dealii::Tensor<2,dim,Number>
     convert_to_tensor (const dealii::SymmetricTensor<2,dim,Number> &s)
     {
@@ -1399,7 +1400,7 @@ namespace internal
 
 
 template <int rank_, int dim, typename Number>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number>::
 operator Tensor<rank_,dim,Number> () const
 {
@@ -1432,7 +1433,7 @@ SymmetricTensor<rank_,dim,Number>::operator !=
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number> &
 SymmetricTensor<rank_,dim,Number>::operator +=
 (const SymmetricTensor<rank_,dim,OtherNumber> &t)
@@ -1445,7 +1446,7 @@ SymmetricTensor<rank_,dim,Number>::operator +=
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number> &
 SymmetricTensor<rank_,dim,Number>::operator -=
 (const SymmetricTensor<rank_,dim,OtherNumber> &t)
@@ -1458,7 +1459,7 @@ SymmetricTensor<rank_,dim,Number>::operator -=
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number> &
 SymmetricTensor<rank_,dim,Number>::operator *= (const OtherNumber &d)
 {
@@ -1470,7 +1471,7 @@ SymmetricTensor<rank_,dim,Number>::operator *= (const OtherNumber &d)
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number> &
 SymmetricTensor<rank_,dim,Number>::operator /= (const OtherNumber &d)
 {
@@ -1481,7 +1482,7 @@ SymmetricTensor<rank_,dim,Number>::operator /= (const OtherNumber &d)
 
 
 template <int rank_, int dim, typename Number>
-inline
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<rank_,dim,Number>
 SymmetricTensor<rank_,dim,Number>::operator - () const
 {
@@ -1493,7 +1494,7 @@ SymmetricTensor<rank_,dim,Number>::operator - () const
 
 
 template <int rank_, int dim, typename Number>
-inline
+inline DEAL_II_ALWAYS_INLINE
 void
 SymmetricTensor<rank_,dim,Number>::clear ()
 {
@@ -1518,7 +1519,7 @@ namespace internal
 {
 
   template <int dim, typename Number, typename OtherNumber = Number>
-  inline
+  inline DEAL_II_ALWAYS_INLINE
   typename SymmetricTensorAccessors::double_contraction_result<2,2,dim,Number,OtherNumber>::type
   perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type      &data,
                               const typename SymmetricTensorAccessors::StorageType<2,dim,OtherNumber>::base_tensor_type &sdata)
@@ -1631,7 +1632,7 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 typename internal::SymmetricTensorAccessors::double_contraction_result<rank_,2,dim,Number,OtherNumber>::type
 SymmetricTensor<rank_,dim,Number>::operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const
 {
