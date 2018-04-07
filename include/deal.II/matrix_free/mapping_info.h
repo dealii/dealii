@@ -37,70 +37,267 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     /**
+     * An enum to identify various types of cells. The most general type is
+     * what we typically compute in the FEValues context but for many
+     * geometries we can save significant storage.
+     */
+    enum CellType : unsigned char
+    {
+      /**
+       * The cell is Cartesian.
+       */
+      cartesian  = 0,
+      /**
+       * The cell may be described with an affine mapping.
+       */
+      affine     = 1,
+      /**
+       * The current face is flat, i.e., the normal factor on a face is the
+       * same on all quadrature points.
+       */
+      flat_faces = 2,
+      /**
+       * There is no special information available for compressing the
+       * representation of the cell.
+       */
+      general    = 3
+    };
+
+
+
+    /**
+     * Definition of a structure that stores all cached data related to the
+     * evaluated geometry from the mapping. In order to support hp-adaptivity
+     * and compressed storage (in particular for Jacobians, JxW values, and
+     * normals), storage length can be different for different rows. Thus, it
+     * allows to jump at the data of individual rows similar to compressed row
+     * storage in sparse matrices. We have two different start indices for
+     * fields with different sizes. The first category of offsets are the
+     * indices for Jacobians of the transformation from unit to real cell (we
+     * store the inverse Jacobian), second derivatives, JxW values, and normal
+     * vectors. We keep separate arrays for all these data structures because
+     * a user code might access only some of them. In such a case, one array
+     * will be gone through in a contiguous order with access to all entries,
+     * which makes it easy for the processor to prefetch data. Having all data
+     * in a single array would require some strides in the access pattern,
+     * which is much more complicated for the processor to predict (and indeed
+     * leads to prefetching of data that does not get used on Intel processors
+     * such as BroadwellEP).
+     *
+     * The second category of indices are the offsets for the quadrature
+     * points. Quadrature points can be compressed less than the other fields
+     * and thus need longer fields. Quadrature point indices are often used in
+     * other contexts such as evaluation of right hand sides.
+     *
+     * The third component is a descriptor of data from the unit cells, called
+     * QuadratureDescriptor, which contains the quadrature weights and
+     * permutations of how to go through quadrature points in case of face
+     * data. The latter comes in a vector for the support of hp adaptivity,
+     * with several data fields for the individual quadrature formulas.
+     *
+     * @author Katharina Kormann, Martin Kronbichler, 2018
+     */
+    template <int structdim, int spacedim, typename Number>
+    struct MappingInfoStorage
+    {
+      struct QuadratureDescriptor
+      {
+        /**
+         * Constructor. Does nothing.
+         */
+        QuadratureDescriptor();
+
+        /**
+         * Set up the lengths in the various members of this struct.
+         */
+        void initialize(const Quadrature<1> &quadrature_1d,
+                        const UpdateFlags    update_flags_inner_faces = update_default);
+
+        /**
+         * Returns the memory consumption in bytes.
+         */
+        std::size_t memory_consumption() const;
+
+        /**
+         * Number of quadrature points applied on the given cell or face.
+         */
+        unsigned int n_q_points;
+
+        /**
+         * Quadrature formula applied on the given cell or face.
+         */
+        Quadrature<structdim> quadrature;
+
+        /**
+         * Quadrature weights separated by dimension for use in specific
+         * situations.
+         */
+        std::array<AlignedVector<Number>, structdim> tensor_quadrature_weights;
+
+        /**
+         * A cached vector of quadrature weights in the given number format
+         * (non-vectorized, as it is cheap to broadcast the value to all lanes
+         * when it is used in a vectorized context).
+         */
+        AlignedVector<Number> quadrature_weights;
+
+        /**
+         * For quadrature on faces, the evaluation of basis functions is not
+         * in the correct order if a face is not in the standard orientation
+         * to a given element. This data structure is used to re-order the
+         * data evaluated on quadrature points to represent the correct order.
+         */
+        dealii::Table<2,unsigned int> face_orientations;
+      };
+
+      /**
+       * A class describing the layout of the sections in the @p data_storage
+       * field and also includes some data that depends on the number of
+       * quadrature points in the hp context such as the inner quadrature
+       * formula and re-indexing for faces that are not in the standard
+       * orientation.
+       */
+      std::vector<QuadratureDescriptor> descriptor;
+
+      /**
+       * Stores the index offset into the arrays @p jxw_values, @p jacobians,
+       * @p normal_vectors and the second derivatives. Note that affine cells
+       * have shorter fields of length 1, where the others have lengths equal
+       * to the numer of quadrature points of the given cell.
+       */
+      AlignedVector<unsigned int> data_index_offsets;
+
+      /**
+       * The storage of the Jacobian determinant (times the quadrature weight
+       * in case the transformation is non-affine) on quadrature
+       * points.
+       *
+       * Indexed by @p data_index_offsets.
+       */
+      AlignedVector<VectorizedArray<Number> > JxW_values;
+
+      /**
+       * Stores the normal vectors.
+       *
+       * Indexed by @p data_index_offsets.
+       */
+      AlignedVector<Tensor<1,spacedim,VectorizedArray<Number> > > normal_vectors;
+
+      /**
+       * The storage of covariant transformation on quadrature points, i.e.,
+       * the inverse and transposed Jacobians of the transformation from the
+       * unit to the real cell.
+       *
+       * Indexed by @p data_index_offsets.
+       *
+       * Contains two fields for access from both sides for interior faces,
+       * but the default case (cell integrals or boundary integrals) only
+       * fills the zeroth component and ignores the first one.
+       */
+      AlignedVector<Tensor<2,spacedim,VectorizedArray<Number> > > jacobians[2];
+
+      /**
+       * The storage of the gradients of the inverse Jacobian
+       * transformation. Because of symmetry, only the upper diagonal and
+       * diagonal part are needed. The first index runs through the
+       * derivatives, starting with the diagonal and then continuing row-wise,
+       * i.e., $\partial^2/\partial x_1 \partial x_2$ first, then
+       * $\partial^2/\partial x_1 \partial x_3$, and so on. The second index
+       * is the spatial coordinate.
+       *
+       * Indexed by @p data_index_offsets.
+       *
+       * Contains two fields for access from both sides for interior faces,
+       * but the default case (cell integrals or boundary integrals) only
+       * fills the zeroth component and ignores the first one.
+       */
+      AlignedVector<Tensor<1,spacedim *(spacedim+1)/2,
+                    Tensor<1,spacedim,VectorizedArray<Number> > > > jacobian_gradients[2];
+
+      /**
+       * Stores the Jacobian transformations times the normal vector (this
+       * represents a shortcut that is accessed often and can thus get higher
+       * performance).
+       *
+       * Indexed by @p data_index_offsets.
+       */
+      AlignedVector<Tensor<1,spacedim,VectorizedArray<Number> > > normals_times_jacobians [2];
+
+      /**
+       * Stores the index offset of a particular cell into the quadrature
+       * points array in real coordinates. Note that Cartesian cells have
+       * shorter fields (length is @p n_q_points_1d) than non-Cartesian cells
+       * (length is @p n_q_points) or faces.
+       */
+      AlignedVector<unsigned int> quadrature_point_offsets;
+
+      /**
+       * Stores the quadrature points in real coordinates, including a
+       * compression scheme for Cartesian cells where we do not need to store
+       * the full data on all points.
+       *
+       * Indexed by @p quadrature_point_offsets.
+       */
+      AlignedVector<Point<spacedim,VectorizedArray<Number> > > quadrature_points;
+
+      /**
+       * Returns the quadrature index for a given number of quadrature
+       * points. If not in hp mode or if the index is not found, this
+       * function always returns index 0. Hence, this function does not
+       * check whether the given degree is actually present.
+       */
+      unsigned int
+      quad_index_from_n_q_points (const unsigned int n_q_points) const;
+
+      /**
+       * Prints a detailed summary of memory consumption in the different
+       * structures of this class to the given output stream.
+       */
+      template <typename StreamType>
+      void print_memory_consumption(StreamType     &out,
+                                    const SizeInfo &task_info) const;
+
+      /**
+       * Returns the memory consumption in bytes.
+       */
+      std::size_t memory_consumption () const;
+    };
+
+
+
+    /**
      * The class that stores all geometry-dependent data related with cell
      * interiors for use in the matrix-free class.
      *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
+     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, 2017
      */
     template <int dim, typename Number>
     struct MappingInfo
     {
-      /**
-       * Determines how many bits of an unsigned int are used to distinguish
-       * the cell types (Cartesian, with constant Jacobian, or general)
-       */
-      static const std::size_t  n_cell_type_bits = 2;
-
-      /**
-       * Determines how many types of different cells can be detected at most.
-       * Corresponds to the number of bits we reserved for it.
-       */
-      static const unsigned int n_cell_types = 1U<<n_cell_type_bits;
-
-      /**
-       * An abbreviation for the length of vector lines of the current data
-       * type.
-       */
-      static const unsigned int n_vector_elements = VectorizedArray<Number>::n_array_elements;
-
       /**
        * Empty constructor.
        */
       MappingInfo();
 
       /**
-       * Compute the information in the given cells. The cells are specified
-       * by the level and the index within the level (as given by
+       * Compute the information in the given cells and faces. The cells are
+       * specified by the level and the index within the level (as given by
        * CellIterator::level() and CellIterator::index(), in order to allow
        * for different kinds of iterators, e.g. standard DoFHandler,
        * multigrid, etc.)  on a fixed Triangulation. In addition, a mapping
        * and several quadrature formulas are given.
        */
       void initialize (const dealii::Triangulation<dim>                &tria,
-                       const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+                       const std::vector<std::pair<unsigned int,unsigned int> >  &cells,
                        const std::vector<unsigned int>         &active_fe_index,
                        const Mapping<dim>                      &mapping,
                        const std::vector<dealii::hp::QCollection<1> >  &quad,
-                       const UpdateFlags                        update_flags);
-
-      /**
-       * Helper function to determine which update flags must be set in the
-       * internal functions to initialize all data as requested by the user.
-       */
-      static UpdateFlags
-      compute_update_flags (const UpdateFlags                        update_flags,
-                            const std::vector<dealii::hp::QCollection<1> >  &quad =
-                              std::vector<dealii::hp::QCollection<1> >());
+                       const UpdateFlags                        update_flags_cells);
 
       /**
        * Return the type of a given cell as detected during initialization.
        */
       CellType get_cell_type (const unsigned int cell_chunk_no) const;
-
-      /**
-       * Return the type of a given cell as detected during initialization.
-       */
-      unsigned int get_cell_data_index (const unsigned int cell_chunk_no) const;
 
       /**
        * Clear all data fields in this class.
@@ -118,232 +315,143 @@ namespace internal
        */
       template <typename StreamType>
       void print_memory_consumption(StreamType     &out,
-                                    const SizeInfo &size_info) const;
+                                    const SizeInfo &task_info) const;
 
       /**
-       * Stores whether a cell is Cartesian, has constant transform data
-       * (Jacobians) or is general. cell_type % 4 gives this information (0:
-       * Cartesian, 1: constant Jacobian throughout cell, 2: general cell),
-       * and cell_type / 4 gives the index in the data field of where to find
-       * the information in the fields Jacobian and JxW values (except for
-       * quadrature points, for which the index runs as usual).
+       * Stores whether a cell is Cartesian (cell type 0), has constant
+       * transform data (Jacobians) (cell type 1), or is general (cell type
+       * 3). Type 2 is only used for faces and no cells are assigned this
+       * value.
        */
-      std::vector<unsigned int> cell_type;
+      std::vector<CellType> cell_type;
 
       /**
-       * The first field stores the inverse Jacobian for Cartesian cells:
-       * There, it is a diagonal rank-2 tensor, so we actually just store a
-       * rank-1 tensor. It is the same on all cells, therefore we only store
-       * it once per cell, and use similarities from one cell to another, too
-       * (on structured meshes, there are usually many cells with the same
-       * Jacobian).
-       *
-       * The second field stores the Jacobian determinant for Cartesian cells
-       * (without the quadrature weight, which depends on the quadrature
-       * point, whereas the determinant is the same on each quadrature point).
+       * Stores whether a face (and both cells adjacent to the face) is
+       * Cartesian (face type 0), whether it represents an affine situation
+       * (face type 1), whether it is a flat face where the normal vector is
+       * the same throughout the face (face type 2), or is general (face type
+       * 3).
        */
-      AlignedVector<std::pair<Tensor<1,dim,VectorizedArray<Number> >,
-                    VectorizedArray<Number> > > cartesian_data;
+      std::vector<CellType> face_type;
 
       /**
-       * The first field stores the Jacobian for non-Cartesian cells where all
-       * the Jacobians on the cell are the same (i.e., constant, which comes
-       * from a linear transformation from unit to real cell). Also use
-       * similarities from one cell to another (on structured meshes, there
-       * are usually many cells with the same Jacobian).
-       *
-       * The second field stores the Jacobian determinant for non-Cartesian
-       * cells with constant Jacobian throughout the cell (without the
-       * quadrature weight, which depends on the quadrature point, whereas the
-       * determinant is the same on each quadrature point).
+       * The data cache for the cells.
        */
-      AlignedVector<std::pair<Tensor<2,dim,VectorizedArray<Number> >,
-                    VectorizedArray<Number> > > affine_data;
+      std::vector<MappingInfoStorage<dim,dim,Number> > cell_data;
 
       /**
-       * Definition of a structure that stores data that depends on the
-       * quadrature formula (if we have more than one quadrature formula on a
-       * given problem, these fields will be different)
+       * The data cache for the faces.
        */
-      struct MappingInfoDependent
+      std::vector<MappingInfoStorage<dim-1,dim,Number> > face_data;
+
+      /**
+       * The data cache for the face-associated-with-cell topology, following
+       * the @p cell_type variable for the cell types.
+       */
+      std::vector<MappingInfoStorage<dim-1,dim,Number> > face_data_by_cells;
+
+      /**
+       * Computes the information in the given cells, called within
+       * initialize.
+       */
+      void initialize_cells (const dealii::Triangulation<dim>                &tria,
+                             const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+                             const std::vector<unsigned int>         &active_fe_index,
+                             const Mapping<dim>                      &mapping,
+                             const std::vector<dealii::hp::QCollection<1> >  &quad,
+                             const UpdateFlags                        update_flags_cells);
+
+      /**
+       * Helper function to determine which update flags must be set in the
+       * internal functions to initialize all data as requested by the user.
+       */
+      static UpdateFlags
+      compute_update_flags (const UpdateFlags                        update_flags,
+                            const std::vector<dealii::hp::QCollection<1> > &quad =
+                              std::vector<dealii::hp::QCollection<1> >());
+    };
+
+
+
+    /**
+     * A helper class to extract either cell or face data from mapping info
+     * for use in FEEvaluationBase.
+     *
+     * @author Katharina Kormann, Martin Kronbichler, 2018
+     */
+    template <int, typename, bool> struct MappingInfoCellsOrFaces;
+
+    template <int dim, typename Number>
+    struct MappingInfoCellsOrFaces<dim,Number,false>
+    {
+      static const MappingInfoStorage<dim,dim,Number> *
+      get(const MappingInfo<dim,Number> &mapping_info,
+          const unsigned int quad_no)
       {
-        /**
-         * This field stores the row starts for the inverse Jacobian
-         * transformations, quadrature weights and second derivatives.
-         */
-        std::vector<unsigned int> rowstart_jacobians;
+        AssertIndexRange(quad_no, mapping_info.cell_data.size());
+        return &mapping_info.cell_data[quad_no];
+      }
+    };
 
-        /**
-         * This field stores the inverse Jacobian transformation from unit to
-         * real cell, which is needed for most gradient transformations
-         * (corresponds to FEValues::inverse_jacobian) for general cells.
-         */
-        AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > jacobians;
-
-        /**
-         * This field stores the Jacobian determinant times the quadrature
-         * weights (JxW in deal.II speak) for general cells.
-         */
-        AlignedVector<VectorizedArray<Number> > JxW_values;
-
-        /**
-         * Stores the diagonal part of the gradient of the inverse Jacobian
-         * transformation. The first index runs over the derivatives
-         * $\partial^2/\partial x_i^2$, the second over the space coordinate.
-         * Needed for computing the Laplacian of FE functions on the real
-         * cell. Uses a separate storage from the off-diagonal part
-         * $\partial^2/\partial x_i \partial x_j, i\neq j$ because that is
-         * only needed for computing a full Hessian.
-         */
-        AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > jacobians_grad_diag;
-
-        /**
-         * Stores the off-diagonal part of the gradient of the inverse
-         * Jacobian transformation. Because of symmetry, only the upper
-         * diagonal part is needed. The first index runs through the
-         * derivatives row-wise, i.e., $\partial^2/\partial x_1 \partial x_2$
-         * first, then $\partial^2/\partial x_1 \partial x_3$, and so on. The
-         * second index is the spatial coordinate. Not filled currently.
-         */
-        AlignedVector<Tensor<1,(dim>1?dim*(dim-1)/2:1),
-                      Tensor<1,dim,VectorizedArray<Number> > > > jacobians_grad_upper;
-
-        /**
-         * Stores the row start for quadrature points in real coordinates for
-         * both types of cells. Note that Cartesian cells will have shorter
-         * fields (length is @p n_q_points_1d) than non-Cartesian cells
-         * (length is @p n_q_points).
-         */
-        std::vector<unsigned int> rowstart_q_points;
-
-        /**
-         * Stores the quadrature points in real coordinates for Cartesian
-         * cells (does not need to store the full data on all points)
-         */
-        AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
-
-        /**
-         * The dim-dimensional quadrature formula underlying the problem
-         * (constructed from a 1D tensor product quadrature formula).
-         */
-        dealii::hp::QCollection<dim>    quadrature;
-
-        /**
-         * The (dim-1)-dimensional quadrature formula corresponding to face
-         * evaluation (constructed from a 1D tensor product quadrature
-         * formula).
-         */
-        dealii::hp::QCollection<dim-1>  face_quadrature;
-
-        /**
-         * The number of quadrature points for the current quadrature formula.
-         */
-        std::vector<unsigned int> n_q_points;
-
-        /**
-         * The number of quadrature points for the current quadrature formula
-         * when applied to a face. Only set if the quadrature formula is
-         * derived from a tensor product, since it is not defined from the
-         * full quadrature formula otherwise.
-         */
-        std::vector<unsigned int> n_q_points_face;
-
-        /**
-         * The quadrature weights (vectorized data format) on the unit cell.
-         */
-        std::vector<AlignedVector<VectorizedArray<Number> > > quadrature_weights;
-
-        /**
-         * This variable stores the number of quadrature points for all
-         * quadrature indices in the underlying element for easier access to
-         * data in the hp case.
-         */
-        std::vector<unsigned int> quad_index_conversion;
-
-        /**
-         * Return the quadrature index for a given number of quadrature
-         * points. If not in hp mode or if the index is not found, this
-         * function always returns index 0. Hence, this function does not
-         * check whether the given degree is actually present.
-         */
-        unsigned int
-        quad_index_from_n_q_points (const unsigned int n_q_points) const;
-
-
-        /**
-         * Prints a detailed summary of memory consumption in the different
-         * structures of this class to the given output stream.
-         */
-        template <typename StreamType>
-        void print_memory_consumption(StreamType     &out,
-                                      const SizeInfo &size_info) const;
-
-        /**
-         * Return the memory consumption in bytes.
-         */
-        std::size_t memory_consumption () const;
-      };
-
-      /**
-       * Contains all the stuff that depends on the quadrature formula
-       */
-      std::vector<MappingInfoDependent> mapping_data_gen;
-
-      /**
-       * Stores whether JxW values have been initialized
-       */
-      bool JxW_values_initialized;
-
-      /**
-       * Stores whether we computed second derivatives.
-       */
-      bool second_derivatives_initialized;
-
-      /**
-       * Stores whether we computed quadrature points.
-       */
-      bool quadrature_points_initialized;
-
-      /**
-       * Internal temporary data used for the initialization.
-       */
-      struct CellData
+    template <int dim, typename Number>
+    struct MappingInfoCellsOrFaces<dim,Number,true>
+    {
+      static const MappingInfoStorage<dim-1,dim,Number> *
+      get(const MappingInfo<dim,Number> &mapping_info,
+          const unsigned int quad_no)
       {
-        CellData (const double jac_size);
-        void resize (const unsigned int size);
+        AssertIndexRange(quad_no, mapping_info.face_data.size());
+        return &mapping_info.face_data[quad_no];
+      }
+    };
 
-        AlignedVector<Tensor<1,dim,VectorizedArray<Number> > >  quadrature_points;
-        AlignedVector<Tensor<2,dim,VectorizedArray<Number> > >  general_jac;
-        AlignedVector<Tensor<3,dim,VectorizedArray<Number> > >  general_jac_grad;
-        Tensor<2,dim,VectorizedArray<Number> > const_jac;
-        const double                           jac_size;
-      };
 
-      /**
-       * Helper function called internally during the initialize function.
-       */
-      void evaluate_on_cell (const dealii::Triangulation<dim> &tria,
-                             const std::pair<unsigned int,unsigned int> *cells,
-                             const unsigned int  cell,
-                             const unsigned int  my_q,
-                             CellType (&cell_t_prev)[n_vector_elements],
-                             CellType (&cell_t)[n_vector_elements],
-                             dealii::FEValues<dim,dim> &fe_values,
-                             CellData          &cell_data) const;
+
+    /**
+     * A class that is used to compare floating point arrays (e.g. std::vectors,
+     * Tensor<1,dim>, etc.). The idea of this class is to consider two arrays as
+     * equal if they are the same within a given tolerance. We use this
+     * comparator class within an std::map<> of the given arrays. Note that this
+     * comparison operator does not satisfy all the mathematical properties one
+     * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
+     * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is
+     * satisfied). This is not a problem in the use cases for this class, but be
+     * careful when using it in other contexts.
+     */
+    template <typename Number>
+    struct FPArrayComparator
+    {
+      FPArrayComparator (const Number scaling);
+
+      bool operator() (const std::vector<Number> &v1,
+                       const std::vector<Number> &v2) const;
+
+      bool operator ()(const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t1,
+                       const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t2) const;
+
+      template <int dim>
+      bool operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                       const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
+
+      template <int dim>
+      bool operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                       const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
+
+      Number tolerance;
     };
 
 
 
     /* ------------------- inline functions ----------------------------- */
 
-    template <int dim, typename Number>
+    template <int structdim, int spacedim, typename Number>
     inline
     unsigned int
-    MappingInfo<dim,Number>::MappingInfoDependent::
-    quad_index_from_n_q_points (const unsigned int n_q_points) const
+    MappingInfoStorage<structdim,spacedim,Number>
+    ::quad_index_from_n_q_points (const unsigned int n_q_points) const
     {
-      for (unsigned int i=0; i<quad_index_conversion.size(); ++i)
-        if (n_q_points == quad_index_conversion[i])
+      for (unsigned int i=0; i<descriptor.size(); ++i)
+        if (n_q_points == descriptor[i].n_q_points)
           return i;
       return 0;
     }
@@ -356,20 +464,7 @@ namespace internal
     MappingInfo<dim,Number>::get_cell_type (const unsigned int cell_no) const
     {
       AssertIndexRange (cell_no, cell_type.size());
-      CellType enum_cell_type = (CellType)(cell_type[cell_no] % n_cell_types);
-      Assert(enum_cell_type != undefined, ExcInternalError());
-      return enum_cell_type;
-    }
-
-
-
-    template <int dim, typename Number>
-    inline
-    unsigned int
-    MappingInfo<dim,Number>::get_cell_data_index (const unsigned int cell_no) const
-    {
-      AssertIndexRange (cell_no, cell_type.size());
-      return cell_type[cell_no] >> n_cell_type_bits;
+      return cell_type[cell_no];
     }
 
   } // end of namespace MatrixFreeFunctions

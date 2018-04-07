@@ -132,64 +132,6 @@ namespace internal
       unsigned int n_procs;
     };
 
-    /**
-     * Data type to identify cell type.
-     */
-    enum CellType
-    {
-      /**
-       * The cell is Cartesian.
-       */
-      cartesian = 0,
-      /**
-       * The cell may be described with an affine mapping.
-       */
-      affine    = 1,
-      /**
-       * There is no special information available for compressing the
-       * representation of the cell.
-       */
-      general   = 2,
-      /**
-       * The cell type is undefined.
-       */
-      undefined = 3
-    };
-
-
-    /**
-     * A class that is used to compare floating point arrays (e.g.
-     * std::vectors, Tensor<1,dim>, etc.). The idea of this class is to
-     * consider two arrays as equal if they are the same within a given
-     * tolerance. We use this comparator class within an std::map<> of the
-     * given arrays. Note that this comparison operator does not satisfy all
-     * the mathematical properties one usually wants to have (consider e.g.
-     * the numbers a=0, b=0.1, c=0.2 with tolerance 0.15; the operator gives
-     * a<c, but neither of a<b? or b<c? is satisfied). This is not a problem
-     * in the use cases for this class, but be careful when using it in other
-     * contexts.
-     */
-    template <typename Number>
-    struct FPArrayComparator
-    {
-      FPArrayComparator (const Number scaling);
-
-      bool operator() (const std::vector<Number> &v1,
-                       const std::vector<Number> &v2) const;
-
-      template <int dim>
-      bool operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
-                       const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
-
-      template <int dim>
-      bool operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
-                       const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
-
-      Number tolerance;
-    };
-
-    // Note: Implementation in matrix_free.templates.h
-
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 

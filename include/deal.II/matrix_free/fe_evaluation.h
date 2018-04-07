@@ -135,17 +135,23 @@ public:
   void reinit (const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
-   * For the transformation information stored in MappingInfo, this function
-   * returns the index which belongs to the current cell as specified in @p
-   * reinit. Note that MappingInfo has different fields for Cartesian cells,
-   * cells with affine mapping and with general mappings, so in order to
-   * access the correct data, this interface must be used together with
-   * get_cell_type.
+   * @deprecated Use get_mapping_data_index_offset() instead.
    */
+  DEAL_II_DEPRECATED
   unsigned int get_cell_data_number() const;
 
   /**
-   * Return the type of the cell the @p reinit function has been called for.
+   * Return the index offset within the geometry fields for the cell the @p
+   * reinit() function has been called for. This index can be used to access
+   * an index into a field that has the same compression behavior as the
+   * Jacobian of the geometry, e.g., to store an effective coefficient tensors
+   * that combines a coefficient with the geometry for lower memory transfer
+   * as the available data fields.
+   */
+  unsigned int get_mapping_data_index_offset() const;
+
+  /**
+   * Return the type of the cell the @p reinit() function has been called for.
    * Valid values are @p cartesian for Cartesian cells (which allows for
    * considerable data compression), @p affine for cells with affine mappings,
    * and @p general for general cells without any compressed storage applied.
@@ -481,6 +487,15 @@ public:
    */
   VectorizedArray<Number> JxW(const unsigned int q_point) const;
 
+  /**
+   * Gets the inverse and transposed version of Jacobian of the mapping
+   * between the unit to the real cell (representing the covariant
+   * transformation). This is exactly the matrix used internally to transform
+   * the unit cell gradients to gradients on the real cell.
+   */
+  Tensor<2,dim,VectorizedArray<Number> >
+  inverse_jacobian(const unsigned int q_index) const;
+
   //@}
 
   /**
@@ -800,12 +815,12 @@ protected:
   const internal::MatrixFreeFunctions::DoFInfo *dof_info;
 
   /**
-   * Stores a pointer to the underlying transformation data from unit to real
-   * cells for the given quadrature formula specified at construction. Also
-   * contained in matrix_info, but it simplifies code if we store a reference
-   * to it.
+   * Stores a pointer to the underlying transformation data from unit to
+   * real cells for the given quadrature formula specified at construction.
+   * Also contained in matrix_info, but it simplifies code if we store a
+   * reference to it.
    */
-  const internal::MatrixFreeFunctions::MappingInfo<dim,Number> *mapping_info;
+  const internal::MatrixFreeFunctions::MappingInfoStorage<dim,dim,Number> *mapping_data;
 
   /**
    * Stores a pointer to the unit cell shape data, i.e., values, gradients and
@@ -814,12 +829,6 @@ protected:
    * store a reference to it.
    */
   const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> *data;
-
-  /**
-   * A pointer to the Cartesian Jacobian information of the present cell. Only
-   * set to a useful value if on a Cartesian cell, otherwise zero.
-   */
-  const Tensor<1,dim,VectorizedArray<Number> > *cartesian_data;
 
   /**
    * A pointer to the Jacobian information of the present cell. Only set to a
@@ -838,26 +847,7 @@ protected:
   /**
    * A pointer to the quadrature weights of the underlying quadrature formula.
    */
-  const VectorizedArray<Number> *quadrature_weights;
-
-  /**
-   * A pointer to the quadrature points on the present cell.
-   */
-  const Point<dim,VectorizedArray<Number> > *quadrature_points;
-
-  /**
-   * A pointer to the diagonal part of the Jacobian gradient on the present
-   * cell. Only set to a useful value if on a general cell with non-constant
-   * Jacobian.
-   */
-  const Tensor<2,dim,VectorizedArray<Number> > *jacobian_grad;
-
-  /**
-   * A pointer to the upper diagonal part of the Jacobian gradient on the
-   * present cell. Only set to a useful value if on a general cell with non-
-   * constant Jacobian.
-   */
-  const Tensor<1,(dim>1?dim*(dim-1)/2:1),Tensor<1,dim,VectorizedArray<Number> > > * jacobian_grad_upper;
+  const Number *quadrature_weights;
 
   /**
    * After a call to reinit(), stores the number of the cell we are currently
@@ -872,11 +862,6 @@ protected:
    * stored internally in MappingInfo.
    */
   internal::MatrixFreeFunctions::CellType cell_type;
-
-  /**
-   * The stride to access the correct data in MappingInfo.
-   */
-  unsigned int cell_data_number;
 
   /**
    * Debug information to track whether dof values have been initialized
@@ -925,12 +910,6 @@ protected:
    * respective constructor.
    */
   std::shared_ptr<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> > mapped_geometry;
-
-  /**
-   * For use with on-the-fly evaluation, provide a data structure to store the
-   * global dof indices on the current cell from a reinit call.
-   */
-  std::vector<types::global_dof_index> old_style_dof_indices;
 
   /**
    * For a FiniteElement with more than one finite element, select at which
@@ -2112,28 +2091,22 @@ FEEvaluationBase<dim,n_components_,Number>
                       :
                       0),
   active_quad_index  (fe_degree != numbers::invalid_unsigned_int ?
-                      data_in.get_mapping_info().
-                      mapping_data_gen[quad_no_in].
-                      quad_index_from_n_q_points(n_q_points)
+                      (data_in.get_mapping_info().cell_data[quad_no_in].
+                       quad_index_from_n_q_points(n_q_points))
                       :
                       0),
   matrix_info        (&data_in),
   dof_info           (&data_in.get_dof_info(fe_no_in)),
-  mapping_info       (&data_in.get_mapping_info()),
+  mapping_data       (internal::MatrixFreeFunctions::MappingInfoCellsOrFaces<dim,Number,false>::get
+                      (data_in.get_mapping_info(), quad_no)),
   data               (&data_in.get_shape_info
                       (fe_no_in, quad_no_in, active_fe_index,
                        active_quad_index)),
-  cartesian_data     (nullptr),
   jacobian           (nullptr),
   J_value            (nullptr),
-  quadrature_weights (mapping_info->mapping_data_gen[quad_no].
-                      quadrature_weights[active_quad_index].begin()),
-  quadrature_points  (nullptr),
-  jacobian_grad      (nullptr),
-  jacobian_grad_upper(nullptr),
+  quadrature_weights (mapping_data->descriptor[active_quad_index].quadrature_weights.begin()),
   cell               (numbers::invalid_unsigned_int),
-  cell_type          (internal::MatrixFreeFunctions::undefined),
-  cell_data_number   (numbers::invalid_unsigned_int),
+  cell_type          (internal::MatrixFreeFunctions::general),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2150,7 +2123,7 @@ FEEvaluationBase<dim,n_components_,Number>
   AssertDimension (data->dofs_per_component_on_cell*n_fe_components,
                    dof_info->dofs_per_cell[active_fe_index]);
   AssertDimension (data->n_q_points,
-                   mapping_info->mapping_data_gen[quad_no].n_q_points[active_quad_index]);
+                   mapping_data->descriptor[active_quad_index].n_q_points);
   Assert (n_fe_components == 1 ||
           n_components == 1 ||
           n_components == n_fe_components,
@@ -2183,19 +2156,14 @@ FEEvaluationBase<dim,n_components_,Number>
   active_quad_index  (numbers::invalid_unsigned_int),
   matrix_info        (nullptr),
   dof_info           (nullptr),
-  mapping_info       (nullptr),
+  mapping_data       (nullptr),
   // select the correct base element from the given FE component
   data               (new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>(quadrature, fe, fe.component_to_base_index(first_selected_component).first)),
-  cartesian_data     (nullptr),
   jacobian           (nullptr),
   J_value            (nullptr),
   quadrature_weights (nullptr),
-  quadrature_points  (nullptr),
-  jacobian_grad      (nullptr),
-  jacobian_grad_upper(nullptr),
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
-  cell_data_number   (numbers::invalid_unsigned_int),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2218,9 +2186,10 @@ FEEvaluationBase<dim,n_components_,Number>
     mapped_geometry
       = std::make_shared<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> >
         (mapping, quadrature, update_flags);
-  jacobian = mapped_geometry->get_inverse_jacobians().begin();
-  J_value = mapped_geometry->get_JxW_values().begin();
-  quadrature_points = mapped_geometry->get_quadrature_points().begin();
+
+  mapping_data = &mapped_geometry->get_data_storage();
+  jacobian = mapped_geometry->get_data_storage().jacobians[0].begin();
+  J_value = mapped_geometry->get_data_storage().JxW_values.begin();
 
   Assert(fe.element_multiplicity(base_element_number) == 1 ||
          fe.element_multiplicity(base_element_number)-first_selected_component >= n_components_,
@@ -2245,24 +2214,16 @@ FEEvaluationBase<dim,n_components_,Number>
   active_quad_index  (other.active_quad_index),
   matrix_info        (other.matrix_info),
   dof_info           (other.dof_info),
-  mapping_info       (other.mapping_info),
+  mapping_data       (other.mapping_data),
   data               (other.matrix_info == nullptr ?
                       new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>(*other.data) :
                       other.data),
-  cartesian_data     (nullptr),
   jacobian           (nullptr),
   J_value            (nullptr),
-  quadrature_weights (mapping_info != nullptr ?
-                      mapping_info->mapping_data_gen[quad_no].
-                      quadrature_weights[active_quad_index].begin()
-                      :
-                      nullptr),
-  quadrature_points  (nullptr),
-  jacobian_grad      (nullptr),
-  jacobian_grad_upper(nullptr),
+  quadrature_weights (other.matrix_info == nullptr ? nullptr :
+                      mapping_data->descriptor[active_quad_index].quadrature_weights.begin()),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::general),
-  cell_data_number   (numbers::invalid_unsigned_int),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2281,10 +2242,11 @@ FEEvaluationBase<dim,n_components_,Number>
        MappingDataOnTheFly<dim,Number>(other.mapped_geometry->get_fe_values().get_mapping(),
                                        other.mapped_geometry->get_quadrature(),
                                        other.mapped_geometry->get_fe_values().get_update_flags()));
-      jacobian = mapped_geometry->get_inverse_jacobians().begin();
-      J_value = mapped_geometry->get_JxW_values().begin();
-      quadrature_points = mapped_geometry->get_quadrature_points().begin();
+      mapping_data = &mapped_geometry->get_data_storage();
       cell = 0;
+
+      jacobian = mapped_geometry->get_data_storage().jacobians[0].begin();
+      J_value = mapped_geometry->get_data_storage().JxW_values.begin();
     }
 }
 
@@ -2315,7 +2277,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
   matrix_info = other.matrix_info;
   dof_info = other.dof_info;
-  mapping_info = other.mapping_info;
+  mapping_data = other.mapping_data;
   if (other.matrix_info == nullptr)
     {
       data = new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>(*other.data);
@@ -2328,20 +2290,14 @@ FEEvaluationBase<dim,n_components_,Number>
     }
   set_data_pointers();
 
-  cartesian_data = nullptr;
   jacobian = nullptr;
   J_value = nullptr;
-  quadrature_weights = mapping_info != nullptr ?
-                       mapping_info->mapping_data_gen[quad_no].
-                       quadrature_weights[active_quad_index].begin()
-                       :
-                       nullptr;
-  quadrature_points = nullptr;
-  jacobian_grad = nullptr;
-  jacobian_grad_upper = nullptr;
+  quadrature_weights = (mapping_data != nullptr ?
+                        mapping_data->descriptor[active_quad_index].quadrature_weights.begin()
+                        :
+                        nullptr);
   cell = numbers::invalid_unsigned_int;
   cell_type = internal::MatrixFreeFunctions::general;
-  cell_data_number = numbers::invalid_unsigned_int;
 
   // Create deep copy of mapped geometry for use in parallel...
   if (other.mapped_geometry.get() != nullptr)
@@ -2351,10 +2307,10 @@ FEEvaluationBase<dim,n_components_,Number>
        MappingDataOnTheFly<dim,Number>(other.mapped_geometry->get_fe_values().get_mapping(),
                                        other.mapped_geometry->get_quadrature(),
                                        other.mapped_geometry->get_fe_values().get_update_flags()));
-      jacobian = mapped_geometry->get_inverse_jacobians().begin();
-      J_value = mapped_geometry->get_JxW_values().begin();
-      quadrature_points = mapped_geometry->get_quadrature_points().begin();
       cell = 0;
+      mapping_data = &mapped_geometry->get_data_storage();
+      jacobian = mapped_geometry->get_data_storage().jacobians[0].begin();
+      J_value = mapped_geometry->get_data_storage().JxW_values.begin();
     }
 
   return *this;
@@ -2427,72 +2383,22 @@ FEEvaluationBase<dim,n_components_,Number>
 template <int dim, int n_components_, typename Number>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_in)
+FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_index)
 {
   Assert (mapped_geometry == nullptr,
           ExcMessage("FEEvaluation was initialized without a matrix-free object."
                      " Integer indexing is not possible"));
   if (mapped_geometry != nullptr)
     return;
-  Assert (dof_info != nullptr, ExcNotInitialized());
-  Assert (mapping_info != nullptr, ExcNotInitialized());
-  AssertIndexRange (cell_in, dof_info->row_starts.size()-1);
-  AssertDimension (((dof_info->cell_active_fe_index.size() > 0) ?
-                    dof_info->cell_active_fe_index[cell_in] : 0),
-                   active_fe_index);
-  cell = cell_in;
-  cell_type = mapping_info->get_cell_type(cell);
-  cell_data_number = mapping_info->get_cell_data_index(cell);
 
-  if (mapping_info->quadrature_points_initialized == true)
-    {
-      AssertIndexRange (cell_data_number, mapping_info->
-                        mapping_data_gen[quad_no].rowstart_q_points.size());
-      const unsigned int index = mapping_info->mapping_data_gen[quad_no].
-                                 rowstart_q_points[cell];
-      AssertIndexRange (index, mapping_info->mapping_data_gen[quad_no].
-                        quadrature_points.size());
-      quadrature_points =
-        &mapping_info->mapping_data_gen[quad_no].quadrature_points[index];
-    }
+  Assert (this->dof_info != nullptr, ExcNotInitialized());
+  Assert (this->mapping_data != nullptr, ExcNotInitialized());
+  this->cell = cell_index;
+  this->cell_type = this->matrix_info->get_mapping_info().get_cell_type(cell_index);
 
-  if (cell_type == internal::MatrixFreeFunctions::cartesian)
-    {
-      cartesian_data = &mapping_info->cartesian_data[cell_data_number].first;
-      J_value        = &mapping_info->cartesian_data[cell_data_number].second;
-    }
-  else if (cell_type == internal::MatrixFreeFunctions::affine)
-    {
-      jacobian  = &mapping_info->affine_data[cell_data_number].first;
-      J_value   = &mapping_info->affine_data[cell_data_number].second;
-    }
-  else
-    {
-      const unsigned int rowstart = mapping_info->
-                                    mapping_data_gen[quad_no].rowstart_jacobians[cell_data_number];
-      AssertIndexRange (rowstart, mapping_info->
-                        mapping_data_gen[quad_no].jacobians.size());
-      jacobian =
-        &mapping_info->mapping_data_gen[quad_no].jacobians[rowstart];
-      if (mapping_info->JxW_values_initialized == true)
-        {
-          AssertIndexRange (rowstart, mapping_info->
-                            mapping_data_gen[quad_no].JxW_values.size());
-          J_value = &(mapping_info->mapping_data_gen[quad_no].
-                      JxW_values[rowstart]);
-        }
-      if (mapping_info->second_derivatives_initialized == true)
-        {
-          AssertIndexRange(rowstart, mapping_info->
-                           mapping_data_gen[quad_no].jacobians_grad_diag.size());
-          jacobian_grad = &mapping_info->mapping_data_gen[quad_no].
-                          jacobians_grad_diag[rowstart];
-          AssertIndexRange(rowstart, mapping_info->
-                           mapping_data_gen[quad_no].jacobians_grad_upper.size());
-          jacobian_grad_upper = &mapping_info->mapping_data_gen[quad_no].
-                                jacobians_grad_upper[rowstart];
-        }
-    }
+  const unsigned int offsets = this->mapping_data->data_index_offsets[cell_index];
+  this->jacobian  = &this->mapping_data->jacobians[0][offsets];
+  this->J_value   = &this->mapping_data->JxW_values[offsets];
 
 #ifdef DEBUG
   dof_values_initialized      = false;
@@ -2550,8 +2456,24 @@ unsigned int
 FEEvaluationBase<dim,n_components_,Number>
 ::get_cell_data_number () const
 {
-  Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  return cell_data_number;
+  return get_mapping_data_index_offset();
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+unsigned int
+FEEvaluationBase<dim,n_components_,Number>
+::get_mapping_data_index_offset () const
+{
+  if (matrix_info == 0)
+    return 0;
+  else
+    {
+      AssertIndexRange(cell, this->mapping_data->data_index_offsets.size());
+      return this->mapping_data->data_index_offsets[cell];
+    }
 }
 
 
@@ -2589,7 +2511,7 @@ FEEvaluationBase<dim,n_components_,Number>
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
       this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      Assert (this->mapping_info != nullptr, ExcNotImplemented());
+      Assert (this->mapping_data != nullptr, ExcNotImplemented());
       VectorizedArray<Number> J = this->J_value[0];
       for (unsigned int q=0; q<this->data->n_q_points; ++q)
         JxW_values[q] = J * this->quadrature_weights[q];
@@ -2606,15 +2528,32 @@ inline
 VectorizedArray<Number>
 FEEvaluationBase<dim,n_components_,Number>::JxW(const unsigned int q_point) const
 {
+  AssertIndexRange(q_point, data->n_q_points);
   Assert (this->J_value != nullptr, ExcNotInitialized());
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
       this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      Assert (this->mapping_info != nullptr, ExcInternalError());
+      Assert (this->quadrature_weights != nullptr, ExcInternalError());
       return this->J_value[0] * this->quadrature_weights[q_point];
     }
   else
     return this->J_value[q_point];
+}
+
+
+
+template <int dim, int n_components_, typename Number>
+inline
+Tensor<2,dim,VectorizedArray<Number> >
+FEEvaluationBase<dim,n_components_,Number>
+::inverse_jacobian(const unsigned int q_index) const
+{
+  AssertIndexRange(q_index, data->n_q_points);
+  Assert (this->jacobian != nullptr, ExcNotImplemented());
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+    return jacobian[0];
+  else
+    return jacobian[q_index];
 }
 
 
@@ -3749,13 +3688,13 @@ FEEvaluationBase<dim,n_components_,Number>
       for (unsigned int comp=0; comp<n_components; comp++)
         for (unsigned int d=0; d<dim; ++d)
           grad_out[comp][d] = (this->gradients_quad[comp][d][q_point] *
-                               cartesian_data[0][d]);
+                               jacobian[0][d][d]);
     }
   // cell with general/affine Jacobian
   else
     {
       const Tensor<2,dim,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->cell_type > internal::MatrixFreeFunctions::affine ?
         jacobian[q_point] : jacobian[0];
       for (unsigned int comp=0; comp<n_components; comp++)
         {
@@ -3841,32 +3780,35 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
+  Assert(jacobian != nullptr, ExcNotImplemented());
+  const Tensor<2,dim,VectorizedArray<Number> > &jac =
+    jacobian[this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point];
+
   Tensor<2,dim,VectorizedArray<Number> > hessian_out [n_components];
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      const Tensor<1,dim,VectorizedArray<Number> > &jac = cartesian_data[0];
       for (unsigned int comp=0; comp<n_components; comp++)
         for (unsigned int d=0; d<dim; ++d)
           {
             hessian_out[comp][d][d] = (this->hessians_quad[comp][d][q_point] *
-                                       jac[d] * jac[d]);
+                                       jac[d][d] * jac[d][d]);
             switch (dim)
               {
               case 1:
                 break;
               case 2:
                 hessian_out[comp][0][1] = (this->hessians_quad[comp][2][q_point] *
-                                           jac[0] * jac[1]);
+                                           jac[0][0] * jac[1][1]);
                 break;
               case 3:
                 hessian_out[comp][0][1] = (this->hessians_quad[comp][3][q_point] *
-                                           jac[0] * jac[1]);
+                                           jac[0][0] * jac[1][1]);
                 hessian_out[comp][0][2] = (this->hessians_quad[comp][4][q_point] *
-                                           jac[0] * jac[2]);
+                                           jac[0][0] * jac[2][2]);
                 hessian_out[comp][1][2] = (this->hessians_quad[comp][5][q_point] *
-                                           jac[1] * jac[2]);
+                                           jac[1][1] * jac[2][2]);
                 break;
               default:
                 Assert (false, ExcNotImplemented());
@@ -3875,56 +3817,9 @@ FEEvaluationBase<dim,n_components_,Number>
               hessian_out[comp][e][d] = hessian_out[comp][d][e];
           }
     }
-  // cell with general Jacobian
-  else if (this->cell_type == internal::MatrixFreeFunctions::general)
-    {
-      Assert (this->mapping_info->second_derivatives_initialized == true,
-              ExcNotInitialized());
-      const Tensor<2,dim,VectorizedArray<Number> > &jac = jacobian[q_point];
-      const Tensor<2,dim,VectorizedArray<Number> > &jac_grad = jacobian_grad[q_point];
-      const Tensor<1,(dim>1?dim*(dim-1)/2:1),
-            Tensor<1,dim,VectorizedArray<Number> > >
-            & jac_grad_UT = jacobian_grad_upper[q_point];
-      for (unsigned int comp=0; comp<n_components; comp++)
-        {
-          // compute laplacian before the gradient because it needs to access
-          // unscaled gradient data
-          VectorizedArray<Number> tmp[dim][dim];
-          internal::hessian_unit_times_jac (jac, this->hessians_quad[comp],
-                                            q_point, tmp);
-
-          // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
-          for (unsigned int d=0; d<dim; ++d)
-            for (unsigned int e=d; e<dim; ++e)
-              {
-                hessian_out[comp][d][e] = jac[d][0] * tmp[0][e];
-                for (unsigned int f=1; f<dim; ++f)
-                  hessian_out[comp][d][e] += jac[d][f] * tmp[f][e];
-              }
-
-          // add diagonal part of J' * grad(u)
-          for (unsigned int d=0; d<dim; ++d)
-            for (unsigned int e=0; e<dim; ++e)
-              hessian_out[comp][d][d] += (jac_grad[d][e] *
-                                          this->gradients_quad[comp][e][q_point]);
-
-          // add off-diagonal part of J' * grad(u)
-          for (unsigned int d=0, count=0; d<dim; ++d)
-            for (unsigned int e=d+1; e<dim; ++e, ++count)
-              for (unsigned int f=0; f<dim; ++f)
-                hessian_out[comp][d][e] += (jac_grad_UT[count][f] *
-                                            this->gradients_quad[comp][f][q_point]);
-
-          // take symmetric part
-          for (unsigned int d=0; d<dim; ++d)
-            for (unsigned int e=d+1; e<dim; ++e)
-              hessian_out[comp][e][d] = hessian_out[comp][d][e];
-        }
-    }
   // cell with general Jacobian, but constant within the cell
-  else // if (this->cell_type == internal::MatrixFreeFunctions::affine)
+  else if (this->cell_type == internal::MatrixFreeFunctions::affine)
     {
-      const Tensor<2,dim,VectorizedArray<Number> > &jac = jacobian[0];
       for (unsigned int comp=0; comp<n_components; comp++)
         {
           // compute laplacian before the gradient because it needs to access
@@ -3951,6 +3846,47 @@ FEEvaluationBase<dim,n_components_,Number>
               hessian_out[comp][e][d] = hessian_out[comp][d][e];
         }
     }
+  // cell with general Jacobian
+  else
+    {
+      const Tensor<1,dim*(dim+1)/2,Tensor<1,dim,VectorizedArray<Number> > > &jac_grad =
+        mapping_data->jacobian_gradients[0][this->get_mapping_data_index_offset()+q_point];
+      for (unsigned int comp=0; comp<n_components; comp++)
+        {
+          // compute laplacian before the gradient because it needs to access
+          // unscaled gradient data
+          VectorizedArray<Number> tmp[dim][dim];
+          internal::hessian_unit_times_jac (jac, this->hessians_quad[comp],
+                                            q_point, tmp);
+
+          // compute first part of hessian, J * tmp = J * hess_unit(u) * J^T
+          for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int e=d; e<dim; ++e)
+              {
+                hessian_out[comp][d][e] = jac[d][0] * tmp[0][e];
+                for (unsigned int f=1; f<dim; ++f)
+                  hessian_out[comp][d][e] += jac[d][f] * tmp[f][e];
+              }
+
+          // add diagonal part of J' * grad(u)
+          for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int e=0; e<dim; ++e)
+              hessian_out[comp][d][d] += (jac_grad[d][e] *
+                                          this->gradients_quad[comp][e][q_point]);
+
+          // add off-diagonal part of J' * grad(u)
+          for (unsigned int d=0, count=dim; d<dim; ++d)
+            for (unsigned int e=d+1; e<dim; ++e, ++count)
+              for (unsigned int f=0; f<dim; ++f)
+                hessian_out[comp][d][e] += (jac_grad[count][f] *
+                                            this->gradients_quad[comp][f][q_point]);
+
+          // take symmetric part
+          for (unsigned int d=0; d<dim; ++d)
+            for (unsigned int e=d+1; e<dim; ++e)
+              hessian_out[comp][e][d] = hessian_out[comp][d][e];
+        }
+    }
   return Tensor<1,n_components_,Tensor<2,dim,VectorizedArray<Number> > >(hessian_out);
 }
 
@@ -3966,24 +3902,46 @@ FEEvaluationBase<dim,n_components_,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
+  Assert(jacobian != nullptr, ExcNotImplemented());
+  const Tensor<2,dim,VectorizedArray<Number> > &jac =
+    jacobian[this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point];
+
   Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hessian_out;
 
   // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      const Tensor<1,dim,VectorizedArray<Number> > &jac = cartesian_data[0];
       for (unsigned int comp=0; comp<n_components; comp++)
         for (unsigned int d=0; d<dim; ++d)
           hessian_out[comp][d] = (this->hessians_quad[comp][d][q_point] *
-                                  jac[d] * jac[d]);
+                                  jac[d][d] * jac[d][d]);
+    }
+  // cell with general Jacobian, but constant within the cell
+  else if (this->cell_type == internal::MatrixFreeFunctions::affine)
+    {
+      for (unsigned int comp=0; comp<n_components; comp++)
+        {
+          // compute laplacian before the gradient because it needs to access
+          // unscaled gradient data
+          VectorizedArray<Number> tmp[dim][dim];
+          internal::hessian_unit_times_jac (jac, this->hessians_quad[comp],
+                                            q_point, tmp);
+
+          // compute only the trace part of hessian, J * tmp = J *
+          // hess_unit(u) * J^T
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              hessian_out[comp][d] = jac[d][0] * tmp[0][d];
+              for (unsigned int f=1; f<dim; ++f)
+                hessian_out[comp][d] += jac[d][f] * tmp[f][d];
+            }
+        }
     }
   // cell with general Jacobian
-  else if (this->cell_type == internal::MatrixFreeFunctions::general)
+  else
     {
-      Assert (this->mapping_info->second_derivatives_initialized == true,
-              ExcNotInitialized());
-      const Tensor<2,dim,VectorizedArray<Number> > &jac = jacobian[q_point];
-      const Tensor<2,dim,VectorizedArray<Number> > &jac_grad = jacobian_grad[q_point];
+      const Tensor<1,dim*(dim+1)/2,Tensor<1,dim,VectorizedArray<Number> > > &jac_grad =
+        mapping_data->jacobian_gradients[0][this->get_mapping_data_index_offset()+q_point];
       for (unsigned int comp=0; comp<n_components; comp++)
         {
           // compute laplacian before the gradient because it needs to access
@@ -4005,28 +3963,6 @@ FEEvaluationBase<dim,n_components_,Number>
             for (unsigned int e=0; e<dim; ++e)
               hessian_out[comp][d] += (jac_grad[d][e] *
                                        this->gradients_quad[comp][e][q_point]);
-        }
-    }
-  // cell with general Jacobian, but constant within the cell
-  else // if (this->cell_type == internal::MatrixFreeFunctions::affine)
-    {
-      const Tensor<2,dim,VectorizedArray<Number> > &jac = jacobian[0];
-      for (unsigned int comp=0; comp<n_components; comp++)
-        {
-          // compute laplacian before the gradient because it needs to access
-          // unscaled gradient data
-          VectorizedArray<Number> tmp[dim][dim];
-          internal::hessian_unit_times_jac (jac, this->hessians_quad[comp],
-                                            q_point, tmp);
-
-          // compute only the trace part of hessian, J * tmp = J *
-          // hess_unit(u) * J^T
-          for (unsigned int d=0; d<dim; ++d)
-            {
-              hessian_out[comp][d] = jac[d][0] * tmp[0][d];
-              for (unsigned int f=1; f<dim; ++f)
-                hessian_out[comp][d] += jac[d][f] * tmp[f][d];
-            }
         }
     }
   return hessian_out;
@@ -4114,22 +4050,25 @@ FEEvaluationBase<dim,n_components_,Number>
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange (q_point, this->data->n_q_points);
   this->gradients_quad_submitted = true;
+  Assert (this->J_value != nullptr, ExcNotInitialized());
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> JxW = J_value[0] * quadrature_weights[q_point];
       for (unsigned int comp=0; comp<n_components; comp++)
         for (unsigned int d=0; d<dim; ++d)
           this->gradients_quad[comp][d][q_point] = (grad_in[comp][d] *
-                                                    cartesian_data[0][d] * JxW);
+                                                    jacobian[0][d][d] * JxW);
     }
   else
     {
       const Tensor<2,dim,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->cell_type > internal::MatrixFreeFunctions::affine ?
         jacobian[q_point] : jacobian[0];
       const VectorizedArray<Number> JxW =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
+        this->cell_type > internal::MatrixFreeFunctions::affine ?
         J_value[q_point] : J_value[0] * quadrature_weights[q_point];
       for (unsigned int comp=0; comp<n_components; ++comp)
         for (unsigned int d=0; d<dim; ++d)
@@ -4320,26 +4259,27 @@ FEEvaluationAccess<dim,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
+
   Tensor<1,dim,VectorizedArray<Number> > grad_out;
 
-  // Cartesian cell
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int d=0; d<dim; ++d)
         grad_out[d] = (this->gradients_quad[0][d][q_point] *
-                       this->cartesian_data[0][d]);
+                       this->jacobian[0][d][d]);
     }
-  // cell with general/constant Jacobian
+  // cell with general/affine Jacobian
   else
     {
       const Tensor<2,dim,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->jacobian[q_point] : this->jacobian[0];
+        this->jacobian[this->cell_type > internal::MatrixFreeFunctions::affine ?
+                       q_point : 0];
       for (unsigned int d=0; d<dim; ++d)
         {
-          grad_out[d] = (jac[d][0] * this->gradients_quad[0][0][q_point]);
+          grad_out[d] = jac[d][0] * this->gradients_quad[0][0][q_point];
           for (unsigned int e=1; e<dim; ++e)
-            grad_out[d] += (jac[d][e] * this->gradients_quad[0][e][q_point]);
+            grad_out[d] += jac[d][e] * this->gradients_quad[0][e][q_point];
         }
     }
   return grad_out;
@@ -4427,36 +4367,40 @@ inline
 void
 FEEvaluationAccess<dim,1,Number>
 ::submit_gradient (const Tensor<1,dim,VectorizedArray<Number> > grad_in,
-                   const unsigned int q_point)
+                   const unsigned int q_index)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_index, this->data->n_q_points);
   this->gradients_quad_submitted = true;
+  Assert (this->J_value != nullptr, ExcNotInitialized());
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
-      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
+      const VectorizedArray<Number> JxW = this->J_value[0] *
+                                          this->quadrature_weights[q_index];
       for (unsigned int d=0; d<dim; ++d)
-        this->gradients_quad[0][d][q_point] = (grad_in[d] *
-                                               this->cartesian_data[0][d] *
+        this->gradients_quad[0][d][q_index] = (grad_in[d] *
+                                               this->jacobian[0][d][d] *
                                                JxW);
     }
   // general/affine cell type
   else
     {
       const Tensor<2,dim,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->jacobian[q_point] : this->jacobian[0];
+        this->cell_type > internal::MatrixFreeFunctions::affine ?
+        this->jacobian[q_index] : this->jacobian[0];
       const VectorizedArray<Number> JxW =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
+        this->cell_type > internal::MatrixFreeFunctions::affine ?
+        this->J_value[q_index] : this->J_value[0] * this->quadrature_weights[q_index];
       for (unsigned int d=0; d<dim; ++d)
         {
           VectorizedArray<Number> new_val = jac[0][d] * grad_in[0];
           for (unsigned int e=1; e<dim; ++e)
             new_val += jac[e][d] * grad_in[e];
-          this->gradients_quad[0][d][q_point] = new_val * JxW;
+          this->gradients_quad[0][d][q_index] = new_val * JxW;
         }
     }
 }
@@ -4552,6 +4496,7 @@ FEEvaluationAccess<dim,dim,Number>
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
 
   VectorizedArray<Number> divergence;
 
@@ -4559,10 +4504,10 @@ FEEvaluationAccess<dim,dim,Number>
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       divergence = (this->gradients_quad[0][0][q_point] *
-                    this->cartesian_data[0][0]);
+                    this->jacobian[0][0][0]);
       for (unsigned int d=1; d<dim; ++d)
         divergence += (this->gradients_quad[d][d][q_point] *
-                       this->cartesian_data[0][d]);
+                       this->jacobian[0][d][d]);
     }
   // cell with general/constant Jacobian
   else
@@ -4714,7 +4659,10 @@ FEEvaluationAccess<dim,dim,Number>
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange (q_point, this->data->n_q_points);
   this->gradients_quad_submitted = true;
+  Assert (this->J_value != nullptr, ExcNotInitialized());
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> fac = this->J_value[0] *
@@ -4722,7 +4670,7 @@ FEEvaluationAccess<dim,dim,Number>
       for (unsigned int d=0; d<dim; ++d)
         {
           this->gradients_quad[d][d][q_point] = (fac *
-                                                 this->cartesian_data[0][d]);
+                                                 this->jacobian[0][d][d]);
           for (unsigned int e=d+1; e<dim; ++e)
             {
               this->gradients_quad[d][e][q_point] = VectorizedArray<Number>();
@@ -4764,22 +4712,25 @@ FEEvaluationAccess<dim,dim,Number>
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   AssertIndexRange (q_point, this->data->n_q_points);
   this->gradients_quad_submitted = true;
+  Assert (this->J_value != nullptr, ExcNotInitialized());
+  Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int d=0; d<dim; ++d)
         this->gradients_quad[d][d][q_point] = (sym_grad.access_raw_entry(d) *
                                                JxW *
-                                               this->cartesian_data[0][d]);
+                                               this->jacobian[0][d][d]);
       for (unsigned int e=0, counter=dim; e<dim; ++e)
         for (unsigned int d=e+1; d<dim; ++d, ++counter)
           {
             const VectorizedArray<Number> value = sym_grad.access_raw_entry(counter) * JxW;
             this->gradients_quad[e][d][q_point] = (value *
-                                                   this->cartesian_data[0][d]);
+                                                   this->jacobian[0][d][d]);
             this->gradients_quad[d][e][q_point] = (value *
-                                                   this->cartesian_data[0][e]);
+                                                   this->jacobian[0][e][e]);
           }
     }
   // general/affine cell type
@@ -4943,23 +4894,13 @@ FEEvaluationAccess<1,1,Number>
           internal::ExcAccessToUninitializedField());
   AssertIndexRange (q_point, this->data->n_q_points);
 
+  const Tensor<2,1,VectorizedArray<Number> > &jac =
+    this->cell_type == internal::MatrixFreeFunctions::general ?
+    this->jacobian[q_point] : this->jacobian[0];
+
   Tensor<1,1,VectorizedArray<Number> > grad_out;
+  grad_out[0] = jac[0][0] * this->gradients_quad[0][0][q_point];
 
-  // Cartesian cell
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-    {
-      grad_out[0] = (this->gradients_quad[0][0][q_point] *
-                     this->cartesian_data[0][0]);
-    }
-  // cell with general/constant Jacobian
-  else
-    {
-      const Tensor<2,1,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->jacobian[q_point] : this->jacobian[0];
-
-      grad_out[0] = (jac[0][0] * this->gradients_quad[0][0][q_point]);
-    }
   return grad_out;
 }
 
@@ -5052,25 +4993,15 @@ FEEvaluationAccess<1,1,Number>
   AssertIndexRange (q_point, this->data->n_q_points);
   this->gradients_quad_submitted = true;
 #endif
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
-    {
-      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
-      this->gradients_quad[0][0][q_point] = (grad_in[0] *
-                                             this->cartesian_data[0][0] *
-                                             JxW);
-    }
-  // general/affine cell type
-  else
-    {
-      const Tensor<2,1,VectorizedArray<Number> > &jac =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->jacobian[q_point] : this->jacobian[0];
-      const VectorizedArray<Number> JxW =
-        this->cell_type == internal::MatrixFreeFunctions::general ?
-        this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
 
-      this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in[0] * JxW;
-    }
+  const Tensor<2,1,VectorizedArray<Number> > &jac =
+    this->cell_type > internal::MatrixFreeFunctions::affine ?
+    this->jacobian[q_point] : this->jacobian[0];
+  const VectorizedArray<Number> JxW =
+    this->cell_type > internal::MatrixFreeFunctions::affine ?
+    this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
+
+  this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in[0] * JxW;
 }
 
 
@@ -5252,13 +5183,13 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                   proposed_dof_comp = no;
                   break;
                 }
-          if (static_n_q_points ==
-              this->mapping_info->mapping_data_gen[this->quad_no].n_q_points[this->active_quad_index])
+          if (n_q_points ==
+              this->mapping_data->descriptor[this->active_quad_index].n_q_points)
             proposed_quad_comp = this->quad_no;
           else
-            for (unsigned int no=0; no<this->mapping_info->mapping_data_gen.size(); ++no)
-              if (this->mapping_info->mapping_data_gen[no].n_q_points[this->active_quad_index]
-                  == static_n_q_points)
+            for (unsigned int no=0; no<this->matrix_info->get_mapping_info().cell_data.size(); ++no)
+              if (this->matrix_info->get_mapping_info().cell_data[no].descriptor[this->active_quad_index].n_q_points
+                  == n_q_points)
                 {
                   proposed_quad_comp = no;
                   break;
@@ -5326,8 +5257,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   if (fe_no != numbers::invalid_unsigned_int)
     {
       AssertDimension (n_q_points,
-                       this->mapping_info->mapping_data_gen[this->quad_no].
-                       n_q_points[this->active_quad_index]);
+                       this->mapping_data->descriptor[this->active_quad_index].n_q_points);
       AssertDimension (this->data->dofs_per_component_on_cell * this->n_fe_components,
                        this->dof_info->dofs_per_cell[this->active_fe_index]);
     }
@@ -5343,10 +5273,24 @@ Point<dim,VectorizedArray<Number> >
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::quadrature_point (const unsigned int q) const
 {
-  Assert (this->mapping_info->quadrature_points_initialized == true,
-          ExcNotInitialized());
-  Assert (this->quadrature_points != nullptr, ExcNotInitialized());
+  if (this->matrix_info == nullptr)
+    {
+      Assert ((this->mapped_geometry->get_fe_values().get_update_flags() |
+               update_quadrature_points),
+              ExcNotInitialized());
+    }
+  else
+    {
+      Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
+             ExcNotInitialized());
+    }
+
   AssertIndexRange (q, n_q_points);
+  const Point<dim,VectorizedArray<Number> > *quadrature_points = &this->mapping_data->
+      quadrature_points[this->mapping_data->quadrature_point_offsets[this->cell]];
+
+  const unsigned int n_q_points_1d_actual =
+    fe_degree == -1 ? this->data->n_q_points_1d : n_q_points_1d;
 
   // Cartesian mesh: not all quadrature points are stored, only the
   // diagonal. Hence, need to find the tensor product index and retrieve the
@@ -5357,15 +5301,15 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       switch (dim)
         {
         case 1:
-          return this->quadrature_points[q];
+          return quadrature_points[q];
         case 2:
-          point[0] = this->quadrature_points[q%n_q_points_1d][0];
-          point[1] = this->quadrature_points[q/n_q_points_1d][1];
+          point[0] = quadrature_points[q%n_q_points_1d_actual][0];
+          point[1] = quadrature_points[q/n_q_points_1d_actual][1];
           return point;
         case 3:
-          point[0] = this->quadrature_points[q%n_q_points_1d][0];
-          point[1] = this->quadrature_points[(q/n_q_points_1d)%n_q_points_1d][1];
-          point[2] = this->quadrature_points[q/(n_q_points_1d*n_q_points_1d)][2];
+          point[0] = quadrature_points[q%n_q_points_1d_actual][0];
+          point[1] = quadrature_points[(q/n_q_points_1d_actual)%n_q_points_1d_actual][1];
+          point[2] = quadrature_points[q/(n_q_points_1d_actual*n_q_points_1d_actual)][2];
           return point;
         default:
           Assert (false, ExcNotImplemented());
@@ -5374,7 +5318,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
     }
   // all other cases: just return the respective data as it is fully stored
   else
-    return this->quadrature_points[q];
+    return quadrature_points[q];
 }
 
 
