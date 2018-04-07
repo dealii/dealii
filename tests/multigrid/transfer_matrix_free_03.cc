@@ -71,6 +71,8 @@ void check(const unsigned int fe_degree)
       MGTransferMatrixFree<dim, Number> transfer(mg_constrained_dofs);
       transfer.build(mgdof);
 
+      const Number tolerance = 1000. * std::numeric_limits<Number>::epsilon();
+
       // check prolongation for all levels using random vector
       for (unsigned int level=1; level<mgdof.get_triangulation().n_global_levels(); ++level)
         {
@@ -86,7 +88,8 @@ void check(const unsigned int fe_degree)
           transfer_ref.prolongate(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff prolongate   l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff prolongate   l" << level << ": "
+                  << filter_out_small_numbers(v3.l2_norm(), tolerance) << std::endl;
         }
 
       // check restriction for all levels using random vector
@@ -104,7 +107,8 @@ void check(const unsigned int fe_degree)
           transfer_ref.restrict_and_add(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff restrict     l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff restrict     l" << level << ": "
+                  << filter_out_small_numbers(v3.l2_norm(), tolerance) << std::endl;
 
           v2 = 1.;
           v3 = 1.;
@@ -112,7 +116,8 @@ void check(const unsigned int fe_degree)
           transfer_ref.restrict_and_add(level, v3, v1_cpy);
           v2_cpy = v2;
           v3 -= v2_cpy;
-          deallog << "Diff restrict add l" << level << ": " << v3.l2_norm() << std::endl;
+          deallog << "Diff restrict add l" << level << ": "
+                  << filter_out_small_numbers(v3.l2_norm(), tolerance) << std::endl;
         }
       deallog << std::endl;
     }
