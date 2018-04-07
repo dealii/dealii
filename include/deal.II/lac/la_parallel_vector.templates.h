@@ -515,7 +515,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::zero_out_ghosts ()
+    Vector<Number>::zero_out_ghosts () const
     {
       std::fill_n (&values[partitioner->local_size()],
                    partitioner->n_ghost_indices(),

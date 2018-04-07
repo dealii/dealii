@@ -331,7 +331,7 @@ namespace LinearAlgebra
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
        */
-      void zero_out_ghosts ();
+      void zero_out_ghosts () const;
 
       /**
        * Return if this Vector contains ghost elements.
