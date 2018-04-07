@@ -1891,7 +1891,7 @@ contract3 (const TensorT1<rank_1, dim, T1>          &left,
  */
 template <int rank_1, int rank_2, int dim,
           typename Number, typename OtherNumber>
-inline
+inline DEAL_II_ALWAYS_INLINE
 Tensor<rank_1 + rank_2, dim, typename ProductType<Number, OtherNumber>::type>
 outer_product(const Tensor<rank_1, dim, Number> &src1,
               const Tensor<rank_2, dim, OtherNumber> &src2)
