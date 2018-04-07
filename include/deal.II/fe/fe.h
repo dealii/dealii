@@ -2413,9 +2413,9 @@ protected:
    * can be in (all combinations of the three bool flags face_orientation,
    * face_flip and face_rotation).
    *
-   * The standard implementation fills this with zeros, i.e. no permutation at
-   * all. Derived finite element classes have to fill this Table with the
-   * correct values.
+   * The constructor of this class fills this table with zeros, i.e.,
+   * no permutation at all. Derived finite element classes have to
+   * fill this Table with the correct values.
    */
   Table<2,int> adjust_quad_dof_index_for_face_orientation_table;
 
@@ -2428,9 +2428,9 @@ protected:
    * for permutation so the vector is empty. In 3D it has the size of
    * #dofs_per_line.
    *
-   * The standard implementation fills this with zeros, i.e. no permutation at
-   * all. Derived finite element classes have to fill this vector with the
-   * correct values.
+   * The constructor of this class fills this table with zeros, i.e.,
+   * no permutation at all. Derived finite element classes have to
+   * fill this vector with the correct values.
    */
   std::vector<int> adjust_line_dof_index_for_line_orientation_table;
 
