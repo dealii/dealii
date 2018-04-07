@@ -81,20 +81,27 @@
  *
  * <h3>An example</h3>
  *
- * A simple example why dealing with curved geometries is already provided
- * by step-1, though it is not elaborated there. For example, consider this
- * small variation of the <code>second_grid()</code> function shown there,
- * where we simply refine <i>every</i> cell several times and do not deal
- * with boundaries at all:
- * @code
- *  Triangulation<2> triangulation;
+ * A simple example why dealing with curved geometries is already provided by
+ * step-1, though it is not elaborated there. By default, the functions in
+ * GridGenerator will attach manifolds to meshes when needed. In each code
+ * snippet below we call Triangulation::reset_all_manifolds() to remove these
+ * manifolds and handle all Manifold attachment in the example itself to make
+ * the impact of the choice of Manifold clear.
  *
+ * Consider this
+ * small variation of the <code>second_grid()</code> function shown there,
+ * where we simply refine <i>every</i> cell several times:
+ * @code
  *  const Point<2> center (1,0);
  *  const double inner_radius = 0.5,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              10);
+ *  // as noted above: disable all non-Cartesian manifolds
+ *  // for demonstration purposes:
+ *  triangulation.reset_all_manifolds();
  *
  *  triangulation.refine_global (3);
  * @endcode
@@ -110,20 +117,20 @@
  * in the middle of the existing ones, regardless of what we may have intended
  * (but omitted to describe in code).
  *
- * This is easily remedied. step-1 already shows how to do this. Consider this
- * code:
+ * This is easily remedied. Consider this code:
  * @code
- *  Triangulation<2> triangulation;
- *
  *  const Point<2> center (1,0);
+ *  const SphericalManifold<2> manifold(center);
  *  const double inner_radius = 0.5,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              10);
- *  const SphericalManifold<2> boundary_description(center);
+ *  // again disable all manifolds for demonstration purposes
+ *  triangulation.reset_all_manifolds();
  *  triangulation.set_all_manifold_ids_on_boundary(0);
- *  triangulation.set_boundary (0, boundary_description);
+ *  triangulation.set_manifold (0, manifold);
  *
  *  triangulation.refine_global (3);
  * @endcode
@@ -146,26 +153,23 @@
  * This can be remedied by assigning a manifold description not only to
  * the lines along the boundary, but also to the radial lines and cells (which,
  * in turn, will inherit it to the new lines that are created upon mesh
- * refinement). This code achieves this:
+ * refinement). This is exactly what GridGenerator::hyper_shell() does by default.
+ * For demonstration purposes, we disable the default Manifold behavior and then
+ * duplicate it manually:
  * @code
- *  Triangulation<2> triangulation;
- *
  *  const Point<2> center (1,0);
+ *  const SphericalManifold<2> manifold(center);
  *  const double inner_radius = 0.5,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              10);
- *  const SphericalManifold<2> boundary_description(center);
- *  triangulation.set_all_manifold_ids_on_boundary(0);
- *  triangulation.set_manifold (0, boundary_description);
- *
- *  Triangulation<2>::active_cell_iterator
- *    cell = triangulation.begin_active(),
- *    endc = triangulation.end();
- *  for (; cell!=endc; ++cell)
- *    cell->set_all_manifold_ids (0);
- *
+ *  // again disable all manifolds for demonstration purposes
+ *  triangulation.reset_all_manifolds();
+ *  // reenable the
+ *  triangulation.set_all_manifold_ids(0);
+ *  triangulation.set_manifold (0, manifold);
  *  triangulation.refine_global (3);
  * @endcode
  * This leads to the following mesh:
@@ -188,17 +192,17 @@
  * not so much of an issue for the meshes shown above, but is sometimes an
  * issue. Consider, for example, the following code and mesh:
  * @code
- *  Triangulation<2> triangulation;
- *
  *  const Point<2> center (1,0);
+ *  const SphericalManifold<2> manifold(center);
  *  const double inner_radius = 0.5,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
- *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.reset_all_manifolds();
  *  triangulation.set_all_manifold_ids_on_boundary(0);
- *  triangulation.set_manifold (0, boundary_description);
+ *  triangulation.set_manifold (0, manifold);
  *
  *  triangulation.refine_global (3);
  * @endcode
@@ -217,23 +221,17 @@
  * generators), we observe the following:
  *
  * @code
- *  Triangulation<2> triangulation;
- *
  *  const Point<2> center (1,0);
+ *  const SphericalManifold<2> manifold(center);
  *  const double inner_radius = 0.8,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
- *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.reset_all_manifolds();
  *  triangulation.set_all_manifold_ids_on_boundary(0);
- *  triangulation.set_manifold (0, boundary_description);
- *
- *  Triangulation<2>::active_cell_iterator
- *    cell = triangulation.begin_active(),
- *    endc = triangulation.end();
- *  for (; cell!=endc; ++cell)
- *    cell->set_all_manifold_ids (0);
+ *  triangulation.set_manifold (0, manifold);
  *
  *  triangulation.refine_global (3);
  * @endcode
@@ -247,28 +245,22 @@
  * not only to the boundary but also to interior cells and edges, using
  * the same code as above:
  * @code
- *  Triangulation<2> triangulation;
- *
  *  const Point<2> center (1,0);
  *  const double inner_radius = 0.8,
  *               outer_radius = 1.0;
+ *  Triangulation<2> triangulation;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
- *  const SphericalManifold<2> boundary_description(center);
- *  triangulation.set_all_manifold_ids(0);
- *  triangulation.set_manifold (0, boundary_description);
- *
- *  Triangulation<2>::active_cell_iterator
- *    cell = triangulation.begin_active(),
- *    endc = triangulation.end();
- *  for (; cell!=endc; ++cell)
- *    cell->set_all_manifold_ids (0);
  *
  *  triangulation.refine_global (3);
  * @endcode
  *
  * @image html hypershell-all-3.png ""
+ *
+ * In this last example we finally let GridGenerator do its job and we keep
+ * the default manifold configuration, which is a SphericalManifold on every
+ * cell and face.
  *
  * Here, even starting with an initial, inappropriately chosen mesh retains
  * our ability to adequately refine the mesh into one that will serve us
