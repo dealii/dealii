@@ -1110,24 +1110,24 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define Assert(cond, exc)                                                  \
-  {                                                                            \
-    if (__builtin_expect(!(cond), false))                                      \
-      ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
-          ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
-  }
+#    define Assert(cond, exc)                                                \
+{                                                                            \
+  if (__builtin_expect(!(cond), false))                                      \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
+        ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
+}
 #  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    define Assert(cond, exc)                                                  \
-  {                                                                            \
-    if (!(cond))                                                               \
-      ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
-          ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
-  }
+#    define Assert(cond, exc)                                                \
+{                                                                            \
+  if (!(cond))                                                               \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
+        ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
+}
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
-#define Assert(cond, exc)                                                      \
+#define Assert(cond, exc)                                                    \
   {}
 #endif
 
@@ -1150,24 +1150,24 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define AssertNothrow(cond, exc)                                           \
-  {                                                                              \
-    if (__builtin_expect(!(cond), false))                                        \
-      ::dealii::deal_II_exceptions::internals::issue_error_nothrow(              \
-          ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,   \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
-  }
+#    define AssertNothrow(cond, exc)                                             \
+{                                                                                \
+  if (__builtin_expect(!(cond), false))                                          \
+    ::dealii::deal_II_exceptions::internals::issue_error_nothrow(                \
+        ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,     \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);              \
+}
 #  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#    define AssertNothrow(cond, exc)                                           \
-  {                                                                              \
-    if (!(cond))                                                                 \
-      ::dealii::deal_II_exceptions::internals::issue_error_nothrow(              \
-          ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,   \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
-  }
+#    define AssertNothrow(cond, exc)                                             \
+{                                                                                \
+  if (!(cond))                                                                   \
+    ::dealii::deal_II_exceptions::internals::issue_error_nothrow(                \
+        ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,     \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);              \
+}
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
-#define AssertNothrow(cond, exc)                                               \
+#define AssertNothrow(cond, exc)                                                 \
   {}
 #endif
 
@@ -1188,20 +1188,20 @@ namespace deal_II_exceptions
  */
 #ifdef DEAL_II_HAVE_BUILTIN_EXPECT
 #define AssertThrow(cond, exc)                                                 \
-  {                                                                            \
-    if (__builtin_expect(!(cond), false))                                      \
-      ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception,         \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
-  }
+{                                                                              \
+  if (__builtin_expect(!(cond), false))                                        \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(            \
+        ::dealii::deal_II_exceptions::internals::throw_on_exception,           \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
+}
 #else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #define AssertThrow(cond, exc)                                                 \
-  {                                                                            \
-    if (!(cond))                                                               \
-      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(           \
-          ::dealii::deal_II_exceptions::internals::throw_on_exception,         \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
-  }
+{                                                                              \
+  if (!(cond))                                                                 \
+    ::dealii::deal_II_exceptions::internals::issue_error_noreturn(             \
+        ::dealii::deal_II_exceptions::internals::throw_on_exception,           \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
+}
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
 /**
@@ -1251,10 +1251,10 @@ namespace internal
  * @author Guido Kanschat 2007
  */
 #define AssertIndexRange(index,range)                                          \
-  Assert((index) < (range),                                                    \
-         dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type< \
-         void(typename std::common_type<decltype(index),                       \
-              decltype(range)>::type)>::type>((index),0,(range)))
+Assert((index) < (range),                                                      \
+       dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<   \
+       void(typename std::common_type<decltype(index),                         \
+            decltype(range)>::type)>::type>((index),0,(range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly
@@ -1266,8 +1266,8 @@ namespace internal
  * @author Wolfgang Bangerth, 2015
  */
 #define AssertIsFinite(number)                                                 \
-  Assert(dealii::numbers::is_finite(number),                                   \
-         dealii::ExcNumberNotFinite(std::complex<double>(number)))
+Assert(dealii::numbers::is_finite(number),                                     \
+       dealii::ExcNumberNotFinite(std::complex<double>(number)))
 
 #ifdef DEAL_II_WITH_MPI
 /**
@@ -1280,8 +1280,8 @@ namespace internal
  * @ingroup Exceptions
  * @author David Wells, 2016
  */
-#define AssertThrowMPI(error_code) \
-  AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
+#define AssertThrowMPI(error_code)                                             \
+AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
 #else
 #define AssertThrowMPI(error_code) {}
 #endif // DEAL_II_WITH_MPI

@@ -18,7 +18,6 @@
 --style=gnu
 
 --convert-tabs
---indent-preprocessor
 --indent=spaces=2
 --indent-namespaces
 --keep-one-line-blocks
