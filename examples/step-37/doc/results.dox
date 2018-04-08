@@ -402,6 +402,37 @@ processors in MPI, which limits scalability by a factor of around two to five.
 
 <h3> Possibilities for extensions</h3>
 
+<h4> Kelly error estimator </h4>
+
+As mentioned above the code is ready for locally adaptive h-refinement.
+For the Poisson equation one can employ the Kelly error indicator,
+implemented in the KellyErrorEstimator class. However one needs to be careful
+with the ghost indices of parallel vectors.
+In order to evaluate the jump terms in the error indicator, each MPI process
+needs to know locally relevant DoFs.
+However MatrixFree::initialize_dof_vector() function initializes the vector only with
+some locally relevant DoFs.
+The ghost indices made available in the vector are a tight set of only those indices
+that are touched in the cell integrals (including constraint resolution).
+This choice has performance reasons, because sending all locally relevant degrees
+of freedom would be too expensive compared to the matrix-vector product.
+Consequently the solution vector as-is is
+not suitable for the KellyErrorEstimator class.
+The trick is to change the ghost part of the partition, for example using a
+temporary vector and LinearAlgebra::distributed::Vector::copy_locally_owned_data_from()
+as shown below.
+
+@code
+IndexSet locally_relevant_set;
+DoFTools::extract_locally_relevant_dofs (dof_handler,
+                                         locally_relevant_set);
+LinearAlgebra::distributed::Vector<double> copy_vec(solution);
+solution.reinit(locally_owned_dofs, locally_relevant_set, mpi_communicator);
+solution.copy_locally_owned_data_from(copy_vec);
+constraints.distribute(solution);
+solution.update_ghost_values();
+@endcode
+
 <h4> Shared-memory parallelization</h4>
 
 This program is parallelized with MPI only. As an alternative, the MatrixFree
