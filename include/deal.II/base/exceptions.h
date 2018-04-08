@@ -347,15 +347,25 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
-#define Assert(cond, exc)                                                   \
+#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#    define Assert(cond, exc)                                                 \
+  {                                                                           \
+    if (__builtin_expect(!(cond), false))                                     \
+      ::dealii::deal_II_exceptions::internals::                               \
+      issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
+                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+  }
+#  else
+#    define Assert(cond, exc)                                                 \
   {                                                                           \
     if (!(cond))                                                              \
       ::dealii::deal_II_exceptions::internals::                               \
       issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
+#  endif
 #else
-#define Assert(cond, exc)                                                   \
+#define Assert(cond, exc)                                                     \
   {}
 #endif
 
@@ -377,7 +387,17 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
-#define AssertNothrow(cond, exc)                                              \
+#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#    define AssertNothrow(cond, exc)                                            \
+  {                                                                             \
+    if (__builtin_expect(!(cond), false))                                       \
+      ::dealii::deal_II_exceptions::internals::                                 \
+      issue_error_nothrow(                                                      \
+          ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
+  }
+#  else
+#    define AssertNothrow(cond, exc)                                            \
   {                                                                             \
     if (!(cond))                                                                \
       ::dealii::deal_II_exceptions::internals::                                 \
@@ -385,6 +405,7 @@ namespace deal_II_exceptions
           ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
           __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
   }
+#  endif
 #else
 #define AssertNothrow(cond, exc)                                              \
   {}
@@ -408,7 +429,7 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#define AssertThrow(cond, exc)                                              \
+#define AssertThrow(cond, exc)                                                \
   {                                                                           \
     if (__builtin_expect(!(cond), false))                                     \
       ::dealii::deal_II_exceptions::internals::                               \
@@ -416,7 +437,7 @@ namespace deal_II_exceptions
                   __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
   }
 #else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#define AssertThrow(cond, exc)                                              \
+#define AssertThrow(cond, exc)                                                \
   {                                                                           \
     if (!(cond))                                                              \
       ::dealii::deal_II_exceptions::internals::                               \
