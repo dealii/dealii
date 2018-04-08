@@ -19,6 +19,7 @@
 
 
 // all include files you need here
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -39,6 +40,11 @@ public:
     if (spacedim > 1)
       p[1] = 4*p[0]*(1-p[0]);
     return p;
+  }
+
+  std::unique_ptr<Manifold<dim,spacedim> > clone() const override
+  {
+    return std_cxx14::make_unique<MyManifold<dim,spacedim> >();
   }
 };
 

@@ -993,7 +993,7 @@ private:
   std::vector<bool> coarse_cell_is_flat;
 
   /**
-   * A flat manifold used to compute new points in the chart space where it we
+   * A flat manifold used to compute new points in the chart space where we
    * use a FlatManifold description.
    */
   FlatManifold<dim> chart_manifold;

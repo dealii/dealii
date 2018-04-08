@@ -3681,11 +3681,11 @@ next_cell:
 
     // Save manifolds
     auto manifold_ids = tria.get_manifold_ids();
-    std::map<types::manifold_id, const Manifold<dim,spacedim>*> manifolds;
+    std::map<types::manifold_id, std::unique_ptr<Manifold<dim,spacedim> > > manifolds;
     // Set manifolds in new Triangulation
     for (auto manifold_id: manifold_ids)
       if (manifold_id != numbers::invalid_manifold_id)
-        manifolds[manifold_id] = &tria.get_manifold(manifold_id);
+        manifolds[manifold_id] = tria.get_manifold(manifold_id).clone();
 
     tria.clear();
 

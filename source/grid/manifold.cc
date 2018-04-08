@@ -15,6 +15,7 @@
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -516,7 +517,7 @@ template<int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim> >
 FlatManifold<dim,spacedim>::clone() const
 {
-  return std::unique_ptr<Manifold<dim,spacedim> >(new FlatManifold<dim,spacedim>(periodicity, tolerance));
+  return std_cxx14::make_unique<FlatManifold<dim,spacedim> >(periodicity, tolerance);
 }
 
 

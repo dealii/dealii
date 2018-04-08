@@ -31,10 +31,16 @@ public:
     ChartManifold<dim,spacedim,spacedim>(periodicity)
   {}
 
+  virtual
+  std::unique_ptr<Manifold<2,3> >
+  clone() const override
+  {
+    return std::unique_ptr<Manifold<2,3> > (new MyCylinderManifold());
+  }
 
   virtual
   Point<spacedim>
-  pull_back(const Point<spacedim> &space_point) const
+  pull_back(const Point<spacedim> &space_point) const override
   {
     const double x = space_point[0];
     const double y = space_point[1];
@@ -51,7 +57,7 @@ public:
 
   virtual
   Point<spacedim>
-  push_forward(const Point<spacedim> &chart_point) const
+  push_forward(const Point<spacedim> &chart_point) const override
   {
     const double r   = chart_point[0];
     const double phi = chart_point[1];
@@ -64,7 +70,7 @@ public:
 
   virtual
   DerivativeForm<1,spacedim,spacedim>
-  push_forward_gradient(const Point<spacedim> &chart_point) const
+  push_forward_gradient(const Point<spacedim> &chart_point) const override
   {
     DerivativeForm<1,spacedim,spacedim> g;
 

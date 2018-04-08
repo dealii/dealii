@@ -15,6 +15,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -103,8 +104,9 @@ template <int dim>
 class Geometry: public ChartManifold<dim>
 {
 public:
-  virtual Point<dim> pull_back(const Point<dim> &space_point) const;
-  virtual Point<dim> push_forward(const Point<dim> &chart_point) const;
+  virtual Point<dim> pull_back(const Point<dim> &space_point) const override;
+  virtual Point<dim> push_forward(const Point<dim> &chart_point) const override;
+  virtual std::unique_ptr<Manifold<dim> >clone() const override;
 };
 
 template <int dim>
@@ -147,6 +149,12 @@ Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
   return p;
 }
 
+template <int dim>
+std::unique_ptr<Manifold<dim> >
+Geometry<dim>::clone() const
+{
+  return std_cxx14::make_unique<Geometry<dim> >();
+}
 
 
 template <int dim>
