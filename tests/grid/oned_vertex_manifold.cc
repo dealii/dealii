@@ -51,15 +51,6 @@ int main()
           deallog << "current vertex manifold id: "
                   << cell->face(vertex_n)->manifold_id()
                   << std::endl;
-
-          if (cell->face(vertex_n)->manifold_id() == 42)
-            {
-              // since the reference is const, the pointer we compare it to
-              // must also be a to a const object
-              const auto &spherical_reference = spherical_manifold;
-              Assert(&spherical_reference == &cell->face(vertex_n)->get_manifold(),
-                     ExcMessage("manifolds should be the same."));
-            }
         }
     }
 }

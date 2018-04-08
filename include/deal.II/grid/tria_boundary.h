@@ -91,6 +91,10 @@ public:
    */
   virtual ~Boundary () = default;
 
+  /**
+   * Clone this Boundary.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Return intermediate points on a line spaced according to the interior
@@ -250,13 +254,18 @@ public:
   StraightBoundary ();
 
   /**
+   * Clone this Boundary.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
+  /**
    * Let the new point be the arithmetic mean of the two vertices of the line.
    *
    * Refer to the general documentation of this class and the documentation of
    * the base class for more information.
    */
   virtual Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
+  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const override;
 
   /**
    * Let the new point be the arithmetic mean of the four vertices of this
@@ -268,7 +277,7 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
+  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const override;
 
   /**
    * Return <tt>n=points.size()</tt> points that split the StraightBoundary
@@ -280,7 +289,7 @@ public:
   virtual
   void
   get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Return <tt>n=points.size()=m*m</tt> points that splits the
@@ -292,7 +301,7 @@ public:
   virtual
   void
   get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Implementation of the function declared in the base class.
@@ -303,7 +312,7 @@ public:
   virtual
   Tensor<1,spacedim>
   normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                 const Point<spacedim> &p) const;
+                 const Point<spacedim> &p) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -314,7 +323,7 @@ public:
   virtual
   void
   get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const override;
 
   /**
    * Given a candidate point and a line segment characterized by the iterator,
@@ -333,7 +342,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const override;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -349,7 +358,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const override;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -366,7 +375,7 @@ public:
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const override;
 };
 
 
