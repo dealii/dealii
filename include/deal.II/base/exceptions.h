@@ -1117,7 +1117,7 @@ namespace deal_II_exceptions
         ::dealii::deal_II_exceptions::internals::abort_on_exception,           \
         __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
 }
-#  else
+#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #    define Assert(cond, exc)                                                  \
 {                                                                              \
   if (!(cond))                                                                 \
@@ -1125,7 +1125,7 @@ namespace deal_II_exceptions
         ::dealii::deal_II_exceptions::internals::abort_on_exception,           \
         __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
 }
-#  endif
+#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
 #define Assert(cond, exc)                                                      \
   {}
@@ -1157,7 +1157,7 @@ namespace deal_II_exceptions
         ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,   \
         __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
 }
-#  else
+#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #    define AssertNothrow(cond, exc)                                           \
 {                                                                              \
   if (!(cond))                                                                 \
@@ -1165,7 +1165,7 @@ namespace deal_II_exceptions
         ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,   \
         __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
 }
-#  endif
+#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
 #define AssertNothrow(cond, exc)                                               \
   {}
