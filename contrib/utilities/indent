@@ -36,7 +36,7 @@ if test ! -d source -o ! -d include -o ! -d examples ; then
 fi
 
 # Add the location 'setup_astyle.sh' installs astyle to to the local PATH.
-ASTYLE_PATH="$(realpath contrib/utilities)/programs/astyle/build/gcc/bin"
+ASTYLE_PATH="$(cd "$(dirname "$0")" && pwd)/programs/astyle/bin"
 export PATH=$ASTYLE_PATH:$PATH
 
 if test ! -f contrib/styles/astyle.rc ; then
