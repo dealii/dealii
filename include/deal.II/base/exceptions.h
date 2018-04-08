@@ -269,7 +269,9 @@ namespace deal_II_exceptions
 
     /**
      * This routine does the main work for the exception generation mechanism
-     * used in the <tt>Assert</tt> macro.
+     * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
+     * name implies, this function either ends with a call to <tt>abort</tt>
+     * or throwing an exception.
      *
      * The actual exception object (the last argument) is typically an unnamed
      * object created in place; because we modify it, we can't take it by
@@ -280,13 +282,14 @@ namespace deal_II_exceptions
      * @ref ExceptionBase
      */
     template <class ExceptionType>
-    void issue_error (ExceptionHandling  handling,
-                      const char       *file,
-                      int               line,
-                      const char       *function,
-                      const char       *cond,
-                      const char       *exc_name,
-                      ExceptionType     e)
+    [[noreturn]]
+    void issue_error_noreturn (ExceptionHandling  handling,
+                               const char       *file,
+                               int               line,
+                               const char       *function,
+                               const char       *cond,
+                               const char       *exc_name,
+                               ExceptionType     e)
     {
       // Fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
@@ -295,16 +298,13 @@ namespace deal_II_exceptions
         {
         case abort_on_exception:
           dealii::deal_II_exceptions::internals::abort(e);
-          break;
-        case abort_nothrow_on_exception:
-          // The proper way is to call the function below directly
-          // to preserve the noexcept specifier.
-          // For reasons of backward compatibility
-          // we treat this case here as well.
-          issue_error_nothrow(handling, file, line, function, cond, exc_name, e);
-          break;
         case throw_on_exception:
           throw e;
+        default:
+          // this function should never return; something must have gone wrong
+          // in the error handling code for us to get this far, so throw an
+          // exception.
+          throw ::dealii::StandardExceptions::ExcInternalError();
         }
     }
 
@@ -348,24 +348,26 @@ namespace deal_II_exceptions
  */
 #ifdef DEBUG
 #  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#    define Assert(cond, exc)                                                 \
-  {                                                                           \
-    if (__builtin_expect(!(cond), false))                                     \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+#    define Assert(cond, exc)                                          \
+  {                                                                    \
+    if (__builtin_expect(!(cond), false))                              \
+      ::dealii::deal_II_exceptions::internals::                        \
+      issue_error_noreturn(                                            \
+          ::dealii::deal_II_exceptions::internals::abort_on_exception, \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);  \
   }
 #  else
-#    define Assert(cond, exc)                                                 \
-  {                                                                           \
-    if (!(cond))                                                              \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+#    define Assert(cond, exc)                                          \
+  {                                                                    \
+    if (!(cond))                                                       \
+      ::dealii::deal_II_exceptions::internals::                        \
+      issue_error_noreturn(                                            \
+          ::dealii::deal_II_exceptions::internals::abort_on_exception, \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);  \
   }
 #  endif
 #else
-#define Assert(cond, exc)                                                     \
+#define Assert(cond, exc)                                              \
   {}
 #endif
 
@@ -407,7 +409,7 @@ namespace deal_II_exceptions
   }
 #  endif
 #else
-#define AssertNothrow(cond, exc)                                              \
+#define AssertNothrow(cond, exc)                                                \
   {}
 #endif
 
@@ -429,20 +431,22 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#define AssertThrow(cond, exc)                                                \
-  {                                                                           \
-    if (__builtin_expect(!(cond), false))                                     \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+#define AssertThrow(cond, exc)                                         \
+  {                                                                    \
+    if (__builtin_expect(!(cond), false))                              \
+      ::dealii::deal_II_exceptions::internals::                        \
+      issue_error_noreturn(                                            \
+          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);  \
   }
 #else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#define AssertThrow(cond, exc)                                                \
-  {                                                                           \
-    if (!(cond))                                                              \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
+#define AssertThrow(cond, exc)                                         \
+  {                                                                    \
+    if (!(cond))                                                       \
+      ::dealii::deal_II_exceptions::internals::                        \
+      issue_error_noreturn(                                            \
+          ::dealii::deal_II_exceptions::internals::throw_on_exception, \
+          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);  \
   }
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
