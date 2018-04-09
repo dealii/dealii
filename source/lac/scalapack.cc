@@ -995,6 +995,182 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
 
 
 template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index_MRRR(const std::pair<unsigned int,unsigned int> &index_limits,
+    const bool compute_eigenvectors)
+{
+  // Check validity of index limits.
+  AssertIndexRange(index_limits.first,static_cast<unsigned int>(n_rows));
+  AssertIndexRange(index_limits.second,static_cast<unsigned int>(n_rows));
+
+  const std::pair<unsigned int,unsigned int> idx = std::make_pair(std::min(index_limits.first,index_limits.second),
+                                                   std::max(index_limits.first,index_limits.second));
+
+  // Compute all eigenvalues/eigenvectors.
+  if (idx.first==0 && idx.second==static_cast<unsigned int>(n_rows-1))
+    return eigenpairs_symmetric_MRRR(compute_eigenvectors);
+  else
+    return eigenpairs_symmetric_MRRR(compute_eigenvectors,idx);
+}
+
+
+
+template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value_MRRR(const std::pair<NumberType,NumberType> &value_limits,
+    const bool compute_eigenvectors)
+{
+  AssertIsFinite(value_limits.first);
+  AssertIsFinite(value_limits.second);
+
+  const std::pair<unsigned int,unsigned int> indices = std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int);
+
+  return eigenpairs_symmetric_MRRR(compute_eigenvectors,indices,value_limits);
+}
+
+
+
+template <typename NumberType>
+std::vector<NumberType>
+ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(const bool compute_eigenvectors,
+                                                       const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
+                                                       const std::pair<NumberType,NumberType> &eigenvalue_limits)
+{
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert (property == LAPACKSupport::symmetric,
+          ExcMessage("Matrix has to be symmetric for this operation."));
+
+  Threads::Mutex::ScopedLock lock(mutex);
+
+  const bool use_values = (std::isnan(eigenvalue_limits.first) || std::isnan(eigenvalue_limits.second)) ? false : true;
+  const bool use_indices = ((eigenvalue_idx.first==numbers::invalid_unsigned_int) || (eigenvalue_idx.second==numbers::invalid_unsigned_int)) ? false : true;
+
+  Assert(!(use_values && use_indices),
+         ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
+
+  // If computation of eigenvectors is not required, use a sufficiently small distributed matrix.
+  std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors = compute_eigenvectors ?
+                                                              std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,grid,row_block_size) :
+                                                              std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
+
+  eigenvectors->property = property;
+  // Number of eigenvalues to be returned from psyevr; upon successful exit ev contains the m seclected eigenvalues in ascending order.
+  int m = n_rows;
+  std::vector<NumberType> ev(n_rows);
+
+  // Number of eigenvectors to be returned;
+  // Upon successful exit the first m=nz columns contain the selected eigenvectors (only if jobz=='V').
+  int nz=0;
+
+  if (grid->mpi_process_is_active)
+    {
+      int info = 0;
+      /*
+       * For jobz==N only eigenvalues are computed, for jobz='V' also the eigenvectors of the matrix are computed.
+       */
+      char jobz = compute_eigenvectors ? 'V' : 'N';
+      // Default value is to compute all eigenvalues and optionally eigenvectors.
+      char range='A';
+      NumberType vl=NumberType(),vu=NumberType();
+      int il=1,iu=1;
+
+      // Index range for eigenvalues is not specified.
+      if (!use_indices)
+        {
+          // Interval for eigenvalues is not specified and consequently all eigenvalues/eigenpairs will be computed.
+          if (!use_values)
+            {
+              range = 'A';
+            }
+          else
+            {
+              range = 'V';
+              vl = std::min(eigenvalue_limits.first,eigenvalue_limits.second);
+              vu = std::max(eigenvalue_limits.first,eigenvalue_limits.second);
+            }
+        }
+      else
+        {
+          range = 'I';
+          // As Fortran starts counting/indexing from 1 unlike C/C++, where it starts from 0.
+          il = std::min(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
+          iu = std::max(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
+        }
+      NumberType *A_loc = &this->values[0];
+
+      /*
+       * By setting lwork to -1 a workspace query for optimal length of work is performed.
+       */
+      int lwork=-1;
+      int liwork=-1;
+      NumberType *eigenvectors_loc = (compute_eigenvectors ? &eigenvectors->values[0] : nullptr);
+      work.resize(1);
+      iwork.resize (1);
+
+      psyevr(&jobz, &range, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor,
+             &vl, &vu, &il, &iu, &m, &nz, ev.data(),
+             eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+             work.data(), &lwork, iwork.data(), &liwork, &info);
+
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyevr", info));
+
+      lwork=work[0];
+      work.resize(lwork);
+      liwork = iwork[0];
+      iwork.resize(liwork);
+
+      psyevr(&jobz, &range, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor,
+             &vl, &vu, &il, &iu, &m, &nz, ev.data(),
+             eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+             work.data(), &lwork, iwork.data(), &liwork, &info);
+
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyevr", info));
+
+      if (compute_eigenvectors)
+        AssertThrow(m==nz,ExcMessage("psyevr failed to compute all eigenvectors for the selected eigenvalues"));
+
+      // If eigenvectors are queried, copy eigenvectors to original matrix.
+      // As the temporary matrix eigenvectors has identical dimensions and
+      // block-cyclic distribution we simply swap the local array.
+      if (compute_eigenvectors)
+        this->values.swap(eigenvectors->values);
+
+      // Adapt the size of ev to fit m upon return.
+      while ((int)ev.size() > m)
+        ev.pop_back();
+    }
+  /*
+   * Send number of computed eigenvalues to inactive processes.
+   */
+  grid->send_to_inactive(&m, 1);
+
+  /*
+   * Inactive processes have to resize array of eigenvalues.
+   */
+  if (! grid->mpi_process_is_active)
+    ev.resize(m);
+  /*
+   * Send the eigenvalues to processors not being part of the process grid.
+   */
+  grid->send_to_inactive(ev.data(), ev.size());
+
+  /*
+   * If only eigenvalues are queried, the content of the matrix will be destroyed.
+   * If the eigenpairs are queried, matrix A on exit stores the eigenvectors in the columns.
+   */
+  if (compute_eigenvectors)
+    {
+      property = LAPACKSupport::Property::general;
+      state = LAPACKSupport::eigenvalues;
+    }
+  else
+    state = LAPACKSupport::unusable;
+
+  return ev;
+}
+
+
+
+template <typename NumberType>
 std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
     ScaLAPACKMatrix<NumberType> *VT)
 {

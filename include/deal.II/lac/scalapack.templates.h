@@ -798,6 +798,61 @@ extern "C"
                const int *IC,
                const int *JC,
                const int *DESCC);
+
+  /**
+   *  psyevr computes selected eigenvalues and, optionally, eigenvectors
+   *  of a real symmetric matrix A using a parallel implementation of the MRR algorithm.
+   *  Eigenvalues/vectors can be selected by specifying a range of values
+   *  or a range of indices for the desired eigenvalues.
+   */
+  void pdsyevr_(const char *jobz,
+                const char *range,
+                const char *uplo,
+                const int *n,
+                double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const double *VL,
+                const double *VU,
+                const int *IL,
+                const int *IU,
+                int *m,
+                int *nz,
+                double *w,
+                double *Z,
+                const int *IZ,
+                const int *JZ,
+                const int *DESCZ,
+                double *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *info);
+  void pssyevr_(const char *jobz,
+                const char *range,
+                const char *uplo,
+                const int *n,
+                float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const float *VL,
+                const float *VU,
+                const int *IL,
+                const int *IU,
+                int *m,
+                int *nz,
+                float *w,
+                float *Z,
+                const int *IZ,
+                const int *JZ,
+                const int *DESCZ,
+                float *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *info);
 }
 
 
@@ -1790,6 +1845,92 @@ inline void ptran(const int *m,
                   const int *DESCC)
 {
   pstran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+}
+
+
+template <typename number>
+inline void psyevr(const char * /*jobz*/,
+                   const char * /*range*/,
+                   const char * /*uplo*/,
+                   const int * /*n*/,
+                   number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   const number * /*VL*/,
+                   const number * /*VU*/,
+                   const int * /*IL*/,
+                   const int * /*IU*/,
+                   int * /*m*/,
+                   int * /*nz*/,
+                   number * /*w*/,
+                   number * /*Z*/,
+                   const int * /*IZ*/,
+                   const int * /*JZ*/,
+                   const int * /*DESCZ*/,
+                   number * /*work*/,
+                   int * /*lwork*/,
+                   int * /*iwork*/,
+                   int * /*liwork*/,
+                   int * /*info*/)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void psyevr(const char *jobz,
+                   const char *range,
+                   const char *uplo,
+                   const int *n,
+                   double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const double *VL,
+                   const double *VU,
+                   const int *IL,
+                   const int *IU,
+                   int *m,
+                   int *nz,
+                   double *w,
+                   double *Z,
+                   const int *IZ,
+                   const int *JZ,
+                   const int *DESCZ,
+                   double *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *info)
+{
+  pdsyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
+}
+
+inline void psyevr(const char *jobz,
+                   const char *range,
+                   const char *uplo,
+                   const int *n,
+                   float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const float *VL,
+                   const float *VU,
+                   const int *IL,
+                   const int *IU,
+                   int *m,
+                   int *nz,
+                   float *w,
+                   float *Z,
+                   const int *IZ,
+                   const int *JZ,
+                   const int *DESCZ,
+                   float *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *info)
+{
+  pssyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
 }
 
 #endif // DEAL_II_WITH_SCALAPACK
