@@ -47,10 +47,9 @@
 #include <boost/iostreams/device/file.hpp>
 
 // The last include file is required because we will be using a feature that is
-// not part of the C++11 standard. The deal.II library, however, can be installed
-// with a C++11 compliant compiler, without assuming that C++14 or C++17 features are
-// available. As some of these features are very useful, we provide their
-// implementation in an internal namespace, if the compiler does not support them:
+// not part of the C++11 standard. As some of the C++14 features are very useful,
+// we provide their implementation in an internal namespace, if the compiler 
+// does not support them:
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <iostream>
