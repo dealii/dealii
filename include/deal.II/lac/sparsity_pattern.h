@@ -511,7 +511,7 @@ public:
   /**
    * Reallocate memory for a matrix of size @p m times @p n. The number of
    * entries for each row is taken from the array @p row_lengths which
-   * has to give this number of each row $i=1\ldots m#.
+   * has to give this number of each row $i=1\ldots m$.
    *
    * If <tt>m*n==0</tt> all memory is freed, resulting in a total
    * reinitialization of the object. If it is nonzero, new memory is only
