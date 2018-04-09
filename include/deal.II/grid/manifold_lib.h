@@ -631,7 +631,6 @@ private:
 
 
 
-
 /**
  * Manifold description for the surface of a Torus in three dimensions. The
  * Torus is assumed to be in the x-z plane. The reference coordinate system

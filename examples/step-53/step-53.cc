@@ -47,8 +47,8 @@
 #include <boost/iostreams/device/file.hpp>
 
 // The last include file is required because we will be using a feature that is
-// not part of the cxx11 standard. The deal.II library, however, can be installed
-// with a cxx11 compliant compiler, without assuming that cxx14 or cxx17 features are
+// not part of the C++11 standard. The deal.II library, however, can be installed
+// with a C++11 compliant compiler, without assuming that C++14 or C++17 features are
 // available. As some of these features are very useful, we provide their
 // implementation in an internal namespace, if the compiler does not support them:
 #include <deal.II/base/std_cxx14/memory.h>
@@ -262,9 +262,9 @@ namespace Step53
 
   // This function is required by the interface of the Manifold base
   // class, and allows you to clone the AfricaGeometry class. This is
-  // where we use a feature that is only available in cxx14, namely the
+  // where we use a feature that is only available in C++14, namely the
   // make_unique function, that simplifies the creation of
-  // std::unique_ptr objects. Notice that, while the function returns a
+  // std::unique_ptr objects. Notice that, while the function returns an
   // std::unique_ptr<Manifold<3,3> >, we internally create a
   // unique_ptr<AfricaGeometry>. C++11 knows how to handle these cases,
   // and is able to transform a unique pointer to a derived class to a
