@@ -476,7 +476,7 @@ protected:
      * ownership), we store the cast result in a std::unique_ptr to indicate
      * that InternalData owns the object.
      */
-    InternalData ( std::unique_ptr<typename FESystem<dim,spacedim>::InternalData> fesystem_data);
+    InternalData (std::unique_ptr<typename FESystem<dim,spacedim>::InternalData> fesystem_data);
 
     /**
      * Give read-access to the pointer to a @p InternalData of the @p
@@ -553,7 +553,7 @@ protected:
    */
   template <int dim_1>
   std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-  setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
+  setup_data (std::unique_ptr<typename FESystem<dim,spacedim>::InternalData> fes_data,
               const UpdateFlags      flags,
               const Quadrature<dim_1> &quadrature) const;
 
