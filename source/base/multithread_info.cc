@@ -198,6 +198,19 @@ MultithreadInfo::memory_consumption ()
 }
 
 
+void
+MultithreadInfo::initialize_multithreading()
+{
+  static bool done = false;
+  if (done)
+    return;
+
+  MultithreadInfo::set_thread_limit (numbers::invalid_unsigned_int);
+  done = true;
+}
+
+
+
 const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
 unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
@@ -210,7 +223,7 @@ namespace
   {
     DoOnce ()
     {
-      MultithreadInfo::set_thread_limit (numbers::invalid_unsigned_int);
+      MultithreadInfo::initialize_multithreading();
     }
   } do_once;
 }

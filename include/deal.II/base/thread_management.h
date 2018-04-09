@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/multithread_info.h>
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <thread>
@@ -1909,6 +1910,7 @@ namespace Threads
   -> Task<decltype(function_object())>
   {
     typedef decltype(function_object()) return_type;
+    dealii::MultithreadInfo::initialize_multithreading();
     return Task<return_type>(std::function<return_type ()>(function_object));
   }
 
