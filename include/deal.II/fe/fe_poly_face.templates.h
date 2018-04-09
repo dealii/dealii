@@ -83,8 +83,17 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase &,
                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &) const
 {
-  // Do nothing, since we do not have
-  // values in the interior
+  // Do nothing, since we do not have values in the interior. Since
+  // FEValues initializes the output variables for this function
+  // with invalid values, this means that we simply leave them at
+  // the invalid values -- typically, signaling NaNs. This means
+  // that when you later look at those components of shape
+  // functions or solution vectors that correspond to the
+  // face element, you will see signaling_NaNs. This simply means
+  // that you should not use them -- the shape functions and the
+  // solution do not actually live inside the cell, and so any
+  // attempt at evaluating it there *should* yield an invalid
+  // result.
 }
 
 
