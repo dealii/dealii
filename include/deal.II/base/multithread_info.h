@@ -101,6 +101,11 @@ public:
    */
   static bool is_running_single_threaded ();
 
+  /**
+   * Make sure the multithreading API is initialized. This normally does not need to be called in usercode.
+   */
+  static void initialize_multithreading ();
+
 private:
 
   /**
