@@ -586,6 +586,47 @@
  * @ref Concepts for more information and a list of concepts in deal.II.
  * </dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossDimension <b>Dimensions @p dim and @p spacedim</b></dt>
+ *
+ * <dd>
+ * Many classes and functions in deal.II have two template parameters,
+ * @p dim and @p spacedim. An example is the basic Triangulation class:
+ * @code
+ *   template <int dim, int spacedim=dim>
+ *   class Triangulation {...};
+ * @endcode
+ * In all of these contexts where you see @p dim and @p spacedim referenced,
+ * these arguments have the following meaning:
+ * - @p dim denotes the dimensionality of the mesh. For example, a mesh that
+ *   consists of line segments is one-dimensional and consequently corresponds
+ *   to `dim==1`. A mesh consisting of quadrilaterals then has `dim==2` and a
+ *   mesh of hexahedra has `dim==3`.
+ * - @p spacedim denotes the dimensionality of the space in which such a mesh
+ *   lives. Generally, one-dimensional meshes live in a one-dimensional space,
+ *   and similarly for two-dimensional and three-dimensional meshes that
+ *   subdivide two- and three-dimensional domains. Consequently, the
+ *   @p spacedim template argument has a default equal to @p dim. But this need
+ *   not be the case: For example, we may want to solve an equation for
+ *   sediment transport on the surface of the Earth. In this case, the domain
+ *   is the two-dimensional surface of the Earth (`dim==2`) that lives in a
+ *   three-dimensional coordinate system (`spacedim==3`).
+ * More generally, deal.II can be used to solve partial differential
+ * equations on <a href="https://en.wikipedia.org/wiki/Manifold">manifolds</a>
+ * that are embedded in higher dimensional space. In other words,
+ * these two template arguments need to satisfy `dim <= spacedim`,
+ * though in many applications one simply has `dim == spacedim`.
+ *
+ * Following the convention in geometry, we say that the "codimension" is
+ * defined as `spacedim-dim`. In other words, a triangulation consisting of
+ * quadrilaterals whose coordinates are three-dimensional (for which we
+ * would then use a `Triangulation<2,3>` object) has "codimension one".
+ *
+ * Examples of uses where these two arguments are not the same are shown in
+ * step-34, step-38, step-54.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
  *
  * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly

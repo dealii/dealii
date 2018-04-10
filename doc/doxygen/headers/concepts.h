@@ -50,6 +50,27 @@
  * @ref ConceptNumber "Number concept" discussed below describes the
  * types that could be used as argument for the Vector class.
  *
+ * Concepts have been proposed as a language
+ * extension to C++ for a long time already. They would allow us to
+ * describe that a class or function has certain properties in order
+ * to be a qualified template argument. For example, it would allow us
+ * to express in C++ code that the first argument to, say,
+ * GridTools::find_closest_vertex(), must have a type that represents
+ * an actual mesh -- which we can currently only describe in words,
+ * see below. Using C++ concepts would allow us to describe this in
+ * code and trying to call such a function with an object as first
+ * argument that is not, in fact, a mesh would yield a compiler error
+ * that makes the mismatch clear.
+ *
+ * Unfortunately, these proposals to C++ have never made it into any
+ * official C++ standard; they are proposed for C++20 however. We may
+ * start to use them once the vast majority of our users have
+ * compilers that support this standard.
+ *
+ * More information on the topic can be found at
+ * <a href="https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)">this wikipedia page</a>.
+
+ *
  * <dl>
  *
  * <dt class="concepts">@anchor ConceptDoFHandlerType <b>DoFHandlerType</b></dt>
