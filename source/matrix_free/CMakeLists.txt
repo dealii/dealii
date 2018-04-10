@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   matrix_free.cc
   evaluation_selector.cc
+  task_info.cc
   )
 
 SET(_inst

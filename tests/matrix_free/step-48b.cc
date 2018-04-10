@@ -86,7 +86,7 @@ namespace Step48
     FEEvaluation<dim,fe_degree> fe_eval(data);
     const unsigned int          n_q_points = fe_eval.n_q_points;
 
-    for (unsigned int cell=0; cell<data.get_size_info().n_macro_cells; ++cell)
+    for (unsigned int cell=0; cell<data.n_macro_cells(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q=0; q<n_q_points; ++q)
@@ -353,4 +353,3 @@ int main (int argc, char **argv)
   Step48::SineGordonProblem<2> sg_problem;
   sg_problem.run ();
 }
-

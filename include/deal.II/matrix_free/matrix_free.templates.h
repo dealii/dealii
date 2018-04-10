@@ -71,7 +71,6 @@ copy_from (const MatrixFree<dim,Number> &v)
   shape_info = v.shape_info;
   cell_level_index = v.cell_level_index;
   task_info = v.task_info;
-  size_info = v.size_info;
   indices_are_initialized = v.indices_are_initialized;
   mapping_is_initialized  = v.mapping_is_initialized;
 }
@@ -115,19 +114,19 @@ internal_reinit(const Mapping<dim>                          &mapping,
           const parallel::Triangulation<dim> *dist_tria =
             dynamic_cast<const parallel::Triangulation<dim>*>
             (&(dof_handler[0]->get_triangulation()));
-          size_info.communicator = dist_tria != nullptr ?
+          task_info.communicator = dist_tria != nullptr ?
                                    dist_tria->get_communicator() :
                                    MPI_COMM_SELF;
-          size_info.my_pid  =
-            Utilities::MPI::this_mpi_process(size_info.communicator);
-          size_info.n_procs =
-            Utilities::MPI::n_mpi_processes(size_info.communicator);
+          task_info.my_pid  =
+            Utilities::MPI::this_mpi_process(task_info.communicator);
+          task_info.n_procs =
+            Utilities::MPI::n_mpi_processes(task_info.communicator);
         }
       else
         {
-          size_info.communicator = MPI_COMM_SELF;
-          size_info.my_pid = 0;
-          size_info.n_procs = 1;
+          task_info.communicator = MPI_COMM_SELF;
+          task_info.my_pid = 0;
+          task_info.n_procs = 1;
         }
 
       initialize_dof_handlers (dof_handler, additional_data.level_mg_handler);
@@ -140,18 +139,12 @@ internal_reinit(const Mapping<dim>                          &mapping,
       if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
           MultithreadInfo::n_threads() > 1)
         {
-          task_info.use_multithreading = true;
+          task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::TasksParallelScheme(static_cast<int>(additional_data.tasks_parallel_scheme));
           task_info.block_size = additional_data.tasks_block_size;
-          task_info.use_partition_partition =
-            (additional_data.tasks_parallel_scheme ==
-             AdditionalData::partition_partition ? true : false);
-          task_info.use_coloring_only =
-            (additional_data.tasks_parallel_scheme ==
-             AdditionalData::color ? true : false);
         }
       else
 #endif
-        task_info.use_multithreading = false;
+        task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::none;
 
       // set dof_indices together with constraint_indicator and
       // constraint_pool_data. It also reorders the way cells are gone through
@@ -165,15 +158,16 @@ internal_reinit(const Mapping<dim>                          &mapping,
     {
       initialize_dof_handlers(dof_handler, additional_data.level_mg_handler);
       std::vector<unsigned int> dummy;
-      size_info.make_layout (cell_level_index.size(),
-                             VectorizedArray<Number>::n_array_elements,
-                             dummy, dummy);
+      std::vector<unsigned char> dummy2;
+      task_info.collect_boundary_cells (cell_level_index.size(), cell_level_index.size(),
+                                        VectorizedArray<Number>::n_array_elements, dummy);
+      task_info.create_blocks_serial(dummy, dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i=0; i<dof_info.size(); ++i)
         {
           dof_info[i].dimension    = dim;
           dof_info[i].n_components = dof_handler[i]->get_fe().element_multiplicity(0);
           dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe().dofs_per_cell);
-          dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
+          dof_info[i].row_starts.resize(task_info.cell_partition_data.back()+1);
           dof_info[i].row_starts.back()[2] =
             cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
 
@@ -249,19 +243,19 @@ internal_reinit(const Mapping<dim>                            &mapping,
           const parallel::Triangulation<dim> *dist_tria =
             dynamic_cast<const parallel::Triangulation<dim>*>
             (&(dof_handler[0]->get_triangulation()));
-          size_info.communicator = dist_tria != nullptr ?
+          task_info.communicator = dist_tria != nullptr ?
                                    dist_tria->get_communicator() :
                                    MPI_COMM_SELF;
-          size_info.my_pid  =
-            Utilities::MPI::this_mpi_process(size_info.communicator);
-          size_info.n_procs =
-            Utilities::MPI::n_mpi_processes(size_info.communicator);
+          task_info.my_pid  =
+            Utilities::MPI::this_mpi_process(task_info.communicator);
+          task_info.n_procs =
+            Utilities::MPI::n_mpi_processes(task_info.communicator);
         }
       else
         {
-          size_info.communicator = MPI_COMM_SELF;
-          size_info.my_pid = 0;
-          size_info.n_procs = 1;
+          task_info.communicator = MPI_COMM_SELF;
+          task_info.my_pid = 0;
+          task_info.n_procs = 1;
         }
 
       initialize_dof_handlers (dof_handler, additional_data.level_mg_handler);
@@ -274,18 +268,12 @@ internal_reinit(const Mapping<dim>                            &mapping,
       if (additional_data.tasks_parallel_scheme != AdditionalData::none &&
           MultithreadInfo::n_threads() > 1)
         {
-          task_info.use_multithreading = true;
+          task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::TasksParallelScheme(static_cast<int>(additional_data.tasks_parallel_scheme));
           task_info.block_size = additional_data.tasks_block_size;
-          task_info.use_partition_partition =
-            (additional_data.tasks_parallel_scheme ==
-             AdditionalData::partition_partition ? true : false);
-          task_info.use_coloring_only =
-            (additional_data.tasks_parallel_scheme ==
-             AdditionalData::color ? true : false);
         }
       else
 #endif
-        task_info.use_multithreading = false;
+        task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::none;
 
       // set dof_indices together with constraint_indicator and
       // constraint_pool_data. It also reorders the way cells are gone through
@@ -299,16 +287,17 @@ internal_reinit(const Mapping<dim>                            &mapping,
     {
       initialize_dof_handlers(dof_handler, additional_data.level_mg_handler);
       std::vector<unsigned int> dummy;
-      size_info.make_layout (cell_level_index.size(),
-                             VectorizedArray<Number>::n_array_elements,
-                             dummy, dummy);
+      std::vector<unsigned char> dummy2;
+      task_info.collect_boundary_cells (cell_level_index.size(), cell_level_index.size(),
+                                        VectorizedArray<Number>::n_array_elements, dummy);
+      task_info.create_blocks_serial(dummy, dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i=0; i<dof_info.size(); ++i)
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1, ExcNotImplemented());
           dof_info[i].dimension    = dim;
           dof_info[i].n_components = dof_handler[i]->get_fe(0).element_multiplicity(0);
           dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe(0).dofs_per_cell);
-          dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
+          dof_info[i].row_starts.resize(task_info.cell_partition_data.back()+1);
           dof_info[i].row_starts.back()[2] =
             cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
 
@@ -410,8 +399,8 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
   // Go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
   // setting up neighboring relations between cells for thread parallelization
-  const unsigned int n_mpi_procs = size_info.n_procs;
-  const unsigned int my_pid = size_info.my_pid;
+  const unsigned int n_mpi_procs = task_info.n_procs;
+  const unsigned int my_pid = task_info.my_pid;
 
   const Triangulation<dim> &tria = dof_handlers.dof_handler[0]->get_triangulation();
   if (level == numbers::invalid_unsigned_int)
@@ -444,6 +433,10 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
               cell_level_index.emplace_back (cell->level(), cell->index());
         }
     }
+
+  // All these are cells local to this processor. Therefore, set
+  // cell_level_index_end_local to the size of cell_level_index.
+  cell_level_index_end_local = cell_level_index.size();
 }
 
 
@@ -464,8 +457,8 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
   // go through cells on zeroth level and then successively step down into
   // children. This gives a z-ordering of the cells, which is beneficial when
   // setting up neighboring relations between cells for thread parallelization
-  const unsigned int n_mpi_procs = size_info.n_procs;
-  const unsigned int my_pid = size_info.my_pid;
+  const unsigned int n_mpi_procs = task_info.n_procs;
+  const unsigned int my_pid = task_info.my_pid;
 
   // if we have no level given, use the same as for the standard DoFHandler,
   // otherwise we must loop through the respective level
@@ -488,6 +481,10 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
 
   Assert(n_mpi_procs>1 || cell_level_index.size()==tria.n_active_cells(),
          ExcInternalError());
+
+  // All these are cells local to this processor. Therefore, set
+  // cell_level_index_end_local to the size of cell_level_index.
+  cell_level_index_end_local = cell_level_index.size();
 }
 
 
@@ -559,7 +556,7 @@ void MatrixFree<dim,Number>::initialize_indices
       // set locally owned range for each component
       Assert (locally_owned_set[no].is_contiguous(), ExcNotImplemented());
       dof_info[no].vector_partitioner.reset
-      (new Utilities::MPI::Partitioner(locally_owned_set[no], size_info.communicator));
+      (new Utilities::MPI::Partitioner(locally_owned_set[no], task_info.communicator));
 
       // initialize the arrays for indices
       dof_info[no].row_starts.resize (n_active_cells+1);
@@ -654,50 +651,174 @@ void MatrixFree<dim,Number>::initialize_indices
 
       // if we found dofs on some FE component that belong to other
       // processors, the cell is added to the boundary cells.
-      if (cell_at_boundary == true)
+      if (cell_at_boundary == true && counter < cell_level_index_end_local)
         boundary_cells.push_back(counter);
     }
 
   const unsigned int vectorization_length =
     VectorizedArray<Number>::n_array_elements;
-  std::vector<unsigned int> irregular_cells;
-  size_info.make_layout (n_active_cells, vectorization_length, boundary_cells,
-                         irregular_cells);
+  task_info.collect_boundary_cells (cell_level_index_end_local,
+                                    n_active_cells, vectorization_length,
+                                    boundary_cells);
 
+  // finalize the creation of ghosts
   for (unsigned int no=0; no<n_fe; ++no)
     dof_info[no].assign_ghosts (boundary_cells);
 
-  // reorganize the indices in order to overlap communication in MPI with
-  // computations: Place all cells with ghost indices into one chunk. Also
-  // reorder cells so that we can parallelize by threads
   std::vector<unsigned int> renumbering;
-  if (task_info.use_multithreading == true)
+  std::vector<unsigned char> irregular_cells;
+  if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
     {
-      dof_info[0].compute_renumber_parallel (boundary_cells, size_info,
-                                             renumbering);
-      if (task_info.use_partition_partition == true)
-        dof_info[0].make_thread_graph_partition_partition
-        (size_info, task_info, renumbering, irregular_cells,
-         dof_handlers.active_dof_handler == DoFHandlers::hp);
-      else
-        dof_info[0].make_thread_graph_partition_color
-        (size_info, task_info, renumbering, irregular_cells,
-         dof_handlers.active_dof_handler == DoFHandlers::hp);
+      const bool strict_categories = dof_handlers.active_dof_handler == DoFHandlers::hp;
+      unsigned int dofs_per_cell = 0;
+      for (unsigned int no=0; no<dof_info.size(); ++no)
+        dofs_per_cell = std::max(dofs_per_cell, dof_info[no].dofs_per_cell[0]);
+      task_info.create_blocks_serial(boundary_cells, std::vector<unsigned int>(),
+                                     dofs_per_cell,
+                                     dof_info[0].cell_active_fe_index,
+                                     strict_categories,
+                                     renumbering, irregular_cells);
     }
   else
     {
-      // In case, we have an hp-dofhandler, we have to reorder the cell
-      // according to the polynomial degree on the cell.
-      dof_info[0].compute_renumber_serial (boundary_cells, size_info,
-                                           renumbering);
-      if (dof_handlers.active_dof_handler == DoFHandlers::hp)
-        dof_info[0].compute_renumber_hp_serial (size_info, renumbering,
-                                                irregular_cells);
+      // For strategy with blocking before partitioning: reorganize the indices
+      // in order to overlap communication in MPI with computations: Place all
+      // cells with ghost indices into one chunk. Also reorder cells so that we
+      // can parallelize by threads
+      task_info.initial_setup_blocks_tasks(boundary_cells, renumbering,
+                                           irregular_cells);
+      task_info.guess_block_size (dof_info[0].dofs_per_cell[0]);
+
+      unsigned int n_macro_cells_before = *(task_info.cell_partition_data.end()-2);
+      unsigned int n_ghost_slots = *(task_info.cell_partition_data.end()-1)-
+                                   n_macro_cells_before;
+
+      unsigned int start_nonboundary = numbers::invalid_unsigned_int;
+
+      if (task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::partition_color)
+        {
+          // set up partitions. if we just use coloring without partitions, do
+          // nothing here, assume all cells to belong to the zero partition (that
+          // we otherwise use for MPI boundary cells)
+          if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::color)
+            {
+              start_nonboundary = task_info.n_procs > 1 ?
+                                  std::min(((task_info.cell_partition_data[2]-
+                                             task_info.cell_partition_data[1]+task_info.block_size-1)/
+                                            task_info.block_size)*task_info.block_size,
+                                           task_info.cell_partition_data[3]) : 0;
+            }
+          else
+            {
+              if (task_info.n_procs > 1)
+                {
+                  task_info.cell_partition_data[1] = 0;
+                  task_info.cell_partition_data[2] = task_info.cell_partition_data[3];
+                }
+              start_nonboundary = task_info.cell_partition_data.back();
+            }
+
+          if (dof_handlers.active_dof_handler == DoFHandlers::hp)
+            {
+              irregular_cells.resize (0);
+              irregular_cells.resize (task_info.cell_partition_data.back()+
+                                      2*dof_info[0].max_fe_index);
+              std::vector<std::vector<unsigned int> > renumbering_fe_index;
+              renumbering_fe_index.resize(dof_info[0].max_fe_index);
+              unsigned int counter;
+              n_macro_cells_before = 0;
+              for (counter=0; counter<std::min(start_nonboundary*vectorization_length,
+                                               task_info.n_active_cells); counter++)
+                {
+                  AssertIndexRange (counter, renumbering.size());
+                  AssertIndexRange (renumbering[counter],
+                                    dof_info[0].cell_active_fe_index.size());
+                  renumbering_fe_index[dof_info[0].cell_active_fe_index[renumbering[counter]]].
+                  push_back(renumbering[counter]);
+                }
+              counter = 0;
+              for (unsigned int j=0; j<dof_info[0].max_fe_index; j++)
+                {
+                  for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
+                    renumbering[counter++] = renumbering_fe_index[j][jj];
+                  irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
+                                  n_macro_cells_before] =
+                                    renumbering_fe_index[j].size()%vectorization_length;
+                  n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+                                          vectorization_length;
+                  renumbering_fe_index[j].resize(0);
+                }
+
+              for (counter=start_nonboundary*vectorization_length;
+                   counter<task_info.n_active_cells; counter++)
+                {
+                  renumbering_fe_index[dof_info[0].cell_active_fe_index.empty() ? 0 :
+                                       dof_info[0].cell_active_fe_index[renumbering[counter]]].
+                  push_back(renumbering[counter]);
+                }
+              counter = start_nonboundary * vectorization_length;
+              for (unsigned int j=0; j<dof_info[0].max_fe_index; j++)
+                {
+                  for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
+                    renumbering[counter++] = renumbering_fe_index[j][jj];
+                  irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
+                                  n_macro_cells_before] =
+                                    renumbering_fe_index[j].size()%vectorization_length;
+                  n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
+                                          vectorization_length;
+                }
+              AssertIndexRange (n_macro_cells_before,
+                                task_info.cell_partition_data.back() + 2*dof_info[0].max_fe_index+1);
+              irregular_cells.resize (n_macro_cells_before+n_ghost_slots);
+              *(task_info.cell_partition_data.end()-2) = n_macro_cells_before;
+              *(task_info.cell_partition_data.end()-1) = n_macro_cells_before+n_ghost_slots;
+            }
+        }
+
+      task_info.n_blocks = (n_macro_cells()+task_info.block_size-1)/
+                           task_info.block_size;
+
+      DynamicSparsityPattern connectivity;
+      connectivity.reinit(task_info.n_active_cells, task_info.n_active_cells);
+      if (task_info.n_active_cells > 0)
+        dof_info[0].make_connectivity_graph(task_info, renumbering, connectivity);
+
+      task_info.make_thread_graph(dof_info[0].cell_active_fe_index,
+                                  connectivity, renumbering, irregular_cells,
+                                  dof_handlers.active_dof_handler == DoFHandlers::hp);
+
+      Assert(irregular_cells.size() >= task_info.cell_partition_data.back(),
+             ExcInternalError());
+
+      irregular_cells.resize(task_info.cell_partition_data.back()+n_ghost_slots);
+      if (n_ghost_slots > 0)
+        {
+          for (unsigned int i=task_info.cell_partition_data.back();
+               i<task_info.cell_partition_data.back()+n_ghost_slots-1; ++i)
+            irregular_cells[i] = 0;
+          irregular_cells.back() = task_info.n_ghost_cells%vectorization_length;
+        }
+
+      {
+        unsigned int n_cells = 0;
+        for (unsigned int i=0; i<task_info.cell_partition_data.back(); ++i)
+          n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
+        AssertDimension(n_cells, task_info.n_active_cells);
+        n_cells = 0;
+        for (unsigned int i=task_info.cell_partition_data.back();
+             i<n_ghost_slots+task_info.cell_partition_data.back(); ++i)
+          n_cells += irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
+        AssertDimension(n_cells, task_info.n_ghost_cells);
+      }
+
+      task_info.cell_partition_data
+      .push_back(task_info.cell_partition_data.back()+n_ghost_slots);
     }
 
-  // Finally perform the renumbering. We also want to group several cells
-  // together to one "macro-cell" for vectorization (where the arithmetic
-  // operations will then be done simultaneously).
+  // Finally perform the renumbering of the degree of freedom number data. We
+  // also want to group several cells together to one "macro-cell" for
+  // vectorization (where the arithmetic operations will then be done
+  // simultaneously).
 #ifdef DEBUG
   {
     std::vector<unsigned int> sorted_renumbering (renumbering);
@@ -710,9 +831,9 @@ void MatrixFree<dim,Number>::initialize_indices
     std::vector<std::pair<unsigned int,unsigned int> >
     cell_level_index_old;
     cell_level_index.swap (cell_level_index_old);
-    cell_level_index.reserve(size_info.n_macro_cells*vectorization_length);
+    cell_level_index.reserve(task_info.cell_partition_data.back()*vectorization_length);
     unsigned int position_cell=0;
-    for (unsigned int i=0; i<size_info.n_macro_cells; ++i)
+    for (unsigned int i=0; i<task_info.cell_partition_data.back(); ++i)
       {
         unsigned int n_comp = (irregular_cells[i]>0)?
                               irregular_cells[i] : vectorization_length;
@@ -729,8 +850,9 @@ void MatrixFree<dim,Number>::initialize_indices
           (cell_level_index_old[renumbering[position_cell+n_comp-1]]);
         position_cell += n_comp;
       }
-    AssertDimension (position_cell, size_info.n_active_cells);
-    AssertDimension (cell_level_index.size(),size_info.n_macro_cells*vectorization_length);
+    AssertDimension (position_cell, task_info.n_active_cells + task_info.n_ghost_cells);
+    AssertDimension (cell_level_index.size(),task_info.cell_partition_data.back()*
+                     vectorization_length);
   }
 
   // set constraint pool from the std::map and reorder the indices
@@ -761,7 +883,7 @@ void MatrixFree<dim,Number>::initialize_indices
     }
   AssertDimension(constraint_pool_data.size(), length);
   for (unsigned int no=0; no<n_fe; ++no)
-    dof_info[no].reorder_cells(size_info, renumbering,
+    dof_info[no].reorder_cells(task_info, renumbering,
                                constraint_pool_row_index,
                                irregular_cells, vectorization_length);
 
@@ -776,7 +898,6 @@ void MatrixFree<dim,Number>::clear()
   dof_info.clear();
   mapping_info.clear();
   cell_level_index.clear();
-  size_info.clear();
   task_info.clear();
   dof_handlers.dof_handler.clear();
   dof_handlers.hp_dof_handler.clear();
@@ -806,26 +927,26 @@ template <typename StreamType>
 void MatrixFree<dim,Number>::print_memory_consumption (StreamType &out) const
 {
   out << "  Memory cell FE operator total: --> ";
-  size_info.print_memory_statistics (out, memory_consumption());
+  task_info.print_memory_statistics (out, memory_consumption());
   out << "   Memory cell index:                ";
-  size_info.print_memory_statistics
+  task_info.print_memory_statistics
   (out, MemoryConsumption::memory_consumption (cell_level_index));
   for (unsigned int j=0; j<dof_info.size(); ++ j)
     {
       out << "   Memory DoFInfo component "<< j << std::endl;
-      dof_info[j].print_memory_consumption(out, size_info);
+      dof_info[j].print_memory_consumption(out, task_info);
     }
 
   out << "   Memory mapping info" << std::endl;
-  mapping_info.print_memory_consumption(out, size_info);
+  mapping_info.print_memory_consumption(out, task_info);
 
   out << "   Memory unit cell shape data:      ";
-  size_info.print_memory_statistics
+  task_info.print_memory_statistics
   (out, MemoryConsumption::memory_consumption (shape_info));
-  if (task_info.use_multithreading == true)
+  if (task_info.scheme != internal::MatrixFreeFunctions::TaskInfo::none)
     {
       out << "   Memory task partitioning info:    ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (task_info));
     }
 }
@@ -844,198 +965,6 @@ void MatrixFree<dim,Number>::print (std::ostream &out) const
     }
 }
 
-
-
-/*-------------------- Implementation of helper functions ------------------*/
-
-namespace internal
-{
-  namespace MatrixFreeFunctions
-  {
-
-    TaskInfo::TaskInfo ()
-    {
-      clear();
-    }
-
-
-
-    void TaskInfo::clear ()
-    {
-      block_size = 0;
-      n_blocks = 0;
-      block_size_last = 0;
-      position_short_block = 0;
-      use_multithreading = false;
-      use_partition_partition = false;
-      use_coloring_only = false;
-      partition_color_blocks_row_index.clear();
-      partition_color_blocks_data.clear();
-      evens = 0;
-      odds = 0;
-      n_blocked_workers = 0;
-      n_workers = 0;
-      partition_evens.clear();
-      partition_odds.clear();
-      partition_n_blocked_workers.clear();
-      partition_n_workers.clear();
-    }
-
-
-
-    std::size_t
-    TaskInfo::memory_consumption () const
-    {
-      return (sizeof(*this)+
-              MemoryConsumption::memory_consumption (partition_color_blocks_row_index) +
-              MemoryConsumption::memory_consumption (partition_color_blocks_data)+
-              MemoryConsumption::memory_consumption (partition_evens) +
-              MemoryConsumption::memory_consumption (partition_odds) +
-              MemoryConsumption::memory_consumption (partition_n_blocked_workers) +
-              MemoryConsumption::memory_consumption (partition_n_workers));
-    }
-
-
-
-    SizeInfo::SizeInfo ()
-    {
-      clear();
-    }
-
-
-
-    void SizeInfo::clear()
-    {
-      n_active_cells = 0;
-      n_macro_cells  = 0;
-      boundary_cells_start = 0;
-      boundary_cells_end   = 0;
-      vectorization_length = 0;
-      locally_owned_cells  = IndexSet();
-      ghost_cells = IndexSet();
-      communicator = MPI_COMM_SELF;
-      my_pid = 0;
-      n_procs = 0;
-    }
-
-
-
-    template <typename StreamType>
-    void SizeInfo::print_memory_statistics (StreamType &out,
-                                            std::size_t data_length) const
-    {
-      Utilities::MPI::MinMaxAvg memory_c
-        = Utilities::MPI::min_max_avg (1e-6*data_length, communicator);
-      if (n_procs < 2)
-        out << memory_c.min;
-      else
-        out << memory_c.min << "/" << memory_c.avg << "/" << memory_c.max;
-      out << " MB" << std::endl;
-    }
-
-
-
-    inline
-    void SizeInfo::make_layout (const unsigned int n_active_cells_in,
-                                const unsigned int vectorization_length_in,
-                                std::vector<unsigned int> &boundary_cells,
-                                std::vector<unsigned int> &irregular_cells)
-    {
-      vectorization_length = vectorization_length_in;
-      n_active_cells = n_active_cells_in;
-
-      unsigned int n_max_boundary_cells = boundary_cells.size();
-      unsigned int n_boundary_cells = n_max_boundary_cells;
-
-      // try to make the number of boundary cells divisible by the number of
-      // vectors in vectorization
-
-      /*
-      // try to balance the number of cells before and after the boundary part
-      // on each processor. probably not worth it!
-      #ifdef DEAL_II_WITH_MPI
-      MPI_Allreduce (&n_boundary_cells, &n_max_boundary_cells, 1, MPI_UNSIGNED,
-                     MPI_MAX, size_info.communicator);
-      #endif
-      if (n_max_boundary_cells > n_active_cells)
-        n_max_boundary_cells = n_active_cells;
-      */
-
-      unsigned int fillup_needed =
-        (vectorization_length - n_boundary_cells%vectorization_length)%vectorization_length;
-      if (fillup_needed > 0 && n_boundary_cells < n_active_cells)
-        {
-          // fill additional cells into the list of boundary cells to get a
-          // balanced number. Go through the indices successively until we
-          // found enough indices
-          std::vector<unsigned int> new_boundary_cells;
-          new_boundary_cells.reserve (n_max_boundary_cells);
-
-          unsigned int next_free_slot = 0, bound_index = 0;
-          while (fillup_needed > 0 && bound_index < boundary_cells.size())
-            {
-              if (next_free_slot < boundary_cells[bound_index])
-                {
-                  // check if there are enough cells to fill with in the
-                  // current slot
-                  if (next_free_slot + fillup_needed <= boundary_cells[bound_index])
-                    {
-                      for (unsigned int j=boundary_cells[bound_index]-fillup_needed;
-                           j < boundary_cells[bound_index]; ++j)
-                        new_boundary_cells.push_back(j);
-                      fillup_needed = 0;
-                    }
-                  // ok, not enough indices, so just take them all up to the
-                  // next boundary cell
-                  else
-                    {
-                      for (unsigned int j=next_free_slot;
-                           j<boundary_cells[bound_index]; ++j)
-                        new_boundary_cells.push_back(j);
-                      fillup_needed -= boundary_cells[bound_index]-next_free_slot;
-                    }
-                }
-              new_boundary_cells.push_back(boundary_cells[bound_index]);
-              next_free_slot = boundary_cells[bound_index]+1;
-              ++bound_index;
-            }
-          while (fillup_needed > 0 && (new_boundary_cells.size()==0 ||
-                                       new_boundary_cells.back()<n_active_cells-1))
-            new_boundary_cells.push_back(new_boundary_cells.back()+1);
-          while (bound_index<boundary_cells.size())
-            new_boundary_cells.push_back(boundary_cells[bound_index++]);
-
-          boundary_cells.swap(new_boundary_cells);
-        }
-
-      // set the number of cells
-      std::sort (boundary_cells.begin(), boundary_cells.end());
-      n_boundary_cells = boundary_cells.size();
-
-      // check that number of boundary cells is divisible by
-      // vectorization_length or that it contains all cells
-      Assert (n_boundary_cells % vectorization_length == 0 ||
-              n_boundary_cells == n_active_cells, ExcInternalError());
-      n_macro_cells = (n_active_cells+vectorization_length-1)/vectorization_length;
-      irregular_cells.resize (n_macro_cells);
-      if (n_macro_cells*vectorization_length > n_active_cells)
-        {
-          irregular_cells[n_macro_cells-1] =
-            vectorization_length - (n_macro_cells*vectorization_length - n_active_cells);
-        }
-      if (n_procs > 1)
-        {
-          const unsigned int n_macro_boundary_cells =
-            (n_boundary_cells+vectorization_length-1)/vectorization_length;
-          boundary_cells_start = (n_macro_cells-n_macro_boundary_cells)/2;
-          boundary_cells_end   = boundary_cells_start + n_macro_boundary_cells;
-        }
-      else
-        boundary_cells_start = boundary_cells_end = n_macro_cells;
-    }
-
-  }
-}
 
 
 DEAL_II_NAMESPACE_CLOSE

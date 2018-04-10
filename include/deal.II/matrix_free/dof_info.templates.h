@@ -420,161 +420,20 @@ no_constraint:
 
 
     void
-    DoFInfo::compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
-                                      const SizeInfo                  &size_info,
-                                      std::vector<unsigned int>       &renumbering)
-    {
-      std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
-                                                   numbers::invalid_unsigned_int);
-      const unsigned int n_boundary_cells = boundary_cells.size();
-      for (unsigned int j=0; j<n_boundary_cells; ++j)
-        reverse_numbering[boundary_cells[j]] =
-          j + size_info.vectorization_length*size_info.boundary_cells_start;
-      unsigned int counter = 0;
-      unsigned int j = 0;
-      while (counter < size_info.n_active_cells &&
-             counter < size_info.vectorization_length * size_info.boundary_cells_start)
-        {
-          if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-            reverse_numbering[j] = counter++;
-          j++;
-        }
-      counter = std::min (size_info.vectorization_length*
-                          size_info.boundary_cells_start+n_boundary_cells,
-                          size_info.n_active_cells);
-      if (counter < size_info.n_active_cells)
-        {
-          for ( ; j<size_info.n_active_cells; ++j)
-            if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-              reverse_numbering[j] = counter++;
-        }
-      AssertDimension (counter, size_info.n_active_cells);
-      renumbering = Utilities::invert_permutation (reverse_numbering);
-    }
-
-
-
-    void
-    DoFInfo::compute_renumber_hp_serial (SizeInfo                  &size_info,
-                                         std::vector<unsigned int> &renumbering,
-                                         std::vector<unsigned int> &irregular_cells)
-    {
-      if (max_fe_index < 2)
-        return;
-      const unsigned int n_active_cells = size_info.n_active_cells;
-      const unsigned int vectorization_length = size_info.vectorization_length;
-      irregular_cells.resize (0);
-      irregular_cells.resize (size_info.n_macro_cells+3*max_fe_index);
-      std::vector<std::vector<unsigned int> > renumbering_fe_index;
-      renumbering_fe_index.resize(max_fe_index);
-      unsigned int counter,n_macro_cells_before = 0;
-      const unsigned int
-      start_bound = std::min (size_info.n_active_cells,
-                              size_info.boundary_cells_start*vectorization_length),
-                    end_bound   = std::min (size_info.n_active_cells,
-                                            size_info.boundary_cells_end*vectorization_length);
-      for (counter=0; counter<start_bound; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-          push_back(renumbering[counter]);
-        }
-      counter = 0;
-      for (unsigned int j=0; j<max_fe_index; j++)
-        {
-          for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
-                          n_macro_cells_before] =
-                            renumbering_fe_index[j].size()%vectorization_length;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
-                                  vectorization_length;
-          renumbering_fe_index[j].resize(0);
-        }
-      unsigned int new_boundary_start = n_macro_cells_before;
-      for (counter = start_bound; counter < end_bound; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-          push_back(renumbering[counter]);
-        }
-      counter = start_bound;
-      for (unsigned int j=0; j<max_fe_index; j++)
-        {
-          for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
-                          n_macro_cells_before] =
-                            renumbering_fe_index[j].size()%vectorization_length;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
-                                  vectorization_length;
-          renumbering_fe_index[j].resize(0);
-        }
-      unsigned int new_boundary_end = n_macro_cells_before;
-      for (counter=end_bound; counter<n_active_cells; counter++)
-        {
-          renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-          push_back(renumbering[counter]);
-        }
-      counter = end_bound;
-      for (unsigned int j=0; j<max_fe_index; j++)
-        {
-          for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
-            renumbering[counter++] = renumbering_fe_index[j][jj];
-          irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
-                          n_macro_cells_before] =
-                            renumbering_fe_index[j].size()%vectorization_length;
-          n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
-                                  vectorization_length;
-        }
-      AssertIndexRange (n_macro_cells_before,
-                        size_info.n_macro_cells + 3*max_fe_index+1);
-      irregular_cells.resize (n_macro_cells_before);
-      size_info.n_macro_cells = n_macro_cells_before;
-      size_info.boundary_cells_start = new_boundary_start;
-      size_info.boundary_cells_end = new_boundary_end;
-    }
-
-
-
-    void
-    DoFInfo::compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
-                                        SizeInfo                        &size_info,
-                                        std::vector<unsigned int>       &renumbering)
-    {
-      std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
-                                                   numbers::invalid_unsigned_int);
-      const unsigned int n_boundary_cells = boundary_cells.size();
-      for (unsigned int j=0; j<n_boundary_cells; ++j)
-        reverse_numbering[boundary_cells[j]] = j;
-      unsigned int counter = n_boundary_cells;
-      for (unsigned int j=0; j<size_info.n_active_cells; ++j)
-        if (reverse_numbering[j] == numbers::invalid_unsigned_int)
-          reverse_numbering[j] = counter++;
-
-      size_info.boundary_cells_end   = (size_info.boundary_cells_end -
-                                        size_info.boundary_cells_start);
-      size_info.boundary_cells_start = 0;
-
-      AssertDimension (counter, size_info.n_active_cells);
-      renumbering = Utilities::invert_permutation (reverse_numbering);
-    }
-
-
-
-    void
-    DoFInfo::reorder_cells (const SizeInfo                  &size_info,
-                            const std::vector<unsigned int> &renumbering,
-                            const std::vector<unsigned int> &constraint_pool_row_index,
-                            const std::vector<unsigned int> &irregular_cells,
-                            const unsigned int               vectorization_length)
+    DoFInfo::reorder_cells (const TaskInfo                   &task_info,
+                            const std::vector<unsigned int>  &renumbering,
+                            const std::vector<unsigned int>  &constraint_pool_row_index,
+                            const std::vector<unsigned char> &irregular_cells,
+                            const unsigned int                vectorization_length)
     {
       // first reorder the active fe index.
       if (cell_active_fe_index.size() > 0)
         {
           std::vector<unsigned int> new_active_fe_index;
-          new_active_fe_index.reserve (size_info.n_macro_cells);
+          new_active_fe_index.reserve (task_info.cell_partition_data.back());
           std::vector<unsigned int> fe_indices(vectorization_length);
           unsigned int position_cell = 0;
-          for (unsigned int cell=0; cell<size_info.n_macro_cells; ++cell)
+          for (unsigned int cell=0; cell<task_info.cell_partition_data.back(); ++cell)
             {
               const unsigned int n_comp = (irregular_cells[cell] > 0 ?
                                            irregular_cells[cell] : vectorization_length);
@@ -597,12 +456,12 @@ no_constraint:
       new_constraint_indicator;
       std::vector<unsigned int> new_plain_indices, new_rowstart_plain;
       unsigned int position_cell = 0;
-      new_row_starts.resize (size_info.n_macro_cells + 1);
+      new_row_starts.resize(task_info.cell_partition_data.back()+1);
       new_dof_indices.reserve (dof_indices.size());
       new_constraint_indicator.reserve (constraint_indicator.size());
       if (store_plain_indices == true)
         {
-          new_rowstart_plain.resize (size_info.n_macro_cells + 1,
+          new_rowstart_plain.resize (task_info.cell_partition_data.back()+1,
                                      numbers::invalid_unsigned_int);
           new_plain_indices.reserve (plain_dof_indices.size());
         }
@@ -617,7 +476,7 @@ no_constraint:
       std::vector<const std::pair<unsigned short,unsigned short>*>
       constr_ind(vectorization_length), constr_end(vectorization_length);
       std::vector<unsigned int> index(vectorization_length);
-      for (unsigned int i=0; i<size_info.n_macro_cells; ++i)
+      for (unsigned int i=0; i<task_info.cell_partition_data.back(); ++i)
         {
           const unsigned int dofs_mcell =
             dofs_per_cell[cell_active_fe_index.size() == 0 ? 0 :
@@ -704,9 +563,9 @@ no_constraint:
         }
       AssertDimension (position_cell+1, row_starts.size());
 
-      new_row_starts[size_info.n_macro_cells][0] = new_dof_indices.size();
-      new_row_starts[size_info.n_macro_cells][1] = new_constraint_indicator.size();
-      new_row_starts[size_info.n_macro_cells][2] = 0;
+      new_row_starts[task_info.cell_partition_data.back()][0] = new_dof_indices.size();
+      new_row_starts[task_info.cell_partition_data.back()][1] = new_constraint_indicator.size();
+      new_row_starts[task_info.cell_partition_data.back()][2] = 0;
 
       AssertDimension(dof_indices.size(), new_dof_indices.size());
       AssertDimension(constraint_indicator.size(),
@@ -731,7 +590,7 @@ no_constraint:
       // be smaller than the number of indices in the row, and the second
       // index should be smaller than the number of constraints in the
       // constraint pool.
-      for (unsigned int row=0; row<size_info.n_macro_cells; ++row)
+      for (unsigned int row=0; row<task_info.cell_partition_data.back(); ++row)
         {
           const unsigned int row_length_ind = row_length_indices(row);
           const std::pair<unsigned short,unsigned short>
@@ -744,884 +603,20 @@ no_constraint:
             }
         }
 
-      // sanity check 3: all non-boundary cells should have indices that only
-      // refer to the locally owned range
-      const unsigned int local_size = (vector_partitioner->local_range().second-
-                                       vector_partitioner->local_range().first);
-      for (unsigned int row=0; row<size_info.boundary_cells_start; ++row)
-        {
-          const unsigned int *ptr     = begin_indices(row);
-          const unsigned int *end_ptr = end_indices  (row);
-          for ( ; ptr != end_ptr; ++ptr)
-            AssertIndexRange (*ptr, local_size);
-        }
-      for (unsigned int row=size_info.boundary_cells_end;
-           row<size_info.n_macro_cells; ++row)
-        {
-          const unsigned int *ptr     = begin_indices(row);
-          const unsigned int *end_ptr = end_indices  (row);
-          for ( ; ptr != end_ptr; ++ptr)
-            AssertIndexRange (*ptr, local_size);
-        }
+      // sanity check 3: check the number of cells once again
+      unsigned int n_active_cells = 0;
+      for (unsigned int c=0; c<*(task_info.cell_partition_data.end()-2); ++c)
+        if (irregular_cells[c] > 0)
+          n_active_cells += irregular_cells[c];
+        else
+          n_active_cells += vectorization_length;
+      AssertDimension(n_active_cells, task_info.n_active_cells);
 #endif
     }
 
 
 
-    void DoFInfo::guess_block_size (const SizeInfo &size_info,
-                                    TaskInfo       &task_info)
-    {
-      // user did not say a positive number, so we have to guess
-      if (task_info.block_size == 0)
-        {
-          // we would like to have enough work to do, so as first guess, try
-          // to get 50 times as many chunks as we have threads on the system.
-          task_info.block_size =
-            size_info.n_macro_cells / (MultithreadInfo::n_threads() * 50);
-
-          // if there are too few degrees of freedom per cell, need to
-          // increase the block size
-          const unsigned int minimum_parallel_grain_size = 500;
-          if (dofs_per_cell[0] * task_info.block_size <
-              minimum_parallel_grain_size)
-            task_info.block_size = (minimum_parallel_grain_size /
-                                    dofs_per_cell[0] + 1);
-        }
-      if (task_info.block_size > size_info.n_macro_cells)
-        task_info.block_size = size_info.n_macro_cells;
-    }
-
-
-
-    void DoFInfo::make_thread_graph_partition_color
-    (SizeInfo                  &size_info,
-     TaskInfo                  &task_info,
-     std::vector<unsigned int> &renumbering,
-     std::vector<unsigned int> &irregular_cells,
-     const bool                 hp_bool)
-    {
-      if (size_info.n_macro_cells == 0)
-        return;
-
-      const std::size_t vectorization_length = size_info.vectorization_length;
-      Assert (vectorization_length > 0, ExcInternalError());
-
-      guess_block_size (size_info, task_info);
-
-      // set up partitions. if we just use coloring without partitions, do
-      // nothing here, assume all cells to belong to the zero partition (that
-      // we otherwise use for MPI boundary cells)
-      unsigned int start_up = 0,
-                   start_nonboundary = numbers::invalid_unsigned_int;
-      if (task_info.use_coloring_only == false)
-        {
-          start_nonboundary =
-            std::min(((size_info.boundary_cells_end+task_info.block_size-1)/
-                      task_info.block_size)*task_info.block_size,
-                     size_info.n_macro_cells);
-          size_info.boundary_cells_end = start_nonboundary;
-        }
-      else
-        {
-          start_nonboundary = size_info.n_macro_cells;
-          size_info.boundary_cells_start = 0;
-          size_info.boundary_cells_end = size_info.n_macro_cells;
-        }
-      if (hp_bool == true)
-        {
-          irregular_cells.resize (0);
-          irregular_cells.resize (size_info.n_macro_cells+2*max_fe_index);
-          std::vector<std::vector<unsigned int> > renumbering_fe_index;
-          renumbering_fe_index.resize(max_fe_index);
-          unsigned int counter,n_macro_cells_before = 0;
-          for (counter=0; counter<start_nonboundary*vectorization_length;
-               counter++)
-            {
-              renumbering_fe_index[cell_active_fe_index[renumbering[counter]]].
-              push_back(renumbering[counter]);
-            }
-          counter = 0;
-          for (unsigned int j=0; j<max_fe_index; j++)
-            {
-              for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
-                renumbering[counter++] = renumbering_fe_index[j][jj];
-              irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
-                              n_macro_cells_before] =
-                                renumbering_fe_index[j].size()%vectorization_length;
-              n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
-                                      vectorization_length;
-              renumbering_fe_index[j].resize(0);
-            }
-
-          unsigned int new_boundary_end = n_macro_cells_before;
-          for (counter=start_nonboundary*vectorization_length;
-               counter<size_info.n_active_cells; counter++)
-            {
-              renumbering_fe_index[cell_active_fe_index.empty() ? 0 :
-                                   cell_active_fe_index[renumbering[counter]]].
-              push_back(renumbering[counter]);
-            }
-          counter = start_nonboundary * vectorization_length;
-          for (unsigned int j=0; j<max_fe_index; j++)
-            {
-              for (unsigned int jj=0; jj<renumbering_fe_index[j].size(); jj++)
-                renumbering[counter++] = renumbering_fe_index[j][jj];
-              irregular_cells[renumbering_fe_index[j].size()/vectorization_length+
-                              n_macro_cells_before] =
-                                renumbering_fe_index[j].size()%vectorization_length;
-              n_macro_cells_before += (renumbering_fe_index[j].size()+vectorization_length-1)/
-                                      vectorization_length;
-            }
-          AssertIndexRange (n_macro_cells_before,
-                            size_info.n_macro_cells + 2*max_fe_index+1);
-          irregular_cells.resize (n_macro_cells_before);
-          size_info.n_macro_cells = n_macro_cells_before;
-          size_info.boundary_cells_start = 0;
-          size_info.boundary_cells_end = new_boundary_end;
-          task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)
-                               /task_info.block_size;
-          task_info.block_size_last = size_info.n_macro_cells%task_info.block_size;
-          if (task_info.block_size_last == 0)
-            task_info.block_size_last = task_info.block_size;
-        }
-
-      // assume that all FEs have the same connectivity graph, so take the
-      // zeroth FE
-      task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)/
-                           task_info.block_size;
-      task_info.block_size_last = size_info.n_macro_cells-
-                                  (task_info.block_size*(task_info.n_blocks-1));
-
-      // create the connectivity graph with internal blocking
-      DynamicSparsityPattern connectivity;
-      make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
-                               true, connectivity);
-
-      // Create cell-block  partitioning.
-      unsigned int partition = 0, counter = 0;
-      bool work = true;
-
-      // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
-      // yet assigned a partition.
-      std::vector<unsigned int> cell_partition(task_info.n_blocks,
-                                               size_info.n_macro_cells);
-      std::vector<unsigned int> neighbor_list;
-      std::vector<unsigned int> neighbor_neighbor_list;
-
-      // In element j of this variable, one puts the old number of the block
-      // that should be the jth block in the new numeration.
-      std::vector<unsigned int> partition_list      (task_info.n_blocks,0);
-      std::vector<unsigned int> partition_color_list(task_info.n_blocks,0);
-
-      // This vector points to the start of each partition.
-      std::vector<unsigned int> partition_blocks (2,0);
-      std::vector<unsigned int> cell_color(task_info.n_blocks,
-                                           size_info.n_macro_cells);
-      std::vector<bool> color_finder;
-
-      // this performs a classical breath-first search in the connectivity
-      // graph of the cell chunks
-      while (work)
-        {
-          // put all cells up to begin_inner_cells into first partition. if
-          // the numbers do not add up exactly, assign an additional block
-          if (start_nonboundary>0)
-            {
-              unsigned int n_blocks = ((start_nonboundary+task_info.block_size-1)
-                                       /task_info.block_size);
-              start_nonboundary = 0;
-              for (unsigned int cell=0; cell<n_blocks; ++cell)
-                {
-                  cell_partition[cell] = partition;
-                  neighbor_list.push_back(cell);
-                  partition_list[counter++] = cell;
-                  partition_blocks.back()++;
-                }
-            }
-          else
-            {
-              // To start up, set the start_up cell to partition and list all
-              // its neighbors.
-              AssertIndexRange(start_up, cell_partition.size());
-              cell_partition[start_up] = partition;
-              neighbor_list.push_back(start_up);
-              partition_list[counter++] = start_up;
-              partition_blocks.back()++;
-            }
-
-          while (neighbor_list.size()>0)
-            {
-              partition++;
-              partition_blocks.push_back(partition_blocks.back());
-              for (unsigned int j=0; j<neighbor_list.size(); ++j)
-                {
-                  Assert(cell_partition[neighbor_list[j]]==partition-1,
-                         ExcInternalError());
-                  DynamicSparsityPattern::iterator neighbor =
-                    connectivity.begin(neighbor_list[j]),
-                    end = connectivity.end(neighbor_list[j]);
-                  for (; neighbor!=end ; ++neighbor)
-                    {
-                      if (cell_partition[neighbor->column()]==size_info.n_macro_cells)
-                        {
-                          partition_blocks.back()++;
-                          cell_partition[neighbor->column()] = partition;
-                          neighbor_neighbor_list.push_back(neighbor->column());
-                          partition_list[counter++] = neighbor->column();
-                        }
-                    }
-                }
-              neighbor_list = neighbor_neighbor_list;
-              neighbor_neighbor_list.resize(0);
-            }
-
-          // One has to check if the graph is not connected so we have to find
-          // another partition.
-          work = false;
-          for (unsigned int j=start_up; j<task_info.n_blocks; ++j)
-            if (cell_partition[j] == size_info.n_macro_cells)
-              {
-                start_up = j;
-                work = true;
-                break;
-              }
-        }
-      AssertDimension (partition_blocks[partition], task_info.n_blocks);
-
-
-      // Color the cells within each partition
-      task_info.partition_color_blocks_row_index.resize(partition+1);
-      unsigned int color_counter = 0, index_counter = 0;
-      for (unsigned int part=0; part<partition; part++)
-        {
-          task_info.partition_color_blocks_row_index[part] = index_counter;
-          unsigned int max_color = 0;
-          for (unsigned int k=partition_blocks[part]; k<partition_blocks[part+1];
-               k++)
-            {
-              unsigned int cell = partition_list[k];
-              unsigned int n_neighbors = connectivity.row_length(cell);
-
-              // In the worst case, each neighbor has a different color. So we
-              // find at least one available color between 0 and n_neighbors.
-              color_finder.resize(n_neighbors+1);
-              for (unsigned int j=0; j<=n_neighbors; ++j)
-                color_finder[j]=true;
-              DynamicSparsityPattern::iterator
-              neighbor = connectivity.begin(cell),
-              end      = connectivity.end(cell);
-              for (; neighbor!=end ; ++neighbor)
-                {
-                  // Mark the color that a neighbor within the partition has
-                  // as taken
-                  if (cell_partition[neighbor->column()] == part &&
-                      cell_color[neighbor->column()] <= n_neighbors)
-                    color_finder[cell_color[neighbor->column()]] = false;
-                }
-              // Choose the smallest color that is not taken for the block
-              cell_color[cell]=0;
-              while (color_finder[cell_color[cell]] == false)
-                cell_color[cell]++;
-              if (cell_color[cell] > max_color)
-                max_color = cell_color[cell];
-            }
-          // Reorder within partition: First, all blocks that belong the 0 and
-          // then so on until those with color max (Note that the smaller the
-          // number the larger the partition)
-          for (unsigned int color=0; color<=max_color; color++)
-            {
-              task_info.partition_color_blocks_data.push_back(color_counter);
-              index_counter++;
-              for (unsigned int k=partition_blocks[part];
-                   k<partition_blocks[part+1]; k++)
-                {
-                  unsigned int cell=partition_list[k];
-                  if (cell_color[cell] == color)
-                    {
-                      partition_color_list[color_counter++] = cell;
-                    }
-                }
-            }
-        }
-      task_info.partition_color_blocks_data.push_back(task_info.n_blocks);
-      task_info.partition_color_blocks_row_index[partition] = index_counter;
-      AssertDimension (color_counter, task_info.n_blocks);
-
-      partition_list = renumbering;
-
-      // in debug mode, check that the partition color list is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_pc_list (partition_color_list);
-        std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
-        for (unsigned int i=0; i<sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
-      }
-#endif
-
-      // set the start list for each block and compute the renumbering of
-      // cells
-      std::vector<unsigned int> block_start(size_info.n_macro_cells+1);
-      std::vector<unsigned int> irregular(size_info.n_macro_cells);
-
-      unsigned int mcell_start=0;
-      block_start[0] = 0;
-      for (unsigned int block=0; block<task_info.n_blocks; block++)
-        {
-          block_start[block+1] = block_start[block];
-          for (unsigned int mcell=mcell_start; mcell<
-               std::min(mcell_start+task_info.block_size,
-                        size_info.n_macro_cells);
-               ++mcell)
-            {
-              unsigned int n_comp = (irregular_cells[mcell]>0)
-                                    ?irregular_cells[mcell]:size_info.vectorization_length;
-              block_start[block+1] += n_comp;
-              ++counter;
-            }
-          mcell_start += task_info.block_size;
-        }
-      counter = 0;
-      unsigned int counter_macro = 0;
-      for (unsigned int block=0; block<task_info.n_blocks; block++)
-        {
-          unsigned int present_block = partition_color_list[block];
-          for (unsigned int cell = block_start[present_block];
-               cell<block_start[present_block+1]; ++cell)
-            renumbering[counter++] = partition_list[cell];
-          unsigned int this_block_size = (present_block == task_info.n_blocks-1)?
-                                         task_info.block_size_last:task_info.block_size;
-          for (unsigned int j=0; j<this_block_size; j++)
-            irregular[counter_macro++] =
-              irregular_cells[present_block*task_info.block_size+j];
-          if (present_block == task_info.n_blocks-1)
-            task_info.position_short_block = block;
-        }
-      irregular_cells.swap(irregular);
-      AssertDimension (counter, size_info.n_active_cells);
-      AssertDimension (counter_macro, size_info.n_macro_cells);
-
-      // check that the renumbering is one-to-one
-#ifdef DEBUG
-      {
-        std::vector<unsigned int> sorted_renumbering (renumbering);
-        std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
-        for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
-          Assert(sorted_renumbering[i] == i, ExcInternalError());
-      }
-#endif
-      AssertDimension(counter,size_info.n_active_cells);
-      task_info.evens = (partition+1)/2;
-      task_info.odds  = (partition)/2;
-      task_info.n_blocked_workers = task_info.odds-
-                                    (task_info.odds+task_info.evens+1)%2;
-      task_info.n_workers = task_info.partition_color_blocks_data.size()-1-
-                            task_info.n_blocked_workers;
-    }
-
-
-
-    void
-    DoFInfo::make_thread_graph_partition_partition
-    (SizeInfo                  &size_info,
-     TaskInfo                  &task_info,
-     std::vector<unsigned int> &renumbering,
-     std::vector<unsigned int> &irregular_cells,
-     const bool                 hp_bool)
-    {
-      if (size_info.n_macro_cells == 0)
-        return;
-
-      const std::size_t vectorization_length = size_info.vectorization_length;
-      Assert (vectorization_length > 0, ExcInternalError());
-
-      guess_block_size (size_info, task_info);
-
-      // assume that all FEs have the same connectivity graph, so take the
-      // zeroth FE
-      task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)/
-                           task_info.block_size;
-      task_info.block_size_last = size_info.n_macro_cells-
-                                  (task_info.block_size*(task_info.n_blocks-1));
-      task_info.position_short_block = task_info.n_blocks-1;
-      unsigned int cluster_size = task_info.block_size*vectorization_length;
-
-      // create the connectivity graph without internal blocking
-      DynamicSparsityPattern connectivity;
-      make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
-                               false, connectivity);
-
-      // Create cell-block  partitioning.
-
-      // For each block of cells, this variable saves to which partitions the
-      // block belongs. Initialize all to n_macro_cells to mark them as not
-      // yet assigned a partition.
-      std::vector<unsigned int> cell_partition (size_info.n_active_cells,
-                                                size_info.n_active_cells);
-      std::vector<unsigned int> neighbor_list;
-      std::vector<unsigned int> neighbor_neighbor_list;
-
-      // In element j of this variable, one puts the old number of the block
-      // that should be the jth block in the new numeration.
-      std::vector<unsigned int> partition_list(size_info.n_active_cells,0);
-      std::vector<unsigned int> partition_partition_list(size_info.n_active_cells,0);
-
-      // This vector points to the start of each partition.
-      std::vector<unsigned int> partition_size(2,0);
-
-      unsigned int partition = 0,start_up=0,counter=0;
-      unsigned int start_nonboundary = vectorization_length * size_info.boundary_cells_end;
-      if (start_nonboundary > size_info.n_active_cells)
-        start_nonboundary = size_info.n_active_cells;
-      bool work = true;
-      unsigned int remainder = cluster_size;
-
-      // this performs a classical breath-first search in the connectivity
-      // graph of the cells under the restriction that the size of the
-      // partitions should be a multiple of the given block size
-      while (work)
-        {
-          // put the cells with neighbors on remote MPI processes up front
-          if (start_nonboundary>0)
-            {
-              for (unsigned int cell=0; cell<start_nonboundary; ++cell)
-                {
-                  const unsigned int cell_nn = renumbering[cell];
-                  cell_partition[cell_nn] = partition;
-                  neighbor_list.push_back(cell_nn);
-                  partition_list[counter++] = cell_nn;
-                  partition_size.back()++;
-                }
-              remainder -= (start_nonboundary%cluster_size);
-              if (remainder == cluster_size)
-                remainder = 0;
-
-              // adjust end of boundary cells to the remainder
-              size_info.boundary_cells_end += (remainder+vectorization_length-1)/vectorization_length;
-              start_nonboundary = 0;
-            }
-          else
-            {
-              // To start up, set the start_up cell to partition and list all
-              // its neighbors.
-              cell_partition[start_up] = partition;
-              neighbor_list.push_back(start_up);
-              partition_list[counter++] = start_up;
-              partition_size.back()++;
-              start_up++;
-              remainder--;
-              if (remainder == cluster_size)
-                remainder = 0;
-            }
-          int index_before = neighbor_list.size(), index = index_before,
-              index_stop = 0;
-          while (remainder>0)
-            {
-              if (index==index_stop)
-                {
-                  index = neighbor_list.size();
-                  if (index == index_before)
-                    {
-                      neighbor_list.resize(0);
-                      goto not_connect;
-                    }
-                  index_stop = index_before;
-                  index_before = index;
-                }
-              index--;
-              unsigned int additional = neighbor_list[index];
-              DynamicSparsityPattern::iterator neighbor =
-                connectivity.begin(additional),
-                end = connectivity.end(additional);
-              for (; neighbor!=end ; ++neighbor)
-                {
-                  if (cell_partition[neighbor->column()]==size_info.n_active_cells)
-                    {
-                      partition_size.back()++;
-                      cell_partition[neighbor->column()] = partition;
-                      neighbor_list.push_back(neighbor->column());
-                      partition_list[counter++] = neighbor->column();
-                      remainder--;
-                      if (remainder == 0)
-                        break;
-                    }
-                }
-            }
-
-          while (neighbor_list.size()>0)
-            {
-              partition++;
-              unsigned int partition_counter = 0;
-              partition_size.push_back(partition_size.back());
-
-              for (unsigned int j=0; j<neighbor_list.size(); ++j)
-                {
-                  Assert(cell_partition[neighbor_list[j]]==partition-1,
-                         ExcInternalError());
-                  DynamicSparsityPattern::iterator neighbor =
-                    connectivity.begin(neighbor_list[j]),
-                    end = connectivity.end(neighbor_list[j]);
-                  for (; neighbor!=end ; ++neighbor)
-                    {
-                      if (cell_partition[neighbor->column()]==size_info.n_active_cells)
-                        {
-                          partition_size.back()++;
-                          cell_partition[neighbor->column()] = partition;
-                          neighbor_neighbor_list.push_back(neighbor->column());
-                          partition_list[counter++] = neighbor->column();
-                          partition_counter++;
-                        }
-                    }
-                }
-              remainder = cluster_size-(partition_counter%cluster_size);
-              if (remainder == cluster_size)
-                remainder = 0;
-              int index_stop = 0;
-              int index_before = neighbor_neighbor_list.size(), index = index_before;
-              while (remainder>0)
-                {
-                  if (index==index_stop)
-                    {
-                      index = neighbor_neighbor_list.size();
-                      if (index == index_before)
-                        {
-                          neighbor_neighbor_list.resize(0);
-                          break;
-                        }
-                      index_stop = index_before;
-                      index_before = index;
-                    }
-                  index--;
-                  unsigned int additional = neighbor_neighbor_list[index];
-                  DynamicSparsityPattern::iterator neighbor =
-                    connectivity.begin(additional),
-                    end = connectivity.end(additional);
-                  for (; neighbor!=end ; ++neighbor)
-                    {
-                      if (cell_partition[neighbor->column()]==size_info.n_active_cells)
-                        {
-                          partition_size.back()++;
-                          cell_partition[neighbor->column()] = partition;
-                          neighbor_neighbor_list.push_back(neighbor->column());
-                          partition_list[counter++] = neighbor->column();
-                          remainder--;
-                          if (remainder == 0)
-                            break;
-                        }
-                    }
-                }
-
-              neighbor_list = neighbor_neighbor_list;
-              neighbor_neighbor_list.resize(0);
-            }
-not_connect:
-          // One has to check if the graph is not connected so we have to find
-          // another partition.
-          work = false;
-          for (unsigned int j=start_up; j<size_info.n_active_cells; ++j)
-            if (cell_partition[j] == size_info.n_active_cells)
-              {
-                start_up = j;
-                work = true;
-                if (remainder == 0)
-                  remainder = cluster_size;
-                break;
-              }
-        }
-      if (remainder != 0)
-        partition++;
-
-      for (unsigned int j=0; j<renumbering.size(); j++)
-        renumbering[j] = 0;
-      irregular_cells.back() = 0;
-      irregular_cells.resize(size_info.n_active_cells);
-      unsigned int n_macro_cells_before = 0;
-      {
-        // Create partitioning within partitions.
-
-        // For each block of cells, this variable saves to which partitions
-        // the block belongs. Initialize all to n_macro_cells to mark them as
-        // not yet assigned a partition.
-        std::vector<unsigned int> cell_partition_l2(size_info.n_active_cells,
-                                                    size_info.n_active_cells);
-        task_info.partition_color_blocks_row_index.resize(partition+1,0);
-        task_info.partition_color_blocks_data.resize(1,0);
-
-        counter = 0;
-        unsigned int missing_macros;
-        for (unsigned int part=0; part<partition; ++part)
-          {
-            neighbor_neighbor_list.resize(0);
-            neighbor_list.resize(0);
-            bool work = true;
-            unsigned int partition_l2 = 0;
-            start_up = partition_size[part];
-            unsigned int partition_counter = 0;
-            while (work)
-              {
-                if (neighbor_list.size()==0)
-                  {
-                    work = false;
-                    partition_counter = 0;
-                    for (unsigned int j=start_up; j<partition_size[part+1]; ++j)
-                      if (cell_partition[partition_list[j]] == part &&
-                          cell_partition_l2[partition_list[j]] == size_info.n_active_cells)
-                        {
-                          start_up = j;
-                          work = true;
-                          partition_counter = 1;
-                          // To start up, set the start_up cell to partition
-                          // and list all its neighbors.
-                          AssertIndexRange (start_up, partition_size[part+1]);
-                          cell_partition_l2[partition_list[start_up]] =
-                            partition_l2;
-                          neighbor_neighbor_list.push_back
-                          (partition_list[start_up]);
-                          partition_partition_list[counter++] =
-                            partition_list[start_up];
-                          start_up++;
-                          break;
-                        }
-                  }
-                else
-                  {
-                    partition_counter = 0;
-                    for (unsigned int j=0; j<neighbor_list.size(); ++j)
-                      {
-                        Assert(cell_partition[neighbor_list[j]]==part,
-                               ExcInternalError());
-                        Assert(cell_partition_l2[neighbor_list[j]]==partition_l2-1,
-                               ExcInternalError());
-                        DynamicSparsityPattern::iterator neighbor =
-                          connectivity.begin(neighbor_list[j]),
-                          end = connectivity.end(neighbor_list[j]);
-                        for (; neighbor!=end ; ++neighbor)
-                          {
-                            if (cell_partition[neighbor->column()] == part &&
-                                cell_partition_l2[neighbor->column()]==
-                                size_info.n_active_cells)
-                              {
-                                cell_partition_l2[neighbor->column()] = partition_l2;
-                                neighbor_neighbor_list.push_back(neighbor->column());
-                                partition_partition_list[counter++] = neighbor->column();
-                                partition_counter++;
-                              }
-                          }
-                      }
-                  }
-                if (partition_counter>0)
-                  {
-                    int index_before = neighbor_neighbor_list.size(),
-                        index = index_before;
-                    {
-                      // put the cells into separate lists for each FE index
-                      // within one partition-partition
-                      missing_macros = 0;
-                      std::vector<unsigned int> remaining_per_macro_cell
-                      (max_fe_index);
-                      std::vector<std::vector<unsigned int> >
-                      renumbering_fe_index;
-                      unsigned int cell;
-                      bool filled = true;
-                      if (hp_bool == true)
-                        {
-                          renumbering_fe_index.resize(max_fe_index);
-                          for (cell=counter-partition_counter; cell<counter; ++cell)
-                            {
-                              renumbering_fe_index
-                              [cell_active_fe_index.empty() ? 0 :
-                               cell_active_fe_index[partition_partition_list
-                                                    [cell]]].
-                              push_back(partition_partition_list[cell]);
-                            }
-                          // check how many more cells are needed in the lists
-                          for (unsigned int j=0; j<max_fe_index; j++)
-                            {
-                              remaining_per_macro_cell[j] =
-                                renumbering_fe_index[j].size()%vectorization_length;
-                              if (remaining_per_macro_cell[j] != 0)
-                                filled = false;
-                              missing_macros += ((renumbering_fe_index[j].size()+
-                                                  vectorization_length-1)/vectorization_length);
-                            }
-                        }
-                      else
-                        {
-                          remaining_per_macro_cell.resize(1);
-                          remaining_per_macro_cell[0] = partition_counter%
-                                                        vectorization_length;
-                          missing_macros = partition_counter/vectorization_length;
-                          if (remaining_per_macro_cell[0] != 0)
-                            {
-                              filled = false;
-                              missing_macros++;
-                            }
-                        }
-                      missing_macros = task_info.block_size -
-                                       (missing_macros%task_info.block_size);
-
-                      // now we realized that there are some cells missing.
-                      while (missing_macros>0 || filled == false)
-                        {
-                          if (index==0)
-                            {
-                              index = neighbor_neighbor_list.size();
-                              if (index == index_before)
-                                {
-                                  if (missing_macros != 0)
-                                    {
-                                      neighbor_neighbor_list.resize(0);
-                                    }
-                                  start_up--;
-                                  break;// not connected - start again
-                                }
-                              index_before = index;
-                            }
-                          index--;
-                          unsigned int additional = neighbor_neighbor_list
-                                                    [index];
-
-                          // go through the neighbors of the last cell in the
-                          // current partition and check if we find some to
-                          // fill up with.
-                          DynamicSparsityPattern::iterator
-                          neighbor = connectivity.begin(additional),
-                          end = connectivity.end(additional);
-                          for (; neighbor!=end ; ++neighbor)
-                            {
-                              if (cell_partition[neighbor->column()] == part &&
-                                  cell_partition_l2[neighbor->column()] ==
-                                  size_info.n_active_cells)
-                                {
-                                  unsigned int this_index = 0;
-                                  if (hp_bool == true)
-                                    this_index = cell_active_fe_index.empty() ? 0 :
-                                                 cell_active_fe_index[neighbor->column()];
-
-                                  // Only add this cell if we need more macro
-                                  // cells in the current block or if there is
-                                  // a macro cell with the FE index that is
-                                  // not yet fully populated
-                                  if (missing_macros > 0 ||
-                                      remaining_per_macro_cell[this_index] > 0)
-                                    {
-                                      cell_partition_l2[neighbor->column()] = partition_l2;
-                                      neighbor_neighbor_list.push_back(neighbor->column());
-                                      if (hp_bool == true)
-                                        renumbering_fe_index[this_index].
-                                        push_back(neighbor->column());
-                                      partition_partition_list[counter] =
-                                        neighbor->column();
-                                      counter++;
-                                      partition_counter++;
-                                      if (remaining_per_macro_cell[this_index]
-                                          == 0 && missing_macros > 0)
-                                        missing_macros--;
-                                      remaining_per_macro_cell[this_index]++;
-                                      if (remaining_per_macro_cell[this_index]
-                                          == vectorization_length)
-                                        {
-                                          remaining_per_macro_cell[this_index] = 0;
-                                        }
-                                      if (missing_macros == 0)
-                                        {
-                                          filled = true;
-                                          for (unsigned int fe_ind=0;
-                                               fe_ind<max_fe_index; ++fe_ind)
-                                            if (remaining_per_macro_cell[fe_ind]!=0)
-                                              filled = false;
-                                        }
-                                      if (filled == true)
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                      if (hp_bool == true)
-                        {
-                          // set the renumbering according to their active FE
-                          // index within one partition-partition which was
-                          // implicitly assumed above
-                          cell = counter - partition_counter;
-                          for (unsigned int j=0; j<max_fe_index; j++)
-                            {
-                              for (unsigned int jj=0; jj<renumbering_fe_index[j].
-                                   size(); jj++)
-                                renumbering[cell++] =
-                                  renumbering_fe_index[j][jj];
-                              if (renumbering_fe_index[j].size()%vectorization_length != 0)
-                                irregular_cells[renumbering_fe_index[j].size()/
-                                                vectorization_length+
-                                                n_macro_cells_before] =
-                                                  renumbering_fe_index[j].size()%vectorization_length;
-                              n_macro_cells_before += (renumbering_fe_index[j].
-                                                       size()+vectorization_length-1)/
-                                                      vectorization_length;
-                              renumbering_fe_index[j].resize(0);
-                            }
-                        }
-                      else
-                        {
-                          n_macro_cells_before += partition_counter/vectorization_length;
-                          if (partition_counter%vectorization_length != 0)
-                            {
-                              irregular_cells[n_macro_cells_before] =
-                                partition_counter%vectorization_length;
-                              n_macro_cells_before++;
-                            }
-                        }
-                    }
-                    task_info.partition_color_blocks_data.
-                    push_back(n_macro_cells_before);
-                    partition_l2++;
-                  }
-                neighbor_list = neighbor_neighbor_list;
-                neighbor_neighbor_list.resize(0);
-              }
-            task_info.partition_color_blocks_row_index[part+1] =
-              task_info.partition_color_blocks_row_index[part] + partition_l2;
-          }
-      }
-
-      if (size_info.boundary_cells_end>0)
-        size_info.boundary_cells_end = task_info.partition_color_blocks_data
-                                       [task_info.partition_color_blocks_row_index[1]];
-
-      if (hp_bool == false)
-        renumbering.swap(partition_partition_list);
-      irregular_cells.resize(n_macro_cells_before);
-      size_info.n_macro_cells = n_macro_cells_before;
-
-      task_info.evens = (partition+1)/2;
-      task_info.odds  = partition/2;
-      task_info.n_blocked_workers =
-        task_info.odds-(task_info.odds+task_info.evens+1)%2;
-      task_info.n_workers = task_info.evens+task_info.odds-
-                            task_info.n_blocked_workers;
-      task_info.partition_evens.resize(partition);
-      task_info.partition_odds.resize(partition);
-      task_info.partition_n_blocked_workers.resize(partition);
-      task_info.partition_n_workers.resize(partition);
-      for (unsigned int part=0; part<partition; part++)
-        {
-          task_info.partition_evens[part] =
-            (task_info.partition_color_blocks_row_index[part+1]-
-             task_info.partition_color_blocks_row_index[part]+1)/2;
-          task_info.partition_odds[part] =
-            (task_info.partition_color_blocks_row_index[part+1]-
-             task_info.partition_color_blocks_row_index[part])/2;
-          task_info.partition_n_blocked_workers[part] =
-            task_info.partition_odds[part]-(task_info.partition_odds[part]+
-                                            task_info.partition_evens[part]+1)%2;
-          task_info.partition_n_workers[part] =
-            task_info.partition_evens[part]+task_info.partition_odds[part]-
-            task_info.partition_n_blocked_workers[part];
-        }
-    }
-
-
-    namespace internal
+    namespace
     {
       // rudimentary version of a vector that keeps entries always ordered
       class ordered_vector : public std::vector<types::global_dof_index>
@@ -1664,188 +659,171 @@ not_connect:
             ++dat;
         }
       };
+
+      // We construct the connectivity graph in parallel. we use one lock for
+      // 256 degrees of freedom to keep the number of locks down to a
+      // reasonable level and reduce the cost of locking to some extent.
+      static constexpr unsigned int bucket_size_threading = 256;
+
+      void compute_row_lengths(const unsigned int           begin,
+                               const unsigned int           end,
+                               const DoFInfo               &dof_info,
+                               std::vector<Threads::Mutex> &mutexes,
+                               std::vector<unsigned int>   &row_lengths)
+      {
+        std::vector<unsigned int> scratch;
+        constexpr unsigned int n_components = 1;
+        for (unsigned int block=begin; block<end; ++block)
+          {
+            scratch.clear();
+            scratch.insert(scratch.end(),
+                           &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
+                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]]);
+            std::sort(scratch.begin(), scratch.end());
+            std::vector<unsigned int>::const_iterator end_unique =
+              std::unique(scratch.begin(), scratch.end());
+            std::vector<unsigned int>::const_iterator it = scratch.begin();
+            while (it != end_unique)
+              {
+                // In this code, the procedure is that we insert all elements
+                // that are within the range of one lock at once
+                const unsigned int next_bucket = (*it/bucket_size_threading+1)*
+                                                 bucket_size_threading;
+                Threads::Mutex::ScopedLock lock(mutexes[*it/bucket_size_threading]);
+                for ( ; it != end_unique && *it < next_bucket; ++it)
+                  {
+                    AssertIndexRange(*it, row_lengths.size());
+                    row_lengths[*it]++;
+                  }
+              }
+          }
+      }
+
+      void fill_connectivity_dofs(const unsigned int               begin,
+                                  const unsigned int               end,
+                                  const DoFInfo                   &dof_info,
+                                  const std::vector<unsigned int> &row_lengths,
+                                  std::vector<Threads::Mutex>     &mutexes,
+                                  dealii::SparsityPattern         &connectivity_dof)
+      {
+        std::vector<unsigned int> scratch;
+        const unsigned int n_components = 1;
+        for (unsigned int block=begin; block<end; ++block)
+          {
+            scratch.clear();
+            scratch.insert(scratch.end(),
+                           &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
+                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]]);
+            std::sort(scratch.begin(), scratch.end());
+            std::vector<unsigned int>::const_iterator end_unique =
+              std::unique(scratch.begin(), scratch.end());
+            std::vector<unsigned int>::const_iterator it = scratch.begin();
+            while (it != end_unique)
+              {
+                const unsigned int next_bucket = (*it/bucket_size_threading+1)*
+                                                 bucket_size_threading;
+                Threads::Mutex::ScopedLock lock(mutexes[*it/bucket_size_threading]);
+                for ( ; it != end_unique && *it < next_bucket; ++it)
+                  if (row_lengths[*it]>0)
+                    connectivity_dof.add(*it, block);
+              }
+          }
+      }
+
+      void fill_connectivity(const unsigned int               begin,
+                             const unsigned int               end,
+                             const DoFInfo                   &dof_info,
+                             const std::vector<unsigned int> &renumbering,
+                             const dealii::SparsityPattern   &connectivity_dof,
+                             DynamicSparsityPattern          &connectivity)
+      {
+        ordered_vector row_entries;
+        const unsigned int n_components = 1;
+        for (unsigned int block=begin; block < end; ++block)
+          {
+            row_entries.clear();
+
+            const unsigned int
+            *it = &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
+             *end_cell = &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]];
+            for ( ; it != end_cell; ++it)
+              {
+                SparsityPattern::iterator sp = connectivity_dof.begin(*it);
+                std::vector<types::global_dof_index>::iterator insert_pos = row_entries.begin();
+                for ( ; sp != connectivity_dof.end(*it); ++sp)
+                  if (sp->column() != block)
+                    row_entries.insert (renumbering[sp->column()], insert_pos);
+              }
+            connectivity.add_entries (renumbering[block], row_entries.begin(), row_entries.end());
+          }
+      }
     }
 
 
     void
     DoFInfo::make_connectivity_graph
-    (const SizeInfo                  &size_info,
-     const TaskInfo                  &task_info,
+    (const TaskInfo                  &task_info,
      const std::vector<unsigned int> &renumbering,
-     const std::vector<unsigned int> &irregular_cells,
-     const bool                       do_blocking,
-     DynamicSparsityPattern &connectivity) const
+     DynamicSparsityPattern          &connectivity) const
     {
-      AssertDimension (row_starts.size()-1, size_info.n_active_cells);
-      const unsigned int n_rows =
+      unsigned int n_rows =
         (vector_partitioner->local_range().second-
          vector_partitioner->local_range().first)
         + vector_partitioner->ghost_indices().n_elements();
-      const unsigned int n_blocks = (do_blocking == true) ?
-                                    task_info.n_blocks : size_info.n_active_cells;
+
+      // Avoid square sparsity patterns that allocate the diagonal entry
+      if (n_rows == task_info.n_active_cells)
+        ++n_rows;
 
       // first determine row lengths
       std::vector<unsigned int> row_lengths(n_rows);
-      unsigned int cell_start = 0, mcell_start = 0;
-      std::vector<unsigned int> scratch;
-      for (unsigned int block = 0; block < n_blocks; ++block)
-        {
-          // if we have the blocking variant (used in the coloring scheme), we
-          // want to build a graph with the blocks with interaction with
-          // remote MPI processes up front. in the non-blocking variant, we do
-          // not do this here. TODO: unify this approach!!!
-          if (do_blocking == true)
-            {
-              scratch.clear();
-              for (unsigned int mcell=mcell_start; mcell<
-                   std::min(mcell_start+task_info.block_size,
-                            size_info.n_macro_cells);
-                   ++mcell)
-                {
-                  unsigned int n_comp = (irregular_cells[mcell]>0)
-                                        ?irregular_cells[mcell]:size_info.vectorization_length;
-                  for (unsigned int cell = cell_start; cell < cell_start+n_comp;
-                       ++cell)
-                    scratch.insert(scratch.end(),
-                                   begin_indices(renumbering[cell]),
-                                   end_indices(renumbering[cell]));
-                  cell_start += n_comp;
-                }
-              std::sort(scratch.begin(), scratch.end());
-              const unsigned int n_unique =
-                std::unique(scratch.begin(), scratch.end())-scratch.begin();
-              for (unsigned int i=0; i<n_unique; ++i)
-                row_lengths[scratch[i]]++;
-              mcell_start += task_info.block_size;
-            }
-          else
-            {
-              scratch.clear();
-              scratch.insert(scratch.end(),
-                             begin_indices(block), end_indices(block));
-              std::sort(scratch.begin(), scratch.end());
-              const unsigned int n_unique =
-                std::unique(scratch.begin(), scratch.end())-scratch.begin();
-              for (unsigned int i=0; i<n_unique; ++i)
-                row_lengths[scratch[i]]++;
-            }
-        }
+      std::vector<Threads::Mutex> mutexes(n_rows/bucket_size_threading+1);
+      parallel::apply_to_subranges(0, task_info.n_active_cells,
+                                   std::bind(&compute_row_lengths,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::cref(*this),
+                                             std::ref(mutexes),
+                                             std::ref(row_lengths)), 20);
 
-      // disregard dofs that only sit on one cell
+      // disregard dofs that only sit on a single cell because they cannot
+      // couple
       for (unsigned int row=0; row<n_rows; ++row)
-        if (row_lengths[row] == 1)
+        if (row_lengths[row] <= 1)
           row_lengths[row] = 0;
 
-      SparsityPattern connectivity_dof (n_rows, n_blocks, row_lengths);
-      cell_start = 0, mcell_start = 0;
-      for (unsigned int block = 0; block < n_blocks; ++block)
-        {
-          // if we have the blocking variant (used in the coloring scheme), we
-          // want to build a graph with the blocks with interaction with
-          // remote MPI processes up front. in the non-blocking variant, we do
-          // not do this here. TODO: unify this approach!!!
-          if (do_blocking == true)
-            {
-              for (unsigned int mcell=mcell_start; mcell<
-                   std::min(mcell_start+task_info.block_size,
-                            size_info.n_macro_cells);
-                   ++mcell)
-                {
-                  unsigned int n_comp = (irregular_cells[mcell]>0)
-                                        ?irregular_cells[mcell]:size_info.vectorization_length;
-                  for (unsigned int cell = cell_start; cell < cell_start+n_comp;
-                       ++cell)
-                    {
-                      const unsigned int
-                      *it = begin_indices (renumbering[cell]),
-                       *end_cell = end_indices (renumbering[cell]);
-                      for ( ; it != end_cell; ++it)
-                        if (row_lengths[*it]>0)
-                          connectivity_dof.add(*it, block);
-                    }
-                  cell_start += n_comp;
-                }
-              mcell_start += task_info.block_size;
-            }
-          else
-            {
-              const unsigned int
-              *it = begin_indices (block),
-               *end_cell = end_indices (block);
-              for ( ; it != end_cell; ++it)
-                if (row_lengths[*it]>0)
-                  connectivity_dof.add(*it, block);
-            }
-        }
+      // Create a temporary sparsity pattern that holds to each degree of
+      // freedom on which cells it appears, i.e., store the connectivity
+      // between cells and dofs
+      SparsityPattern connectivity_dof (n_rows, task_info.n_active_cells,
+                                        row_lengths);
+      parallel::apply_to_subranges(0, task_info.n_active_cells,
+                                   std::bind(&fill_connectivity_dofs,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::cref(*this),
+                                             std::cref(row_lengths),
+                                             std::ref(mutexes),
+                                             std::ref(connectivity_dof)), 20);
       connectivity_dof.compress();
 
-      connectivity.reinit (n_blocks, n_blocks);
-      internal::ordered_vector row_entries;
-      cell_start = 0;
-      mcell_start = 0;
-      for (unsigned int block=0;  block < n_blocks; ++block)
-        {
-          row_entries.clear();
 
-          if (do_blocking==true)
-            {
-              for (unsigned int mcell=mcell_start; mcell<
-                   std::min(mcell_start+task_info.block_size,
-                            size_info.n_macro_cells);
-                   ++mcell)
-                {
-                  unsigned int n_comp = (irregular_cells[mcell]>0)
-                                        ?irregular_cells[mcell]:size_info.vectorization_length;
-                  for (unsigned int cell = cell_start; cell < cell_start+n_comp;
-                       ++cell)
-                    {
-                      // apply renumbering when we do blocking
-                      const unsigned int
-                      *it = begin_indices (renumbering[cell]),
-                       *end_cell = end_indices (renumbering[cell]);
-                      for ( ; it != end_cell; ++it)
-                        if (row_lengths[*it] > 0)
-                          {
-                            SparsityPattern::iterator sp = connectivity_dof.begin(*it);
-                            // jump over diagonal for square patterns
-                            if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
-                              ++sp;
-                            row_entries.reserve (row_entries.size() + end_cell - it);
-                            std::vector<types::global_dof_index>::iterator insert_pos = row_entries.begin();
-                            for ( ; sp != connectivity_dof.end(*it); ++sp)
-                              if (sp->column() >= block)
-                                break;
-                              else
-                                row_entries.insert (sp->column(), insert_pos);
-                          }
-                    }
-                  cell_start +=n_comp;
-                }
-              mcell_start += task_info.block_size;
-            }
-          else
-            {
-              const unsigned int *it = begin_indices (block),
-                                  * end_cell = end_indices (block);
-              for ( ; it != end_cell; ++it)
-                if (row_lengths[*it] > 0)
-                  {
-                    SparsityPattern::iterator sp = connectivity_dof.begin(*it);
-                    // jump over diagonal for square patterns
-                    if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
-                      ++sp;
-                    row_entries.reserve (row_entries.size() + end_cell - it);
-                    std::vector<types::global_dof_index>::iterator insert_pos = row_entries.begin();
-                    for ( ; sp != connectivity_dof.end(*it); ++sp)
-                      if (sp->column() >= block)
-                        break;
-                      else
-                        row_entries.insert (sp->column(), insert_pos);
-                  }
-            }
-          connectivity.add_entries (block, row_entries.begin(), row_entries.end());
-        }
-      connectivity.symmetrize ();
+      // Invert renumbering for use in fill_connectivity.
+      std::vector<unsigned int> reverse_numbering(task_info.n_active_cells);
+      reverse_numbering = Utilities::invert_permutation(renumbering);
+
+      // From the above connectivity between dofs and cells, we can finally
+      // create a connectivity list between cells. The connectivity graph
+      // should apply the renumbering, i.e., the entry for cell j is the entry
+      // for cell renumbering[j] in the original ordering.
+      parallel::apply_to_subranges(0, task_info.n_active_cells,
+                                   std::bind(&fill_connectivity,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::cref(*this),
+                                             std::cref(reverse_numbering),
+                                             std::cref(connectivity_dof),
+                                             std::ref(connectivity)), 20);
     }
 
 
@@ -1917,23 +895,23 @@ not_connect:
     template <typename StreamType>
     void
     DoFInfo::print_memory_consumption (StreamType     &out,
-                                       const SizeInfo &size_info) const
+                                       const TaskInfo &task_info) const
     {
       out << "       Memory row starts indices:    ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, (row_starts.capacity()*sizeof(std::array<unsigned int, 3>)));
       out << "       Memory dof indices:           ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));
       out << "       Memory constraint indicators: ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (constraint_indicator));
       out << "       Memory plain indices:         ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (row_starts_plain_indices)+
        MemoryConsumption::memory_consumption (plain_dof_indices));
       out << "       Memory vector partitioner:    ";
-      size_info.print_memory_statistics
+      task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (*vector_partitioner));
     }
 

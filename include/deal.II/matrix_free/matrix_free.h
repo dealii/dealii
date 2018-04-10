@@ -34,17 +34,10 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
-#include <deal.II/matrix_free/helper_functions.h>
+#include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
-
-#ifdef DEAL_II_WITH_THREADS
-#include <tbb/task.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/parallel_for.h>
-#include <tbb/blocked_range.h>
-#endif
 
 #include <stdlib.h>
 #include <memory>
@@ -805,7 +798,8 @@ public:
   /**
    * Return information on system size.
    */
-  const internal::MatrixFreeFunctions::SizeInfo &
+  DEAL_II_DEPRECATED
+  const internal::MatrixFreeFunctions::TaskInfo &
   get_size_info () const;
 
   /*
@@ -992,13 +986,18 @@ private:
   std::vector<std::pair<unsigned int,unsigned int> > cell_level_index;
 
   /**
-   * Stores how many cells we have, how many cells that we see after applying
-   * vectorization (i.e., the number of macro cells), and MPI-related stuff.
-   */
-  internal::MatrixFreeFunctions::SizeInfo size_info;
+   * For discontinuous Galerkin, the cell_level_index includes cells that are
+   * not on the local processor but that are needed to evaluate the cell
+   * integrals. In cell_level_index_end_local, we store the number of local
+   * cells.
+   **/
+  unsigned int cell_level_index_end_local;
 
   /**
-   * Information regarding the shared memory parallelization.
+   * Stores how many cells we have, how many cells that we see after applying
+   * vectorization (i.e., the number of macro cells), MPI-related stuff, and,
+   * if threads are enabled, information regarding the shared memory
+   * parallelization.
    */
   internal::MatrixFreeFunctions::TaskInfo task_info;
 
@@ -1100,10 +1099,10 @@ MatrixFree<dim,Number>::get_task_info () const
 
 template <int dim, typename Number>
 inline
-const internal::MatrixFreeFunctions::SizeInfo &
+const internal::MatrixFreeFunctions::TaskInfo &
 MatrixFree<dim,Number>::get_size_info () const
 {
-  return size_info;
+  return task_info;
 }
 
 
@@ -1113,7 +1112,7 @@ inline
 unsigned int
 MatrixFree<dim,Number>::n_macro_cells () const
 {
-  return size_info.n_macro_cells;
+  return *(task_info.cell_partition_data.end()-2);
 }
 
 
@@ -1123,7 +1122,7 @@ inline
 unsigned int
 MatrixFree<dim,Number>::n_physical_cells () const
 {
-  return size_info.n_active_cells;
+  return task_info.n_active_cells;
 }
 
 
@@ -1297,7 +1296,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
 #ifdef DEBUG
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
+  AssertIndexRange (macro_cell_number, n_macro_cells());
   AssertIndexRange (vector_number, vectorization_length);
   const unsigned int irreg_filled = dof_info[dof_index].row_starts[macro_cell_number][2];
   if (irreg_filled > 0)
@@ -1335,7 +1334,7 @@ MatrixFree<dim,Number>::get_hp_cell_iterator(const unsigned int macro_cell_numbe
   const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
 #ifdef DEBUG
   AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
+  AssertIndexRange (macro_cell_number, n_macro_cells());
   AssertIndexRange (vector_number, vectorization_length);
   const unsigned int irreg_filled = dof_info[dof_index].row_starts[macro_cell_number][2];
   if (irreg_filled > 0)
@@ -1358,7 +1357,7 @@ inline
 bool
 MatrixFree<dim,Number>::at_irregular_cell (const unsigned int macro_cell) const
 {
-  AssertIndexRange (macro_cell, size_info.n_macro_cells);
+  AssertIndexRange (macro_cell, n_macro_cells());
   return dof_info[0].row_starts[macro_cell][2] > 0;
 }
 
@@ -1369,7 +1368,7 @@ inline
 unsigned int
 MatrixFree<dim,Number>::n_components_filled (const unsigned int macro_cell) const
 {
-  AssertIndexRange (macro_cell, size_info.n_macro_cells);
+  AssertIndexRange (macro_cell, n_macro_cells());
   const unsigned int n_filled = dof_info[0].row_starts[macro_cell][2];
   if (n_filled == 0)
     return VectorizedArray<Number>::n_array_elements;
@@ -1753,9 +1752,10 @@ reinit(const Mapping<dim>                                    &mapping,
 // functions: for generic vectors, do nothing at all. For distributed vectors,
 // call update_ghost_values_start function and so on. If we have collections
 // of vectors, just do the individual functions of the components. In order to
-// keep ghost values consistent (whether we are in read or write mode). the whole situation is a bit complicated by the fact
-// that we need to treat block vectors differently, which use some additional
-// helper functions to select the blocks and template magic.
+// keep ghost values consistent (whether we are in read or write mode). the
+// whole situation is a bit complicated by the fact that we need to treat
+// block vectors differently, which use some additional helper functions to
+// select the blocks and template magic.
 namespace internal
 {
   template <typename VectorStruct>
@@ -2081,257 +2081,192 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_THREADS
 
-  // This defines the TBB data structures that are needed to schedule the
-  // partition-partition variant
-
-  namespace partition
+  namespace MatrixFreeFunctions
   {
-    template <typename Worker>
-    class CellWork : public tbb::task
-    {
-    public:
-      CellWork (const Worker &worker_in,
-                const unsigned int partition_in,
-                const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
-                const bool is_blocked_in)
-        :
-        dummy (nullptr),
-        worker (worker_in),
-        partition (partition_in),
-        task_info (task_info_in),
-        is_blocked (is_blocked_in)
-      {};
-      tbb::task *execute ()
-      {
-        std::pair<unsigned int, unsigned int> cell_range
-        (task_info.partition_color_blocks_data[partition],
-         task_info.partition_color_blocks_data[partition+1]);
-        worker(cell_range);
-        if (is_blocked==true)
-          dummy->spawn (*dummy);
-        return (nullptr);
-      }
-
-      tbb::empty_task *dummy;
-
-    private:
-      const Worker      &worker;
-      const unsigned int partition;
-      const internal::MatrixFreeFunctions::TaskInfo &task_info;
-      const bool         is_blocked;
-    };
-
-
-
-    template <typename Worker>
-    class PartitionWork : public tbb::task
-    {
-    public:
-      PartitionWork (const Worker &function_in,
-                     const unsigned int partition_in,
-                     const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
-                     const bool    is_blocked_in = false)
-        :
-        dummy (nullptr),
-        function (function_in),
-        partition (partition_in),
-        task_info (task_info_in),
-        is_blocked (is_blocked_in)
-      {};
-      tbb::task *execute ()
-      {
-        tbb::empty_task *root = new ( tbb::task::allocate_root() )
-        tbb::empty_task;
-        unsigned int evens = task_info.partition_evens[partition];
-        unsigned int odds  = task_info.partition_odds[partition];
-        unsigned int n_blocked_workers =
-          task_info.partition_n_blocked_workers[partition];
-        unsigned int n_workers = task_info.partition_n_workers[partition];
-        std::vector<CellWork<Worker>*> worker(n_workers);
-        std::vector<CellWork<Worker>*> blocked_worker(n_blocked_workers);
-
-        root->set_ref_count(evens+1);
-        for (unsigned int j=0; j<evens; j++)
-          {
-            worker[j] = new (root->allocate_child())
-            CellWork<Worker>(function, task_info.
-                             partition_color_blocks_row_index[partition]+2*j,
-                             task_info, false);
-            if (j>0)
-              {
-                worker[j]->set_ref_count(2);
-                blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
-                tbb::empty_task;
-                worker[j-1]->spawn(*blocked_worker[j-1]);
-              }
-            else
-              worker[j]->set_ref_count(1);
-            if (j<evens-1)
-              {
-                blocked_worker[j] = new (worker[j]->allocate_child())
-                CellWork<Worker>(function, task_info.
-                                 partition_color_blocks_row_index
-                                 [partition] + 2*j+1, task_info, true);
-              }
-            else
-              {
-                if (odds==evens)
-                  {
-                    worker[evens] = new (worker[j]->allocate_child())
-                    CellWork<Worker>(function, task_info.
-                                     partition_color_blocks_row_index[partition]+2*j+1,
-                                     task_info, false);
-                    worker[j]->spawn(*worker[evens]);
-                  }
-                else
-                  {
-                    tbb::empty_task *child = new (worker[j]->allocate_child())
-                    tbb::empty_task();
-                    worker[j]->spawn(*child);
-                  }
-              }
-          }
-
-        root->wait_for_all();
-        root->destroy(*root);
-        if (is_blocked==true)
-          dummy->spawn (*dummy);
-        return (nullptr);
-      }
-
-      tbb::empty_task *dummy;
-
-    private:
-      const Worker  &function;
-      const unsigned int partition;
-      const internal::MatrixFreeFunctions::TaskInfo &task_info;
-      const bool     is_blocked;
-    };
-
-  } // end of namespace partition
-
-
-
-  namespace color
-  {
-    template <typename Worker>
-    class CellWork
-    {
-    public:
-      CellWork (const Worker                   &worker_in,
-                const internal::MatrixFreeFunctions::TaskInfo &task_info_in)
-        :
-        worker (worker_in),
-        task_info (task_info_in)
-      {};
-      void operator()(const tbb::blocked_range<unsigned int> &r) const
-      {
-        for (unsigned int block=r.begin(); block<r.end(); block++)
-          {
-            std::pair<unsigned int,unsigned int> cell_range;
-            if (task_info.position_short_block<block)
-              {
-                cell_range.first = (block-1)*task_info.block_size+
-                                   task_info.block_size_last;
-                cell_range.second = cell_range.first + task_info.block_size;
-              }
-            else
-              {
-                cell_range.first = block*task_info.block_size;
-                cell_range.second = cell_range.first +
-                                    ((block == task_info.position_short_block)?
-                                     (task_info.block_size_last):(task_info.block_size));
-              }
-            worker (cell_range);
-          }
-      }
-    private:
-      const Worker   &worker;
-      const internal::MatrixFreeFunctions::TaskInfo &task_info;
-    };
-
-
-    template <typename Worker>
-    class PartitionWork : public tbb::task
-    {
-    public:
-      PartitionWork (const Worker &worker_in,
-                     const unsigned int partition_in,
-                     const internal::MatrixFreeFunctions::TaskInfo &task_info_in,
-                     const bool    is_blocked_in)
-        :
-        dummy (nullptr),
-        worker (worker_in),
-        partition (partition_in),
-        task_info (task_info_in),
-        is_blocked (is_blocked_in)
-      {};
-      tbb::task *execute ()
-      {
-        unsigned int lower = task_info.partition_color_blocks_data[partition],
-                     upper = task_info.partition_color_blocks_data[partition+1];
-        parallel_for(tbb::blocked_range<unsigned int>(lower,upper,1),
-                     CellWork<Worker> (worker,task_info));
-        if (is_blocked==true)
-          dummy->spawn (*dummy);
-        return (nullptr);
-      }
-
-      tbb::empty_task *dummy;
-
-    private:
-      const Worker &worker;
-      const unsigned int partition;
-      const internal::MatrixFreeFunctions::TaskInfo &task_info;
-      const bool is_blocked;
-    };
-
-  } // end of namespace color
-
-
-  template <typename VectorStruct>
-  class MPIComDistribute : public tbb::task
-  {
-  public:
-    MPIComDistribute (const VectorStruct  &src_in)
-      :
-      src(src_in)
+    // struct to select between a const interface and a non-const interface
+    // for MFWorker
+    template <typename, typename, typename, typename, bool>
+    struct InterfaceSelector
     {};
 
-    tbb::task *execute ()
+    // Version of constant functions
+    template <typename MF, typename InVector, typename OutVector, typename Container>
+    struct InterfaceSelector<MF, InVector, OutVector, Container, true>
     {
-      internal::update_ghost_values_finish(src);
-      return nullptr;
+      typedef void (Container::*function_type)
+      (const MF &, OutVector &, const InVector &,
+       const std::pair<unsigned int, unsigned int> &)const;
+    };
+
+    // Version for non-constant functions
+    template <typename MF, typename InVector, typename OutVector, typename Container>
+    struct InterfaceSelector<MF, InVector, OutVector, Container, false>
+    {
+      typedef void (Container::*function_type)
+      (const MF &, OutVector &, const InVector &,
+       const std::pair<unsigned int, unsigned int> &);
+    };
+  }
+
+
+
+  // A implementation class for the worker object that runs the various
+  // operations we want to perform during the matrix-free loop
+  template <typename MF, typename InVector, typename OutVector,
+            typename Container, bool is_constant>
+  class MFWorker : public MFWorkerInterface
+  {
+  public:
+    // A typedef to make the arguments further down more readable
+    typedef typename MatrixFreeFunctions::InterfaceSelector
+    <MF,InVector,OutVector,Container,is_constant>::function_type function_type;
+
+    // constructor, binds all the arguments to this class
+    MFWorker (const MF &matrix_free,
+              const InVector &src,
+              OutVector &dst,
+              const bool zero_dst_vector_setting,
+              const Container &container,
+              function_type cell_function,
+              function_type face_function,
+              function_type boundary_function)
+      :
+      matrix_free (matrix_free),
+      container (const_cast<Container &>(container)),
+      cell_function (cell_function),
+      face_function (face_function),
+      boundary_function (boundary_function),
+      src (src),
+      dst (dst),
+      ghosts_were_set(false),
+      src_and_dst_are_same (PointerComparison::equal(&src, &dst)),
+      zero_dst_vector_setting(zero_dst_vector_setting  &&!src_and_dst_are_same)
+    {}
+
+    // Runs the cell work. If no function is given, nothing is done
+    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range) override
+    {
+      if (cell_function != nullptr && cell_range.second > cell_range.first)
+        (container.*cell_function)(matrix_free, this->dst, this->src, cell_range);
     }
 
-  private:
-    const VectorStruct &src;
-  };
+    // Runs the assembler on interior faces. If no function is given, nothing
+    // is done
+    virtual void face(const std::pair<unsigned int,unsigned int> &face_range) override
+    {
+      if (face_function != nullptr && face_range.second > face_range.first)
+        (container.*face_function)(matrix_free, this->dst, this->src, face_range);
+    }
 
+    // Runs the assembler on boundary faces. If no function is given, nothing
+    // is done
+    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range) override
+    {
+      if (boundary_function != nullptr && face_range.second > face_range.first)
+        (container.*boundary_function)(matrix_free, this->dst, this->src, face_range);
+    }
 
+    // Starts the communication for the update ghost values operation. We
+    // cannot call this update if ghost and destination are the same because
+    // that would introduce spurious entries in the destination (there is also
+    // the problem that reading from a vector that we also write to is usually
+    // not intended in case there is overlap, but this is up to the
+    // application code to decide and we cannot catch this case here).
+    virtual void vector_update_ghosts_start() override
+    {
+      if (!src_and_dst_are_same)
+        ghosts_were_set = internal::update_ghost_values_start(src);
+    }
 
-  template <typename VectorStruct>
-  class MPIComCompress : public tbb::task
-  {
-  public:
-    MPIComCompress (VectorStruct        &dst_in)
-      :
-      dst(dst_in)
-    {};
+    // Finishes the communication for the update ghost values operation
+    virtual void vector_update_ghosts_finish() override
+    {
+      if (!src_and_dst_are_same)
+        internal::update_ghost_values_finish(src);
+    }
 
-    tbb::task *execute ()
+    // Starts the communication for the vector compress operation
+    virtual void vector_compress_start() override
     {
       internal::compress_start(dst);
-      return nullptr;
+    }
+
+    // Finishes the communication for the vector compress operation
+    virtual void vector_compress_finish() override
+    {
+      internal::compress_finish(dst);
+      if (!src_and_dst_are_same)
+        internal::reset_ghost_values(src, !ghosts_were_set);
+    }
+
+    // Zeros the given input vector
+    virtual void zero_dst_vector_range(const unsigned int /*range_index*/) override
+    {
+      // currently not implemented
+      (void)zero_dst_vector_setting;
     }
 
   private:
-    VectorStruct &dst;
+    const MF       &matrix_free;
+    Container      &container;
+    function_type   cell_function;
+    function_type   face_function;
+    function_type   boundary_function;
+
+    const InVector &src;
+    OutVector      &dst;
+    bool            ghosts_were_set;
+    const bool      src_and_dst_are_same;
+    const bool      zero_dst_vector_setting;
   };
 
-#endif // DEAL_II_WITH_THREADS
+
+
+  /**
+   * An internal class to convert three function pointers to the
+   * scheme with virtual functions above.
+   */
+  template <class MF, typename InVector, typename OutVector>
+  struct MFClassWrapper
+  {
+    typedef std::function<void (const MF &, OutVector &, const InVector &,
+                                const std::pair<unsigned int, unsigned int> &)> function_type;
+
+    MFClassWrapper (const function_type cell,
+                    const function_type face,
+                    const function_type boundary)
+      :
+      cell (cell),
+      face (face),
+      boundary (boundary)
+    {}
+
+    void cell_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                          const std::pair<unsigned int, unsigned int> &range) const
+    {
+      if (cell)
+        cell(mf, dst, src, range);
+    }
+
+    void face_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                          const std::pair<unsigned int, unsigned int> &range) const
+    {
+      if (face)
+        face(mf, dst, src, range);
+    }
+
+    void boundary_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                              const std::pair<unsigned int, unsigned int> &range) const
+    {
+      if (boundary)
+        boundary(mf, dst, src, range);
+    }
+
+    const function_type cell;
+    const function_type face;
+    const function_type boundary;
+  };
 
 } // end of namespace internal
 
@@ -2350,275 +2285,13 @@ MatrixFree<dim, Number>::cell_loop
  OutVector       &dst,
  const InVector  &src) const
 {
-  // in any case, need to start the ghost import at the beginning
-  bool ghosts_were_not_set = internal::update_ghost_values_start (src);
+  typedef internal::MFClassWrapper<MatrixFree<dim, Number>, InVector, OutVector> Wrapper;
+  Wrapper wrap (cell_operation, nullptr, nullptr);
+  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, Wrapper, true>
+  worker(*this, src, dst, false, wrap, &Wrapper::cell_integrator,
+         &Wrapper::face_integrator, &Wrapper::boundary_integrator);
 
-#ifdef DEAL_II_WITH_THREADS
-
-  // Use multithreading if so requested and if there is enough work to do in
-  // parallel (the code might hang if there are less than two chunks!)
-  if (task_info.use_multithreading == true && task_info.n_blocks > 3)
-    {
-      // to simplify the function calls, bind away all arguments except the
-      // cell range
-      typedef
-      std::function<void (const std::pair<unsigned int,unsigned int> &range)>
-      Worker;
-
-      const Worker func = std::bind (std::ref(cell_operation),
-                                     std::cref(*this),
-                                     std::ref(dst),
-                                     std::cref(src),
-                                     std::placeholders::_1);
-
-      if (task_info.use_partition_partition == true)
-        {
-          tbb::empty_task *root = new ( tbb::task::allocate_root() )
-          tbb::empty_task;
-          unsigned int evens = task_info.evens;
-          unsigned int odds  = task_info.odds;
-          root->set_ref_count(evens+1);
-          unsigned int n_blocked_workers = task_info.n_blocked_workers;
-          unsigned int n_workers = task_info.n_workers;
-          std::vector<internal::partition::PartitionWork<Worker>*>
-          worker(n_workers);
-          std::vector<internal::partition::PartitionWork<Worker>*>
-          blocked_worker(n_blocked_workers);
-          internal::MPIComCompress<OutVector> *worker_compr =
-            new (root->allocate_child())
-          internal::MPIComCompress<OutVector>(dst);
-          worker_compr->set_ref_count(1);
-          for (unsigned int j=0; j<evens; j++)
-            {
-              if (j>0)
-                {
-                  worker[j] = new (root->allocate_child())
-                  internal::partition::PartitionWork<Worker>
-                  (func,2*j,task_info,false);
-                  worker[j]->set_ref_count(2);
-                  blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
-                  tbb::empty_task;
-                  if (j>1)
-                    worker[j-1]->spawn(*blocked_worker[j-1]);
-                  else
-                    worker_compr->spawn(*blocked_worker[j-1]);
-                }
-              else
-                {
-                  worker[j] = new (worker_compr->allocate_child())
-                  internal::partition::PartitionWork<Worker>
-                  (func,2*j,task_info,false);
-                  worker[j]->set_ref_count(2);
-                  internal::MPIComDistribute<InVector> *worker_dist =
-                    new (worker[j]->allocate_child())
-                  internal::MPIComDistribute<InVector>(src);
-                  worker_dist->spawn(*worker_dist);
-                }
-              if (j<evens-1)
-                {
-                  blocked_worker[j] = new (worker[j]->allocate_child())
-                  internal::partition::PartitionWork<Worker>
-                  (func,2*j+1,task_info,true);
-                }
-              else
-                {
-                  if (odds==evens)
-                    {
-                      worker[evens] = new (worker[j]->allocate_child())
-                      internal::partition::PartitionWork<Worker>
-                      (func,2*j+1,task_info,false);
-                      worker[j]->spawn(*worker[evens]);
-                    }
-                  else
-                    {
-                      tbb::empty_task *child = new (worker[j]->allocate_child())
-                      tbb::empty_task();
-                      worker[j]->spawn(*child);
-                    }
-                }
-            }
-
-          root->wait_for_all();
-          root->destroy(*root);
-        }
-      else // end of partition-partition, start of partition-color
-        {
-          unsigned int evens = task_info.evens;
-          unsigned int odds  = task_info.odds;
-
-          // check whether there is only one partition. if not, build up the
-          // tree of partitions
-          if (odds > 0)
-            {
-              tbb::empty_task *root = new ( tbb::task::allocate_root() ) tbb::empty_task;
-              root->set_ref_count(evens+1);
-              unsigned int n_blocked_workers = odds-(odds+evens+1)%2;
-              unsigned int n_workers = task_info.partition_color_blocks_data.size()-1-
-                                       n_blocked_workers;
-              std::vector<internal::color::PartitionWork<Worker>*> worker(n_workers);
-              std::vector<internal::color::PartitionWork<Worker>*> blocked_worker(n_blocked_workers);
-              unsigned int worker_index = 0, slice_index = 0;
-              unsigned int spawn_index =  0;
-              int spawn_index_child = -2;
-              internal::MPIComCompress<OutVector> *worker_compr = new (root->allocate_child())
-              internal::MPIComCompress<OutVector>(dst);
-              worker_compr->set_ref_count(1);
-              for (unsigned int part=0;
-                   part<task_info.partition_color_blocks_row_index.size()-1; part++)
-                {
-                  const unsigned int spawn_index_new = worker_index;
-                  if (part == 0)
-                    worker[worker_index] = new (worker_compr->allocate_child())
-                    internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
-                  else
-                    worker[worker_index] = new (root->allocate_child())
-                    internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
-                  slice_index++;
-                  for (; slice_index<task_info.partition_color_blocks_row_index[part+1];
-                       slice_index++)
-                    {
-                      worker[worker_index]->set_ref_count(1);
-                      worker_index++;
-                      worker[worker_index] = new (worker[worker_index-1]->allocate_child())
-                      internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
-                    }
-                  worker[worker_index]->set_ref_count(2);
-                  if (part>0)
-                    {
-                      blocked_worker[(part-1)/2]->dummy =
-                        new (worker[worker_index]->allocate_child()) tbb::empty_task;
-                      worker_index++;
-                      if (spawn_index_child == -1)
-                        worker[spawn_index]->spawn(*blocked_worker[(part-1)/2]);
-                      else
-                        {
-                          Assert(spawn_index_child>=0, ExcInternalError());
-                          worker[spawn_index]->spawn(*worker[spawn_index_child]);
-                        }
-                      spawn_index = spawn_index_new;
-                    }
-                  else
-                    {
-                      internal::MPIComDistribute<InVector> *worker_dist =
-                        new (worker[worker_index]->allocate_child())
-                      internal::MPIComDistribute<InVector>(src);
-                      worker_dist->spawn(*worker_dist);
-                      worker_index++;
-                    }
-                  part += 1;
-                  if (part<task_info.partition_color_blocks_row_index.size()-1)
-                    {
-                      if (part<task_info.partition_color_blocks_row_index.size()-2)
-                        {
-                          blocked_worker[part/2] = new (worker[worker_index-1]->allocate_child())
-                          internal::color::PartitionWork<Worker>(func,slice_index,task_info,true);
-                          slice_index++;
-                          if (slice_index<
-                              task_info.partition_color_blocks_row_index[part+1])
-                            {
-                              blocked_worker[part/2]->set_ref_count(1);
-                              worker[worker_index] = new (blocked_worker[part/2]->allocate_child())
-                              internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
-                              slice_index++;
-                            }
-                          else
-                            {
-                              spawn_index_child = -1;
-                              continue;
-                            }
-                        }
-                      for (; slice_index<task_info.partition_color_blocks_row_index[part+1];
-                           slice_index++)
-                        {
-                          if (slice_index>
-                              task_info.partition_color_blocks_row_index[part])
-                            {
-                              worker[worker_index]->set_ref_count(1);
-                              worker_index++;
-                            }
-                          worker[worker_index] = new (worker[worker_index-1]->allocate_child())
-                          internal::color::PartitionWork<Worker>(func,slice_index,task_info,false);
-                        }
-                      spawn_index_child = worker_index;
-                      worker_index++;
-                    }
-                  else
-                    {
-                      tbb::empty_task *final = new (worker[worker_index-1]->allocate_child())
-                      tbb::empty_task;
-                      worker[spawn_index]->spawn(*final);
-                      spawn_index_child = worker_index-1;
-                    }
-                }
-              if (evens==odds)
-                {
-                  Assert(spawn_index_child>=0, ExcInternalError());
-                  worker[spawn_index]->spawn(*worker[spawn_index_child]);
-                }
-              root->wait_for_all();
-              root->destroy(*root);
-            }
-          // case when we only have one partition: this is the usual coloring
-          // scheme, and we just schedule a parallel for loop for each color
-          else
-            {
-              Assert(evens==1,ExcInternalError());
-              internal::update_ghost_values_finish(src);
-
-              for (unsigned int color=0;
-                   color < task_info.partition_color_blocks_row_index[1];
-                   ++color)
-                {
-                  unsigned int lower = task_info.partition_color_blocks_data[color],
-                               upper = task_info.partition_color_blocks_data[color+1];
-                  parallel_for(tbb::blocked_range<unsigned int>(lower,upper,1),
-                               internal::color::CellWork<Worker>
-                               (func,task_info));
-                }
-
-              internal::compress_start(dst);
-            }
-        }
-    }
-  else
-#endif
-    // serial loop
-    {
-      std::pair<unsigned int,unsigned int> cell_range;
-
-      // First operate on cells where no ghost data is needed (inner cells)
-      {
-        cell_range.first = 0;
-        cell_range.second = size_info.boundary_cells_start;
-        cell_operation (*this, dst, src, cell_range);
-      }
-
-      // before starting operations on cells that contain ghost nodes (outer
-      // cells), wait for the MPI commands to finish
-      internal::update_ghost_values_finish(src);
-
-      // For the outer cells, do the same procedure as for inner cells.
-      if (size_info.boundary_cells_end > size_info.boundary_cells_start)
-        {
-          cell_range.first = size_info.boundary_cells_start;
-          cell_range.second = size_info.boundary_cells_end;
-          cell_operation (*this, dst, src, cell_range);
-        }
-
-      internal::compress_start(dst);
-
-      // Finally operate on cells where no ghost data is needed (inner cells)
-      if (size_info.n_macro_cells > size_info.boundary_cells_end)
-        {
-          cell_range.first = size_info.boundary_cells_end;
-          cell_range.second = size_info.n_macro_cells;
-          cell_operation (*this, dst, src, cell_range);
-        }
-    }
-
-  // In every case, we need to finish transfers at the very end
-  internal::compress_finish(dst);
-  internal::reset_ghost_values(src, ghosts_were_not_set);
+  task_info.loop (worker);
 }
 
 
@@ -2637,20 +2310,9 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std::bind to hand a function handler with the appropriate
-  // argument to the other loop function
-  std::function<void (const MatrixFree<dim,Number> &,
-                      OutVector &,
-                      const InVector &,
-                      const std::pair<unsigned int,
-                      unsigned int> &)>
-  function = std::bind<void>(function_pointer,
-                             owning_class,
-                             std::placeholders::_1,
-                             std::placeholders::_2,
-                             std::placeholders::_3,
-                             std::placeholders::_4);
-  cell_loop (function, dst, src);
+  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, true>
+  worker(*this, src, dst, false, *owning_class, function_pointer, nullptr, nullptr);
+  task_info.loop(worker);
 }
 
 
@@ -2669,20 +2331,9 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std::bind to hand a function handler with the appropriate
-  // argument to the other loop function
-  std::function<void (const MatrixFree<dim,Number> &,
-                      OutVector &,
-                      const InVector &,
-                      const std::pair<unsigned int,
-                      unsigned int> &)>
-  function = std::bind<void>(function_pointer,
-                             owning_class,
-                             std::placeholders::_1,
-                             std::placeholders::_2,
-                             std::placeholders::_3,
-                             std::placeholders::_4);
-  cell_loop (function, dst, src);
+  internal::MFWorker<MatrixFree<dim, Number>, InVector, OutVector, CLASS, false>
+  worker(*this, src, dst, false, *owning_class, function_pointer, nullptr, nullptr);
+  task_info.loop(worker);
 }
 
 
