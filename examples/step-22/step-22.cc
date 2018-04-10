@@ -103,12 +103,14 @@ namespace Step22
   // @sect3{The <code>StokesProblem</code> class template}
 
   // This is an adaptation of step-20, so the main class and the data types
-  // are the same as used there. In this example we also use adaptive grid
-  // refinement, which is handled in analogy to step-6. According to the
-  // discussion in the introduction, we are also going to use the
-  // ConstraintMatrix for implementing Dirichlet boundary conditions. Hence,
-  // we change the name <code>hanging_node_constraints</code> into
-  // <code>constraints</code>.
+  // are nearl same as used there. The only difference is that we have an
+  // additional member <code>pressure_mass_matrix</code>that is used for
+  // preconditioning the Schur complement.
+  // In this example we also use adaptive grid refinement, which is handled
+  // in analogy to step-6. According to the discussion in the introduction,
+  // we are also going to use the ConstraintMatrix for implementing Dirichlet
+  // boundary conditions. Hence, we change the name
+  // <code>hanging_node_constraints</code> into <code>constraints</code>.
   template <int dim>
   class StokesProblem
   {
@@ -133,6 +135,8 @@ namespace Step22
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
+
+    SparseMatrix<double>      pressure_mass_matrix;
 
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
@@ -401,8 +405,8 @@ namespace Step22
   // releases the pointer to the preconditioner object (if the shared pointer
   // pointed at anything at all at this point) since it will definitely not be
   // needed any more after this point and will have to be re-computed after
-  // assembling the matrix, and unties the sparse matrix from its sparsity
-  // pattern object.
+  // assembling the matrix, and unties the sparse matrices from their sparsity
+  // pattern objects.
   //
   // We then proceed with distributing degrees of freedom and renumbering
   // them: In order to make the ILU preconditioner (in 3D) work efficiently,
@@ -442,6 +446,7 @@ namespace Step22
   {
     A_preconditioner.reset ();
     system_matrix.clear ();
+    pressure_mass_matrix.clear ();
 
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::Cuthill_McKee (dof_handler);
@@ -540,9 +545,11 @@ namespace Step22
       sparsity_pattern.copy_from (dsp);
     }
 
-    // Finally, the system matrix, solution and right hand side are created
-    // from the block structure as in step-20:
+    // Finally, the system matrix, the pressure mass matrix, the solution and
+    // the right hand side vector are created from the block structure
+    // similar to the approach in step-20:
     system_matrix.reinit (sparsity_pattern);
+    pressure_mass_matrix.reinit (sparsity_pattern.block(1,1));
 
     solution.reinit (2);
     solution.block(0).reinit (n_u);
@@ -567,6 +574,7 @@ namespace Step22
   {
     system_matrix=0;
     system_rhs=0;
+    pressure_mass_matrix = 0.;
 
     QGauss<dim>   quadrature_formula(degree+2);
 
@@ -651,7 +659,6 @@ namespace Step22
                                           - phi_p[i] * div_phi_u[j]
                                           + phi_p[i] * phi_p[j])
                                          * fe_values.JxW(q);
-
                   }
 
                 // For the right-hand side we use the fact that the shape
@@ -680,7 +687,8 @@ namespace Step22
         // discussed in the introduction. That this term only ends up in the
         // $(1,1)$ block stems from the fact that both of the factors in
         // <code>phi_p[i] * phi_p[j]</code> are only non-zero when all the
-        // other terms vanish (and the other way around).
+        // other terms vanish (and the other way around). This block will
+        // finally end up in the pressure_mass_matrix object.
         //
         // Note also that operator* is overloaded for symmetric tensors,
         // yielding the scalar product between the two tensors in the first
@@ -704,6 +712,13 @@ namespace Step22
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
       }
+
+    // As dicussed previously, we built a pressure mass matrix in the $(1,1)$
+    // block of the system matrix. Now, correct for this by copying the block
+    // to the pressure_mass_matrix object and clear it in the system matrix
+    // afterwards.
+    pressure_mass_matrix.copy_from(system_matrix.block(1,1));
+    system_matrix.block(1,1) = 0.;
 
     // Before we're going to solve this linear system, we generate a
     // preconditioner for the velocity-velocity matrix, i.e.,
@@ -762,8 +777,7 @@ namespace Step22
 
       // Now to the preconditioner to the Schur complement. As explained in
       // the introduction, the preconditioning is done by a mass matrix in the
-      // pressure variable.  It is stored in the $(1,1)$ block of the system
-      // matrix (that is not used anywhere else but in preconditioning).
+      // pressure variable.
       //
       // Actually, the solver needs to have the preconditioner in the form
       // $P^{-1}$, so we need to create an inverse operation. Once again, we
@@ -784,11 +798,11 @@ namespace Step22
       // 1.2. It needs about twice the number of iterations, but the costs for
       // its generation are almost negligible.
       SparseILU<double> preconditioner;
-      preconditioner.initialize (system_matrix.block(1,1),
+      preconditioner.initialize (pressure_mass_matrix,
                                  SparseILU<double>::AdditionalData());
 
       InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      m_inverse (system_matrix.block(1,1), preconditioner);
+      m_inverse (pressure_mass_matrix, preconditioner);
 
       // With the Schur complement and an efficient preconditioner at hand, we
       // can solve the respective equation for the pressure (i.e. block 0 in
