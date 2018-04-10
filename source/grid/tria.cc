@@ -1684,6 +1684,7 @@ namespace internal
       }
 
 
+
       /**
        * Create a triangulation from
        * given data. This function does
@@ -10497,6 +10498,51 @@ Triangulation<dim, spacedim>::create_triangulation_compatibility(
   create_triangulation(v, reordered_cells, reordered_subcelldata);
 }
 
+
+template <>
+void Triangulation<1, 1>::reorder_vertices(std::vector<Point<1>> &points)
+{
+  Assert(
+    points.size() == GeometryInfo<1>::vertices_per_cell,
+    ExcMessage(
+      "Number of vertices does not match GeometryInfo<1>::vertices_per_cell"));
+  if (points[0][0] > points[1][0])
+    std::swap(points[0], points[1]);
+}
+
+template <>
+void Triangulation<2, 2>::reorder_vertices(std::vector<Point<2>> &points)
+{
+  Assert(
+    points.size() == GeometryInfo<2>::vertices_per_cell,
+    ExcMessage(
+      "Number of vertices does not match GeometryInfo<2>::vertices_per_cell"));
+  // center of the cell
+  const Point<2> ctr(
+    std::accumulate(points.begin(), points.end(), Point<2>(0, 0)) * 0.25);
+  // function used to calculate relative angle per vertex
+  auto angle = [&](const Point<2> &p) {
+    // get the difference from the center
+    const double dx = p[0] - ctr[0], dy = p[1] - ctr[1];
+    // return the angle in radian in (-pi, pi]
+    if (std::fabs(dx) < 1.0e-15)
+      return (dy > 0.) ? (0.5 * numbers::PI) : (-.5 * numbers::PI);
+    else if (std::fabs(dy) < 1.0e-15)
+      return (dx > 0.) ? 0. : numbers::PI;
+    else
+      return (dx > 0.) ? std::atan(dy / dx) :
+                         (dy > 0. ? std::atan(dy / dx) + numbers::PI :
+                                    (std::atan(dy / dx) - numbers::PI));
+  };
+  // sort the vertex counter-clockwise based on the relative angle
+  std::sort(points.begin(),
+            points.end(),
+            [&](const Point<2> &p1, const Point<2> &p2) {
+              return angle(p1) < angle(p2);
+            });
+  // swap the last two vertex
+  std::swap(points[2], points[3]);
+}
 
 
 template <int dim, int spacedim>

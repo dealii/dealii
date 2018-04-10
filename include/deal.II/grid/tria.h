@@ -1999,6 +1999,17 @@ public:
                        const SubCellData &                 subcelldata);
 
   /**
+   * Given vertices @p vertices in a cell, reorder them in cannonical way.
+   *
+   * @note This function only works for dim=1 and 2 with the restriction of
+   * dim=spacedim.
+   *
+   * @author Weixiong Zheng, 2018
+   */
+  static void
+  reorder_vertices(std::vector<Point<spacedim>> &points);
+
+  /**
    * For backward compatibility, only. This function takes the cell data in
    * the ordering as requested by deal.II versions up to 5.2, converts it to
    * the new (lexicographic) ordering and calls create_triangulation().

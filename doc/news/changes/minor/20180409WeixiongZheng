@@ -1,0 +1,4 @@
+New: Add Triangulation<dim,spacedim>::reorder_vertices to reorder vertices
+when generating 1d and 2d triangulations.
+<br>
+(Weixiong Zheng, 2018/04/09)
