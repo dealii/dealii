@@ -1,9 +1,9 @@
 
 DEAL::Add and dot should be (1334.7905,349.71042), is (1334.7905,349.71042)
-DEAL::Add and dot should be (91530.094,22094.701), is (91530.094,22094.701)
-DEAL::Add and dot should be (181725.41,43834.062), is (181725.41,43834.062)
-DEAL::Add and dot should be (271920.72,65573.367), is (271920.72,65573.367)
-DEAL::Add and dot should be (362116.03,87312.664), is (362116.03,87312.664)
+DEAL::Add and dot should be (91530.086,22094.701), is (91530.086,22094.701)
+DEAL::Add and dot should be (181725.41,43834.066), is (181725.41,43834.066)
+DEAL::Add and dot should be (271920.69,65573.367), is (271920.69,65573.367)
+DEAL::Add and dot should be (362116.03,87312.656), is (362116.03,87312.656)
 IndexSet: {[0,16]}
 
 [0]: (2.554e-02,1.842e+00)
