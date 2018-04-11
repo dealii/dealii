@@ -537,6 +537,8 @@ With this said, we turn to the realization of the solver call with GMRES with
 $k=100$ temporary vectors:
 
 @code
+      const SparseMatrix<double> &pressure_mass_matrix
+        = preconditioner_matrix.block(1,1);
       SparseILU<double> pmass_preconditioner;
       pmass_preconditioner.initialize (pressure_mass_matrix,
         SparseILU<double>::AdditionalData());

@@ -103,9 +103,10 @@ namespace Step22
   // @sect3{The <code>StokesProblem</code> class template}
 
   // This is an adaptation of step-20, so the main class and the data types
-  // are nearl same as used there. The only difference is that we have an
-  // additional member <code>pressure_mass_matrix</code>that is used for
-  // preconditioning the Schur complement.
+  // are nearly the same as used there. The only difference is that we have an
+  // additional member <code>preconditioner_matrix</code>, that is used for
+  // preconditioning the Schur complement, and a corresponding sparsity pattern
+  // <code>preconditioner_sparsity_pattern</code>.
   // In this example we also use adaptive grid refinement, which is handled
   // in analogy to step-6. According to the discussion in the introduction,
   // we are also going to use the ConstraintMatrix for implementing Dirichlet
@@ -136,7 +137,8 @@ namespace Step22
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
-    SparseMatrix<double>      pressure_mass_matrix;
+    BlockSparsityPattern      preconditioner_sparsity_pattern;
+    BlockSparseMatrix<double> preconditioner_matrix;
 
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
@@ -446,7 +448,7 @@ namespace Step22
   {
     A_preconditioner.reset ();
     system_matrix.clear ();
-    pressure_mass_matrix.clear ();
+    preconditioner_matrix.clear ();
 
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::Cuthill_McKee (dof_handler);
@@ -510,27 +512,30 @@ namespace Step22
               << " (" << n_u << '+' << n_p << ')'
               << std::endl;
 
-    // The next task is to allocate a sparsity pattern for the system matrix
-    // we will create. We could do this in the same way as in step-20,
-    // i.e. directly build an object of type SparsityPattern through
-    // DoFTools::make_sparsity_pattern. However, there is a major reason not
-    // to do so: In 3D, the function DoFTools::max_couplings_between_dofs
-    // yields a conservative but rather large number for the coupling between
-    // the individual dofs, so that the memory initially provided for the
-    // creation of the sparsity pattern of the matrix is far too much -- so
-    // much actually that the initial sparsity pattern won't even fit into the
-    // physical memory of most systems already for moderately-sized 3D
-    // problems, see also the discussion in step-18.  Instead, we first build
-    // a temporary object that uses a different data structure that doesn't
-    // require allocating more memory than necessary but isn't suitable for
-    // use as a basis of SparseMatrix or BlockSparseMatrix objects; in a
-    // second step we then copy this object into an object of
-    // BlockSparsityPattern. This is entirely analogous to what we already did
-    // in step-11 and step-18.
+    // The next task is to allocate a sparsity pattern for the system matrix we
+    // will create and one for the preconditioner matrix. We could do this in
+    // the same way as in step-20, i.e. directly build an object of type
+    // SparsityPattern through DoFTools::make_sparsity_pattern. However, there
+    // is a major reason not to do so:
+    // In 3D, the function DoFTools::max_couplings_between_dofs yields a
+    // conservative but rather large number for the coupling between the
+    // individual dofs, so that the memory initially provided for the creation
+    // of the sparsity pattern of the matrix is far too much -- so much actually
+    // that the initial sparsity pattern won't even fit into the physical memory
+    // of most systems already for moderately-sized 3D problems, see also the
+    // discussion in step-18. Instead, we first build temporary objects that use
+    // a different data structure that doesn't require allocating more memory
+    // than necessary but isn't suitable for use as a basis of SparseMatrix or
+    // BlockSparseMatrix objects; in a second step we then copy these objects
+    // into objects of type BlockSparsityPattern. This is entirely analogous to
+    // what we already did in step-11 and step-18. In particular, we make use of
+    // the fact that we will never write into the $(1,1)$ block of the system
+    // matrix and that this is the only block to be filled for the
+    // preconditioner matrix.
     //
-    // All this is done inside a new scope, which
-    // means that the memory of <code>dsp</code> will be released once the
-    // information has been copied to <code>sparsity_pattern</code>.
+    // All this is done inside new scopes, which means that the memory of
+    // <code>dsp</code> will be released once the information has been copied to
+    // <code>sparsity_pattern</code>.
     {
       BlockDynamicSparsityPattern dsp (2,2);
 
@@ -541,15 +546,50 @@ namespace Step22
 
       dsp.collect_sizes();
 
-      DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+      Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+
+      for (unsigned int c=0; c<dim+1; ++c)
+        for (unsigned int d=0; d<dim+1; ++d)
+          if (! ((c==dim) && (d==dim)))
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
+      DoFTools::make_sparsity_pattern (dof_handler, coupling, dsp, constraints, false);
+
       sparsity_pattern.copy_from (dsp);
     }
 
-    // Finally, the system matrix, the pressure mass matrix, the solution and
-    // the right hand side vector are created from the block structure
-    // similar to the approach in step-20:
+    {
+      BlockDynamicSparsityPattern preconditioner_dsp (2,2);
+
+      preconditioner_dsp.block(0,0).reinit (n_u, n_u);
+      preconditioner_dsp.block(1,0).reinit (n_p, n_u);
+      preconditioner_dsp.block(0,1).reinit (n_u, n_p);
+      preconditioner_dsp.block(1,1).reinit (n_p, n_p);
+
+      preconditioner_dsp.collect_sizes();
+
+      Table<2,DoFTools::Coupling> preconditioner_coupling (dim+1, dim+1);
+
+      for (unsigned int c=0; c<dim+1; ++c)
+        for (unsigned int d=0; d<dim+1; ++d)
+          if (((c==dim) && (d==dim)))
+            preconditioner_coupling[c][d] = DoFTools::always;
+          else
+            preconditioner_coupling[c][d] = DoFTools::none;
+
+      DoFTools::make_sparsity_pattern (dof_handler, preconditioner_coupling,
+                                       preconditioner_dsp, constraints, false);
+
+      preconditioner_sparsity_pattern.copy_from (preconditioner_dsp);
+    }
+
+    // Finally, the system matrix, the preconsitioner matrix, the solution and
+    // the right hand side vector are created from the block structure similar
+    // to the approach in step-20:
     system_matrix.reinit (sparsity_pattern);
-    pressure_mass_matrix.reinit (sparsity_pattern.block(1,1));
+    preconditioner_matrix.reinit (preconditioner_sparsity_pattern);
 
     solution.reinit (2);
     solution.block(0).reinit (n_u);
@@ -567,14 +607,14 @@ namespace Step22
 
   // The assembly process follows the discussion in step-20 and in the
   // introduction. We use the well-known abbreviations for the data structures
-  // that hold the local matrix, right hand side, and global numbering of the
+  // that hold the local matrices, right hand side, and global numbering of the
   // degrees of freedom for the present cell.
   template <int dim>
   void StokesProblem<dim>::assemble_system ()
   {
     system_matrix=0;
     system_rhs=0;
-    pressure_mass_matrix = 0.;
+    preconditioner_matrix = 0;
 
     QGauss<dim>   quadrature_formula(degree+2);
 
@@ -589,6 +629,7 @@ namespace Step22
     const unsigned int   n_q_points      = quadrature_formula.size();
 
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>   local_preconditioner_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
@@ -636,6 +677,7 @@ namespace Step22
       {
         fe_values.reinit (cell);
         local_matrix = 0;
+        local_preconditioner_matrix = 0;
         local_rhs = 0;
 
         right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
@@ -656,9 +698,11 @@ namespace Step22
                   {
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
-                                          - phi_p[i] * div_phi_u[j]
-                                          + phi_p[i] * phi_p[j])
+                                          - phi_p[i] * div_phi_u[j])
                                          * fe_values.JxW(q);
+
+                    local_preconditioner_matrix(i,j) += (phi_p[i] * phi_p[j])
+                                                        * fe_values.JxW(q);
                   }
 
                 // For the right-hand side we use the fact that the shape
@@ -681,16 +725,7 @@ namespace Step22
               }
           }
 
-        // Note that in the above computation of the local matrix contribution
-        // we added the term <code> phi_p[i] * phi_p[j] </code>, yielding a
-        // pressure mass matrix in the $(1,1)$ block of the matrix as
-        // discussed in the introduction. That this term only ends up in the
-        // $(1,1)$ block stems from the fact that both of the factors in
-        // <code>phi_p[i] * phi_p[j]</code> are only non-zero when all the
-        // other terms vanish (and the other way around). This block will
-        // finally end up in the pressure_mass_matrix object.
-        //
-        // Note also that operator* is overloaded for symmetric tensors,
+        // Note that operator* is overloaded for symmetric tensors,
         // yielding the scalar product between the two tensors in the first
         // line of the local matrix contribution.
 
@@ -698,27 +733,26 @@ namespace Step22
         // simultaneously use the ConstraintMatrix object to apply Dirichlet
         // boundary conditions and eliminate hanging node constraints, as we
         // discussed in the introduction), we have to be careful about one
-        // thing, though. We have only built half of the local matrix
-        // because of symmetry, but we're going to save the full system matrix
-        // in order to use the standard functions for solution. This is done
+        // thing, though. We have only built half of the local matrices
+        // because of symmetry, but we're going to save the full matrices
+        // in order to use the standard functions for solving. This is done
         // by flipping the indices in case we are pointing into the empty part
-        // of the local matrix.
+        // of the local matrices.
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=i+1; j<dofs_per_cell; ++j)
-            local_matrix(i,j) = local_matrix(j,i);
+            {
+              local_matrix(i,j) = local_matrix(j,i);
+              local_preconditioner_matrix(i,j) = local_preconditioner_matrix(j,i);
+            }
 
         cell->get_dof_indices (local_dof_indices);
         constraints.distribute_local_to_global (local_matrix, local_rhs,
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
+        constraints.distribute_local_to_global (local_preconditioner_matrix,
+                                                local_dof_indices,
+                                                preconditioner_matrix);
       }
-
-    // As dicussed previously, we built a pressure mass matrix in the $(1,1)$
-    // block of the system matrix. Now, correct for this by copying the block
-    // to the pressure_mass_matrix object and clear it in the system matrix
-    // afterwards.
-    pressure_mass_matrix.copy_from(system_matrix.block(1,1));
-    system_matrix.block(1,1) = 0.;
 
     // Before we're going to solve this linear system, we generate a
     // preconditioner for the velocity-velocity matrix, i.e.,
@@ -798,11 +832,11 @@ namespace Step22
       // 1.2. It needs about twice the number of iterations, but the costs for
       // its generation are almost negligible.
       SparseILU<double> preconditioner;
-      preconditioner.initialize (pressure_mass_matrix,
+      preconditioner.initialize (preconditioner_matrix.block(1,1),
                                  SparseILU<double>::AdditionalData());
 
       InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      m_inverse (pressure_mass_matrix, preconditioner);
+      m_inverse (preconditioner_matrix.block(1,1), preconditioner);
 
       // With the Schur complement and an efficient preconditioner at hand, we
       // can solve the respective equation for the pressure (i.e. block 0 in
