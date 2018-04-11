@@ -167,7 +167,7 @@ namespace LinearAlgebra
     /**
      * Destructor.
      */
-    ~ReadWriteVector ();
+    ~ReadWriteVector () = default;
 
     /**
      * Set the global size of the vector to @p size. The stored elements have
@@ -610,7 +610,7 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    Number *val;
+    std::unique_ptr<Number[]> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
@@ -668,8 +668,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
-    :
-    val(nullptr)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -683,8 +681,7 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
-    Subscriptor(),
-    val(nullptr)
+    Subscriptor()
   {
     this->operator=(v);
   }
@@ -694,8 +691,6 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
-    :
-    val(nullptr)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -708,27 +703,11 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
-    :
-    val(nullptr)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
     // for clarity be explicit on which function is called
     ReadWriteVector<Number>::reinit (locally_stored_indices);
-  }
-
-
-
-  template <typename Number>
-  inline
-  ReadWriteVector<Number>::~ReadWriteVector ()
-  {
-    try
-      {
-        resize_val(0);
-      }
-    catch (...)
-      {}
   }
 
 
@@ -768,7 +747,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::begin ()
   {
-    return val;
+    return values.get();
   }
 
 
@@ -778,7 +757,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::begin () const
   {
-    return val;
+    return values.get();
   }
 
 
@@ -788,7 +767,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end ()
   {
-    return val + this->n_elements();
+    return values.get() + this->n_elements();
   }
 
 
@@ -798,7 +777,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end () const
   {
-    return val + this->n_elements();
+    return values.get() + this->n_elements();
   }
 
 
@@ -808,7 +787,7 @@ namespace LinearAlgebra
   Number
   ReadWriteVector<Number>::operator() (const size_type global_index) const
   {
-    return val[global_to_local(global_index)];
+    return values[global_to_local(global_index)];
   }
 
 
@@ -818,7 +797,7 @@ namespace LinearAlgebra
   Number &
   ReadWriteVector<Number>::operator() (const size_type global_index)
   {
-    return val[global_to_local (global_index)];
+    return values[global_to_local (global_index)];
   }
 
 
@@ -847,10 +826,10 @@ namespace LinearAlgebra
   template <typename Number2>
   inline
   void ReadWriteVector<Number>::extract_subvector_to (const std::vector<size_type> &indices,
-                                                      std::vector<Number2> &values) const
+                                                      std::vector<Number2> &extracted_values) const
   {
     for (size_type i = 0; i < indices.size(); ++i)
-      values[i] = operator()(indices[i]);
+      extracted_values[i] = operator()(indices[i]);
   }
 
 
@@ -879,7 +858,7 @@ namespace LinearAlgebra
   {
     AssertIndexRange (local_index, this->n_elements());
 
-    return val[local_index];
+    return values[local_index];
   }
 
 
@@ -891,7 +870,7 @@ namespace LinearAlgebra
   {
     AssertIndexRange (local_index, this->n_elements());
 
-    return val[local_index];
+    return values[local_index];
   }
 
 
@@ -933,13 +912,13 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::add (const size_type    n_indices,
                                 const size_type   *indices,
-                                const Number2     *values)
+                                const Number2     *values_to_add)
   {
     for (size_type i=0; i<n_indices; ++i)
       {
         Assert (numbers::is_finite(values[i]),
                 ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-        this->operator()(indices[i]) += values[i];
+        this->operator()(indices[i]) += values_to_add[i];
       }
   }
 
@@ -965,7 +944,7 @@ namespace LinearAlgebra
       const size_type end)
   {
     for (size_type i=begin; i<end; ++i)
-      functor(parent.val[i]);
+      functor(parent.values[i]);
   }
 
 #endif  // ifndef DOXYGEN
