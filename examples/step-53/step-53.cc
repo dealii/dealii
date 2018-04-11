@@ -46,6 +46,12 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
 
+// The last include file is required because we will be using a feature that is
+// not part of the C++11 standard. As some of the C++14 features are very useful,
+// we provide their implementation in an internal namespace, if the compiler
+// does not support them:
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <iostream>
 #include <fstream>
 
@@ -210,11 +216,13 @@ namespace Step53
   public:
     virtual
     Point<3>
-    pull_back(const Point<3> &space_point) const;
+    pull_back(const Point<3> &space_point) const override;
 
     virtual
     Point<3>
-    push_forward(const Point<3> &chart_point) const;
+    push_forward(const Point<3> &chart_point) const override;
+
+    virtual std::unique_ptr<Manifold<3,3> > clone() const override;
 
   private:
     static const double    R;
@@ -248,6 +256,22 @@ namespace Step53
   AfricaGeometry::push_forward(const Point<3> &chart_point) const
   {
     return push_forward_wgs84 (push_forward_topo (chart_point));
+  }
+
+
+  // This function is required by the interface of the Manifold base
+  // class, and allows you to clone the AfricaGeometry class. This is
+  // where we use a feature that is only available in C++14, namely the
+  // make_unique function, that simplifies the creation of
+  // std::unique_ptr objects. Notice that, while the function returns an
+  // std::unique_ptr<Manifold<3,3> >, we internally create a
+  // unique_ptr<AfricaGeometry>. C++11 knows how to handle these cases,
+  // and is able to transform a unique pointer to a derived class to a
+  // unique pointer to its base class automatically:
+  std::unique_ptr<Manifold<3,3> >
+  AfricaGeometry::clone() const
+  {
+    return std_cxx14::make_unique<AfricaGeometry>();
   }
 
 

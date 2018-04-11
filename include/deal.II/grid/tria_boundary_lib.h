@@ -73,18 +73,23 @@ public:
                     const Point<spacedim> &point_on_axis);
 
   /**
-   * Refer to the general documentation of this class and the documentation of
-   * the base class.
+   * Clone this Boundary object.
    */
-  virtual Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
    * the base class.
    */
   virtual Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
+  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const override;
+
+  /**
+   * Refer to the general documentation of this class and the documentation of
+   * the base class.
+   */
+  virtual Point<spacedim>
+  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -94,7 +99,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -104,7 +109,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -114,7 +119,7 @@ public:
    */
   virtual void
   get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const override;
 
   /**
    * Return the radius of the cylinder.
@@ -217,6 +222,11 @@ public:
                 const Point<dim> x_1);
 
   /**
+   * Clone this Boundary object.
+   */
+  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+
+  /**
    * Return the radius of the (truncated) cone at given point <tt>x</tt> on
    * the axis.
    */
@@ -228,7 +238,7 @@ public:
    */
   virtual
   Point<dim>
-  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -236,7 +246,7 @@ public:
    */
   virtual
   Point<dim>
-  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -247,7 +257,7 @@ public:
   virtual
   void
   get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -258,7 +268,7 @@ public:
   virtual
   void
   get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -269,7 +279,7 @@ public:
   virtual
   void
   get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const override;
 
   /**
    * Implementation of the function declared in the base class.
@@ -280,7 +290,7 @@ public:
   virtual
   Tensor<1,dim>
   normal_vector (const typename Triangulation<dim>::face_iterator &face,
-                 const Point<dim> &p) const;
+                 const Point<dim> &p) const override;
 
 
 protected:
@@ -352,12 +362,9 @@ public:
                      const double     radius = 1.0);
 
   /**
-   * Refer to the general documentation of this class and the documentation of
-   * the base class.
+   * Clone this Boundary object.
    */
-  virtual
-  Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -365,7 +372,15 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
+  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const override;
+
+  /**
+   * Refer to the general documentation of this class and the documentation of
+   * the base class.
+   */
+  virtual
+  Point<spacedim>
+  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -376,7 +391,7 @@ public:
   virtual
   void
   get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -387,7 +402,7 @@ public:
   virtual
   void
   get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                                   std::vector<Point<spacedim> > &points) const;
+                                   std::vector<Point<spacedim> > &points) const override;
 
   /**
    * Implementation of the function declared in the base class.
@@ -398,7 +413,7 @@ public:
   virtual
   Tensor<1,spacedim>
   normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                 const Point<spacedim> &p) const;
+                 const Point<spacedim> &p) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -409,7 +424,7 @@ public:
   virtual
   void
   get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const override;
 
   /**
    * Return the center of the ball.
@@ -494,16 +509,21 @@ public:
                          const double     radius = 1.0);
 
   /**
-   * Check if on the line <tt>x==0</tt>, otherwise pass to the base class.
+   * Clone this Boundary object.
    */
-  virtual Point<dim>
-  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
 
   /**
    * Check if on the line <tt>x==0</tt>, otherwise pass to the base class.
    */
   virtual Point<dim>
-  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const override;
+
+  /**
+   * Check if on the line <tt>x==0</tt>, otherwise pass to the base class.
+   */
+  virtual Point<dim>
+  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -513,7 +533,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -523,7 +543,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -533,7 +553,7 @@ public:
    */
   virtual void
   get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const override;
 };
 
 
@@ -562,6 +582,11 @@ public:
    * radius as argument. This radius will be ignored
    */
   HyperShellBoundary (const Point<dim> &center = Point<dim>());
+
+  /**
+   * Clone this Boundary object.
+   */
+  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
 };
 
 
@@ -598,16 +623,21 @@ public:
                           const double outer_radius = -1);
 
   /**
+   * Clone this Boundary object.
+   */
+  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+
+  /**
    * Construct a new point on a line.
    */
   virtual Point<dim>
-  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const override;
 
   /**
    * Construct a new point on a quad.
    */
   virtual Point<dim>
-  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -617,7 +647,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -627,7 +657,7 @@ public:
    */
   virtual void
   get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-                                   std::vector<Point<dim> > &points) const;
+                                   std::vector<Point<dim> > &points) const override;
 
   /**
    * Compute the normals to the boundary at the vertices of the given face.
@@ -637,7 +667,7 @@ public:
    */
   virtual void
   get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+                           typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const override;
 
 private:
   /**
@@ -668,32 +698,37 @@ public:
    */
   TorusBoundary (const double R, const double r);
 
+  /**
+   * Clone this Boundary object.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+
 //Boundary Refinement Functions
   /**
    * Construct a new point on a line.
    */
   virtual Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
+  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const override;
 
   /**
    * Construct a new point on a quad.
    */
   virtual Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
+  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const override;
 
   /**
    * Construct a new points on a line.
    */
   virtual void   get_intermediate_points_on_line (
     const typename Triangulation< dim, spacedim >::line_iterator   &line,
-    std::vector< Point< spacedim > >         &points) const;
+    std::vector< Point< spacedim > >         &points) const override;
 
   /**
    * Construct a new points on a quad.
    */
   virtual void  get_intermediate_points_on_quad (
     const typename Triangulation< dim, spacedim >::quad_iterator &quad,
-    std::vector< Point< spacedim > >         &points ) const;
+    std::vector< Point< spacedim > >         &points ) const override;
 
   /**
    * Get the normal from cartesian coordinates. This normal does not have unit
@@ -701,7 +736,7 @@ public:
    */
   virtual void get_normals_at_vertices (
     const typename Triangulation< dim, spacedim >::face_iterator &face,
-    typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
+    typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const override;
 
 private:
   //Handy functions

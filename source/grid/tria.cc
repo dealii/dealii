@@ -8958,7 +8958,7 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
   Assert(m_number < numbers::invalid_manifold_id,
          ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
-  manifold[m_number] = &manifold_object;
+  manifold[m_number] = manifold_object.clone();
 }
 
 
@@ -9069,8 +9069,7 @@ Triangulation<dim, spacedim>::get_manifold (const types::manifold_id m_number) c
 {
   //look, if there is a manifold stored at
   //manifold_id number.
-  typename std::map<types::manifold_id, SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator it
-    = manifold.find(m_number);
+  const auto it = manifold.find(m_number);
 
   if (it != manifold.end())
     {
@@ -9167,11 +9166,9 @@ copy_triangulation (const Triangulation<dim, spacedim> &other_tria)
   if (dim > 1)
     faces = std_cxx14::make_unique<internal::TriangulationImplementation::TriaFaces<dim>> (*other_tria.faces);
 
-  typename std::map<types::manifold_id,
-           SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator
-           bdry_iterator = other_tria.manifold.begin();
+  auto bdry_iterator = other_tria.manifold.begin();
   for (; bdry_iterator != other_tria.manifold.end() ; ++bdry_iterator)
-    manifold[bdry_iterator->first] = bdry_iterator->second;
+    manifold[bdry_iterator->first] = bdry_iterator->second->clone();
 
 
   levels.reserve (other_tria.levels.size());

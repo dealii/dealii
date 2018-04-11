@@ -351,6 +351,13 @@ public:
   virtual ~Manifold () = default;
 
   /**
+   * Return a copy of this manifold.
+   *
+   * Every derived class should implement this operation in a sensible manner.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const = 0;
+
+  /**
    * @name Computing the location of points.
    */
   /// @{
@@ -691,6 +698,11 @@ public:
    */
   FlatManifold (const Tensor<1,spacedim> &periodicity = Tensor<1,spacedim>(),
                 const double tolerance=1e-10);
+
+  /**
+   * Return a copy of this manifold.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
 
   /**
    * Let the new point be the average sum of surrounding vertices.

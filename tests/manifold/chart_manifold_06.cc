@@ -28,6 +28,13 @@ public:
   {}
 
 
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone () const override
+  {
+    return std::unique_ptr<Manifold<dim,spacedim> >(new MyFlatManifold(this->get_periodicity()));
+  }
+
+
   virtual
   Point<spacedim>
   pull_back(const Point<spacedim> &space_point) const

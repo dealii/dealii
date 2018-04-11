@@ -25,6 +25,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -74,6 +75,11 @@ public:
    */
   CompositionManifold(const ChartManifold<dim1, intermediate_dim, chartdim> &F,
                       const ChartManifold<dim2, spacedim, intermediate_dim> &G);
+
+  /**
+   * Make a clone of this Manifold.
+   */
+  virtual std::unique_ptr<Manifold<dim, spacedim> > clone() const override;
 
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim
@@ -134,6 +140,14 @@ CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::Compositi
          ExcMessage("The second manifold cannot be periodic."));
 }
 
+
+template <int dim, int spacedim, int chartdim, int intermediate_dim,
+          int dim1, int dim2>
+std::unique_ptr<Manifold<dim,spacedim> >
+CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2>::clone() const
+{
+  return std_cxx14::make_unique<CompositionManifold<dim,spacedim,chartdim,intermediate_dim,dim1,dim2> >(*F, *G);
+}
 
 
 template <int dim, int spacedim, int chartdim, int intermediate_dim,

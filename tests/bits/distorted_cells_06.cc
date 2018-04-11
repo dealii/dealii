@@ -37,6 +37,11 @@
 template <int dim>
 class MyManifold : public Manifold<dim>
 {
+  virtual std::unique_ptr<Manifold<dim> > clone() const override
+  {
+    return std::unique_ptr<Manifold<dim> >(new MyManifold<dim>());
+  }
+
   virtual Point<dim>
   get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
   {

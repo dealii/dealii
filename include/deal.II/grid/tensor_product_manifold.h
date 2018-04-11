@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/point.h>
 #include <deal.II/grid/manifold.h>
 
@@ -83,25 +84,31 @@ public:
     const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B);
 
   /**
+   * Clone this manifold.
+   */
+  virtual std::unique_ptr<Manifold<dim,spacedim_A+spacedim_B> >
+  clone() const override;
+
+  /**
    * Pull back operation.
    */
   virtual
   Point<chartdim>
-  pull_back(const Point<spacedim> &space_point) const;
+  pull_back(const Point<spacedim> &space_point) const override;
 
   /**
    * Push forward operation.
    */
   virtual
   Point<spacedim>
-  push_forward(const Point<chartdim> &chart_point) const;
+  push_forward(const Point<chartdim> &chart_point) const override;
 
   /**
    * Gradient.
    */
   virtual
   DerivativeForm<1,chartdim,spacedim>
-  push_forward_gradient(const Point<chartdim> &chart_point) const;
+  push_forward_gradient(const Point<chartdim> &chart_point) const override;
 
 private:
   SmartPointer<const ChartManifold<dim_A, spacedim_A, chartdim_A>,
@@ -169,6 +176,16 @@ TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, cha
   manifold_A (&manifold_A),
   manifold_B (&manifold_B)
 {}
+
+template <int dim,
+          int dim_A, int spacedim_A, int chartdim_A,
+          int dim_B, int spacedim_B, int chartdim_B>
+std::unique_ptr<Manifold<dim,spacedim_A+spacedim_B> >
+TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::clone() const
+{
+  return std_cxx14::make_unique<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B> >
+         (*manifold_A, *manifold_B);
+}
 
 template <int dim,
           int dim_A, int spacedim_A, int chartdim_A,

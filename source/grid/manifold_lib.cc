@@ -15,6 +15,7 @@
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -119,6 +120,15 @@ PolarManifold<dim,spacedim>::PolarManifold(const Point<spacedim> center):
   ChartManifold<dim,spacedim,spacedim>(PolarManifold<dim,spacedim>::get_periodicity()),
   center(center)
 {}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+PolarManifold<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<PolarManifold<dim,spacedim> >(center);
+}
 
 
 
@@ -265,6 +275,15 @@ SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center)
   center(center),
   polar_manifold(center)
 {}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+SphericalManifold<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<SphericalManifold<dim,spacedim> >(center);
+}
 
 
 
@@ -948,6 +967,15 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Tensor<1, spacedim
 
 
 
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+CylindricalManifold<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<CylindricalManifold<dim,spacedim> >(direction, point_on_axis, tolerance);
+}
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
@@ -1077,7 +1105,8 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   push_forward_function(&push_forward_function),
   pull_back_function(&pull_back_function),
   tolerance(tolerance),
-  owns_pointers(false)
+  owns_pointers(false),
+  finite_difference_step(0)
 {
   AssertDimension(push_forward_function.n_components, spacedim);
   AssertDimension(pull_back_function.n_components, chartdim);
@@ -1098,7 +1127,12 @@ FunctionManifold<dim,spacedim,chartdim>::FunctionManifold
   ChartManifold<dim,spacedim,chartdim>(periodicity),
   const_map(const_map),
   tolerance(tolerance),
-  owns_pointers(true)
+  owns_pointers(true),
+  push_forward_expression(push_forward_expression),
+  pull_back_expression(pull_back_expression),
+  chart_vars(chart_vars),
+  space_vars(space_vars),
+  finite_difference_step(h)
 {
   FunctionParser<chartdim> *pf = new FunctionParser<chartdim>(spacedim, 0.0, h);
   FunctionParser<spacedim> *pb = new FunctionParser<spacedim>(chartdim, 0.0, h);
@@ -1123,6 +1157,40 @@ FunctionManifold<dim,spacedim,chartdim>::~FunctionManifold()
       pull_back_function = nullptr;
       delete pb;
     }
+}
+
+
+
+template<int dim, int spacedim, int chartdim>
+std::unique_ptr<Manifold<dim, spacedim> >
+FunctionManifold<dim,spacedim,chartdim>::clone() const
+{
+  // This manifold can be constructed either by providing an expression for the
+  // push forward and the pull back charts, or by providing two Function
+  // objects. In the first case, the push_forward and pull_back functions are
+  // created internally in FunctionManifold, and destroyed when this object is
+  // deleted. We need to make sure that our cloned object is constructed in the
+  // same way this class was constructed, and that its internal Function
+  // pointers point either to the same Function objects used to construct this
+  // function (owns_pointers == false) or that the newly generated manifold
+  // creates internally the push_forward and pull_back functions using the same
+  // expressions that were used to construct this class (own_pointers == true).
+  if (owns_pointers == true)
+    {
+      return std_cxx14::make_unique<FunctionManifold<dim,spacedim,chartdim> >(push_forward_expression,
+             pull_back_expression,
+             this->get_periodicity(),
+             const_map,
+             chart_vars,
+             space_vars,
+             tolerance,
+             finite_difference_step);
+    }
+  else
+    return std_cxx14::make_unique<FunctionManifold<dim,spacedim,chartdim> >(*push_forward_function,
+           *pull_back_function,
+           this->get_periodicity(),
+           tolerance);
 }
 
 
@@ -1229,6 +1297,15 @@ TorusManifold<dim>::TorusManifold (const double R, const double r)
 
 
 
+template<int dim>
+std::unique_ptr<Manifold<dim, 3> >
+TorusManifold<dim>::clone() const
+{
+  return std_cxx14::make_unique<TorusManifold<dim> >(R,r);
+}
+
+
+
 template <int dim>
 DerivativeForm<1,3,3>
 TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
@@ -1266,6 +1343,18 @@ TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold
   level_coarse (-1)
 {
   AssertThrow(dim > 1, ExcNotImplemented());
+}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+TransfiniteInterpolationManifold<dim,spacedim>::clone() const
+{
+  auto ptr = new TransfiniteInterpolationManifold<dim,spacedim>();
+  if (triangulation)
+    ptr->initialize(*triangulation);
+  return std::unique_ptr<Manifold<dim,spacedim> >(ptr);
 }
 
 

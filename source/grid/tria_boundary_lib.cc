@@ -18,6 +18,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <cmath>
 
 
@@ -45,6 +46,16 @@ CylinderBoundary<dim,spacedim>::CylinderBoundary (const double           radius,
   direction (direction / direction.norm()),
   point_on_axis (point_on_axis)
 {}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+CylinderBoundary<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<CylinderBoundary<dim, spacedim> >(radius, direction, point_on_axis);
+}
+
 
 
 template <int dim, int spacedim>
@@ -285,6 +296,14 @@ ConeBoundary<dim>::ConeBoundary (const double radius_0,
 
 
 
+template<int dim>
+std::unique_ptr<Manifold<dim,dim> > ConeBoundary<dim>::clone() const
+{
+  return std_cxx14::make_unique<ConeBoundary<dim> >(radius_0,radius_1,x_0,x_1);
+}
+
+
+
 template <int dim>
 double ConeBoundary<dim>::get_radius (Point<dim> x) const
 {
@@ -512,6 +531,15 @@ HyperBallBoundary<dim,spacedim>::HyperBallBoundary (const Point<spacedim> p,
   radius(radius),
   compute_radius_automatically(false)
 {}
+
+
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+HyperBallBoundary<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<HyperBallBoundary<dim,spacedim> >(center, radius);
+}
 
 
 
@@ -820,6 +848,15 @@ HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,
 
 
 
+template<int dim>
+std::unique_ptr<Manifold<dim,dim> > HalfHyperBallBoundary<dim>::clone() const
+{
+  return std_cxx14::make_unique<HalfHyperBallBoundary<dim> >(this->get_center(),
+                                                             this->get_radius());
+}
+
+
+
 template <int dim>
 Point<dim>
 HalfHyperBallBoundary<dim>::
@@ -960,6 +997,16 @@ HyperShellBoundary<dim>::HyperShellBoundary (const Point<dim> &center)
 }
 
 
+
+template<int dim>
+std::unique_ptr<Manifold<dim,dim> >
+HyperShellBoundary<dim>::clone() const
+{
+  return std_cxx14::make_unique<HyperShellBoundary<dim> >(this->get_center());
+}
+
+
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -979,6 +1026,17 @@ HalfHyperShellBoundary<dim>::HalfHyperShellBoundary (const Point<dim> &center,
             (outer_radius > 0) &&
             (outer_radius > inner_radius),
             ExcMessage ("Inner and outer radii must be specified explicitly in 3d."));
+}
+
+
+
+template<int dim>
+std::unique_ptr<Manifold<dim,dim> >
+HalfHyperShellBoundary<dim>::clone() const
+{
+  return std_cxx14::make_unique<HalfHyperShellBoundary<dim> >(this->get_center(),
+                                                              inner_radius,
+                                                              outer_radius);
 }
 
 
@@ -1238,6 +1296,13 @@ TorusBoundary<2,3>::TorusBoundary (const double R_,
   r(r_)
 {
   Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
+}
+
+template<int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+TorusBoundary<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<TorusBoundary<dim,spacedim> >(R,r);
 }
 
 

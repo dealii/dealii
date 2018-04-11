@@ -38,7 +38,7 @@ class Ball :
 public:
   virtual Point<dim>
   get_new_point (const ArrayView<const Point<dim>> &surrounding_points,
-                 const ArrayView<const double>     &weights) const
+                 const ArrayView<const double>     &weights) const override
   {
     Point<dim> middle = FlatManifold<dim>::get_new_point(surrounding_points, weights);
 
@@ -49,6 +49,11 @@ public:
       middle(i) += .5;
 
     return middle;
+  }
+
+  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override
+  {
+    return std::unique_ptr<Manifold<dim,dim> >(new Ball<dim>());
   }
 };
 

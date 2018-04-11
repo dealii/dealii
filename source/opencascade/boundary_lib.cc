@@ -86,6 +86,16 @@ namespace OpenCASCADE
   }
 
 
+
+  template<int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim> >
+  NormalProjectionBoundary<dim,spacedim>::clone() const
+  {
+    return std::unique_ptr<Manifold<dim,spacedim> >(new NormalProjectionBoundary(sh, tolerance));
+  }
+
+
+
   template <int dim, int spacedim>
   Point<spacedim>  NormalProjectionBoundary<dim,spacedim>::
   project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
@@ -116,6 +126,17 @@ namespace OpenCASCADE
   }
 
 
+
+  template<int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim> >
+  DirectionalProjectionBoundary<dim,spacedim>::clone() const
+  {
+    return std::unique_ptr<Manifold<dim,spacedim> >
+           (new DirectionalProjectionBoundary(sh, direction, tolerance));
+  }
+
+
+
   template <int dim, int spacedim>
   Point<spacedim>  DirectionalProjectionBoundary<dim,spacedim>::
   project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
@@ -144,6 +165,14 @@ namespace OpenCASCADE
     Assert(spacedim == 3, ExcNotImplemented());
     Assert(std::get<0>(count_elements(sh)) > 0,
            ExcMessage("NormalToMeshProjectionBoundary needs a shape containing faces to operate."));
+  }
+
+  template<int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim> >
+  NormalToMeshProjectionBoundary<dim,spacedim>::clone() const
+  {
+    return std::unique_ptr<Manifold<dim, spacedim> >
+           (new NormalToMeshProjectionBoundary<dim,spacedim>(sh,tolerance));
   }
 
 
@@ -260,12 +289,24 @@ namespace OpenCASCADE
     ChartManifold<dim,spacedim,1>(sh.Closed() ?
                                   Point<1>(shape_length(sh)) :
                                   Point<1>()),
+    sh(sh),
     curve(curve_adaptor(sh)),
     tolerance(tolerance),
     length(shape_length(sh))
   {
     Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
   }
+
+
+
+  template<int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim> >
+  ArclengthProjectionLineManifold<dim, spacedim>::clone() const
+  {
+    return std::unique_ptr<Manifold<dim, spacedim> >
+           (new ArclengthProjectionLineManifold(sh,tolerance));
+  }
+
 
 
   template <int dim, int spacedim>
@@ -300,6 +341,18 @@ namespace OpenCASCADE
     face(face),
     tolerance(tolerance)
   {}
+
+
+
+  template<int dim, int spacedim>
+  std::unique_ptr<Manifold<dim, spacedim> >
+  NURBSPatchManifold<dim,spacedim>::clone() const
+  {
+    return std::unique_ptr<Manifold<dim, spacedim> >
+           (new NURBSPatchManifold<dim,spacedim>(face,tolerance));
+  }
+
+
 
   template <int dim, int spacedim>  Point<2>
   NURBSPatchManifold<dim, spacedim>::

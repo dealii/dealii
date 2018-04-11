@@ -47,9 +47,11 @@ int main ()
     }
   static const SphericalManifold<dim> spherical_manifold;
   tria.set_manifold(1, spherical_manifold);
-  static TransfiniteInterpolationManifold<dim> transfinite;
-  transfinite.initialize(tria);
-  tria.set_manifold(0, transfinite);
+  static TransfiniteInterpolationManifold<dim> transfinite0;
+  transfinite0.initialize(tria);
+  tria.set_manifold(0, transfinite0);
+
+  const auto &transfinite = tria.get_manifold(0);
 
   const std::array<Point<3>, 2> points({{Point<3>(0, 0.360566, 0), Point<3>(0, 0.321132, 0)}});
   const std::array<double, 2> weights({{0.4, 0.6}});

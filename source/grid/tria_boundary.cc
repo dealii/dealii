@@ -30,6 +30,16 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+Boundary<dim,spacedim>::clone() const
+{
+  AssertThrow(false, ExcPureFunctionCalled());
+  return std::unique_ptr<Manifold<dim,spacedim> >();
+}
+
+
+
+template <int dim, int spacedim>
 void
 Boundary<dim, spacedim>::
 get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::line_iterator &,
@@ -191,6 +201,14 @@ StraightBoundary<dim, spacedim>::
 get_new_point_on_line (const typename Triangulation<dim, spacedim>::line_iterator &line) const
 {
   return (line->vertex(0) + line->vertex(1)) / 2;
+}
+
+
+template <int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim> >
+StraightBoundary<dim,spacedim>::clone() const
+{
+  return std_cxx14::make_unique<StraightBoundary<dim,spacedim> >();
 }
 
 
