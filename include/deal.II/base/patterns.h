@@ -1266,7 +1266,7 @@ namespace Patterns
     };
 
     /**
-     * A utility function that simplify the convertion to strings of arbitrarily
+     * A utility function that simplifies the conversion to strings of arbitrarily
      * complex types.
      *
      * This function calls the method Convert<T>::to_string() with the default
@@ -1285,7 +1285,7 @@ namespace Patterns
     std::string to_string(const T &t);
 
     /**
-     * A utility function that simplify the convertion from strings to arbitrary
+     * A utility function that simplifies the conversion from strings to arbitrary
      * types.
      *
      * This function calls the method Convert<T>::to_value() with the default
