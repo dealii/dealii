@@ -15,6 +15,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
 
 #include <cmath>
 #include <limits>
@@ -67,97 +68,20 @@ QGauss<1>::QGauss (const unsigned int n)
   if (n == 0)
     return;
 
-  const unsigned int m = (n+1)/2;
+  std::vector<long double> points
+    = Polynomials::jacobi_polynomial_roots<long double>(n, 0, 0);
 
-  // tolerance for the Newton
-  // iteration below. we need to make
-  // it adaptive since on some
-  // machines (for example PowerPC)
-  // long double is the same as
-  // double -- in that case we can
-  // only get to a certain multiple
-  // of the accuracy of double there,
-  // while on other machines we'd
-  // like to go further down
-  //
-  // the situation is complicated by
-  // the fact that even if long
-  // double exists and is described
-  // by std::numeric_limits, we may
-  // not actually get the additional
-  // precision. One case where this
-  // happens is on x86, where one can
-  // set hardware flags that disable
-  // long double precision even for
-  // long double variables. these
-  // flags are not usually set, but
-  // for example matlab sets them and
-  // this then breaks deal.II code
-  // that is run as a subroutine to
-  // matlab...
-  //
-  // a similar situation exists, btw,
-  // when running programs under
-  // valgrind up to and including at
-  // least version 3.3: valgrind's
-  // emulator only supports 64 bit
-  // arithmetic, even for 80 bit long
-  // doubles.
-  const long double
-  long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
-  double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
-
-  // now check whether long double is more
-  // accurate than double, and set
-  // tolerances accordingly. generate a one
-  // that really is generated at run-time
-  // and is not optimized away by the
-  // compiler. that makes sure that the
-  // tolerance is set at run-time with the
-  // current behavior, not at compile-time
-  // (not doing so leads to trouble with
-  // valgrind for example).
-  volatile long double runtime_one = 1.0;
-  const long double tolerance
-    = (runtime_one + long_double_eps != runtime_one
-       ?
-       std::max (double_eps / 100, long_double_eps * 5)
-       :
-       double_eps * 5
-      );
-
-
-  for (unsigned int i=1; i<=m; ++i)
+  for (unsigned int i=0; i<(points.size()+1)/2; ++i)
     {
-      long double z = std::cos(numbers::PI * (i-.25)/(n+.5));
+      this->quadrature_points[i][0] = points[i];
+      this->quadrature_points[n-i-1][0] = 1.-points[i];
 
-      long double pp;
-      long double p1;
-
-      // Newton iteration
-      do
-        {
-          // compute L_n (z)
-          p1 = 1.;
-          long double p2 = 0.;
-          for (unsigned int j=0; j<n; ++j)
-            {
-              const long double p3 = p2;
-              p2 = p1;
-              p1 = ((2.*j+1.)*z*p2-j*p3)/(j+1);
-            }
-          pp = n*(z*p1-p2)/(z*z-1);
-          z = z-p1/pp;
-        }
-      while (std::abs(p1/pp) > tolerance);
-
-      double x = .5*z;
-      this->quadrature_points[i-1] = Point<1>(.5-x);
-      this->quadrature_points[n-i] = Point<1>(.5+x);
-
-      double w = 1./((1.-z*z)*pp*pp);
-      this->weights[i-1] = w;
-      this->weights[n-i] = w;
+      // derivative of Jacobi polynomial
+      const long double pp = 0.5*(n + 1)*Polynomials::jacobi_polynomial_value(n-1, 1, 1, points[i]);
+      const long double x = -1. + 2.*points[i];
+      const double w = 1./((1.-x*x)*pp*pp);
+      this->weights[i] = w;
+      this->weights[n-i-1] = w;
     }
 }
 
@@ -165,42 +89,6 @@ namespace internal
 {
   namespace QGaussLobatto
   {
-    /*
-     * Evaluate a Jacobi polynomial $ P^{\alpha, \beta}_n(x) $ specified by the
-     * parameters @p alpha, @p beta, @p n. Note: The Jacobi polynomials are not
-     * orthonormal and defined on the interval $[-1, +1]$. @p x is the point of
-     * evaluation.
-     */
-    long double JacobiP(const long double x,
-                        const int alpha,
-                        const int beta,
-                        const unsigned int n)
-    {
-      // the Jacobi polynomial is evaluated
-      // using a recursion formula.
-      std::vector<long double> p(n+1);
-
-      // initial values P_0(x), P_1(x):
-      p[0] = 1.0L;
-      if (n==0) return p[0];
-      p[1] = ((alpha+beta+2)*x + (alpha-beta))/2;
-      if (n==1) return p[1];
-
-      for (unsigned int i=1; i<=(n-1); ++i)
-        {
-          const int v  = 2*i + alpha + beta;
-          const int a1 = 2*(i+1)*(i + alpha + beta + 1)*v;
-          const int a2 = (v + 1)*(alpha*alpha - beta*beta);
-          const int a3 = v*(v + 1)*(v + 2);
-          const int a4 = 2*(i+alpha)*(i+beta)*(v + 2);
-
-          p[i+1] = static_cast<long double>( (a2 + a3*x)*p[i] - a4*p[i-1])/a1;
-        } // for
-      return p[n];
-    }
-
-
-
     /**
      * Evaluate the Gamma function $ \Gamma(n) = (n-1)! $.
      * @param n  point of evaluation (integer).
@@ -211,89 +99,6 @@ namespace internal
       for (int i=n-2; i>1; --i)
         result *= i;
       return result;
-    }
-
-
-
-    /**
-     * Compute Legendre-Gauss-Lobatto quadrature points in the interval $[-1,
-     * +1]$. They are equal to the roots of the corresponding Jacobi polynomial
-     * (specified by @p alpha, @p beta).  @p q is the number of points.
-     *
-     * @return Vector containing nodes.
-     */
-    std::vector<long double>
-    compute_quadrature_points(const unsigned int q,
-                              const int alpha,
-                              const int beta)
-    {
-      const unsigned int m = q-2; // no. of inner points
-      std::vector<long double> x(m);
-
-      // compute quadrature points with
-      // a Newton algorithm.
-
-      // Set tolerance. See class QGauss
-      // for detailed explanation.
-      const long double
-      long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
-      double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
-
-      // check whether long double is
-      // more accurate than double, and
-      // set tolerances accordingly
-      volatile long double runtime_one = 1.0;
-      const long double tolerance
-        = (runtime_one + long_double_eps != runtime_one
-           ?
-           std::max (double_eps / 100, long_double_eps * 5)
-           :
-           double_eps * 5
-          );
-
-      // The following implementation
-      // follows closely the one given in
-      // the appendix of the book by
-      // Karniadakis and Sherwin:
-      // Spectral/hp element methods for
-      // computational fluid dynamics
-      // (Oxford University Press, 2005)
-
-      // we take the zeros of the Chebyshev
-      // polynomial (alpha=beta=-0.5) as
-      // initial values:
-      for (unsigned int i=0; i<m; ++i)
-        x[i] = - std::cos( (long double) (2*i+1)/(2*m) * numbers::PI );
-
-      long double s, J_x, f, delta;
-
-      for (unsigned int k=0; k<m; ++k)
-        {
-          long double r = x[k];
-          if (k>0)
-            r = (r + x[k-1])/2;
-
-          do
-            {
-              s = 0.;
-              for (unsigned int i=0; i<k; ++i)
-                s += 1./(r - x[i]);
-
-              J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
-              f     = JacobiP(r, alpha, beta, m);
-              delta = f/(f*s- J_x);
-              r += delta;
-            }
-          while (std::fabs(delta) >= tolerance);
-
-          x[k] = r;
-        } // for
-
-      // add boundary points:
-      x.insert(x.begin(), -1.L);
-      x.push_back(+1.L);
-
-      return x;
     }
 
 
@@ -319,7 +124,7 @@ namespace internal
                                  ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
       for (unsigned int i=0; i<q; ++i)
         {
-          const long double s = JacobiP(x[i], alpha, beta, q-1);
+          const long double s = Polynomials::jacobi_polynomial_value(q-1, alpha, beta, x[i]);
           w[i] = factor/(s*s);
         }
       w[0]   *= (beta + 1);
@@ -340,16 +145,17 @@ QGaussLobatto<1>::QGaussLobatto (const unsigned int n)
   Assert (n >= 2, ExcNotImplemented());
 
   std::vector<long double> points
-    = internal::QGaussLobatto::compute_quadrature_points(n, 1, 1);
+    = Polynomials::jacobi_polynomial_roots<long double>(n-2, 1, 1);
+  points.insert(points.begin(), 0);
+  points.push_back(1.);
   std::vector<long double> w
     = internal::QGaussLobatto::compute_quadrature_weights(points, 0, 0);
 
-  // scale points to the interval
-  // [0.0, 1.0]:
+  // scale weights to the interval [0.0, 1.0]:
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      this->quadrature_points[i] = Point<1>(0.5 + 0.5*static_cast<double>(points[i]));
-      this->weights[i]           = 0.5*w[i];
+      this->quadrature_points[i][0] = points[i];
+      this->weights[i]              = 0.5*w[i];
     }
 }
 

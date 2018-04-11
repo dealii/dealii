@@ -37,8 +37,6 @@
 #include <vector>
 #include <string>
 
-#define PRECISION 2
-
 
 
 
@@ -93,8 +91,8 @@ void test ()
       // also for the second test. note that vertex dofs always come first in
       // local1, so we can easily compare
       for (unsigned int i=0; i<fe[0].dofs_per_cell; ++i)
-        AssertThrow (local1[i] == local3[i],
-                     ExcInternalError());
+        AssertThrow (std::abs(local1[i] - local3[i]) < 1e-15*dof_handler.n_dofs(),
+                     ExcInternalError("Got difference " + std::to_string(local1[i]-local3[i])));
     }
   deallog << "OK" << std::endl;
 }
@@ -103,10 +101,7 @@ void test ()
 int
 main()
 {
-  std::ofstream logfile ("output");
-  logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);
-  deallog.attach(logfile);
+  initlog();
 
   test<1>();
   test<2>();

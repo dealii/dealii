@@ -19,8 +19,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <cmath>
 #include <algorithm>
@@ -1243,7 +1241,7 @@ namespace Polynomials
     // originally been derived by a secant method for the integral entry
     // l_0(x) * l_1(x) but we only need to do one iteration because the zero
     // x_star is linear in the integral value.
-    double find_support_point_x_star (const Vector<double> &jacobi_roots)
+    double find_support_point_x_star (const std::vector<double> &jacobi_roots)
     {
       // Initial guess for the support point position values: The zero turns
       // out to be between zero and the first root of the Jacobi polynomial,
@@ -1267,7 +1265,7 @@ namespace Polynomials
           const double x = gauss.point(q)[0];
           double poly_val_common = x;
           for (unsigned int j=0; j<degree-3; ++j)
-            poly_val_common *= Utilities::fixed_power<2>(x-jacobi_roots(j));
+            poly_val_common *= Utilities::fixed_power<2>(x-jacobi_roots[j]);
           poly_val_common *= Utilities::fixed_power<4>(x - 1.);
           integral_left += gauss.weight(q)*(poly_val_common*(x - guess_left));
           integral_right += gauss.weight(q)*(poly_val_common*(x - guess_right));
@@ -1390,39 +1388,10 @@ namespace Polynomials
         // We find the inner points as the zeros of the Jacobi polynomials
         // with alpha = beta = 2 which is the polynomial with the kernel
         // (1-x)^2 (1+x)^2, the two polynomials achieving zero value and zero
-        // derivative at the boundary. The zeros of the Jacobi polynomials are
-        // given by the eigenvalues to a symmetric tridiagonal matrix with the
-        // entries given below. For degree 4 the eigenvalue is zero, so bypass
-        // the LAPACK logic in that case.
+        // derivative at the boundary.
 
-        Vector<double> jacobi_roots(degree-3);
-        if (degree > 4)
-          {
-            LAPACKFullMatrix<double> jacobi_support_points_mat(degree-3,
-                                                               degree-3);
-            for (unsigned int k=1; k<degree-3; k++)
-              {
-                jacobi_support_points_mat(k-1,k) =
-                  std::sqrt(4.*k*(k+2.)*(k+2.)*(k+4.)/((2.*k+3.)*(2.*k+4.)*(2.*k+4.)*(2.*k+5.)));
-                jacobi_support_points_mat(k,k-1) = jacobi_support_points_mat(k-1,k);
-              }
-
-            // calculate the eigenvalues = zero points of the Jacobi polynomials
-            FullMatrix<double> eigenvectors(degree-3,degree-3);
-            jacobi_support_points_mat.compute_eigenvalues_symmetric(-1., 1., 1.e-20,
-                                                                    jacobi_roots,
-                                                                    eigenvectors);
-            AssertDimension(jacobi_roots.size(), degree-3);
-
-            // Note that this algorithm computes the zeros of the Jacobi
-            // polynomial for the interval [-1,1], so we must scale the
-            // eigenvalues to the interval [0,1] before using them
-            for (unsigned int i=0; i<degree-3; ++i)
-              jacobi_roots(i) = 0.5*jacobi_roots(i)+0.5;
-          }
-        else
-          // only a single zero at x=0.5 for degree==4
-          jacobi_roots(0) = 0.5;
+        std::vector<double> jacobi_roots = jacobi_polynomial_roots<double>(degree-3, 2, 2);
+        AssertDimension(jacobi_roots.size(), degree-3);
 
         // iteration from variable support point N with secant method
         // initial values
@@ -1433,7 +1402,7 @@ namespace Polynomials
             const double auxiliary_zero = find_support_point_x_star(jacobi_roots);
             this->lagrange_support_points[0] = auxiliary_zero;
             for (unsigned int m=0; m<degree-3; m++)
-              this->lagrange_support_points[m+1] = jacobi_roots(m);
+              this->lagrange_support_points[m+1] = jacobi_roots[m];
             this->lagrange_support_points[degree-2] = 1.;
             this->lagrange_support_points[degree-1] = 1.;
 
@@ -1444,7 +1413,7 @@ namespace Polynomials
           {
             this->lagrange_support_points[0] = 0.;
             for (unsigned int m=0; m<degree-3; m++)
-              this->lagrange_support_points[m+1] = jacobi_roots(m);
+              this->lagrange_support_points[m+1] = jacobi_roots[m];
             this->lagrange_support_points[degree-2] = 1.;
             this->lagrange_support_points[degree-1] = 1.;
 
@@ -1479,20 +1448,20 @@ namespace Polynomials
             this->lagrange_support_points[1] = 0.;
             for (unsigned int m=0, c=2; m<degree-3; m++)
               if (m+2 != index)
-                this->lagrange_support_points[c++] = jacobi_roots(m);
+                this->lagrange_support_points[c++] = jacobi_roots[m];
             this->lagrange_support_points[degree-2] = 1.;
             this->lagrange_support_points[degree-1] = 1.;
 
             // ensure that the polynomial evaluates to one at the respective
             // nodal point
-            this->lagrange_weight = 1./this->value(jacobi_roots(index-2));
+            this->lagrange_weight = 1./this->value(jacobi_roots[index-2]);
           }
         else if (index==degree-1)
           {
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
             for (unsigned int m=0; m<degree-3; m++)
-              this->lagrange_support_points[m+2] = jacobi_roots(m);
+              this->lagrange_support_points[m+2] = jacobi_roots[m];
             this->lagrange_support_points[degree-1] = 1.;
 
             std::vector<Point<1>> points(degree);
@@ -1518,7 +1487,7 @@ namespace Polynomials
             this->lagrange_support_points[0] = 0.;
             this->lagrange_support_points[1] = 0.;
             for (unsigned int m=0; m<degree-3; m++)
-              this->lagrange_support_points[m+2] = jacobi_roots(m);
+              this->lagrange_support_points[m+2] = jacobi_roots[m];
             this->lagrange_support_points[degree-1] = 1.-auxiliary_zero;
 
             // ensure that the polynomial evaluates to one at x=1

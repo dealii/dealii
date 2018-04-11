@@ -40,7 +40,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   // which sometimes rounds to 0.38 and
   // sometimes to 0.37, depending on how
   // intermediate errors have accumulated)
-  deallog << std::setprecision (5);
+  deallog << std::setprecision (12);
 
   // don't run this test if hanging
   // nodes are not implemented
