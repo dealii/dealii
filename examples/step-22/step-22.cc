@@ -134,6 +134,9 @@ namespace Step22
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
+    BlockSparsityPattern      preconditioner_sparsity_pattern;
+    BlockSparseMatrix<double> preconditioner_matrix;
+
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
 
@@ -536,13 +539,47 @@ namespace Step22
 
       dsp.collect_sizes();
 
-      DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+      Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+
+      for (unsigned int c=0; c<dim+1; ++c)
+        for (unsigned int d=0; d<dim+1; ++d)
+          if (! ((c==dim) && (d==dim)))
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
+      DoFTools::make_sparsity_pattern (dof_handler, coupling, dsp, constraints, false);
       sparsity_pattern.copy_from (dsp);
     }
+
+    {
+      BlockDynamicSparsityPattern dsp (2,2);
+
+      dsp.block(0,0).reinit (n_u, n_u);
+      dsp.block(1,0).reinit (n_p, n_u);
+      dsp.block(0,1).reinit (n_u, n_p);
+      dsp.block(1,1).reinit (n_p, n_p);
+
+      dsp.collect_sizes();
+
+      Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
+
+      for (unsigned int c=0; c<dim+1; ++c)
+        for (unsigned int d=0; d<dim+1; ++d)
+          if ((c==dim) && (d==dim))
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
+      DoFTools::make_sparsity_pattern (dof_handler, coupling, dsp, constraints, false);
+      preconditioner_sparsity_pattern.copy_from (dsp);
+    }
+
 
     // Finally, the system matrix, solution and right hand side are created
     // from the block structure as in step-20:
     system_matrix.reinit (sparsity_pattern);
+    preconditioner_matrix.reinit (preconditioner_sparsity_pattern);
 
     solution.reinit (2);
     solution.block(0).reinit (n_u);
@@ -581,6 +618,7 @@ namespace Step22
     const unsigned int   n_q_points      = quadrature_formula.size();
 
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<double>   local_preconditioner_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
@@ -648,10 +686,11 @@ namespace Step22
                   {
                     local_matrix(i,j) += (2 * (symgrad_phi_u[i] * symgrad_phi_u[j])
                                           - div_phi_u[i] * phi_p[j]
-                                          - phi_p[i] * div_phi_u[j]
-                                          + phi_p[i] * phi_p[j])
+                                          - phi_p[i] * div_phi_u[j])
                                          * fe_values.JxW(q);
 
+                    local_preconditioner_matrix(i,j) += (phi_p[i] * phi_p[j])
+                                                        * fe_values.JxW(q);
                   }
 
                 // For the right-hand side we use the fact that the shape
@@ -697,12 +736,18 @@ namespace Step22
         // of the local matrix.
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=i+1; j<dofs_per_cell; ++j)
-            local_matrix(i,j) = local_matrix(j,i);
+            {
+              local_matrix(i,j)                = local_matrix(j,i);
+              local_preconditioner_matrix(i,j) = local_preconditioner_matrix(j,i);
+            }
 
         cell->get_dof_indices (local_dof_indices);
         constraints.distribute_local_to_global (local_matrix, local_rhs,
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
+        constraints.distribute_local_to_global (local_preconditioner_matrix,
+                                                local_dof_indices,
+                                                preconditioner_matrix);
       }
 
     // Before we're going to solve this linear system, we generate a
@@ -784,11 +829,11 @@ namespace Step22
       // 1.2. It needs about twice the number of iterations, but the costs for
       // its generation are almost negligible.
       SparseILU<double> preconditioner;
-      preconditioner.initialize (system_matrix.block(1,1),
+      preconditioner.initialize (preconditioner_matrix.block(1,1),
                                  SparseILU<double>::AdditionalData());
 
       InverseMatrix<SparseMatrix<double>,SparseILU<double> >
-      m_inverse (system_matrix.block(1,1), preconditioner);
+      m_inverse (preconditioner_matrix.block(1,1), preconditioner);
 
       // With the Schur complement and an efficient preconditioner at hand, we
       // can solve the respective equation for the pressure (i.e. block 0 in
