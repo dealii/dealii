@@ -352,8 +352,8 @@ namespace internal
       void evaluate_on_cell (const dealii::Triangulation<dim> &tria,
                              const std::pair<unsigned int,unsigned int> *cells,
                              const unsigned int         my_q,
-                             CellType                  &cell_t_prev,
-                             CellType (&cell_t)[VectorizedArray<Number>::n_array_elements],
+                             GeometryType              &cell_t_prev,
+                             GeometryType (&cell_t)[VectorizedArray<Number>::n_array_elements],
                              dealii::FEValues<dim,dim> &fe_val,
                              LocalData<dim,Number>     &cell_data)
       {
@@ -570,8 +570,8 @@ namespace internal
         // encodes the cell types of the current cell. Since several cells
         // must be considered together, this variable holds the individual
         // info of the last chunk of cells
-        CellType cell_t [VectorizedArray<Number>::n_array_elements];
-        CellType cell_t_prev = general;
+        GeometryType cell_t [VectorizedArray<Number>::n_array_elements];
+        GeometryType cell_t_prev = general;
 
         // fe_values object that is used to compute the mapping data. for
         // the hp case there might be more than one finite element. since we
@@ -638,7 +638,7 @@ namespace internal
               // old cell type to invalid (otherwise, we might detect
               // similarity due to some cells further ahead)
               if (my_q > 0)
-                cell_t_prev = CellType(mapping_info.cell_type[cell]);
+                cell_t_prev = GeometryType(mapping_info.cell_type[cell]);
               else if (cell > cell_range.first && active_fe_index.size() > 0 &&
                        active_fe_index[cell] != active_fe_index[cell-1])
                 cell_t_prev = general;
@@ -656,7 +656,7 @@ namespace internal
                 {
                   // find the most general cell type (most general type is 3
                   // (general cell))
-                  CellType most_general_type = cartesian;
+                  GeometryType most_general_type = cartesian;
                   for (unsigned int j=0; j<VectorizedArray<Number>::n_array_elements; ++j)
                     if (cell_t[j] > most_general_type)
                       most_general_type = cell_t[j];
@@ -856,7 +856,7 @@ namespace internal
       copy_data (const unsigned int                first_cell,
                  const std::array<std::size_t,2>  &data_shift,
                  const std::vector<unsigned int>  &indices_compressed,
-                 const std::vector<CellType>      &cell_type,
+                 const std::vector<GeometryType>      &cell_type,
                  MappingInfoStorage<structdim,dim,Number> &data_cells_local,
                  MappingInfoStorage<structdim,dim,Number> &data_cells)
       {
@@ -1075,8 +1075,8 @@ namespace internal
       std::size_t
       memory  = MemoryConsumption::memory_consumption (cell_data);
       memory += MemoryConsumption::memory_consumption (face_data);
-      memory += cell_type.capacity()*sizeof(CellType);
-      memory += face_type.capacity()*sizeof(CellType);
+      memory += cell_type.capacity()*sizeof(GeometryType);
+      memory += face_type.capacity()*sizeof(GeometryType);
       memory += sizeof (*this);
       return memory;
     }
@@ -1090,10 +1090,10 @@ namespace internal
     {
       out << "    Cell types:                      ";
       task_info.print_memory_statistics
-      (out, cell_type.capacity()*sizeof(CellType));
+      (out, cell_type.capacity()*sizeof(GeometryType));
       out << "    Face types:                      ";
       task_info.print_memory_statistics
-      (out, face_type.capacity()*sizeof(CellType));
+      (out, face_type.capacity()*sizeof(GeometryType));
       for (unsigned int j=0; j<cell_data.size(); ++j)
         {
           out << "    Data component " << j << std::endl;

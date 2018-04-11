@@ -37,28 +37,28 @@ namespace internal
   namespace MatrixFreeFunctions
   {
     /**
-     * An enum to identify various types of cells. The most general type is
-     * what we typically compute in the FEValues context but for many
+     * An enum to identify various types of cells and faces. The most general
+     * type is what we typically compute in the FEValues context but for many
      * geometries we can save significant storage.
      */
-    enum CellType : unsigned char
+    enum GeometryType : unsigned char
     {
       /**
-       * The cell is Cartesian.
+       * The cell or face is Cartesian.
        */
       cartesian  = 0,
       /**
-       * The cell may be described with an affine mapping.
+       * The cell or face can be described with an affine mapping.
        */
       affine     = 1,
       /**
-       * The current face is flat, i.e., the normal factor on a face is the
-       * same on all quadrature points.
+       * The face is flat, i.e., the normal factor on a face is the same on
+       * all quadrature points. This type is not assigned for cells.
        */
       flat_faces = 2,
       /**
        * There is no special information available for compressing the
-       * representation of the cell.
+       * representation of the object under consideration.
        */
       general    = 3
     };
@@ -297,7 +297,7 @@ namespace internal
       /**
        * Return the type of a given cell as detected during initialization.
        */
-      CellType get_cell_type (const unsigned int cell_chunk_no) const;
+      GeometryType get_cell_type (const unsigned int cell_chunk_no) const;
 
       /**
        * Clear all data fields in this class.
@@ -323,7 +323,7 @@ namespace internal
        * 3). Type 2 is only used for faces and no cells are assigned this
        * value.
        */
-      std::vector<CellType> cell_type;
+      std::vector<GeometryType> cell_type;
 
       /**
        * Stores whether a face (and both cells adjacent to the face) is
@@ -332,7 +332,7 @@ namespace internal
        * the same throughout the face (face type 2), or is general (face type
        * 3).
        */
-      std::vector<CellType> face_type;
+      std::vector<GeometryType> face_type;
 
       /**
        * The data cache for the cells.
@@ -460,7 +460,7 @@ namespace internal
 
     template <int dim, typename Number>
     inline
-    CellType
+    GeometryType
     MappingInfo<dim,Number>::get_cell_type (const unsigned int cell_no) const
     {
       AssertIndexRange (cell_no, cell_type.size());

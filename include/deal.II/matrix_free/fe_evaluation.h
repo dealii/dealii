@@ -156,7 +156,7 @@ public:
    * considerable data compression), @p affine for cells with affine mappings,
    * and @p general for general cells without any compressed storage applied.
    */
-  internal::MatrixFreeFunctions::CellType get_cell_type() const;
+  internal::MatrixFreeFunctions::GeometryType get_cell_type() const;
 
   /**
    * Return a reference to the ShapeInfo object currently in use.
@@ -861,7 +861,7 @@ protected:
    * have different implications on how the Jacobian transformations are
    * stored internally in MappingInfo.
    */
-  internal::MatrixFreeFunctions::CellType cell_type;
+  internal::MatrixFreeFunctions::GeometryType cell_type;
 
   /**
    * Debug information to track whether dof values have been initialized
@@ -2480,7 +2480,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 template <int dim, int n_components_, typename Number>
 inline
-internal::MatrixFreeFunctions::CellType
+internal::MatrixFreeFunctions::GeometryType
 FEEvaluationBase<dim,n_components_,Number>::get_cell_type () const
 {
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
