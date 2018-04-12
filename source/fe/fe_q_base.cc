@@ -456,18 +456,18 @@ FE_Q_Base<PolynomialType,dim,spacedim>::initialize (const std::vector<Point<1> >
     this->poly_space.set_numbering(renumber);
   }
 
-  // finally fill in support points on cell and face
-  initialize_unit_support_points (points);
-  initialize_unit_face_support_points (points);
-
-  // reinit constraints
-  initialize_constraints (points);
+  // Finally fill in support points on cell and face and initialize
+  // constraints. All of this can happen in parallel
+  Threads::TaskGroup<> tasks;
+  tasks += Threads::new_task ([&]() { initialize_unit_support_points (points); });
+  tasks += Threads::new_task ([&]() { initialize_unit_face_support_points (points); });
+  tasks += Threads::new_task ([&]() { initialize_constraints (points); });
+  tasks += Threads::new_task ([&]() { this->initialize_quad_dof_index_permutation(); });
+  tasks.join_all();
 
   // do not initialize embedding and restriction here. these matrices are
   // initialized on demand in get_restriction_matrix and
   // get_prolongation_matrix
-
-  this->initialize_quad_dof_index_permutation();
 }
 
 
@@ -902,16 +902,23 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 
 
 template <class PolynomialType, int dim, int spacedim>
-void FE_Q_Base<PolynomialType,dim,spacedim>::initialize_unit_support_points
-(const std::vector<Point<1> > &points)
+void
+FE_Q_Base<PolynomialType,dim,spacedim>::
+initialize_unit_support_points (const std::vector<Point<1> > &points)
 {
   const std::vector<unsigned int> &index_map_inverse=
     this->poly_space.get_numbering_inverse();
 
-  Quadrature<1> support_1d(points);
+  // We can compute the support points by computing the tensor
+  // product of the 1d set of points. We could do this by hand, but it's
+  // easier to just re-use functionality that's already been implemented
+  // for quadrature formulas.
+  const Quadrature<1>   support_1d(points);
   const Quadrature<dim> support_quadrature(support_1d); // NOLINT
-  this->unit_support_points.resize(support_quadrature.size());
 
+  // The only thing we have to do is reorder the points from tensor
+  // product order to the order in which we enumerate DoFs on cells
+  this->unit_support_points.resize(support_quadrature.size());
   for (unsigned int k=0; k<support_quadrature.size(); ++k)
     this->unit_support_points[index_map_inverse[k]] = support_quadrature.point(k);
 }
@@ -926,16 +933,22 @@ void FE_Q_Base<PolynomialType,dim,spacedim>::initialize_unit_face_support_points
   if (dim == 1)
     return;
 
-  const unsigned int codim = dim-1;
-  this->unit_face_support_points.resize(Utilities::fixed_power<codim>(q_degree+1));
+  this->unit_face_support_points.resize(Utilities::fixed_power<dim-1>(q_degree+1));
 
   // find renumbering of faces and assign from values of quadrature
-  std::vector<unsigned int> face_index_map =
+  const std::vector<unsigned int> face_index_map =
     internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(q_degree);
-  Quadrature<1> support_1d(points);
-  const Quadrature<codim> support_quadrature(support_1d); // NOLINT
-  this->unit_face_support_points.resize(support_quadrature.size());
 
+  // We can compute the support points by computing the tensor
+  // product of the 1d set of points. We could do this by hand, but it's
+  // easier to just re-use functionality that's already been implemented
+  // for quadrature formulas.
+  const Quadrature<1>     support_1d(points);
+  const Quadrature<dim-1> support_quadrature(support_1d); // NOLINT
+
+  // The only thing we have to do is reorder the points from tensor
+  // product order to the order in which we enumerate DoFs on cells
+  this->unit_face_support_points.resize(support_quadrature.size());
   for (unsigned int k=0; k<support_quadrature.size(); ++k)
     this->unit_face_support_points[face_index_map[k]] = support_quadrature.point(k);
 }
