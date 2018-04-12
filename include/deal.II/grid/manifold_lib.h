@@ -832,6 +832,11 @@ public:
   TransfiniteInterpolationManifold();
 
   /**
+   * Destructor.
+   */
+  ~TransfiniteInterpolationManifold();
+
+  /**
    * Make a clone of this Manifold object.
    */
   virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
@@ -996,6 +1001,12 @@ private:
    * use a FlatManifold description.
    */
   FlatManifold<dim> chart_manifold;
+
+  /**
+   * The connection to Triangulation::signals::clear that must be reset once
+   * this class goes out of scope.
+   */
+  boost::signals2::connection clear_signal;
 };
 
 DEAL_II_NAMESPACE_CLOSE
