@@ -1347,6 +1347,15 @@ TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold
 
 
 
+template <int dim, int spacedim>
+TransfiniteInterpolationManifold<dim,spacedim>::~TransfiniteInterpolationManifold()
+{
+  if (clear_signal.connected())
+    clear_signal.disconnect();
+}
+
+
+
 template<int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim> >
 TransfiniteInterpolationManifold<dim,spacedim>::clone() const
@@ -1366,8 +1375,8 @@ TransfiniteInterpolationManifold<dim,spacedim>
 {
   this->triangulation = &triangulation;
   // in case the triangulatoin is cleared, remove the pointers by a signal
-  triangulation.signals.clear.connect
-  ([&]() -> void {this->triangulation = nullptr; this->level_coarse = -1;});
+  clear_signal = triangulation.signals.clear.connect
+                 ([&]() -> void {this->triangulation = nullptr; this->level_coarse = -1;});
   level_coarse = triangulation.last()->level();
   coarse_cell_is_flat.resize(triangulation.n_cells(level_coarse), false);
   typename Triangulation<dim,spacedim>::active_cell_iterator
