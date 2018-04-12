@@ -31,6 +31,7 @@
 #include <deal.II/matrix_free/shape_info.templates.h>
 #include <deal.II/matrix_free/mapping_info.templates.h>
 #include <deal.II/matrix_free/dof_info.templates.h>
+#include <deal.II/matrix_free/face_info.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -188,9 +189,13 @@ internal_reinit(const Mapping<dim>                          &mapping,
   // general case?
   if (additional_data.initialize_mapping == true)
     {
+      std::vector<unsigned int> dummy;
       mapping_info.initialize (dof_handler[0]->get_triangulation(), cell_level_index,
-                               dof_info[0].cell_active_fe_index, mapping, quad,
-                               additional_data.mapping_update_flags);
+                               internal::MatrixFreeFunctions:: FaceInfo
+                               <VectorizedArray<Number>::n_array_elements>(),
+                               dummy, mapping,
+                               quad, additional_data.mapping_update_flags,
+                               update_default, update_default, update_default);
 
       mapping_is_initialized = true;
     }
@@ -316,8 +321,11 @@ internal_reinit(const Mapping<dim>                            &mapping,
   if (additional_data.initialize_mapping == true)
     {
       mapping_info.initialize (dof_handler[0]->get_triangulation(), cell_level_index,
-                               dof_info[0].cell_active_fe_index, mapping, quad,
-                               additional_data.mapping_update_flags);
+                               internal::MatrixFreeFunctions::FaceInfo
+                               <VectorizedArray<Number>::n_array_elements>(),
+                               dof_info[0].cell_active_fe_index, mapping,
+                               quad, additional_data.mapping_update_flags,
+                               update_default, update_default, update_default);
 
       mapping_is_initialized = true;
     }

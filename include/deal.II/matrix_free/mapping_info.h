@@ -25,6 +25,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/matrix_free/helper_functions.h>
+#include <deal.II/matrix_free/face_info.h>
 
 #include <memory>
 
@@ -289,10 +290,14 @@ namespace internal
        */
       void initialize (const dealii::Triangulation<dim>                &tria,
                        const std::vector<std::pair<unsigned int,unsigned int> >  &cells,
+                       const FaceInfo<VectorizedArray<Number>::n_array_elements> &faces,
                        const std::vector<unsigned int>         &active_fe_index,
                        const Mapping<dim>                      &mapping,
                        const std::vector<dealii::hp::QCollection<1> >  &quad,
-                       const UpdateFlags                        update_flags_cells);
+                       const UpdateFlags                        update_flags_cells,
+                       const UpdateFlags                        update_flags_boundary_faces,
+                       const UpdateFlags                        update_flags_inner_faces,
+                       const UpdateFlags                        update_flags_faces_by_cells);
 
       /**
        * Return the type of a given cell as detected during initialization.
@@ -360,6 +365,29 @@ namespace internal
                              const Mapping<dim>                      &mapping,
                              const std::vector<dealii::hp::QCollection<1> >  &quad,
                              const UpdateFlags                        update_flags_cells);
+
+      /**
+       * Computes the information in the given faces, called within
+       * initialize.
+       */
+      void initialize_faces (const dealii::Triangulation<dim>        &tria,
+                             const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+                             const std::vector<FaceToCellTopology<VectorizedArray<Number>::n_array_elements> > &faces,
+                             const Mapping<dim>                      &mapping,
+                             const std::vector<dealii::hp::QCollection<1> >  &quad,
+                             const UpdateFlags                        update_flags_boundary_faces,
+                             const UpdateFlags                        update_flags_inner_faces);
+
+      /**
+       * Computes the information in the given faces, called within
+       * initialize.
+       */
+      void initialize_faces_by_cells
+      (const dealii::Triangulation<dim>        &tria,
+       const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+       const Mapping<dim>                      &mapping,
+       const std::vector<dealii::hp::QCollection<1> > &quad,
+       const UpdateFlags                        update_flags_faces_by_cells);
 
       /**
        * Helper function to determine which update flags must be set in the
