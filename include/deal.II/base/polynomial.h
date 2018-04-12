@@ -906,7 +906,7 @@ namespace Polynomials
           r = (r + x[k-1])/2;
 
         unsigned int converged = numbers::invalid_unsigned_int;
-        for (unsigned int i=1; i<1000; ++i)
+        for (unsigned int it=1; it<1000; ++it)
           {
             Number s = 0.;
             for (unsigned int i=0; i<k; ++i)
@@ -923,11 +923,11 @@ namespace Polynomials
             r += delta;
             if (converged == numbers::invalid_unsigned_int &&
                 std::abs(delta) < tolerance)
-              converged = i;
+              converged = it;
 
             // do one more iteration to ensure accuracy also for tighter
             // types than double (e.g. long double)
-            if (i == converged + 1)
+            if (it == converged + 1)
               break;
           }
 
