@@ -641,7 +641,7 @@ namespace Differentiation
                typename std::enable_if<
                is_ad_number<F>::value &&
                std::is_arithmetic<T>::value
-               >::type * = 0)
+               >::type * = nullptr)
         {
           // We recursively call this function in case the AD number is a
           // nested one. The recursion ends when the extracted value is
@@ -661,7 +661,7 @@ namespace Differentiation
                typename std::enable_if<
                is_ad_number<F>::value &&
                is_ad_number<T>::value
-               >::type * = 0)
+               >::type * = nullptr)
         {
           return T(f);
         }
@@ -678,7 +678,7 @@ namespace Differentiation
         value (const F &f,
                typename std::enable_if<
                !is_ad_number<F>::value
-               >::type * = 0)
+               >::type * = nullptr)
         -> decltype (dealii::internal::NumberType< std::complex<T> >::value(f))
         {
           // We call the other function defined in the numbers
@@ -697,7 +697,7 @@ namespace Differentiation
                typename std::enable_if<
                is_ad_number<F>::value &&
                std::is_arithmetic<T>::value
-               >::type * = 0)
+               >::type * = nullptr)
         {
           // We recursively call this function in case the AD number is a
           // nested one. The recursion ends when the extracted value is
@@ -1021,6 +1021,12 @@ namespace Differentiation
       std::is_arithmetic<ScalarType>::value
       >::type>
     {
+      /**
+       * Underlying floating point value type.
+       * This could real-valued or complex-valued.
+       */
+      typedef ScalarType                scalar_type;
+
       static ScalarType
       get_directional_derivative(const ScalarType   &/*x*/,
                                  const unsigned int  /*direction*/)

@@ -17,26 +17,8 @@
 #define dealii_differentiation_ad_sacado_number_types_h
 
 #include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_TRILINOS
-
-#include <Sacado.hpp>
-// It appears that some versions of Trilinos do not directly or indirectly
-// include all the headers for all forward and reverse Sacado AD types.
-// So we directly include these both here as a precaution.
-// Standard forward AD classes (templated)
-#include <Sacado_Fad_DFad.hpp>
-// Reverse AD classes (templated)
-#include <Sacado_trad.hpp>
-
-#include <deal.II/base/numbers.h>
-#include <deal.II/base/exceptions.h>
-
-#include <deal.II/differentiation/ad/ad_number_types.h>
-#include <deal.II/differentiation/ad/ad_number_traits.h>
-
-#include <complex>
 #include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -54,7 +36,9 @@ namespace Differentiation
      * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
-    struct is_sacado_number;
+    struct is_sacado_number
+      : std::false_type
+    {};
 
 
     /**
@@ -65,7 +49,9 @@ namespace Differentiation
      * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
-    struct is_sacado_dfad_number;
+    struct is_sacado_dfad_number
+      : std::false_type
+    {};
 
 
     /**
@@ -76,7 +62,47 @@ namespace Differentiation
      * @author Jean-Paul Pelteret, 2017
      */
     template <typename NumberType, typename = void>
-    struct is_sacado_rad_number;
+    struct is_sacado_rad_number
+      : std::false_type
+    {};
+
+  } // namespace AD
+} // namespace Differentiation
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <Sacado.hpp>
+// It appears that some versions of Trilinos do not directly or indirectly
+// include all the headers for all forward and reverse Sacado AD types.
+// So we directly include these both here as a precaution.
+// Standard forward AD classes (templated)
+#include <Sacado_Fad_DFad.hpp>
+// Reverse AD classes (templated)
+#include <Sacado_trad.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/exceptions.h>
+
+#include <deal.II/differentiation/ad/ad_number_types.h>
+#include <deal.II/differentiation/ad/ad_number_traits.h>
+
+#include <complex>
+#include <type_traits>
+
+DEAL_II_NAMESPACE_OPEN
+
+
+namespace Differentiation
+{
+  namespace AD
+  {
 
 
     namespace internal
@@ -743,12 +769,6 @@ namespace Differentiation
     /* -------------- Additional type traits -------------- */
 
 
-    template <typename NumberType, typename>
-    struct is_sacado_dfad_number
-      : std::false_type
-    {};
-
-
     template <typename NumberType>
     struct is_sacado_dfad_number<NumberType, typename std::enable_if<
       ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::sacado_dfad ||
@@ -758,24 +778,12 @@ namespace Differentiation
     {};
 
 
-    template <typename NumberType, typename>
-    struct is_sacado_rad_number
-      : std::false_type
-    {};
-
-
     template <typename NumberType>
     struct is_sacado_rad_number<NumberType, typename std::enable_if<
       ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::sacado_rad ||
       ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::sacado_rad_dfad
       >::type>
       : std::true_type
-    {};
-
-
-    template <typename NumberType, typename>
-    struct is_sacado_number
-      : std::false_type
     {};
 
 

@@ -83,6 +83,31 @@ namespace internal
     typedef Sacado::Fad::DFad<typename ProductType<T,U>::type> type;
   };
 
+
+  // Sacado::Fad::Dfad expression templates
+  // We demote the result of the expression template operations
+  // to a Sacado::Fad::Dfad itself. This is the only way to retain
+  // consistency between the number type going into a complex chain of
+  // (potentially branching) operations and that coming out of them.
+
+  template <typename T, typename U>
+  struct ProductTypeImpl<Sacado::Fad::Expr<T>, U>
+  {
+    typedef typename ProductType<typename Sacado::Fad::Expr<T>::value_type,U>::type type;
+  };
+
+  template <typename T, typename U>
+  struct ProductTypeImpl<T, Sacado::Fad::Expr<U> >
+  {
+    typedef typename ProductType<T,typename Sacado::Fad::Expr<U>::value_type>::type type;
+  };
+
+  template <typename T, typename U>
+  struct ProductTypeImpl<Sacado::Fad::Expr<T>, Sacado::Fad::Expr<U> >
+  {
+    typedef typename ProductType<typename Sacado::Fad::Expr<T>::value_type,typename Sacado::Fad::Expr<U>::value_type>::type type;
+  };
+
 }
 
 
@@ -90,6 +115,12 @@ template <typename T>
 struct EnableIfScalar<Sacado::Fad::DFad<T> >
 {
   typedef Sacado::Fad::DFad<T> type;
+};
+
+template <typename T>
+struct EnableIfScalar<Sacado::Fad::Expr<T> >
+{
+  typedef typename Sacado::Fad::Expr<T>::value_type type;
 };
 
 
