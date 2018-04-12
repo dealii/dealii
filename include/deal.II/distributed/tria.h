@@ -607,39 +607,105 @@ namespace parallel
                 const bool autopartition = true);
 
       /**
-       * Register a function with the current Triangulation object that will
-       * be used to attach data to active cells before
-       * execute_coarsening_and_refinement(). In
-       * execute_coarsening_and_refinement() the Triangulation will call the
-       * given function pointer and provide @p size bytes to store data. If
-       * necessary, this data will be transferred to the new owner of that
-       * cell during repartitioning the tree. See notify_ready_to_unpack() on
-       * how to retrieve the data.
+       * Register a function that can be used to attach data of fixed size
+       * to cells. This is useful for two purposes: (i) Upon refinement and
+       * coarsening of a triangulation (in
+       * parallel::distributed::Triangulation::execute_coarsening_and_refinement()),
+       * one needs to be able to store one or more data vectors per cell that
+       * characterizes the solution values on the cell so that this data can
+       * then be transferred to the new owning processor of the cell (or
+       * its parent/children) when the mesh is re-partitioned; (ii) when
+       * serializing a computation to a file, it is necessary to attach
+       * data to cells so that it can be saved (in
+       * parallel::distributed::Triangulation::save()) along with the cell's
+       * other information and, if necessary, later be reloaded from disk
+       * with a different subdivision of cells among the processors.
        *
-       * Callers need to store the return value.  It specifies an offset of
-       * the position at which data can later be retrieved during a call to
-       * notify_ready_to_unpack().
+       * The way this function works is that it allows any number of interest
+       * parties to register their intent to attach data to cells. One example
+       * of classes that do this is parallel::distributed::SolutionTransfer
+       * where each parallel::distributed::SolutionTransfer object that works
+       * on the current Triangulation object then needs to register its intent.
+       * Each of these parties registers a call-back function (the second
+       * argument here, @p pack_callback) that will be called whenever the
+       * triangulation's execute_coarsening_and_refinement() or save()
+       * functions are called. The first argument here specifies the number
+       * of bytes the interest party will want to store per cell. (This
+       * needs to be a constant per cell.)
        *
-       * The CellStatus argument in the callback function will tell you if the
-       * given cell will be coarsened, refined, or will persist as is (this
-       * can be different than the coarsen and refine flags set by you). If it
-       * is
+       * The current function then returns an offset that specifies where
+       * in an array the callback function can write. Conceptually, one can
+       * think of this offset in the following way: Let's say, that the
+       * first interested party registers a callback for @p size equal
+       * to @p N1. It will then receive a returned offset of zero
+       * because it will be allowed to write into position zero of an
+       * array that will be allocated for each cell. The second party
+       * registering a callback for @p size equal to @p N2 will then
+       * receive a returned offset of @p N1. The third interested party
+       * will receive an offset of `N1+N2`, etc. Each interested party
+       * needs to store their respective returned offset for later use
+       * when unpacking data in the callback provided to
+       * notify_ready_to_unpack(). (The actual offsets returned may
+       * be different than the example above, but the principle is
+       * the same.)
        *
-       * - CELL_PERSIST: the cell won't be refined/coarsened, but might be
-       * moved to a different processor
-       * - CELL_REFINE: this cell will be refined into 4/8 cells, you can not
-       * access the children (because they don't exist yet)
-       * - CELL_COARSEN: the children of this cell will be coarsened into the
-       * given cell (you can access the active children!)
+       * Whenever @p pack_callback is then called by
+       * execute_coarsening_and_refinement() or load() on a given cell, it
+       * receives a number of arguments. In particular, the first
+       * argument passed to the callback indicates the cell for which
+       * it is supposed to attach data. This is always an active cell.
        *
-       * When unpacking the data with notify_ready_to_unpack() you can access
-       * the children of the cell if the status is CELL_REFINE but not for
-       * CELL_COARSEN. As a consequence you need to handle coarsening while
-       * packing and refinement during unpacking.
+       * The second, CellStatus, argument provided to the callback function
+       * will tell you if the given cell will be coarsened, refined, or will
+       * persist as is. (This status may be different than the refinement
+       * or coarsening flags set on that cell, to accommodate things such as
+       * the "one hanging node per edge" rule.). Specifically, the values for
+       * this argument mean the following:
        *
-       * @note The two functions can also be used for serialization of data
-       * using save() and load() in the same way. Then the status will always
-       * be CELL_PERSIST.
+       * - `CELL_PERSIST`: The cell won't be refined/coarsened, but might be
+       * moved to a different processor. If this is the case, the callback
+       * will want to pack up the data on this cell into an array and store
+       * it at the provided address for later unpacking wherever this cell
+       * may land.
+       * - `CELL_REFINE`: this cell will be refined into 4 or 8 cells (in 2d
+       * and 3d, respectively). However, because these children don't exist
+       * yet, you cannot access them at the time when the callback is
+       * called. If the callback is called with this value, the callback
+       * will want to pack up the data on this cell into an array and store
+       * it at the provided address for later unpacking in a way so that
+       * it can then be transferred to the children of the cell that will
+       * then be available. In other words, if the data the callback
+       * will want to pack up corresponds to a finite element field, then
+       * the prolongation from parent to (new) children will have to happen
+       * during unpacking.
+       * - `CELL_COARSEN`: the children of this cell will be coarsened into the
+       * given cell. These children still exist, so if this is the value
+       * given to the callback as second argument, the callback will want
+       * to transfer data from the children to the current parent cell and
+       * pack it up so that it can later be unpacked again on a cell that
+       * then no longer has any children (and may also be located on a
+       * different processor). In other words, if the data the callback
+       * will want to pack up corresponds to a finite element field, then
+       * it will need to do the restriction from children to parent at
+       * this point.
+       *
+       * @note If this function is used for serialization of data
+       *   using save() and load(), then the cell status argument with which
+       *   the callback is called will always `CELL_PERSIST`.
+       *
+       * The third argument given to the callback is a pointer to a memory
+       * location at which the callback can store its data. It is allowed
+       * to store exactly as many bytes as were passed to the current
+       * function via the @p size argument.
+       *
+       * @note The purpose of this function is to register intent to
+       *   attach data for a single, subsequent call to
+       *   execute_coarsening_and_refinement() and notify_ready_to_unpack(),
+       *   save(), load(). Consequently, notify_ready_to_unpack(), save(),
+       *   and load() all forget the registered callbacks once these
+       *   callbacks have been called, and you will have to re-register
+       *   them with a triangulation if you want them to be active for
+       *   another call to these functions.
        */
       unsigned int
       register_data_attach (const std::size_t size,
