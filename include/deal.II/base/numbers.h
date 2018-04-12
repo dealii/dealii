@@ -39,6 +39,17 @@ template <typename T> struct EnableIfScalar;
 
 DEAL_II_NAMESPACE_CLOSE
 
+// Declare / Import auto-differentiable math functions in(to) standard
+// namespace before numbers::NumberTraits is defined
+#include <deal.II/differentiation/ad/adolc_math.h>
+// Ideally we'd like to #include <deal.II/differentiation/ad/sacado_math.h>
+// but header indirectly references numbers.h. We therefore simply
+// import the whole Sacado header at this point to get the math
+// functions imported into the standard namespace.
+#ifdef DEAL_II_WITH_TRILINOS
+#include <Sacado.hpp>
+#endif
+
 namespace std
 {
   template <typename Number> DEAL_II_ALWAYS_INLINE ::dealii::VectorizedArray<Number>
