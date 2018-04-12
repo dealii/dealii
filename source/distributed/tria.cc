@@ -609,13 +609,18 @@ namespace
       }
     else if (!p4est_has_children && !dealii_cell->has_children())
       {
-        //this active cell didn't change
+        // this active cell didn't change
         typename internal::p4est::types<dim>::quadrant *q;
         q = static_cast<typename internal::p4est::types<dim>::quadrant *> (
               sc_array_index (const_cast<sc_array_t *>(&tree.quadrants), idx)
             );
         *static_cast<typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *>(q->p.user_data) = parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST;
 
+        // double check the condition that we will only ever attach data
+        // to active cells when we get here
+        Assert (dealii_cell->active(), ExcInternalError());
+
+        // call all callbacks
         for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
              it != attached_data_pack_callbacks.end();
              ++it)
@@ -628,9 +633,10 @@ namespace
       }
     else if (p4est_has_children)
       {
-        //this cell got refined
+        // this cell got refined in p4est, but the dealii_cell has not yet been
+        // refined
 
-        //attach to the first child, because we can only attach to active
+        // attach to the first child, because we can only attach to active
         // quadrants
         typename internal::p4est::types<dim>::quadrant
         p4est_child[GeometryInfo<dim>::max_children_per_cell];
@@ -660,18 +666,25 @@ namespace
             );
         *static_cast<typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *>(q->p.user_data) = parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE;
 
+        // double check the condition that we will only ever attach data
+        // to active cells when we get here
+        Assert (dealii_cell->active(), ExcInternalError());
+
+        // call all callbacks
         for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
              it != attached_data_pack_callbacks.end();
              ++it)
           {
-            void *ptr = static_cast<char *>(q->p.user_data) + (*it).first; //add offset
+            // compute the address where this particular callback is allowed
+            // to write its data, using the correct offset
+            void *ptr = static_cast<char *>(q->p.user_data) + (*it).first;
 
             ((*it).second)(dealii_cell,
                            parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE,
                            ptr);
           }
 
-        //mark other children as invalid, so that unpack only happens once
+        // mark other children as invalid, so that unpack only happens once
         for (unsigned int i=1; i<GeometryInfo<dim>::max_children_per_cell; ++i)
           {
             int child_idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
@@ -687,13 +700,23 @@ namespace
       }
     else
       {
-        //its children got coarsened into this cell
+        // its children got coarsened into this cell in p4est, but the dealii_cell
+        // still has its children
         typename internal::p4est::types<dim>::quadrant *q;
         q = static_cast<typename internal::p4est::types<dim>::quadrant *> (
               sc_array_index (const_cast<sc_array_t *>(&tree.quadrants), idx)
             );
         *static_cast<typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *>(q->p.user_data) = parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN;
 
+        // double check the condition that we will only ever attach data
+        // to cells with children when we get here. however, we can
+        // only tolerate one level of coarsening at a time, so check
+        // that the children are all active
+        Assert (dealii_cell->active() == false, ExcInternalError());
+        for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          Assert (dealii_cell->child(c)->active(), ExcInternalError());
+
+        // then call all callbacks
         for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
              it != attached_data_pack_callbacks.end();
              ++it)
@@ -1804,12 +1827,16 @@ namespace parallel
 
       dealii::internal::p4est::functions<dim>::save(filename, parallel_forest, attached_data_size>0);
 
-      dealii::parallel::distributed::Triangulation<dim, spacedim> *tria
-        = const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this);
+      // clear all of the callback data, as explained in the documentation of
+      // register_data_attach()
+      {
+        dealii::parallel::distributed::Triangulation<dim, spacedim> *tria
+          = const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this);
 
-      tria->n_attached_datas = 0;
-      tria->attached_data_size = 0;
-      tria->attached_data_pack_callbacks.clear();
+        tria->n_attached_datas = 0;
+        tria->attached_data_size = 0;
+        tria->attached_data_pack_callbacks.clear();
+      }
 
       // and release the data
       void *userptr = parallel_forest->user_pointer;
@@ -1858,6 +1885,8 @@ namespace parallel
                              "save() when using p4est 0.3.4.2."));
 #endif
 
+      // clear all of the callback data, as explained in the documentation of
+      // register_data_attach()
       attached_data_size = 0;
       n_attached_datas = 0;
       n_attached_deserialize = attached_count;
@@ -3213,10 +3242,11 @@ namespace parallel
       Assert(attached_data_pack_callbacks.size()==n_attached_datas,
              ExcMessage("register_data_attach(), not all data has been unpacked last time?"));
 
-      unsigned int offset = attached_data_size+sizeof(CellStatus);
+      const unsigned int offset = attached_data_size+sizeof(CellStatus);
       ++n_attached_datas;
-      attached_data_size+=size;
+      attached_data_size += size;
       attached_data_pack_callbacks.emplace_back(offset, pack_callback);
+
       return offset;
     }
 
@@ -3279,7 +3309,7 @@ namespace parallel
       // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
       if (!n_attached_datas && n_attached_deserialize == 0)
         {
-          // everybody got his data, time for cleanup!
+          // everybody got their data, time for cleanup!
           attached_data_size = 0;
           attached_data_pack_callbacks.clear();
 
