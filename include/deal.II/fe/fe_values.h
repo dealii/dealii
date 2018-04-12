@@ -1376,17 +1376,18 @@ namespace FEValuesViews
    * @ref vector_valued
    * module.
    *
-   * This class allows to query the value and divergence of (components of)
+   * This class allows to query the value, gradient and divergence of (components of)
    * shape functions and solutions representing tensors. The divergence of a
-   * tensor $T_{ij}, 0\le i,j<\text{dim}$ is defined as $d_i = \sum_j
-   * \frac{\partial T_{ji}}{\partial x_j}, 0\le i<\text{dim}$.
+   * tensor $T_{ij},\, 0\le i,j<\text{dim}$ is defined as $d_i = \sum_j
+   * \frac{\partial T_{ij}}{\partial x_j}, \, 0\le i<\text{dim}$,
+   * whereas its gradient is $G_{ijk} = \frac{\partial T_{ij}}{\partial x_k}$.
    *
    * You get an object of this type if you apply a FEValuesExtractors::Tensor
    * to an FEValues, FEFaceValues or FESubfaceValues object.
    *
    * @ingroup feaccess vector_valued
    *
-   * @author Denis Davydov, 2013
+   * @author Denis Davydov, 2013, 2018
    */
   template <int dim, int spacedim>
   class Tensor<2,dim,spacedim>
@@ -1403,6 +1404,11 @@ namespace FEValuesViews
      * Data type for taking the divergence of a tensor: a vector.
      */
     typedef dealii::Tensor<1, spacedim> divergence_type;
+
+    /**
+     * Data type for taking the gradient of a second order tensor: a third order tensor.
+     */
+    typedef dealii::Tensor<3, spacedim> gradient_type;
 
     /**
      * A struct that provides the output type for the product of the value
@@ -1422,6 +1428,12 @@ namespace FEValuesViews
        * divergences of the view the Tensor class.
        */
       typedef typename ProductType<Number, typename Tensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * gradient of the view the Tensor class.
+       */
+      typedef typename ProductType<Number, typename Tensor<2,dim,spacedim>::gradient_type>::type gradient_type;
     };
 
     /**
@@ -1529,6 +1541,23 @@ namespace FEValuesViews
                 const unsigned int q_point) const;
 
     /**
+     * Return the gradient (3-rd order tensor) of the vector components selected by this
+     * view, for the shape function and quadrature point selected by the
+     * arguments.
+     *
+     * See the general discussion of this class for a definition of the
+     * gradient.
+     *
+     * @note The meaning of the arguments is as documented for the value()
+     * function.
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    gradient_type
+    gradient (const unsigned int shape_function,
+              const unsigned int q_point) const;
+
+    /**
      * Return the values of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -1603,8 +1632,34 @@ namespace FEValuesViews
      */
     template <class InputVector>
     void get_function_divergences_from_local_dof_values (const InputVector &dof_values,
-                                                         std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &values) const;
+                                                         std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &divergences) const;
 
+    /**
+     * Return the gradient of the selected vector components of the finite
+     * element function characterized by <tt>fe_function</tt> at the
+     * quadrature points of the cell, face or subface selected the last time
+     * the <tt>reinit</tt> function of the FEValues object was called.
+     *
+     * See the general discussion of this class for a definition of the
+     * gradient.
+     *
+     * The data type stored by the output vector must be what you get when you
+     * multiply the gradients of shape functions (i.e., @p gradient_type)
+     * times the type used to store the values of the unknowns $U_j$ of your
+     * finite element vector $U$ (represented by the @p fe_function argument).
+     *
+     * @dealiiRequiresUpdateFlags{update_gradients}
+     */
+    template <class InputVector>
+    void get_function_gradients (const InputVector &fe_function,
+                                 std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
+
+    /**
+     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                       std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const;
 
   private:
     /**
@@ -4227,7 +4282,8 @@ namespace FEValuesViews
         const dealii::Tensor<1, spacedim> &phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
-        return_value[jj] = phi_grad[ii];
+        // note that we contract \nabla from the right
+        return_value[ii] = phi_grad[jj];
 
         return return_value;
       }
@@ -4238,6 +4294,58 @@ namespace FEValuesViews
         return return_value;
       }
   }
+
+  template <int dim, int spacedim>
+  inline
+  typename Tensor<2, dim, spacedim>::gradient_type
+  Tensor<2, dim, spacedim>::gradient(const unsigned int shape_function,
+                                     const unsigned int q_point) const
+  {
+    Assert (shape_function < fe_values->fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
+    Assert (fe_values->update_flags & update_gradients,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+    if (snc == -2)
+      {
+        // shape function is zero for the selected components
+        return gradient_type();
+      }
+    else if (snc != -1)
+      {
+        // we have a single non-zero component when the tensor is
+        // represented in unrolled form.
+        //
+        // the gradient of a second-order tensor is a third order tensor.
+        //
+        // assume the second-order tensor is A with components A_{ij},
+        // then gradient is B_{ijk} := \frac{\partial A_{ij}}{\partial x_k}
+        //
+        // Now, we know the nonzero component in unrolled form: it is indicated
+        // by 'snc'. we can figure out which tensor components belong to this:
+        const unsigned int comp =
+          shape_function_data[shape_function].single_nonzero_component_index;
+        const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
+        const unsigned int ii = indices[0];
+        const unsigned int jj = indices[1];
+
+        const dealii::Tensor<1, spacedim> &phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
+
+        gradient_type return_value;
+        return_value[ii][jj] = phi_grad;
+
+        return return_value;
+      }
+    else
+      {
+        Assert (false, ExcNotImplemented());
+        gradient_type return_value;
+        return return_value;
+      }
+  }
+
 }
 
 

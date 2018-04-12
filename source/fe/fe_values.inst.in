@@ -135,6 +135,10 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension
     void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>
     ::get_function_divergences<dealii::VEC>
     (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
+    template
+    void FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>
+    ::get_function_gradients<dealii::VEC>
+    (const dealii::VEC&, std::vector<ProductType<dealii::VEC::value_type,dealii::Tensor<3,deal_II_space_dimension> >::type>&) const;
 #endif
 }
 
@@ -235,6 +239,11 @@ for (VEC : GENERAL_CONTAINER_TYPES;
     void FEValuesViews::Tensor<2,deal_II_dimension, deal_II_space_dimension>
     ::get_function_divergences_from_local_dof_values<VEC<Number>>
             (const VEC<Number>&, std::vector<typename OutputType<Number>::divergence_type>&) const;
+
+    template
+    void FEValuesViews::Tensor<2,deal_II_dimension, deal_II_space_dimension>
+    ::get_function_gradients_from_local_dof_values<VEC<Number>>
+            (const VEC<Number>&, std::vector<typename OutputType<Number>::gradient_type>&) const;
 #endif
 }
 
@@ -396,6 +405,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
     template
     void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_space_dimension>::get_function_divergences<dealii::IndexSet>
     (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<1,deal_II_space_dimension> >::type>&) const;
+    template
+    void FEValuesViews::Tensor<2,deal_II_dimension,deal_II_space_dimension>::get_function_gradients<dealii::IndexSet>
+    (const dealii::IndexSet&, std::vector<ProductType<IndexSet::value_type,dealii::Tensor<3,deal_II_space_dimension> >::type>&) const;
 #endif
 }
 

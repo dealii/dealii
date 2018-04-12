@@ -1308,7 +1308,69 @@ namespace FEValuesViews
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
                    ++q_point, ++shape_gradient_ptr)
                 {
-                  divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
+                  divergences[q_point][ii] += value * (*shape_gradient_ptr)[jj];
+                }
+            }
+          else
+            {
+              for (unsigned int d = 0;
+                   d < dim*dim; ++d)
+                if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+                  {
+                    Assert (false, ExcNotImplemented());
+                  }
+            }
+        }
+    }
+
+    template <int dim, int spacedim, typename Number>
+    void
+    do_function_gradients (const ArrayView<Number> &dof_values,
+                           const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
+                           const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
+                           std::vector<typename Tensor<2,dim,spacedim>::template OutputType<Number>::gradient_type> &gradients)
+    {
+      const unsigned int dofs_per_cell = dof_values.size();
+      const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
+                                               shape_gradients[0].size() : gradients.size();
+      AssertDimension (gradients.size(), n_quadrature_points);
+
+      std::fill (gradients.begin(), gradients.end(),
+                 typename Tensor<2,dim,spacedim>::template OutputType<Number>::gradient_type());
+
+      for (unsigned int shape_function=0;
+           shape_function<dofs_per_cell; ++shape_function)
+        {
+          const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+          if (snc == -2)
+            // shape function is zero for the selected components
+            continue;
+
+          const Number &value = dof_values[shape_function];
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
+
+          if (snc != -1)
+            {
+              const unsigned int comp =
+                shape_function_data[shape_function].single_nonzero_component_index;
+
+              const dealii::Tensor < 1, spacedim> *shape_gradient_ptr =
+                &shape_gradients[snc][0];
+
+              const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
+              const unsigned int ii = indices[0];
+              const unsigned int jj = indices[1];
+
+              for (unsigned int q_point = 0; q_point < n_quadrature_points;
+                   ++q_point, ++shape_gradient_ptr)
+                {
+                  gradients[q_point][ii][jj] += value * (*shape_gradient_ptr);
                 }
             }
           else
@@ -2080,6 +2142,52 @@ namespace FEValuesViews
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Tensor<2, dim, spacedim>::
+  get_function_gradients(const InputVector &fe_function,
+                         std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const
+  {
+    Assert(fe_values->update_flags & update_gradients,
+           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+    Assert(fe_values->present_cell.get() != nullptr,
+           ExcMessage("FEValues object is not reinit'ed to any cell"));
+    AssertDimension(fe_function.size(),
+                    fe_values->present_cell->n_dofs_for_dof_handler());
+
+    // get function values of dofs
+    // on this cell
+    dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
+    fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_gradients<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Tensor<2, dim, spacedim>::
+  get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const
+  {
+    Assert(fe_values->update_flags & update_gradients,
+           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+    Assert(fe_values->present_cell.get() != nullptr,
+           ExcMessage("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_gradients<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+  }
+
 }
 
 

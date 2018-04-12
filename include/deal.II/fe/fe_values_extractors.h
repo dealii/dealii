@@ -168,7 +168,7 @@ namespace FEValuesExtractors
 
 
   /**
-   * Extractor for a (possible non-)symmetric tensor of a rank specified by
+   * Extractor for a general tensor of a given rank specified by
    * the template argument. For a second order tensor, this represents a
    * collection of <code>(dim*dim)</code> components of a vector-valued
    * element. The value of <code>dim</code> is defined by the FEValues object
