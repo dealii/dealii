@@ -473,33 +473,7 @@ program to see that indeed the number of CG iterations does not change as we
 refine the mesh).
 
 So all we need in addition to what we already have is the mass matrix on the
-pressure variables. We could do that by building this matrix on the
-side in a separate data structure. However, it is worth remembering
-that although we build the system matrix
-@f{eqnarray*}
-  \left(\begin{array}{cc}
-    A & B^T \\ B & 0
-  \end{array}\right)
-@f}
-as one object (of type BlockSparseMatrix), we never actually do
-matrix-vector products with this matrix, or any other operations that
-consider the entire matrix. Rather, we only build it in this form for
-convenience (because it reflects the structure of the FESystem finite
-element and associated DoFHandler object) but later only operate on
-the $(0,0),(0,1)$, and $(1,0)$ blocks of this matrix. In other words,
-our algorithm so far entirely ignores the $(1,1)$ (pressure-pressure)
-block as it is empty anyway.
-
-Now, as mentioned, we need a pressure mass matrix to precondition the
-Schur complement and that conveniently the pressure-pressure block of
-the matrix we build anyway is currently empty and ignored. So what we
-will do is to assemble the needed mass matrix in this space; this does
-change the global system matrix but since our algorithm never operates
-on the global matrix and instead only considers individual blocks,
-this fact does not affect what we actually compute. Later, when
-solving, we then precondition the Schur complement with $M_p^{-1}$ by
-doing a few CG iterations on the well-conditioned pressure mass matrix
-$M_p$ stored in the $(1,1)$ block.
+pressure variables and we will store it in a separate object.
 
 
 
