@@ -79,14 +79,15 @@ void test ()
   mf.reinit (dof, constraints, quad, data);
 
   const unsigned int n_macro_cells = mf.n_macro_cells();
-  const unsigned int n_cartesian = mf.get_mapping_info().cartesian_data.size();
-  const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
-  const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
+  std::vector<unsigned int> n_cell_types(4, 0);
+  for (unsigned int i=0; i<n_macro_cells; ++i)
+    n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should do at least some compression
-  Assert(n_cartesian+n_affine+n_general < n_macro_cells, ExcInternalError());
-  Assert(n_cartesian * 5 < n_macro_cells, ExcInternalError());
-  Assert(n_affine * 10 < n_macro_cells, ExcInternalError());
+  Assert(n_cell_types[0]+n_cell_types[1] > 0, ExcInternalError());
+  Assert(mf.get_mapping_info().cell_data[0].jacobians[0].size() <
+         (n_cell_types[3]*quad.size()+n_macro_cells-n_cell_types[3]),
+         ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -115,15 +116,14 @@ void test_cube ()
   mf.reinit (dof, constraints, quad, data);
 
   const unsigned int n_macro_cells = mf.n_macro_cells();
-  const unsigned int n_cartesian = mf.get_mapping_info().cartesian_data.size();
-  const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
-  const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
+  std::vector<unsigned int> n_cell_types(4, 0);
+  for (unsigned int i=0; i<n_macro_cells; ++i)
+    n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should have one Cartesian cell and no other
   // cell type
-  AssertDimension(n_cartesian, 1);
-  AssertDimension(n_affine, 0);
-  AssertDimension(n_general, 0);
+  AssertDimension(n_cell_types[0], n_macro_cells);
+  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
   Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
@@ -160,15 +160,14 @@ void test_parallelogram ()
   mf.reinit (dof, constraints, quad, data);
 
   const unsigned int n_macro_cells = mf.n_macro_cells();
-  const unsigned int n_cartesian = mf.get_mapping_info().cartesian_data.size();
-  const unsigned int n_affine = mf.get_mapping_info().affine_data.size();
-  const unsigned int n_general = mf.get_mapping_info().mapping_data_gen[0].rowstart_jacobians.size()-1;
+  std::vector<unsigned int> n_cell_types(4, 0);
+  for (unsigned int i=0; i<n_macro_cells; ++i)
+    n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should have one affine cell and no other
   // cell type
-  AssertDimension(n_cartesian, 0);
-  AssertDimension(n_affine, 1);
-  AssertDimension(n_general, 0);
+  AssertDimension(n_cell_types[1], n_macro_cells);
+  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
   Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }

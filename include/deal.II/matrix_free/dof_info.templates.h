@@ -23,6 +23,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/helper_functions.h>
+#include <deal.II/matrix_free/mapping_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -1397,9 +1397,8 @@ unsigned int
 MatrixFree<dim,Number>::get_n_q_points(const unsigned int quad_index,
                                        const unsigned int active_fe_index) const
 {
-  AssertIndexRange (quad_index,
-                    mapping_info.mapping_data_gen.size());
-  return mapping_info.mapping_data_gen[quad_index].n_q_points[active_fe_index];
+  AssertIndexRange (quad_index, mapping_info.cell_data.size());
+  return mapping_info.cell_data[quad_index].descriptor[active_fe_index].n_q_points;
 }
 
 
@@ -1422,9 +1421,8 @@ unsigned int
 MatrixFree<dim,Number>::get_n_q_points_face(const unsigned int quad_index,
                                             const unsigned int active_fe_index) const
 {
-  AssertIndexRange (quad_index,
-                    mapping_info.mapping_data_gen.size());
-  return mapping_info.mapping_data_gen[quad_index].n_q_points_face[active_fe_index];
+  AssertIndexRange (quad_index, mapping_info.face_data.size());
+  return mapping_info.face_data[quad_index].descriptor[active_fe_index].n_q_points;
 }
 
 
@@ -1475,9 +1473,8 @@ const Quadrature<dim> &
 MatrixFree<dim,Number>::get_quadrature (const unsigned int quad_index,
                                         const unsigned int active_fe_index) const
 {
-  AssertIndexRange (quad_index, mapping_info.mapping_data_gen.size());
-  return mapping_info.mapping_data_gen[quad_index].
-         quadrature[active_fe_index];
+  AssertIndexRange (quad_index, mapping_info.cell_data.size());
+  return mapping_info.cell_data[quad_index].descriptor[active_fe_index].quadrature;
 }
 
 
@@ -1488,9 +1485,8 @@ const Quadrature<dim-1> &
 MatrixFree<dim,Number>::get_face_quadrature (const unsigned int quad_index,
                                              const unsigned int active_fe_index) const
 {
-  AssertIndexRange (quad_index, mapping_info.mapping_data_gen.size());
-  return mapping_info.mapping_data_gen[quad_index].
-         face_quadrature[active_fe_index];
+  AssertIndexRange (quad_index, mapping_info.face_data.size());
+  return mapping_info.face_data[quad_index].descriptor[active_fe_index].quadrature;
 }
 
 

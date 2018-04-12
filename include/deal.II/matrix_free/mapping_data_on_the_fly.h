@@ -27,6 +27,7 @@
 #include <deal.II/matrix_free/mapping_info.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/mapping_q1.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -101,36 +102,13 @@ namespace internal
       const dealii::FEValues<dim> &get_fe_values () const;
 
       /**
-       * Return a vector of inverse transpose Jacobians. For compatibility
-       * with FEEvaluation, it returns tensors of vectorized arrays, even
-       * though all components are equal.
+       * Return a reference to the underlying storage field of type
+       * MappingInfoStorage of the same format as the data fields in
+       * MappingInfo. This ensures compatibility with the precomputed data
+       * fields in the MappingInfo class.
        */
-      const AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > &
-      get_inverse_jacobians() const;
-
-      /**
-       * Return a vector of quadrature weights times the Jacobian determinant
-       * (JxW). For compatibility with FEEvaluation, it returns tensors of
-       * vectorized arrays, even though all components are equal.
-       */
-      const AlignedVector<VectorizedArray<Number> > &
-      get_JxW_values() const;
-
-      /**
-       * Return a vector of quadrature points in real space on the given cell.
-       * For compatibility with FEEvaluation, it returns tensors of vectorized
-       * arrays, even though all components are equal.
-       */
-      const AlignedVector<Point<dim,VectorizedArray<Number> > > &
-      get_quadrature_points() const;
-
-      /**
-       * Return a vector of normal vectors in real space on the given cell.
-       * For compatibility with FEEvaluation, it returns tensors of vectorized
-       * arrays, even though all components are equal.
-       */
-      const AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > &
-      get_normal_vectors() const;
+      const MappingInfoStorage<dim,dim,Number> &
+      get_data_storage() const;
 
       /**
        * Return a reference to 1D quadrature underlying this object.
@@ -162,24 +140,10 @@ namespace internal
       const Quadrature<1> quadrature_1d;
 
       /**
-       * Inverse Jacobians, stored in vectorized array form.
+       * The storage part created for a single cell and held in analogy to
+       * MappingInfo.
        */
-      AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > inverse_jacobians;
-
-      /**
-       * Stored Jacobian determinants and quadrature weights
-       */
-      AlignedVector<VectorizedArray<Number> > jxw_values;
-
-      /**
-       * Stored quadrature points
-       */
-      AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
-
-      /**
-       * Stored normal vectors (for face integration)
-       */
-      AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > normal_vectors;
+      MappingInfoStorage<dim,dim,Number> mapping_info_storage;
     };
 
 
@@ -192,13 +156,24 @@ namespace internal
                                                           const UpdateFlags update_flags)
       :
       fe_values(mapping, fe_dummy, Quadrature<dim>(quadrature),
-                internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
-      quadrature_1d(quadrature),
-      inverse_jacobians(fe_values.get_quadrature().size()),
-      jxw_values(fe_values.get_quadrature().size()),
-      quadrature_points(fe_values.get_quadrature().size()),
-      normal_vectors(fe_values.get_quadrature().size())
+                MappingInfo<dim,Number>::compute_update_flags(update_flags)),
+      quadrature_1d(quadrature)
     {
+      mapping_info_storage.descriptor.resize(1);
+      mapping_info_storage.descriptor[0].initialize(quadrature);
+      mapping_info_storage.data_index_offsets.resize(1);
+      mapping_info_storage.JxW_values.resize(fe_values.n_quadrature_points);
+      mapping_info_storage.jacobians[0].resize(fe_values.n_quadrature_points);
+      if (update_flags & update_quadrature_points)
+        {
+          mapping_info_storage.quadrature_point_offsets.resize(1, 0);
+          mapping_info_storage.quadrature_points.resize(fe_values.n_quadrature_points);
+        }
+      if (fe_values.get_update_flags() & update_normal_vectors)
+        {
+          mapping_info_storage.normal_vectors.resize(fe_values.n_quadrature_points);
+          mapping_info_storage.normals_times_jacobians[0].resize(fe_values.n_quadrature_points);
+        }
       Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
              ExcNotImplemented());
     }
@@ -210,17 +185,9 @@ namespace internal
     MappingDataOnTheFly<dim,Number>::MappingDataOnTheFly (const Quadrature<1> &quadrature,
                                                           const UpdateFlags update_flags)
       :
-      fe_values(fe_dummy, Quadrature<dim>(quadrature),
-                internal::MatrixFreeFunctions::MappingInfo<dim,Number>::compute_update_flags(update_flags)),
-      quadrature_1d(quadrature),
-      inverse_jacobians(fe_values.get_quadrature().size()),
-      jxw_values(fe_values.get_quadrature().size()),
-      quadrature_points(fe_values.get_quadrature().size()),
-      normal_vectors(fe_values.get_quadrature().size())
-    {
-      Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
-             ExcNotImplemented());
-    }
+      MappingDataOnTheFly(::dealii::StaticMappingQ1<dim,dim>::mapping,
+                          quadrature, update_flags)
+    {}
 
 
 
@@ -235,18 +202,27 @@ namespace internal
       fe_values.reinit(present_cell);
       for (unsigned int q=0; q<fe_values.get_quadrature().size(); ++q)
         {
-          if (fe_values.get_update_flags() & update_inverse_jacobians)
-            for (unsigned int d=0; d<dim; ++d)
-              for (unsigned int e=0; e<dim; ++e)
-                inverse_jacobians[q][d][e] = fe_values.inverse_jacobian(q)[e][d];
+          if (fe_values.get_update_flags() & update_JxW_values)
+            mapping_info_storage.JxW_values[q] = fe_values.JxW(q);
+          if (fe_values.get_update_flags() & update_jacobians)
+            {
+              Tensor<2,dim> jac = fe_values.jacobian(q);
+              jac = invert(transpose(jac));
+              for (unsigned int d=0; d<dim; ++d)
+                for (unsigned int e=0; e<dim; ++e)
+                  mapping_info_storage.jacobians[0][q][d][e] = jac[d][e];
+            }
           if (fe_values.get_update_flags() & update_quadrature_points)
             for (unsigned int d=0; d<dim; ++d)
-              quadrature_points[q][d] = fe_values.quadrature_point(q)[d];
+              mapping_info_storage.quadrature_points[q][d] = fe_values.quadrature_point(q)[d];
           if (fe_values.get_update_flags() & update_normal_vectors)
-            for (unsigned int d=0; d<dim; ++d)
-              normal_vectors[q][d] = fe_values.normal_vector(q)[d];
-          if (fe_values.get_update_flags() & update_JxW_values)
-            jxw_values[q] = fe_values.JxW(q);
+            {
+              for (unsigned int d=0; d<dim; ++d)
+                mapping_info_storage.normal_vectors[q][d] = fe_values.normal_vector(q)[d];
+              mapping_info_storage.normals_times_jacobians[0][q] =
+                mapping_info_storage.normal_vectors[q] *
+                mapping_info_storage.jacobians[0][q];
+            }
         }
     }
 
@@ -284,40 +260,10 @@ namespace internal
 
     template <int dim, typename Number>
     inline
-    const AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > &
-    MappingDataOnTheFly<dim,Number>::get_inverse_jacobians() const
+    const MappingInfoStorage<dim,dim,Number> &
+    MappingDataOnTheFly<dim,Number>::get_data_storage() const
     {
-      return inverse_jacobians;
-    }
-
-
-
-    template <int dim, typename Number>
-    inline
-    const AlignedVector<Tensor<1,dim,VectorizedArray<Number> > > &
-    MappingDataOnTheFly<dim,Number>::get_normal_vectors() const
-    {
-      return normal_vectors;
-    }
-
-
-
-    template <int dim, typename Number>
-    inline
-    const AlignedVector<Point<dim,VectorizedArray<Number> > > &
-    MappingDataOnTheFly<dim,Number>::get_quadrature_points() const
-    {
-      return quadrature_points;
-    }
-
-
-
-    template <int dim, typename Number>
-    inline
-    const AlignedVector<VectorizedArray<Number> > &
-    MappingDataOnTheFly<dim,Number>::get_JxW_values() const
-    {
-      return jxw_values;
+      return mapping_info_storage;
     }
 
 
