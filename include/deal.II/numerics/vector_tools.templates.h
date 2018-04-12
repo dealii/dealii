@@ -295,6 +295,27 @@ namespace VectorTools
       Assert(component_mask.n_selected_components(
                dof_handler.get_fe().n_components()) > 0,
              ComponentMask::ExcNoComponentSelected());
+#ifdef DEAL_II_WITH_MPI
+      if ( const auto vt = dynamic_cast<const LinearAlgebra::distributed::Vector<double> *> ( &vec ) )
+      {
+        // If the vector is distributed, the following checks
+        // try to prevent problems on ghost cells
+        Assert(!vt->has_ghost_elements(),
+             ExcMessage(
+               "Vector has no write access on ghost cells"));
+
+        // Cheking for overlapping values on ghost cells:
+        // this test is not 100% accurate, but should catch most of the problems
+        const auto n_global_elements =
+                Utilities::MPI::sum(vt->local_size() + vt->n_ghost_entries(),
+                                    vt->get_mpi_communicator());
+
+        Assert( (n_global_elements - vt->size() ) != 0,
+               ExcMessage(
+                 "Error: some values on ghost cells are overlapping"));
+      }
+
+#endif
 
       //
       // Computing the generalized interpolant isn't quite as straightforward

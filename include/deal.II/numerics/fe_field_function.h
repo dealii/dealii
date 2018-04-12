@@ -16,6 +16,7 @@
 #ifndef dealii_fe_function_h
 #define dealii_fe_function_h
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
@@ -126,11 +127,23 @@ namespace Functions
    * and
    * @ref GlossGhostCell).
    * The solution can be evaluated on ghost cells, but for artificial cells
-   * we have no access to the solution there and
+   * we have no access to the solution there. By default
    * functions that evaluate the solution at such a point will trigger an
    * exception of type VectorTools::ExcPointNotAvailableHere.
    *
-   * To deal with this situation, you will want to use code as follows when,
+   * This can be solved computing a description of the locally owned
+   * part of the mesh using bounding boxes and then exchanging it with
+   * all other processes obtaining a global description
+   * (see GridTools::distributed_compute_point_locations for the details).
+   * To activate the computation on artificial cells of distributed meshes,
+   * the fourth argument passed to the constructor, for the bool parameter
+   * @p allow_evaluation_on_artificial_cells , must be set to true (it's false
+   * by default). Then the function FEFieldFunction::set_up_bounding_boxes
+   * can be used to pass or create the global description of the mesh.
+   *
+   * If it is not possible to create the global description or the
+   * distributed version of the function is missing, to deal with the exception
+   * you will want to use code as follows when,
    * for example, evaluating the solution at the origin (here using a parallel
    * TrilinosWrappers vector to hold the solution):
    * @code
@@ -170,10 +183,10 @@ namespace Functions
      * mapping is specified, that is what is used to find out where the points
      * lay. Otherwise the standard Q1 mapping is used.
      */
-    FEFieldFunction(
-      const DoFHandlerType &dh,
-      const VectorType &    data_vector,
-      const Mapping<dim> &  mapping = StaticMappingQ1<dim>::mapping);
+    FEFieldFunction(const DoFHandlerType &dh,
+                    const VectorType &    data_vector,
+                    const Mapping<dim> &mapping = StaticMappingQ1<dim>::mapping,
+                    const bool allow_evaluation_on_artificial_cells = false);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you
@@ -264,6 +277,7 @@ namespace Functions
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<typename VectorType::value_type>>
                         &values) const override;
+
 
     /**
      * Return the gradient of all components of the function at the given
@@ -436,6 +450,31 @@ namespace Functions
       std::vector<std::vector<Point<dim>>> &                      qpoints,
       std::vector<std::vector<unsigned int>> &                    maps) const;
 
+    /**
+     * This function is needed to use computations on artificial cell's
+     * of distributed meshes, as it updates or initializes the global
+     * description of the mesh. This description is made using bounding boxes
+     * (see GridTools::compute_mesh_predicate_bounding_box ; beware: it
+     * currently doesn't handle curved gemetries.).
+     * If no vector @p global_bboxes of bounding boxes describing the global
+     * mesh is given, then one is generated using the default values of
+     * GridTools::compute_mesh_predicate_bounding_box.
+     *
+     * The return value is true if the update was successful.
+     *
+     * The function throws an error if the mesh is not distributed, if
+     * the evaluation on artificial cells is not active or if
+     * @p global_bboxes has uncompatible dimension i.e. its size is not
+     * equal to the number of mpi processes.
+     *
+     * Note: while default values are guaranteed to work (except with
+     * curved geometry), depending on the mesh they can be extremely slow
+     * as a huge number of bounding boxes can be potentially generated.
+     */
+    void
+    set_up_bounding_boxes(
+      const std::vector<std::vector<BoundingBox<dim>>> &new_global_bboxes = {});
+
   private:
     /**
      * Typedef holding the local cell_hint.
@@ -469,6 +508,18 @@ namespace Functions
      * The latest cell hint.
      */
     mutable cell_hint_t cell_hint;
+
+    /**
+     * A flag used to activate/deactivate the use of methods to compute values
+     * on artificial cells using bounding boxes and communication.
+     */
+    bool allow_evaluation_on_artificial_cells;
+
+    /**
+     * A reference to the global bounding boxes, used to describe
+     * the owner of each portion of the mesh in a distributed triangulation.
+     */
+    mutable std::vector<std::vector<BoundingBox<dim>>> global_bboxes;
 
     /**
      * Given a cell, return the reference coordinates of the given point

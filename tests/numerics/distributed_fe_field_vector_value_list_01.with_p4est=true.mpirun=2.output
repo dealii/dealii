@@ -1,0 +1,47 @@
+
+DEAL:0::Deal.II FEFieldFunction::vector_value_list
+DEAL:0::for the distributed version
+DEAL:0::2D tests:
+DEAL:0::Testing for dim = 2 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0::Sphere refinements:3
+DEAL:0::Sphere center:0.470000 0.420000
+DEAL:0::Sphere radius:0.300000
+DEAL:0::Serial part: completed
+DEAL:0::Using the distributed version of the function:
+DEAL:0::Checking results
+DEAL:0::Test passed
+DEAL:0::3D tests
+DEAL:0::Testing for dim = 3 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0::Sphere refinements:2
+DEAL:0::Sphere center:0.470000 0.420000 0.370000
+DEAL:0::Sphere radius:0.250000
+DEAL:0::Serial part: completed
+DEAL:0::Using the distributed version of the function:
+DEAL:0::Checking results
+DEAL:0::Test passed
+
+DEAL:1::Deal.II FEFieldFunction::vector_value_list
+DEAL:1::for the distributed version
+DEAL:1::2D tests:
+DEAL:1::Testing for dim = 2 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1::Sphere refinements:3
+DEAL:1::Sphere center:0.470000 0.420000
+DEAL:1::Sphere radius:0.300000
+DEAL:1::Serial part: completed
+DEAL:1::Using the distributed version of the function:
+DEAL:1::Checking results
+DEAL:1::Test passed
+DEAL:1::3D tests
+DEAL:1::Testing for dim = 3 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1::Sphere refinements:2
+DEAL:1::Sphere center:0.470000 0.420000 0.370000
+DEAL:1::Sphere radius:0.250000
+DEAL:1::Serial part: completed
+DEAL:1::Using the distributed version of the function:
+DEAL:1::Checking results
+DEAL:1::Test passed
+

@@ -1,0 +1,4 @@
+New: Add to Functions::FEFieldFunction::vector_value_list()
+a version working on distributed meshes (using bounding boxes).
+<br>
+(Giovanni Alzetta 2018/07/25)
