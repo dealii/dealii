@@ -20,6 +20,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/lac/lapack_support.h>
 
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#include <cfenv>
+#endif
+
 extern "C"
 {
 // vector update of the form y += alpha*x with a scalar, x,y vectors
@@ -1401,7 +1405,21 @@ syevr(const char *jobz,
       types::blas_int *liwork,
       types::blas_int *info)
 {
+  /*
+   * Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero) within the call to dsyevr
+   * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
+   * to dsyevr into the following code to supress the exception.
+   */
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fenv_t fp_exceptions;
+  feholdexcept(&fp_exceptions);
+#endif
+
   dsyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
+
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fesetenv(&fp_exceptions);
+#endif
 }
 
 inline void
@@ -1427,7 +1445,21 @@ syevr(const char *jobz,
       types::blas_int *liwork,
       types::blas_int *info)
 {
+  /*
+   * Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero) within the call to ssyevr
+   * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
+   * to ssyevr into the following code to supress the exception.
+   */
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fenv_t fp_exceptions;
+  feholdexcept(&fp_exceptions);
+#endif
+
   ssyevr_(jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,isuppz,work,lwork,iwork,liwork,info);
+
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fesetenv(&fp_exceptions);
+#endif
 }
 #endif
 
