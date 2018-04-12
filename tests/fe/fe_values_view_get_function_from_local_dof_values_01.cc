@@ -264,6 +264,7 @@ void test_view (const Vector<double> &solution,
   // Typedefs
   typedef typename View::template OutputType<NumberType> OutputType;
   typedef typename ProductType<typename View::value_type,NumberType>::type value_type;
+  typedef typename ProductType<typename View::gradient_type,NumberType>::type gradient_type;
   typedef typename ProductType<typename View::divergence_type,NumberType>::type divergence_type;
 
   // Values
@@ -278,6 +279,12 @@ void test_view (const Vector<double> &solution,
   fe_values_view.get_function_divergences_from_local_dof_values(local_dof_values, qp_divs_local);
   fe_values_view.get_function_divergences (solution,qp_divs_global);
 
+  // Gradients
+  std::vector<typename OutputType::gradient_type> qp_grads_local(n_q_points);
+  std::vector<gradient_type> qp_grads_global (n_q_points);
+  fe_values_view.get_function_gradients_from_local_dof_values(local_dof_values, qp_grads_local);
+  fe_values_view.get_function_gradients (solution,qp_grads_global);
+
   // Output
   for (unsigned int q=0; q<n_q_points; ++q)
     {
@@ -286,6 +293,9 @@ void test_view (const Vector<double> &solution,
 
       if (divergence_type(qp_divs_local[q]) != divergence_type(qp_divs_global[q]))
         deallog << "NOT OK: Div @ " << q << std::endl;
+
+      if (gradient_type(qp_grads_local[q]) != gradient_type(qp_grads_global[q]))
+        deallog << "NOT OK: Grad @ " << q << std::endl;
     }
 }
 

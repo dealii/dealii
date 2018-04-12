@@ -15,9 +15,8 @@
 
 
 
-// there was a bug in getting the divergence of shape functions for the
-// Tensor extractors. test that it is fixed by comparing with
-// get_function_divergences
+// output value of divergence field for Tensor extractors
+// for a simple mesh with linear elements.
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
@@ -59,10 +58,6 @@ void test (const Triangulation<dim> &tr,
   FEValuesExtractors::Tensor<2> extractor(0);
   fe_values[extractor]
   .get_function_divergences (fe_function, divergences);
-
-  // now do the same "by hand"
-  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
-  dof.begin_active()->get_dof_indices (local_dof_indices);
 
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {

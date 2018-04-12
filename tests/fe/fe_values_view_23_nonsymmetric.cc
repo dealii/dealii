@@ -15,9 +15,8 @@
 
 
 
-// there was a bug in getting the divergence of shape functions for the
-// Tensor extractors. test that it is fixed by comparing with
-// get_function_divergences
+// for Tensor extractor compare get_function_divergences with
+// the evaluation by hand via divergence(i,q) * value(i)
 
 #include "../tests.h"
 #include <deal.II/base/function.h>

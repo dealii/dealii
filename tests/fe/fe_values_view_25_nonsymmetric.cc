@@ -15,7 +15,7 @@
 
 
 
-// like _24, but for a simpler mesh for which the output has been
+// like _24_nonsymmetric, but for a simpler mesh for which the output has been
 // verified to be correct
 
 #include "../tests.h"
