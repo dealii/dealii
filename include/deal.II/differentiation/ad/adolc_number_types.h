@@ -17,6 +17,58 @@
 #define dealii_differentiation_ad_adolc_number_types_h
 
 #include <deal.II/base/config.h>
+#include <type_traits>
+
+DEAL_II_NAMESPACE_OPEN
+
+
+namespace Differentiation
+{
+  namespace AD
+  {
+    /**
+     * A struct to indicate whether a given @p NumberType is an
+     * Adol-C number or not. By default, numbers are not considered to
+     * have the necessary characteristics to fulfill this condition.
+     *
+     * @author Jean-Paul Pelteret, 2017
+     */
+    template <typename NumberType, typename = void>
+    struct is_adolc_number
+      : std::false_type
+    {};
+
+
+    /**
+     * A struct to indicate whether a given @p NumberType is a taped
+     * Adol-C number or not. By default, numbers are not considered to
+     * have the necessary characteristics to fulfill this condition.
+     *
+     * @author Jean-Paul Pelteret, 2017
+     */
+    template <typename NumberType, typename = void>
+    struct is_adolc_taped_number
+      : std::false_type
+    {};
+
+
+    /**
+     * A struct to indicate whether a given @p NumberType is a tapeless
+     * Adol-C number or not. By default, numbers are not considered to
+     * have the necessary characteristics to fulfill this condition.
+     *
+     * @author Jean-Paul Pelteret, 2017
+     */
+    template <typename NumberType, typename = void>
+    struct is_adolc_tapeless_number
+      : std::false_type
+    {};
+  }
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
 
 #ifdef DEAL_II_WITH_ADOLC
 
@@ -36,23 +88,6 @@
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-namespace Differentiation
-{
-  namespace AD
-  {
-    /**
-     * A struct to indicate whether a given @p NumberType is an
-     * Adol-C number or not. By default, numbers are not considered to
-     * have the necessary characteristics to fulfill this condition.
-     *
-     * @author Jean-Paul Pelteret, 2017
-     */
-    template <typename NumberType, typename = void>
-    struct is_adolc_number;
-  }
-}
 
 
 /* --------------------------- inline and template functions and specializations ------------------------- */
@@ -435,17 +470,28 @@ namespace Differentiation
     {};
 
 
-
     /**
-     * A struct to indicate whether a given @p NumberType is an
-     * Adol-C number or not. By default, numbers are not considered to
-     * have the necessary characteristics to fulfill this condition.
+     * Specialization of the struct for the case when the input template
+     * parameter is a (real or complex) taped Adol-C number.
      */
-    template <typename NumberType, typename>
-    struct is_adolc_number
-      : std::false_type
+    template <typename NumberType>
+    struct is_adolc_taped_number<NumberType, typename std::enable_if<
+      ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::adolc_taped
+      >::type>
+      : std::true_type
     {};
 
+
+    /**
+     * Specialization of the struct for the case when the input template
+     * parameter is a (real or complex) tapeless Adol-C number.
+     */
+    template <typename NumberType>
+    struct is_adolc_tapeless_number<NumberType, typename std::enable_if<
+      ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::adolc_tapeless
+      >::type>
+      : std::true_type
+    {};
 
 
     /**
@@ -454,8 +500,8 @@ namespace Differentiation
      */
     template <typename NumberType>
     struct is_adolc_number<NumberType, typename std::enable_if<
-      ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::adolc_taped ||
-      ADNumberTraits<typename std::decay<NumberType>::type>::type_code == NumberTypes::adolc_tapeless
+      is_adolc_taped_number<NumberType>::value ||
+      is_adolc_tapeless_number<NumberType>::value
       >::type>
       : std::true_type
     {};
