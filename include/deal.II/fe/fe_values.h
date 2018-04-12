@@ -1202,6 +1202,10 @@ namespace FEValuesViews
        * nonzero, then store -1. If no components are nonzero then store -2.
        */
       int single_nonzero_component;
+
+      /**
+       * Index of the @p single_nonzero_component .
+       */
       unsigned int single_nonzero_component_index;
     };
 
@@ -1248,7 +1252,6 @@ namespace FEValuesViews
     value_type
     value (const unsigned int shape_function,
            const unsigned int q_point) const;
-
 
     /**
      * Return the vector divergence of the vector components selected by this
@@ -1311,7 +1314,6 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_values_from_local_dof_values (const InputVector &dof_values,
                                                     std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
-
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -1458,6 +1460,10 @@ namespace FEValuesViews
        * then store -1. If no components are nonzero then store -2.
        */
       int single_nonzero_component;
+
+      /**
+       * Index of the @p single_nonzero_component .
+       */
       unsigned int single_nonzero_component_index;
     };
 
@@ -1465,7 +1471,6 @@ namespace FEValuesViews
      * Default constructor. Creates an invalid object.
      */
     Tensor();
-
 
     /**
      * Constructor for an object that represents <code>(dim*dim)</code>
@@ -1567,7 +1572,6 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_values_from_local_dof_values (const InputVector &dof_values,
                                                     std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
-
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -3548,12 +3552,9 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_gradients,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
 
-    // an adaptation of the
-    // FEValuesBase::shape_grad_component
-    // function except that here we know the
-    // component as fixed and we have
-    // pre-computed and cached a bunch of
-    // information. See the comments there.
+    // an adaptation of the FEValuesBase::shape_grad_component
+    // function except that here we know the component as fixed and we have
+    // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values->finite_element_output.shape_gradients[shape_function_data[shape_function]
                                                               .row_index][q_point];
@@ -3574,12 +3575,9 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_hessians,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_hessians")));
 
-    // an adaptation of the
-    // FEValuesBase::shape_hessian_component
-    // function except that here we know the
-    // component as fixed and we have
-    // pre-computed and cached a bunch of
-    // information. See the comments there.
+    // an adaptation of the FEValuesBase::shape_hessian_component
+    // function except that here we know the component as fixed and we have
+    // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values->finite_element_output.shape_hessians[shape_function_data[shape_function].row_index][q_point];
     else
@@ -3599,12 +3597,9 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_3rd_derivatives,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_3rd_derivatives")));
 
-    // an adaptation of the
-    // FEValuesBase::shape_3rdderivative_component
-    // function except that here we know the
-    // component as fixed and we have
-    // pre-computed and cached a bunch of
-    // information. See the comments there.
+    // an adaptation of the FEValuesBase::shape_3rdderivative_component
+    // function except that here we know the component as fixed and we have
+    // pre-computed and cached a bunch of information. See the comments there.
     if (shape_function_data[shape_function].is_nonzero_shape_function_component)
       return fe_values->finite_element_output.shape_3rd_derivatives[shape_function_data[shape_function].row_index][q_point];
     else
@@ -3624,8 +3619,7 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_values,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return value_type();
@@ -3661,8 +3655,7 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_gradients,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return gradient_type();
@@ -3693,15 +3686,13 @@ namespace FEValuesViews
   Vector<dim,spacedim>::divergence (const unsigned int shape_function,
                                     const unsigned int q_point) const
   {
-    // this function works like in
-    // the case above
+    // this function works like in the case above
     Assert (shape_function < fe_values->fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
     Assert (fe_values->update_flags & update_gradients,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return divergence_type();
@@ -3754,10 +3745,7 @@ namespace FEValuesViews
             {
               curl_type return_value;
 
-              // the single
-              // nonzero component
-              // can only be zero
-              // or one in 2d
+              // the single nonzero component can only be zero or one in 2d
               if (shape_function_data[shape_function].single_nonzero_component_index == 0)
                 return_value[0] = -1.0 * fe_values->finite_element_output.shape_gradients[snc][q_point][1];
               else
@@ -3864,15 +3852,13 @@ namespace FEValuesViews
   Vector<dim,spacedim>::hessian (const unsigned int shape_function,
                                  const unsigned int q_point) const
   {
-    // this function works like in
-    // the case above
+    // this function works like in the case above
     Assert (shape_function < fe_values->fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
     Assert (fe_values->update_flags & update_hessians,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_hessians")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return hessian_type();
@@ -3901,15 +3887,13 @@ namespace FEValuesViews
   Vector<dim,spacedim>::third_derivative (const unsigned int shape_function,
                                           const unsigned int q_point) const
   {
-    // this function works like in
-    // the case above
+    // this function works like in the case above
     Assert (shape_function < fe_values->fe->dofs_per_cell,
             ExcIndexRange (shape_function, 0, fe_values->fe->dofs_per_cell));
     Assert (fe_values->update_flags & update_3rd_derivatives,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_3rd_derivatives")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return third_derivative_type();
@@ -3945,7 +3929,7 @@ namespace FEValuesViews
                            const dealii::Tensor<1,1> &t)
     {
       Assert (n < 1, ExcIndexRange (n, 0, 1));
-      (void)n; // removes -Wunused-parameter warning in optimized mode
+      (void)n;
 
       const double array[1] = { t[0] };
       return dealii::SymmetricTensor<2,1>(array);
@@ -4021,8 +4005,7 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_gradients,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
 
-    // same as for the scalar case except
-    // that we have one more index
+    // same as for the scalar case except that we have one more index
     const int snc = shape_function_data[shape_function].single_nonzero_component;
     if (snc == -2)
       return symmetric_gradient_type();
@@ -4054,17 +4037,14 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_values,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
 
-    // similar to the vector case where we
-    // have more then one index and we need
-    // to convert between unrolled and
-    // component indexing for tensors
+    // similar to the vector case where we have more then one index and we need
+    // to convert between unrolled and component indexing for tensors
     const int snc
       = shape_function_data[shape_function].single_nonzero_component;
 
     if (snc == -2)
       {
-        // shape function is zero for the
-        // selected components
+        // shape function is zero for the selected components
         return value_type();
 
       }
@@ -4104,62 +4084,47 @@ namespace FEValuesViews
 
     if (snc == -2)
       {
-        // shape function is zero for the
-        // selected components
+        // shape function is zero for the selected components
         return divergence_type();
       }
     else if (snc != -1)
       {
-        // we have a single non-zero component
-        // when the symmetric tensor is
-        // represented in unrolled form.
-        // this implies we potentially have
-        // two non-zero components when
-        // represented in component form!  we
-        // will only have one non-zero entry
-        // if the non-zero component lies on
+        // we have a single non-zero component when the symmetric tensor is
+        // represented in unrolled form. this implies we potentially have
+        // two non-zero components when represented in component form!  we
+        // will only have one non-zero entry if the non-zero component lies on
         // the diagonal of the tensor.
         //
-        // the divergence of a second-order tensor
-        // is a first order tensor.
+        // the divergence of a second-order tensor is a first order tensor.
         //
-        // assume the second-order tensor is
-        // A with components A_{ij}.  then
-        // A_{ij} = A_{ji} and there is only
-        // one (if diagonal) or two non-zero
-        // entries in the tensorial
-        // representation.  define the
+        // assume the second-order tensor is A with components A_{ij}.  then
+        // A_{ij} = A_{ji} and there is only one (if diagonal) or two non-zero
+        // entries in the tensorial representation.  define the
         // divergence as:
         // b_i := \dfrac{\partial phi_{ij}}{\partial x_j}.
         // (which is incidentally also
         // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}).
         // In both cases, a sum is implied.
         //
-        // Now, we know the nonzero component
-        // in unrolled form: it is indicated
-        // by 'snc'. we can figure out which
-        // tensor components belong to this:
+        // Now, we know the nonzero component in unrolled form: it is indicated
+        // by 'snc'. we can figure out which tensor components belong to this:
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const unsigned int ii = value_type::unrolled_to_component_indices(comp)[0];
         const unsigned int jj = value_type::unrolled_to_component_indices(comp)[1];
 
-        // given the form of the divergence
-        // above, if ii=jj there is only a
-        // single nonzero component of the
-        // full tensor and the gradient
+        // given the form of the divergence above, if ii=jj there is only a
+        // single nonzero component of the full tensor and the gradient
         // equals
         // b_ii := \dfrac{\partial phi_{ii,ii}}{\partial x_ii}.
         // all other entries of 'b' are zero
         //
-        // on the other hand, if ii!=jj, then
-        // there are two nonzero entries in
+        // on the other hand, if ii!=jj, then there are two nonzero entries in
         // the full tensor and
         // b_ii := \dfrac{\partial phi_{ii,jj}}{\partial x_ii}.
         // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
-        // again, all other entries of 'b' are
-        // zero
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
+        // again, all other entries of 'b' are zero
+        const dealii::Tensor<1, spacedim> &phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[ii] = phi_grad[jj];
@@ -4189,19 +4154,15 @@ namespace FEValuesViews
     Assert (fe_values->update_flags & update_values,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
 
-    // similar to the vector case where we
-    // have more then one index and we need
-    // to convert between unrolled and
-    // component indexing for tensors
+    // similar to the vector case where we have more then one index and we need
+    // to convert between unrolled and component indexing for tensors
     const int snc
       = shape_function_data[shape_function].single_nonzero_component;
 
     if (snc == -2)
       {
-        // shape function is zero for the
-        // selected components
+        // shape function is zero for the selected components
         return value_type();
-
       }
     else if (snc != -1)
       {
@@ -4242,41 +4203,33 @@ namespace FEValuesViews
 
     if (snc == -2)
       {
-        // shape function is zero for the
-        // selected components
+        // shape function is zero for the selected components
         return divergence_type();
       }
     else if (snc != -1)
       {
-        // we have a single non-zero component
-        // when the tensor is
+        // we have a single non-zero component when the tensor is
         // represented in unrolled form.
         //
-        // the divergence of a second-order tensor
-        // is a first order tensor.
+        // the divergence of a second-order tensor is a first order tensor.
         //
-        // assume the second-order tensor is
-        // A with components A_{ij}.
-        // divergence as:
-        // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}.
+        // assume the second-order tensor is A with components A_{ij},
+        // then divergence is d_i := \frac{\partial A_{ij}}{\partial x_j}
         //
-        // Now, we know the nonzero component
-        // in unrolled form: it is indicated
-        // by 'snc'. we can figure out which
-        // tensor components belong to this:
+        // Now, we know the nonzero component in unrolled form: it is indicated
+        // by 'snc'. we can figure out which tensor components belong to this:
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
         const unsigned int ii = indices[0];
         const unsigned int jj = indices[1];
 
-        const dealii::Tensor<1, spacedim> phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> &phi_grad = fe_values->finite_element_output.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[jj] = phi_grad[ii];
 
         return return_value;
-
       }
     else
       {
