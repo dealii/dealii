@@ -1621,9 +1621,9 @@ namespace internal
             if ( type == 0 && contract_over_rows == true && nn%2==1 && mm%2==1 )
               {
                 if (add==false)
-                  out[stride*n_cols]  = xmid;
+                  out[stride*n_cols]  = shapes[mid*offset+n_cols] * xmid;
                 else
-                  out[stride*n_cols] += xmid;
+                  out[stride*n_cols] += shapes[mid*offset+n_cols] * xmid;
               }
             else if (contract_over_rows == true && nn%2==1)
               {
@@ -1665,9 +1665,7 @@ namespace internal
                 else
                   r0 = Number();
 
-                if (type == 0 && mm % 2 == 1)
-                  r0 += xmid;
-                else if (type == 2 && mm % 2 == 1)
+                if ((type == 0 || type == 2) && mm % 2 == 1)
                   r0 += shapes[n_cols*offset+mid] * xmid;
 
                 if (add == false)

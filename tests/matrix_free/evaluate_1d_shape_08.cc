@@ -16,7 +16,7 @@
 
 
 // check the correctness of the 1d evaluation functions used in FEEvaluation,
-// path evaluate_general, when using a double array for coefficients but
+// path evaluate_evenodd, when using a double array for coefficients but
 // VectorizedArray for the input and output vector
 
 #include "../tests.h"
@@ -44,7 +44,7 @@ void test()
     {
       for (unsigned int i=0; i<M; ++i)
         shape[i][N/2] = 0.;
-      shape[M/2][N/2] = 1;
+      shape[M/2][N/2] = 0.9;
     }
   if (type == 1 && M%2 == 1 && N%2 == 1)
     shape[M/2][N/2] = 0.;
