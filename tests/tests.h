@@ -359,7 +359,7 @@ Number filter_out_small_numbers (const Number number, const double tolerance)
  */
 inline unsigned int testing_max_num_threads()
 {
-  return 5;
+  return 3;
 }
 
 struct LimitConcurrency
