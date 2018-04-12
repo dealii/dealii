@@ -1313,7 +1313,7 @@ namespace internal
         Number diagonal_sum = internal::NumberType<Number>::value(0.0);
         for (unsigned int i=0; i<N; ++i)
           diagonal_sum += std::fabs(tmp.data[i][i]);
-        const Number typical_diagonal_element = diagonal_sum/N;
+        const Number typical_diagonal_element = diagonal_sum/static_cast<double>(N);
         (void)typical_diagonal_element;
 
         unsigned int p[N];
@@ -3113,22 +3113,6 @@ enum struct SymmetricTensorEigenvectorMethod
 
 
 /**
- * Return the eigenvalues and eigenvectors of a symmetric 1x1 tensor of rank 2.
- *
- * @relatesalso SymmetricTensor
- * @author Jean-Paul Pelteret, 2017
- */
-template <typename Number>
-std::array<std::pair<Number, Tensor<1,1,Number> >,1>
-eigenvectors (const SymmetricTensor<2,1,Number>           &T,
-              const SymmetricTensorEigenvectorMethod /*method*/ = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
-{
-  return { {std::make_pair(T[0][0], Tensor<1,1,Number>({1.0}))} };
-}
-
-
-
-/**
  * Return the eigenvalues and eigenvectors of a real-valued rank-2 symmetric
  * tensor $T$. The array of matched eigenvalue and eigenvector pairs is sorted
  * in descending order (determined by the eigenvalues).
@@ -3158,30 +3142,7 @@ eigenvectors (const SymmetricTensor<2,1,Number>           &T,
 template <int dim, typename Number>
 std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
 eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
-              const SymmetricTensorEigenvectorMethod  method = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
-{
-  std::array<std::pair<Number, Tensor<1,dim,Number> >,dim> eig_vals_vecs;
-
-  switch (method)
-    {
-    case SymmetricTensorEigenvectorMethod::hybrid:
-      eig_vals_vecs = internal::SymmetricTensorImplementation::hybrid(T);
-      break;
-    case SymmetricTensorEigenvectorMethod::ql_implicit_shifts:
-      eig_vals_vecs = internal::SymmetricTensorImplementation::ql_implicit_shifts(T);
-      break;
-    case SymmetricTensorEigenvectorMethod::jacobi:
-      eig_vals_vecs = internal::SymmetricTensorImplementation::jacobi(T);
-      break;
-    default:
-      AssertThrow(false, ExcNotImplemented());
-    }
-
-  // Sort in descending order before output.
-  std::sort(eig_vals_vecs.begin(), eig_vals_vecs.end(),
-            internal::SymmetricTensorImplementation::SortEigenValuesVectors<dim,Number>());
-  return eig_vals_vecs;
-}
+              const SymmetricTensorEigenvectorMethod       method = SymmetricTensorEigenvectorMethod::ql_implicit_shifts);
 
 
 
