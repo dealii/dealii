@@ -152,6 +152,7 @@ namespace FEValuesViews
   {}
 
 
+
   template <int dim, int spacedim>
   Scalar<dim,spacedim> &
   Scalar<dim,spacedim>::operator= (const Scalar<dim,spacedim> &)
@@ -238,6 +239,7 @@ namespace FEValuesViews
   }
 
 
+
   template <int dim, int spacedim>
   Vector<dim,spacedim>::Vector ()
     :
@@ -255,6 +257,7 @@ namespace FEValuesViews
     Assert (false, ExcInternalError());
     return *this;
   }
+
 
 
   template <int dim, int spacedim>
@@ -356,6 +359,7 @@ namespace FEValuesViews
   }
 
 
+
   template <int dim, int spacedim>
   Tensor<2, dim, spacedim>::
   Tensor(const FEValuesBase<dim, spacedim> &fe_values,
@@ -453,6 +457,7 @@ namespace FEValuesViews
     Assert(false, ExcInternalError());
     return *this;
   }
+
 
 
   namespace internal
@@ -1323,6 +1328,8 @@ namespace FEValuesViews
         }
     }
 
+
+
     template <int dim, int spacedim, typename Number>
     void
     do_function_gradients (const ArrayView<Number> &dof_values,
@@ -1410,6 +1417,8 @@ namespace FEValuesViews
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
+
+
 
   template <int dim, int spacedim>
   template <class InputVector>
@@ -1901,7 +1910,6 @@ namespace FEValuesViews
 
 
 
-
   template <int dim, int spacedim>
   template <class InputVector>
   void
@@ -1921,6 +1929,7 @@ namespace FEValuesViews
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
+
 
 
   template <int dim, int spacedim>
@@ -2216,13 +2225,9 @@ namespace internal
                                                       component);
         }
 
-      // compute number of vectors
-      // that we can fit into
-      // this finite element. note
-      // that this is based on the
-      // dimensionality 'dim' of the
-      // manifold, not 'spacedim' of
-      // the output vector
+      // compute number of vectors that we can fit into this finite element. note
+      // that this is based on the dimensionality 'dim' of the
+      // manifold, not 'spacedim' of the output vector
       const unsigned int n_vectors = (fe.n_components() >= spacedim ?
                                       fe.n_components()-spacedim+1 :
                                       0);
@@ -2238,8 +2243,7 @@ namespace internal
                                                       component);
         }
 
-      // compute number of symmetric
-      // tensors in the same way as above
+      // compute number of symmetric tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors
         = (fe.n_components() >= (dim*dim + dim)/2 ?
            fe.n_components() - (dim*dim + dim)/2 + 1 :
@@ -2257,8 +2261,7 @@ namespace internal
         }
 
 
-      // compute number of symmetric
-      // tensors in the same way as above
+      // compute number of symmetric tensors in the same way as above
       const unsigned int n_second_order_tensors
         = (fe.n_components() >= dim*dim ?
            fe.n_components() - dim*dim + 1 :
@@ -2286,35 +2289,23 @@ class FEValuesBase<dim,spacedim>::CellIteratorBase
 {
 public:
   /**
-   * Destructor. Made virtual
-   * since we store only
-   * pointers to the base
-   * class.
+   * Destructor. Made virtual since we store only
+   * pointers to the base class.
    */
   virtual ~CellIteratorBase () = default;
 
   /**
-   * Conversion operator to an
-   * iterator for
-   * triangulations. This
-   * conversion is implicit for
-   * the original iterators,
-   * since they are derived
-   * classes. However, since
-   * here we have kind of a
-   * parallel class hierarchy,
-   * we have to have a
-   * conversion operator.
+   * Conversion operator to an iterator for triangulations. This
+   * conversion is implicit for the original iterators, since they are derived
+   * classes. However, since here we have kind of a parallel class hierarchy,
+   * we have to have a conversion operator.
    */
   virtual
   operator typename Triangulation<dim,spacedim>::cell_iterator () const = 0;
 
   /**
-   * Return the number of
-   * degrees of freedom the DoF
-   * handler object has to
-   * which the iterator belongs
-   * to.
+   * Return the number of degrees of freedom the DoF
+   * handler object has to which the iterator belongs to.
    */
   virtual
   types::global_dof_index
@@ -2322,10 +2313,10 @@ public:
 
 #include "fe_values.decl.1.inst"
 
-  /// Call
-  /// @p get_interpolated_dof_values
-  /// of the iterator with the
-  /// given arguments.
+  /**
+   * Call @p get_interpolated_dof_values of the iterator with the
+   * given arguments.
+   */
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
@@ -2336,12 +2327,8 @@ public:
 
 
 /**
- * Implementation of derived
- * classes of the
- * CellIteratorBase
- * interface. See there for a
- * description of the use of
- * these classes.
+ * Implementation of derived classes of the CellIteratorBase
+ * interface. See there for a description of the use of these classes.
  *
  * @author Wolfgang Bangerth, 2003
  */
@@ -2351,34 +2338,22 @@ class FEValuesBase<dim,spacedim>::CellIterator : public FEValuesBase<dim,spacedi
 {
 public:
   /**
-   * Constructor. Take an
-   * iterator and store it in
-   * this class.
+   * Constructor. Take an iterator and store it in this class.
    */
   CellIterator (const CI &cell);
 
   /**
-   * Conversion operator to an
-   * iterator for
-   * triangulations. This
-   * conversion is implicit for
-   * the original iterators,
-   * since they are derived
-   * classes. However, since
-   * here we have kind of a
-   * parallel class hierarchy,
-   * we have to have a
-   * conversion operator.
+   * Conversion operator to an iterator for triangulations. This
+   * conversion is implicit for the original iterators, since they are derived
+   * classes. However, since here we have kind of a parallel class hierarchy,
+   * we have to have a conversion operator.
    */
   virtual
   operator typename Triangulation<dim,spacedim>::cell_iterator () const;
 
   /**
-   * Return the number of
-   * degrees of freedom the DoF
-   * handler object has to
-   * which the iterator belongs
-   * to.
+   * Return the number of degrees of freedom the DoF handler object has to
+   * which the iterator belongs to.
    */
   virtual
   types::global_dof_index
@@ -2386,10 +2361,10 @@ public:
 
 #include "fe_values.decl.2.inst"
 
-  /// Call
-  /// @p get_interpolated_dof_values
-  /// of the iterator with the
-  /// given arguments.
+  /**
+   * Call @p get_interpolated_dof_values
+   * of the iterator with the given arguments.
+   */
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
@@ -2397,53 +2372,28 @@ public:
 
 private:
   /**
-   * Copy of the iterator which
-   * we use in this object.
+   * Copy of the iterator which we use in this object.
    */
   const CI cell;
 };
 
 
 /**
- * Implementation of a derived
- * class of the
- * CellIteratorBase
- * interface. See there for a
- * description of the use of
+ * Implementation of a derived class of the CellIteratorBase
+ * interface. See there for a description of the use of
  * these classes.
  *
- * This class is basically a
- * specialization of the general
- * template for iterators into
- * Triangulation objects (but
- * since C++ does not allow
- * something like this for nested
- * classes, it runs under a
- * separate name). Since these do
- * not implement the interface
- * that we would like to call,
- * the functions of this class
- * cannot be implemented
- * meaningfully. However, most
- * functions of the FEValues
- * class do not make any use of
- * degrees of freedom at all, so
- * it should be possible to call
- * FEValues::reinit() with a tria
- * iterator only; this class
- * makes this possible, but
- * whenever one of the functions
- * of FEValues tries to call
- * any of the functions of this
- * class, an exception will be
- * raised reminding the user that
- * if she wants to use these
- * features, then the
- * FEValues object has to be
- * reinitialized with a cell
- * iterator that allows to
- * extract degree of freedom
- * information.
+ * This class is basically a specialization of the general template for iterators into
+ * Triangulation objects (but since C++ does not allow something like this for nested
+ * classes, it runs under a separate name). Since these do not implement the interface
+ * that we would like to call, the functions of this class cannot be implemented
+ * meaningfully. However, most functions of the FEValues class do not make any use of
+ * degrees of freedom at all, so it should be possible to call FEValues::reinit() with a tria
+ * iterator only; this class makes this possible, but whenever one of the functions
+ * of FEValues tries to call any of the functions of this class, an exception will be
+ * raised reminding the user that if she wants to use these features, then the
+ * FEValues object has to be reinitialized with a cell iterator that allows to
+ * extract degree of freedom information.
  *
  * @author Wolfgang Bangerth, 2003
  */
@@ -2452,36 +2402,23 @@ class FEValuesBase<dim,spacedim>::TriaCellIterator : public FEValuesBase<dim,spa
 {
 public:
   /**
-   * Constructor. Take an
-   * iterator and store it in
-   * this class.
+   * Constructor. Take an iterator and store it in this class.
    */
   TriaCellIterator (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
 
   /**
-   * Conversion operator to an
-   * iterator for
-   * triangulations. This
-   * conversion is implicit for
-   * the original iterators,
-   * since they are derived
-   * classes. However, since
-   * here we have kind of a
-   * parallel class hierarchy,
-   * we have to have a
-   * conversion operator. Here,
-   * the conversion is trivial,
+   * Conversion operator to an iterator for triangulations. This
+   * conversion is implicit for the original iterators, since they are derived
+   * classes. However, since here we have kind of a parallel class hierarchy,
+   * we have to have a conversion operator. Here, the conversion is trivial,
    * from and to the same time.
    */
   virtual
   operator typename Triangulation<dim,spacedim>::cell_iterator () const;
 
   /**
-   * Implement the respective
-   * function of the base
-   * class. Since this is not
-   * possible, we just raise an
-   * error.
+   * Implement the respective function of the base class. Since this is not
+   * possible, we just raise an error.
    */
   virtual
   types::global_dof_index
@@ -2489,10 +2426,10 @@ public:
 
 #include "fe_values.decl.2.inst"
 
-  /// Call
-  /// @p get_interpolated_dof_values
-  /// of the iterator with the
-  /// given arguments.
+  /**
+   * Call @p get_interpolated_dof_values of the iterator with the
+   * given arguments.
+   */
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
@@ -2500,18 +2437,13 @@ public:
 
 private:
   /**
-   * Copy of the iterator which
-   * we use in this object.
+   * Copy of the iterator which we use in this object.
    */
   const typename Triangulation<dim,spacedim>::cell_iterator cell;
 
   /**
-   * String to be displayed
-   * whenever one of the
-   * functions of this class is
-   * called. Make it a static
-   * member variable, since we
-   * show the same message for
+   * String to be displayed whenever one of the functions of this class is
+   * called. Make it a static member variable, since we show the same message for
    * all member functions.
    */
   static const char *const message_string;
@@ -2555,6 +2487,7 @@ FEValuesBase<dim,spacedim>::CellIterator<CI>::n_dofs_for_dof_handler () const
 #include "fe_values.impl.1.inst"
 
 
+
 template <int dim, int spacedim>
 template <typename CI>
 void
@@ -2586,6 +2519,7 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::message_string
      "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
 
+
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::TriaCellIterator::
 TriaCellIterator (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
@@ -2613,7 +2547,9 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::n_dofs_for_dof_handler () const
 }
 
 
+
 #include "fe_values.impl.2.inst"
+
 
 
 template <int dim, int spacedim>
@@ -2706,7 +2642,6 @@ namespace internal
 
 
 
-
     template <int dim, int spacedim>
     void
     FiniteElementRelatedData<dim,spacedim>::initialize (const unsigned int        n_quadrature_points,
@@ -2727,10 +2662,8 @@ namespace internal
       Assert (n_nonzero_shape_components >= fe.dofs_per_cell,
               ExcInternalError());
 
-      // with the number of rows now
-      // known, initialize those fields
-      // that we will need to their
-      // correct size
+      // with the number of rows now known, initialize those fields
+      // that we will need to their correct size
       if (flags & update_values)
         {
           this->shape_values.reinit(n_nonzero_shape_components,
@@ -2861,6 +2794,8 @@ namespace internal
       }
   }
 
+
+
   template <int dim, int spacedim, typename VectorType>
   void
   do_function_values (const typename VectorType::value_type *dof_values_ptr,
@@ -2962,6 +2897,8 @@ namespace internal
         }
   }
 
+
+
   // use the same implementation for gradients and Hessians, distinguish them
   // by the rank of the tensors
   template <int order, int spacedim, typename Number>
@@ -3001,6 +2938,8 @@ namespace internal
           derivatives[point] += value * (*shape_derivative_ptr++);
       }
   }
+
+
 
   template <int order, int dim, int spacedim, typename Number>
   void
@@ -3098,6 +3037,8 @@ namespace internal
         }
   }
 
+
+
   template <int spacedim, typename Number, typename Number2>
   void
   do_function_laplacians (const Number2        *dof_values_ptr,
@@ -3132,6 +3073,8 @@ namespace internal
           laplacians[point] += value * trace(*shape_hessian_ptr++);
       }
   }
+
+
 
   template <int dim, int spacedim, typename VectorType, typename Number>
   void
@@ -3415,7 +3358,6 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 
 
 
-
 template <int dim, int spacedim>
 template <class InputVector>
 void
@@ -3515,7 +3457,6 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
   internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_hessians,
                                     hessians);
 }
-
 
 
 
@@ -3740,7 +3681,6 @@ void FEValuesBase<dim,spacedim>::get_function_third_derivatives (
 
 
 
-
 template <int dim, int spacedim>
 template <class InputVector>
 void
@@ -3867,6 +3807,7 @@ FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags
 }
 
 
+
 template <int dim, int spacedim>
 void
 FEValuesBase< dim, spacedim >::invalidate_present_cell ()
@@ -3882,6 +3823,7 @@ FEValuesBase< dim, spacedim >::invalidate_present_cell ()
   tria_listener_mesh_transform.disconnect ();
   present_cell.reset ();
 }
+
 
 
 template <int dim, int spacedim>
@@ -3926,6 +3868,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
                     std::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
     }
 }
+
 
 
 template <int dim, int spacedim>
@@ -3992,8 +3935,10 @@ FEValuesBase<dim,spacedim>::get_cell_similarity () const
 }
 
 
+
 template <int dim, int spacedim>
 const unsigned int FEValuesBase<dim,spacedim>::dimension;
+
 
 
 template <int dim, int spacedim>
@@ -4003,7 +3948,6 @@ const unsigned int FEValuesBase<dim,spacedim>::space_dimension;
 
 template <int dim, int spacedim>
 const unsigned int FEValues<dim,spacedim>::integral_dimension;
-
 
 
 
@@ -4046,8 +3990,7 @@ template <int dim, int spacedim>
 void
 FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 {
-  // You can compute normal vectors
-  // to the cells only in the
+  // You can compute normal vectors to the cells only in the
   // codimension one case.
   if (dim != spacedim-1)
     Assert ((update_flags & update_normal_vectors) == false,
@@ -4092,6 +4035,7 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 }
 
 
+
 namespace
 {
   // Reset a unique_ptr. If we can, do not de-allocate the previously
@@ -4124,6 +4068,7 @@ namespace
 }
 
 
+
 template <int dim, int spacedim>
 void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
@@ -4135,10 +4080,8 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit ();
 }
@@ -4151,10 +4094,8 @@ void
 FEValues<dim,spacedim>::reinit
 (const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>, lda> > &cell)
 {
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
+  // assert that the finite elements passed to the constructor and
+  // used by the DoFHandler used by this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
           static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
           (typename FEValuesBase<dim,spacedim>::ExcFEDontMatch()));
@@ -4167,10 +4108,8 @@ FEValues<dim,spacedim>::reinit
                                             lda> > > >
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit ();
 }
@@ -4266,8 +4205,11 @@ FEFaceValuesBase<dim,spacedim>::memory_consumption () const
 template <int dim, int spacedim>
 const unsigned int FEFaceValues<dim,spacedim>::dimension;
 
+
+
 template <int dim, int spacedim>
 const unsigned int FEFaceValues<dim,spacedim>::integral_dimension;
+
 
 
 template <int dim, int spacedim>
@@ -4350,10 +4292,8 @@ FEFaceValues<dim,spacedim>::reinit
 (const TriaIterator<DoFCellAccessor<DoFHandlerType<dim,spacedim>, lda> > &cell,
  const unsigned int face_no)
 {
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
+  // assert that the finite elements passed to the constructor and
+  // used by the DoFHandler used by this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
           static_cast<const FiniteElementData<dim>&>(
             cell->get_dof_handler().get_fe(cell->active_fe_index ())),
@@ -4368,10 +4308,8 @@ FEFaceValues<dim,spacedim>::reinit
                                             lda> > > >
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit (face_no);
 }
@@ -4389,10 +4327,8 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit (face_no);
 }
@@ -4431,6 +4367,8 @@ void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
 
 template <int dim, int spacedim>
 const unsigned int FESubfaceValues<dim,spacedim>::dimension;
+
+
 
 template <int dim, int spacedim>
 const unsigned int FESubfaceValues<dim,spacedim>::integral_dimension;
@@ -4510,6 +4448,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 }
 
 
+
 template <int dim, int spacedim>
 template <template <int, int> class DoFHandlerType, bool lda>
 void FESubfaceValues<dim,spacedim>::reinit
@@ -4517,24 +4456,18 @@ void FESubfaceValues<dim,spacedim>::reinit
  const unsigned int face_no,
  const unsigned int subface_no)
 {
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the hp::DoFHandler used by
-  // this cell, are the same
+  // assert that the finite elements passed to the constructor and
+  // used by the hp::DoFHandler used by this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
           static_cast<const FiniteElementData<dim>&>(
             cell->get_dof_handler().get_fe(cell->active_fe_index ())),
           (typename FEValuesBase<dim,spacedim>::ExcFEDontMatch()));
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  // We would like to check for
-  // subface_no < cell->face(face_no)->n_children(),
-  // but unfortunately the current
-  // function is also called for
-  // faces without children (see
-  // tests/fe/mapping.cc). Therefore,
-  // we must use following workaround
-  // of two separate assertions
+  // We would like to check for subface_no < cell->face(face_no)->n_children(),
+  // but unfortunately the current function is also called for
+  // faces without children (see tests/fe/mapping.cc). Therefore,
+  // we must use following workaround of two separate assertions
   Assert (cell->face(face_no)->has_children() ||
           subface_no < GeometryInfo<dim>::max_children_per_face,
           ExcIndexRange (subface_no, 0, GeometryInfo<dim>::max_children_per_face));
@@ -4552,13 +4485,12 @@ void FESubfaceValues<dim,spacedim>::reinit
                                             lda> > > >
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit (face_no, subface_no);
 }
+
 
 
 template <int dim, int spacedim>
@@ -4575,10 +4507,8 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
   reset_pointer_in_place_if_possible<typename FEValuesBase<dim,spacedim>::TriaCellIterator>
   (this->present_cell, cell);
 
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
+  // this was the part of the work that is dependent on the actual
+  // data type of the iterator. now pass on to the function doing
   // the real work.
   do_reinit (face_no, subface_no);
 }
@@ -4589,23 +4519,19 @@ template <int dim, int spacedim>
 void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
                                                const unsigned int subface_no)
 {
-  // first of all, set the present_face_index
-  // (if available)
+  // first of all, set the present_face_index (if available)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;
 
   if (!cell->face(face_no)->has_children())
-    // no subfaces at all, so set
-    // present_face_index to this face rather
+    // no subfaces at all, so set present_face_index to this face rather
     // than any subface
     this->present_face_index=cell->face_index(face_no);
   else if (dim!=3)
     this->present_face_index=cell->face(face_no)->child_index(subface_no);
   else
     {
-      // this is the same logic we use in
-      // cell->neighbor_child_on_subface(). See
-      // there for an explanation of the
-      // different cases
+      // this is the same logic we use in cell->neighbor_child_on_subface(). See
+      // there for an explanation of the different cases
       unsigned int subface_index=numbers::invalid_unsigned_int;
       switch (cell->subface_case(face_no))
         {

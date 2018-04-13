@@ -3595,7 +3595,6 @@ namespace FEValuesViews
 
 
 
-
   template <int dim, int spacedim>
   inline
   typename Scalar<dim,spacedim>::gradient_type
@@ -3901,6 +3900,8 @@ namespace FEValuesViews
     return curl_type();
   }
 
+
+
   template <int dim, int spacedim>
   inline
   typename Vector<dim,spacedim>::hessian_type
@@ -3935,6 +3936,8 @@ namespace FEValuesViews
         return return_value;
       }
   }
+
+
 
   template <int dim, int spacedim>
   inline
@@ -3972,6 +3975,7 @@ namespace FEValuesViews
   }
 
 
+
   namespace
   {
     /**
@@ -3989,6 +3993,7 @@ namespace FEValuesViews
       const double array[1] = { t[0] };
       return dealii::SymmetricTensor<2,1>(array);
     }
+
 
 
     inline
@@ -4015,6 +4020,7 @@ namespace FEValuesViews
         }
         }
     }
+
 
 
     inline
@@ -4047,6 +4053,7 @@ namespace FEValuesViews
         }
     }
   }
+
 
 
   template <int dim, int spacedim>
@@ -4124,6 +4131,7 @@ namespace FEValuesViews
   }
 
 
+
   template <int dim, int spacedim>
   inline
   typename SymmetricTensor<2, dim, spacedim>::divergence_type
@@ -4198,6 +4206,8 @@ namespace FEValuesViews
       }
   }
 
+
+
   template <int dim, int spacedim>
   inline
   typename Tensor<2, dim, spacedim>::value_type
@@ -4241,6 +4251,7 @@ namespace FEValuesViews
         return return_value;
       }
   }
+
 
 
   template <int dim, int spacedim>
@@ -4294,6 +4305,8 @@ namespace FEValuesViews
         return return_value;
       }
   }
+
+
 
   template <int dim, int spacedim>
   inline
@@ -4383,6 +4396,8 @@ operator[] (const FEValuesExtractors::Vector &vector) const
   return fe_values_views_cache.vectors[vector.first_vector_component];
 }
 
+
+
 template <int dim, int spacedim>
 inline
 const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
@@ -4397,6 +4412,8 @@ operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const
   return fe_values_views_cache.symmetric_second_order_tensors[tensor.first_tensor_component];
 }
 
+
+
 template <int dim, int spacedim>
 inline
 const FEValuesViews::Tensor<2,dim,spacedim> &
@@ -4410,7 +4427,6 @@ operator[] (const FEValuesExtractors::Tensor<2> &tensor) const
 
   return fe_values_views_cache.second_order_tensors[tensor.first_tensor_component];
 }
-
 
 
 
@@ -4692,6 +4708,7 @@ FEValuesBase<dim,spacedim>::get_fe () const
 }
 
 
+
 template <int dim, int spacedim>
 inline
 const Mapping<dim,spacedim> &
@@ -4907,6 +4924,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_3rd_derivatives () const
 }
 
 
+
 template <int dim, int spacedim>
 inline
 const std::vector<DerivativeForm<1,spacedim,dim> > &
@@ -4935,7 +4953,6 @@ FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 
   return this->mapping_output.quadrature_points[i];
 }
-
 
 
 
@@ -5004,6 +5021,7 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 
   return this->mapping_output.inverse_jacobians[i];
 }
+
 
 
 template <int dim, int spacedim>
