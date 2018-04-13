@@ -890,7 +890,20 @@ namespace parallel
       /**
        * Internal function notifying all registered classes to attach their
        * data before repartitioning occurs. Called from
-       * execute_coarsening_and_refinement().
+       * execute_coarsening_and_refinement() and save(). The function
+       * recursively visits all deal.II cells and corresponding p4est
+       * quadrants and calls the callbacks registered via
+       * register_data_attach() on the ones where data needs to be
+       * stored.
+       *
+       * This function is odd in that it is called on a p4est triangulation
+       * and a deal.II triangulation that may not be in sync when it is called
+       * from execute_coarsening_and_refinement(). Specifically, the p4est
+       * trees have already been refined and coarsened, but the deal.II
+       * triangulation has not. Consequently, when walking the two recursively,
+       * it can reason about which cells will remain after the deal.II
+       * triangulation has been brought up to date with regard to the p4est
+       * trees.
        */
       void attach_mesh_data();
 
