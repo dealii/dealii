@@ -80,6 +80,7 @@ namespace GridGenerator
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             cell->face(f)->set_boundary_id (f);
         }
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
 
@@ -144,6 +145,7 @@ namespace GridGenerator
                 Assert (false, ExcInternalError());
 
             }
+      GridTools::copy_boundary_to_manifold_id(tria);
 
       for (typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
            cell != tria.end(); ++cell)
@@ -179,6 +181,8 @@ namespace GridGenerator
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face (2)->set_all_boundary_ids (1);
         }
+
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
 
@@ -259,6 +263,8 @@ namespace GridGenerator
         }
       else
         Assert (false, ExcNotImplemented());
+
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
 
@@ -331,6 +337,7 @@ namespace GridGenerator
             else
               Assert (false, ExcInternalError());
           }
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
   }
@@ -1099,6 +1106,7 @@ namespace GridGenerator
                   cell->face(face)->set_boundary_id(face);
               }
           }
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -1648,6 +1656,7 @@ namespace GridGenerator
                     }
                 }
           }
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -1756,11 +1765,13 @@ namespace GridGenerator
                     {
                       if (face_center[i]<cell_center[i]-eps)
                         cell->face(f)->set_boundary_id(i*2);
+
                       if (face_center[i]>cell_center[i]+eps)
                         cell->face(f)->set_boundary_id(i*2+1);
                     }
                 }
           }
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -2170,6 +2181,7 @@ namespace GridGenerator
         cell->face(1)->set_boundary_id(1);
         ++cell;
         cell->face(0)->set_boundary_id(2);
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -2209,6 +2221,7 @@ namespace GridGenerator
 
     for (unsigned int i = 2; i < 4; ++i)
       cell->face (i)->set_boundary_id (0);
+    GridTools::copy_boundary_to_manifold_id(triangulation);
   }
 
 
@@ -2266,6 +2279,7 @@ namespace GridGenerator
         cell->face(1)->set_boundary_id(4);
         cell->face(3)->set_boundary_id(5);
 
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
 
   }
@@ -2412,6 +2426,7 @@ namespace GridGenerator
           }
         ++f;
       }
+    GridTools::copy_boundary_to_manifold_id(tria);
   }
 
 
@@ -2488,6 +2503,7 @@ namespace GridGenerator
           }
         ++cell;
       }
+    GridTools::copy_boundary_to_manifold_id(tria);
   }
 
 
@@ -2548,6 +2564,7 @@ namespace GridGenerator
           }
         ++cell;
       }
+    GridTools::copy_boundary_to_manifold_id(tria);
   }
 
 
@@ -2631,6 +2648,8 @@ namespace GridGenerator
         tria.begin()->face(0)->set_boundary_id(3);
 
         tria.last()->face(1)->set_boundary_id(2);
+
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -2711,6 +2730,7 @@ namespace GridGenerator
         tria.begin()->face(0)->set_boundary_id(3);
 
         tria.last()->face(1)->set_boundary_id(2);
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -2772,6 +2792,7 @@ namespace GridGenerator
         cell->face(1)->set_boundary_id(1);
         ++cell;
         cell->face(0)->set_boundary_id(2);
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -2919,6 +2940,7 @@ namespace GridGenerator
         for (unsigned int i = 0; i < 4; ++i)
           cell->face (i)->set_boundary_id (0);
       }
+    GridTools::copy_boundary_to_manifold_id(triangulation);
   }
 
 
@@ -3190,6 +3212,7 @@ namespace GridGenerator
                     cell->face(i)->line(e)->set_boundary_id(1);
               }
           }
+    GridTools::copy_boundary_to_manifold_id(tria);
   }
 
 
@@ -3278,6 +3301,7 @@ namespace GridGenerator
           }
         ++cell;
       }
+    GridTools::copy_boundary_to_manifold_id(tria);
   }
 
 
@@ -3718,6 +3742,8 @@ namespace GridGenerator
                       face->set_all_boundary_ids(1);
                   }
               }
+
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
@@ -4275,6 +4301,7 @@ namespace GridGenerator
                 }
             }
       }
+    GridTools::copy_boundary_to_manifold_id(triangulation);
   }
 
 
@@ -4395,6 +4422,7 @@ namespace GridGenerator
                 }
             }
       }
+    GridTools::copy_boundary_to_manifold_id(triangulation);
   }
 
   template <int dim, int spacedim1, int spacedim2>
