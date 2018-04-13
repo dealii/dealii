@@ -284,9 +284,16 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
     namespace GridTools \{
     template void copy_boundary_to_manifold_id<deal_II_dimension, deal_II_space_dimension>
     (Triangulation<deal_II_dimension, deal_II_space_dimension> &, const bool);
+
     template void copy_material_to_manifold_id<deal_II_dimension, deal_II_space_dimension>
     (Triangulation<deal_II_dimension, deal_II_space_dimension> &, const bool);
 
+    template void map_boundary_to_manifold_ids<deal_II_dimension, deal_II_space_dimension>
+    (const std::vector<types::boundary_id> &,
+     const std::vector<types::manifold_id> &,
+    Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+    const std::vector<types::boundary_id> &);
+    
     template
     void regularize_corner_cells
     (Triangulation<deal_II_dimension,deal_II_space_dimension> &, double);

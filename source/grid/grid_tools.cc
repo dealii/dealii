@@ -3236,6 +3236,33 @@ next_cell:
   void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
                                     const bool reset_boundary_ids)
   {
+    const auto src_boundary_ids = tria.get_boundary_ids();
+    std::vector<types::manifold_id> dst_manifold_ids(src_boundary_ids.size());
+    auto m_it = dst_manifold_ids.begin();
+    for (auto b : src_boundary_ids)
+      {
+        *m_it = static_cast<types::manifold_id>(b);
+        ++m_it;
+      }
+    const std::vector<types::boundary_id> reset_boundary_id =
+      reset_boundary_ids ?
+      std::vector<types::boundary_id>(src_boundary_ids.size(), 0) : src_boundary_ids;
+    map_boundary_to_manifold_ids(src_boundary_ids, dst_manifold_ids, tria, reset_boundary_id);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
+                                    const std::vector<types::manifold_id> &dst_manifold_ids,
+                                    Triangulation<dim, spacedim> &tria,
+                                    const std::vector<types::boundary_id> &reset_boundary_ids_)
+  {
+    AssertDimension(src_boundary_ids.size(), dst_manifold_ids.size());
+    const auto reset_boundary_ids = reset_boundary_ids_.size() ?
+                                    reset_boundary_ids_ : src_boundary_ids;
+    AssertDimension(reset_boundary_ids.size(), src_boundary_ids.size());
+
     // in 3d, we not only have to copy boundary ids of faces, but also of edges
     // because we see them twice (once from each adjacent boundary face),
     // we cannot immediately reset their boundary ids. thus, copy first
@@ -3247,8 +3274,13 @@ next_cell:
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->face(f)->at_boundary())
             for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
-              cell->face(f)->line(e)->set_manifold_id
-              (static_cast<types::manifold_id>(cell->face(f)->line(e)->boundary_id()));
+              {
+                auto bid = cell->face(f)->line(e)->boundary_id();
+                auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                           src_boundary_ids.begin();
+                if ((unsigned int)ind < src_boundary_ids.size())
+                  cell->face(f)->line(e)->set_manifold_id(dst_manifold_ids[ind]);
+              }
 
     // now do cells
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
@@ -3257,22 +3289,29 @@ next_cell:
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
-            // copy boundary to manifold ids
-            cell->face(f)->set_manifold_id
-            (static_cast<types::manifold_id>(cell->face(f)->boundary_id()));
+            auto bid = cell->face(f)->boundary_id();
+            auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                       src_boundary_ids.begin();
 
-            // then reset boundary ids if so desired, and in 3d also that
-            // of edges
-            if (reset_boundary_ids == true)
+            if ((unsigned int)ind < src_boundary_ids.size())
               {
-                cell->face(f)->set_boundary_id(0);
-                if (dim >= 3)
-                  for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
-                    cell->face(f)->line(e)->set_boundary_id(0);
+                // assign the manifold id
+                cell->face(f)->set_manifold_id(dst_manifold_ids[ind]);
+                // then reset boundary id
+                cell->face(f)->set_boundary_id(reset_boundary_ids[ind]);
               }
+
+            if (dim >= 3)
+              for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
+                {
+                  auto bid = cell->face(f)->line(e)->boundary_id();
+                  auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                             src_boundary_ids.begin();
+                  if ((unsigned int)ind < src_boundary_ids.size())
+                    cell->face(f)->line(e)->set_boundary_id(reset_boundary_ids[ind]);
+                }
           }
   }
-
 
 
   template <int dim, int spacedim>

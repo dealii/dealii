@@ -1,0 +1,5 @@
+New: GridTools::map_boundary_to_manifold_ids() allows you to set manifold ids on the 
+boundary according to a given map of boundary to manifold ids. 
+<br>
+(Luca Heltai, 2018/04/13)
+
