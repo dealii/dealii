@@ -926,6 +926,9 @@ namespace parallel
       /**
        * Override the implementation in parallel::Triangulation because
        * we can ask p4est about ghost neighbors across periodic boundaries.
+       *
+       * Specifically, this function determines the neighboring subdomains that
+       * are adjacent to each vertex.
        */
       virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       compute_vertices_with_ghost_neighbors () const;

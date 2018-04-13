@@ -1789,6 +1789,7 @@ namespace parallel
     }
 
 
+
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
@@ -1843,6 +1844,7 @@ namespace parallel
       dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, nullptr, nullptr);
       parallel_forest->user_pointer = userptr;
     }
+
 
 
     template <int dim, int spacedim>
@@ -3014,6 +3016,8 @@ namespace parallel
       this->update_periodic_face_map();
     }
 
+
+
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::repartition ()
@@ -3230,6 +3234,8 @@ namespace parallel
              ExcInternalError());
     }
 
+
+
     template <int dim, int spacedim>
     unsigned int
     Triangulation<dim,spacedim>::
@@ -3272,7 +3278,7 @@ namespace parallel
            cell != this->end (0);
            ++cell)
         {
-          //skip coarse cells, that are not ours
+          // skip coarse cells that are not ours
           if (tree_exists_locally<dim, spacedim> (parallel_forest,
                                                   coarse_cell_to_p4est_tree_permutation[cell->index() ])
               == false)
@@ -3321,6 +3327,7 @@ namespace parallel
     }
 
 
+
     template <int dim, int spacedim>
     const std::vector<types::global_dof_index> &
     Triangulation<dim, spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
@@ -3338,10 +3345,7 @@ namespace parallel
     }
 
 
-    /**
-     * Determine the neighboring subdomains that are adjacent to each vertex.
-     * This is achieved via the p4est_iterate/p8est_iterate tool
-     */
+
     template <int dim, int spacedim>
     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     Triangulation<dim,spacedim>::compute_vertices_with_ghost_neighbors () const
@@ -3351,8 +3355,6 @@ namespace parallel
       return dealii::internal::p4est::compute_vertices_with_ghost_neighbors<dim, spacedim> (*this,
              this->parallel_forest,
              this->parallel_ghost);
-
-
     }
 
 
@@ -3661,6 +3663,7 @@ namespace parallel
     }
 
 
+
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
@@ -3710,6 +3713,8 @@ namespace parallel
                                                      attached_data_pack_callbacks);
         }
     }
+
+
 
     template <int dim, int spacedim>
     std::vector<unsigned int>
@@ -3819,6 +3824,7 @@ namespace parallel
     }
 
 
+
     template <int spacedim>
     const std::vector<types::global_dof_index> &
     Triangulation<1,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
@@ -3826,6 +3832,8 @@ namespace parallel
       static std::vector<types::global_dof_index> a;
       return a;
     }
+
+
 
     template <int spacedim>
     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
@@ -3836,6 +3844,8 @@ namespace parallel
       return std::map<unsigned int, std::set<dealii::types::subdomain_id> >();
     }
 
+
+
     template <int spacedim>
     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     Triangulation<1,spacedim>::
@@ -3845,6 +3855,8 @@ namespace parallel
 
       return std::map<unsigned int, std::set<dealii::types::subdomain_id> >();
     }
+
+
 
     template <int spacedim>
     std::vector<bool>
@@ -3864,6 +3876,8 @@ namespace parallel
     {
       Assert (false, ExcNotImplemented());
     }
+
+
 
     template <int spacedim>
     void
