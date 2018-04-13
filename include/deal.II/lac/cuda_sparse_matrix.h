@@ -20,6 +20,7 @@
 #include <deal.II/base/subscriptor.h>
 
 #ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/cuda.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/cuda_vector.h>
 #include <cusparse.h>
@@ -74,11 +75,11 @@ namespace CUDAWrappers
     SparseMatrix();
 
     /**
-     * Constructor. Takes a cuSPARSE handle and a sparse matrix on the host.
+     * Constructor. Takes a Utilities::CUDA::Handle and a sparse matrix on the host.
      * The sparse matrix on the host is copied on the device and the elements
      * are reordered according to the format supported by cuSPARSE.
      */
-    SparseMatrix(cusparseHandle_t handle,
+    SparseMatrix(Utilities::CUDA::Handle &handle,
                  const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
 
     /**
@@ -102,7 +103,7 @@ namespace CUDAWrappers
      * to the device and the elementes are reordered according to the format
      * supported by cuSPARSE.
      */
-    void reinit(cusparseHandle_t handle,
+    void reinit(Utilities::CUDA::Handle &handle,
                 const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
     //@}
 
@@ -251,8 +252,8 @@ namespace CUDAWrappers
 
   private:
     /**
-     * cuSPARSE used to call cuSPARSE function. The cuSPARSE handle needs to
-     * be mutable to be called in a const function.
+     * cuSPARSE handle used to call cuSPARSE functions. The cuSPARSE handle needs
+     * to be mutable to be called in a const function.
      */
     mutable cusparseHandle_t cusparse_handle;
 

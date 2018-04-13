@@ -134,7 +134,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  SparseMatrix<Number>::SparseMatrix(cusparseHandle_t handle,
+  SparseMatrix<Number>::SparseMatrix(Utilities::CUDA::Handle &handle,
                                      const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
     :
     val_dev(nullptr),
@@ -208,10 +208,10 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  void SparseMatrix<Number>::reinit(cusparseHandle_t handle,
+  void SparseMatrix<Number>::reinit(Utilities::CUDA::Handle &handle,
                                     const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
   {
-    cusparse_handle = handle;
+    cusparse_handle = handle.cusparse_handle;
     nnz = sparse_matrix_host.n_nonzero_elements();
     n_rows = sparse_matrix_host.m();
     n_cols = sparse_matrix_host.n();

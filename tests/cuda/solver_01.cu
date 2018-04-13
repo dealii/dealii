@@ -18,6 +18,7 @@
 #include "../tests.h"
 #include "../testmatrix.h"
 
+#include <deal.II/base/cuda.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/cuda_sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -26,7 +27,7 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
-void test(cusparseHandle_t cusparse_handle)
+void test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Build the sparse matrix on the host
   const unsigned int problem_size = 10;
@@ -50,7 +51,7 @@ void test(cusparseHandle_t cusparse_handle)
   cg_host.solve(A, sol_host, rhs_host, prec_no);
 
   // Solve on the device
-  CUDAWrappers::SparseMatrix<double> A_dev(cusparse_handle, A);
+  CUDAWrappers::SparseMatrix<double> A_dev(cuda_handle, A);
   LinearAlgebra::CUDAWrappers::Vector<double> sol_dev(size);
   LinearAlgebra::CUDAWrappers::Vector<double> rhs_dev(size);
   LinearAlgebra::ReadWriteVector<double> rw_vector(size);
@@ -71,16 +72,10 @@ int main()
   initlog();
   deallog.depth_console(0);
 
-  cusparseHandle_t cusparse_handle;
-  cusparseStatus_t cusparse_error_code = cusparseCreate(&cusparse_handle);
-  AssertCusparse(cusparse_error_code);
-
-  test(cusparse_handle);
+  Utilities::CUDA::Handle cuda_handle;
+  test(cuda_handle);
 
   GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
-
-  cusparse_error_code = cusparseDestroy(cusparse_handle);
-  AssertCusparse(cusparse_error_code);
 
   deallog << "OK" <<std::endl;
 
