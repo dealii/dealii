@@ -580,29 +580,29 @@ extern "C"
    * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
    */
   void
-  pdlacpy_(const char *uplo,
-           const int * m,
-           const int * n,
-           double *    A,
-           const int * ia,
-           const int * ja,
-           int *       desca,
-           double *    B,
-           const int * ib,
-           const int * jb,
-           int *       descb);
+  pdlacpy_(const char *  uplo,
+           const int *   m,
+           const int *   n,
+           const double *A,
+           const int *   ia,
+           const int *   ja,
+           const int *   desca,
+           double *      B,
+           const int *   ib,
+           const int *   jb,
+           const int *   descb);
   void
-  pslacpy_(const char *uplo,
-           const int * m,
-           const int * n,
-           float *     A,
-           const int * ia,
-           const int * ja,
-           int *       desca,
-           float *     B,
-           const int * ib,
-           const int * jb,
-           int *       descb);
+  pslacpy_(const char * uplo,
+           const int *  m,
+           const int *  n,
+           const float *A,
+           const int *  ia,
+           const int *  ja,
+           const int *  desca,
+           float *      B,
+           const int *  ib,
+           const int *  jb,
+           const int *  descb);
 
   /**
    * Copies the content of a general rectangular distributed matrix @p A to another distributed matrix @p B
@@ -1558,46 +1558,46 @@ inline void
 placpy(const char * /*uplo*/,
        const int * /*m*/,
        const int * /*n*/,
-       number * /*A*/,
+       const number * /*A*/,
        const int * /*ia*/,
        const int * /*ja*/,
-       int * /*desca*/,
+       const int * /*desca*/,
        number * /*B*/,
        const int * /*ib*/,
        const int * /*jb*/,
-       int * /*descb*/)
+       const int * /*descb*/)
 {
   Assert(false, dealii::ExcNotImplemented());
 }
 
 inline void
-placpy(const char *uplo,
-       const int * m,
-       const int * n,
-       double *    A,
-       const int * ia,
-       const int * ja,
-       int *       desca,
-       double *    B,
-       const int * ib,
-       const int * jb,
-       int *       descb)
+placpy(const char *  uplo,
+       const int *   m,
+       const int *   n,
+       const double *A,
+       const int *   ia,
+       const int *   ja,
+       const int *   desca,
+       double *      B,
+       const int *   ib,
+       const int *   jb,
+       const int *   descb)
 {
   pdlacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
 }
 
 inline void
-placpy(const char *uplo,
-       const int * m,
-       const int * n,
-       float *     A,
-       const int * ia,
-       const int * ja,
-       int *       desca,
-       float *     B,
-       const int * ib,
-       const int * jb,
-       int *       descb)
+placpy(const char * uplo,
+       const int *  m,
+       const int *  n,
+       const float *A,
+       const int *  ia,
+       const int *  ja,
+       const int *  desca,
+       float *      B,
+       const int *  ib,
+       const int *  jb,
+       const int *  descb)
 {
   pslacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
 }

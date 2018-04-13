@@ -26,6 +26,7 @@
 #  include <deal.II/base/thread_management.h>
 
 #  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/lapack_full_matrix.h>
 #  include <deal.II/lac/lapack_support.h>
 
 #  include <mpi.h>
@@ -191,6 +192,19 @@ public:
   operator=(const FullMatrix<NumberType> &);
 
   /**
+   * Copies the content of the locally owned @p matrix to the distributed matrix.
+   * The distributed matrix and @p matrix on process @p rank must have matching dimensions.
+   *
+   * For all processes except the process with rank @p rank the serial @p matrix is not referenced.
+   * The user has to ensure that all processes call this with identical @p rank.
+   * The @p rank refers to a process of the MPI communicator used to create the process grid
+   * of the distributed matrix.
+   */
+  void
+  copy_from(const LAPACKFullMatrix<NumberType> &matrix,
+            const unsigned int                  rank);
+
+  /**
    * Copy the contents of the distributed matrix into @p matrix.
    *
    * @note This function should only be used for relatively small matrix
@@ -198,6 +212,18 @@ public:
    */
   void
   copy_to(FullMatrix<NumberType> &matrix) const;
+
+  /**
+   * Copies the content of the distributed matrix into the locally replicated @p matrix
+   * on the process with rank @rank. For all processes except @p rank @p matrix is not referenced.
+   * The distributed matrix and @p matrix on the process @p rank must have matching dimensions.
+   *
+   * The user has to ensure that all processes call this with identical @p rank.
+   * The @p rank refers to a process of the MPI communicator used to create the process grid
+   * of the distributed matrix.
+   */
+  void
+  copy_to(LAPACKFullMatrix<NumberType> &matrix, const unsigned int rank) const;
 
   /**
    * Copy the contents of the distributed matrix into a differently distributed matrix @p dest.
