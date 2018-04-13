@@ -1,0 +1,3 @@
+New: FEValuesExtractors::Tensor now supports calculation of gradients.
+<br>
+(Denis Davydov, 2018/04/12)

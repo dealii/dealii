@@ -166,6 +166,7 @@ void test_view (const Vector<double> &solution,
   // Typedefs
   typedef typename View::template OutputType<NumberType> OutputType;
   typedef typename ProductType<typename View::value_type,NumberType>::type value_type;
+  typedef typename ProductType<typename View::gradient_type,NumberType>::type gradient_type;
   typedef typename ProductType<typename View::divergence_type,NumberType>::type divergence_type;
 
   // Values
@@ -175,6 +176,11 @@ void test_view (const Vector<double> &solution,
   // Divergences
   std::vector<typename OutputType::divergence_type> qp_divs_local(n_q_points);
   fe_values_view.get_function_divergences_from_local_dof_values(local_dof_values, qp_divs_local);
+
+  // Gradients
+  std::vector<typename OutputType::gradient_type> qp_grads_local(n_q_points);
+  fe_values_view.get_function_gradients_from_local_dof_values(local_dof_values, qp_grads_local);
+
 }
 
 template <typename NumberType, int dim, typename FEType, typename ExtractorType>

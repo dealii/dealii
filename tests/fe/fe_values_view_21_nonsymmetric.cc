@@ -17,6 +17,7 @@
 
 // a simple example code demonstrating the usage of tensor-valued nodal unknowns
 // in deal.II
+// similar to fe_values_view_21.cc but with Tensor extractor
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
