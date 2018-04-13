@@ -24,6 +24,10 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#include <cfenv>
+#endif
+
 // useful examples:
 // https://stackoverflow.com/questions/14147705/cholesky-decomposition-scalapack-error/14203864
 // http://icl.cs.utk.edu/lapack-forum/viewtopic.php?t=139   // second post by Julien Langou
@@ -1902,7 +1906,21 @@ inline void psyevr(const char *jobz,
                    int *liwork,
                    int *info)
 {
+  /*
+   * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pdsyevr
+   * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
+   * to pdsyevr into the following code to supress the exception.
+   */
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fenv_t fp_exceptions;
+  feholdexcept(&fp_exceptions);
+#endif
+
   pdsyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
+
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fesetenv(&fp_exceptions);
+#endif
 }
 
 inline void psyevr(const char *jobz,
@@ -1930,7 +1948,21 @@ inline void psyevr(const char *jobz,
                    int *liwork,
                    int *info)
 {
+  /*
+   * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pssyevr
+   * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
+   * to pssyevr into the following code to supress the exception.
+   */
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fenv_t fp_exceptions;
+  feholdexcept(&fp_exceptions);
+#endif
+
   pssyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
+
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  fesetenv(&fp_exceptions);
+#endif
 }
 
 #endif // DEAL_II_WITH_SCALAPACK
