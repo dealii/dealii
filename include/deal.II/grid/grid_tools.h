@@ -2273,14 +2273,14 @@ namespace GridTools
    * Map the given boundary ids to the given manifold ids on faces and
    * edges at the boundary.
    *
-   * This function copies the boundary_ids of the boundary faces and
+   * This function copies the boundary ids of the boundary faces and
    * edges that are present in the parameter @p src_boundary_ids to
    * the corresponding manifold_id in @p dst_manifold_ids, of the same
    * faces and edges.
    *
    * If the optional parameter @p reset_boundary_ids is non empty,
    * each boundary id in @p src_boundary_ids, is replaced with the
-   * corresponding boudnary id in @p reset_boundary_ids.
+   * corresponding boundary id in @p reset_boundary_ids.
    *
    * An exception is thrown if the size of the input vectors do not
    * match. If a boundary id indicated in @p src_boundary_ids is not
@@ -2296,7 +2296,7 @@ namespace GridTools
   void map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
                                     const std::vector<types::manifold_id> &dst_manifold_ids,
                                     Triangulation<dim, spacedim> &tria,
-                                    const std::vector<types::boundary_id> &reset_boundary_ids= {});
+                                    const std::vector<types::boundary_id> &reset_boundary_ids = {});
 
   /**
    * Copy material ids to manifold ids. The default manifold_id for new

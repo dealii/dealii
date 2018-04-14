@@ -3273,11 +3273,11 @@ next_cell:
            cell != tria.end(); ++cell)
         for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->face(f)->at_boundary())
-            for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
+            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
               {
-                auto bid = cell->face(f)->line(e)->boundary_id();
-                auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
-                           src_boundary_ids.begin();
+                const auto bid = cell->face(f)->line(e)->boundary_id();
+                const auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                                 src_boundary_ids.begin();
                 if ((unsigned int)ind < src_boundary_ids.size())
                   cell->face(f)->line(e)->set_manifold_id(dst_manifold_ids[ind]);
               }
@@ -3289,9 +3289,9 @@ next_cell:
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
-            auto bid = cell->face(f)->boundary_id();
-            auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
-                       src_boundary_ids.begin();
+            const auto bid = cell->face(f)->boundary_id();
+            const auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                             src_boundary_ids.begin();
 
             if ((unsigned int)ind < src_boundary_ids.size())
               {
@@ -3302,11 +3302,11 @@ next_cell:
               }
 
             if (dim >= 3)
-              for (signed int e=0; e<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++e)
+              for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
                 {
-                  auto bid = cell->face(f)->line(e)->boundary_id();
-                  auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
-                             src_boundary_ids.begin();
+                  const auto bid = cell->face(f)->line(e)->boundary_id();
+                  const auto ind = std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid)-
+                                   src_boundary_ids.begin();
                   if ((unsigned int)ind < src_boundary_ids.size())
                     cell->face(f)->line(e)->set_boundary_id(reset_boundary_ids[ind]);
                 }
