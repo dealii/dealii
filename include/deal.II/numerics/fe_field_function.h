@@ -123,16 +123,10 @@ namespace Functions
    * @ref GlossArtificialCell
    * and
    * @ref GlossGhostCell).
-   * If the cell is artificial, we have no access to the solution there and
+   * The solution can be evaluated on ghost cells, but for artificial cells
+   * we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
-   * exception of type VectorTools::ExcPointNotAvailableHere. The same kind of
-   * exception will also be produced if the cell is a ghost cell: On such
-   * cells, one could in principle evaluate the solution, but it becomes
-   * easier if we do not allow to do so because then there is exactly one
-   * processor in a parallel distributed computation that can indeed evaluate
-   * the solution. Consequently, it is clear which processor is responsible
-   * for producing output if the point evaluation is done as a postprocessing
-   * step.
+   * exception of type VectorTools::ExcPointNotAvailableHere.
    *
    * To deal with this situation, you will want to use code as follows when,
    * for example, evaluating the solution at the origin (here using a parallel
@@ -194,8 +188,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -214,8 +208,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -232,8 +226,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -252,8 +246,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -270,8 +264,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -289,8 +283,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -305,8 +299,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -323,8 +317,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -340,8 +334,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -356,8 +350,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -371,8 +365,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
@@ -387,8 +381,8 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
