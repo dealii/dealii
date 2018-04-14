@@ -57,7 +57,7 @@ void test(unsigned int ref=1)
 
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
-  tria.set_manifold(1);
+  tria.reset_manifold(1);
 }
 
 int main ()

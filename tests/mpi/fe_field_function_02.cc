@@ -155,7 +155,7 @@ void test()
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 
-  tr.set_manifold(99);
+  tr.reset_manifold(99);
 }
 
 
