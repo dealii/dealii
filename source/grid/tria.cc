@@ -8974,12 +8974,27 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number)
 {
+  reset_manifold(m_number);
+}
+
+
+template<int dim, int spacedim>
+void Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
+{
   Assert(m_number < numbers::invalid_manifold_id,
          ExcIndexRange(m_number,0,numbers::invalid_manifold_id));
 
   //delete the entry located at number.
   manifold.erase(m_number);
 }
+
+
+template<int dim, int spacedim>
+void Triangulation<dim, spacedim>::reset_all_manifolds()
+{
+  manifold.clear();
+}
+
 
 template <int dim, int spacedim>
 void
