@@ -1785,23 +1785,24 @@ public:
   void set_manifold (const types::manifold_id number);
 
   /**
-   * Reset those parts of the triangulation with the given manifold_id
-   * to use a FlatManifold object. This is the default state of a
-   * non-curved triangulation, and undoes assignment of a different
-   * Manifold object by the function Triangulation::set_manifold()
+   * Reset those parts of the triangulation with the given
+   * @p manifold_number to use a FlatManifold object. This is the
+   * default state of a non-curved triangulation, and undoes
+   * assignment of a different Manifold object by the function
+   * Triangulation::set_manifold().
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void reset_manifold (const types::manifold_id number);
+  void reset_manifold (const types::manifold_id manifold_number);
 
   /**
-   * Reset all parts of the trianuglation, regardless of their
+   * Reset all parts of the triangulation, regardless of their
    * manifold_id, to use a FlatManifold object. This undoes assignment
    * of all Manifold objects by the function
-   * Triangulation::set_manifold()
+   * Triangulation::set_manifold().
    *
    * @ingroup manifold
    *
