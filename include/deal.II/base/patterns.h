@@ -1276,8 +1276,12 @@ namespace Patterns
      * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
      * auto s = Patterns::Tools::to_string(t);
      *
-     * std::cout << s; // will print "1 % 1 : ciao
+     * std::cout << s; // will print "1 % 1 : ciao""
      * @endcode
+     *
+     * See the documentation of the class Patterns::Tools::Convert, and of the
+     * helper class Patterns::Tools::RankInfo for details on the way separators
+     * are selected when outputting STL container types.
      *
      * @author Luca Heltai, 2018
      */
@@ -1295,8 +1299,13 @@ namespace Patterns
      * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
      * to_value("2 % 3 : mondo", t);
      * auto s = Patterns::Tools::to_string(t);
-     * std::cout << s; // will print "2 % 3 : mondo
+     * std::cout << s; // will print "2 % 3 : mondo""
      * @endcode
+     *
+     * See the documentation of the class Patterns::Tools::Convert, and of the
+     * helper class Patterns::Tools::RankInfo for details on the separators you
+     * should use in your string patterns when converting from a string to a
+     * container type.
      *
      * @author Luca Heltai, 2018
      */
