@@ -2269,6 +2269,35 @@ namespace GridTools
                                     const bool reset_boundary_ids=false);
 
   /**
+   * Map the given boundary ids to the given manifold ids on faces and
+   * edges at the boundary.
+   *
+   * This function copies the boundary ids of the boundary faces and
+   * edges that are present in the parameter @p src_boundary_ids to
+   * the corresponding manifold id in @p dst_manifold_ids, of the same
+   * faces and edges.
+   *
+   * If the optional parameter @p reset_boundary_ids is non empty,
+   * each boundary id in @p src_boundary_ids, is replaced with the
+   * corresponding boundary id in @p reset_boundary_ids.
+   *
+   * An exception is thrown if the size of the input vectors do not
+   * match. If a boundary id indicated in @p src_boundary_ids is not
+   * present in the triangulation, it is simply ignored during the
+   * process.
+   *
+   * @ingroup manifold
+   * @relatesalso boundary
+   *
+   * @author Luca Heltai, 2018
+   */
+  template <int dim, int spacedim>
+  void map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
+                                    const std::vector<types::manifold_id> &dst_manifold_ids,
+                                    Triangulation<dim, spacedim> &tria,
+                                    const std::vector<types::boundary_id> &reset_boundary_ids = {});
+
+  /**
    * Copy material ids to manifold ids. The default manifold_id for new
    * Triangulation objects is numbers::invalid_manifold_id. When refinements
    * occurs, the Triangulation asks where to locate new points to the
