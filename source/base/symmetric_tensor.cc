@@ -16,12 +16,8 @@
 #include <deal.II/base/config.h>
 
 // Required for instantiation of template functions
-#ifdef DEAL_II_WITH_TRILINOS
-
-#  include <Sacado.hpp>
-
+#include <deal.II/differentiation/ad/adolc_product_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
-#endif
 
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/symmetric_tensor.templates.h>
