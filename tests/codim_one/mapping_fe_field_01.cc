@@ -115,7 +115,7 @@ void test(const unsigned int refs,
   data_out_euler.write_vtk(deallog.get_file_stream());
 
 
-  triangulation.set_manifold(0);
+  triangulation.reset_manifold(0);
 }
 
 int main ()

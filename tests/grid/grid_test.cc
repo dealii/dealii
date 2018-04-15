@@ -239,7 +239,7 @@ void test (const int test_case)
           tria.execute_coarsening_and_refinement();
         };
 
-      tria.set_manifold (1);
+      tria.reset_manifold(1);
       break;
     }
     }

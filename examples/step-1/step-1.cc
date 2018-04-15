@@ -257,7 +257,7 @@ void second_grid ()
   // follows. Note that this sets the manifold object used for part "0" of the
   // domain back to a default object, over which the triangulation has full
   // control.
-  triangulation.set_manifold (0);
+  triangulation.reset_manifold(0);
   // An alternative to doing so, and one that is frequently more convenient,
   // would have been to declare the manifold object before the triangulation
   // object. In that case, the triangulation would have let lose of the

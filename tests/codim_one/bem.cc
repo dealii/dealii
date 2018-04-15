@@ -145,7 +145,7 @@ BEM<spacedim>::run()
           solve();
           output_results();
 
-          tria.set_manifold(1);
+          tria.reset_manifold(1);
 
           for (unsigned int i=0; i<dof_handler_q.n_dofs(); ++i)
             global_error +=

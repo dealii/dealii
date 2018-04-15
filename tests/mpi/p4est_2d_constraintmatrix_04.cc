@@ -307,8 +307,8 @@ void test()
   std::ofstream output (filename.c_str());
   data_out.write_deal_II_intermediate (output);
 
-  tr.set_manifold (0);
-  tr.set_manifold (1);
+  tr.reset_manifold(0);
+  tr.reset_manifold(1);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }

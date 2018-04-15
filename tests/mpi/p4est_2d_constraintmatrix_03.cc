@@ -135,8 +135,8 @@ void test()
   if (myid==0)
     x_dub.print(deallog.get_file_stream(), 8, true, false);
 
-  tr.set_manifold (0);
-  tr.set_manifold (1);
+  tr.reset_manifold(0);
+  tr.reset_manifold(1);
 }
 
 

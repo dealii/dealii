@@ -47,7 +47,7 @@ void test(std::ostream &out)
   deallog << "Writing refined from constructor" << std::endl;
   go.write_ucd(tr, out);
 
-  tr.set_manifold(1);
+  tr.reset_manifold(1);
   tr.clear();
 
   GridIn<dim> gi;
@@ -70,7 +70,7 @@ void test(std::ostream &out)
     grid_file.close();
   }
 
-  tr.set_manifold(1);
+  tr.reset_manifold(1);
   tr.clear();
 }
 

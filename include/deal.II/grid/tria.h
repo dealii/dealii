@@ -1732,7 +1732,7 @@ public:
    * @ingroup boundary
    *
    * @deprecated This method has been deprecated. Use
-   * Triangulation::set_manifold() instead.
+   * Triangulation::reset_manifold() instead.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -1755,8 +1755,7 @@ public:
    * It is possible to remove or replace the boundary object during the
    * lifetime of a non-empty triangulation. Usually, this is done before the
    * first refinement and is dangerous afterwards. Removal of a manifold
-   * object is done by <tt>set_manifold(number)</tt>, i.e. the function of
-   * same name but only one argument. This operation then replaces the
+   * object is done by reset_manifold(). This operation then replaces the
    * manifold object given before by a straight manifold approximation.
    *
    * @ingroup manifold
@@ -1769,17 +1768,48 @@ public:
 
 
   /**
-   * Reset those parts of the triangulation with the given manifold_id to use
-   * a FlatManifold object. This is the default state of a triangulation, and
-   * undoes assignment of a different Manifold object by the function of same
-   * name and two arguments.
+   * Reset those parts of the triangulation with the given manifold_id
+   * to use a FlatManifold object. This is the default state of a
+   * non-curved triangulation, and undoes assignment of a different
+   * Manifold object by the function of same name and two arguments.
+   *
+   * @ingroup manifold
+   *
+   * @deprecated This method has been deprecated. Use
+   * Triangulation::reset_manifold() instead.
+   *
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  DEAL_II_DEPRECATED
+  void set_manifold (const types::manifold_id number);
+
+  /**
+   * Reset those parts of the triangulation with the given
+   * @p manifold_number to use a FlatManifold object. This is the
+   * default state of a non-curved triangulation, and undoes
+   * assignment of a different Manifold object by the function
+   * Triangulation::set_manifold().
    *
    * @ingroup manifold
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_manifold (const types::manifold_id number);
+  void reset_manifold (const types::manifold_id manifold_number);
+
+  /**
+   * Reset all parts of the triangulation, regardless of their
+   * manifold_id, to use a FlatManifold object. This undoes assignment
+   * of all Manifold objects by the function
+   * Triangulation::set_manifold().
+   *
+   * @ingroup manifold
+   *
+   * @see
+   * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
+   */
+  void reset_all_manifolds ();
 
   /**
    * Set the manifold_id of all cells and faces to the given argument.

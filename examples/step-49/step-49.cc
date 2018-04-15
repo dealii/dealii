@@ -204,7 +204,7 @@ void grid_3 ()
   // object is destroyed first in this function since it was declared after
   // the triangulation).
   print_mesh_info (triangulation, "grid-3.eps");
-  triangulation.set_manifold (1);
+  triangulation.reset_manifold(1);
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on

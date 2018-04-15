@@ -122,7 +122,7 @@ int main ()
 
 
   dh_test.clear();
-  tria.set_manifold(0);
+  tria.reset_manifold(0);
 
   return 0;
 }

@@ -72,7 +72,7 @@ int main ()
 
   GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
                                         boundary_ids);
-  triangulation.set_manifold (0);
+  triangulation.reset_manifold(0);
   GridTools::transform (&warp<3>, triangulation);
 
   deallog << "Surface mesh has " << triangulation.n_active_cells()

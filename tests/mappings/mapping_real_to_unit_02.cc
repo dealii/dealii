@@ -69,7 +69,7 @@ void test2()
   points[95]=p;
   fe_function.value_list (points, m); // <<<< this fails at point[95] but only if the other points are filled in?!
 
-  triangulation.set_manifold (0);
+  triangulation.reset_manifold(0);
 
   deallog << "OK" << std::endl;
 }
