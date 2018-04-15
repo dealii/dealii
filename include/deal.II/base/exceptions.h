@@ -165,268 +165,6 @@ private:
   mutable std::string what_str;
 };
 
-
-
-/**
- * In this namespace, functions in connection with the Assert and AssertThrow
- * mechanism are declared.
- *
- * @ingroup Exceptions
- */
-namespace deal_II_exceptions
-{
-
-  /**
-   * Set a string that is printed upon output of the message indicating a
-   * triggered <tt>Assert</tt> statement. This string, which is printed in
-   * addition to the usual output may indicate information that is otherwise
-   * not readily available unless we are using a debugger. For example, with
-   * distributed programs on cluster computers, the output of all processes is
-   * redirected to the same console window. In this case, it is convenient to
-   * set as additional name the name of the host on which the program runs, so
-   * that one can see in which instance of the program the exception occurred.
-   *
-   * The string pointed to by the argument is copied, so doesn't need to be
-   * stored after the call to this function.
-   *
-   * Previously set additional output is replaced by the argument given to
-   * this function.
-   *
-   * @see Exceptions
-   */
-  void set_additional_assert_output (const char *const p);
-
-  /**
-   * Calling this function disables printing a stacktrace along with the other
-   * output printed when an exception occurs. Most of the time, you will want
-   * to see such a stacktrace; suppressing it, however, is useful if one wants
-   * to compare the output of a program across different machines and systems,
-   * since the stacktrace shows memory addresses and library names/paths that
-   * depend on the exact setup of a machine.
-   *
-   * @see Exceptions
-   */
-  void suppress_stacktrace_in_exceptions ();
-
-  /**
-   * Calling this function switches off the use of <tt>std::abort()</tt> when
-   * an exception is created using the Assert() macro. Instead, the Exception
-   * will be thrown using 'throw', so it can be caught if desired. Generally,
-   * you want to abort the execution of a program when Assert() is called, but
-   * it needs to be switched off if you want to log all exceptions created, or
-   * if you want to test if an assertion is working correctly. This is done
-   * for example in regression tests. Please note that some fatal errors will
-   * still call abort(), e.g. when an exception is caught during exception
-   * handling.
-   *
-   * @see Exceptions
-   */
-  void disable_abort_on_exception ();
-
-  /**
-   * The functions in this namespace are in connection with the Assert and
-   * AssertThrow mechanism but are solely for internal purposes and are not
-   * for use outside the exception handling and throwing mechanism.
-   *
-   * @ingroup Exceptions
-   */
-  namespace internals
-  {
-
-    /**
-     * Conditionally abort the program.
-     *
-     * Depending on whether deal_II_exceptions::disable_abort_on_exception was
-     * called, this function either aborts the program flow by printing the
-     * error message provided by @p exc and calling <tt>std::abort()</tt>, or
-     * throws @p exc instead.
-     */
-    [[noreturn]]
-    void abort (const ExceptionBase &exc);
-
-    /**
-     * An enum describing how to treat an exception in issue_error.
-     */
-    enum ExceptionHandling
-    {
-      /**
-       * Abort the program by calling <code>std::abort</code> unless
-       * deal_II_exceptions::disable_abort_on_exception has been called: in
-       * that case the program will throw an exception.
-       */
-      abort_on_exception,
-      /**
-       * Throw the exception normally.
-       */
-      throw_on_exception,
-      /**
-       * Call <code>std::abort</code> as long as
-       * deal_II_exceptions::disable_abort_on_exception has not been called:
-       * if it has, then just print a description of the exception to deallog.
-       */
-      abort_nothrow_on_exception
-    };
-
-    /**
-     * This routine does the main work for the exception generation mechanism
-     * used in the <tt>Assert</tt> macro.
-     *
-     * The actual exception object (the last argument) is typically an unnamed
-     * object created in place; because we modify it, we can't take it by
-     * const reference, and temporaries don't bind to non-const references.
-     * So take it by value (=copy it) -- the performance implications are
-     * pretty minimal anyway.
-     *
-     * @ref ExceptionBase
-     */
-    template <class ExceptionType>
-    void issue_error (ExceptionHandling  handling,
-                      const char       *file,
-                      int               line,
-                      const char       *function,
-                      const char       *cond,
-                      const char       *exc_name,
-                      ExceptionType     e)
-    {
-      // Fill the fields of the exception object
-      e.set_fields (file, line, function, cond, exc_name);
-
-      switch (handling)
-        {
-        case abort_on_exception:
-          dealii::deal_II_exceptions::internals::abort(e);
-          break;
-        case abort_nothrow_on_exception:
-          // The proper way is to call the function below directly
-          // to preserve the noexcept specifier.
-          // For reasons of backward compatibility
-          // we treat this case here as well.
-          issue_error_nothrow(handling, file, line, function, cond, exc_name, e);
-          break;
-        case throw_on_exception:
-          throw e;
-        }
-    }
-
-    /**
-     * Exception generation mechanism in case we must not throw.
-     *
-     * @ref ExceptionBase
-     */
-    void issue_error_nothrow (ExceptionHandling,
-                              const char       *file,
-                              int               line,
-                              const char       *function,
-                              const char       *cond,
-                              const char       *exc_name,
-                              ExceptionBase     e) noexcept;
-#ifdef DEAL_II_WITH_CUDA
-    /**
-     * Return a string given an error code. This is similar to the cudaGetErrorString
-     * function but there is no equivalent function for cuSPARSE.
-     */
-    std::string get_cusparse_error_string(const cusparseStatus_t error_code);
-#endif
-  } /*namespace internals*/
-
-} /*namespace deal_II_exceptions*/
-
-
-
-/**
- * A macro that serves as the main routine in the exception mechanism for debug mode
- * error checking. It asserts that a certain condition is fulfilled, otherwise
- * issues an error and aborts the program.
- *
- * A more detailed description can be found in the @ref Exceptions documentation
- * module. It is first used in step-5 and step-6.
- * See also the <tt>ExceptionBase</tt> class for more information.
- *
- * @note Active in DEBUG mode only
- * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
- */
-#ifdef DEBUG
-#define Assert(cond, exc)                                                   \
-  {                                                                           \
-    if (!(cond))                                                              \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::abort_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-  }
-#else
-#define Assert(cond, exc)                                                   \
-  {}
-#endif
-
-
-
-/**
- * A variant of the <tt>Assert</tt> macro above that exhibits the same runtime
- * behavior as long as disable_abort_on_exception was not called.
- *
- * However, if disable_abort_on_exception was called, this macro merely prints
- * the exception that would be thrown to deallog and continues normally
- * without throwing an exception.
- *
- * A more detailed description can be found in the @ref Exceptions documentation
- * module, in the discussion about the corner case at the bottom of the page.
- *
- * @note Active in DEBUG mode only
- * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
- */
-#ifdef DEBUG
-#define AssertNothrow(cond, exc)                                              \
-  {                                                                             \
-    if (!(cond))                                                                \
-      ::dealii::deal_II_exceptions::internals::                                 \
-      issue_error_nothrow(                                                      \
-          ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
-  }
-#else
-#define AssertNothrow(cond, exc)                                              \
-  {}
-#endif
-
-
-
-/**
- * A macro that serves as the main routine in the exception mechanism for dynamic
- * error checking. It asserts that a certain condition is fulfilled, otherwise
- * throws an exception via the C++ @p throw mechanism. This exception can
- * be caught via a @p catch clause, as is shown in step-6 and all following
- * tutorial programs.
- *
- * A more detailed description can be found in the @ref Exceptions documentation
- * module. It is first used in step-9 and step-13.
- * See also the <tt>ExceptionBase</tt> class for more information.
- *
- * @note Active in both DEBUG and RELEASE modes
- * @ingroup Exceptions
- * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
- */
-#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
-#define AssertThrow(cond, exc)                                              \
-  {                                                                           \
-    if (__builtin_expect(!(cond), false))                                     \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-  }
-#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-#define AssertThrow(cond, exc)                                              \
-  {                                                                           \
-    if (!(cond))                                                              \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(::dealii::deal_II_exceptions::internals::throw_on_exception,\
-                  __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
-  }
-#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
-
-
-
 #ifndef DOXYGEN
 
 /**
@@ -1190,6 +928,282 @@ namespace StandardExceptions
 } /*namespace StandardExceptions*/
 
 
+
+/**
+ * In this namespace, functions in connection with the Assert and AssertThrow
+ * mechanism are declared.
+ *
+ * @ingroup Exceptions
+ */
+namespace deal_II_exceptions
+{
+
+  /**
+   * Set a string that is printed upon output of the message indicating a
+   * triggered <tt>Assert</tt> statement. This string, which is printed in
+   * addition to the usual output may indicate information that is otherwise
+   * not readily available unless we are using a debugger. For example, with
+   * distributed programs on cluster computers, the output of all processes is
+   * redirected to the same console window. In this case, it is convenient to
+   * set as additional name the name of the host on which the program runs, so
+   * that one can see in which instance of the program the exception occurred.
+   *
+   * The string pointed to by the argument is copied, so doesn't need to be
+   * stored after the call to this function.
+   *
+   * Previously set additional output is replaced by the argument given to
+   * this function.
+   *
+   * @see Exceptions
+   */
+  void set_additional_assert_output (const char *const p);
+
+  /**
+   * Calling this function disables printing a stacktrace along with the other
+   * output printed when an exception occurs. Most of the time, you will want
+   * to see such a stacktrace; suppressing it, however, is useful if one wants
+   * to compare the output of a program across different machines and systems,
+   * since the stacktrace shows memory addresses and library names/paths that
+   * depend on the exact setup of a machine.
+   *
+   * @see Exceptions
+   */
+  void suppress_stacktrace_in_exceptions ();
+
+  /**
+   * Calling this function switches off the use of <tt>std::abort()</tt> when
+   * an exception is created using the Assert() macro. Instead, the Exception
+   * will be thrown using 'throw', so it can be caught if desired. Generally,
+   * you want to abort the execution of a program when Assert() is called, but
+   * it needs to be switched off if you want to log all exceptions created, or
+   * if you want to test if an assertion is working correctly. This is done
+   * for example in regression tests. Please note that some fatal errors will
+   * still call abort(), e.g. when an exception is caught during exception
+   * handling.
+   *
+   * @see Exceptions
+   */
+  void disable_abort_on_exception ();
+
+  /**
+   * The functions in this namespace are in connection with the Assert and
+   * AssertThrow mechanism but are solely for internal purposes and are not
+   * for use outside the exception handling and throwing mechanism.
+   *
+   * @ingroup Exceptions
+   */
+  namespace internals
+  {
+
+    /**
+     * Conditionally abort the program.
+     *
+     * Depending on whether deal_II_exceptions::disable_abort_on_exception was
+     * called, this function either aborts the program flow by printing the
+     * error message provided by @p exc and calling <tt>std::abort()</tt>, or
+     * throws @p exc instead.
+     */
+    [[noreturn]]
+    void abort (const ExceptionBase &exc);
+
+    /**
+     * An enum describing how to treat an exception in issue_error.
+     */
+    enum ExceptionHandling
+    {
+      /**
+       * Abort the program by calling <code>std::abort</code> unless
+       * deal_II_exceptions::disable_abort_on_exception has been called: in
+       * that case the program will throw an exception.
+       */
+      abort_on_exception,
+      /**
+       * Throw the exception normally.
+       */
+      throw_on_exception,
+      /**
+       * Call <code>std::abort</code> as long as
+       * deal_II_exceptions::disable_abort_on_exception has not been called:
+       * if it has, then just print a description of the exception to deallog.
+       */
+      abort_nothrow_on_exception
+    };
+
+    /**
+     * This routine does the main work for the exception generation mechanism
+     * used in the <tt>Assert</tt> and <tt>AssertThrow</tt> macros: as the
+     * name implies, this function either ends with a call to <tt>abort</tt>
+     * or throwing an exception.
+     *
+     * The actual exception object (the last argument) is typically an unnamed
+     * object created in place; because we modify it, we can't take it by
+     * const reference, and temporaries don't bind to non-const references.
+     * So take it by value (=copy it) -- the performance implications are
+     * pretty minimal anyway.
+     *
+     * @ref ExceptionBase
+     */
+    template <class ExceptionType>
+    [[noreturn]]
+    void issue_error_noreturn (ExceptionHandling  handling,
+                               const char       *file,
+                               int               line,
+                               const char       *function,
+                               const char       *cond,
+                               const char       *exc_name,
+                               ExceptionType     e)
+    {
+      // Fill the fields of the exception object
+      e.set_fields (file, line, function, cond, exc_name);
+
+      switch (handling)
+        {
+        case abort_on_exception:
+          dealii::deal_II_exceptions::internals::abort(e);
+        case throw_on_exception:
+          throw e;
+        default:
+          // this function should never return; something must have gone wrong
+          // in the error handling code for us to get this far, so throw an
+          // exception.
+          throw ::dealii::StandardExceptions::ExcInternalError();
+        }
+    }
+
+    /**
+     * Exception generation mechanism in case we must not throw.
+     *
+     * @ref ExceptionBase
+     */
+    void issue_error_nothrow (ExceptionHandling,
+                              const char       *file,
+                              int               line,
+                              const char       *function,
+                              const char       *cond,
+                              const char       *exc_name,
+                              ExceptionBase     e) noexcept;
+#ifdef DEAL_II_WITH_CUDA
+    /**
+     * Return a string given an error code. This is similar to the cudaGetErrorString
+     * function but there is no equivalent function for cuSPARSE.
+     */
+    std::string get_cusparse_error_string(const cusparseStatus_t error_code);
+#endif
+  } /*namespace internals*/
+
+} /*namespace deal_II_exceptions*/
+
+
+
+/**
+ * A macro that serves as the main routine in the exception mechanism for debug mode
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
+ * issues an error and aborts the program.
+ *
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module. It is first used in step-5 and step-6.
+ * See also the <tt>ExceptionBase</tt> class for more information.
+ *
+ * @note Active in DEBUG mode only
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
+ */
+#ifdef DEBUG
+#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#    define Assert(cond, exc)                                                \
+{                                                                            \
+  if (__builtin_expect(!(cond), false))                                      \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
+        ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
+}
+#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#    define Assert(cond, exc)                                                \
+{                                                                            \
+  if (!(cond))                                                               \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(          \
+        ::dealii::deal_II_exceptions::internals::abort_on_exception,         \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);          \
+}
+#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#else
+#define Assert(cond, exc)                                                    \
+  {}
+#endif
+
+
+
+/**
+ * A variant of the <tt>Assert</tt> macro above that exhibits the same runtime
+ * behavior as long as disable_abort_on_exception was not called.
+ *
+ * However, if disable_abort_on_exception was called, this macro merely prints
+ * the exception that would be thrown to deallog and continues normally
+ * without throwing an exception.
+ *
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module, in the discussion about the corner case at the bottom of the page.
+ *
+ * @note Active in DEBUG mode only
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
+ */
+#ifdef DEBUG
+#  ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#    define AssertNothrow(cond, exc)                                             \
+{                                                                                \
+  if (__builtin_expect(!(cond), false))                                          \
+    ::dealii::deal_II_exceptions::internals::issue_error_nothrow(                \
+        ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,     \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);              \
+}
+#  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#    define AssertNothrow(cond, exc)                                             \
+{                                                                                \
+  if (!(cond))                                                                   \
+    ::dealii::deal_II_exceptions::internals::issue_error_nothrow(                \
+        ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,     \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);              \
+}
+#  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#else
+#define AssertNothrow(cond, exc)                                                 \
+  {}
+#endif
+
+/**
+ * A macro that serves as the main routine in the exception mechanism for dynamic
+ * error checking. It asserts that a certain condition is fulfilled, otherwise
+ * throws an exception via the C++ @p throw mechanism. This exception can
+ * be caught via a @p catch clause, as is shown in step-6 and all following
+ * tutorial programs.
+ *
+ * A more detailed description can be found in the @ref Exceptions documentation
+ * module. It is first used in step-9 and step-13.
+ * See also the <tt>ExceptionBase</tt> class for more information.
+ *
+ * @note Active in both DEBUG and RELEASE modes
+ * @ingroup Exceptions
+ * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
+ */
+#ifdef DEAL_II_HAVE_BUILTIN_EXPECT
+#define AssertThrow(cond, exc)                                                 \
+{                                                                              \
+  if (__builtin_expect(!(cond), false))                                        \
+    ::dealii::deal_II_exceptions::internals:: issue_error_noreturn(            \
+        ::dealii::deal_II_exceptions::internals::throw_on_exception,           \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
+}
+#else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+#define AssertThrow(cond, exc)                                                 \
+{                                                                              \
+  if (!(cond))                                                                 \
+    ::dealii::deal_II_exceptions::internals::issue_error_noreturn(             \
+        ::dealii::deal_II_exceptions::internals::throw_on_exception,           \
+        __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);            \
+}
+#endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
+
 /**
  * Special assertion for dimension mismatch.
  *
@@ -1200,8 +1214,8 @@ namespace StandardExceptions
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
  */
-#define AssertDimension(dim1,dim2) Assert((dim1) == (dim2),       \
-                                          dealii::ExcDimensionMismatch((dim1),(dim2)))
+#define AssertDimension(dim1,dim2) \
+  Assert((dim1) == (dim2), dealii::ExcDimensionMismatch((dim1),(dim2)))
 
 
 /**
@@ -1211,8 +1225,9 @@ namespace StandardExceptions
  * @ingroup Exceptions
  * @author Guido Kanschat 2010
  */
-#define AssertVectorVectorDimension(vec,dim1,dim2) AssertDimension((vec).size(), (dim1)) \
-  for (unsigned int i=0;i<dim1;++i) { AssertDimension((vec)[i].size(), (dim2)); }
+#define AssertVectorVectorDimension(vec,dim1,dim2)                              \
+  AssertDimension((vec).size(), (dim1));                                        \
+  for (unsigned int i=0;i<dim1;++i) {AssertDimension((vec)[i].size(), (dim2));}
 
 namespace internal
 {
@@ -1235,12 +1250,11 @@ namespace internal
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
  */
-#define AssertIndexRange(index,range) \
-  Assert((index) < (range), \
-         dealii::ExcIndexRangeType< \
-         typename ::dealii::internal::argument_type< \
-         void(typename std::common_type<decltype(index), \
-              decltype(range)>::type)>::type>((index),0,(range)))
+#define AssertIndexRange(index,range)                                          \
+Assert((index) < (range),                                                      \
+       dealii::ExcIndexRangeType<typename ::dealii::internal::argument_type<   \
+       void(typename std::common_type<decltype(index),                         \
+            decltype(range)>::type)>::type>((index),0,(range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly
@@ -1251,8 +1265,9 @@ namespace internal
  * @ingroup Exceptions
  * @author Wolfgang Bangerth, 2015
  */
-#define AssertIsFinite(number) Assert(dealii::numbers::is_finite(number), \
-                                      dealii::ExcNumberNotFinite(std::complex<double>(number)))
+#define AssertIsFinite(number)                                                 \
+Assert(dealii::numbers::is_finite(number),                                     \
+       dealii::ExcNumberNotFinite(std::complex<double>(number)))
 
 #ifdef DEAL_II_WITH_MPI
 /**
@@ -1265,8 +1280,8 @@ namespace internal
  * @ingroup Exceptions
  * @author David Wells, 2016
  */
-#define AssertThrowMPI(error_code) AssertThrow(error_code == MPI_SUCCESS, \
-                                               dealii::ExcMPI(error_code))
+#define AssertThrowMPI(error_code)                                             \
+AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
 #else
 #define AssertThrowMPI(error_code) {}
 #endif // DEAL_II_WITH_MPI

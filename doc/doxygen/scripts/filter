@@ -35,12 +35,35 @@ while (<>)
     # We don't let doxygen put everything into a namespace
     # dealii. consequently, doxygen can't link references that contain an
     # explicit dealii:: qualification. remove it and replace it by the
-    # global scope
+    # global scope.
+    #
+    # Try to detect whether or not ::dealii:: is part of a macro (e.g., Assert)
+    # continuation line (line ending in '\'): if it is then replace it with
+    # spaces. This keeps the '\'s aligned, e.g., the following snippet (which is
+    # part of the definition of Assert)
+    #
+    # ::dealii::internals::abort(__LINE__,             \ # part of macro
+    #                            __PRETTY_FUNCTION__)
+    #
+    # will be converted to
+    #
+    #         ::internals::abort(__LINE__,             \ # part of macro
+    #                            __PRETTY_FUNCTION__)
+    #
+    # so the '\' is kept in the same column.
     #
     # Now, as of doxygen 1.5, this still produces the wrong result, but
     # that's not our fault. This is reported here:
     #    http://bugzilla.gnome.org/show_bug.cgi?id=365053
-    s/(::)?dealii::/::/g;
+    if (m/^ *(::)?dealii::.*\\$/)
+    {
+        s/::dealii::(.*)\\$/::\1        \\/g;
+        s/dealii::(.*)\\$/\1        \\/g;
+    }
+    else
+    {
+        s/(::)?dealii::/::/g;
+    }
 
     # Replace all occurrences of something like step-xx by
     #    @ref step_xx "step-xx"
