@@ -802,7 +802,7 @@ namespace internal
 
 
 template <int dim, typename Number>
-std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
+std::array<std::pair<Number, Tensor<1,dim,Number> >,std::integral_constant<int, dim>::value>
 eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
               const SymmetricTensorEigenvectorMethod       method)
 {

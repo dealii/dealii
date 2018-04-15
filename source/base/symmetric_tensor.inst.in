@@ -27,7 +27,7 @@ for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
     eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
 
     template
-    std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
+    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
     eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
                   const SymmetricTensorEigenvectorMethod);
 }
@@ -45,7 +45,7 @@ for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
     eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
 
     template
-    std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
+    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
     eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
                   const SymmetricTensorEigenvectorMethod);
 }
@@ -63,7 +63,7 @@ for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_TRILINOS_SACADO_REA
     eigenvalues (const SymmetricTensor<2,deal_II_dimension,number> &);
 
     template
-    std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
+    std::array<std::pair<number,Tensor<1,deal_II_dimension,number> >,std::integral_constant<int, deal_II_dimension>::value>
     eigenvectors (const SymmetricTensor<2,deal_II_dimension,number> &,
                   const SymmetricTensorEigenvectorMethod);
 }
