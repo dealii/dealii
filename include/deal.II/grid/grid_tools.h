@@ -2275,7 +2275,7 @@ namespace GridTools
    *
    * This function copies the boundary ids of the boundary faces and
    * edges that are present in the parameter @p src_boundary_ids to
-   * the corresponding manifold_id in @p dst_manifold_ids, of the same
+   * the corresponding manifold id in @p dst_manifold_ids, of the same
    * faces and edges.
    *
    * If the optional parameter @p reset_boundary_ids is non empty,
