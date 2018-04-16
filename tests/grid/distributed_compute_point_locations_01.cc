@@ -55,11 +55,14 @@ void test_compute_pt_loc(unsigned int n_points)
   std::vector< BoundingBox<dim> > local_bbox = GridTools::compute_mesh_predicate_bounding_box
                                                (cache.get_triangulation(),
                                                 std::function<bool (const typename Triangulation<dim>::active_cell_iterator &)>(locally_owned_cell_predicate),
-                                                1, true, 4); // These options should be passed
-  // Using the distributed version of compute point location
+                                                1, true, 4);
 
-  // Using the distributed version
-  auto output_tuple = distributed_compute_point_locations(cache,points,local_bbox);
+  // Obtaining the global mesh description through an all to all communication
+  std::vector< std::vector< BoundingBox<dim> > > global_bboxes;
+  global_bboxes = Utilities::MPI::all_gather(mpi_communicator,local_bbox);
+
+  // Using the distributed version of compute point location
+  auto output_tuple = distributed_compute_point_locations(cache,points,global_bboxes);
   // Testing in serial against the serial version
   auto cell_qpoint_map = GridTools::compute_point_locations(cache,points);
 

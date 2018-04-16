@@ -121,9 +121,13 @@ void test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
                                                (cache.get_triangulation(), locally_owned_cell_predicate,
                                                 1, true, 4);
 
+  // Obtaining the global mesh description through an all to all communication
+  std::vector< std::vector< BoundingBox<dim> > > global_bboxes;
+  global_bboxes = Utilities::MPI::all_gather(mpi_communicator,local_bbox);
+
   // Using the distributed version of compute point location
   auto output_tuple = distributed_compute_point_locations
-                      (cache,loc_owned_points,local_bbox);
+                      (cache,loc_owned_points,global_bboxes);
   deallog << "Comparing results" << std::endl;
   const auto &output_cells = std::get<0>(output_tuple);
   const auto &output_qpoints = std::get<1>(output_tuple);

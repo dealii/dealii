@@ -683,9 +683,14 @@ namespace GridTools
    * @param[in] local_points the array of points owned by the current process. Every
    *  process can have a different array of points which can be empty and not
    *  contained within the locally owned part of the triangulation
-   * @param[in] local_bbox the description of the locally owned part of the mesh made
-   *  with bounding boxes. It can be obtained from
-   *  GridTools::compute_mesh_predicate_bounding_box
+   * @param[in] global_bboxes a vector of vectors of bounding boxes; it describes
+   *  the locally owned part of the mesh for each process.
+   *  The bounding boxes describing which part of the mesh is locally owned by
+   *  process with rank rk are contained in global_bboxes[rk].
+   *  The local description can be obtained from
+   *  GridTools::compute_mesh_predicate_bounding_box ; then the global one can
+   *  be obtained using either GridTools::exchange_local_bounding_boxes
+   *  or Utilities::MPI::all_gather
    * @return A tuple containing the quadrature information
    *
    * The elements of the output tuple are:
@@ -739,9 +744,9 @@ namespace GridTools
   return_type
 #endif
       distributed_compute_point_locations
-      (const GridTools::Cache<dim,spacedim>                &cache,
-       const std::vector<Point<spacedim> >                 &local_points,
-       const std::vector< BoundingBox<spacedim> >          &local_bbox);
+      (const GridTools::Cache<dim,spacedim>                        &cache,
+       const std::vector<Point<spacedim> >                         &local_points,
+       const std::vector< std::vector< BoundingBox<spacedim> > >   &global_bboxes);
 
   /**
    * Return a map of index:Point<spacedim>, containing the used vertices of the
