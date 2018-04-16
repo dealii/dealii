@@ -18,9 +18,6 @@
 #include "../tests.h"
 #include "../testmatrix.h"
 
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/vector_memory.templates.h>
-
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/cuda_sparse_matrix.h>
 #include <deal.II/lac/precondition.h>

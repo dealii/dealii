@@ -15,6 +15,7 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
@@ -30,6 +31,13 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "vector_memory.inst"
 
+#ifdef DEAL_II_WITH_CUDA
+template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
+template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
+template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
+template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
+#endif
+
 namespace internal
 {
   namespace GrowingVectorMemoryImplementation
@@ -37,6 +45,11 @@ namespace internal
     void release_all_unused_memory()
     {
 #include "vector_memory_release.inst"
+
+#ifdef DEAL_II_WITH_CUDA
+      dealii::GrowingVectorMemory<dealii::LinearAlgebra::CUDAWrappers::Vector<float>>::release_unused_memory();
+      dealii::GrowingVectorMemory<dealii::LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
+#endif
     }
   }
 }
