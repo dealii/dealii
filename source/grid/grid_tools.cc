@@ -4213,14 +4213,14 @@ next_cell:
       std::vector< std::vector< unsigned int > >
       >
       distributed_compute_point_locations
-      (const GridTools::Cache<dim,spacedim>                &cache,
-       const std::vector<Point<spacedim> >                 &local_points,
-       const std::vector< BoundingBox<spacedim> >          &local_bbox)
+      (const GridTools::Cache<dim,spacedim>                         &cache,
+       const std::vector<Point<spacedim> >                          &local_points,
+       const std::vector< std::vector< BoundingBox<spacedim> > >    &global_bboxes)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)cache;
     (void)local_points;
-    (void)local_bbox;
+    (void)global_bboxes;
     Assert(false, ExcMessage("GridTools::distributed_compute_point_locations() requires MPI."));
     std::tuple<
     std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
@@ -4257,10 +4257,6 @@ next_cell:
         internal::distributed_cptloc::cell_hash<dim,spacedim> >
         temporary_unmap;
 
-    // Obtaining the global mesh description through an all to all communication
-    std::vector< std::vector< BoundingBox<spacedim> > > global_bounding_boxes;
-    global_bounding_boxes = Utilities::MPI::all_gather(mpi_communicator,local_bbox);
-
     // Step 1 (part 1): Using the bounding boxes to guess the owner of each points
     // in local_points
     unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_communicator);
@@ -4269,7 +4265,7 @@ next_cell:
     std::tuple< std::vector< std::vector< unsigned int > >, std::map< unsigned int, unsigned int >,
         std::map< unsigned int, std::vector< unsigned int > > > guessed_points;
     guessed_points =
-      GridTools::guess_point_owner(global_bounding_boxes, local_points);
+      GridTools::guess_point_owner(global_bboxes, local_points);
 
     // Preparing to call compute point locations on points which are/might be
     // local
