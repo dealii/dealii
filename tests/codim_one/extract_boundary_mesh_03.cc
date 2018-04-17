@@ -97,7 +97,7 @@ int main ()
     // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
+    deallog << "Testing hyper_ball in dim: " << dim << "..."<< endl;
 
     map< Triangulation<dim-1,dim>::cell_iterator,
          Triangulation<dim,dim>::face_iterator>
@@ -111,6 +111,7 @@ int main ()
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           cell->face(f)->set_all_boundary_ids (1);
+    GridTools::copy_boundary_to_manifold_id(volume_mesh);
     volume_mesh.set_manifold (1, boundary_description);
     volume_mesh.refine_global (1);
 

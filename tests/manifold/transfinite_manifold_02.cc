@@ -18,6 +18,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
 
@@ -29,11 +30,19 @@ void do_test(const Triangulation<dim,spacedim> &tria)
     {
       deallog << "Lines on cell with center: " << cell->center() << std::endl;
       for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-        deallog << cell->line(line)->center(/*respect_manifold=*/true) << std::endl;
+        {
+          deallog << cell->line(line)->center(/*respect_manifold=*/true) << std::endl;
+          deallog << "Manifold id: " << cell->line(line)->manifold_id() << std::endl;
+        }
       deallog << "Faces on cell with center: " << cell->center() << std::endl;
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-        deallog << cell->face(face)->center(/*respect_manifold=*/true) << std::endl;
+        {
+          deallog << cell->face(face)->center(/*respect_manifold=*/true) << std::endl;
+          deallog << "Manifold id: " << cell->face(face)->manifold_id() << std::endl;
+        }
+
       deallog << "Center with manifold: " << cell->center(true) << std::endl;
+      deallog << "Manifold id: " << cell->manifold_id() << std::endl;
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->at_boundary(face))
           {
@@ -49,6 +58,7 @@ void do_test(const Triangulation<dim,spacedim> &tria)
                                    make_array_view(weights));
             deallog << "Distance between cell manifold and face manifold: "
                     << (pref-p) << std::endl;
+            Assert ((pref-p).norm() < 1e-6, ExcInternalError());
             weights[0] = 0.55;
             weights[1] = 0.45;
             p = cell->get_manifold().get_new_point(make_array_view(points),
@@ -57,6 +67,7 @@ void do_test(const Triangulation<dim,spacedim> &tria)
                                                                   make_array_view(weights));
             deallog << "Distance between cell manifold and face manifold: "
                     << (pref-p) << std::endl;
+            Assert ((pref-p).norm() < 1e-6, ExcInternalError());
           }
     }
   deallog << std::endl;
@@ -73,6 +84,7 @@ void test_polar()
 
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_ball (tria);
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
 
   // set all cells at the boundary to the transfinite manifold except for the
   // boundaries where we put the polar manifold
@@ -100,6 +112,7 @@ void test_spherical()
 
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_ball (tria);
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
 
   // set all cells at the boundary to the transfinite manifold except for the
   // boundaries where we put the polar manifold
@@ -125,12 +138,14 @@ void test_cylinder(unsigned int ref=1)
   TransfiniteInterpolationManifold<dim,spacedim> manifold;
   Triangulation<dim,spacedim> tria;
   GridGenerator::cylinder (tria);
+  tria.reset_all_manifolds();
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
 
   for (typename Triangulation<dim,spacedim>::active_cell_iterator
        cell=tria.begin_active(); cell!=tria.end(); ++cell)
     {
       if (cell->at_boundary())
-        cell->set_manifold_id(1);
+        cell->set_all_manifold_ids(1);
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         if (cell->at_boundary(face))
           {

@@ -38,13 +38,18 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 
 
-
 void test()
 {
   const int dim=3;
 
   Triangulation<dim>   triangulation;
   GridGenerator::cylinder(triangulation, 100, 200);
+  GridTools::copy_boundary_to_manifold_id(triangulation);
+  for (auto cell = triangulation.begin_active(); cell != triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->boundary_id() != numbers::invalid_boundary_id)
+        for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+          cell->face(f)->line(e)->set_manifold_id(cell->face(f)->boundary_id());
 
   static const CylinderBoundary<dim> outer_cylinder (100,0);
   triangulation.set_manifold(0,outer_cylinder);
@@ -61,6 +66,9 @@ void test()
   // indicators
   triangulation_surface.refine_global (1);
   GridOut().write_gnuplot(triangulation_surface, deallog.get_file_stream());
+
+  std::ofstream output ("grid.vtk");
+  GridOut().write_vtk(triangulation_surface, output);
 
   deallog << triangulation_surface.n_used_vertices() << std::endl;
   deallog << triangulation_surface.n_active_cells() << std::endl;

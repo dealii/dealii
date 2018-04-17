@@ -102,13 +102,14 @@ int main ()
     // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
+    deallog << "Testing hyper_ball in dim: " << dim << "..."<< endl;
 
     map< Triangulation<dim-1,dim>::cell_iterator,
          Triangulation<dim,dim>::face_iterator>
          surface_to_volume_mapping;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
+    volume_mesh.reset_manifold (0);
 
     volume_mesh.refine_global (1);
 

@@ -21,6 +21,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <iostream>
 
@@ -34,8 +35,10 @@ void dim_2(std::ostream &os)
   Triangulation<d> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr,inner,outer,outer,true);
+  tr.set_all_manifold_ids_on_boundary(numbers::flat_manifold_id);
+  tr.reset_manifold(0);
   static SphericalManifold<d> boundary;
-  tr.set_all_manifold_ids_on_boundary(1,1);
+  GridTools::copy_boundary_to_manifold_id(tr);
   tr.set_manifold(1,boundary);
 
   tr.refine_global(2);
@@ -55,8 +58,10 @@ void dim_3(std::ostream &os)
   Triangulation<d> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr,inner,outer,outer,true);
+  tr.set_all_manifold_ids_on_boundary(numbers::flat_manifold_id);
+  tr.reset_manifold(0);
   static CylindricalManifold<d> boundary(2);
-  tr.set_all_manifold_ids_on_boundary(1,1);
+  GridTools::copy_boundary_to_manifold_id(tr);
   tr.set_manifold(1,boundary);
 
   tr.refine_global(1);

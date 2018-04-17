@@ -33,13 +33,14 @@ int main ()
 {
   const unsigned int dim=2;
   Point<dim> origin;
-  SphericalManifold<dim> boundary(origin);
   MappingQ<dim> mapping(2);
   Triangulation<dim> tria;
-  tria.set_manifold(0, boundary);
   const double inner_radius=1.;
   const double outer_radius=5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
+  GridTools::copy_boundary_to_manifold_id(tria);
+  SphericalManifold<dim> boundary(origin);
+  tria.set_manifold(0, boundary);
   tria.refine_global(2);
 
   // build up a map of vertex indices
@@ -94,7 +95,7 @@ int main ()
                 }
           }
     }
-
+  GridTools::copy_boundary_to_manifold_id(tria);
   GridTools::laplace_transform (new_points, tria);
   SphericalManifold<dim> inner_ball(n_center);
   tria.set_manifold(1, inner_ball);

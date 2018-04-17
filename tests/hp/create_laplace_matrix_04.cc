@@ -59,6 +59,7 @@ check ()
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
     GridGenerator::hyper_cube(tr, -1,1);
+  tr.reset_manifold(0);
   tr.refine_global (1);
   tr.begin_active()->set_refine_flag ();
   tr.execute_coarsening_and_refinement ();

@@ -719,6 +719,8 @@ namespace Step22
                                         outer_radius,
                                         0,
                                         true);
+    triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
+    GridTools::copy_boundary_to_manifold_id(triangulation);
 
 #ifdef PERIODIC
     std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> >

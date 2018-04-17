@@ -45,12 +45,15 @@ void check (double r1, double r2, unsigned int n)
   // 3d. the test was written in a way that it tests with this bug present, so
   // undo the big fix here
   GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
+  tria.reset_manifold(0);
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
+  GridTools::copy_boundary_to_manifold_id(tria);
   if (dim==3)
     for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active(); c!=tria.end(); ++c)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (c->face(f)->at_boundary())
           for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
-            c->face(f)->line(e)->set_boundary_id(0);
+            c->face(f)->line(e)->set_manifold_id(0);
 
   static const SphericalManifold<dim> boundary(center);
   tria.set_manifold(0, boundary);

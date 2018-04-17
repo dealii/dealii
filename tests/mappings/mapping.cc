@@ -25,6 +25,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>
@@ -304,8 +305,8 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       v3(1) = 3.;
       tria->set_manifold(1,*boundary1);
       tria->set_manifold(2,*boundary2);
-      tria->begin_active()->face(1)->set_boundary_id(1);
-      tria->begin_active()->face(3)->set_boundary_id(2);
+      tria->begin_active()->face(1)->set_manifold_id(1);
+      tria->begin_active()->face(3)->set_manifold_id(2);
       double pi=std::acos(-1.);
       double alpha=2*std::atan(0.5);
       exact_areas.push_back(4+pi-2.5*(alpha-std::sin(alpha)));
@@ -342,7 +343,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       v3(0) = 0.5;
       v3(1) = 1.5;
       tria->set_manifold(1,*boundary1);
-      tria->begin_active()->face(1)->set_boundary_id(1);
+      tria->begin_active()->face(1)->set_manifold_id(1);
       exact_areas.push_back(0.);
       for (unsigned int i=0; i<=4; ++i)
         show[4][i]=1;
@@ -397,7 +398,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
       tria->set_manifold(1,*boundary1);
-      tria->begin_active()->face(1)->set_boundary_id(1);
+      tria->begin_active()->face(1)->set_manifold_id(1);
       exact_areas.push_back(8.+pi/3*h*h*(3*r-h));
     }
 

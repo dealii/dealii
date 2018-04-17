@@ -49,6 +49,7 @@ check ()
                                    Point<dim>(),
                                    0.5,
                                    1,0);
+  tr.reset_manifold(0);
 
   ConstraintMatrix cm;
   MappingQ<dim> mapping(1);

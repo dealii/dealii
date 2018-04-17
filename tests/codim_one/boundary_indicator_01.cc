@@ -60,6 +60,7 @@ int main ()
     const SphericalManifold<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
+    GridTools::copy_boundary_to_manifold_id(volume_mesh);
     volume_mesh.set_manifold (0, boundary_description);
 
     // exclude one of the 6 faces
@@ -107,6 +108,7 @@ int main ()
       for (unsigned int f=0; f<GeometryInfo<dim-1>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           cell->face(f)->set_boundary_id(1);
+    GridTools::copy_boundary_to_manifold_id(boundary_mesh);
 
     boundary_mesh.refine_global (2);
 

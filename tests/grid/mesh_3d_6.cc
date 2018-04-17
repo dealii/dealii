@@ -126,6 +126,7 @@ int main ()
   {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
+    coarse_grid.reset_manifold(0);
     check (coarse_grid);
   }
 

@@ -73,6 +73,7 @@ void run()
 
   // indicator 6 = cylinder
   GridGenerator::hyper_cube_with_cylindrical_hole (tria, 0.25, 0.5, 0.5, 1, true);
+  tria.reset_manifold(0);
 
   /*  std::string filename = "Mesh.eps";
   std::ofstream output (filename.c_str());

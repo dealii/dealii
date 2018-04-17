@@ -57,6 +57,7 @@ void test()
                               R0,
                               R1,
                               96, true);
+  triangulation.reset_manifold(0);
   triangulation.refine_global (2);
 
   for (typename Triangulation<dim>::active_cell_iterator

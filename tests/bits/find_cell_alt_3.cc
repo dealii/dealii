@@ -72,6 +72,7 @@ int main ()
   {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
+    coarse_grid.reset_all_manifolds();
     coarse_grid.refine_global (1);
     check (coarse_grid);
   }

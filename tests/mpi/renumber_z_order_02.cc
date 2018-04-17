@@ -53,6 +53,7 @@ void test()
                               0.3,
                               1.0,
                               12, true);
+  tr.reset_all_manifolds();
 //  GridGenerator::hyper_cube (tr, -1.0, 1.0);
   tr.refine_global (1);
 

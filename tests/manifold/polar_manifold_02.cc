@@ -37,6 +37,7 @@ void test(unsigned int ref=1)
 
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_ball (tria);
+  tria.reset_manifold(0);
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 

@@ -35,6 +35,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
@@ -169,6 +170,7 @@ void run()
                          Point<dim>(),
                          0.5,
                          1.0);
+  GridTools::copy_boundary_to_manifold_id(triangulation);
 
   static SphericalManifold<dim> boundary((Point<dim>()));
   triangulation.set_manifold (0, boundary);

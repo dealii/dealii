@@ -29,6 +29,7 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -62,6 +63,7 @@ void test()
                               R1,
                               12,
                               true);
+  GridTools::copy_boundary_to_manifold_id(tr);
 
   static SphericalManifold<dim> boundary;
   tr.set_manifold (0, boundary);
