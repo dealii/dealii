@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,11 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// Test that an overlap in boundary and manifold IDs does not lead to
-// the boundary being treated as a (curved) manifold upon refinement.
-
+// Test that an overlap in boundary and manifold IDs does not lead to the
+// boundary being treated as a (curved) manifold upon refinement. More
+// exactly: with the old boundary compatibility code (removed for the 9.0
+// release) boundary ids may be treated as manifold ids. Make sure that this
+// no longer happens.
 #include "../tests.h"
-
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -36,9 +37,7 @@ void print_triangulation_data(Stream &stream,
 // Boundary id count
   std::map<int,int> boundary_id_count;
   std::map<int,int> manifold_id_count;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell!=triangulation.end(); ++cell)
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         {
@@ -57,36 +56,31 @@ void print_triangulation_data(Stream &stream,
                 }
               else
                 manifold_id_count[cell->face(face)->manifold_id()]++;
-
             }
         }
     }
 
-  for (typename std::map<int,int>::const_iterator
-       it = boundary_id_count.begin();
-       it != boundary_id_count.end(); ++it)
+  for (const auto &pair : boundary_id_count)
     {
       stream
-          << "  Boundary: " << it->first
+          << "  Boundary: " << pair.first
           << "  ;"
-          << "  Number of faces: " << it->second
+          << "  Number of faces: " << pair.second
           << "\n";
     }
-  for (typename std::map<int,int>::const_iterator
-       it = manifold_id_count.begin();
-       it != manifold_id_count.end(); ++it)
+  for (const auto &pair : manifold_id_count)
     {
       stream
-          << "  Manifold: " << it->first
+          << "  Manifold: " << pair.first
           << "  ;"
-          << "  Number of faces: " << it->second
+          << "  Number of faces: " << pair.second
           << "\n";
     }
 
   stream << std::endl;
 }
 
-int main (int argc, char *argv[])
+int main ()
 {
   initlog();
 
@@ -98,51 +92,33 @@ int main (int argc, char *argv[])
   const double outer_radius = 0.5;
   const double tol = 1e-6;
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube_with_cylindrical_hole (tria,inner_radius,outer_radius);
+  GridGenerator::hyper_cube_with_cylindrical_hole (tria, inner_radius, outer_radius);
   tria.reset_all_manifolds();
 
-  // Enumerate the flat boundaries and the curved one
-  // separately. Also provide a manifold ID to the curved
-  // surface. Note that the manifold ID coincides with
-  // one of the boundary IDs. This is the root cause of the
-  // issue...
+  // Enumerate the flat boundaries and the curved one separately. Also provide
+  // a manifold ID to the curved surface. Note that the manifold ID coincides
+  // with the boundary IDs. This is the root cause of the issue...
   const types::manifold_id curved_manifold_id = 1;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tria.begin_active();
-       cell != tria.end(); ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     {
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
         {
           if (cell->face(face)->at_boundary())
             {
-              const Point<dim> pt_centre = cell->face(face)->center();
-
               for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
                 {
                   const Point<dim> pt_vertex = cell->face(face)->vertex(vertex);
 
                   if (std::abs(pt_vertex.norm() - inner_radius) < tol)
-                    {
-                      cell->face(face)->set_manifold_id(curved_manifold_id);
-                      cell->face(face)->set_boundary_id(5);
-                    }
+                    cell->face(face)->set_manifold_id(curved_manifold_id);
                   else
-                    {
-                      if (std::abs(pt_centre[0] - outer_radius) < tol)
-                        cell->face(face)->set_boundary_id(1);
-                      else if (std::abs(pt_centre[0] + outer_radius) < tol)
-                        cell->face(face)->set_boundary_id(2);
-                      else if (std::abs(pt_centre[1] - outer_radius) < tol)
-                        cell->face(face)->set_boundary_id(3);
-                      else if (std::abs(pt_centre[1] + outer_radius) < tol)
-                        cell->face(face)->set_boundary_id(4);
-                    }
+                    cell->face(face)->set_boundary_id(curved_manifold_id);
                 }
             }
         }
     }
 
-  static const SphericalManifold<dim> sphere;
+  const SphericalManifold<dim> sphere;
   tria.set_manifold(curved_manifold_id, sphere);
   tria.refine_global(n_global_refinements);
 
@@ -150,11 +126,11 @@ int main (int argc, char *argv[])
   print_triangulation_data(deallog, tria);
 
   deallog << "Output grid: " << std::endl;
-  std::ofstream file_gridout ("grid.vtu");
-  GridOut().write_vtu(tria, file_gridout);
   GridOut().write_vtk(tria, deallog.get_file_stream());
 
   deallog << "OK" << std::endl;
+  std::ofstream file_gridout ("grid.vtu");
+  GridOut().write_vtu(tria, file_gridout);
 
   return 0;
 }
