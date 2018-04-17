@@ -11,3 +11,23 @@
 # misc
 /compile_commands.json
 /.clang_complete
+
+# emacs temporary and backup files
+*~
+*#
+
+# configuration, executable, and output files from examples
+examples/step-*/*eps
+examples/step-*/*json
+examples/step-*/*gmv
+examples/step-*/*gnuplot
+examples/step-*/*svg
+examples/step-*/*visit
+examples/step-*/*vtk
+examples/step-*/*vtu
+examples/step-*/CMakeFiles/
+examples/step-*/Makefile
+examples/step-*/CMakeCache.txt
+examples/step-*/cmake_install.cmake
+examples/step-*/step-?
+examples/step-*/step-??
