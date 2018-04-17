@@ -42,6 +42,7 @@
 #include <numeric>
 #include <set>
 #include <ostream>
+#include <boost/serialization/utility.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -100,6 +101,100 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
 {
   return boost::make_iterator_range(lines.begin(), lines.end());
+}
+
+
+namespace
+{
+  struct line
+  {
+    types::global_dof_index row;
+    double inhom;
+    std::vector< std::pair<types::global_dof_index, double> > entries;
+
+    template <class Archive>
+    void serialize(Archive &ar, const unsigned int)
+    {
+      ar   &row &entries &inhom;
+    }
+
+    line() {}
+
+    line(const ConstraintMatrix &cm, const types::global_dof_index row)
+      : row (row)
+    {
+      inhom = cm.get_inhomogeneity(row);
+      if (auto v=cm.get_constraint_entries(row))
+        entries = *v;
+    }
+  };
+}
+
+bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                                 const MPI_Comm mpi_communicator,
+                                                 const bool verbose) const
+{
+  // identify non-owned rows and send to owner:
+  std::map< unsigned int, std::vector<line> > to_send;
+
+  const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+  IndexSet non_owned = this->get_local_lines();
+  non_owned.subtract_set(locally_owned_dofs[myid]);
+  for (auto it = non_owned.begin(); it != non_owned.end(); ++it)
+    {
+      line l(*this, *it);
+      unsigned int owner;
+      // this is inefficient, but I guess we don't care
+      for (owner=0; owner<locally_owned_dofs.size(); ++owner)
+        {
+          if (locally_owned_dofs[owner].is_element(*it))
+            {
+              to_send[owner].push_back(l);
+              break;
+            }
+        }
+    }
+
+  std::map<unsigned int, std::vector<line> > received = Utilities::MPI::some_to_some (MPI_COMM_WORLD, to_send);
+
+  unsigned int inconsistent = 0;
+
+
+  // from each processor:
+  for (auto  &kv : received)
+    {
+      // for each incoming line:
+      for (auto &lineit : kv.second)
+        {
+          line ref(*this, lineit.row);
+
+          if (lineit.inhom!=ref.inhom)
+            {
+              ++inconsistent;
+
+              if (verbose)
+                std::cout << "Proc " << myid
+                          << " got line " << lineit.row
+                          << " from " << kv.first
+                          << " inhomogeneity " << lineit.inhom << " != " << ref.inhom << std::endl;
+            }
+          else if (ref.entries != lineit.entries)
+            {
+              ++inconsistent;
+              if (verbose)
+                std::cout << "Proc " << myid
+                          << " got line " << lineit.row
+                          << " from " << kv.first
+                          << " wrong values!"
+                          << std::endl;
+            }
+        }
+    }
+
+  const unsigned int total = Utilities::MPI::sum(inconsistent, mpi_communicator);
+  if (verbose && total>0 && myid==0)
+    std::cout << total << " inconsistent lines discovered!" << std::endl;
+  return total==0;
 }
 
 

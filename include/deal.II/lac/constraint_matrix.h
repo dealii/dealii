@@ -1204,6 +1204,31 @@ public:
 
 
   /**
+   * Check if the current object is consistent on all processors
+   * in a distributed computation.
+   *
+   * This method checks if all processors agree on the constraints for their
+   * local lines as returned by get_local_lines(). This method is a collective
+   * operation and will return @p true only if all processors are consistent.
+   *
+   * Please supply the owned DoFs per processor as return by
+   * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs.
+   *
+   * If @p verbose is set to @p true, additional debug information is written
+   * to std::cout.
+   *
+   * @note This method exchanges all constraint information of locally relevant
+   * lines and is as such slow for large computations and should probably
+   * only be used in debug mode.
+   *
+   * @return Whether all ConstraintMatrix objects are consistent.
+   */
+  bool is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                 const MPI_Comm mpi_communicator,
+                                 const bool verbose=false) const;
+
+
+  /**
    * Exception
    *
    * @ingroup Exceptions
