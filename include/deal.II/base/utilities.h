@@ -263,6 +263,7 @@ namespace Utilities
   /**
    * Generate a random number from a normalized Gaussian probability
    * distribution centered around @p a and with standard deviation @p sigma.
+   * The returned number will be different every time the function is called.
    *
    * This function is reentrant, i.e., it can safely be called from multiple
    * threads at the same time. In addition, each thread will get the same
@@ -278,8 +279,8 @@ namespace Utilities
    * @note Like the system function rand(), this function produces the same
    * sequence of random numbers every time a program is started. This is an
    * important property for debugging codes, but it makes it impossible to
-   * really verify statistics properties of a code. For rand(), you can call
-   * srand() to "seed" the random number generator to get different sequences
+   * really verify statistical properties of a code. For `rand()`, you can call
+   * `srand()` to "seed" the random number generator to get different sequences
    * of random numbers every time a program is called. However, this function
    * does not allow seeding the random number generator. If you need this, as
    * above, use one of the C++ or BOOST facilities.
