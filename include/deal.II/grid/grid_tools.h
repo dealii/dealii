@@ -1557,12 +1557,33 @@ namespace GridTools
    * I.e., you can write a program so that it runs in the single-processor single-partition
    * case without packages installed, and only requires them installed when
    * multiple partitions are required.
+   *
+   * @note If the @p cell_weight signal has been attached to the @p triangulation,
+   * then this will be used and passed to the partitioner.
    */
   template <int dim, int spacedim>
   void
   partition_triangulation (const unsigned int  n_partitions,
                            Triangulation<dim, spacedim> &triangulation,
                            const SparsityTools::Partitioner partitioner = SparsityTools::Partitioner::metis
+                          );
+
+  /**
+   * This function performs the same operation as the one above, except that
+   * it takes into consideration a specific set of @p cell_weights, which allow the
+   * partitioner to balance the graph while taking into consideration the
+   * computational effort expended on each cell.
+   *
+   * @note If the @p cell_weights vector is empty, then no weighting is taken
+   * into consideration. If not then the size of this vector must equal to the
+   * number of active cells in the triangulation.
+   */
+  template <int dim, int spacedim>
+  void
+  partition_triangulation (const unsigned int                n_partitions,
+                           const std::vector<unsigned int>  &cell_weights,
+                           Triangulation<dim, spacedim>     &triangulation,
+                           const SparsityTools::Partitioner  partitioner = SparsityTools::Partitioner::metis
                           );
 
   /**
@@ -1606,6 +1627,9 @@ namespace GridTools
    * the connectivity graph built only using face neighbors. In a case like
    * this, partitioning algorithm may sometimes make bad decisions and you may want to build
    * your own connectivity graph.
+   *
+   * @note If the @p cell_weight signal has been attached to the @p triangulation,
+   * then this will be used and passed to the partitioner.
    */
   template <int dim, int spacedim>
   void
@@ -1613,6 +1637,25 @@ namespace GridTools
                            const SparsityPattern &cell_connection_graph,
                            Triangulation<dim,spacedim>    &triangulation,
                            const SparsityTools::Partitioner partitioner = SparsityTools::Partitioner::metis
+                          );
+
+  /**
+   * This function performs the same operation as the one above, except that
+   * it takes into consideration a specific set of @p cell_weights, which allow the
+   * partitioner to balance the graph while taking into consideration the
+   * computational effort expended on each cell.
+   *
+   * @note If the @p cell_weights vector is empty, then no weighting is taken
+   * into consideration. If not then the size of this vector must equal to the
+   * number of active cells in the triangulation.
+   */
+  template <int dim, int spacedim>
+  void
+  partition_triangulation (const unsigned int                n_partitions,
+                           const std::vector<unsigned int>  &cell_weights,
+                           const SparsityPattern            &cell_connection_graph,
+                           Triangulation<dim,spacedim>      &triangulation,
+                           const SparsityTools::Partitioner  partitioner = SparsityTools::Partitioner::metis
                           );
 
   /**
