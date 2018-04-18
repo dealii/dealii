@@ -24,13 +24,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace hp
-{
-  template <int dim, int spacedim>
-  class FECollection;
-}
-
-
 namespace internal
 {
   namespace hp

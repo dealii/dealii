@@ -1164,13 +1164,13 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != nullptr,
+        Assert (dof_handler.fe_collection != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
                               dof_handler.get_fe(fe_index).dofs_per_vertex));
-        Assert (fe_index < dof_handler.finite_elements->size(),
+        Assert (fe_index < dof_handler.fe_collection->size(),
                 ExcInternalError());
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
                 numbers::invalid_unsigned_int,
@@ -1195,7 +1195,7 @@ namespace internal
 
             Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
-            Assert (this_fe_index < dof_handler.finite_elements->size(),
+            Assert (this_fe_index < dof_handler.fe_collection->size(),
                     ExcInternalError());
 
             if (this_fe_index == fe_index)
@@ -1249,7 +1249,7 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != nullptr,
+        Assert (dof_handler.fe_collection,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
@@ -1280,7 +1280,7 @@ namespace internal
 
             Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
-            Assert (this_fe_index < dof_handler.finite_elements->size(),
+            Assert (this_fe_index < dof_handler.fe_collection->size(),
                     ExcInternalError());
 
             if (this_fe_index == fe_index)
@@ -1302,7 +1302,7 @@ namespace internal
       n_active_vertex_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int vertex_index)
       {
-        Assert (dof_handler.finite_elements != nullptr,
+        Assert (dof_handler.fe_collection != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
 
@@ -1350,7 +1350,7 @@ namespace internal
                                   const unsigned int vertex_index,
                                   const unsigned int n)
       {
-        Assert (dof_handler.finite_elements != nullptr,
+        Assert (dof_handler.fe_collection != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (n < n_active_vertex_fe_indices(dof_handler, vertex_index),
@@ -1379,7 +1379,7 @@ namespace internal
             Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
             const types::global_dof_index this_fe_index = *pointer;
 
-            Assert (this_fe_index < dof_handler.finite_elements->size(),
+            Assert (this_fe_index < dof_handler.fe_collection->size(),
                     ExcInternalError());
 
             if (counter == n)
@@ -1410,10 +1410,10 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != nullptr,
+        Assert (dof_handler.fe_collection != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
-        Assert (fe_index < dof_handler.finite_elements->size(),
+        Assert (fe_index < dof_handler.fe_collection->size(),
                 ExcInternalError());
 
         // make sure we don't ask on
@@ -1438,7 +1438,7 @@ namespace internal
             Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
             const types::global_dof_index this_fe_index = *pointer;
 
-            Assert (this_fe_index < dof_handler.finite_elements->size(),
+            Assert (this_fe_index < dof_handler.fe_collection->size(),
                     ExcInternalError());
 
             if (this_fe_index == numbers::invalid_dof_index)
