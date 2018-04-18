@@ -315,7 +315,7 @@ namespace internal
        */
       template <typename StreamType>
       void print_memory_consumption(StreamType     &out,
-                                    const SizeInfo &task_info) const;
+                                    const TaskInfo &task_info) const;
 
       /**
        * Stores whether a cell is Cartesian (cell type 0), has constant

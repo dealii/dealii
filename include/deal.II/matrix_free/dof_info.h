@@ -199,75 +199,21 @@ namespace internal
        * together and interprets them as one cell only, as is needed for
        * vectorization.
        */
-      void reorder_cells (const SizeInfo                  &size_info,
-                          const std::vector<unsigned int> &renumbering,
-                          const std::vector<unsigned int> &constraint_pool_row_index,
-                          const std::vector<unsigned int> &irregular_cells,
-                          const unsigned int               vectorization_length);
-
-      /**
-       * This helper function determines a block size if the user decided not
-       * to force a block size through MatrixFree::AdditionalData. This is
-       * computed based on the number of hardware threads on the system and
-       * the number of macro cells that we should work on.
-       */
-      void guess_block_size (const SizeInfo &size_info,
-                             TaskInfo       &task_info);
-
-      /**
-       * This method goes through all cells that have been filled into @p
-       * dof_indices and finds out which cells can be worked on independently
-       * and which ones are neighboring and need to be done at different times
-       * when used in parallel.
-       *
-       * The strategy is based on a two-level approach. The outer level is
-       * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is subdivided via colors (for
-       * chunks within the same color, can work independently). One task is
-       * represented by a chunk of cells. The cell chunks are formed before
-       * subdivision into partitions and colors.
-       */
-      void
-      make_thread_graph_partition_color (SizeInfo                  &size_info,
-                                         TaskInfo                  &task_info,
-                                         std::vector<unsigned int> &renumbering,
-                                         std::vector<unsigned int> &irregular_cells,
-                                         const bool                 hp_bool);
-
-      /**
-       * This function goes through all cells that have been filled into @p
-       * dof_indices and finds out which cells can be worked on independently
-       * and which ones are neighboring and need to be done at different times
-       * when used in parallel.
-       *
-       * The strategy is based on a two-level approach. The outer level is
-       * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is again subdivided into Cuthill-
-       * McKee-like partitions (partitions whose level differs by more than 2
-       * can be worked on independently). One task is represented by a chunk
-       * of cells. The cell chunks are formed after subdivision into the two
-       * levels of partitions.
-       */
-      void
-      make_thread_graph_partition_partition (SizeInfo                  &size_info,
-                                             TaskInfo                  &task_info,
-                                             std::vector<unsigned int> &renumbering,
-                                             std::vector<unsigned int> &irregular_cells,
-                                             const bool                 hp_bool);
+      void reorder_cells (const SizeInfo                   &size_info,
+                          const std::vector<unsigned int>  &renumbering,
+                          const std::vector<unsigned int>  &constraint_pool_row_index,
+                          const std::vector<unsigned char> &irregular_cells,
+                          const unsigned int                vectorization_length);
 
       /**
        * This function computes the connectivity of the currently stored
-       * indices and fills the structure into a sparsity pattern. The
-       * parameter block_size can be used to specify whether several cells
-       * should be treated as one.
+       * indices in terms of connections between the individual cells and
+       * fills the structure into a sparsity pattern.
        */
       void
-      make_connectivity_graph (const SizeInfo                  &size_info,
-                               const TaskInfo                  &task_info,
+      make_connectivity_graph (const TaskInfo                  &task_info,
                                const std::vector<unsigned int> &renumbering,
-                               const std::vector<unsigned int> &irregular_cells,
-                               const bool                       do_blocking,
-                               DynamicSparsityPattern &connectivity) const;
+                               DynamicSparsityPattern          &connectivity) const;
 
       /**
        * Renumbers the degrees of freedom to give good access for this class.
