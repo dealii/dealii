@@ -278,7 +278,7 @@ namespace internal
             element_type = tensor_symmetric_collocation;
           else
             element_type = tensor_symmetric;
-          if (n_dofs_1d > 3 && element_type == tensor_symmetric)
+          if (n_dofs_1d > 2 && element_type == tensor_symmetric)
             {
               // check if we are a Hermite type
               element_type = tensor_symmetric_hermite;
