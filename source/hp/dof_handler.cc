@@ -960,33 +960,22 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  DoFHandler<dim,spacedim>::DoFHandler ()
+    :
+    tria(nullptr, typeid(*this).name()),
+    faces (nullptr)
+  {}
+
+
+  template <int dim, int spacedim>
   DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
     :
     tria(&tria, typeid(*this).name()),
     faces (nullptr)
   {
-    // decide whether we need a sequential or a parallel shared/distributed policy
-    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
-      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
-    else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
-      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
-    else
-      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
+    setup_policy_and_listeners ();
 
     create_active_fe_table ();
-
-    tria_listeners.push_back
-    (tria.signals.pre_refinement
-     .connect (std::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
-                          std::ref(*this))));
-    tria_listeners.push_back
-    (tria.signals.post_refinement
-     .connect (std::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
-                          std::ref(*this))));
-    tria_listeners.push_back
-    (tria.signals.create
-     .connect (std::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
-                          std::ref(*this))));
   }
 
 
@@ -1269,6 +1258,25 @@ namespace hp
       active_fe_indices[i] = cell->active_fe_index();
   }
 
+  template <int dim, int spacedim>
+  void DoFHandler<dim,spacedim>::initialize(const Triangulation<dim,spacedim> &tria,
+                                            const hp::FECollection<dim,spacedim> &fe)
+  {
+    if (this->tria != &tria)
+      {
+        for (unsigned int i=0; i<tria_listeners.size(); ++i)
+          tria_listeners[i].disconnect ();
+        tria_listeners.clear ();
+
+        this->tria = &tria;
+
+        setup_policy_and_listeners ();
+      }
+
+    create_active_fe_table ();
+
+    distribute_dofs (fe);
+  }
 
 
   template <int dim, int spacedim>
@@ -1371,6 +1379,31 @@ namespace hp
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
   }
 
+
+  template <int dim, int spacedim>
+  void DoFHandler<dim,spacedim>::setup_policy_and_listeners ()
+  {
+    // decide whether we need a sequential or a parallel shared/distributed policy
+    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
+    else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
+    else
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
+
+    tria_listeners.push_back
+    (this->tria->signals.pre_refinement
+     .connect (std::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
+                          std::ref(*this))));
+    tria_listeners.push_back
+    (this->tria->signals.post_refinement
+     .connect (std::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+                          std::ref(*this))));
+    tria_listeners.push_back
+    (this->tria->signals.create
+     .connect (std::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+                          std::ref(*this))));
+  }
 
 
   template <int dim, int spacedim>
