@@ -35,9 +35,9 @@ void dim_2(std::ostream &os)
   Triangulation<d> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr,inner,outer,outer,true);
-  tr.set_all_manifold_ids_on_boundary(numbers::flat_manifold_id);
+  tr.set_all_manifold_ids(numbers::flat_manifold_id);
   tr.reset_manifold(0);
-  static SphericalManifold<d> boundary;
+  SphericalManifold<d> boundary;
   GridTools::copy_boundary_to_manifold_id(tr);
   tr.set_manifold(1,boundary);
 
@@ -58,9 +58,9 @@ void dim_3(std::ostream &os)
   Triangulation<d> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr,inner,outer,outer,true);
-  tr.set_all_manifold_ids_on_boundary(numbers::flat_manifold_id);
+  tr.set_all_manifold_ids(numbers::flat_manifold_id);
   tr.reset_manifold(0);
-  static CylindricalManifold<d> boundary(2);
+  CylindricalManifold<d> boundary(2);
   GridTools::copy_boundary_to_manifold_id(tr);
   tr.set_manifold(1,boundary);
 
