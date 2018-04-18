@@ -1212,18 +1212,24 @@ public:
    * operation and will return @p true only if all processors are consistent.
    *
    * Please supply the owned DoFs per processor as return by
-   * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs.
+   * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs
+   * and the result of DoFTools::extract_locally_active_dofs() as
+   * @p locally_active_dofs. The
+   * former is used to determine ownership of the specific DoF, while the latter
+   * is used as the set of rows that need to be checked.
    *
    * If @p verbose is set to @p true, additional debug information is written
    * to std::cout.
    *
-   * @note This method exchanges all constraint information of locally relevant
+   * @note This method exchanges all constraint information of locally active
    * lines and is as such slow for large computations and should probably
    * only be used in debug mode.
    *
-   * @return Whether all ConstraintMatrix objects are consistent.
+   * @return Whether all ConstraintMatrix objects are consistent. Returns the
+   * same value on all processors.
    */
   bool is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                 const IndexSet &locally_active_dofs,
                                  const MPI_Comm mpi_communicator,
                                  const bool verbose=false) const;
 

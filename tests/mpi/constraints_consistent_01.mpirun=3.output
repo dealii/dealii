@@ -414,7 +414,7 @@ constraints:
     91 = 42.0000
     94 = 42.0000
     95 = 42.0000
-DEAL:0::consistent? 0
+DEAL:0::consistent? 1
 
 DEAL:1::LocallyOwned = {[50,129]}
 constraints:
@@ -464,7 +464,7 @@ constraints:
     147 = 42.0000
     150 = 42.0000
     151 = 42.0000
-DEAL:1::consistent? 0
+DEAL:1::consistent? 1
 
 
 DEAL:2::LocallyOwned = {[130,161]}
@@ -495,6 +495,6 @@ constraints:
     157 = 42.0000
     158 = 42.0000
     159 = 42.0000
-DEAL:2::consistent? 0
+DEAL:2::consistent? 1
 
 DEAL::OK

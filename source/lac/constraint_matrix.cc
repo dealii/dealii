@@ -131,6 +131,7 @@ namespace
 }
 
 bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                                 const IndexSet &locally_active_dofs,
                                                  const MPI_Comm mpi_communicator,
                                                  const bool verbose) const
 {
@@ -138,7 +139,10 @@ bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &lo
   std::map< unsigned int, std::vector<line> > to_send;
 
   const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
-  IndexSet non_owned = this->get_local_lines();
+
+  // We will send all locally active dofs that are not locally owned for checking. Note
+  // that we allow constraints to differ on locally_relevant (and not active) DoFs.
+  IndexSet non_owned = locally_active_dofs;
   non_owned.subtract_set(locally_owned_dofs[myid]);
   for (auto it = non_owned.begin(); it != non_owned.end(); ++it)
     {
