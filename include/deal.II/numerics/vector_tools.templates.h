@@ -7245,7 +7245,10 @@ namespace VectorTools
       // on, if necessary, so have a read-write version of it:
       double exponent = exponent_1;
 
-      const unsigned int        n_components = dof.get_fe(0).n_components();
+      const unsigned int n_components = dof.get_fe(0).n_components();
+
+      Assert (exact_solution.n_components==n_components,
+              ExcDimensionMismatch(exact_solution.n_components, n_components));
 
       if (weight!=nullptr)
         {
