@@ -61,7 +61,7 @@ namespace GridGenerator
    * tensor product interval $[left,right]^{\text{dim}}$ in the present number
    * of dimensions, where the limits are given as arguments. They default to
    * zero and unity, then producing the unit hypercube.
-               *
+   *
    * If the argument @p colorize is false, all boundary indicators are set to
    * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
    * colorized as in hyper_rectangle(). In 1d the indicators are always
