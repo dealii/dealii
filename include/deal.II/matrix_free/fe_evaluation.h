@@ -1981,25 +1981,98 @@ public:
 
   /**
    * Evaluates the function values, the gradients, and the Hessians of the
-   * FE function given at the DoF values in the input vector at the quadrature
-   * points on the unit cell.  The function arguments specify which parts
-   * shall actually be computed. Needs to be called before the functions @p
-   * get_value(), @p get_gradient() or @p get_laplacian give useful
-   * information (unless these values have been set manually).
+   * polynomial interpolation from the DoF values in the input vector to the
+   * quadrature points on the unit cell.  The function arguments specify which
+   * parts shall actually be computed. This function has to be called first so
+   * that the access functions @p get_value(), @p get_gradient() or @p
+   * get_laplacian give useful information (unless these values have been set
+   * manually).
    */
   void evaluate (const bool evaluate_values,
                  const bool evaluate_gradients,
                  const bool evaluate_hessians = false);
 
   /**
+   * Evaluates the function values, the gradients, and the Hessians of the
+   * polynomial interpolation from the DoF values in the input array @p
+   * values_array to the quadrature points on the unit cell. If multiple
+   * components are involved in the current FEEvaluation object, the sorting
+   * in @p values_array is such that all degrees of freedom for the first
+   * component come first, then all degrees of freedom for the second, and so
+   * on. The function arguments specify which parts shall actually be
+   * computed. This function has to be called first so that the access
+   * functions @p get_value(), @p get_gradient() or @p get_laplacian give
+   * useful information (unless these values have been set manually).
+   */
+  void evaluate (const VectorizedArray<Number> *values_array,
+                 const bool                     evaluate_values,
+                 const bool                     evaluate_gradients,
+                 const bool                     evaluate_hessians = false);
+
+  /**
+   * Reads from the input vector and evaluates the function values, the
+   * gradients, and the Hessians of the polynomial interpolation of the vector
+   * entries from @p input_vector associated with the current cell to the
+   * quadrature points on the unit cell. The function arguments specify which
+   * parts shall actually be computed. This function has to be called first so
+   * that the access functions @p get_value(), @p get_gradient() or @p
+   * get_laplacian give useful information (unless these values have been set
+   * manually).
+   *
+   * This call is equivalent to calling read_dof_values() followed by
+   * evaluate(), but might internally use some additional optimizations.
+   */
+  template <typename VectorType>
+  void gather_evaluate (const VectorType &input_vector,
+                        const bool        evaluate_values,
+                        const bool        evaluate_gradients,
+                        const bool        evaluate_hessians = false);
+
+  /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
    * cell and performs the cell integration. The two function arguments
-   * @p integrate_values and @p integrate_gradients define which of the values
-   * or gradients (or both) are summed together.
+   * @p integrate_values and @p integrate_gradients are used to enable/disable
+   * summation of the contributions submitted to the values or gradients slots,
+   * respectively. The result is written into the internal data field
+   * @p dof_values (that is usually written into the result vector by the
+   * distribute_local_to_global() or set_dof_values() methods).
    */
   void integrate (const bool integrate_values,
                   const bool integrate_gradients);
+
+  /**
+   * This function takes the values and/or gradients that are stored on
+   * quadrature points, tests them by all the basis functions/gradients on the
+   * cell and performs the cell integration. The two function arguments @p
+   * integrate_values and @p integrate_gradients are used to enable/disable
+   * summation of the contributions submitted to the values or gradients
+   * slots, respectively. As opposed to the other integrate() method, this
+   * call stores the result of the testing in the given array @p values_array,
+   * whose previous results is overwritten, rather than writing it on the
+   * internal data structures behind begin_dof_values().
+   */
+  void integrate (const bool               integrate_values,
+                  const bool               integrate_gradients,
+                  VectorizedArray<Number> *values_array);
+
+  /**
+   * This function takes the values and/or gradients that are stored on
+   * quadrature points, tests them by all the basis functions/gradients on the
+   * cell, performs the cell integration, and adds the result into the global
+   * vector @p output_vector on the degrees of freedom associated with the
+   * present cell index. The two function arguments @p integrate_values and
+   * @p integrate_gradients are used to enable/disable summation of the
+   * contributions submitted to the values or gradients slots, respectively.
+   *
+   * This call is equivalent to calling integrate() followed by
+   * distribute_local_to_global(), but might internally use
+   * some additional optimizations.
+   */
+  template <typename VectorType>
+  void integrate_scatter (const bool  integrate_values,
+                          const bool  integrate_gradients,
+                          VectorType &output_vector);
 
   /**
    * Return the q-th quadrature point stored in MappingInfo.
@@ -5334,11 +5407,24 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 {
   Assert (this->dof_values_initialized == true,
           internal::ExcAccessToUninitializedField());
-  Assert(this->matrix_info != nullptr ||
-         this->mapped_geometry->is_initialized(), ExcNotInitialized());
+  evaluate(this->values_dofs[0], evaluate_values, evaluate_gradients, evaluate_hessians);
+}
 
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+void
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::evaluate (const VectorizedArray<Number> *values_array,
+            const bool evaluate_values,
+            const bool evaluate_gradients,
+            const bool evaluate_hessians)
+{
   SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, VectorizedArray<Number> >
-  ::evaluate (*this->data, this->values_dofs[0], this->values_quad[0],
+  ::evaluate (*this->data, const_cast<VectorizedArray<Number>*>(values_array),
+              this->values_quad[0],
               this->gradients_quad[0][0], this->hessians_quad[0][0], this->scratch_data,
               evaluate_values, evaluate_gradients, evaluate_hessians);
 
@@ -5356,11 +5442,47 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
+template <typename VectorType>
+inline
+void
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::gather_evaluate (const VectorType &input_vector,
+                   const bool        evaluate_values,
+                   const bool        evaluate_gradients,
+                   const bool        evaluate_hessians)
+{
+  this->read_dof_values(input_vector);
+  evaluate(this->begin_dof_values(), evaluate_values, evaluate_gradients,
+           evaluate_hessians);
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::integrate (const bool integrate_values,
              const bool integrate_gradients)
+{
+  integrate(integrate_values, integrate_gradients, this->values_dofs[0]);
+
+#ifdef DEBUG
+  this->dof_values_initialized = true;
+#endif
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+inline
+void
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::integrate (const bool               integrate_values,
+             const bool               integrate_gradients,
+             VectorizedArray<Number> *values_array)
 {
   if (integrate_values == true)
     Assert (this->values_quad_submitted == true,
@@ -5372,13 +5494,29 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
   SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, VectorizedArray<Number> >
-  ::integrate (*this->data, this->values_dofs[0], this->values_quad[0],
+  ::integrate (*this->data, values_array, this->values_quad[0],
                this->gradients_quad[0][0], this->scratch_data,
                integrate_values, integrate_gradients);
 
 #ifdef DEBUG
   this->dof_values_initialized = true;
 #endif
+}
+
+
+
+template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
+          typename Number>
+template <typename VectorType>
+inline
+void
+FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
+::integrate_scatter (const bool  integrate_values,
+                     const bool  integrate_gradients,
+                     VectorType &destination)
+{
+  integrate(integrate_values, integrate_gradients, this->begin_dof_values());
+  this->distribute_local_to_global(destination);
 }
 
 
