@@ -2406,6 +2406,36 @@ next_cell:
                            const SparsityTools::Partitioner  partitioner
                           )
   {
+    std::vector<unsigned int> cell_weights;
+
+    // Get cell weighting if a signal has been attached to the triangulation
+    if (!triangulation.signals.cell_weight.empty())
+      {
+        cell_weights.resize(triangulation.n_active_cells(), std::numeric_limits<unsigned int>::max());
+
+        unsigned int c = 0;
+        typename Triangulation<dim>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
+        for (; cell!=endc; ++cell, ++c)
+          cell_weights[c] = triangulation.signals.cell_weight(cell, Triangulation<dim,spacedim>::CellStatus::CELL_PERSIST);
+      }
+
+    // Call the other more general function
+    partition_triangulation(n_partitions, cell_weights,
+                            triangulation, partitioner);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation (const unsigned int                n_partitions,
+                           const std::vector<unsigned int>  &cell_weights,
+                           Triangulation<dim,spacedim>      &triangulation,
+                           const SparsityTools::Partitioner  partitioner
+                          )
+  {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
              == nullptr),
@@ -2436,6 +2466,7 @@ next_cell:
     SparsityPattern sp_cell_connectivity;
     sp_cell_connectivity.copy_from(cell_connectivity);
     partition_triangulation (n_partitions,
+                             cell_weights,
                              sp_cell_connectivity,
                              triangulation,
                              partitioner
@@ -2449,6 +2480,38 @@ next_cell:
   partition_triangulation (const unsigned int           n_partitions,
                            const SparsityPattern        &cell_connection_graph,
                            Triangulation<dim,spacedim>  &triangulation,
+                           const SparsityTools::Partitioner  partitioner
+                          )
+  {
+    std::vector<unsigned int> cell_weights;
+
+    // Get cell weighting if a signal has been attached to the triangulation
+    if (!triangulation.signals.cell_weight.empty())
+      {
+        cell_weights.resize(triangulation.n_active_cells(), std::numeric_limits<unsigned int>::max());
+
+        unsigned int c = 0;
+        typename Triangulation<dim>::active_cell_iterator
+        cell = triangulation.begin_active(),
+        endc = triangulation.end();
+        for (; cell!=endc; ++cell, ++c)
+          cell_weights[c] = triangulation.signals.cell_weight(cell, Triangulation<dim,spacedim>::CellStatus::CELL_PERSIST);
+      }
+
+    // Call the other more general function
+    partition_triangulation(n_partitions, cell_weights,
+                            cell_connection_graph,
+                            triangulation, partitioner);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation (const unsigned int                n_partitions,
+                           const std::vector<unsigned int>  &cell_weights,
+                           const SparsityPattern            &cell_connection_graph,
+                           Triangulation<dim,spacedim>      &triangulation,
                            const SparsityTools::Partitioner  partitioner
                           )
   {
@@ -2479,7 +2542,8 @@ next_cell:
     // of freedom (which is associated with a
     // cell)
     std::vector<unsigned int> partition_indices (triangulation.n_active_cells());
-    SparsityTools::partition (cell_connection_graph, n_partitions,  partition_indices, partitioner);
+    SparsityTools::partition (cell_connection_graph, cell_weights, n_partitions,
+                              partition_indices, partitioner);
 
     // finally loop over all cells and set the
     // subdomain ids

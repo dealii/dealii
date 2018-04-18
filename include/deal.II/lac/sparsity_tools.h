@@ -104,6 +104,24 @@ namespace SparsityTools
                   const Partitioner partitioner = Partitioner::metis
                  );
 
+
+  /**
+   * This function performs the same operation as the one above, except that
+   * it takes into consideration a set of @p cell_weights, which allow the
+   * partitioner to balance the graph while taking into consideration the
+   * computational effort expended on each cell.
+   *
+   * @note If the @p cell_weights vector is empty, then no weighting is taken
+   * into consideration. If not then the size of this vector must equal to the
+   * number of active cells in the triangulation.
+   */
+  void partition (const SparsityPattern           &sparsity_pattern,
+                  const std::vector<unsigned int> &cell_weights,
+                  const unsigned int               n_partitions,
+                  std::vector<unsigned int>       &partition_indices,
+                  const Partitioner                partitioner = Partitioner::metis
+                 );
+
   /**
    * Using a coloring algorithm provided by ZOLTAN to color nodes whose
    * connections are represented using a SparsityPattern object. In effect,

@@ -52,14 +52,16 @@ namespace SparsityTools
 
   namespace
   {
-    void partition_metis (const SparsityPattern     &sparsity_pattern,
-                          const unsigned int         n_partitions,
-                          std::vector<unsigned int> &partition_indices)
+    void partition_metis (const SparsityPattern           &sparsity_pattern,
+                          const std::vector<unsigned int> &cell_weights,
+                          const unsigned int               n_partitions,
+                          std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that METIS is actually
       // installed and detected
 #ifndef DEAL_II_WITH_METIS
       (void) sparsity_pattern;
+      (void) cell_weights;
       (void) n_partitions;
       (void) partition_indices;
       AssertThrow (false, ExcMETISNotInstalled());
@@ -104,6 +106,22 @@ namespace SparsityTools
 
       std::vector<idx_t> int_partition_indices (sparsity_pattern.n_rows());
 
+      // Setup cell weighting option
+      std::vector<idx_t> int_cell_weights;
+      if (cell_weights.size() > 0)
+        {
+          Assert(cell_weights.size() == sparsity_pattern.n_rows(),
+                 ExcDimensionMismatch(cell_weights.size(),sparsity_pattern.n_rows()));
+          int_cell_weights.resize(cell_weights.size());
+          std::copy (cell_weights.begin(),
+                     cell_weights.end(),
+                     int_cell_weights.begin());
+        }
+      // Set a pointer to the optional cell weighting information.
+      // METIS expects a null pointer if there are no weights to be considered.
+      idx_t *const p_int_cell_weights = (cell_weights.size() > 0 ? int_cell_weights.data() : nullptr);
+
+
       // Make use of METIS' error code.
       int ierr;
 
@@ -112,14 +130,14 @@ namespace SparsityTools
       // Use recursive if the number of partitions is less than or equal to 8
       if (nparts <= 8)
         ierr = METIS_PartGraphRecursive(&n, &ncon, int_rowstart.data(), int_colnums.data(),
-                                        nullptr, nullptr, nullptr,
+                                        p_int_cell_weights, nullptr, nullptr,
                                         &nparts,nullptr,nullptr,options,
                                         &dummy,int_partition_indices.data());
 
       // Otherwise use kway
       else
         ierr = METIS_PartGraphKway(&n, &ncon, int_rowstart.data(), int_colnums.data(),
-                                   nullptr, nullptr, nullptr,
+                                   p_int_cell_weights, nullptr, nullptr,
                                    &nparts,nullptr,nullptr,options,
                                    &dummy,int_partition_indices.data());
 
@@ -223,18 +241,23 @@ namespace SparsityTools
 #endif
 
 
-    void partition_zoltan (const SparsityPattern     &sparsity_pattern,
-                           const unsigned int         n_partitions,
-                           std::vector<unsigned int> &partition_indices)
+    void partition_zoltan (const SparsityPattern           &sparsity_pattern,
+                           const std::vector<unsigned int> &cell_weights,
+                           const unsigned int               n_partitions,
+                           std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that ZOLTAN is actually
       // installed and detected
 #ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
       (void) sparsity_pattern;
+      (void) cell_weights;
       (void) n_partitions;
       (void) partition_indices;
       AssertThrow (false, ExcZOLTANNotInstalled());
 #else
+
+      Assert(cell_weights.size() == 0,
+             ExcMessage("The cell weighting functionality for Zoltan has not yet been implemented."));
 
       //MPI environment must have been initialized by this point.
       std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
@@ -322,6 +345,21 @@ namespace SparsityTools
                   const Partitioner partitioner
                  )
   {
+    std::vector<unsigned int> cell_weights;
+
+    // Call the other more general function
+    partition(sparsity_pattern, cell_weights, n_partitions,
+              partition_indices, partitioner);
+  }
+
+
+  void partition (const SparsityPattern           &sparsity_pattern,
+                  const std::vector<unsigned int> &cell_weights,
+                  const unsigned int               n_partitions,
+                  std::vector<unsigned int>       &partition_indices,
+                  const Partitioner                partitioner
+                 )
+  {
     Assert (sparsity_pattern.n_rows()==sparsity_pattern.n_cols(),
             ExcNotQuadratic());
     Assert (sparsity_pattern.is_compressed(),
@@ -340,9 +378,9 @@ namespace SparsityTools
       }
 
     if (partitioner == Partitioner::metis)
-      partition_metis(sparsity_pattern, n_partitions, partition_indices);
+      partition_metis(sparsity_pattern, cell_weights, n_partitions, partition_indices);
     else if (partitioner == Partitioner::zoltan)
-      partition_zoltan(sparsity_pattern, n_partitions, partition_indices);
+      partition_zoltan(sparsity_pattern, cell_weights, n_partitions, partition_indices);
     else
       AssertThrow(false, ExcInternalError());
   }
