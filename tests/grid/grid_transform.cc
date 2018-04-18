@@ -38,10 +38,13 @@ int main ()
   const double inner_radius=1.;
   const double outer_radius=5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
-  GridTools::copy_boundary_to_manifold_id(tria);
-  SphericalManifold<dim> boundary(origin);
-  tria.set_manifold(0, boundary);
+  // restore compatibility with the pre-9.0 version of GridGenerator by resetting manifolds
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
+  tria.set_all_manifold_ids_on_boundary(0);
   tria.refine_global(2);
+  // We will move the boundary faces below in the laplace smoothing algorithm:
+  // for now reset all manifold IDs.
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
 
   // build up a map of vertex indices
   // of boundary vertices to the new
@@ -74,6 +77,7 @@ int main ()
                       // they are.
                       new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
                                           face->vertex_index(vertex_no), v));
+                      face->set_manifold_id(0);
                     }
                   else if (std::fabs(std::sqrt(v.square())-inner_radius)<1e-12)
                     {
@@ -88,7 +92,7 @@ int main ()
                       // circle.
                       new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
                                           face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
-                      face->set_boundary_id(1);
+                      face->set_manifold_id(1);
                     }
                   else
                     Assert(false, ExcInternalError());
@@ -96,12 +100,14 @@ int main ()
           }
     }
   GridTools::copy_boundary_to_manifold_id(tria);
-  GridTools::laplace_transform (new_points, tria);
   SphericalManifold<dim> inner_ball(n_center);
   tria.set_manifold(1, inner_ball);
+  SphericalManifold<dim> outer_ball(origin);
+  tria.set_manifold(0, outer_ball);
+  GridTools::laplace_transform (new_points, tria);
 
-  GridOut grid_out;
   std::ofstream eps_stream2("output");
+  GridOut grid_out;
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();
