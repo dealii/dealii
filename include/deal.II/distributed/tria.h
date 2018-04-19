@@ -633,21 +633,15 @@ namespace parallel
        * of bytes the interest party will want to store per cell. (This
        * needs to be a constant per cell.)
        *
-       * The current function then returns an offset that specifies where
-       * in an array the callback function can write. Conceptually, one can
-       * think of this offset in the following way: Let's say, that the
-       * first interested party registers a callback for @p size equal
-       * to @p N1. It will then receive a returned offset of zero
-       * because it will be allowed to write into position zero of an
-       * array that will be allocated for each cell. The second party
-       * registering a callback for @p size equal to @p N2 will then
-       * receive a returned offset of @p N1. The third interested party
-       * will receive an offset of `N1+N2`, etc. Each interested party
-       * needs to store their respective returned offset for later use
+       * The current function then returns an integer handle that corresponds
+       * to the number of data set that the callback provided here will attach.
+       * While this number could be given a precise meaning, this is
+       * not important: You will never actually have to do anything with
+       * this number except return it to the notify_ready_to_unpack() function.
+       * In other words, each interested party (i.e., the caller of the current
+       * function) needs to store their respective returned handle for later use
        * when unpacking data in the callback provided to
-       * notify_ready_to_unpack(). (The actual offsets returned may
-       * be different than the example above, but the principle is
-       * the same.)
+       * notify_ready_to_unpack().
        *
        * Whenever @p pack_callback is then called by
        * execute_coarsening_and_refinement() or load() on a given cell, it
@@ -753,13 +747,16 @@ namespace parallel
        * access the children if the status is `CELL_REFINE` but no longer for
        * callbacks with status `CELL_COARSEN`.
        *
-       * The first argument to this function, `offset`, corresponds to
-       * the return value of register_data_attach() and indicates in essence
-       * the how-manyth data set that was previously attached to each cell
-       * the caller of this function wants to unpack.
+       * The first argument to this function, `handle`, corresponds to
+       * the return value of register_data_attach(). (The precise
+       * meaning of what the numeric value of this handle is supposed
+       * to represent is neither important, nor should you try to use
+       * it for anything other than transmit information between a
+       * call to register_data_attach() to the corresponding call to
+       * notify_ready_to_unpack().)
        */
       void
-      notify_ready_to_unpack (const unsigned int offset,
+      notify_ready_to_unpack (const unsigned int handle,
                               const std::function<void (const cell_iterator &,
                                                         const CellStatus,
                                                         const void *)> &unpack_callback);

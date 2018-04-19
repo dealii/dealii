@@ -816,7 +816,7 @@ namespace
                               const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
                               const typename Triangulation<dim,spacedim>::cell_iterator &parent_cell,
                               const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                              const unsigned int offset,
+                              const unsigned int handle,
                               const typename std::function<
                               void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator, typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus, void *)
                               > &unpack_callback)
@@ -863,7 +863,7 @@ namespace
                                                       dealii_cell->child(c),
                                                       dealii_cell,
                                                       p4est_child[c],
-                                                      offset,
+                                                      handle,
                                                       unpack_callback);
           }
       }
@@ -876,7 +876,7 @@ namespace
               sc_array_index (const_cast<sc_array_t *>(&tree.quadrants), idx)
             );
 
-        void *ptr = static_cast<char *>(q->p.user_data) + offset;
+        void *ptr = static_cast<char *>(q->p.user_data) + handle;
         typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus
         status = * static_cast<
                  typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *
@@ -3261,14 +3261,14 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
-    notify_ready_to_unpack (const unsigned int offset,
+    notify_ready_to_unpack (const unsigned int handle,
                             const std::function<void (const cell_iterator &,
                                                       const CellStatus,
                                                       const void *)> &unpack_callback)
     {
-      Assert (offset >= sizeof(CellStatus),
+      Assert (handle >= sizeof(CellStatus),
               ExcMessage ("Invalid offset."));
-      Assert (offset < sizeof(CellStatus)+attached_data_size,
+      Assert (handle < sizeof(CellStatus)+attached_data_size,
               ExcMessage ("Invalid offset."));
       Assert (n_attached_datas > 0,
               ExcMessage ("The notify_ready_to_unpack() has already been called "
@@ -3298,7 +3298,7 @@ namespace parallel
                                                      cell,
                                                      cell,
                                                      p4est_coarse_cell,
-                                                     offset,
+                                                     handle,
                                                      unpack_callback);
         }
 
