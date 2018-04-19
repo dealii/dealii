@@ -390,16 +390,13 @@ namespace internal
             return false;
 
       // shape values should be zero at x=0.5 for all basis functions except
-      // for one which is one
+      // for the middle one
       if (n_q_points_1d%2 == 1 && n_dofs_1d%2 == 1)
         {
           for (unsigned int i=0; i<n_dofs_1d/2; ++i)
             if (std::abs(get_first_array_element(shape_values[i*n_q_points_1d+
                                                               n_q_points_1d/2])) > zero_tol)
               return false;
-          if (std::abs(get_first_array_element(shape_values[(n_dofs_1d/2)*n_q_points_1d+
-                                                            n_q_points_1d/2])-1.)> zero_tol)
-            return false;
         }
 
       // skew-symmetry for gradient, zero of middle basis function in middle
