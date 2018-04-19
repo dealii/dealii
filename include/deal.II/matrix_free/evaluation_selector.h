@@ -245,8 +245,7 @@ namespace
                                     const bool               evaluate_gradients,
                                     const bool               evaluate_hessians)
   {
-    Assert(shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric||
-           shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation,
+    Assert(shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric,
            ExcInternalError());
     Factory<dim, n_components, Number>::evaluate
     (shape_info, values_dofs_actual, values_quad, gradients_quad, hessians_quad,
@@ -268,8 +267,7 @@ namespace
                                      const bool               integrate_values,
                                      const bool               integrate_gradients)
   {
-    Assert(shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric||
-           shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation,
+    Assert(shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric,
            ExcInternalError());
     Factory<dim, n_components, Number>::integrate
     (shape_info, values_dofs_actual, values_quad, gradients_quad,
@@ -401,7 +399,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate
                  evaluate_values, evaluate_gradients, evaluate_hessians);
     }
   else if (fe_degree < n_q_points_1d &&
-           shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+           shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<dim, fe_degree, n_q_points_1d, n_components, Number>
       ::evaluate(shape_info, values_dofs_actual, values_quad,
@@ -469,7 +467,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate
                   integrate_values, integrate_gradients, false);
     }
   else if (fe_degree < n_q_points_1d &&
-           shape_info.element_type == internal::MatrixFreeFunctions::tensor_symmetric)
+           shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<dim, fe_degree, n_q_points_1d, n_components, Number>
       ::integrate(shape_info, values_dofs_actual, values_quad,

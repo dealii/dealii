@@ -87,6 +87,20 @@ int main ()
   test(FE_DGQ<2>(17), gauss8);
   test(FE_DGQ<2>(25), gauss3);
 
+  test(FE_DGQHermite<2>(1), gauss3);
+  test(FE_DGQHermite<2>(1), gauss8);
+  test(FE_DGQHermite<2>(2), gauss3);
+  test(FE_DGQHermite<2>(2), gauss8);
+  test(FE_DGQHermite<2>(3), gauss3);
+  test(FE_DGQHermite<2>(3), gauss8);
+  test(FE_DGQHermite<2>(6), gauss3);
+  test(FE_DGQHermite<2>(6), gauss8);
+  test(FE_DGQHermite<2>(12), gauss3);
+  test(FE_DGQHermite<2>(12), gauss8);
+  test(FE_DGQHermite<2>(25), gauss3);
+  test(FE_DGQHermite<2>(25), gauss8);
+  test(FE_DGQHermite<2>(45), gauss8);
+
   test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 1)), gauss3);
   test(FE_DGQArbitraryNodes<3>(QIterated<1>(QTrapez<1>(), 6)), gauss3);
   test(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 13)), gauss8);
