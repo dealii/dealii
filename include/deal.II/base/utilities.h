@@ -430,11 +430,26 @@ namespace Utilities
 
   /**
    * Given an arbitrary object of type T, use boost::serialization utilities
-   * to pack the object into a vector of characters. The object can be unpacked
-   * using the Utilities::unpack function below.
+   * to pack the object into a vector of characters and append it to the
+   * given buffer. The number of elements that have been added to the buffer
+   * will be returned. The object can be unpacked using the Utilities::unpack
+   * function below.
    *
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * is compressed.
+   *
+   * If many consecutive calls with the same buffer are considered, it is
+   * recommended for reasons of performance to ensure that its capacity is
+   * sufficient.
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template <typename T>
+  size_t pack (const T &object, std::vector<char> &dest_buffer);
+
+  /**
+   * Creates and returns a buffer solely for the given object, using the
+   * above mentioned pack function.
    *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
@@ -473,6 +488,16 @@ namespace Utilities
   T unpack (const std::vector<char> &buffer);
 
   /**
+   * Same unpack function as above, but takes constant iterators on
+   * (a fraction of) a given packed buffer of type std::vector<char> instead.
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template <typename T>
+  T unpack (const std::vector<char>::iterator &begin,
+            const std::vector<char>::iterator &end);
+
+  /**
    * Given a vector of characters, obtained through a call to the function
    * Utilities::pack, restore its content in an array of type T.
    *
@@ -504,6 +529,17 @@ namespace Utilities
    */
   template <typename T, int N>
   void unpack (const std::vector<char> &buffer,
+               T (&unpacked_object)[N]);
+
+  /**
+   * Same unpack function as above, but takes constant iterators on
+   * (a fraction of) a given packed buffer of type std::vector<char> instead.
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template <typename T, int N>
+  void unpack (const std::vector<char>::iterator &begin,
+               const std::vector<char>::iterator &end,
                T (&unpacked_object)[N]);
 
   /**
@@ -927,9 +963,10 @@ namespace Utilities
   }
 
 
+// --------------------- non-inline functions
 
   template <typename T>
-  std::vector<char> pack(const T &object)
+  size_t pack (const T &object, std::vector<char> &dest_buffer)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -947,22 +984,25 @@ namespace Utilities
       &&
       sizeof(T)<256)
       {
-        std::vector<char> buffer (sizeof(T));
-        std::memcpy (buffer.data(), &object, sizeof(T));
-        return buffer;
+        const size_t previous_size = dest_buffer.size();
+        dest_buffer.resize (previous_size + sizeof(T));
+
+        std::memcpy (dest_buffer.data() + previous_size, &object, sizeof(T));
+
+        return sizeof(T);
       }
     else
       {
-        // set up a buffer and then use it as the target of a compressing
+        // use buffer as the target of a compressing
         // stream into which we serialize the current object
-        std::vector<char> buffer;
+        const size_t previous_size = dest_buffer.size();
         {
 #ifdef DEAL_II_WITH_ZLIB
           boost::iostreams::filtering_ostream out;
           out.push(boost::iostreams::gzip_compressor
                    (boost::iostreams::gzip_params
                     (boost::iostreams::gzip::best_compression)));
-          out.push(boost::iostreams::back_inserter(buffer));
+          out.push(boost::iostreams::back_inserter(dest_buffer));
 
           boost::archive::binary_oarchive archive(out);
           archive << object;
@@ -971,18 +1011,29 @@ namespace Utilities
           std::ostringstream out;
           boost::archive::binary_oarchive archive(out);
           archive << object;
+
           const std::string &s = out.str();
-          buffer.reserve(s.size());
-          buffer.assign(s.begin(), s.end());
+          dest_buffer.reserve (dest_buffer.size() + s.size());
+          std::move (s.begin(), s.end(), std::back_inserter(dest_buffer));
 #endif
         }
-        return buffer;
+        return (dest_buffer.size() - previous_size);
       }
   }
 
 
   template <typename T>
-  T unpack(const std::vector<char> &buffer)
+  std::vector<char> pack (const T &object)
+  {
+    std::vector<char> buffer;
+    pack<T> (object, buffer);
+    return buffer;
+  }
+
+
+  template <typename T>
+  T unpack (const std::vector<char>::const_iterator &cbegin,
+            const std::vector<char>::const_iterator &cend)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1000,9 +1051,9 @@ namespace Utilities
       &&
       sizeof(T)<256)
       {
-        Assert (buffer.size() == sizeof(T), ExcInternalError());
+        Assert (std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         T object;
-        std::memcpy (&object, buffer.data(), sizeof(T));
+        std::memcpy (&object, &*cbegin, sizeof(T));
         return object;
       }
     else
@@ -1016,9 +1067,9 @@ namespace Utilities
           boost::iostreams::filtering_ostream decompressing_stream;
           decompressing_stream.push(boost::iostreams::gzip_decompressor());
           decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-          decompressing_stream.write (buffer.data(), buffer.size());
+          decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
 #else
-          decompressed_buffer.assign (buffer.begin(), buffer.end());
+          decompressed_buffer.assign (cbegin, cend);
 #endif
         }
 
@@ -1032,9 +1083,16 @@ namespace Utilities
   }
 
 
+  template <typename T>
+  T unpack(const std::vector<char> &buffer)
+  {
+    return unpack<T> (buffer.cbegin(), buffer.cend());
+  }
+
 
   template <typename T, int N>
-  void unpack (const std::vector<char> &buffer,
+  void unpack (const std::vector<char>::const_iterator &cbegin,
+               const std::vector<char>::const_iterator &cend,
                T (&unpacked_object)[N])
   {
     // see if the object is small and copyable via memcpy. if so, use
@@ -1053,8 +1111,8 @@ namespace Utilities
       &&
       sizeof(T)*N<256)
       {
-        Assert (buffer.size() == sizeof(T)*N, ExcInternalError());
-        std::memcpy (unpacked_object, buffer.data(), sizeof(T)*N);
+        Assert (std::distance(cbegin, cend) == sizeof(T)*N, ExcInternalError());
+        std::memcpy (unpacked_object, &*cbegin, sizeof(T)*N);
       }
     else
       {
@@ -1066,9 +1124,9 @@ namespace Utilities
           boost::iostreams::filtering_ostream decompressing_stream;
           decompressing_stream.push(boost::iostreams::gzip_decompressor());
           decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-          decompressing_stream.write (buffer.data(), buffer.size());
+          decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
 #else
-          decompressed_buffer.assign (buffer.begin(), buffer.end());
+          decompressed_buffer.assign (cbegin, cend);
 #endif
         }
 
@@ -1078,6 +1136,14 @@ namespace Utilities
 
         archive >> unpacked_object;
       }
+  }
+
+
+  template <typename T, int N>
+  void unpack (const std::vector<char> &buffer,
+               T (&unpacked_object)[N])
+  {
+    unpack<T,N> (buffer.cbegin(), buffer.cend(), unpacked_object);
   }
 
 }
