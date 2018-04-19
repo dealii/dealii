@@ -1,0 +1,27 @@
+
+DEAL:0::Deal.II GridTools::distributed_compute_point_locations
+DEAL:0::Test 3: maps values
+DEAL:0::2D tests:
+DEAL:0::Testing for dim = 2 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0:: Testing on 64 points
+DEAL:0::Test passed
+DEAL:0::3D tests
+DEAL:0::Testing for dim = 3 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0:: Testing on 512 points
+DEAL:0::Test passed
+
+DEAL:1::Deal.II GridTools::distributed_compute_point_locations
+DEAL:1::Test 3: maps values
+DEAL:1::2D tests:
+DEAL:1::Testing for dim = 2 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1:: Testing on 64 points
+DEAL:1::Test passed
+DEAL:1::3D tests
+DEAL:1::Testing for dim = 3 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1:: Testing on 512 points
+DEAL:1::Test passed
+

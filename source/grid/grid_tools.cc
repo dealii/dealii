@@ -4143,18 +4143,21 @@ next_cell:
               {
                 // Point inside locally owned cell: storing all its data
                 std::vector < Point<spacedim> > cell_points(indices_loc.size());
+                std::vector < unsigned int > cell_points_idx(indices_loc.size());
                 for (unsigned int i=0; i< indices_loc.size(); ++i)
                   {
                     // Adding the point to the cell points
                     cell_points[i] = local_points[indices_loc[i]];
+
                     // Storing the index: notice indices loc refer to the local points
                     // vector, but we need to return the index with respect of
                     // the points owned by the current process
+                    cell_points_idx[i] = local_points_idx[indices_loc[i]];
                     classified_pts.emplace_back(local_points_idx[indices_loc[i]]);
                   }
                 output_unmap.emplace(std::make_pair(cell_loc,
                                                     std::make_tuple(q_loc,
-                                                                    indices_loc,
+                                                                    cell_points_idx,
                                                                     cell_points,
                                                                     std::vector<unsigned int>
                                                                     (indices_loc.size(),cell_loc->subdomain_id()))));
@@ -4164,9 +4167,11 @@ next_cell:
                 // Point inside ghost cell: storing all its information and preparing
                 // it to be sent
                 std::vector < Point<spacedim> > cell_points(indices_loc.size());
+                std::vector < unsigned int > cell_points_idx(indices_loc.size());
                 for (unsigned int i=0; i< indices_loc.size(); ++i)
                   {
                     cell_points[i] = local_points[indices_loc[i]];
+                    cell_points_idx[i] = local_points_idx[indices_loc[i]];
                     classified_pts.emplace_back(local_points_idx[indices_loc[i]]);
                   }
                 // Each key of the following map represent a process,
@@ -4176,7 +4181,7 @@ next_cell:
                 // To identify the cell on the other process we use the cell id
                 std::get<0>(map_tuple_owner).emplace_back(cell_loc->id());
                 std::get<1>(map_tuple_owner).emplace_back(q_loc);
-                std::get<2>(map_tuple_owner).emplace_back(indices_loc);
+                std::get<2>(map_tuple_owner).emplace_back(cell_points_idx);
                 std::get<3>(map_tuple_owner).emplace_back(cell_points);
               }
             // else: the cell is artificial, nothing to do
@@ -4218,7 +4223,7 @@ next_cell:
             // Rewriting the contents of the map in human readable format
             const auto &received_process = rank_and_points.first;
             const auto &received_points = rank_and_points.second.first;
-            const auto &received_ranks = rank_and_points.second.second;
+            const auto &received_map = rank_and_points.second.second;
 
             // Initializing the vectors needed to store the result of compute point location
             std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator > in_cell;
@@ -4246,7 +4251,7 @@ next_cell:
                     std::vector< Point<spacedim> > cell_points(loc_size);
                     for (unsigned int pt=0; pt<loc_size; ++pt)
                       {
-                        cell_maps[pt] = received_ranks[proc_maps[pt]];
+                        cell_maps[pt] = received_map[proc_maps[pt]];
                         cell_points[pt] = received_points[proc_maps[pt]];
                       }
                     in_maps.emplace_back(cell_maps);
@@ -4376,6 +4381,7 @@ next_cell:
         {
           // Finding/adding in the map the current process
           auto &current_pts = other_owned_pts[indices.second];
+          // Indices.first is the index of the considered point in local points
           current_pts.first.emplace_back(local_points[indices.first]);
           current_pts.second.emplace_back(indices.first);
         }
@@ -4399,13 +4405,18 @@ next_cell:
 
     // Step 3: construct vectors containing uncertain points i.e. those whose owner
     // is known among few guesses
+    // The maps goes from rank of the probable owner to a pair of vectors: the first
+    // containing the points, the second containing the ranks in the current process
     std::map<
     unsigned int,
              std::pair< std::vector < Point<spacedim> >,
-             std::vector<unsigned int > > >
+             std::vector< unsigned int > > >
              other_check_pts;
 
-    const auto &other_check_idx = std::get<2>(guessed_points);
+    // This map goes from the point index to a vector of
+    // ranks probable owners
+    const std::map< unsigned int, std::vector< unsigned int > >
+    &other_check_idx = std::get<2>(guessed_points);
 
     // Points in classified pts need not to be communicated;
     // sorting the array classified pts in order to use
@@ -4416,15 +4427,20 @@ next_cell:
 
     for (const auto &pt_to_guesses: other_check_idx)
       {
+        const auto &point_idx = pt_to_guesses.first;
+        const auto &probable_owners_rks = pt_to_guesses.second;
         if ( !std::binary_search(
-               classified_pts.begin(), classified_pts.end(),pt_to_guesses.first) )
+               classified_pts.begin(), classified_pts.end(), point_idx) )
           // The point wasn't found in ghost or locally owned cells: adding it to the map
-          for (unsigned int rank=0; rank<pt_to_guesses.second.size(); ++rank)
-            if (pt_to_guesses.second[rank] != my_rank)
+          for (unsigned int i=0; i<probable_owners_rks.size(); ++i)
+            if (probable_owners_rks[i] != my_rank)
               {
-                auto &current_pts = other_check_pts[pt_to_guesses.second[rank]];
-                current_pts.first.emplace_back(local_points[pt_to_guesses.first]);
-                current_pts.second.emplace_back(pt_to_guesses.second[rank]);
+                // add to the data for process probable_owners_rks[i]
+                auto &current_pts = other_check_pts[probable_owners_rks[i]];
+                // The point local_points[point_idx]
+                current_pts.first.emplace_back(local_points[point_idx]);
+                // and its index in the current process
+                current_pts.second.emplace_back(point_idx);
               }
       }
 
