@@ -3267,10 +3267,12 @@ namespace parallel
                                                       const void *)> &unpack_callback)
     {
       Assert (offset >= sizeof(CellStatus),
-              ExcMessage ("invalid offset in notify_ready_to_unpack()"));
+              ExcMessage ("Invalid offset."));
       Assert (offset < sizeof(CellStatus)+attached_data_size,
-              ExcMessage ("invalid offset in notify_ready_to_unpack()"));
-      Assert (n_attached_datas > 0, ExcMessage ("notify_ready_to_unpack() called too often"));
+              ExcMessage ("Invalid offset."));
+      Assert (n_attached_datas > 0,
+              ExcMessage ("The notify_ready_to_unpack() has already been called "
+                          "once for each registered callback."));
 
       // Recurse over p4est and hand the caller the data back
       for (typename Triangulation<dim, spacedim>::cell_iterator
@@ -3313,7 +3315,7 @@ namespace parallel
       // would destroy the saved data before the second SolutionTransfer can
       // get it. This created a bug that is documented in
       // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
-      if (!n_attached_datas && n_attached_deserialize == 0)
+      if (n_attached_datas == 0 && n_attached_deserialize == 0)
         {
           // everybody got their data, time for cleanup!
           attached_data_size = 0;
