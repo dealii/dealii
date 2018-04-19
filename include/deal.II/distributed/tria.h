@@ -714,18 +714,49 @@ namespace parallel
                                                       void *)> &pack_callback);
 
       /**
-       * The supplied callback function is called for each newly locally owned
-       * cell and corresponding data saved with register_data_attach().  This
-       * function needs to be called after execute_coarsening_and_refinement()
-       * with the offset returned by register_data_attach().
+       * This function is the opposite of register_data_attach(). It is called
+       * <i>after</i> the execute_coarsening_and_refinement() or save()/load()
+       * functions are done when classes and functions that have previously
+       * attached data to a triangulation for either transfer to other
+       * processors, across mesh refinement, or serialization of data to
+       * a file are ready to receive that data back. The important part about
+       * this process is that the triangulation cannot do this right away from
+       * the end of execute_coarsening_and_refinement() or load() via a
+       * previously attached callback function (as the register_data_attach()
+       * function does) because the classes that eventually want the data
+       * back may need to do some setup between the point in time where the
+       * mesh has been recreated and when the data can actually be received.
+       * An example is the parallel::distributed::SolutionTransfer class
+       * that can really only receive the data once not only the mesh is
+       * completely available again on the current processor, but only
+       * after a DoFHandler has been reinitialized and distributed
+       * degrees of freedom. In other words, there is typically a significant
+       * amount of set up that needs to happen in user space before the classes
+       * that can receive data attached to cell are ready to actually do so.
+       * When they are, they use the current function to tell the triangulation
+       * object that now is the time when they are ready by calling the
+       * current function.
+       *
+       * The supplied callback function is then called for each newly locally owned
+       * cell. The first argument to the callback is an iterator that designated
+       * the cell; the second argument indicates the status of the cell in
+       * question; and the third argument points to a memory area that contains the
+       * data that was previously saved from the callback provided to
+       * register_data_attach().
        *
        * The CellStatus will indicate if the cell was refined, coarsened, or
-       * persisted unchanged. The cell_iterator will either by an active,
+       * persisted unchanged. The @p cell_iterator argument to the callback
+       * will then either be an active,
        * locally owned cell (if the cell was not refined), or the immediate
        * parent if it was refined during execute_coarsening_and_refinement().
        * Therefore, contrary to during register_data_attach(), you can now
-       * access the children if the status is CELL_REFINE but no longer for
-       * callbacks with status CELL_COARSEN.
+       * access the children if the status is `CELL_REFINE` but no longer for
+       * callbacks with status `CELL_COARSEN`.
+       *
+       * The first argument to this function, `offset`, corresponds to
+       * the return value of register_data_attach() and indicates in essence
+       * the how-manyth data set that was previously attached to each cell
+       * the caller of this function wants to unpack.
        */
       void
       notify_ready_to_unpack (const unsigned int offset,
