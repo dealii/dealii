@@ -39,10 +39,32 @@ template <typename number> class Vector;
 /**
  * QR-decomposition of a full matrix.
  *
- * Whenever an object of this class is created, it copies the matrix given and
- * computes its QR-decomposition by Householder algorithm. Then, the function
- * least_squares() can be used to compute the vector <i>x</i> minimizing
- * <i>||Ax-b||</i> for a given vector <i>b</i>.
+ * This class computes the QR-decomposition of given matrix by the
+ * Householder algorithm. Then, the function least_squares() can be
+ * used to compute the vector $x$ minimizing $\|Ax-b\|$ for a given
+ * vector $b$. The QR decomposition of $A$ is useful for this purpose
+ * because the minimizer is given by the equation
+ * $x=(A^TA)^{-1}A^Tb=(R^TQ^TQR)^{-1}R^TQ^Tb$ which is easy to compute
+ * because $Q$ is an orthogonal matrix, and consequently
+ * $Q^TQ=I$. Thus,
+ * $x=(R^TR)^{-1}R^TQ^Tb=R^{-1}R^{-T}R^TQ^Tb=R^{-1}Q^Tb$. Furthermore,
+ * $R$ is triangular, so applying $R^{-1}$ to a vector only involves a
+ * backward or forward solve.
+ *
+ *
+ * <h3>Implementation details</h3>
+ *
+ * The class does not in fact store the $Q$ and $R$ factors explicitly
+ * as matrices. It does store $R$, but the $Q$ factor is stored as the
+ * product of Householder reflections of the form $Q_i = I-v_i v_i^T$
+ * where the vectors $v_i$ are so that they can be stored in the
+ * lower-triangular part of an underlying matrix object, whereas $R$
+ * is stored in the upper triangular part.
+ *
+ * The $v_i$ vectors and the $R$ matrix now are in conflict because they
+ * both want to use the diagonal entry of the matrix, but we can only
+ * store one in these positions, of course. Consequently, the entries
+ * $(v_i)_i$ are stored separately in the `diagonal` member variable.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -57,7 +79,7 @@ class Householder : private FullMatrix<number>
 {
 public:
   /**
-   * Declare type of container size.
+   * Declare type of container size type.
    */
   typedef types::global_dof_index size_type;
 
@@ -67,21 +89,23 @@ public:
   Householder () = default;
 
   /**
-   * Create an object holding the QR-decomposition of a matrix.
+   * Create an object holding the QR-decomposition of the matrix $A$.
    */
   template <typename number2>
-  Householder (const FullMatrix<number2> &);
+  Householder (const FullMatrix<number2> &A);
 
   /**
-   * Compute the QR-decomposition of another matrix.
+   * Compute the QR-decomposition of the given matrix $A$.
+   *
+   * This overwrites any previously computed QR decomposition.
    */
   template <typename number2>
   void
-  initialize (const FullMatrix<number2> &);
+  initialize (const FullMatrix<number2> &A);
 
   /**
    * Solve the least-squares problem for the right hand side <tt>src</tt>. The
-   * return value is the Euclidean norm of the approximation error.
+   * returned scalar value is the Euclidean norm of the approximation error.
    *
    * @arg @c dst contains the solution of the least squares problem on return.
    *
@@ -94,7 +118,7 @@ public:
                         const Vector<number2> &src) const;
 
   /**
-   * This function does the same as the one for BlockVectors.
+   * This function does the same as the previous one, but for BlockVectors.
    */
   template <typename number2>
   double least_squares (BlockVector<number2> &dst,
@@ -105,15 +129,21 @@ public:
    * interface.
    */
   template <class VectorType>
-  void vmult (VectorType &dst, const VectorType &src) const;
+  void vmult (VectorType &dst,
+              const VectorType &src) const;
 
+  /**
+   * A wrapper to least_squares() that implements multiplication with
+   * the transpose matrix.
+   */
   template <class VectorType>
   void Tvmult (VectorType &dst, const VectorType &src) const;
 
 
 private:
   /**
-   * Storage for the diagonal elements of the orthogonal transformation.
+   * Storage for the diagonal elements of the orthogonal
+   * transformation. See the class documentation for more information.
    */
   std::vector<number> diagonal;
 };
@@ -181,12 +211,14 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
 }
 
 
+
 template <typename number>
 template <typename number2>
 Householder<number>::Householder(const FullMatrix<number2> &M)
 {
   initialize(M);
 }
+
 
 
 template <typename number>
@@ -208,7 +240,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   // m > n, m = src.n, n = dst.n
 
   // Multiply Q_n ... Q_2 Q_1 src
-  // Where Q_i = I-v_i v_i^T
+  // Where Q_i = I - v_i v_i^T
   for (size_type j=0; j<n; ++j)
     {
       // sum = v_i^T dst
