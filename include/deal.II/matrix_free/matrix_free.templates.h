@@ -695,7 +695,7 @@ void MatrixFree<dim,Number>::initialize_indices
 
       unsigned int start_nonboundary = numbers::invalid_unsigned_int;
 
-      if (task_info.scheme = internal::MatrixFreeFunctions::TaskInfo::partition_color)
+      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::partition_color)
         {
           // set up partitions. if we just use coloring without partitions, do
           // nothing here, assume all cells to belong to the zero partition (that

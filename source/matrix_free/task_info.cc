@@ -1410,7 +1410,7 @@ namespace internal
       unsigned int max_fe_index = 0;
       for (unsigned int i=0; i<cell_active_fe_index.size(); ++i)
         max_fe_index = std::max(cell_active_fe_index[i], max_fe_index);
-      Assert(!hp_bool || cell_active_fe_index.size() == n_macro_cells,
+      Assert(!hp_bool || cell_active_fe_index.size() == n_active_cells,
              ExcInternalError());
 
       unsigned int n_macro_cells_before = 0;
@@ -1498,14 +1498,14 @@ namespace internal
                       // within one partition-partition
                       missing_macros = 0;
                       std::vector<unsigned int> remaining_per_macro_cell
-                      (max_fe_index);
+                      (max_fe_index+1);
                       std::vector<std::vector<unsigned int> >
                       renumbering_fe_index;
                       unsigned int cell;
                       bool filled = true;
                       if (hp_bool == true)
                         {
-                          renumbering_fe_index.resize(max_fe_index);
+                          renumbering_fe_index.resize(max_fe_index+1);
                           for (cell=counter-partition_counter; cell<counter; ++cell)
                             {
                               renumbering_fe_index
@@ -1515,7 +1515,7 @@ namespace internal
                               push_back(partition_partition_list[cell]);
                             }
                           // check how many more cells are needed in the lists
-                          for (unsigned int j=0; j<max_fe_index; j++)
+                          for (unsigned int j=0; j<max_fe_index+1; j++)
                             {
                               remaining_per_macro_cell[j] =
                                 renumbering_fe_index[j].size()%vectorization_length;
@@ -1606,7 +1606,7 @@ namespace internal
                                         {
                                           filled = true;
                                           for (unsigned int fe_ind=0;
-                                               fe_ind<max_fe_index; ++fe_ind)
+                                               fe_ind<max_fe_index+1; ++fe_ind)
                                             if (remaining_per_macro_cell[fe_ind]!=0)
                                               filled = false;
                                         }
@@ -1622,7 +1622,7 @@ namespace internal
                           // index within one partition-partition which was
                           // implicitly assumed above
                           cell = counter - partition_counter;
-                          for (unsigned int j=0; j<max_fe_index; j++)
+                          for (unsigned int j=0; j<max_fe_index+1; j++)
                             {
                               for (unsigned int jj=0; jj<renumbering_fe_index[j].
                                    size(); jj++)
