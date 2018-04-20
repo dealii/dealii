@@ -158,6 +158,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(7);
   deallog << std::fixed;
 
   for (unsigned int degree=1; degree<4; ++degree)
