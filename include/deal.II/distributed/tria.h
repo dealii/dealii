@@ -847,10 +847,12 @@ namespace parallel
       struct CellAttachedData
       {
         /**
-         * number of bytes that get attached to the Triangulation through
-         * register_data_attach() for example SolutionTransfer.
+         * Cumulative size in bytes of the buffers that those functions that
+         * have called register_data_attach() want to attach to each cell.
+         * This number only pertains to fixed-sized buffers where the data
+         * attached to each cell has exactly the same size.
          */
-        unsigned int attached_data_size;
+        unsigned int cumulative_fixed_data_size;
 
         /**
          * number of functions that get attached to the Triangulation through
