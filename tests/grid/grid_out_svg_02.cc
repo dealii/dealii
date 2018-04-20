@@ -35,6 +35,7 @@ Triangulation<2,2> create_grid()
   Point<2> center(0., 0.);
 
   GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, inner_radius, outer_radius);
+  triangulation.reset_manifold(0);
   triangulation.refine_global(1);
 
   for (unsigned int l=0; l<3; ++l)

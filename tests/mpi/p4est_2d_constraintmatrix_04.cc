@@ -143,6 +143,7 @@ void test()
                               R1,
                               12,
                               true);
+  tr.reset_all_manifolds();
   static SphericalManifold<dim> boundary;
 //  tr.set_manifold (0, boundary);
 // tr.set_manifold (1, boundary);

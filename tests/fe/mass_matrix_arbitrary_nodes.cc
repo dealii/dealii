@@ -44,6 +44,7 @@ void check ()
         GridGenerator::hyper_cube (tr);
       else
         GridGenerator::hyper_ball (tr);
+      tr.reset_manifold(0);
       tr.refine_global (3-dim);
 
       FE_DGQArbitraryNodes<dim> fe ((QGauss<1>(q_points)));

@@ -24,6 +24,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <string>
@@ -35,11 +36,12 @@ void test(std::string filename)
 {
   SphericalManifold<dim, spacedim> boundary;
   Triangulation<dim, spacedim> tria;
-  tria.set_manifold(1, boundary);
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
+  tria.set_all_manifold_ids(1);
+  tria.set_manifold(1, boundary);
 
   GridOut grid_out;
   grid_out.set_flags (GridOutFlags::Ucd(true));

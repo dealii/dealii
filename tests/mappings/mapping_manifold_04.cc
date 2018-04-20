@@ -45,7 +45,7 @@ void test()
                outer_radius = 1.0;
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius);
-
+  triangulation.reset_manifold(0);
   const QGauss<spacedim> quad(3);
 
   FE_Q<dim,spacedim> fe(1);

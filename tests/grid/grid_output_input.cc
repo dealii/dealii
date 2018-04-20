@@ -24,6 +24,7 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_tools.h>
 
 
 
@@ -36,6 +37,8 @@ void test(std::ostream &out)
   Triangulation<dim> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr, .3, .4, 1, 1, false);
+  tr.reset_manifold(0);
+  GridTools::copy_boundary_to_manifold_id(tr);
   CylindricalManifold<dim> boundary(2);
   tr.set_manifold(1, boundary);
   {
@@ -46,8 +49,6 @@ void test(std::ostream &out)
   tr.refine_global(1);
   deallog << "Writing refined from constructor" << std::endl;
   go.write_ucd(tr, out);
-
-  tr.reset_manifold(1);
   tr.clear();
 
   GridIn<dim> gi;
@@ -59,7 +60,8 @@ void test(std::ostream &out)
     grid_file.close();
   }
 
-  tr.set_manifold(1, boundary);
+  GridTools::map_boundary_to_manifold_ids({1}, {0},tr);
+  tr.set_manifold(0, boundary);
   tr.refine_global(1);
   deallog << "Writing refined from file" << std::endl;
   go.write_ucd(tr, out);
@@ -69,8 +71,6 @@ void test(std::ostream &out)
     go.write_msh(tr, grid_file);
     grid_file.close();
   }
-
-  tr.reset_manifold(1);
   tr.clear();
 }
 

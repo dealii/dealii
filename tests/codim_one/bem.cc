@@ -35,6 +35,7 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -128,7 +129,6 @@ BEM<spacedim>::run()
       // works up to cycle<9, but for testin purpose, we stop at 4
       for (unsigned int cycle=0; cycle<4; ++cycle)
         {
-
           tria.set_manifold(1, boundary);
           tria.refine_global(1);
 
@@ -465,6 +465,9 @@ BEM<spacedim>::read_grid(std::string filename)
   gi.attach_triangulation (tria);
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
+
+  for (auto cell = tria.begin_active(); cell != tria.end(); ++cell)
+    cell->set_all_manifold_ids(1);
 }
 
 

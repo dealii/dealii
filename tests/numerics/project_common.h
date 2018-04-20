@@ -204,6 +204,7 @@ void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
     {
       Triangulation<dim>     triangulation;
       GridGenerator::hyper_ball (triangulation);
+      triangulation.set_manifold(0);
       typename Triangulation<dim>::active_cell_iterator
       cell = triangulation.begin_active();
       std::advance (cell, i);

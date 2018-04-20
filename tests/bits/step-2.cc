@@ -22,6 +22,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/hp/dof_handler.h>
@@ -44,6 +45,8 @@ void make_grid (Triangulation<2> &triangulation)
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
                               10);
+  //triangulation.reset_all_manifolds();
+  GridTools::copy_boundary_to_manifold_id(triangulation);
 
   static const SphericalManifold<2> boundary_description(center);
   triangulation.set_manifold (0, boundary_description);

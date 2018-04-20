@@ -428,6 +428,7 @@ template <int dim>
 void AdvectionProblem<dim>::run ()
 {
   GridGenerator::hyper_ball (triangulation);
+  triangulation.reset_manifold(0);
   triangulation.refine_global (3-dim);
 
   // manually refine the first two cells

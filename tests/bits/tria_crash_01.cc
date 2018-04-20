@@ -41,6 +41,7 @@ int main ()
   const unsigned int dim=3;
   Triangulation<dim> tria;
   GridGenerator::cylinder(tria, 1, .7);
+  tria.reset_all_manifolds();
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
 
@@ -77,6 +78,4 @@ int main ()
   tria.execute_coarsening_and_refinement();
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
-
-  return 0;
 }

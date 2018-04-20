@@ -54,7 +54,10 @@ check (const unsigned int level,
 
   DoFHandler<dim> dof(tr);
   if (dim==2)
-    GridGenerator::hyper_ball(tr, Point<dim>(), 1);
+    {
+      GridGenerator::hyper_ball(tr, Point<dim>(), 1);
+      tr.reset_manifold(0);
+    }
   else
     GridGenerator::hyper_cube(tr, -1,1);
 

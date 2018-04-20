@@ -67,6 +67,7 @@ void test_isotropic (int type, std::ostream *logfile)
   else
     GridGenerator::hyper_ball (tria);
 
+  tria.reset_manifold(0);
   tria.refine_global(1);
 
   *logfile << "cycle: 0, number of cells: "<<tria.n_cells()

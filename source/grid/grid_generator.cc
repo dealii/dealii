@@ -1985,7 +1985,8 @@ namespace GridGenerator
   template <>
   void hyper_ball (Triangulation<1> &,
                    const Point<1> &,
-                   const double)
+                   const double,
+                   const bool)
   {
     Assert (false, ExcNotImplemented());
   }
@@ -2265,7 +2266,6 @@ namespace GridGenerator
         cell->face(0)->set_boundary_id(0);
         cell->face(1)->set_boundary_id(4);
         cell->face(3)->set_boundary_id(5);
-
       }
 
   }
@@ -2277,7 +2277,8 @@ namespace GridGenerator
   void
   hyper_ball (Triangulation<2> &tria,
               const Point<2>   &p,
-              const double      radius)
+              const double      radius,
+              const bool internal_manifolds)
   {
     // equilibrate cell sizes at
     // transition from the inner part
@@ -2307,12 +2308,17 @@ namespace GridGenerator
         for (unsigned int j=0; j<4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
+        cells[i].manifold_id = i==2 ? 1 : numbers::flat_manifold_id;
       };
 
     tria.create_triangulation (
       std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
+    tria.set_all_manifold_ids_on_boundary(0);
+    tria.set_manifold(0, SphericalManifold<2>(p));
+    if (internal_manifolds)
+      tria.set_manifold(1, SphericalManifold<2>(p));
   }
 
 
@@ -2379,6 +2385,9 @@ namespace GridGenerator
 
     if (colorize)
       colorize_hyper_shell(tria, center, inner_radius, outer_radius);
+
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<2>(center));
   }
 
 
@@ -2473,6 +2482,8 @@ namespace GridGenerator
     Triangulation<dim>::cell_iterator cell = tria.begin();
     Triangulation<dim>::cell_iterator end = tria.end();
 
+    tria.set_all_manifold_ids_on_boundary(0);
+
     while (cell != end)
       {
         for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
@@ -2484,10 +2495,14 @@ namespace GridGenerator
             // component of the center, then this is part of the plane
             if (cell->face(i)->center()(0) < p(0)+1.e-5 * radius
                 || cell->face(i)->center()(1) < p(1)+1.e-5 * radius)
-              cell->face(i)->set_boundary_id(1);
+              {
+                cell->face(i)->set_boundary_id(1);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
+              }
           }
         ++cell;
       }
+    tria.set_manifold(0, SphericalManifold<2>(p));
   }
 
 
@@ -2534,6 +2549,7 @@ namespace GridGenerator
     Triangulation<2>::cell_iterator cell = tria.begin();
     Triangulation<2>::cell_iterator end = tria.end();
 
+    tria.set_all_manifold_ids_on_boundary(0);
 
     while (cell != end)
       {
@@ -2544,10 +2560,14 @@ namespace GridGenerator
 
             // If x is zero, then this is part of the plane
             if (cell->face(i)->center()(0) < p(0)+1.e-5 * radius)
-              cell->face(i)->set_boundary_id(1);
+              {
+                cell->face(i)->set_boundary_id(1);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
+              }
           }
         ++cell;
       }
+    tria.set_manifold(0, SphericalManifold<2>(p));
   }
 
 
@@ -2632,6 +2652,8 @@ namespace GridGenerator
 
         tria.last()->face(1)->set_boundary_id(2);
       }
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<2>(center));
   }
 
 
@@ -2712,6 +2734,9 @@ namespace GridGenerator
 
         tria.last()->face(1)->set_boundary_id(2);
       }
+
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<2>(center));
   }
 
 
@@ -2896,6 +2921,7 @@ namespace GridGenerator
       }
 
     triangulation.create_triangulation (vertices, cells, SubCellData ());
+    triangulation.set_all_manifold_ids_on_boundary(0);
 
     for (Triangulation<3>::cell_iterator cell = triangulation.begin ();
          cell != triangulation.end (); ++cell)
@@ -2903,6 +2929,7 @@ namespace GridGenerator
         if (cell->vertex (0) (0) == -half_length)
           {
             cell->face (4)->set_boundary_id (1);
+            cell->face (4)->set_manifold_id(numbers::flat_manifold_id);
 
             for (unsigned int i = 0; i < 4; ++i)
               cell->line (i)->set_boundary_id (0);
@@ -2911,6 +2938,7 @@ namespace GridGenerator
         if (cell->vertex (4) (0) == half_length)
           {
             cell->face (5)->set_boundary_id (2);
+            cell->face (5)->set_manifold_id(numbers::flat_manifold_id);
 
             for (unsigned int i = 4; i < 8; ++i)
               cell->line (i)->set_boundary_id (0);
@@ -2919,6 +2947,8 @@ namespace GridGenerator
         for (unsigned int i = 0; i < 4; ++i)
           cell->face (i)->set_boundary_id (0);
       }
+
+    triangulation.set_manifold(0, CylindricalManifold<3>());
   }
 
 
@@ -3002,7 +3032,8 @@ namespace GridGenerator
   void
   hyper_ball (Triangulation<3> &tria,
               const Point<3>   &p,
-              const double radius)
+              const double radius,
+              const bool internal_manifold)
   {
     const double a = 1./(1+std::sqrt(3.0)); // equilibrate cell sizes at transition
     // from the inner part to the radial
@@ -3052,12 +3083,17 @@ namespace GridGenerator
         for (unsigned int j=0; j<GeometryInfo<3>::vertices_per_cell; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
+        cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
       };
 
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
+    tria.set_all_manifold_ids_on_boundary(0);
+    tria.set_manifold(0, SphericalManifold<3>(p));
+    if (internal_manifold)
+      tria.set_manifold(1, SphericalManifold<3>(p));
   }
 
 
@@ -3074,6 +3110,8 @@ namespace GridGenerator
     boundary_ids.insert (0);
     GridGenerator::extract_boundary_mesh (volume_mesh, tria,
                                           boundary_ids);
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<spacedim-1, spacedim>(p));
   }
 
 
@@ -3163,6 +3201,8 @@ namespace GridGenerator
     Triangulation<3>::cell_iterator cell = tria.begin();
     Triangulation<3>::cell_iterator end = tria.end();
 
+    tria.set_all_manifold_ids_on_boundary(0);
+
     for (; cell != end; ++cell)
       for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
         if (cell->at_boundary(i))
@@ -3170,26 +3210,35 @@ namespace GridGenerator
             if (cell->face(i)->center()(0) > half_length-1.e-5)
               {
                 cell->face(i)->set_boundary_id(2);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
 
                 for (unsigned int e=0; e<GeometryInfo<3>::lines_per_face; ++e)
                   if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
-                    cell->face(i)->line(e)->set_boundary_id(2);
+                    {
+                      cell->face(i)->line(e)->set_boundary_id(2);
+                      cell->face(i)->line(e)->set_manifold_id(numbers::flat_manifold_id);
+                    }
               }
             else if (cell->face(i)->center()(0) < -half_length+1.e-5)
               {
                 cell->face(i)->set_boundary_id(1);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
 
                 for (unsigned int e=0; e<GeometryInfo<3>::lines_per_face; ++e)
                   if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
                       (std::fabs(cell->face(i)->line(e)->vertex(1)[2]) == a))
-                    cell->face(i)->line(e)->set_boundary_id(1);
+                    {
+                      cell->face(i)->line(e)->set_boundary_id(1);
+                      cell->face(i)->line(e)->set_manifold_id(numbers::flat_manifold_id);
+                    }
               }
           }
+    tria.set_manifold(0, CylindricalManifold<3>());
   }
 
 
@@ -3245,6 +3294,7 @@ namespace GridGenerator
     Triangulation<dim>::cell_iterator cell = tria.begin();
     Triangulation<dim>::cell_iterator end = tria.end();
 
+    tria.set_all_manifold_ids_on_boundary(0);
     while (cell != end)
       {
         for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
@@ -3258,6 +3308,7 @@ namespace GridGenerator
                 || cell->face(i)->center()(2) < center(2)+1.e-5 * radius)
               {
                 cell->face(i)->set_boundary_id(1);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
                 // also set the boundary indicators of the bounding lines,
                 // unless both vertices are on the perimeter
                 for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
@@ -3271,13 +3322,17 @@ namespace GridGenerator
                         ||
                         (std::fabs(line_vertices[1].distance(center)-radius) >
                          1e-5*radius))
-                      cell->face(i)->line(j)->set_boundary_id(1);
+                      {
+                        cell->face(i)->line(j)->set_boundary_id(1);
+                        cell->face(i)->line(j)->set_manifold_id(numbers::flat_manifold_id);
+                      }
                   }
 
               }
           }
         ++cell;
       }
+    tria.set_manifold(0, SphericalManifold<3>(center));
   }
 
 
@@ -3346,6 +3401,8 @@ namespace GridGenerator
     Triangulation<3>::cell_iterator cell = tria.begin();
     Triangulation<3>::cell_iterator end = tria.end();
 
+    tria.set_all_manifold_ids_on_boundary(0);
+
     // go over all faces. for the ones on the flat face, set boundary
     // indicator for face and edges to one; the rest will remain at
     // zero but we have to pay attention to those edges that are
@@ -3364,6 +3421,7 @@ namespace GridGenerator
             if (cell->face(i)->center()(0) < center(0)+1.e-5*radius)
               {
                 cell->face(i)->set_boundary_id(1);
+                cell->face(i)->set_manifold_id(numbers::flat_manifold_id);
                 for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
                   {
                     const Point<3> line_vertices[2]
@@ -3375,12 +3433,16 @@ namespace GridGenerator
                         ||
                         (std::fabs(line_vertices[1].distance(center)-radius) >
                          1e-5*radius))
-                      cell->face(i)->line(j)->set_boundary_id(1);
+                      {
+                        cell->face(i)->line(j)->set_boundary_id(1);
+                        cell->face(i)->line(j)->set_manifold_id(numbers::flat_manifold_id);
+                      }
                   }
               }
           }
         ++cell;
       }
+    tria.set_manifold(0, SphericalManifold<3>(center));
   }
 
 
@@ -3608,6 +3670,8 @@ namespace GridGenerator
 
     if (colorize)
       colorize_hyper_shell(tria, p, inner_radius, outer_radius);
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<3>(p));
   }
 
 
@@ -3719,6 +3783,8 @@ namespace GridGenerator
                   }
               }
       }
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<3>(center));
   }
 
 
@@ -3783,6 +3849,9 @@ namespace GridGenerator
 
     if (colorize)
       colorize_quarter_hyper_shell(tria, center, inner_radius, outer_radius);
+
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, SphericalManifold<3>(center));
   }
 
 
@@ -3865,6 +3934,8 @@ namespace GridGenerator
 
     tria.create_triangulation (
       vertices_3d, cells, SubCellData());
+    tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, CylindricalManifold<3>(2));
   }
 
 
@@ -4263,18 +4334,25 @@ namespace GridGenerator
                   else if (std::abs(dy - outer_radius) < eps)
                     cell->face(f)->set_boundary_id(3);
                   else
-                    cell->face(f)->set_boundary_id(4);
+                    {
+                      cell->face(f)->set_boundary_id(4);
+                      cell->face(f)->set_manifold_id(0);
+                    }
                 }
               else
                 {
                   double d = (cell->face(f)->center() - center).norm();
                   if (d-inner_radius < 0)
-                    cell->face(f)->set_boundary_id(1);
+                    {
+                      cell->face(f)->set_boundary_id(1);
+                      cell->face(f)->set_manifold_id(0);
+                    }
                   else
                     cell->face(f)->set_boundary_id(0);
                 }
             }
       }
+    triangulation.set_manifold(0, PolarManifold<2>(center));
   }
 
 
@@ -4373,9 +4451,8 @@ namespace GridGenerator
 
                   else
                     {
-                      cell->face(f)->set_boundary_id(6);
-                      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
-                        cell->face(f)->line(l)->set_boundary_id(6);
+                      cell->face(f)->set_all_boundary_ids(6);
+                      cell->face(f)->set_all_manifold_ids(0);
                     }
 
                 }
@@ -4386,15 +4463,15 @@ namespace GridGenerator
                   double d = c.norm();
                   if (d-inner_radius < 0)
                     {
-                      cell->face(f)->set_boundary_id(1);
-                      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
-                        cell->face(f)->line(l)->set_boundary_id(1);
+                      cell->face(f)->set_all_boundary_ids(1);
+                      cell->face(f)->set_all_manifold_ids(0);
                     }
                   else
                     cell->face(f)->set_boundary_id(0);
                 }
             }
       }
+    triangulation.set_manifold(0, CylindricalManifold<3>(2));
   }
 
   template <int dim, int spacedim1, int spacedim2>

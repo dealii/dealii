@@ -1,5 +1,5 @@
 
-DEAL::Testing hyper_cube in dim: 3...
+DEAL::Testing hyper_ball in dim: 3...
 DEAL::The last column should be 0
 DEAL::Vol faces		Surf cell		Distance
 DEAL::

@@ -47,10 +47,12 @@ int main ()
   SphericalManifold<dim> boundary(origin);
   MappingQ<dim> mapping(2);
   Triangulation<dim> tria;
-  tria.set_manifold(0, boundary);
   const double inner_radius=1.;
   const double outer_radius=5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
+  tria.set_all_manifold_ids(numbers::flat_manifold_id);
+  GridTools::copy_boundary_to_manifold_id(tria);
+  tria.set_manifold(0, boundary);
   tria.refine_global(2);
 
   // build up a map of vertex indices
@@ -98,7 +100,7 @@ int main ()
                       // circle.
                       new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
                                           face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
-                      face->set_boundary_id(1);
+                      face->set_manifold_id(1);
                     }
                   else
                     Assert(false, ExcInternalError());

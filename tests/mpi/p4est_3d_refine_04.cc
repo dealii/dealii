@@ -56,6 +56,7 @@ void test()
                                   R1,
                                   (dim==3) ? 96 : 12,
                                   true);
+      triangulation.reset_manifold(0);
       triangulation.refine_global (2);
 
       // then flag all cells for

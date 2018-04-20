@@ -28,6 +28,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -90,6 +91,7 @@ check ()
     }
   else
     GridGenerator::hyper_cube(tr, -1./std::sqrt(static_cast<double>(dim)),1./std::sqrt(static_cast<double>(dim)));
+  GridTools::copy_boundary_to_manifold_id(tr);
   static const SphericalManifold<dim> boundary;
   if (dim != 1)
     {

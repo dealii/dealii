@@ -33,6 +33,7 @@ void test()
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_ball(tr);
+  tr.reset_manifold(0);
   tr.refine_global (1);
 
   const FE_Q<dim> fe(1);

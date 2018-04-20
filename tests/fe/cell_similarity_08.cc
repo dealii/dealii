@@ -34,6 +34,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
@@ -148,6 +149,7 @@ void test()
   std::vector<unsigned int> subdivisions (dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);
+  GridTools::copy_boundary_to_manifold_id(tr);
 
   static const SphericalManifold<dim> boundary(tr.begin_active()->center());
   tr.set_manifold (1, boundary);
@@ -155,7 +157,7 @@ void test()
   // set boundary id on cell 1
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     if (tr.begin_active()->at_boundary(f))
-      tr.begin_active()->face(f)->set_boundary_id (1);
+      tr.begin_active()->face(f)->set_manifold_id (1);
 
   test(tr);
 }

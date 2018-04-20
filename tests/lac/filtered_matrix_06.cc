@@ -104,6 +104,7 @@ check ()
     GridGenerator::hyper_ball(tr, Point<dim>(), 1);
   else
     GridGenerator::hyper_cube(tr, -1,1);
+  tr.reset_manifold(0);
 
   tr.refine_global (5-dim);
 

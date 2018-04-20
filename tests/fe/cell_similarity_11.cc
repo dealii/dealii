@@ -110,7 +110,7 @@ void test()
       if (cell->face(f)->at_boundary() &&
           std::abs(cell->face(f)->center()[0]+1.) < 1e-12 &&
           std::abs(cell->face(f)->center()[1]) < 1e-12)
-        cell->face(f)->set_boundary_id(1);
+        cell->face(f)->set_manifold_id(1);
 
   static const SphericalManifold<dim> boundary;
   tr.set_manifold (1, boundary);

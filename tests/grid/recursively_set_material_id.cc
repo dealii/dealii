@@ -35,7 +35,10 @@ void test()
 
       Triangulation<dim> tr;
       if (dim > 1)
-        GridGenerator::hyper_ball(tr);
+        {
+          GridGenerator::hyper_ball(tr);
+          tr.reset_manifold(0);
+        }
       else
         GridGenerator::hyper_cube(tr);
 

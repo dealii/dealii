@@ -33,11 +33,18 @@ DEAL_II_NAMESPACE_OPEN
  * This namespace provides a collection of functions for generating
  * triangulations for some basic geometries.
  *
- * Some of these functions receive a flag @p colorize. If this is set, parts
- * of the boundary receive different
- * @ref GlossBoundaryIndicator "boundary indicators"),
- * allowing them to be distinguished for the purpose of attaching geometry
- * objects and evaluating different boundary conditions.
+ * Some of these functions receive a flag @p colorize. If this is set, parts of
+ * the boundary receive different @ref GlossBoundaryIndicator "boundary
+ * indicators" allowing them to be distinguished for the purpose of evaluating
+ * different boundary conditions.
+ *
+ * If the domain is curved, each of the domain parts that should be
+ * refined by following an appropriate Manifold description will
+ * receive a different @ref GlossManifoldIndicator "manifold
+ * indicator", and the correct Manifold descriptor will be attached to
+ * the Triangulation. Notice that if you later tranform the
+ * triangulation, you have to make sure you attach the correct new Manifold
+ * to the triangulation.
  *
  * @ingroup grid
  */
@@ -138,18 +145,14 @@ namespace GridGenerator
    * GeometryInfo class. Importantly, however, in 3d colorization does not set
    * @p boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
    * boundary edge is shared between two faces and it is not clear how the
-   * boundary id of an edge should be set in that case. This may later on lead
-   * to problems if one wants to assign boundary or manifold objects to parts
-   * of the boundary with certain boundary indicators since then the boundary
-   * object may not apply to the edges bounding the face it is meant to
-   * describe.
+   * boundary id of an edge should be set in that case.
    *
    * Additionally, if @p colorize is @p true, material ids are assigned to the
    * cells according to the octant their center is in: being in the right half
    * space for any coordinate direction <i>x<sub>i</sub></i> adds
    * 2<sup>i</sup>. For instance, a cell with center point (1,-1,1) yields a
    * material id 5, assuming that the center of the hyper rectangle lies at
-   * the origin.
+   * the origin. No manifold id is set for the cells.
    *
    * If @p dim < @p spacedim, this will create a @p dim dimensional object in
    * the first @p dim coordinate directions embedded into the @p spacedim
@@ -176,9 +179,9 @@ namespace GridGenerator
    * direction is 1.
    *
    * If the @p colorize flag is set, the @p boundary_ids of the surfaces are
-   * assigned, such that the lower one in @p x-direction is 0, the upper one
-   * is 1 (the left and the right vertical face). The indicators for the
-   * surfaces in @p y-direction are 2 and 3, the ones for @p z are 4 and 5.
+   * assigned, such that the lower one in @p x-direction is 0, the upper one is
+   * 1 (the left and the right vertical face). The indicators for the surfaces
+   * in @p y-direction are 2 and 3, the ones for @p z are 4 and 5.
    * Additionally, material ids are assigned to the cells according to the
    * octant their center is in: being in the right half plane for any
    * coordinate direction <i>x<sub>i</sub></i> adds 2<sup>i</sup>. For
@@ -260,7 +263,7 @@ namespace GridGenerator
                               const std::vector< std::vector<double> > &spacing,
                               const Point<dim>                         &p,
                               const Table<dim,types::material_id>      &material_id,
-                              const bool                                colorize=false);
+                              const bool                               colorize=false);
 
   /**
    * \brief Rectangular domain with rectangular pattern of holes
@@ -452,29 +455,36 @@ namespace GridGenerator
    * This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
-   * You should attach a SphericalManifold to the cells and faces for correct
-   * placement of vertices upon refinement and to be able to use higher order
-   * mappings. However, it turns out that creating a mesh for a hyperball is
-   * not entirely trivial since the central cell has to be treated
-   * differently than the "cap" cells. The "Possibilities for extensions"
-   * section of step-6 has an extensive discussion of how one would construct
-   * such meshes and what one needs to do for it.
+   * By default, the manifold_id is set to 0 on the boundary faces, 1 on the
+   * the boundary cells, and types::flat_manifold_id on the central cell and on
+   * internal faces.
+   *
+   * A SphericalManifold is attached by default to the boundary faces for
+   * correct placement of boundary vertices upon refinement and to be able to
+   * use higher order mappings. However, it turns out that this strategy may
+   * not be the optimal one to create a good a mesh for a hyperball. The
+   * "Possibilities for extensions" section of step-6 has an extensive
+   * discussion of how one would construct better meshes and what one needs to
+   * do for it. Selecting the argument @p
+   * attach_spherical_manifold_on_boundary_cells to true attaches a
+   * SphericalManifold manifold also to the boundary cells, and not only to the
+   * boundary faces.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void hyper_ball (Triangulation<dim> &tria,
                    const Point<dim>   &center = Point<dim>(),
-                   const double        radius = 1.);
+                   const double        radius = 1.,
+                   const bool attach_spherical_manifold_on_boundary_cells=false);
 
   /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
    * dimensions. (To create a mesh of a ball, use GridGenerator::hyper_ball().)
    *
-   * You should attach a SphericalManifold to the cells and faces for correct
-   * placement of vertices upon refinement and to be able to use higher order
-   * mappings.
+   * By default, all manifold ids of the triangulation are set to zero, and a
+   * SphericalManifold is attached to the grid.
    *
    * The following pictures are generated with:
    * @code
@@ -483,9 +493,6 @@ namespace GridGenerator
    * static SphericalManifold<2,3> surface_description;
    *
    * GridGenerator::hyper_sphere(triangulation);
-   *
-   * triangulation.set_all_manifold_ids(0);
-   * triangulation.set_manifold (0, surface_description);
    * triangulation.refine_global(3);
    * @endcode
    *
@@ -509,11 +516,11 @@ namespace GridGenerator
    * relative to @p center, which contains three elements in 2d and four in 3d.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
-   * boundary and 1 for the cut plane.
+   * boundary and 1 for the cut plane. The manifold id for the curved boundary is
+   * set to zero, and a SphericalManifold is attached to it.
    *
-   * The appropriate boundary class is HyperBallBoundary.
-   *
-   * @note The triangulation passed as argument needs to be empty when calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling
+   * this function.
    */
   template <int dim>
   void quarter_hyper_ball (Triangulation<dim> &tria,
@@ -526,10 +533,8 @@ namespace GridGenerator
    * <i>x</i>-axis.
    *
    * The boundary indicators for the final triangulation are 0 for the curved
-   * boundary and 1 for the cut plane.
-   *
-   * The appropriate boundary class is HalfHyperBallBoundary, or
-   * HyperBallBoundary.
+   * boundary and 1 for the cut plane. The manifold id for the curved boundary is
+   * set to zero, and a SphericalManifold is attached to it.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
@@ -556,6 +561,9 @@ namespace GridGenerator
    * the GridTools::transform() function using a rotation operator as
    * argument.
    *
+   * The manifold id for the hull of the cylinder is set to zero, and a
+   * CylindricalManifold is attached to it.
+   *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
@@ -578,11 +586,10 @@ namespace GridGenerator
    *
    * The boundaries are colored according to the following scheme: 0 for the
    * hull of the cone, 1 for the left hand face and 2 for the right hand face.
+   * Both the boundary indicators and the manifold indicators are set.
    *
-   * In three dimensions, the CylindricalManifold class is an appropriate choice
-   * for the description of the hull, with which you probably want to associate
-   * boundary indicator 0.
-   * In two dimensions the default FlatManifold is sufficient.
+   * In three dimensions, the manifold id of the hull is set to zero, and a
+   * CylindricalManifold is attached to it.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    *
@@ -702,11 +709,8 @@ namespace GridGenerator
    * both the faces and the edges of these boundaries. If the flag is @p
    * false, both have indicator zero.
    *
-   * You should attach a SphericalManifold to the cells and faces for correct
-   * placement of vertices upon refinement and to be able to use higher order
-   * mappings. Alternatively, it is also possible to attach a
-   * HyperShellBoundary to the inner and outer boundary. This will create
-   * inferior meshes as described below.
+   * All manifold ids are set to zero, and a SphericalManifold is attached to the
+   * the triangulation.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
@@ -780,6 +784,9 @@ namespace GridGenerator
    * If colorize is set to true, the inner, outer, and the part of the
    * boundary where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise
    * all indicators are set to 0.
+   *
+   * All manifold ids are set to zero, and a  SphericalManifold is attached
+   * to the triangulation.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
@@ -876,9 +883,16 @@ namespace GridGenerator
 
 
   /**
-   * This class produces a square in the <i>xy</i>-plane with a circular hole
-   * in the middle. Square and circle are centered at the origin. In 3d, this
-   * geometry is extruded in $z$ direction to the interval $[0,L]$.
+   * This class produces a square in the <i>xy</i>-plane with a cylindrical
+   * hole in the middle. The square and the circle are centered at the
+   * origin. In 3d, this geometry is extruded in $z$ direction to the interval
+   * $[0,L]$.
+   *
+   * The inner boundary has a manifold id of $0$ and a boundary id of
+   * $6$. This function attaches a PolarManifold or CylindricalManifold to the
+   * interior boundary in 2d and 3d respectively. The other faces have
+   * boundary ids of $0, 1, 2, 3, 4$, or $5$ given in the standard order of
+   * faces in 2d or 3d.
    *
    * @image html cubes_hole.png
    *

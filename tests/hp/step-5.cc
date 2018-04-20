@@ -31,6 +31,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
@@ -295,7 +296,8 @@ void LaplaceProblem<dim>::run ()
           std::ifstream input_file(SOURCE_DIR "/grids/circle-grid.inp");
           Assert (dim==2, ExcInternalError());
 
-          grid_in.read_ucd (input_file);
+          grid_in.read_ucd (input_file, true);
+          GridTools::copy_boundary_to_manifold_id(triangulation);
 
           static const SphericalManifold<dim> boundary;
           triangulation.set_manifold (0, boundary);

@@ -114,6 +114,7 @@ int main ()
 
   Triangulation<3> triangulation;
   GridGenerator::hyper_ball(triangulation);
+  triangulation.reset_manifold(0);
   triangulation.refine_global(1);
   test<3>(triangulation);
 }
