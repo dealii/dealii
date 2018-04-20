@@ -1286,11 +1286,6 @@ namespace DoFTools
    * components are then flagged @p true, while all others are set to @p
    * false.
    *
-   * The size of @p component_mask must be compatible with the number of
-   * components in the FiniteElement used by @p dof. The size of @p
-   * selected_dofs must equal DoFHandler::n_dofs(). Previous contents of this
-   * array are overwritten.
-   *
    * If the finite element under consideration is not primitive, i.e., some or
    * all of its shape functions are non-zero in more than one vector component
    * (which holds, for example, for FE_Nedelec or FE_RaviartThomas elements),
@@ -1300,6 +1295,20 @@ namespace DoFTools
    * @ref GlossComponentMask),
    * then this is equivalent to selecting <em>all</em> vector components
    * corresponding to this non-primitive base element.
+   *
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] component_mask A mask that states which components you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   components in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossComponentMask "the glossary entry on component masks"
+   *   for more information.
+   * @param[out] selected_dofs A vector that will hold @p true or @p false
+   *   values for each degree of freedom depending on whether or not it
+   *   corresponds to a vector component selected by the mask above. The size
+   *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
+   *   sequential computations of course equals DoFHandler::n_dofs(). The previous
+   *   contents of this array are overwritten.
    */
   template <int dim, int spacedim>
   void
@@ -1326,13 +1335,19 @@ namespace DoFTools
    * Consequently, the second argument is not a ComponentMask but a BlockMask
    * object.
    *
-   * @param dof_handler The DoFHandler object from which to extract degrees of
-   * freedom
-   * @param block_mask The block mask that describes which blocks to consider
-   * (see
-   * @ref GlossBlockMask)
-   * @param selected_dofs A vector of length DoFHandler::n_dofs() in which
-   * those entries are true that correspond to the selected blocks.
+   * @param[in] dof_handler The DoFHandler whose enumerated degrees of freedom
+   *   are to be filtered by this function.
+   * @param[in] block_mask A mask that states which blocks you want
+   *   to select. The size of this mask must be compatible with the number of
+   *   blocks in the FiniteElement used by the @p dof_handler. See
+   *   @ref GlossBlockMask "the glossary entry on block masks"
+   *   for more information.
+   * @param[out] selected_dofs A vector that will hold @p true or @p false
+   *   values for each degree of freedom depending on whether or not it
+   *   corresponds to a vector block selected by the mask above. The size
+   *   of this array must equal DoFHandler::n_locally_owned_dofs(), which for
+   *   sequential computations of course equals DoFHandler::n_dofs(). The previous
+   *   contents of this array are overwritten.
    */
   template <int dim, int spacedim>
   void
