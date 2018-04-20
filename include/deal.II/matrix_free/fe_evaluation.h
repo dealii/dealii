@@ -62,7 +62,7 @@ template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
  * implements a reinit method that is used to set pointers so that operations
  * on quadrature points can be performed quickly, access functions to vectors
  * for the @p read_dof_values, @p set_dof_values, and @p
- * distributed_local_to_global functions, as well as methods to access values
+ * distribute_local_to_global functions, as well as methods to access values
  * and gradients of finite element functions.
  *
  * This class has three template arguments:
@@ -76,9 +76,9 @@ template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
  *
  * @param Number Number format, usually @p double or @p float
  *
- * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
+ * @author Katharina Kormann and Martin Kronbichler, 2010-2018
  */
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face=false>
 class FEEvaluationBase
 {
 public:
@@ -163,12 +163,6 @@ public:
    */
   const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
       get_shape_info() const;
-
-  /**
-   * Fills the JxW values currently used.
-   */
-  void
-  fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const;
 
   //@}
 
@@ -377,9 +371,24 @@ public:
   gradient_type get_gradient (const unsigned int q_point) const;
 
   /**
+   * Return the derivative of a finite element function at quadrature point
+   * number @p q_point after a call to @p evaluate(...,true,...) in the
+   * direction normal to the face:
+   * $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf x_q)$
+   *
+   * This call is equivalent to calling `get_gradient() * get_normal_vector()`
+   * but will use a more efficient internal representation of data.
+   *
+   * Note that the derived class FEEvaluationAccess overloads this operation
+   * with specializations for the scalar case (n_components == 1) and for the
+   * vector-valued case (n_components == dim).
+   */
+  value_type get_normal_derivative (const unsigned int q_point) const;
+
+  /**
    * Write a contribution that is tested by the gradient to the field
    * containing the values on quadrature points with component @p q_point.
-   * Access to the same field as through @p get_gradient. If applied before
+   * Access to the same field as through get_gradient(). If applied before
    * the function @p integrate(...,true) is called, this specifies what is
    * tested by all basis function gradients on the current cell and integrated
    * over.
@@ -390,6 +399,21 @@ public:
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
+
+  /**
+   * Write a contribution that is tested by the gradient to the field
+   * containing the values on quadrature points with component @p
+   * q_point. Access to the same field as through get_gradient() or
+   * get_normal_derivative(). If applied before the function @p
+   * integrate(...,true) is called, this specifies what is tested by all basis
+   * function gradients on the current cell and integrated over.
+   *
+   * Note that the derived class FEEvaluationAccess overloads this operation
+   * with specializations for the scalar case (n_components == 1) and for the
+   * vector-valued case (n_components == dim).
+   */
+  void submit_normal_derivative(const value_type    grad_in,
+                                const unsigned int  q_point);
 
   /**
    * Return the Hessian of a finite element function at quadrature point
@@ -485,16 +509,46 @@ public:
    * Return the determinant of the Jacobian from the unit to the real cell
    * times the quadrature weight.
    */
-  VectorizedArray<Number> JxW(const unsigned int q_point) const;
+  VectorizedArray<Number> JxW(const unsigned int q_index) const;
 
   /**
-   * Gets the inverse and transposed version of Jacobian of the mapping
+   * Fills the JxW values currently used into the given array.
+   */
+  void
+  fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const;
+
+  /**
+   * Return the inverse and transposed version of Jacobian of the mapping
    * between the unit to the real cell (representing the covariant
    * transformation). This is exactly the matrix used internally to transform
    * the unit cell gradients to gradients on the real cell.
    */
   Tensor<2,dim,VectorizedArray<Number> >
   inverse_jacobian(const unsigned int q_index) const;
+
+  /**
+   * Return the unit normal vector on a face. Note that both sides of a face
+   * use the same orientation of the normal vector: For the faces enumerated
+   * as `interior` in FaceToCellTopology and selected with the
+   * `is_interior_face=true` flag of the constructor, this corresponds to the
+   * outer normal vector, whereas for faces enumerated as `exterior` in
+   * FaceToCellTopology and selected with the `is_interior_face=false` flag of
+   * the constructor, the normal points into the element as a consequence of
+   * the single normal vector.
+   *
+   * @note Only implemented in case `is_face == true`.
+   */
+  Tensor<1,dim,VectorizedArray<Number> >
+  get_normal_vector(const unsigned int q_point) const;
+
+  /**
+   * Provides a unified interface to access data in a vector of
+   * VectorizedArray fields of length MatrixFree::n_macro_cells() +
+   * MatrixFree::n_macro_ghost_cells() for both cells (plain read) and faces
+   * (indirect addressing).
+   */
+  VectorizedArray<Number>
+  read_cell_data (const AlignedVector<VectorizedArray<Number> > &array) const;
 
   //@}
 
@@ -625,14 +679,17 @@ protected:
    * Constructor. Made protected to prevent users from directly using this
    * class. Takes all data stored in MatrixFree. If applied to problems with
    * more than one finite element or more than one quadrature formula selected
-   * during construction of @p matrix_free, @p fe_no and @p quad_no allow to
-   * select the appropriate components.
+   * during construction of @p matrix_free, @p dof_no, @p
+   * first_selected_component and @p quad_no allow to select the appropriate
+   * components.
    */
   FEEvaluationBase (const MatrixFree<dim,Number> &matrix_free,
-                    const unsigned int            fe_no,
+                    const unsigned int            dof_no,
+                    const unsigned int            first_selected_component,
                     const unsigned int            quad_no,
                     const unsigned int            fe_degree,
-                    const unsigned int            n_q_points);
+                    const unsigned int            n_q_points,
+                    const bool                    is_interior_face);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -803,6 +860,11 @@ protected:
   const unsigned int active_quad_index;
 
   /**
+   * Stores the number of quadrature points in the current evaluation context.
+   */
+  const unsigned int n_quadrature_points;
+
+  /**
    * Stores a pointer to the underlying data.
    */
   const MatrixFree<dim,Number> *matrix_info;
@@ -820,7 +882,7 @@ protected:
    * Also contained in matrix_info, but it simplifies code if we store a
    * reference to it.
    */
-  const internal::MatrixFreeFunctions::MappingInfoStorage<dim,dim,Number> *mapping_data;
+  const internal::MatrixFreeFunctions::MappingInfoStorage<(is_face?dim-1:dim),dim,Number> *mapping_data;
 
   /**
    * Stores a pointer to the unit cell shape data, i.e., values, gradients and
@@ -845,6 +907,16 @@ protected:
   const VectorizedArray<Number> *J_value;
 
   /**
+   * A pointer to the normal vectors at faces.
+   **/
+  const Tensor<1,dim,VectorizedArray<Number> > *normal_vectors;
+
+  /**
+   * A pointer to the normal vectors times the jacobian at faces.
+   **/
+  const Tensor<1,dim,VectorizedArray<Number> > *normal_x_jacobian;
+
+  /**
    * A pointer to the quadrature weights of the underlying quadrature formula.
    */
   const Number *quadrature_weights;
@@ -854,6 +926,33 @@ protected:
    * working with.
    */
   unsigned int cell;
+
+  /**
+   * Flag holding information whether a face is an interior or exterior face
+   * according to the defined direction of the normal.  Not used for cells.
+   **/
+  bool is_interior_face;
+
+  /**
+   * Stores the current number of a face within the given cell in case
+   * `is_face==true`, using values between `0` and `2*dim`.
+   */
+  unsigned int face_no;
+
+  /**
+   * Stores the orientation of the given face with respect to the standard
+   * orientation, 0 if in standard orientation.
+   */
+  unsigned int face_orientation;
+
+  /**
+   * Stores the subface index of the given face. Usually, this variable takes
+   * the value numbers::invalid_unsigned_int to indicate integration over the
+   * full face, but in case the current physical face has a neighbor that is
+   * more refined, it is a subface and must scale the entries in ShapeInfo
+   * appropriately.
+   */
+  unsigned int subface_index;
 
   /**
    * Stores the type of the cell we are currently working with after a call to
@@ -912,7 +1011,7 @@ protected:
   std::shared_ptr<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> > mapped_geometry;
 
   /**
-   * For a FiniteElement with more than one finite element, select at which
+   * For a FiniteElement with more than one base element, select at which
    * component this data structure should start.
    */
   const unsigned int first_selected_component;
@@ -933,7 +1032,7 @@ private:
   /**
    * Make other FEEvaluationBase as well as FEEvaluation objects friends.
    */
-  template <int, int, typename> friend class FEEvaluationBase;
+  template <int, int, typename, bool> friend class FEEvaluationBase;
   template <int, int, int, int, typename> friend class FEEvaluation;
 };
 
@@ -946,8 +1045,8 @@ private:
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
-template <int dim, int n_components_, typename Number>
-class FEEvaluationAccess : public FEEvaluationBase<dim,n_components_,Number>
+template <int dim, int n_components_, typename Number, bool is_face>
+class FEEvaluationAccess : public FEEvaluationBase<dim,n_components_,Number, is_face>
 {
 public:
   typedef Number                            number_type;
@@ -955,21 +1054,23 @@ public:
   typedef Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > gradient_type;
   static constexpr unsigned int dimension     = dim;
   static constexpr unsigned int n_components  = n_components_;
-  typedef FEEvaluationBase<dim,n_components_, Number> BaseClass;
+  typedef FEEvaluationBase<dim,n_components_, Number, is_face> BaseClass;
 
 protected:
   /**
    * Constructor. Made protected to prevent initialization in user code. Takes
    * all data stored in MatrixFree. If applied to problems with more than one
    * finite element or more than one quadrature formula selected during
-   * construction of @p matrix_free, @p fe_no and @p quad_no allow to select
-   * the appropriate components.
+   * construction of @p matrix_free, @p first_selected_component and @p
+   * quad_no allow to select the appropriate components.
    */
   FEEvaluationAccess (const MatrixFree<dim,Number> &matrix_free,
-                      const unsigned int            fe_no,
+                      const unsigned int            dof_no,
+                      const unsigned int            first_selected_component,
                       const unsigned int            quad_no,
                       const unsigned int            fe_degree,
-                      const unsigned int            n_q_points);
+                      const unsigned int            n_q_points,
+                      const bool                    is_interior_face = true);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -981,7 +1082,7 @@ protected:
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other);
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other);
 
   /**
    * Copy constructor
@@ -1005,15 +1106,15 @@ protected:
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
-template <int dim, typename Number>
-class FEEvaluationAccess<dim,1,Number> : public FEEvaluationBase<dim,1,Number>
+template <int dim, typename Number, bool is_face>
+class FEEvaluationAccess<dim,1,Number,is_face> : public FEEvaluationBase<dim,1,Number,is_face>
 {
 public:
   typedef Number                                 number_type;
   typedef VectorizedArray<Number>                value_type;
   typedef Tensor<1,dim,VectorizedArray<Number> > gradient_type;
   static constexpr unsigned int dimension          = dim;
-  typedef FEEvaluationBase<dim,1,Number>         BaseClass;
+  typedef FEEvaluationBase<dim,1,Number,is_face> BaseClass;
 
   /** @copydoc FEEvaluationBase<dim,1,Number>::get_dof_value()
    */
@@ -1033,14 +1134,28 @@ public:
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
+  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_value()
+   */
+  void submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+                     const unsigned int q_point);
+
   /** @copydoc FEEvaluationBase<dim,1,Number>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_normal_derivative()
+   */
+  value_type get_normal_derivative (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
+
+  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_normal_derivative()
+   */
+  void submit_normal_derivative(const value_type grad_in,
+                                const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<dim,1,Number>::get_hessian()
    */
@@ -1064,14 +1179,16 @@ protected:
    * Constructor. Made protected to avoid initialization in user code. Takes
    * all data stored in MatrixFree. If applied to problems with more than one
    * finite element or more than one quadrature formula selected during
-   * construction of @p matrix_free, @p fe_no and @p quad_no allow to select
-   * the appropriate components.
+   * construction of @p matrix_free, @p first_selected_component and @p
+   * quad_no allow to select the appropriate components.
    */
   FEEvaluationAccess (const MatrixFree<dim,Number> &matrix_free,
-                      const unsigned int            fe_no,
+                      const unsigned int            dof_no,
+                      const unsigned int            first_selected_component,
                       const unsigned int            quad_no,
                       const unsigned int            fe_degree,
-                      const unsigned int            n_q_points);
+                      const unsigned int            n_q_points,
+                      const bool                    is_interior_face = true);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1083,7 +1200,7 @@ protected:
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other);
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other);
 
   /**
    * Copy constructor
@@ -1107,8 +1224,8 @@ protected:
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
-template <int dim, typename Number>
-class FEEvaluationAccess<dim,dim,Number> : public FEEvaluationBase<dim,dim,Number>
+template <int dim, typename Number, bool is_face>
+class FEEvaluationAccess<dim,dim,Number,is_face> : public FEEvaluationBase<dim,dim,Number,is_face>
 {
 public:
   typedef Number                            number_type;
@@ -1116,7 +1233,7 @@ public:
   typedef Tensor<2,dim,VectorizedArray<Number> > gradient_type;
   static constexpr unsigned int dimension     = dim;
   static constexpr unsigned int n_components  = dim;
-  typedef FEEvaluationBase<dim,dim,Number> BaseClass;
+  typedef FEEvaluationBase<dim,dim,Number,is_face> BaseClass;
 
   /** @copydoc FEEvaluationBase<dim,dim,Number>::get_gradient()
    */
@@ -1203,14 +1320,16 @@ protected:
    * Constructor. Made protected to avoid initialization in user code. Takes
    * all data stored in MatrixFree. If applied to problems with more than one
    * finite element or more than one quadrature formula selected during
-   * construction of @p matrix_free, @p fe_no and @p quad_no allow to select
-   * the appropriate components.
+   * construction of @p matrix_free, @p first_selected_component and @p
+   * quad_no allow to select the appropriate components.
    */
   FEEvaluationAccess (const MatrixFree<dim,Number> &matrix_free,
-                      const unsigned int            fe_no,
+                      const unsigned int            dof_no,
+                      const unsigned int            first_selected_component,
                       const unsigned int            quad_no,
                       const unsigned int            dofs_per_cell,
-                      const unsigned int            n_q_points);
+                      const unsigned int            n_q_points,
+                      const bool                    is_interior_face = true);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1222,7 +1341,7 @@ protected:
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other);
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other);
 
   /**
    * Copy constructor
@@ -1245,15 +1364,15 @@ protected:
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, Shiva
  * Rudraraju, 2014
  */
-template <typename Number>
-class FEEvaluationAccess<1,1,Number> : public FEEvaluationBase<1,1,Number>
+template <typename Number, bool is_face>
+class FEEvaluationAccess<1,1,Number,is_face> : public FEEvaluationBase<1,1,Number,is_face>
 {
 public:
   typedef Number                                 number_type;
   typedef VectorizedArray<Number>                value_type;
   typedef Tensor<1,1,VectorizedArray<Number> >   gradient_type;
-  static constexpr unsigned int dimension          = 1;
-  typedef FEEvaluationBase<1,1,Number>           BaseClass;
+  static constexpr unsigned int dimension      = 1;
+  typedef FEEvaluationBase<1,1,Number,is_face>   BaseClass;
 
   /** @copydoc FEEvaluationBase<1,1,Number>::get_dof_value()
    */
@@ -1273,14 +1392,38 @@ public:
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_value()
+   */
+  void submit_value (const gradient_type   val_in,
+                     const unsigned int q_point);
+
   /** @copydoc FEEvaluationBase<1,1,Number>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
+
+  /** @copydoc FEEvaluationBase<dim,1,Number>::get_normal_derivative()
+   */
+  value_type get_normal_derivative (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
+
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_gradient()
+   */
+  void submit_gradient(const value_type   grad_in,
+                       const unsigned int q_point);
+
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_normal_derivative()
+   */
+  void submit_normal_derivative(const value_type grad_in,
+                                const unsigned int  q_point);
+
+  /** @copydoc FEEvaluationBase<1,1,Number>::submit_normal_derivative()
+   */
+  void submit_normal_derivative(const gradient_type grad_in,
+                                const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number>::get_hessian()
    */
@@ -1304,14 +1447,16 @@ protected:
    * Constructor. Made protected to avoid initialization in user code. Takes
    * all data stored in MatrixFree. If applied to problems with more than one
    * finite element or more than one quadrature formula selected during
-   * construction of @p matrix_free, @p fe_no and @p quad_no allow to select
-   * the appropriate components.
+   * construction of @p matrix_free, @p first_selected_component and @p
+   * quad_no allow to select the appropriate components.
    */
   FEEvaluationAccess (const MatrixFree<1,Number> &matrix_free,
-                      const unsigned int          fe_no,
+                      const unsigned int          dof_no,
+                      const unsigned int          first_selected_component,
                       const unsigned int          quad_no,
                       const unsigned int          fe_degree,
-                      const unsigned int          n_q_points);
+                      const unsigned int          n_q_points,
+                      const bool                  is_interior_face = true);
 
   /**
    * Constructor with reduced functionality for similar usage of FEEvaluation
@@ -1323,7 +1468,7 @@ protected:
                       const Quadrature<1>    &quadrature,
                       const UpdateFlags       update_flags,
                       const unsigned int      first_selected_component,
-                      const FEEvaluationBase<1,n_components_other,Number> *other);
+                      const FEEvaluationBase<1,n_components_other,Number,is_face> *other);
 
   /**
    * Copy constructor
@@ -1882,10 +2027,10 @@ protected:
  */
 template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
           typename Number >
-class FEEvaluation : public FEEvaluationAccess<dim,n_components_,Number>
+class FEEvaluation : public FEEvaluationAccess<dim,n_components_,Number,false>
 {
 public:
-  typedef FEEvaluationAccess<dim,n_components_,Number> BaseClass;
+  typedef FEEvaluationAccess<dim,n_components_,Number,false> BaseClass;
   typedef Number                            number_type;
   typedef typename BaseClass::value_type    value_type;
   typedef typename BaseClass::gradient_type gradient_type;
@@ -1899,12 +2044,32 @@ public:
   /**
    * Constructor. Takes all data stored in MatrixFree. If applied to problems
    * with more than one finite element or more than one quadrature formula
-   * selected during construction of @p matrix_free, @p fe_no and @p quad_no
-   * allow to select the appropriate components.
+   * selected during construction of @p matrix_free, the appropriate component
+   * can be selected by the optional arguments.
+   *
+   * @param matrix_free Data object that contains all data
+   *
+   * @param dof_no If matrix_free was set up with multiple DoFHandler
+   * objects, this parameter selects to which DoFHandler/ConstraintMatrix pair
+   * the given evaluator should be attached to.
+   *
+   * @param quad_no If matrix_free was set up with multiple Quadrature
+   * objects, this parameter selects the appropriate number of the quadrature
+   * formula.
+   *
+   * @param first_selected_component If the dof_handler selected by dof_no
+   * uses an FESystem consisting of more than one component, this parameter
+   * allows for selecting the component where the current evaluation routine
+   * should start. Note that one evaluator does not support combining
+   * different shape functions in different components. In other words, the
+   * same base element of a FESystem needs to be set for the components
+   * between @p first_selected_component and
+   * <code>first_selected_component+n_components_</code>.
    */
   FEEvaluation (const MatrixFree<dim,Number> &matrix_free,
-                const unsigned int            fe_no   = 0,
-                const unsigned int            quad_no = 0);
+                const unsigned int            dof_no  = 0,
+                const unsigned int            quad_no = 0,
+                const unsigned int            first_selected_component = 0);
 
   /**
    * Constructor that comes with reduced functionality and works similar as
@@ -2097,10 +2262,11 @@ public:
   const unsigned int dofs_per_cell;
 
   /**
-   * The number of quadrature points in use for the current evaluation
-   * object. It equals static_n_q_points in case the element degree is not set
-   * to -1, i.e., the worker kernels can be set according to the templates @p
-   * fe_degree and @p n_q_points_1d rather than at run time.
+   * The number of quadrature points in use. If the number of quadrature
+   * points in 1d is given as a template, this number is simply the
+   * <tt>dim</tt>-th power of that value. If the element degree is set to -1
+   * (dynamic selection of element degree), the static value of quadrature
+   * points is inaccurate and this value must be used instead.
    */
   const unsigned int n_q_points;
 
@@ -2147,38 +2313,53 @@ namespace internal
 
 /*----------------------- FEEvaluationBase ----------------------------------*/
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::FEEvaluationBase (const MatrixFree<dim,Number> &data_in,
-                    const unsigned int fe_no_in,
+                    const unsigned int dof_no,
+                    const unsigned int first_selected_component,
                     const unsigned int quad_no_in,
                     const unsigned int fe_degree,
-                    const unsigned int n_q_points)
+                    const unsigned int n_q_points,
+                    const bool is_interior_face)
   :
   scratch_data_array (data_in.acquire_scratch_data()),
   quad_no            (quad_no_in),
-  n_fe_components    (data_in.get_dof_info(fe_no_in).n_components),
+  n_fe_components    (data_in.get_dof_info(dof_no).n_components),
   active_fe_index    (fe_degree != numbers::invalid_unsigned_int ?
-                      data_in.get_dof_info(fe_no_in).fe_index_from_degree(fe_degree)
+                      data_in.get_dof_info(dof_no).fe_index_from_degree(fe_degree)
                       :
                       0),
   active_quad_index  (fe_degree != numbers::invalid_unsigned_int ?
-                      (data_in.get_mapping_info().cell_data[quad_no_in].
+                      (is_face ?
+                       data_in.get_mapping_info().face_data[quad_no_in].
+                       quad_index_from_n_q_points(n_q_points)
+                       :
+                       data_in.get_mapping_info().cell_data[quad_no_in].
                        quad_index_from_n_q_points(n_q_points))
                       :
                       0),
+  n_quadrature_points(fe_degree != numbers::invalid_unsigned_int ? n_q_points :
+                      (is_face ?
+                       data_in.get_shape_info
+                       (dof_no, quad_no_in, active_fe_index, active_quad_index).n_q_points_face
+                       :
+                       data_in.get_shape_info
+                       (dof_no, quad_no_in, active_fe_index, active_quad_index).n_q_points)),
   matrix_info        (&data_in),
-  dof_info           (&data_in.get_dof_info(fe_no_in)),
-  mapping_data       (internal::MatrixFreeFunctions::MappingInfoCellsOrFaces<dim,Number,false>::get
-                      (data_in.get_mapping_info(), quad_no)),
+  dof_info           (&data_in.get_dof_info(dof_no)),
+  mapping_data       (internal::MatrixFreeFunctions::MappingInfoCellsOrFaces<dim,Number,is_face>::get(data_in.get_mapping_info(), quad_no)),
   data               (&data_in.get_shape_info
-                      (fe_no_in, quad_no_in, active_fe_index,
+                      (dof_no, quad_no_in, active_fe_index,
                        active_quad_index)),
   jacobian           (nullptr),
   J_value            (nullptr),
+  normal_vectors     (nullptr),
+  normal_x_jacobian  (nullptr),
   quadrature_weights (mapping_data->descriptor[active_quad_index].quadrature_weights.begin()),
   cell               (numbers::invalid_unsigned_int),
+  is_interior_face      (is_interior_face),
   cell_type          (internal::MatrixFreeFunctions::general),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
@@ -2186,16 +2367,16 @@ FEEvaluationBase<dim,n_components_,Number>
   hessians_quad_initialized (false),
   values_quad_submitted     (false),
   gradients_quad_submitted  (false),
-  first_selected_component  (0)
+  first_selected_component  (first_selected_component)
 {
   set_data_pointers();
   Assert (matrix_info->mapping_initialized() == true,
           ExcNotInitialized());
   AssertDimension (matrix_info->get_size_info().vectorization_length,
                    VectorizedArray<Number>::n_array_elements);
-  AssertDimension (data->dofs_per_component_on_cell*n_fe_components,
-                   dof_info->dofs_per_cell[active_fe_index]);
-  AssertDimension (data->n_q_points,
+  AssertDimension ((is_face ? data->n_q_points_face : data->n_q_points),
+                   n_quadrature_points);
+  AssertDimension (n_quadrature_points,
                    mapping_data->descriptor[active_quad_index].n_q_points);
   Assert (n_fe_components == 1 ||
           n_components == 1 ||
@@ -2211,10 +2392,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <int n_components_other>
 inline
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::FEEvaluationBase (const Mapping<dim>       &mapping,
                     const FiniteElement<dim> &fe,
                     const Quadrature<1>      &quadrature,
@@ -2227,16 +2408,20 @@ FEEvaluationBase<dim,n_components_,Number>
   n_fe_components    (n_components_),
   active_fe_index    (numbers::invalid_unsigned_int),
   active_quad_index  (numbers::invalid_unsigned_int),
+  n_quadrature_points(Utilities::fixed_power<is_face?dim-1:dim>(quadrature.size())),
   matrix_info        (nullptr),
   dof_info           (nullptr),
   mapping_data       (nullptr),
   // select the correct base element from the given FE component
-  data               (new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>(quadrature, fe, fe.component_to_base_index(first_selected_component).first)),
+  data               (new internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> (quadrature, fe, fe.component_to_base_index(first_selected_component).first)),
   jacobian           (nullptr),
   J_value            (nullptr),
+  normal_vectors     (nullptr),
+  normal_x_jacobian  (nullptr),
   quadrature_weights (nullptr),
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
+  is_interior_face      (true),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2245,10 +2430,8 @@ FEEvaluationBase<dim,n_components_,Number>
   gradients_quad_submitted  (false),
   // keep the number of the selected component within the current base element
   // for reading dof values
-  first_selected_component  (fe.component_to_base_index(first_selected_component).second)
+  first_selected_component  (first_selected_component)
 {
-  const unsigned int base_element_number =
-    fe.component_to_base_index(first_selected_component).first;
   set_data_pointers();
 
   Assert(other == nullptr || other->mapped_geometry.get() != nullptr, ExcInternalError());
@@ -2259,11 +2442,14 @@ FEEvaluationBase<dim,n_components_,Number>
     mapped_geometry
       = std::make_shared<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> >
         (mapping, quadrature, update_flags);
+  cell = 0;
 
   mapping_data = &mapped_geometry->get_data_storage();
   jacobian = mapped_geometry->get_data_storage().jacobians[0].begin();
   J_value = mapped_geometry->get_data_storage().JxW_values.begin();
 
+  const unsigned int base_element_number =
+    fe.component_to_base_index(first_selected_component).first;
   Assert(fe.element_multiplicity(base_element_number) == 1 ||
          fe.element_multiplicity(base_element_number)-first_selected_component >= n_components_,
          ExcMessage("The underlying element must at least contain as many "
@@ -2273,10 +2459,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationBase<dim,n_components_,Number>
-::FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number> &other)
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number,is_face> &other)
   :
   scratch_data_array (other.matrix_info == nullptr ?
                       new AlignedVector<VectorizedArray<Number> >() :
@@ -2285,6 +2471,7 @@ FEEvaluationBase<dim,n_components_,Number>
   n_fe_components    (other.n_fe_components),
   active_fe_index    (other.active_fe_index),
   active_quad_index  (other.active_quad_index),
+  n_quadrature_points(other.n_quadrature_points),
   matrix_info        (other.matrix_info),
   dof_info           (other.dof_info),
   mapping_data       (other.mapping_data),
@@ -2293,10 +2480,13 @@ FEEvaluationBase<dim,n_components_,Number>
                       other.data),
   jacobian           (nullptr),
   J_value            (nullptr),
+  normal_vectors     (nullptr),
+  normal_x_jacobian  (nullptr),
   quadrature_weights (other.matrix_info == nullptr ? nullptr :
                       mapping_data->descriptor[active_quad_index].quadrature_weights.begin()),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::general),
+  is_interior_face      (other.is_interior_face),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2325,11 +2515,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationBase<dim,n_components_,Number> &
-FEEvaluationBase<dim,n_components_,Number>
-::operator= (const FEEvaluationBase<dim,n_components_,Number> &other)
+FEEvaluationBase<dim,n_components_,Number,is_face> &
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::operator= (const FEEvaluationBase<dim,n_components_,Number,is_face> &other)
 {
   AssertDimension(quad_no, other.quad_no);
   AssertDimension(n_fe_components, other.n_fe_components);
@@ -2363,14 +2553,13 @@ FEEvaluationBase<dim,n_components_,Number>
     }
   set_data_pointers();
 
-  jacobian = nullptr;
-  J_value = nullptr;
   quadrature_weights = (mapping_data != nullptr ?
                         mapping_data->descriptor[active_quad_index].quadrature_weights.begin()
                         :
                         nullptr);
   cell = numbers::invalid_unsigned_int;
   cell_type = internal::MatrixFreeFunctions::general;
+  is_interior_face = other.is_interior_face;
 
   // Create deep copy of mapped geometry for use in parallel...
   if (other.mapped_geometry.get() != nullptr)
@@ -2391,9 +2580,9 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase ()
+FEEvaluationBase<dim,n_components_,Number,is_face>::~FEEvaluationBase ()
 {
   if (matrix_info != nullptr)
     {
@@ -2408,15 +2597,17 @@ FEEvaluationBase<dim,n_components_,Number>::~FEEvaluationBase ()
     {
       delete scratch_data_array;
       delete data;
+      data = nullptr;
     }
+  scratch_data_array = nullptr;
 }
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::set_data_pointers()
 {
   Assert(scratch_data_array != nullptr, ExcInternalError());
@@ -2424,7 +2615,7 @@ FEEvaluationBase<dim,n_components_,Number>
   const unsigned int tensor_dofs_per_component =
     Utilities::fixed_power<dim>(this->data->fe_degree+1);
   const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
-  const unsigned int n_quadrature_points = this->data->n_q_points;
+  const unsigned int n_quadrature_points = is_face ? this->data->n_q_points_face : this->data->n_q_points;
 
   const unsigned int shift = std::max(tensor_dofs_per_component+1, dofs_per_component)*
                              n_components_*3 + 2 * n_quadrature_points;
@@ -2453,10 +2644,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_index)
+FEEvaluationBase<dim,n_components_,Number,is_face>::reinit (const unsigned int cell_index)
 {
   Assert (mapped_geometry == nullptr,
           ExcMessage("FEEvaluation was initialized without a matrix-free object."
@@ -2483,11 +2674,11 @@ FEEvaluationBase<dim,n_components_,Number>::reinit (const unsigned int cell_inde
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename DoFHandlerType, bool level_dof_access>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
 {
   Assert(matrix_info == nullptr,
@@ -2506,10 +2697,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::reinit (const typename Triangulation<dim>::cell_iterator &cell)
 {
   Assert(matrix_info == 0,
@@ -2523,10 +2714,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 unsigned int
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number, is_face>
 ::get_cell_data_number () const
 {
   return get_mapping_data_index_offset();
@@ -2534,10 +2725,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 unsigned int
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number, is_face>
 ::get_mapping_data_index_offset () const
 {
   if (matrix_info == 0)
@@ -2551,10 +2742,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 internal::MatrixFreeFunctions::GeometryType
-FEEvaluationBase<dim,n_components_,Number>::get_cell_type () const
+FEEvaluationBase<dim,n_components_,Number, is_face>::get_cell_type () const
 {
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   return cell_type;
@@ -2562,10 +2753,10 @@ FEEvaluationBase<dim,n_components_,Number>::get_cell_type () const
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
-    FEEvaluationBase<dim,n_components_,Number>::get_shape_info() const
+    FEEvaluationBase<dim,n_components_,Number, is_face>::get_shape_info() const
 {
   Assert(data != nullptr, ExcInternalError());
   return *data;
@@ -2573,60 +2764,99 @@ const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
 {
-  AssertDimension(JxW_values.size(), data->n_q_points);
-  Assert (this->J_value != nullptr, ExcNotInitialized());
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
-      this->cell_type == internal::MatrixFreeFunctions::affine)
+  AssertDimension(JxW_values.size(), n_quadrature_points);
+  Assert (J_value != nullptr, ExcNotInitialized());
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      Assert (this->mapping_data != nullptr, ExcNotImplemented());
-      VectorizedArray<Number> J = this->J_value[0];
-      for (unsigned int q=0; q<this->data->n_q_points; ++q)
+      VectorizedArray<Number> J = J_value[0];
+      for (unsigned int q=0; q<this->n_quadrature_points; ++q)
         JxW_values[q] = J * this->quadrature_weights[q];
     }
   else
-    for (unsigned int q=0; q<data->n_q_points; ++q)
-      JxW_values[q] = this->J_value[q];
+    for (unsigned int q=0; q<n_quadrature_points; ++q)
+      JxW_values[q] = J_value[q];
 }
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
-VectorizedArray<Number>
-FEEvaluationBase<dim,n_components_,Number>::JxW(const unsigned int q_point) const
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+Tensor<1,dim,VectorizedArray<Number> >
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::get_normal_vector(const unsigned int q_index) const
 {
-  AssertIndexRange(q_point, data->n_q_points);
-  Assert (this->J_value != nullptr, ExcNotInitialized());
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian ||
-      this->cell_type == internal::MatrixFreeFunctions::affine)
+  AssertIndexRange(q_index, n_quadrature_points);
+  Assert(normal_vectors != nullptr, ExcMessage("Did not call reinit()!"));
+  if (this->cell_type <= internal::MatrixFreeFunctions::flat_faces)
+    return normal_vectors[0];
+  else
+    return normal_vectors[q_index];
+}
+
+
+
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+VectorizedArray<Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>::JxW(const unsigned int q_index) const
+{
+  AssertIndexRange(q_index, n_quadrature_points);
+  Assert (J_value != nullptr, ExcNotInitialized());
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
       Assert (this->quadrature_weights != nullptr, ExcInternalError());
-      return this->J_value[0] * this->quadrature_weights[q_point];
+      return J_value[0] * this->quadrature_weights[q_index];
     }
   else
-    return this->J_value[q_point];
+    return J_value[q_index];
 }
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<2,dim,VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::inverse_jacobian(const unsigned int q_index) const
 {
-  AssertIndexRange(q_index, data->n_q_points);
+  AssertIndexRange(q_index, n_quadrature_points);
   Assert (this->jacobian != nullptr, ExcNotImplemented());
   if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     return jacobian[0];
   else
     return jacobian[q_index];
+}
+
+
+
+template <int dim, int n_components_, typename Number, bool is_face>
+inline
+VectorizedArray<Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::read_cell_data(const AlignedVector<VectorizedArray<Number> > &array) const
+{
+  Assert(matrix_info != nullptr, ExcNotImplemented());
+  AssertDimension(array.size(), matrix_info->get_task_info().cell_partition_data.back());
+  if (is_face)
+    {
+      VectorizedArray<Number> out = make_vectorized_array<Number>(Number(1.));
+      const unsigned int *cells =
+        is_interior_face ?
+        &this->matrix_info->get_face_info(cell).cells_interior[0] :
+        &this->matrix_info->get_face_info(cell).cells_exterior[0];
+      for (unsigned int i=0; i<VectorizedArray<Number>::n_array_elements; ++i)
+        if (cells[i] != numbers::invalid_unsigned_int)
+          out[i] = array[cells[i]/VectorizedArray<Number>::n_array_elements][cells[i]%VectorizedArray<Number>::n_array_elements];
+      return out;
+    }
+  else
+    return array[cell];
 }
 
 
@@ -2999,11 +3229,11 @@ namespace internal
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType, typename VectorOperation>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::read_write_operation (const VectorOperation &operation,
                         VectorType            *src[]) const
 {
@@ -3034,6 +3264,7 @@ FEEvaluationBase<dim,n_components_,Number>
       return;
     }
 
+  // Some standard checks
   Assert (dof_info != nullptr, ExcNotInitialized());
   Assert (matrix_info->indices_initialized() == true,
           ExcNotInitialized());
@@ -3354,11 +3585,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::read_dof_values (const VectorType  &src,
                    const unsigned int first_index)
 {
@@ -3379,11 +3610,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::read_dof_values_plain (const VectorType  &src,
                          const unsigned int first_index)
 {
@@ -3399,11 +3630,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::distribute_local_to_global (VectorType        &dst,
                               const unsigned int first_index) const
 {
@@ -3423,11 +3654,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::set_dof_values (VectorType        &dst,
                   const unsigned int first_index) const
 {
@@ -3447,11 +3678,11 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <typename VectorType>
 inline
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::read_dof_values_plain (const VectorType *src[])
 {
   // Case without MatrixFree initialization object
@@ -3585,10 +3816,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 /*------------------------------ access to data fields ----------------------*/
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 const std::vector<unsigned int> &
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 get_internal_dof_numbering() const
 {
   return data->lexicographic_numbering;
@@ -3596,10 +3827,10 @@ get_internal_dof_numbering() const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 ArrayView<VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 get_scratch_data() const
 {
   return ArrayView<VectorizedArray<Number> >(const_cast<VectorizedArray<Number> *>(scratch_data),
@@ -3609,10 +3840,10 @@ get_scratch_data() const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 const VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_dof_values () const
 {
   return &values_dofs[0][0];
@@ -3620,10 +3851,10 @@ begin_dof_values () const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_dof_values ()
 {
 #ifdef DEBUG
@@ -3634,10 +3865,10 @@ begin_dof_values ()
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 const VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_values () const
 {
   Assert (values_quad_initialized || values_quad_submitted,
@@ -3647,13 +3878,14 @@ begin_values () const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_values ()
 {
 #ifdef DEBUG
+  values_quad_initialized = true;
   values_quad_submitted = true;
 #endif
   return &values_quad[0][0];
@@ -3661,10 +3893,10 @@ begin_values ()
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 const VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_gradients () const
 {
   Assert (gradients_quad_initialized || gradients_quad_submitted,
@@ -3674,24 +3906,25 @@ begin_gradients () const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_gradients ()
 {
 #ifdef DEBUG
   gradients_quad_submitted = true;
+  gradients_quad_initialized = true;
 #endif
   return &gradients_quad[0][0][0];
 }
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 const VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_hessians () const
 {
   Assert (hessians_quad_initialized, ExcNotInitialized());
@@ -3700,21 +3933,24 @@ begin_hessians () const
 
 
 
-template <int dim, int n_components, typename Number>
+template <int dim, int n_components, typename Number, bool is_face>
 inline
 VectorizedArray<Number> *
-FEEvaluationBase<dim,n_components,Number>::
+FEEvaluationBase<dim,n_components,Number,is_face>::
 begin_hessians ()
 {
+#ifdef DEBUG
+  hessians_quad_initialized = true;
+#endif
   return &hessians_quad[0][0][0];
 }
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
@@ -3726,15 +3962,15 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_quad[comp][q_point];
@@ -3743,20 +3979,22 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_gradient (const unsigned int q_point) const
 {
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
+
+  Assert(jacobian != nullptr, ExcNotInitialized());
 
   Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > grad_out;
 
   // Cartesian cell
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int comp=0; comp<n_components; comp++)
         for (unsigned int d=0; d<dim; ++d)
@@ -3767,18 +4005,50 @@ FEEvaluationBase<dim,n_components_,Number>
   else
     {
       const Tensor<2,dim,VectorizedArray<Number> > &jac =
-        this->cell_type > internal::MatrixFreeFunctions::affine ?
-        jacobian[q_point] : jacobian[0];
+        jacobian[this->cell_type > internal::MatrixFreeFunctions::affine ? q_point : 0];
+      for (unsigned int comp=0; comp<n_components; comp++)
+        for (unsigned int d=0; d<dim; ++d)
+          {
+            grad_out[comp][d] = jac[d][0] *
+                                this->gradients_quad[comp][0][q_point];
+            for (unsigned int e=1; e<dim; ++e)
+              grad_out[comp][d] += jac[d][e] *
+                                   this->gradients_quad[comp][e][q_point];
+          }
+    }
+  return grad_out;
+}
+
+
+
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+Tensor<1,n_components_,VectorizedArray<Number> >
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::get_normal_derivative (const unsigned int q_point) const
+{
+  AssertIndexRange (q_point, this->n_quadrature_points);
+  Assert (this->gradients_quad_initialized==true,
+          internal::ExcAccessToUninitializedField());
+
+  Assert(normal_x_jacobian != nullptr, ExcNotInitialized());
+
+  Tensor<1,n_components,VectorizedArray<Number> > grad_out;
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    for (unsigned int comp=0; comp<n_components; comp++)
+      grad_out[comp] = this->gradients_quad[comp][dim-1][q_point] *
+                       (this->normal_x_jacobian[0][dim-1]);
+  else
+    {
+      const unsigned int index =
+        this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
       for (unsigned int comp=0; comp<n_components; comp++)
         {
-          for (unsigned int d=0; d<dim; ++d)
-            {
-              grad_out[comp][d] = (jac[d][0] *
-                                   this->gradients_quad[comp][0][q_point]);
-              for (unsigned int e=1; e<dim; ++e)
-                grad_out[comp][d] += (jac[d][e] *
-                                      this->gradients_quad[comp][e][q_point]);
-            }
+          grad_out[comp] = this->gradients_quad[comp][0][q_point] *
+                           this->normal_x_jacobian[index][0];
+          for (unsigned int d=1; d<dim; ++d)
+            grad_out[comp] += this->gradients_quad[comp][d][q_point] *
+                              this->normal_x_jacobian[index][d];
         }
     }
   return grad_out;
@@ -3843,15 +4113,16 @@ namespace internal
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,Tensor<2,dim,VectorizedArray<Number> > >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_hessian (const unsigned int q_point) const
 {
+  Assert(!is_face, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
 
   Assert(jacobian != nullptr, ExcNotImplemented());
   const Tensor<2,dim,VectorizedArray<Number> > &jac =
@@ -3923,7 +4194,7 @@ FEEvaluationBase<dim,n_components_,Number>
   else
     {
       const Tensor<1,dim*(dim+1)/2,Tensor<1,dim,VectorizedArray<Number> > > &jac_grad =
-        mapping_data->jacobian_gradients[0][this->get_mapping_data_index_offset()+q_point];
+        mapping_data->jacobian_gradients[1-this->is_interior_face][this->mapping_data->data_index_offsets[this->cell]+q_point];
       for (unsigned int comp=0; comp<n_components; comp++)
         {
           // compute laplacian before the gradient because it needs to access
@@ -3965,15 +4236,16 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_hessian_diagonal (const unsigned int q_point) const
 {
+  Assert(!is_face, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
 
   Assert(jacobian != nullptr, ExcNotImplemented());
   const Tensor<2,dim,VectorizedArray<Number> > &jac =
@@ -4014,7 +4286,7 @@ FEEvaluationBase<dim,n_components_,Number>
   else
     {
       const Tensor<1,dim*(dim+1)/2,Tensor<1,dim,VectorizedArray<Number> > > &jac_grad =
-        mapping_data->jacobian_gradients[0][this->get_mapping_data_index_offset()+q_point];
+        mapping_data->jacobian_gradients[0][this->mapping_data->data_index_offsets[this->cell]+q_point];
       for (unsigned int comp=0; comp<n_components; comp++)
         {
           // compute laplacian before the gradient because it needs to access
@@ -4043,15 +4315,17 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::get_laplacian (const unsigned int q_point) const
 {
+  Assert (is_face == false, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
+
   Tensor<1,n_components_,VectorizedArray<Number> > laplacian_out;
   const Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > hess_diag
     = get_hessian_diagonal(q_point);
@@ -4066,10 +4340,10 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::submit_dof_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
                     const unsigned int dof)
 {
@@ -4083,27 +4357,29 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::submit_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
                 const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
+  Assert (this->J_value != nullptr, ExcNotInitialized());
   this->values_quad_submitted = true;
 #endif
-  if (this->cell_type == internal::MatrixFreeFunctions::general)
+
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      const VectorizedArray<Number> JxW = J_value[q_point];
+      const VectorizedArray<Number> JxW = J_value[0] * quadrature_weights[q_point];
       for (unsigned int comp=0; comp<n_components; ++comp)
         this->values_quad[comp][q_point] = val_in[comp] * JxW;
     }
-  else //if (this->cell_type < internal::MatrixFreeFunctions::general)
+  else
     {
-      const VectorizedArray<Number> JxW = J_value[0] * quadrature_weights[q_point];
+      const VectorizedArray<Number> JxW = J_value[q_point];
       for (unsigned int comp=0; comp<n_components; ++comp)
         this->values_quad[comp][q_point] = val_in[comp] * JxW;
     }
@@ -4111,23 +4387,23 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
-inline
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::submit_gradient (const Tensor<1,n_components_,
                    Tensor<1,dim,VectorizedArray<Number> > >grad_in,
                    const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   this->gradients_quad_submitted = true;
   Assert (this->J_value != nullptr, ExcNotInitialized());
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
 
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> JxW = J_value[0] * quadrature_weights[q_point];
       for (unsigned int comp=0; comp<n_components; comp++)
@@ -4156,10 +4432,52 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::submit_normal_derivative (const Tensor<1,n_components_,VectorizedArray<Number> > grad_in,
+                            const unsigned int q_point)
+{
+#ifdef DEBUG
+  AssertIndexRange (q_point, this->n_quadrature_points);
+  this->gradients_quad_submitted = true;
+  Assert (this->normal_x_jacobian != nullptr, ExcNotInitialized());
+#endif
+
+  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+    for (unsigned int comp=0; comp<n_components; comp++)
+      {
+        for (unsigned int d=0; d<dim-1; ++d)
+          this->gradients_quad[comp][d][q_point] = VectorizedArray<Number>();
+        this->gradients_quad[comp][dim-1][q_point] =
+          grad_in[comp] * (this->normal_x_jacobian[0][dim-1] *
+                           this->J_value[0] * this->quadrature_weights[q_point]);
+      }
+  else
+    {
+      const unsigned int index =
+        this->cell_type <= internal::MatrixFreeFunctions::affine ? 0 : q_point;
+      for (unsigned int comp=0; comp<n_components; comp++)
+        {
+          VectorizedArray<Number> factor = grad_in[comp] *
+                                           this->J_value[index];
+          if (this->cell_type <= internal::MatrixFreeFunctions::affine)
+            factor = factor * this->quadrature_weights[q_point];
+          for (unsigned int d=0; d<dim; ++d)
+            this->gradients_quad[comp][d][q_point] = factor *
+                                                     this->normal_x_jacobian[index][d];
+        }
+    }
+}
+
+
+
+
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
-FEEvaluationBase<dim,n_components_,Number>
+FEEvaluationBase<dim,n_components_,Number,is_face>
 ::integrate_value () const
 {
 #ifdef DEBUG
@@ -4170,7 +4488,7 @@ FEEvaluationBase<dim,n_components_,Number>
   Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; ++comp)
     return_value[comp] = this->values_quad[comp][0];
-  const unsigned int n_q_points = this->data->n_q_points;
+  const unsigned int n_q_points = this->n_quadrature_points;
   for (unsigned int q=1; q<n_q_points; ++q)
     for (unsigned int comp=0; comp<n_components; ++comp)
       return_value[comp] += this->values_quad[comp][q];
@@ -4182,55 +4500,58 @@ FEEvaluationBase<dim,n_components_,Number>
 /*----------------------- FEEvaluationAccess --------------------------------*/
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,n_components_,Number>
+FEEvaluationAccess<dim,n_components_,Number,is_face>
 ::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int fe_no,
+                      const unsigned int dof_no,
+                      const unsigned int first_selected_component,
                       const unsigned int quad_no_in,
                       const unsigned int fe_degree,
-                      const unsigned int n_q_points)
+                      const unsigned int n_q_points,
+                      const bool         is_interior_face)
   :
-  FEEvaluationBase <dim,n_components_,Number>
-  (data_in, fe_no, quad_no_in, fe_degree, n_q_points)
+  FEEvaluationBase <dim,n_components_,Number,is_face>
+  (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
+   is_interior_face)
 {}
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 template <int n_components_other>
 inline
-FEEvaluationAccess<dim,n_components_,Number>
+FEEvaluationAccess<dim,n_components_,Number,is_face>
 ::FEEvaluationAccess (const Mapping<dim>       &mapping,
                       const FiniteElement<dim> &fe,
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other)
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
-  FEEvaluationBase <dim,n_components_,Number>(mapping, fe, quadrature, update_flags,
-                                              first_selected_component, other)
+  FEEvaluationBase <dim,n_components_,Number,is_face>(mapping, fe, quadrature, update_flags,
+                                                      first_selected_component, other)
 {}
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,n_components_,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,n_components_,Number> &other)
+FEEvaluationAccess<dim,n_components_,Number,is_face>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,n_components_,Number,is_face> &other)
   :
-  FEEvaluationBase <dim,n_components_,Number>(other)
+  FEEvaluationBase <dim,n_components_,Number,is_face>(other)
 {}
 
 
 
-template <int dim, int n_components_, typename Number>
+template <int dim, int n_components_, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,n_components_,Number> &
-FEEvaluationAccess<dim,n_components_,Number>
-::operator= (const FEEvaluationAccess<dim,n_components_,Number> &other)
+FEEvaluationAccess<dim,n_components_,Number,is_face> &
+FEEvaluationAccess<dim,n_components_,Number,is_face>
+::operator= (const FEEvaluationAccess<dim,n_components_,Number,is_face> &other)
 {
-  this->FEEvaluationBase<dim,n_components_,Number>::operator=(other);
+  this->FEEvaluationBase<dim,n_components_,Number,is_face>::operator=(other);
   return *this;
 }
 
@@ -4239,64 +4560,67 @@ FEEvaluationAccess<dim,n_components_,Number>
 /*-------------------- FEEvaluationAccess scalar ----------------------------*/
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int fe_no,
+                      const unsigned int dof_no,
+                      const unsigned int first_selected_component,
                       const unsigned int quad_no_in,
                       const unsigned int fe_degree,
-                      const unsigned int n_q_points)
+                      const unsigned int n_q_points,
+                      const bool         is_interior_face)
   :
-  FEEvaluationBase <dim,1,Number>
-  (data_in, fe_no, quad_no_in, fe_degree, n_q_points)
+  FEEvaluationBase <dim,1,Number,is_face>
+  (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
+   is_interior_face)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 template <int n_components_other>
 inline
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::FEEvaluationAccess (const Mapping<dim>       &mapping,
                       const FiniteElement<dim> &fe,
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other)
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
-  FEEvaluationBase <dim,1,Number> (mapping, fe, quadrature, update_flags,
-                                   first_selected_component, other)
+  FEEvaluationBase <dim,1,Number,is_face> (mapping, fe, quadrature, update_flags,
+                                           first_selected_component, other)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,1,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number> &other)
+FEEvaluationAccess<dim,1,Number,is_face>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number,is_face> &other)
   :
-  FEEvaluationBase <dim,1,Number>(other)
+  FEEvaluationBase <dim,1,Number,is_face>(other)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,1,Number> &
-FEEvaluationAccess<dim,1,Number>
-::operator= (const FEEvaluationAccess<dim,1,Number> &other)
+FEEvaluationAccess<dim,1,Number,is_face> &
+FEEvaluationAccess<dim,1,Number,is_face>
+::operator= (const FEEvaluationAccess<dim,1,Number,is_face> &other)
 {
-  this->FEEvaluationBase<dim,1,Number>::operator=(other);
+  this->FEEvaluationBase<dim,1,Number,is_face>::operator=(other);
   return *this;
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
@@ -4305,38 +4629,49 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   return this->values_quad[0][q_point];
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+VectorizedArray<Number>
+FEEvaluationAccess<dim,1,Number,is_face>
+::get_normal_derivative (const unsigned int q_point) const
+{
+  return BaseClass::get_normal_derivative(q_point)[0];
+}
+
+
+
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_gradient (const unsigned int q_point) const
 {
-  // could use the base class gradient, but that involves too many inefficient
+  // could use the base class gradient, but that involves too many expensive
   // initialization operations on tensors
 
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
 
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 
   Tensor<1,dim,VectorizedArray<Number> > grad_out;
 
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       for (unsigned int d=0; d<dim; ++d)
         grad_out[d] = (this->gradients_quad[0][d][q_point] *
@@ -4360,10 +4695,10 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
 Tensor<2,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_hessian (const unsigned int q_point) const
 {
   return BaseClass::get_hessian(q_point)[0];
@@ -4371,10 +4706,10 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
 Tensor<1,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_hessian_diagonal (const unsigned int q_point) const
 {
   return BaseClass::get_hessian_diagonal(q_point)[0];
@@ -4382,10 +4717,10 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
 VectorizedArray<Number>
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::get_laplacian (const unsigned int q_point) const
 {
   return BaseClass::get_laplacian(q_point)[0];
@@ -4393,10 +4728,10 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-void
-FEEvaluationAccess<dim,1,Number>
+void DEAL_II_ALWAYS_INLINE
+FEEvaluationAccess<dim,1,Number,is_face>
 ::submit_dof_value (const VectorizedArray<Number> val_in,
                     const unsigned int dof)
 {
@@ -4409,48 +4744,74 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-void
-FEEvaluationAccess<dim,1,Number>
+void DEAL_II_ALWAYS_INLINE
+FEEvaluationAccess<dim,1,Number,is_face>
 ::submit_value (const VectorizedArray<Number> val_in,
-                const unsigned int q_point)
+                const unsigned int q_index)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_index, this->n_quadrature_points);
+  Assert (this->J_value != nullptr, ExcNotInitialized());
   this->values_quad_submitted = true;
 #endif
-  if (this->cell_type == internal::MatrixFreeFunctions::general)
+  if (this->cell_type <= internal::MatrixFreeFunctions::affine)
     {
-      const VectorizedArray<Number> JxW = this->J_value[q_point];
-      this->values_quad[0][q_point] = val_in * JxW;
+      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_index];
+      this->values_quad[0][q_index] = val_in * JxW;
     }
   else //if (this->cell_type < internal::MatrixFreeFunctions::general)
     {
-      const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
-      this->values_quad[0][q_point] = val_in * JxW;
+      this->values_quad[0][q_index] = val_in * this->J_value[q_index];
     }
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
+::submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+                const unsigned int q_point)
+{
+  submit_value(val_in[0], q_point);
+}
+
+
+
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<dim,1,Number,is_face>
+::submit_normal_derivative (const VectorizedArray<Number> grad_in,
+                            const unsigned int q_point)
+{
+  Tensor<1,1,VectorizedArray<Number> > grad;
+  grad[0] = grad_in;
+  BaseClass::submit_normal_derivative(grad, q_point);
+}
+
+
+
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<dim,1,Number,is_face>
 ::submit_gradient (const Tensor<1,dim,VectorizedArray<Number> > grad_in,
                    const unsigned int q_index)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_index, this->data->n_q_points);
+  AssertIndexRange (q_index, this->n_quadrature_points);
   this->gradients_quad_submitted = true;
   Assert (this->J_value != nullptr, ExcNotInitialized());
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
 
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> JxW = this->J_value[0] *
                                           this->quadrature_weights[q_index];
@@ -4480,10 +4841,10 @@ FEEvaluationAccess<dim,1,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
 VectorizedArray<Number>
-FEEvaluationAccess<dim,1,Number>
+FEEvaluationAccess<dim,1,Number,is_face>
 ::integrate_value () const
 {
   return BaseClass::integrate_value()[0];
@@ -4495,64 +4856,67 @@ FEEvaluationAccess<dim,1,Number>
 /*----------------- FEEvaluationAccess vector-valued ------------------------*/
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int fe_no,
+                      const unsigned int dof_no,
+                      const unsigned int first_selected_component,
                       const unsigned int quad_no_in,
                       const unsigned int fe_degree,
-                      const unsigned int n_q_points)
+                      const unsigned int n_q_points,
+                      const bool         is_interior_face)
   :
-  FEEvaluationBase <dim,dim,Number>
-  (data_in, fe_no, quad_no_in, fe_degree, n_q_points)
+  FEEvaluationBase <dim,dim,Number,is_face>
+  (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
+   is_interior_face)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 template <int n_components_other>
 inline
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::FEEvaluationAccess (const Mapping<dim>       &mapping,
                       const FiniteElement<dim> &fe,
                       const Quadrature<1>      &quadrature,
                       const UpdateFlags         update_flags,
                       const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number> *other)
+                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
-  FEEvaluationBase <dim,dim,Number> (mapping, fe, quadrature, update_flags,
-                                     first_selected_component, other)
+  FEEvaluationBase <dim,dim,Number,is_face> (mapping, fe, quadrature, update_flags,
+                                             first_selected_component, other)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,dim,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number> &other)
+FEEvaluationAccess<dim,dim,Number,is_face>
+::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number,is_face> &other)
   :
-  FEEvaluationBase <dim,dim,Number>(other)
+  FEEvaluationBase <dim,dim,Number,is_face>(other)
 {}
 
 
 
-template <int dim, typename Number>
+template <int dim, typename Number, bool is_face>
 inline
-FEEvaluationAccess<dim,dim,Number> &
-FEEvaluationAccess<dim,dim,Number>
-::operator= (const FEEvaluationAccess<dim,dim,Number> &other)
+FEEvaluationAccess<dim,dim,Number,is_face> &
+FEEvaluationAccess<dim,dim,Number,is_face>
+::operator= (const FEEvaluationAccess<dim,dim,Number,is_face> &other)
 {
-  this->FEEvaluationAccess<dim,dim,Number>::operator=(other);
+  this->FEEvaluationBase<dim,dim,Number,is_face>::operator=(other);
   return *this;
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<2,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_gradient (const unsigned int q_point) const
 {
   return BaseClass::get_gradient (q_point);
@@ -4560,21 +4924,21 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_divergence (const unsigned int q_point) const
 {
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 
   VectorizedArray<Number> divergence;
 
   // Cartesian cell
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       divergence = (this->gradients_quad[0][0][q_point] *
                     this->jacobian[0][0][0]);
@@ -4600,10 +4964,10 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<2,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_symmetric_gradient (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
@@ -4636,10 +5000,10 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_curl (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
@@ -4667,39 +5031,35 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<2,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_hessian_diagonal (const unsigned int q_point) const
 {
-  Assert (this->hessians_quad_initialized==true,
-          internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
-
   return BaseClass::get_hessian_diagonal (q_point);
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<3,dim,VectorizedArray<Number> >
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::get_hessian (const unsigned int q_point) const
 {
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   return BaseClass::get_hessian(q_point);
 }
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::submit_gradient (const Tensor<2,dim,VectorizedArray<Number> > grad_in,
                    const unsigned int q_point)
 {
@@ -4708,10 +5068,10 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::submit_gradient (const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > >
                    grad_in,
                    const unsigned int q_point)
@@ -4721,22 +5081,22 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::submit_divergence (const VectorizedArray<Number> div_in,
                      const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   this->gradients_quad_submitted = true;
   Assert (this->J_value != nullptr, ExcNotInitialized());
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
 
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> fac = this->J_value[0] *
                                           this->quadrature_weights[q_point] * div_in;
@@ -4770,10 +5130,10 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> >
                             sym_grad,
                             const unsigned int q_point)
@@ -4783,13 +5143,13 @@ FEEvaluationAccess<dim,dim,Number>
   // that saves some operations
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   this->gradients_quad_submitted = true;
   Assert (this->J_value != nullptr, ExcNotInitialized());
   Assert (this->jacobian != nullptr, ExcNotInitialized());
 #endif
 
-  if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
+  if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
       for (unsigned int d=0; d<dim; ++d)
@@ -4838,10 +5198,10 @@ FEEvaluationAccess<dim,dim,Number>
 
 
 
-template <int dim, typename Number>
-inline
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<dim,dim,Number>
+FEEvaluationAccess<dim,dim,Number,is_face>
 ::submit_curl (const Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl,
                const unsigned int q_point)
 {
@@ -4874,64 +5234,67 @@ FEEvaluationAccess<dim,dim,Number>
 /*-------------------- FEEvaluationAccess scalar for 1d ----------------------------*/
 
 
-template <typename Number>
+template <typename Number, bool is_face>
 inline
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::FEEvaluationAccess (const MatrixFree<1,Number> &data_in,
-                      const unsigned int fe_no,
+                      const unsigned int dof_no,
+                      const unsigned int first_selected_component,
                       const unsigned int quad_no_in,
                       const unsigned int fe_degree,
-                      const unsigned int n_q_points)
+                      const unsigned int n_q_points,
+                      const bool         is_interior_face)
   :
-  FEEvaluationBase <1,1,Number>
-  (data_in, fe_no, quad_no_in, fe_degree, n_q_points)
+  FEEvaluationBase <1,1,Number,is_face>
+  (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
+   is_interior_face)
 {}
 
 
 
-template <typename Number>
+template <typename Number, bool is_face>
 template <int n_components_other>
 inline
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::FEEvaluationAccess (const Mapping<1>       &mapping,
                       const FiniteElement<1> &fe,
                       const Quadrature<1>    &quadrature,
                       const UpdateFlags       update_flags,
                       const unsigned int      first_selected_component,
-                      const FEEvaluationBase<1,n_components_other,Number> *other)
+                      const FEEvaluationBase<1,n_components_other,Number,is_face> *other)
   :
-  FEEvaluationBase <1,1,Number> (mapping, fe, quadrature, update_flags,
-                                 first_selected_component, other)
+  FEEvaluationBase <1,1,Number,is_face> (mapping, fe, quadrature, update_flags,
+                                         first_selected_component, other)
 {}
 
 
 
-template <typename Number>
+template <typename Number, bool is_face>
 inline
-FEEvaluationAccess<1,1,Number>
-::FEEvaluationAccess (const FEEvaluationAccess<1,1,Number> &other)
+FEEvaluationAccess<1,1,Number,is_face>
+::FEEvaluationAccess (const FEEvaluationAccess<1,1,Number,is_face> &other)
   :
-  FEEvaluationBase <1,1,Number>(other)
+  FEEvaluationBase <1,1,Number,is_face>(other)
 {}
 
 
 
-template <typename Number>
+template <typename Number, bool is_face>
 inline
-FEEvaluationAccess<1,1,Number> &
-FEEvaluationAccess<1,1,Number>
-::operator= (const FEEvaluationAccess<1,1,Number> &other)
+FEEvaluationAccess<1,1,Number,is_face> &
+FEEvaluationAccess<1,1,Number,is_face>
+::operator= (const FEEvaluationAccess<1,1,Number,is_face> &other)
 {
-  this->FEEvaluationBase<1,1,Number>::operator=(other);
+  this->FEEvaluationBase<1,1,Number,is_face>::operator=(other);
   return *this;
 }
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
@@ -4940,24 +5303,24 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   return this->values_quad[0][q_point];
 }
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,1,VectorizedArray<Number> >
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_gradient (const unsigned int q_point) const
 {
   // could use the base class gradient, but that involves too many inefficient
@@ -4965,7 +5328,7 @@ FEEvaluationAccess<1,1,Number>
 
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
 
   const Tensor<2,1,VectorizedArray<Number> > &jac =
     this->cell_type == internal::MatrixFreeFunctions::general ?
@@ -4979,10 +5342,21 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+VectorizedArray<Number>
+FEEvaluationAccess<1,1,Number,is_face>
+::get_normal_derivative (const unsigned int q_point) const
+{
+  return BaseClass::get_normal_derivative(q_point)[0];
+}
+
+
+
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<2,1,VectorizedArray<Number> >
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_hessian (const unsigned int q_point) const
 {
   return BaseClass::get_hessian(q_point)[0];
@@ -4990,10 +5364,10 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 Tensor<1,1,VectorizedArray<Number> >
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_hessian_diagonal (const unsigned int q_point) const
 {
   return BaseClass::get_hessian_diagonal(q_point)[0];
@@ -5001,10 +5375,10 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::get_laplacian (const unsigned int q_point) const
 {
   return BaseClass::get_laplacian(q_point)[0];
@@ -5012,10 +5386,10 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
-void
-FEEvaluationAccess<1,1,Number>
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void DEAL_II_ALWAYS_INLINE
+FEEvaluationAccess<1,1,Number,is_face>
 ::submit_dof_value (const VectorizedArray<Number> val_in,
                     const unsigned int dof)
 {
@@ -5028,16 +5402,16 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::submit_value (const VectorizedArray<Number> val_in,
                 const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
+  AssertIndexRange (q_point, this->n_quadrature_points);
   this->values_quad_submitted = true;
 #endif
   if (this->cell_type == internal::MatrixFreeFunctions::general)
@@ -5045,7 +5419,7 @@ FEEvaluationAccess<1,1,Number>
       const VectorizedArray<Number> JxW = this->J_value[q_point];
       this->values_quad[0][q_point] = val_in * JxW;
     }
-  else //if (this->cell_type < internal::MatrixFreeFunctions::general)
+  else //if (this->cell_type == internal::MatrixFreeFunctions::general)
     {
       const VectorizedArray<Number> JxW = this->J_value[0] * this->quadrature_weights[q_point];
       this->values_quad[0][q_point] = val_in * JxW;
@@ -5054,35 +5428,85 @@ FEEvaluationAccess<1,1,Number>
 
 
 
-template <typename Number>
-inline
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
 void
-FEEvaluationAccess<1,1,Number>
-::submit_gradient (const Tensor<1,1,VectorizedArray<Number> > grad_in,
-                   const unsigned int q_point)
+FEEvaluationAccess<1,1,Number,is_face>
+::submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+                const unsigned int q_point)
 {
-#ifdef DEBUG
-  Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  AssertIndexRange (q_point, this->data->n_q_points);
-  this->gradients_quad_submitted = true;
-#endif
-
-  const Tensor<2,1,VectorizedArray<Number> > &jac =
-    this->cell_type > internal::MatrixFreeFunctions::affine ?
-    this->jacobian[q_point] : this->jacobian[0];
-  const VectorizedArray<Number> JxW =
-    this->cell_type > internal::MatrixFreeFunctions::affine ?
-    this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
-
-  this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in[0] * JxW;
+  submit_value(val_in[0], q_point);
 }
 
 
 
-template <typename Number>
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<1,1,Number,is_face>
+::submit_gradient (const Tensor<1,1,VectorizedArray<Number> > grad_in,
+                   const unsigned int q_point)
+{
+  submit_gradient(grad_in[0], q_point);
+}
+
+
+
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<1,1,Number,is_face>
+::submit_gradient (const VectorizedArray<Number> grad_in,
+                   const unsigned int q_point)
+{
+#ifdef DEBUG
+  Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
+  AssertIndexRange (q_point, this->n_quadrature_points);
+  this->gradients_quad_submitted = true;
+#endif
+
+  const Tensor<2,1,VectorizedArray<Number> > &jac =
+    this->cell_type == internal::MatrixFreeFunctions::general ?
+    this->jacobian[q_point] : this->jacobian[0];
+  const VectorizedArray<Number> JxW =
+    this->cell_type == internal::MatrixFreeFunctions::general ?
+    this->J_value[q_point] : this->J_value[0] * this->quadrature_weights[q_point];
+
+  this->gradients_quad[0][0][q_point] = jac[0][0] * grad_in * JxW;
+}
+
+
+
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<1,1,Number,is_face>
+::submit_normal_derivative (const VectorizedArray<Number> grad_in,
+                            const unsigned int q_point)
+{
+  Tensor<1,1,VectorizedArray<Number> > grad;
+  grad[0] = grad_in;
+  BaseClass::submit_normal_derivative(grad, q_point);
+}
+
+
+
+template <typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE
+void
+FEEvaluationAccess<1,1,Number,is_face>
+::submit_normal_derivative (const Tensor<1,1,VectorizedArray<Number> > grad_in,
+                            const unsigned int q_point)
+{
+  BaseClass::submit_normal_derivative(grad_in, q_point);
+}
+
+
+
+template <typename Number, bool is_face>
 inline
 VectorizedArray<Number>
-FEEvaluationAccess<1,1,Number>
+FEEvaluationAccess<1,1,Number,is_face>
 ::integrate_value () const
 {
   return BaseClass::integrate_value()[0];
@@ -5100,9 +5524,10 @@ inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluation (const MatrixFree<dim,Number> &data_in,
                 const unsigned int fe_no,
-                const unsigned int quad_no)
+                const unsigned int quad_no,
+                const unsigned int first_selected_component)
   :
-  BaseClass (data_in, fe_no, quad_no, fe_degree, static_n_q_points),
+  BaseClass (data_in, fe_no, first_selected_component, quad_no, fe_degree, static_n_q_points),
   dofs_per_component (this->data->dofs_per_component_on_cell),
   dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
@@ -5124,7 +5549,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (mapping, fe, quadrature, update_flags,
              first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
+             static_cast<FEEvaluationBase<dim,1,Number,false>*>(nullptr)),
   dofs_per_component (this->data->dofs_per_component_on_cell),
   dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
@@ -5145,7 +5570,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   :
   BaseClass (StaticMappingQ1<dim>::mapping, fe, quadrature, update_flags,
              first_selected_component,
-             static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
+             static_cast<FEEvaluationBase<dim,1,Number,false>*>(nullptr)),
   dofs_per_component (this->data->dofs_per_component_on_cell),
   dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
@@ -5212,18 +5637,19 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::check_template_arguments(const unsigned int fe_no,
+::check_template_arguments(const unsigned int dof_no,
                            const unsigned int first_selected_component)
 {
-  (void)fe_no;
+  (void)dof_no;
   (void)first_selected_component;
 
 #ifdef DEBUG
   // print error message when the dimensions do not match. Propose a possible
   // fix
-  if ((fe_degree != -1 && static_cast<unsigned int>(fe_degree) != this->data->fe_degree)
+  if ((static_cast<unsigned int>(fe_degree) != numbers::invalid_unsigned_int &&
+       static_cast<unsigned int>(fe_degree) != this->data->fe_degree)
       ||
-      (fe_degree != -1 && static_n_q_points != this->data->n_q_points))
+      n_q_points != this->n_quadrature_points)
     {
       std::string message =
         "-------------------------------------------------------\n";
@@ -5233,27 +5659,33 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       message += Utilities::int_to_string(n_q_points_1d);
       message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data";
-      if (fe_no != numbers::invalid_unsigned_int)
+      if (first_selected_component != numbers::invalid_unsigned_int)
         {
-          message += ", " + Utilities::int_to_string(fe_no) + ", ";
-          message += Utilities::int_to_string(this->quad_no);
+          message += ", " + Utilities::int_to_string(dof_no) + ", ";
+          message += Utilities::int_to_string(this->quad_no) + ", ";
+          message += Utilities::int_to_string(first_selected_component);
         }
       message += ")\n";
 
       // check whether some other vector component has the correct number of
       // points
-      unsigned int proposed_dof_comp = numbers::invalid_unsigned_int,
+      unsigned int proposed_dof_comp  = numbers::invalid_unsigned_int,
+                   proposed_fe_comp   = numbers::invalid_unsigned_int,
                    proposed_quad_comp = numbers::invalid_unsigned_int;
-      if (fe_no != numbers::invalid_unsigned_int)
+      if (dof_no != numbers::invalid_unsigned_int)
         {
           if (static_cast<unsigned int>(fe_degree) == this->data->fe_degree)
-            proposed_dof_comp = fe_no;
+            {
+              proposed_dof_comp = dof_no;
+              proposed_fe_comp  = first_selected_component;
+            }
           else
             for (unsigned int no=0; no<this->matrix_info->n_components(); ++no)
               if (this->matrix_info->get_shape_info(no,0,this->active_fe_index,0).fe_degree
                   == static_cast<unsigned int>(fe_degree))
                 {
                   proposed_dof_comp = no;
+                  proposed_fe_comp = 0;
                   break;
                 }
           if (n_q_points ==
@@ -5271,7 +5703,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       if (proposed_dof_comp  != numbers::invalid_unsigned_int &&
           proposed_quad_comp != numbers::invalid_unsigned_int)
         {
-          if (proposed_dof_comp != fe_no)
+          if (proposed_dof_comp != first_selected_component)
             message += "Wrong vector component selection:\n";
           else
             message += "Wrong quadrature formula selection:\n";
@@ -5280,18 +5712,23 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
           message += Utilities::int_to_string(n_q_points_1d);
           message += "," + Utilities::int_to_string(n_components);
           message += ",Number>(data";
-          if (fe_no != numbers::invalid_unsigned_int)
+          if (dof_no != numbers::invalid_unsigned_int)
             {
               message += ", " + Utilities::int_to_string(proposed_dof_comp) + ", ";
-              message += Utilities::int_to_string(proposed_quad_comp);
+              message += Utilities::int_to_string(proposed_quad_comp) + ", ";
+              message += Utilities::int_to_string(proposed_fe_comp);
             }
           message += ")?\n";
           std::string correct_pos;
-          if (proposed_dof_comp != fe_no)
+          if (proposed_dof_comp != dof_no)
             correct_pos = " ^ ";
           else
             correct_pos = "   ";
           if (proposed_quad_comp != this->quad_no)
+            correct_pos += " ^ ";
+          else
+            correct_pos += "   ";
+          if (proposed_fe_comp != first_selected_component)
             correct_pos += " ^\n";
           else
             correct_pos += "  \n";
@@ -5299,17 +5736,18 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
         }
       // ok, did not find the numbers specified by the template arguments in
       // the given list. Suggest correct template arguments
-      const unsigned int proposed_n_q_points_1d = static_cast<unsigned int>(std::pow(1.001*this->data->n_q_points,1./dim));
+      const unsigned int proposed_n_q_points_1d = static_cast<unsigned int>(std::pow(1.001*this->n_quadrature_points,1./dim));
       message += "Wrong template arguments:\n";
       message += "    Did you mean FEEvaluation<dim,";
       message += Utilities::int_to_string(this->data->fe_degree) + ",";
       message += Utilities::int_to_string(proposed_n_q_points_1d);
       message += "," + Utilities::int_to_string(n_components);
       message += ",Number>(data";
-      if (fe_no != numbers::invalid_unsigned_int)
+      if (dof_no != numbers::invalid_unsigned_int)
         {
-          message += ", " + Utilities::int_to_string(fe_no) + ", ";
+          message += ", " + Utilities::int_to_string(dof_no) + ", ";
           message += Utilities::int_to_string(this->quad_no);
+          message += ", " + Utilities::int_to_string(first_selected_component);
         }
       message += ")?\n";
       std::string correct_pos;
@@ -5324,10 +5762,10 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       message += "                                 " + correct_pos;
 
       Assert (static_cast<unsigned int>(fe_degree) == this->data->fe_degree &&
-              static_n_q_points == this->data->n_q_points,
+              n_q_points == this->n_quadrature_points,
               ExcMessage(message));
     }
-  if (fe_no != numbers::invalid_unsigned_int)
+  if (dof_no != numbers::invalid_unsigned_int)
     {
       AssertDimension (n_q_points,
                        this->mapping_data->descriptor[this->active_quad_index].n_q_points);
@@ -5359,8 +5797,6 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
     }
 
   AssertIndexRange (q, n_q_points);
-  const Point<dim,VectorizedArray<Number> > *quadrature_points = &this->mapping_data->
-      quadrature_points[this->mapping_data->quadrature_point_offsets[this->cell]];
 
   const unsigned int n_q_points_1d_actual =
     fe_degree == -1 ? this->data->n_q_points_1d : n_q_points_1d;
@@ -5368,6 +5804,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   // Cartesian mesh: not all quadrature points are stored, only the
   // diagonal. Hence, need to find the tensor product index and retrieve the
   // value from that
+  const Point<dim,VectorizedArray<Number> > *quadrature_points =
+    &this->mapping_data->quadrature_points[this->mapping_data->quadrature_point_offsets[this->cell]];
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       Point<dim,VectorizedArray<Number> > point;
