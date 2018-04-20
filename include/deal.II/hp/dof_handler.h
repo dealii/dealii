@@ -254,6 +254,11 @@ namespace hp
 
 
     /**
+     * Default Constructor.
+     */
+    DoFHandler ();
+
+    /**
      * Constructor. Take @p tria as the triangulation to work on.
      */
     DoFHandler (const Triangulation<dim,spacedim> &tria);
@@ -278,6 +283,13 @@ namespace hp
      * is explicitly removed from the interface of this class.
      */
     DoFHandler &operator = (const DoFHandler &) = delete;
+
+    /**
+     * Assign a Triangulation and a FECollection to the DoFHandler and compute
+     * the distribution of degrees of freedom over the mesh.
+     */
+    void initialize(const Triangulation<dim,spacedim> &tria,
+                    const hp::FECollection<dim,spacedim> &fe);
 
     /**
      * Go through the triangulation and "distribute" the degrees of
@@ -835,6 +847,11 @@ namespace hp
      */
     std::unique_ptr<dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> > policy;
 
+
+    /**
+     * Setup policy and listeners based on the underlying Triangulation.
+     */
+    void setup_policy_and_listeners ();
 
     /**
      * Free all used memory.
