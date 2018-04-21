@@ -1315,9 +1315,7 @@ namespace parallel
       triangulation_has_content (false),
       connectivity (nullptr),
       parallel_forest (nullptr),
-      attached_data_size(0),
-      n_attached_datas(0),
-      n_attached_deserialize(0)
+      cell_attached_data ({0, 0, 0, {}})
     {
       parallel_ghost = nullptr;
     }
@@ -1795,38 +1793,41 @@ namespace parallel
     Triangulation<dim,spacedim>::
     save(const char *filename) const
     {
-      Assert(n_attached_deserialize==0,
+      Assert(cell_attached_data.n_attached_deserialize==0,
              ExcMessage ("not all SolutionTransfer's got deserialized after the last load()"));
+      Assert(this->n_cells()>0, ExcMessage("Can not save() an empty Triangulation."));
 
       // signal that serialization is going to happen
       this->signals.pre_distributed_save();
 
-      int real_data_size = 0;
-      if (attached_data_size>0)
-        real_data_size = attached_data_size+sizeof(CellStatus);
-
-      Assert(this->n_cells()>0, ExcMessage("Can not save() an empty Triangulation."));
-
       if (this->my_subdomain==0)
         {
+          const unsigned int buffer_size_per_cell
+            =  (cell_attached_data.cumulative_fixed_data_size > 0
+                ?
+                cell_attached_data.cumulative_fixed_data_size+sizeof(CellStatus)
+                :
+                0);
+
           std::string fname=std::string(filename)+".info";
           std::ofstream f(fname.c_str());
           f << "version nproc attached_bytes n_attached_objs n_coarse_cells" << std::endl
             << 2 << " "
             << Utilities::MPI::n_mpi_processes (this->mpi_communicator) << " "
-            << real_data_size << " "
-            << attached_data_pack_callbacks.size() << " "
+            << buffer_size_per_cell << " "
+            << cell_attached_data.attached_data_pack_callbacks.size() << " "
             << this->n_cells(0)
             << std::endl;
         }
 
-      if (attached_data_size>0)
+      if (cell_attached_data.cumulative_fixed_data_size>0)
         {
           const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this)
           ->attach_mesh_data();
         }
 
-      dealii::internal::p4est::functions<dim>::save(filename, parallel_forest, attached_data_size>0);
+      dealii::internal::p4est::functions<dim>::save(filename, parallel_forest,
+                                                    cell_attached_data.cumulative_fixed_data_size>0);
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
@@ -1834,9 +1835,9 @@ namespace parallel
         dealii::parallel::distributed::Triangulation<dim, spacedim> *tria
           = const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this);
 
-        tria->n_attached_datas = 0;
-        tria->attached_data_size = 0;
-        tria->attached_data_pack_callbacks.clear();
+        tria->cell_attached_data.n_attached_datas = 0;
+        tria->cell_attached_data.cumulative_fixed_data_size = 0;
+        tria->cell_attached_data.attached_data_pack_callbacks.clear();
       }
 
       // and release the data
@@ -1889,9 +1890,9 @@ namespace parallel
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
-      attached_data_size = 0;
-      n_attached_datas = 0;
-      n_attached_deserialize = attached_count;
+      cell_attached_data.cumulative_fixed_data_size = 0;
+      cell_attached_data.n_attached_datas = 0;
+      cell_attached_data.n_attached_deserialize = attached_count;
 
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,3)
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext (
@@ -3245,15 +3246,17 @@ namespace parallel
                                                    void *)> &pack_callback)
     {
       Assert(size>0, ExcMessage("register_data_attach(), size==0"));
-      Assert(attached_data_pack_callbacks.size()==n_attached_datas,
+      Assert(cell_attached_data.attached_data_pack_callbacks.size()==cell_attached_data.n_attached_datas,
              ExcMessage("register_data_attach(), not all data has been unpacked last time?"));
 
-      const unsigned int offset = attached_data_size+sizeof(CellStatus);
-      ++n_attached_datas;
-      attached_data_size += size;
-      attached_data_pack_callbacks.emplace_back(offset, pack_callback);
+      const unsigned int current_buffer_positition = cell_attached_data.cumulative_fixed_data_size+sizeof(CellStatus);
+      ++cell_attached_data.n_attached_datas;
+      cell_attached_data.cumulative_fixed_data_size += size;
+      cell_attached_data.attached_data_pack_callbacks.emplace_back(current_buffer_positition, pack_callback);
 
-      return offset;
+      // use the offset as the handle that callers receive and later hand back
+      // to notify_ready_to_unpack()
+      return current_buffer_positition;
     }
 
 
@@ -3268,9 +3271,9 @@ namespace parallel
     {
       Assert (handle >= sizeof(CellStatus),
               ExcMessage ("Invalid offset."));
-      Assert (handle < sizeof(CellStatus)+attached_data_size,
+      Assert (handle < cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
               ExcMessage ("Invalid offset."));
-      Assert (n_attached_datas > 0,
+      Assert (cell_attached_data.n_attached_datas > 0,
               ExcMessage ("The notify_ready_to_unpack() has already been called "
                           "once for each registered callback."));
 
@@ -3302,11 +3305,11 @@ namespace parallel
                                                      unpack_callback);
         }
 
-      --n_attached_datas;
-      if (n_attached_deserialize > 0)
+      --cell_attached_data.n_attached_datas;
+      if (cell_attached_data.n_attached_deserialize > 0)
         {
-          --n_attached_deserialize;
-          attached_data_pack_callbacks.pop_front();
+          --cell_attached_data.n_attached_deserialize;
+          cell_attached_data.attached_data_pack_callbacks.pop_front();
         }
 
       // important: only remove data if we are not in the deserialization
@@ -3315,11 +3318,13 @@ namespace parallel
       // would destroy the saved data before the second SolutionTransfer can
       // get it. This created a bug that is documented in
       // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
-      if (n_attached_datas == 0 && n_attached_deserialize == 0)
+      if (cell_attached_data.n_attached_datas == 0
+          &&
+          cell_attached_data.n_attached_deserialize == 0)
         {
           // everybody got their data, time for cleanup!
-          attached_data_size = 0;
-          attached_data_pack_callbacks.clear();
+          cell_attached_data.cumulative_fixed_data_size = 0;
+          cell_attached_data.attached_data_pack_callbacks.clear();
 
           // and release the data
           void *userptr = parallel_forest->user_pointer;
@@ -3585,8 +3590,8 @@ namespace parallel
         + MemoryConsumption::memory_consumption(triangulation_has_content)
         + MemoryConsumption::memory_consumption(connectivity)
         + MemoryConsumption::memory_consumption(parallel_forest)
-        + MemoryConsumption::memory_consumption(attached_data_size)
-        + MemoryConsumption::memory_consumption(n_attached_datas)
+        + MemoryConsumption::memory_consumption(cell_attached_data.cumulative_fixed_data_size)
+        + MemoryConsumption::memory_consumption(cell_attached_data.n_attached_datas)
 //      + MemoryConsumption::memory_consumption(attached_data_pack_callbacks) //TODO[TH]: how?
         + MemoryConsumption::memory_consumption(coarse_cell_to_p4est_tree_permutation)
         + MemoryConsumption::memory_consumption(p4est_tree_to_coarse_cell_permutation)
@@ -3637,8 +3642,8 @@ namespace parallel
         {
           coarse_cell_to_p4est_tree_permutation = other_tria_x->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation = other_tria_x->p4est_tree_to_coarse_cell_permutation;
-          attached_data_size = other_tria_x->attached_data_size;
-          n_attached_datas   = other_tria_x->n_attached_datas;
+          cell_attached_data.cumulative_fixed_data_size = other_tria_x->cell_attached_data.cumulative_fixed_data_size;
+          cell_attached_data.n_attached_datas   = other_tria_x->cell_attached_data.n_attached_datas;
 
           settings           = other_tria_x->settings;
         }
@@ -3671,20 +3676,17 @@ namespace parallel
     Triangulation<dim,spacedim>::
     attach_mesh_data()
     {
-      // determine size of memory in bytes to attach to each cell. This needs
-      // to be constant because of p4est.
-      if (attached_data_size==0)
+      // check if there is anything at all to do here
+      if (cell_attached_data.cumulative_fixed_data_size==0)
         {
-          Assert(n_attached_datas==0, ExcInternalError());
-
-          //nothing to do
+          Assert(cell_attached_data.n_attached_datas==0, ExcInternalError());
           return;
         }
 
-      // realloc user_data in p4est
+      // reallocate user_data in p4est
       void *userptr = parallel_forest->user_pointer;
       dealii::internal::p4est::functions<dim>::reset_data (parallel_forest,
-                                                           attached_data_size+sizeof(CellStatus),
+                                                           cell_attached_data.cumulative_fixed_data_size+sizeof(CellStatus),
                                                            nullptr, nullptr);
       parallel_forest->user_pointer = userptr;
 
@@ -3712,7 +3714,7 @@ namespace parallel
           attach_mesh_data_recursively<dim,spacedim>(*tree,
                                                      cell,
                                                      p4est_coarse_cell,
-                                                     attached_data_pack_callbacks);
+                                                     cell_attached_data.attached_data_pack_callbacks);
         }
     }
 

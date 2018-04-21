@@ -32,6 +32,7 @@
 #include <utility>
 #include <functional>
 #include <tuple>
+#include <type_traits>
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
@@ -839,37 +840,48 @@ namespace parallel
       typename dealii::internal::p4est::types<dim>::ghost  *parallel_ghost;
 
       /**
-       * number of bytes that get attached to the Triangulation through
-       * register_data_attach() for example SolutionTransfer.
+       * A structure that stores information about the data that has been, or
+       * will be, attached to cells via the register_data_attach() function
+       * and later retrieved via notify_ready_to_unpack().
        */
-      unsigned int attached_data_size;
+      struct CellAttachedData
+      {
+        /**
+         * Cumulative size in bytes of the buffers that those functions that
+         * have called register_data_attach() want to attach to each cell.
+         * This number only pertains to fixed-sized buffers where the data
+         * attached to each cell has exactly the same size.
+         */
+        unsigned int cumulative_fixed_data_size;
 
-      /**
-       * number of functions that get attached to the Triangulation through
-       * register_data_attach() for example SolutionTransfer.
-       */
-      unsigned int n_attached_datas;
+        /**
+         * number of functions that get attached to the Triangulation through
+         * register_data_attach() for example SolutionTransfer.
+         */
+        unsigned int n_attached_datas;
 
-      /**
-       * number of functions that need to unpack their data after a call from
-       * load()
-       */
-      unsigned int n_attached_deserialize;
+        /**
+         * number of functions that need to unpack their data after a call from
+         * load()
+         */
+        unsigned int n_attached_deserialize;
 
-      typedef  std::function<
-      void(typename Triangulation<dim,spacedim>::cell_iterator, CellStatus, void *)
-      > pack_callback_t;
+        using pack_callback_t = std::function<void (typename Triangulation<dim,spacedim>::cell_iterator,
+                                                    CellStatus,
+                                                    void *)>;
 
-      typedef std::pair<unsigned int, pack_callback_t> callback_pair_t;
+        using callback_pair_t = std::pair<unsigned int, pack_callback_t>;
 
-      typedef std::list<callback_pair_t> callback_list_t;
+        using callback_list_t = std::list<callback_pair_t>;
 
-      /**
-       * List of callback functions registered by register_data_attach() that
-       * are going to be called for packing data.
-       */
-      callback_list_t attached_data_pack_callbacks;
+        /**
+         * List of callback functions registered by register_data_attach() that
+         * are going to be called for packing data.
+         */
+        callback_list_t attached_data_pack_callbacks;
+      };
 
+      CellAttachedData cell_attached_data;
 
       /**
        * Two arrays that store which p4est tree corresponds to which coarse
