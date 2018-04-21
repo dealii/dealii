@@ -18,6 +18,7 @@
 #include "../tests.h"
 #include "../testmatrix.h"
 
+#include <deal.II/base/cuda.h>
 #include <deal.II/lac/cuda_sparse_matrix.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
@@ -65,7 +66,7 @@ void check_vector(Vector<double> const &a,
     AssertThrow(std::abs(a[i] - b[i]) < 1e-15, ExcInternalError());
 }
 
-void test(cusparseHandle_t cusparse_handle)
+void test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Build the sparse matrix on the host
   const unsigned int size = 10;
@@ -79,7 +80,7 @@ void test(cusparseHandle_t cusparse_handle)
   testproblem.five_point(A, true);
 
   // Create the sparse matrix on the device
-  CUDAWrappers::SparseMatrix<double> A_dev(cusparse_handle, A);
+  CUDAWrappers::SparseMatrix<double> A_dev(cuda_handle, A);
   check_matrix(A, A_dev);
 
   AssertThrow(A.m() == A_dev.m(), ExcInternalError());
@@ -190,7 +191,7 @@ void test(cusparseHandle_t cusparse_handle)
       if (i<vector_size-1)
         B.set(i, i+1, 1);
     }
-  CUDAWrappers::SparseMatrix<double> B_dev(cusparse_handle, B);
+  CUDAWrappers::SparseMatrix<double> B_dev(cuda_handle, B);
   value = B.l1_norm();
   value_host = B_dev.l1_norm();
   AssertThrow(std::abs(value-value_host) < 1e-15, ExcInternalError());
@@ -201,14 +202,9 @@ int main()
   initlog();
   deallog.depth_console(0);
 
-  cusparseHandle_t cusparse_handle;
-  cusparseStatus_t cusparse_error_code = cusparseCreate(&cusparse_handle);
-  AssertCusparse(cusparse_error_code);
+  Utilities::CUDA::Handle cuda_handle;
 
-  test(cusparse_handle);
-
-  cusparse_error_code = cusparseDestroy(cusparse_handle);
-  AssertCusparse(cusparse_error_code);
+  test(cuda_handle);
 
   deallog << "OK" <<std::endl;
 

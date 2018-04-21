@@ -88,6 +88,14 @@ SET(_separate_src
   symmetric_tensor.cc
   )
 
+# Add CUDA wrapper files
+IF(DEAL_II_WITH_CUDA)
+  SET(_separate_src
+    ${_separate_src}
+    cuda.cu
+  )
+ENDIF()
+
 # determined by profiling
 SET(_n_includes_per_unity_file 29)
 
