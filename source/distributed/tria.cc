@@ -553,11 +553,11 @@ namespace
   attach_mesh_data_recursively (const typename internal::p4est::types<dim>::tree &tree,
                                 const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
                                 const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                                const typename std::list<std::pair<unsigned int, typename std::function<
+                                const std::map<unsigned int, typename std::function<
                                 void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
                                      typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
                                      void *)
-                                > > > &attached_data_pack_callbacks)
+                                > > &pack_callbacks)
   {
     typedef std::list<std::pair<unsigned int, typename std::function<
     void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
@@ -604,7 +604,7 @@ namespace
             attach_mesh_data_recursively<dim,spacedim> (tree,
                                                         dealii_cell->child(c),
                                                         p4est_child[c],
-                                                        attached_data_pack_callbacks);
+                                                        pack_callbacks);
           }
       }
     else if (!p4est_has_children && !dealii_cell->has_children())
@@ -621,14 +621,12 @@ namespace
         Assert (dealii_cell->active(), ExcInternalError());
 
         // call all callbacks
-        for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
-             it != attached_data_pack_callbacks.end();
-             ++it)
+        for (const auto &it : pack_callbacks)
           {
-            void *ptr = static_cast<char *>(q->p.user_data) + (*it).first; //add offset
-            ((*it).second)(dealii_cell,
-                           parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST,
-                           ptr);
+            void *ptr = static_cast<char *>(q->p.user_data) + it.first; //add offset
+            (it.second)(dealii_cell,
+                        parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST,
+                        ptr);
           }
       }
     else if (p4est_has_children)
@@ -671,17 +669,15 @@ namespace
         Assert (dealii_cell->active(), ExcInternalError());
 
         // call all callbacks
-        for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
-             it != attached_data_pack_callbacks.end();
-             ++it)
+        for (const auto &it : pack_callbacks)
           {
             // compute the address where this particular callback is allowed
             // to write its data, using the correct offset
-            void *ptr = static_cast<char *>(q->p.user_data) + (*it).first;
+            void *ptr = static_cast<char *>(q->p.user_data) + it.first;
 
-            ((*it).second)(dealii_cell,
-                           parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE,
-                           ptr);
+            (it.second)(dealii_cell,
+                        parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE,
+                        ptr);
           }
 
         // mark other children as invalid, so that unpack only happens once
@@ -717,14 +713,12 @@ namespace
           Assert (dealii_cell->child(c)->active(), ExcInternalError());
 
         // then call all callbacks
-        for (typename callback_list_t::const_iterator it = attached_data_pack_callbacks.begin();
-             it != attached_data_pack_callbacks.end();
-             ++it)
+        for (const auto &it : pack_callbacks)
           {
-            void *ptr = static_cast<char *>(q->p.user_data) + (*it).first; //add offset
-            ((*it).second)(dealii_cell,
-                           parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN,
-                           ptr);
+            void *ptr = static_cast<char *>(q->p.user_data) + it.first; //add offset
+            (it.second)(dealii_cell,
+                        parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN,
+                        ptr);
           }
       }
   }
@@ -1815,7 +1809,7 @@ namespace parallel
             << 2 << " "
             << Utilities::MPI::n_mpi_processes (this->mpi_communicator) << " "
             << buffer_size_per_cell << " "
-            << cell_attached_data.attached_data_pack_callbacks.size() << " "
+            << cell_attached_data.pack_callbacks.size() << " "
             << this->n_cells(0)
             << std::endl;
         }
@@ -1837,7 +1831,7 @@ namespace parallel
 
         tria->cell_attached_data.n_attached_datas = 0;
         tria->cell_attached_data.cumulative_fixed_data_size = 0;
-        tria->cell_attached_data.attached_data_pack_callbacks.clear();
+        tria->cell_attached_data.pack_callbacks.clear();
       }
 
       // and release the data
@@ -3246,13 +3240,13 @@ namespace parallel
                                                    void *)> &pack_callback)
     {
       Assert(size>0, ExcMessage("register_data_attach(), size==0"));
-      Assert(cell_attached_data.attached_data_pack_callbacks.size()==cell_attached_data.n_attached_datas,
+      Assert(cell_attached_data.pack_callbacks.size()==cell_attached_data.n_attached_datas,
              ExcMessage("register_data_attach(), not all data has been unpacked last time?"));
 
       const unsigned int current_buffer_positition = cell_attached_data.cumulative_fixed_data_size+sizeof(CellStatus);
       ++cell_attached_data.n_attached_datas;
       cell_attached_data.cumulative_fixed_data_size += size;
-      cell_attached_data.attached_data_pack_callbacks.emplace_back(current_buffer_positition, pack_callback);
+      cell_attached_data.pack_callbacks[current_buffer_positition] = pack_callback;
 
       // use the offset as the handle that callers receive and later hand back
       // to notify_ready_to_unpack()
@@ -3309,7 +3303,15 @@ namespace parallel
       if (cell_attached_data.n_attached_deserialize > 0)
         {
           --cell_attached_data.n_attached_deserialize;
-          cell_attached_data.attached_data_pack_callbacks.pop_front();
+
+          // Remove the entry that corresponds to the handle that was
+          // passed to the current function. Double check that such an
+          // entry really existed.
+          const unsigned int n_elements_removed
+            = cell_attached_data.pack_callbacks.erase (handle);
+          (void)n_elements_removed;
+          Assert (n_elements_removed == 1,
+                  ExcInternalError());
         }
 
       // important: only remove data if we are not in the deserialization
@@ -3324,7 +3326,7 @@ namespace parallel
         {
           // everybody got their data, time for cleanup!
           cell_attached_data.cumulative_fixed_data_size = 0;
-          cell_attached_data.attached_data_pack_callbacks.clear();
+          cell_attached_data.pack_callbacks.clear();
 
           // and release the data
           void *userptr = parallel_forest->user_pointer;
@@ -3592,7 +3594,7 @@ namespace parallel
         + MemoryConsumption::memory_consumption(parallel_forest)
         + MemoryConsumption::memory_consumption(cell_attached_data.cumulative_fixed_data_size)
         + MemoryConsumption::memory_consumption(cell_attached_data.n_attached_datas)
-//      + MemoryConsumption::memory_consumption(attached_data_pack_callbacks) //TODO[TH]: how?
+//      + MemoryConsumption::memory_consumption(pack_callbacks) //TODO[TH]: how?
         + MemoryConsumption::memory_consumption(coarse_cell_to_p4est_tree_permutation)
         + MemoryConsumption::memory_consumption(p4est_tree_to_coarse_cell_permutation)
         + memory_consumption_p4est();
@@ -3714,7 +3716,7 @@ namespace parallel
           attach_mesh_data_recursively<dim,spacedim>(*tree,
                                                      cell,
                                                      p4est_coarse_cell,
-                                                     cell_attached_data.attached_data_pack_callbacks);
+                                                     cell_attached_data.pack_callbacks);
         }
     }
 

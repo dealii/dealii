@@ -870,15 +870,14 @@ namespace parallel
                                                     CellStatus,
                                                     void *)>;
 
-        using callback_pair_t = std::pair<unsigned int, pack_callback_t>;
-
-        using callback_list_t = std::list<callback_pair_t>;
-
         /**
          * List of callback functions registered by register_data_attach() that
-         * are going to be called for packing data.
+         * are going to be called for packing data. The key of this map
+         * variable is the offset at which each callback is allowed to
+         * write into the per-cell buffer (counted in bytes) whereas the
+         * value of the map is the callback function object.
          */
-        callback_list_t attached_data_pack_callbacks;
+        std::map<unsigned int, pack_callback_t> pack_callbacks;
       };
 
       CellAttachedData cell_attached_data;
