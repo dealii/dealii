@@ -2400,6 +2400,53 @@ namespace DoFTools
    * @image html support_point_dofs1.png
    * @image html support_point_dofs2.png
    * </p>
+   *
+   * To generate the mesh and the support point info in a single gnuplot file,
+   * use code similar to
+   * @code
+   * std::ofstream out("gnuplot.gpl");
+   * out << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset 1,1" << std::endl;
+   * GridOut().write_gnuplot (triangulation, out);
+   * out << "e" << std::endl;
+   *
+   * std::map<types::global_dof_index, Point<dim> > support_points;
+   * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
+   *                                       dof_handler,
+   *                                       support_points);
+   * DoFTools::write_gnuplot_dof_support_point_info(out,
+   *                                                support_points);
+   * out << "e" << std::endl;
+   * @endcode
+   * and from within gnuplot execute the following command:
+   * @code
+   * load "gnuplot.gpl"
+   * @endcode
+   *
+   * Alternatively, the following gnuplot script will generate a png file when
+   * executed as <tt>gnuplot gnuplot.gpl</tt> on the command line:
+   * @code
+   * std::ofstream out("gnuplot.gpl");
+   *
+   * out << "set terminal png size 400,410 enhanced font \"Helvetica,8\"" << std::endl
+   *     << "set output \"output.png\"" << std::endl
+   *     << "set size square" << std::endl
+   *     << "set view equal xy" << std::endl
+   *     << "unset xtics" << std::endl
+   *     << "unset ytics" << std::endl
+   *     << "unset grid" << std::endl
+   *     << "unset border" << std::endl
+   *     << "plot '-' using 1:2 with lines notitle, '-' with labels point pt 2 offset 1,1 notitle" << std::endl;
+   * GridOut().write_gnuplot (triangulation, out);
+   * out << "e" << std::endl;
+   *
+   * std::map<types::global_dof_index, Point<dim> > support_points;
+   * DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
+   *                                       dof_handler,
+   *                                       support_points);
+   * DoFTools::write_gnuplot_dof_support_point_info(out,
+   *                                                support_points);
+   * out << "e" << std::endl;
+   * @endcode
    */
   template <int spacedim>
   void
