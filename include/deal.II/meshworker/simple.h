@@ -86,7 +86,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -184,7 +184,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -199,7 +199,7 @@ namespace MeshWorker
 
       /**
        * Assemble all local matrices associated with an interior face in the
-       * info objects into the global matrix.
+       * @p info1 and @p info2 objects into the global matrix.
        */
       template <class DOFINFO>
       void assemble(const DOFINFO &info1,
@@ -282,7 +282,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -295,8 +295,8 @@ namespace MeshWorker
       void assemble(const DOFINFO &info);
 
       /**
-       * Assemble both local matrices in the info objects into the global
-       * matrices.
+       * Assemble both local matrices in the @p info1 and @p info2
+       * objects into the global matrices.
        */
       template <class DOFINFO>
       void assemble(const DOFINFO &info1,
@@ -440,7 +440,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -453,8 +453,8 @@ namespace MeshWorker
       void assemble(const DOFINFO &info);
 
       /**
-       * Assemble both local matrices in the info objects into the global
-       * matrix.
+       * Assemble both local matrices in the @p info1 and @p info2
+       * objects into the global matrix.
        */
       template <class DOFINFO>
       void assemble(const DOFINFO &info1,

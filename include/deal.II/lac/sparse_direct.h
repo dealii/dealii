@@ -346,7 +346,7 @@ private:
   std::vector<double> Ax;
 
   /**
-   * Control and info arrays for the solver routines.
+   * Control and work arrays for the solver routines.
    */
   std::vector<double> control;
 };

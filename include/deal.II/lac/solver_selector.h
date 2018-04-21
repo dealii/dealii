@@ -136,37 +136,37 @@ public:
   void set_control(SolverControl &ctrl);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverRichardson<VectorType>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverCG<VectorType>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverMinRes<VectorType>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverBicgstab<VectorType>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverGMRES<VectorType>
                 ::AdditionalData &data);
 
   /**
-   * Set the additional data. For more info see the @p Solver class.
+   * Set the additional data. For more information see the @p Solver class.
    */
   void set_data(const typename SolverFGMRES<VectorType>
                 ::AdditionalData &data);
