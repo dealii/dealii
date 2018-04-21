@@ -912,6 +912,40 @@ namespace parallel
       CellAttachedData cell_attached_data;
 
       /**
+       * This auxiliary data structure stores the relation between a p4est
+       * quadrant, a deal.II cell and its current CellStatus. For an extensive
+       * description of the latter, see the documentation for the member
+       * function register_data_attach.
+       */
+      typedef typename std::tuple<
+        typename dealii::internal::p4est::types<dim>::quadrant *,
+        CellStatus,
+        cell_iterator>
+        quadrant_cell_relation_t;
+
+      /**
+       * Vector of tuples, which each contain a p4est quadrant, a deal.II cell
+       * and their relation after refinement. To update its contents, use the
+       * compute_quadrant_cell_relations member function.
+       *
+       * The size of this vector is assumed to be equal to the number of locally
+       * owned quadrants in the parallel_forest object.
+       */
+      std::vector<quadrant_cell_relation_t> local_quadrant_cell_relations;
+
+      /**
+       * Go through all p4est trees and store the relations between locally
+       * owned quadrants and cells in the private member
+       * local_quadrant_cell_relations.
+       *
+       * The stored vector will be ordered by the occurrence of quadrants in
+       * the corresponding local sc_array of the parallel_forest. p4est requires
+       * this specific ordering for its transfer functions.
+       */
+      void
+      update_quadrant_cell_relations();
+
+      /**
        * Two arrays that store which p4est tree corresponds to which coarse
        * grid cell and vice versa. We need these arrays because p4est goes
        * with the original order of coarse cells when it sets up its forest,
@@ -996,7 +1030,7 @@ namespace parallel
        * them.
        */
       std::vector<unsigned int>
-      get_cell_weights();
+      get_cell_weights() const;
 
       /**
        * Override the implementation in parallel::Triangulation because

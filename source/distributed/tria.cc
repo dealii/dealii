@@ -574,391 +574,6 @@ namespace
 
 
 
-  template <int dim, int spacedim>
-  void
-  attach_mesh_data_recursively(
-    const typename internal::p4est::types<dim>::tree &          tree,
-    const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
-    const std::vector<std::pair<
-      unsigned int,
-      typename std::function<void(typename parallel::distributed::
-                                    Triangulation<dim, spacedim>::cell_iterator,
-                                  typename parallel::distributed::
-                                    Triangulation<dim, spacedim>::CellStatus,
-                                  void *)>>> &                  pack_callbacks)
-  {
-    int idx =
-      sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                       &p4est_cell,
-                       internal::p4est::functions<dim>::quadrant_compare);
-
-    if (idx == -1 &&
-        (internal::p4est::functions<dim>::quadrant_overlaps_tree(
-           const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
-           &p4est_cell) == false))
-      return; // this quadrant and none of its children belongs to us.
-
-    bool p4est_has_children = (idx == -1);
-
-    if (p4est_has_children && dealii_cell->has_children())
-      {
-        // recurse further
-        typename internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                Assert(false, ExcNotImplemented());
-            }
-
-        internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
-                                                            p4est_child);
-
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          {
-            attach_mesh_data_recursively<dim, spacedim>(
-              tree, dealii_cell->child(c), p4est_child[c], pack_callbacks);
-          }
-      }
-    else if (!p4est_has_children && !dealii_cell->has_children())
-      {
-        // this active cell didn't change
-        typename internal::p4est::types<dim>::quadrant *q;
-        q = static_cast<typename internal::p4est::types<dim>::quadrant *>(
-          sc_array_index(const_cast<sc_array_t *>(&tree.quadrants), idx));
-        *static_cast<typename parallel::distributed::
-                       Triangulation<dim, spacedim>::CellStatus *>(
-          q->p.user_data) =
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST;
-
-        // double check the condition that we will only ever attach data
-        // to active cells when we get here
-        Assert(dealii_cell->active(), ExcInternalError());
-
-        // call all callbacks
-        for (const auto &it : pack_callbacks)
-          {
-            void *ptr =
-              static_cast<char *>(q->p.user_data) + it.first; // add offset
-            (it.second)(
-              dealii_cell,
-              parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST,
-              ptr);
-          }
-      }
-    else if (p4est_has_children)
-      {
-        // this cell got refined in p4est, but the dealii_cell has not yet been
-        // refined
-
-        // attach to the first child, because we can only attach to active
-        // quadrants
-        typename internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                Assert(false, ExcNotImplemented());
-            }
-
-        internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
-                                                            p4est_child);
-        int child0_idx =
-          sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                           &p4est_child[0],
-                           internal::p4est::functions<dim>::quadrant_compare);
-        Assert(
-          child0_idx != -1,
-          ExcMessage("the first child should exist as an active quadrant!"));
-
-        typename internal::p4est::types<dim>::quadrant *q;
-        q = static_cast<typename internal::p4est::types<dim>::quadrant *>(
-          sc_array_index(const_cast<sc_array_t *>(&tree.quadrants),
-                         child0_idx));
-        *static_cast<typename parallel::distributed::
-                       Triangulation<dim, spacedim>::CellStatus *>(
-          q->p.user_data) =
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE;
-
-        // double check the condition that we will only ever attach data
-        // to active cells when we get here
-        Assert(dealii_cell->active(), ExcInternalError());
-
-        // call all callbacks
-        for (const auto &it : pack_callbacks)
-          {
-            // compute the address where this particular callback is allowed
-            // to write its data, using the correct offset
-            void *ptr = static_cast<char *>(q->p.user_data) + it.first;
-
-            (it.second)(
-              dealii_cell,
-              parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE,
-              ptr);
-          }
-
-        // mark other children as invalid, so that unpack only happens once
-        for (unsigned int i = 1; i < GeometryInfo<dim>::max_children_per_cell;
-             ++i)
-          {
-            int child_idx = sc_array_bsearch(
-              const_cast<sc_array_t *>(&tree.quadrants),
-              &p4est_child[i],
-              internal::p4est::functions<dim>::quadrant_compare);
-            q = static_cast<typename internal::p4est::types<dim>::quadrant *>(
-              sc_array_index(const_cast<sc_array_t *>(&tree.quadrants),
-                             child_idx));
-            *static_cast<typename parallel::distributed::
-                           Triangulation<dim, spacedim>::CellStatus *>(
-              q->p.user_data) =
-              parallel::distributed::Triangulation<dim, spacedim>::CELL_INVALID;
-          }
-      }
-    else
-      {
-        // its children got coarsened into this cell in p4est, but the
-        // dealii_cell still has its children
-        typename internal::p4est::types<dim>::quadrant *q;
-        q = static_cast<typename internal::p4est::types<dim>::quadrant *>(
-          sc_array_index(const_cast<sc_array_t *>(&tree.quadrants), idx));
-        *static_cast<typename parallel::distributed::
-                       Triangulation<dim, spacedim>::CellStatus *>(
-          q->p.user_data) =
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN;
-
-        // double check the condition that we will only ever attach data
-        // to cells with children when we get here. however, we can
-        // only tolerate one level of coarsening at a time, so check
-        // that the children are all active
-        Assert(dealii_cell->active() == false, ExcInternalError());
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          Assert(dealii_cell->child(c)->active(), ExcInternalError());
-
-        // then call all callbacks
-        for (const auto &it : pack_callbacks)
-          {
-            void *ptr =
-              static_cast<char *>(q->p.user_data) + it.first; // add offset
-            (it.second)(
-              dealii_cell,
-              parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN,
-              ptr);
-          }
-      }
-  }
-
-  template <int dim, int spacedim>
-  void
-  get_cell_weights_recursively(
-    const typename internal::p4est::types<dim>::tree &          tree,
-    const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
-    const typename Triangulation<dim, spacedim>::Signals &      signals,
-    std::vector<unsigned int> &                                 weight)
-  {
-    const int idx =
-      sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                       &p4est_cell,
-                       internal::p4est::functions<dim>::quadrant_compare);
-
-    if (idx == -1 &&
-        (internal::p4est::functions<dim>::quadrant_overlaps_tree(
-           const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
-           &p4est_cell) == false))
-      return; // This quadrant and none of its children belongs to us.
-
-    const bool p4est_has_children = (idx == -1);
-
-    if (p4est_has_children && dealii_cell->has_children())
-      {
-        // recurse further
-        typename internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                Assert(false, ExcNotImplemented());
-            }
-
-        internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
-                                                            p4est_child);
-
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          {
-            get_cell_weights_recursively<dim, spacedim>(
-              tree, dealii_cell->child(c), p4est_child[c], signals, weight);
-          }
-      }
-    else if (!p4est_has_children && !dealii_cell->has_children())
-      {
-        // This active cell didn't change
-        weight.push_back(1000);
-        weight.back() += signals.cell_weight(
-          dealii_cell,
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST);
-      }
-    else if (p4est_has_children)
-      {
-        // This cell will be refined
-        unsigned int parent_weight(1000);
-        parent_weight += signals.cell_weight(
-          dealii_cell,
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_REFINE);
-
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          {
-            // We assign the weight of the parent cell equally to all children
-            weight.push_back(parent_weight);
-          }
-      }
-    else
-      {
-        // This cell's children will be coarsened into this cell
-        weight.push_back(1000);
-        weight.back() += signals.cell_weight(
-          dealii_cell,
-          parallel::distributed::Triangulation<dim, spacedim>::CELL_COARSEN);
-      }
-  }
-
-
-  template <int dim, int spacedim>
-  void
-  post_mesh_data_recursively(
-    const typename internal::p4est::types<dim>::tree &          tree,
-    const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename Triangulation<dim, spacedim>::cell_iterator &parent_cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
-    const unsigned int                                          offset,
-    const typename std::function<void(
-      typename parallel::distributed::Triangulation<dim,
-                                                    spacedim>::cell_iterator,
-      typename parallel::distributed::Triangulation<dim, spacedim>::CellStatus,
-      void *)> &                                                unpack_callback)
-  {
-    int idx =
-      sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                       &p4est_cell,
-                       internal::p4est::functions<dim>::quadrant_compare);
-    if (idx == -1 &&
-        (internal::p4est::functions<dim>::quadrant_overlaps_tree(
-           const_cast<typename internal::p4est::types<dim>::tree *>(&tree),
-           &p4est_cell) == false))
-      // this quadrant and none of its children belong to us.
-      return;
-
-
-    const bool p4est_has_children = (idx == -1);
-    if (p4est_has_children)
-      {
-        Assert(dealii_cell->has_children(), ExcInternalError());
-
-        // recurse further
-        typename internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          switch (dim)
-            {
-              case 2:
-                P4EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              case 3:
-                P8EST_QUADRANT_INIT(&p4est_child[c]);
-                break;
-              default:
-                Assert(false, ExcNotImplemented());
-            }
-
-        internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
-                                                            p4est_child);
-
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
-          {
-            post_mesh_data_recursively<dim, spacedim>(tree,
-                                                      dealii_cell->child(c),
-                                                      dealii_cell,
-                                                      p4est_child[c],
-                                                      offset,
-                                                      unpack_callback);
-          }
-      }
-    else
-      {
-        Assert(!dealii_cell->has_children(), ExcInternalError());
-
-        typename internal::p4est::types<dim>::quadrant *q;
-        q = static_cast<typename internal::p4est::types<dim>::quadrant *>(
-          sc_array_index(const_cast<sc_array_t *>(&tree.quadrants), idx));
-
-        void *ptr = static_cast<char *>(q->p.user_data) + offset;
-        typename parallel::distributed::Triangulation<dim, spacedim>::CellStatus
-          status = *static_cast<typename parallel::distributed::
-                                  Triangulation<dim, spacedim>::CellStatus *>(
-            q->p.user_data);
-        switch (status)
-          {
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_PERSIST:
-              {
-                unpack_callback(dealii_cell, status, ptr);
-                break;
-              }
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_REFINE:
-              {
-                unpack_callback(parent_cell, status, ptr);
-                break;
-              }
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_COARSEN:
-              {
-                unpack_callback(dealii_cell, status, ptr);
-                break;
-              }
-            case parallel::distributed::Triangulation<dim,
-                                                      spacedim>::CELL_INVALID:
-              {
-                break;
-              }
-            default:
-              Assert(false, ExcInternalError());
-          }
-      }
-  }
-
-
-
   /**
    * A data structure that we use to store which cells (indicated by
    * internal::p4est::types<dim>::quadrant objects) shall be refined and which
@@ -1325,6 +940,184 @@ namespace
 
     // get the weight, increment the pointer, and return the weight
     return *this_object->current_pointer++;
+  }
+
+
+
+  template <int dim, int spacedim>
+  using quadrant_cell_relation_t = typename std::tuple<
+    typename dealii::internal::p4est::types<dim>::quadrant *,
+    typename dealii::Triangulation<dim, spacedim>::CellStatus,
+    typename dealii::Triangulation<dim, spacedim>::cell_iterator>;
+
+
+
+  /**
+   * Adds a tuple of a p4est quadrant, @p status and @p dealii_cell
+   * to the vector containing all relations @p quad_cell_rel.
+   * The tuple will be inserted in the position corresponding to the one
+   * of the p4est quadrant in the underlying p4est sc_array. The position
+   * will be determined from @p idx, which is the position of the quadrant
+   * in its corresponding @p tree. The p4est quadrant will be deduced from
+   * the @p tree by @p idx.
+   */
+  template <int dim, int spacedim>
+  inline void
+  add_single_quadrant_cell_relation(
+    std::vector<quadrant_cell_relation_t<dim, spacedim>> &      quad_cell_rel,
+    const typename dealii::internal::p4est::types<dim>::tree &  tree,
+    const unsigned int                                          idx,
+    const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
+    const typename Triangulation<dim, spacedim>::CellStatus     status)
+  {
+    const unsigned int local_quadrant_index = tree.quadrants_offset + idx;
+
+    const auto q =
+      static_cast<typename dealii::internal::p4est::types<dim>::quadrant *>(
+        sc_array_index(const_cast<sc_array_t *>(&tree.quadrants), idx));
+
+    // check if we will be writing into valid memory
+    Assert(local_quadrant_index < quad_cell_rel.size(), ExcInternalError());
+
+    // store relation
+    quad_cell_rel[local_quadrant_index] =
+      std::make_tuple(q, status, dealii_cell);
+  }
+
+
+
+  /**
+   * This is the recursive part of the member function
+   * update_quadrant_cell_relations().
+   *
+   * Find the relation between the @p p4est_cell and the @p dealii_cell in the
+   * corresponding @p tree. Depending on the CellStatus relation between the two,
+   * a new entry will either be inserted in @p quad_cell_rel or the recursion
+   * will be continued.
+   */
+  template <int dim, int spacedim>
+  void
+  update_quadrant_cell_relations_recursively(
+    std::vector<quadrant_cell_relation_t<dim, spacedim>> &        quad_cell_rel,
+    const typename dealii::internal::p4est::types<dim>::tree &    tree,
+    const typename Triangulation<dim, spacedim>::cell_iterator &  dealii_cell,
+    const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell)
+  {
+    // find index of p4est_cell in the quadrants array of the corresponding tree
+    const int idx = sc_array_bsearch(
+      const_cast<sc_array_t *>(&tree.quadrants),
+      &p4est_cell,
+      dealii::internal::p4est::functions<dim>::quadrant_compare);
+    if (idx == -1 &&
+        (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
+           const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+             &tree),
+           &p4est_cell) == false))
+      // this quadrant and none of its children belong to us.
+      return;
+
+    // recurse further if both p4est and dealii still have children
+    const bool p4est_has_children = (idx == -1);
+    if (p4est_has_children && dealii_cell->has_children())
+      {
+        // recurse further
+        typename dealii::internal::p4est::types<dim>::quadrant
+          p4est_child[GeometryInfo<dim>::max_children_per_cell];
+
+        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
+             ++c)
+          switch (dim)
+            {
+              case 2:
+                P4EST_QUADRANT_INIT(&p4est_child[c]);
+                break;
+              case 3:
+                P8EST_QUADRANT_INIT(&p4est_child[c]);
+                break;
+              default:
+                Assert(false, ExcNotImplemented());
+            }
+
+        dealii::internal::p4est::functions<dim>::quadrant_childrenv(
+          &p4est_cell, p4est_child);
+
+        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
+             ++c)
+          {
+            update_quadrant_cell_relations_recursively<dim, spacedim>(
+              quad_cell_rel, tree, dealii_cell->child(c), p4est_child[c]);
+          }
+      }
+    else if (!p4est_has_children && !dealii_cell->has_children())
+      {
+        // this active cell didn't change
+        // save tuple into corresponding position
+        add_single_quadrant_cell_relation<dim, spacedim>(
+          quad_cell_rel,
+          tree,
+          idx,
+          dealii_cell,
+          Triangulation<dim, spacedim>::CELL_PERSIST);
+      }
+    else if (p4est_has_children) // based on the conditions above, we know that
+                                 // dealii_cell has no children
+      {
+        // this cell got refined in p4est, but the dealii_cell has not yet been
+        // refined
+
+        // this quadrant is not active
+        // generate its children, and store information in those
+        typename dealii::internal::p4est::types<dim>::quadrant
+          p4est_child[GeometryInfo<dim>::max_children_per_cell];
+        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
+             ++c)
+          switch (dim)
+            {
+              case 2:
+                P4EST_QUADRANT_INIT(&p4est_child[c]);
+                break;
+              case 3:
+                P8EST_QUADRANT_INIT(&p4est_child[c]);
+                break;
+              default:
+                Assert(false, ExcNotImplemented());
+            }
+
+        dealii::internal::p4est::functions<dim>::quadrant_childrenv(
+          &p4est_cell, p4est_child);
+
+        // mark first child with CELL_REFINE and the remaining children with
+        // CELL_INVALID, but associate them all with the parent cell unpack
+        // algorithm will be called only on CELL_REFINE flagged quadrant
+        int                                               child_idx;
+        typename Triangulation<dim, spacedim>::CellStatus cell_status;
+        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
+             ++i)
+          {
+            child_idx = sc_array_bsearch(
+              const_cast<sc_array_t *>(&tree.quadrants),
+              &p4est_child[i],
+              dealii::internal::p4est::functions<dim>::quadrant_compare);
+
+            cell_status = (i == 0) ? Triangulation<dim, spacedim>::CELL_REFINE :
+                                     Triangulation<dim, spacedim>::CELL_INVALID;
+
+            add_single_quadrant_cell_relation<dim, spacedim>(
+              quad_cell_rel, tree, child_idx, dealii_cell, cell_status);
+          }
+      }
+    else // based on the conditions above, we know that p4est_cell has no
+         // children, and the dealii_cell does
+      {
+        // its children got coarsened into this cell in p4est,
+        // but the dealii_cell still has its children
+        add_single_quadrant_cell_relation<dim, spacedim>(
+          quad_cell_rel,
+          tree,
+          idx,
+          dealii_cell,
+          Triangulation<dim, spacedim>::CELL_COARSEN);
+      }
   }
 } // namespace
 
@@ -2963,6 +2756,12 @@ namespace parallel
       }
 
       this->smooth_grid = save_smooth;
+
+      // finally, after syncing the parallel_forest with the triangulation,
+      // also update the quadrant_cell_relations, which will be used for
+      // repartitioning, further refinement/coarsening, and unpacking
+      // of stored or transfered data.
+      update_quadrant_cell_relations();
     }
 
 
@@ -3067,6 +2866,10 @@ namespace parallel
                     typename dealii::internal::p4est::types<dim>::balance_type(
                       P8EST_CONNECT_FULL)),
         /*init_callback=*/nullptr);
+
+      // since refinement and/or coarsening on the parallel forest
+      // has happened, we need to update the quadrant cell relations
+      update_quadrant_cell_relations();
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
@@ -3484,35 +3287,53 @@ namespace parallel
              ExcMessage("The notify_ready_to_unpack() has already been called "
                         "once for each registered callback."));
 
+      // check if local_quadrant_cell_relations have been previously gathered
+      // correctly
+      Assert(local_quadrant_cell_relations.size() ==
+               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
+             ExcInternalError());
+
       const unsigned int offset =
         std::get<0>(cell_attached_data.pack_callbacks[handle]);
       // check if unpack function has been previously called
       Assert(offset != dealii::numbers::invalid_unsigned_int,
              ExcInternalError());
 
-      // Recurse over p4est and hand the caller the data back
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &it_rel : local_quadrant_cell_relations)
         {
-          // skip coarse cells that are not ours
-          if (tree_exists_locally<dim, spacedim>(
-                parallel_forest,
-                coarse_cell_to_p4est_tree_permutation[cell->index()]) == false)
-            continue;
+          const auto &q       = std::get<0>(it_rel);
+          const auto &cell_it = std::get<2>(it_rel);
 
-          typename dealii::internal::p4est::types<dim>::quadrant
-                                                              p4est_coarse_cell;
-          typename dealii::internal::p4est::types<dim>::tree *tree =
-            init_tree(cell->index());
+          const auto cell_status =
+            *static_cast<typename parallel::distributed::
+                           Triangulation<dim, spacedim>::CellStatus *>(
+              q->p.user_data);
 
-          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          void *ptr = static_cast<char *>(q->p.user_data) + offset;
 
-          // parent_cell is not correct here, but is only used in a refined
-          // cell
-          post_mesh_data_recursively<dim, spacedim>(
-            *tree, cell, cell, p4est_coarse_cell, offset, unpack_callback);
+          switch (cell_status)
+            {
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_PERSIST:
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_COARSEN:
+                unpack_callback(cell_it, cell_status, ptr);
+                break;
+
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_REFINE:
+                unpack_callback(cell_it->parent(), cell_status, ptr);
+                break;
+
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_INVALID:
+                // do nothing on these cells
+                break;
+
+              default:
+                Assert(false, ExcInternalError());
+                break;
+            }
         }
 
       --cell_attached_data.n_attached_datas;
@@ -3943,6 +3764,43 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
+    Triangulation<dim, spacedim>::update_quadrant_cell_relations()
+    {
+      // reorganize memory for local_quadrant_cell_relations
+      local_quadrant_cell_relations.resize(
+        parallel_forest->local_num_quadrants);
+      local_quadrant_cell_relations.shrink_to_fit();
+
+      // recurse over p4est
+      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
+             this->begin(0);
+           cell != this->end(0);
+           ++cell)
+        {
+          // skip coarse cells that are not ours
+          if (tree_exists_locally<dim, spacedim>(
+                parallel_forest,
+                coarse_cell_to_p4est_tree_permutation[cell->index()]) == false)
+            continue;
+
+          // initialize auxiliary top level p4est quadrant
+          typename dealii::internal::p4est::types<dim>::quadrant
+            p4est_coarse_cell;
+          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+
+          // determine tree to start recursion on
+          typename dealii::internal::p4est::types<dim>::tree *tree =
+            init_tree(cell->index());
+
+          update_quadrant_cell_relations_recursively<dim, spacedim>(
+            local_quadrant_cell_relations, *tree, cell, p4est_coarse_cell);
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
     Triangulation<dim, spacedim>::attach_mesh_data()
     {
       // check if there is anything at all to do here
@@ -3951,6 +3809,12 @@ namespace parallel
           Assert(cell_attached_data.n_attached_datas == 0, ExcInternalError());
           return;
         }
+
+      // check if local_quadrant_cell_relations have been previously gathered
+      // correctly
+      Assert(local_quadrant_cell_relations.size() ==
+               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
+             ExcInternalError());
 
       // reallocate user_data in p4est
       void *userptr = parallel_forest->user_pointer;
@@ -3961,30 +3825,63 @@ namespace parallel
         nullptr);
       parallel_forest->user_pointer = userptr;
 
-
-      // Recurse over p4est and Triangulation
-      // to find refined/coarsened/kept
-      // cells. Then query and attach the data.
-      for (typename Triangulation<dim, spacedim>::cell_iterator cell =
-             this->begin(0);
-           cell != this->end(0);
-           ++cell)
+      for (const auto &it_rel : local_quadrant_cell_relations)
         {
-          // skip coarse cells, that are not ours
-          if (tree_exists_locally<dim, spacedim>(
-                parallel_forest,
-                coarse_cell_to_p4est_tree_permutation[cell->index()]) == false)
-            continue;
+          const auto &q           = std::get<0>(it_rel);
+          const auto &cell_status = std::get<1>(it_rel);
+          const auto &cell_it     = std::get<2>(it_rel);
 
-          typename dealii::internal::p4est::types<dim>::quadrant
-                                                              p4est_coarse_cell;
-          typename dealii::internal::p4est::types<dim>::tree *tree =
-            init_tree(cell->index());
+          *static_cast<typename parallel::distributed::
+                         Triangulation<dim, spacedim>::CellStatus *>(
+            q->p.user_data) = cell_status;
 
-          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          switch (cell_status)
+            {
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_PERSIST:
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_COARSEN:
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_REFINE:
+#  ifdef DEBUG
+                if (cell_status == parallel::distributed::
+                                     Triangulation<dim, spacedim>::CELL_COARSEN)
+                  {
+                    // double check the condition that we will only ever attach
+                    // data to cells with children when we get here. however, we
+                    // can only tolerate one level of coarsening at a time, so
+                    // check that the children are all active
+                    Assert(cell_it->active() == false, ExcInternalError());
+                    for (unsigned int c = 0;
+                         c < GeometryInfo<dim>::max_children_per_cell;
+                         ++c)
+                      Assert(cell_it->child(c)->active(), ExcInternalError());
+                  }
+                else
+                  {
+                    // double check the condition that we will only ever attach
+                    // data to active cells when we get here
+                    Assert(cell_it->active(), ExcInternalError());
+                  }
+#  endif
+                // call all callbacks
+                for (const auto &it_pack : cell_attached_data.pack_callbacks)
+                  {
+                    void *ptr = static_cast<char *>(q->p.user_data) +
+                                it_pack.first; // add offset
+                    (it_pack.second)(cell_it, cell_status, ptr);
+                  }
+                break;
 
-          attach_mesh_data_recursively<dim, spacedim>(
-            *tree, cell, p4est_coarse_cell, cell_attached_data.pack_callbacks);
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_INVALID:
+                // do nothing on these cells
+                break;
+
+              default:
+                Assert(false, ExcInternalError());
+                break;
+            }
         }
     }
 
@@ -3992,8 +3889,14 @@ namespace parallel
 
     template <int dim, int spacedim>
     std::vector<unsigned int>
-    Triangulation<dim, spacedim>::get_cell_weights()
+    Triangulation<dim, spacedim>::get_cell_weights() const
     {
+      // check if local_quadrant_cell_relations have been previously gathered
+      // correctly
+      Assert(local_quadrant_cell_relations.size() ==
+               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
+             ExcInternalError());
+
       // Allocate the space for the weights. In fact we do not know yet, how
       // many cells we own after the refinement (only p4est knows that
       // at this point). We simply reserve n_active_cells space and if many
@@ -4002,40 +3905,58 @@ namespace parallel
       std::vector<unsigned int> weights;
       weights.reserve(this->n_active_cells());
 
-      // Recurse over p4est and Triangulation
+      // Iterate over p4est and Triangulation relations
       // to find refined/coarsened/kept
       // cells. Then append cell_weight.
       // Note that we need to follow the p4est ordering
       // instead of the deal.II ordering to get the cell_weights
       // in the same order p4est will encounter them during repartitioning.
-      for (unsigned int c = 0; c < this->n_cells(0); ++c)
+      for (const auto &it_rel : local_quadrant_cell_relations)
         {
-          // skip coarse cells, that are not ours
-          if (tree_exists_locally<dim, spacedim>(parallel_forest, c) == false)
-            continue;
+          const auto &cell_status = std::get<1>(it_rel);
+          const auto &cell_it     = std::get<2>(it_rel);
 
-          const unsigned int coarse_cell_index =
-            p4est_tree_to_coarse_cell_permutation[c];
+          switch (cell_status)
+            {
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_PERSIST:
+                weights.push_back(1000);
+                weights.back() += this->signals.cell_weight(
+                  cell_it,
+                  parallel::distributed::Triangulation<dim,
+                                                       spacedim>::CELL_PERSIST);
+                break;
 
-          const typename Triangulation<dim, spacedim>::cell_iterator
-            dealii_coarse_cell(this, 0, coarse_cell_index);
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_REFINE:
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_INVALID:
+                {
+                  // calculate weight of parent cell
+                  unsigned int parent_weight = 1000;
+                  parent_weight += this->signals.cell_weight(
+                    cell_it,
+                    parallel::distributed::Triangulation<dim, spacedim>::
+                      CELL_REFINE);
+                  // assign the weight of the parent cell equally to all
+                  // children
+                  weights.push_back(parent_weight);
+                  break;
+                }
 
-          typename dealii::internal::p4est::types<dim>::quadrant
-            p4est_coarse_cell;
-          dealii::internal::p4est::functions<dim>::quadrant_set_morton(
-            &p4est_coarse_cell,
-            /*level=*/0,
-            /*index=*/0);
-          p4est_coarse_cell.p.which_tree = c;
+              case parallel::distributed::Triangulation<dim,
+                                                        spacedim>::CELL_COARSEN:
+                weights.push_back(1000);
+                weights.back() += this->signals.cell_weight(
+                  cell_it,
+                  parallel::distributed::Triangulation<dim,
+                                                       spacedim>::CELL_COARSEN);
+                break;
 
-          const typename dealii::internal::p4est::types<dim>::tree *tree =
-            init_tree(coarse_cell_index);
-
-          get_cell_weights_recursively<dim, spacedim>(*tree,
-                                                      dealii_coarse_cell,
-                                                      p4est_coarse_cell,
-                                                      this->signals,
-                                                      weights);
+              default:
+                Assert(false, ExcInternalError());
+                break;
+            }
         }
 
       return weights;
