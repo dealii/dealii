@@ -1951,7 +1951,7 @@ public:
   /**
    * Constructor for the reduced functionality. Similar to the other
    * constructor with FiniteElement argument but using another
-   * FEEvaluationBase object to provide info about the geometry. This allows
+   * FEEvaluationBase object to provide information about the geometry. This allows
    * several FEEvaluation objects to share the geometry evaluation, i.e., the
    * underlying mapping and quadrature points do only need to be evaluated
    * once. Make sure to not pass an optional object around when you intend to

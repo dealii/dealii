@@ -284,7 +284,7 @@ namespace MeshWorker
   public:
 
     /**
-     * The type of the info object for cells.
+     * The type of the @p info object for cells.
      */
     typedef IntegrationInfo<dim, spacedim> CellInfo;
 
@@ -524,24 +524,24 @@ namespace MeshWorker
     void post_faces(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
-     * The info object for a cell.
+     * The @p info object for a cell.
      */
     CellInfo cell;
     /**
-     * The info object for a boundary face.
+     * The @p info object for a boundary face.
      */
     CellInfo boundary;
     /**
-     * The info object for a regular interior face, seen from the first cell.
+     * The @p info object for a regular interior face, seen from the first cell.
      */
     CellInfo face;
     /**
-     * The info object for the refined side of an interior face seen from the
+     * The @p info object for the refined side of an interior face seen from the
      * first cell.
      */
     CellInfo subface;
     /**
-     * The info object for an interior face, seen from the other cell.
+     * The @p info object for an interior face, seen from the other cell.
      */
     CellInfo neighbor;
 

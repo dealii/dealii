@@ -393,7 +393,7 @@ public:
 
   /**
    * Write out a series of .gpl files named base_name + "-00.gpl", base_name +
-   * "-01.gpl" etc. The data file gives info about where the support points
+   * "-01.gpl" etc. The data file gives information about where the support points
    * selected and interpreting the data. If @p n_indep != 0 an additional file
    * base_name + "_indep.gpl" containing key and independent data. The file
    * name agrees with the order the points were added to the class. The names
@@ -588,7 +588,7 @@ private:
   std::map <std::string, std::vector<std::string> > component_names_map;
 
   /**
-   * Save the location and other mesh info about support points.
+   * Save the location and other mesh information about support points.
    */
   std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >
   point_geometry_data;

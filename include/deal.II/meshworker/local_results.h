@@ -40,7 +40,7 @@ class BlockIndices;
  * integration_loop() instead.
  *
  * The loop() depends on certain objects handed to it as arguments. These
- * objects are of two types, info objects like DoFInfo and IntegrationInfo and
+ * objects are of two types, @p info objects like DoFInfo and IntegrationInfo and
  * worker objects like LocalWorker and IntegrationWorker.
  *
  * Worker objects usually do two different jobs: first, they compute the local
@@ -198,7 +198,7 @@ namespace MeshWorker
    * with matrix(), using the second argument <tt>true</tt>.
    * </ol>
    *
-   * The local matrices initialized by reinit() of the info object and then
+   * The local matrices initialized by reinit() of the @p info object and then
    * assembled into the global system by Assembler classes.
    *
    * @ingroup MeshWorker

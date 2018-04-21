@@ -78,7 +78,7 @@ namespace MeshWorker
     /**
      * The number of the current face on the current cell.
      *
-     * This number is numbers::invalid_unsigned_int if the info object was
+     * This number is numbers::invalid_unsigned_int if the @p info object was
      * initialized with a cell.
      */
     unsigned int face_number;
@@ -86,7 +86,7 @@ namespace MeshWorker
     /**
      * The number of the current subface on the current face
      *
-     * This number is numbers::invalid_unsigned_int if the info object was not
+     * This number is numbers::invalid_unsigned_int if the @p info object was not
      * initialized with a subface.
      */
     unsigned int sub_number;
@@ -226,7 +226,7 @@ namespace MeshWorker
     void reset();
 
     /**
-     * After all info objects have been filled appropriately, use the
+     * After all DOFINFO objects have been filled appropriately, use the
      * ASSEMBLER object to assemble them into the global data. See
      * MeshWorker::Assembler for available classes.
      */

@@ -2401,8 +2401,8 @@ namespace DoFTools
    * @image html support_point_dofs2.png
    * </p>
    *
-   * To generate the mesh and the support point info in a single gnuplot file,
-   * use code similar to
+   * To generate the mesh and the support point information in a
+   * single gnuplot file, use code similar to
    * @code
    * std::ofstream out("gnuplot.gpl");
    * out << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset 1,1" << std::endl;

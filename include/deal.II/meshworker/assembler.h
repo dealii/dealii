@@ -120,7 +120,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -217,7 +217,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
@@ -341,7 +341,7 @@ namespace MeshWorker
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>

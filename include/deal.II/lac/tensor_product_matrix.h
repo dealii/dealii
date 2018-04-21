@@ -58,7 +58,7 @@ template <typename> class VectorizedArray;
  * @tparam Number Arithmetic type of the underlying array elements.
  *
  * @tparam size Compile-time array lengths. By default at -1, which means that
- * the run-time info stored in the matrices passed to the reinit()
+ * the run-time information stored in the matrices passed to the reinit()
  * function is used.
  *
  * @author Martin Kronbichler and Julius Witte, 2017
@@ -206,7 +206,7 @@ private:
  * float and double numbers.
  *
  * @tparam size Compile-time array lengths. By default at -1, which means that
- * the run-time info stored in the matrices passed to the reinit()
+ * the run-time information stored in the matrices passed to the reinit()
  * function is used.
  *
  * @author Martin Kronbichler and Julius Witte, 2017
