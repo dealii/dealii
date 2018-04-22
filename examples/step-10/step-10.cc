@@ -75,15 +75,13 @@ namespace Step10
     std::cout << "Output of grids into gnuplot files:" << std::endl
               << "===================================" << std::endl;
 
-    // So first generate a coarse triangulation of the circle and
-    // associate a suitable boundary description to it. Note that the
-    // default value of the argument to the SphericalManifold
-    // constructor is a center at the origin.
+    // So first generate a coarse triangulation of the circle and associate a
+    // suitable boundary description to it. By default,
+    // GridGenerator::hyper_ball attaches a SphericalManifold to the boundary
+    // (and uses FlatManifold for the interior) so we simply call that
+    // function and move on:
     Triangulation<dim> triangulation;
     GridGenerator::hyper_ball (triangulation);
-    static const SphericalManifold<dim> boundary;
-    triangulation.set_all_manifold_ids_on_boundary(0);
-    triangulation.set_manifold (0, boundary);
 
     // Next generate output for this grid and for a once refined grid. Note
     // that we have hidden the mesh refinement in the loop header, which might
@@ -134,7 +132,7 @@ namespace Step10
             // sufficient to give us the impression of seeing a curved line,
             // rather than a set of straight lines.
             GridOut grid_out;
-            GridOutFlags::Gnuplot gnuplot_flags(false, 30);
+            GridOutFlags::Gnuplot gnuplot_flags(false, 60);
             grid_out.set_flags(gnuplot_flags);
 
             // Finally, generate a filename and a file for output:
@@ -206,10 +204,6 @@ namespace Step10
         // object as already seen.
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball (triangulation);
-
-        static const SphericalManifold<dim> boundary;
-        triangulation.set_all_manifold_ids_on_boundary (0);
-        triangulation.set_manifold(0, boundary);
 
         const MappingQ<dim> mapping (degree);
 
@@ -343,10 +337,6 @@ namespace Step10
         std::cout << "Degree = " << degree << std::endl;
         Triangulation<dim> triangulation;
         GridGenerator::hyper_ball (triangulation);
-
-        static const SphericalManifold<dim> boundary;
-        triangulation.set_all_manifold_ids_on_boundary (0);
-        triangulation.set_manifold (0, boundary);
 
         const MappingQ<dim> mapping (degree);
         const FE_Q<dim>     fe (1);
