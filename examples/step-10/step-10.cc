@@ -30,7 +30,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
 
 // This is the only new one: in it, we declare the MappingQ class
@@ -207,15 +207,14 @@ namespace Step10
 
         const MappingQ<dim> mapping (degree);
 
-        // We now create a dummy finite element. Here we could choose any
-        // finite element, as we are only interested in the `JxW' values
-        // provided by the FEValues object below. Nevertheless, we have to
-        // provide a finite element since in this example we abuse the
-        // FEValues class a little in that we only ask it to provide us with
-        // the weights of certain quadrature points, in contrast to the usual
-        // purpose (and name) of the FEValues class which is to provide the
-        // values of finite elements at these points.
-        const FE_Q<dim>     dummy_fe (1);
+        // We now create a finite element. Unlike the rest of the example
+        // programs, we do not actually need to do any computations with shape
+        // functions; we only need the `JxW' values from an FEValues
+        // object. Hence we use the special finite element class FE_Nothing
+        // which has exactly zero degrees of freedom per cell (as the name
+        // implies, the local basis on each cell is the empty set). A more
+        // typical usage of FE_Nothing is shown in step-46.
+        const FE_Nothing<dim> fe;
 
         // Likewise, we need to create a DoFHandler object. We do not actually
         // use it, but it will provide us with `active_cell_iterators' that
@@ -236,8 +235,7 @@ namespace Step10
         // computation of the mapping from unit to real cell. In previous
         // examples, this argument was omitted, resulting in the implicit use
         // of an object of type MappingQ1.
-        FEValues<dim> fe_values (mapping, dummy_fe, quadrature,
-                                 update_JxW_values);
+        FEValues<dim> fe_values (mapping, fe, quadrature, update_JxW_values);
 
         // We employ an object of the ConvergenceTable class to store all
         // important data like the approximated values for $\pi$ and the error
@@ -261,7 +259,7 @@ namespace Step10
             // our special case but we call it to make the DoFHandler happy --
             // otherwise it would throw an assertion in the FEValues::reinit
             // function below.
-            dof_handler.distribute_dofs (dummy_fe);
+            dof_handler.distribute_dofs (fe);
 
             // We define the variable area as `long double' like we did for
             // the pi variable before.
