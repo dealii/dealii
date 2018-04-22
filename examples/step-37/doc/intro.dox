@@ -514,7 +514,8 @@ FEEvaluation for your computer, you should compile deal.II with the so-called
 enabled by setting the variable <tt>CMAKE_CXX_FLAGS</tt> to
 <tt>"-march=native"</tt> in the cmake build settings (on the command line,
 specify <tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>, see the deal.II README for
-more information). Similar options exist for other compilers.
+more information). Similar options exist for other compilers. We output
+the current vectorization length in the run() function of this example.
 
 
 <h3>Running multigrid on large-scale parallel computers</h3>

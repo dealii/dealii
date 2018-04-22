@@ -631,6 +631,24 @@ namespace Utilities
 
 #endif
 
+    const std::string
+    get_current_vectorization_level()
+    {
+      switch (DEAL_II_COMPILER_VECTORIZATION_LEVEL)
+        {
+        case 0:
+          return "disabled";
+        case 1:
+          return "SSE2";
+        case 2:
+          return "AVX";
+        case 3:
+          return "AVX512";
+        default:
+          AssertThrow(false, ExcInternalError("Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+          return "ERROR";
+        }
+    }
 
 
     void get_memory_stats (MemoryStats &stats)

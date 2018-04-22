@@ -1159,9 +1159,22 @@ namespace Step37
   // The function that runs the program is very similar to the one in
   // step-16. We do few refinement steps in 3D compared to 2D, but that's
   // it.
+  //
+  // Before we run the program, we output some information about the detected
+  // vectorization level as discussed in the introduction.
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
+    {
+      const unsigned int n_vect_doubles = VectorizedArray<double>::n_array_elements;
+      const unsigned int n_vect_bits = 8*sizeof(double)*n_vect_doubles;
+
+      pcout << "Vectorization over " << n_vect_doubles
+            << " doubles = " << n_vect_bits << " bits ("
+            << Utilities::System::get_current_vectorization_level()
+            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL << std::endl;
+    }
+
     for (unsigned int cycle=0; cycle<9-dim; ++cycle)
       {
         pcout << "Cycle " << cycle << std::endl;
