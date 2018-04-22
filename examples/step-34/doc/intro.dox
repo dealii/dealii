@@ -670,7 +670,7 @@ derivatives.
 
 The testcase we will be solving is for a circular (in 2d) or spherical
 (in 3d) obstacle. Meshes for these geometries will be read in from
-files in the current directory and an object of type HyperBallBoundary
+files in the current directory and an object of type SphericalManifold
 will then be attached to the triangulation to allow mesh refinement
 that respects the continuous geometry behind the discrete initial
 mesh.

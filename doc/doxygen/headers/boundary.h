@@ -17,6 +17,12 @@
 /**
  * @defgroup boundary Boundary and manifold description for triangulations
  *
+ * @warning This module describes usage of the Boundary classes, which are
+ * deprecated: see the
+ * @ref manifold
+ * module for detailed information on how to describe curved boundaries with
+ * the Manifold classes, which are the replacements for the Boundary classes.
+ *
  * The classes in this module are concerned with the description of the
  * geometry of a domain in which a Triangulation lives. This geometry
  * description is necessary in three contexts:

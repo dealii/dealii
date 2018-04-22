@@ -345,7 +345,7 @@
  * particular boundary indicator. This method is still supported, and
  * it allows the Triangulation object to use a different method of
  * finding new points on faces and edges to be refined; the default is
- * to use a StraightBoundary object for all faces and edges. The
+ * to use a FlatManifold object for all faces and edges. The
  * results section of step-49 has a worked example that shows all of
  * this in action.
  *
@@ -364,7 +364,7 @@
  * VectorTools::interpolate_boundary_values,
  * VectorTools::compute_no_normal_flux_constraints.
  *
- * @note Boundary indicators are inherited from mother faces and edges to
+ * @note %Boundary indicators are inherited from mother faces and edges to
  * their children upon mesh refinement. Some more information about boundary
  * indicators is also presented in a section of the documentation of the
  * Triangulation class.
