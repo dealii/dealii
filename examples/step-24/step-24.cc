@@ -274,9 +274,6 @@ namespace Step24
   {
     const Point<dim> center;
     GridGenerator::hyper_ball (triangulation, center, 1.);
-    static const SphericalManifold<dim> boundary_description (center);
-    triangulation.set_all_manifold_ids_on_boundary(0);
-    triangulation.set_manifold (0,boundary_description);
     triangulation.refine_global (7);
 
     time_step = GridTools::minimal_cell_diameter(triangulation) /

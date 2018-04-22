@@ -66,18 +66,6 @@ using namespace dealii;
 // This is the function that produced the circular grid in the previous step-1
 // example program with fewer refinements steps. The sole difference is that it
 // returns the grid it produces via its argument.
-//
-// The details of what the function does are explained in step-1. The only
-// thing we would like to comment on is this:
-//
-// Since we want to export the triangulation through this function's
-// parameter, we need to make sure that the manifold object lives at least as
-// long as the triangulation does. However, in step-1, the manifold object is
-// a local variable, and it would be deleted at the end of the function, which
-// is too early. We avoid the problem by declaring it 'static' which makes
-// sure that the object is initialized the first time control the program
-// passes this point, but at the same time assures that it lives until the end
-// of the program.
 void make_grid (Triangulation<2> &triangulation)
 {
   const Point<2> center (1,0);
@@ -86,10 +74,6 @@ void make_grid (Triangulation<2> &triangulation)
   GridGenerator::hyper_shell (triangulation,
                               center, inner_radius, outer_radius,
                               5 );
-
-  static const SphericalManifold<2> manifold_description(center);
-  triangulation.set_manifold (0, manifold_description);
-  triangulation.set_all_manifold_ids(0);
 
   for (unsigned int step=0; step<3; ++step)
     {

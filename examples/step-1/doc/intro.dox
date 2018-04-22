@@ -133,8 +133,9 @@ development we occasionally rename or deprecate functions or classes
 that are still referenced in these video lectures.  For
 example, the step-1 code shown in video lecture 5 uses a class
 HyperShellBoundary which was replaced with SphericalManifold class
-later on. However, in spite of such kind of details the content of the
-lectures is still very relevant.
+later on. Additionally, as of deal.II version 9.0, GridGenerator::hyper_shell()
+now automatically attaches a SphericalManifold to the Triangulation. Otherwise
+the rest of the lecture material is relevant.
 
 <h3> What this program does </h3>
 

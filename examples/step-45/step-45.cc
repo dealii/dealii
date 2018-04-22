@@ -85,7 +85,6 @@ namespace Step45
 
     MPI_Comm                                    mpi_communicator;
 
-    SphericalManifold<dim>                      manifold;
     parallel::distributed::Triangulation<dim>   triangulation;
     FESystem<dim>                               fe;
     DoFHandler<dim>                             dof_handler;
@@ -349,9 +348,6 @@ namespace Step45
 // particularly easy by just calling
 // parallel::distributed::Triangulation::add_periodicity.
     triangulation.add_periodicity(periodicity_vector);
-
-    triangulation.set_all_manifold_ids(1);
-    triangulation.set_manifold(1, manifold);
 
     triangulation.refine_global (4-dim);
   }
