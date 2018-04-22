@@ -808,7 +808,7 @@ namespace internal
       unsigned int counter = 0;
       unsigned int n_cells = 0;
       std::vector<std::vector<unsigned int> > renumbering_category(n_categories);
-      for (unsigned int block=1; block<(n_procs>1 ? 5 : 3); ++block)
+      for (unsigned int block=1; block<(n_procs>1u ? 5u : 3u); ++block)
         {
           // step 1: sort by category
           for (unsigned int i=0; i<n_active_cells+n_ghost_cells; ++i)
