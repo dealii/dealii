@@ -247,8 +247,8 @@ namespace CUDAWrappers
      * the cuSPARSE matrix description.
      */
     std::tuple<Number *, int *, int *, cusparseMatDescr_t>
-    get_cusparse_matrix();
-    //@}
+    get_cusparse_matrix() const;
+    //*}
 
   private:
     /**

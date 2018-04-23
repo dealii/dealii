@@ -52,11 +52,11 @@ namespace CUDAWrappers
                                                CUSPARSE_OPERATION_TRANSPOSE :
                                                CUSPARSE_OPERATION_NON_TRANSPOSE;
 
-      cusparseStatus_t error_code;
       // This function performs y = alpha*op(A)*x + beta*y
-      error_code = cusparseScsrmv(handle, cusparse_operation, m, n, nnz,
-                                  &alpha, descr, A_val_dev, A_row_ptr_dev,
-                                  A_column_index_dev, x, &beta, y);
+      cusparseStatus_t error_code = cusparseScsrmv(handle, cusparse_operation,
+                                                   m, n, nnz, &alpha, descr,
+                                                   A_val_dev, A_row_ptr_dev,
+                                                   A_column_index_dev, x, &beta, y);
       AssertCusparse(error_code);
     }
 
@@ -73,11 +73,11 @@ namespace CUDAWrappers
                                                CUSPARSE_OPERATION_TRANSPOSE :
                                                CUSPARSE_OPERATION_NON_TRANSPOSE;
 
-      cusparseStatus_t error_code;
       // This function performs y = alpha*op(A)*x + beta*y
-      error_code = cusparseDcsrmv(handle, cusparse_operation, m, n, nnz,
-                                  &alpha, descr, A_val_dev, A_row_ptr_dev,
-                                  A_column_index_dev, x, &beta, y);
+      cusparseStatus_t error_code = cusparseDcsrmv(handle, cusparse_operation,
+                                                   m, n, nnz, &alpha, descr,
+                                                   A_val_dev, A_row_ptr_dev,
+                                                   A_column_index_dev, x, &beta, y);
       AssertCusparse(error_code);
     }
 
@@ -452,7 +452,7 @@ namespace CUDAWrappers
 
   template <typename Number>
   std::tuple<Number *, int *, int *, cusparseMatDescr_t>
-  SparseMatrix<Number>::get_cusparse_matrix()
+  SparseMatrix<Number>::get_cusparse_matrix() const
   {
     return std::make_tuple(val_dev, column_index_dev, row_ptr_dev, descr);
   }
