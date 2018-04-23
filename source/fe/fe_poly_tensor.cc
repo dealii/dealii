@@ -150,6 +150,7 @@ FE_PolyTensor<PolynomialType,dim,spacedim>::FE_PolyTensor
   FiniteElement<dim,spacedim> (fe_data,
                                restriction_is_additive_flags,
                                nonzero_components),
+  mapping_type(MappingType::mapping_none),
   poly_space(PolynomialType(degree))
 {
   cached_point(0) = -1;
