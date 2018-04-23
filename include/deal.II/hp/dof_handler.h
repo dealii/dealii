@@ -313,15 +313,8 @@ namespace hp
      * want a particular ordering, use the functions in namespace
      * DoFRenumbering.
      *
-     * @note In contrast to the dealii::DoFHandler::distribute_dofs()
-     * function, this function does not make a copy of the object
-     * given as argument. Rather, it stores a reference to the given
-     * object, and it is the responsibility of user code to ensure
-     * that the hp::FECollection given as argument lives at least as
-     * long as the hp::DoFHandler object. If you want to break this
-     * dependence by asking the hp::DoFHandler to release the
-     * reference to the hp::FECollection object, call the
-     * hp::DoFHandler::clear() function.
+     * @note In accordance with dealii::DoFHandler::distribute_dofs(),
+     * this function also makes a copy of the object given as argument.
      */
     virtual void distribute_dofs (const hp::FECollection<dim,spacedim> &fe);
 
@@ -832,14 +825,9 @@ namespace hp
     SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> > tria;
 
     /**
-     * Store a pointer to the finite element set given latest for the
-     * distribution of dofs. In order to avoid destruction of the object
-     * before the lifetime of the DoF handler, we subscribe to the finite
-     * element object. To unlock the FE before the end of the lifetime of this
-     * DoF handler, use the <tt>clear()</tt> function (this clears all data of
-     * this object as well, though).
+     * Store a copy of the finite element set given latest to distribute_dofs().
      */
-    SmartPointer<const hp::FECollection<dim,spacedim>,hp::DoFHandler<dim,spacedim> > finite_elements;
+    std::unique_ptr<const hp::FECollection<dim,spacedim> > fe_collection;
 
     /**
      * An object that describes how degrees of freedom should be distributed and
@@ -1213,10 +1201,10 @@ namespace hp
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe () const
   {
-    Assert (finite_elements != nullptr,
+    Assert (fe_collection,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return *finite_elements;
+    return *fe_collection;
   }
 
 
@@ -1227,10 +1215,10 @@ namespace hp
   DoFHandler<dim,spacedim>::get_fe
   (const unsigned int number) const
   {
-    Assert (finite_elements != nullptr,
+    Assert (fe_collection,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return (*finite_elements)[number];
+    return (*fe_collection)[number];
   }
 
 
@@ -1240,10 +1228,10 @@ namespace hp
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe_collection () const
   {
-    Assert (finite_elements != nullptr,
+    Assert (fe_collection,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return *finite_elements;
+    return *fe_collection;
   }
 
 
