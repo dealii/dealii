@@ -701,6 +701,9 @@ private:
    * the content of the matrix will be overwritten.
    *
    * If successful, the computed eigenvalues are arranged in ascending order.
+   *
+   * @note Due to a bug in Netlib-ScaLAPACK, either all or no eigenvectors can be computed.
+   * Therefore, the input @p index_limits has to be set accordingly. Using Intel-MKL this restriction is not required.
    */
   std::vector<NumberType> eigenpairs_symmetric_MRRR(const bool compute_eigenvectors,
                                                     const std::pair<unsigned int,unsigned int> &index_limits=
