@@ -322,6 +322,12 @@ CHECK_CXX_SOURCE_COMPILES(
           int old_fn () { return 0; }
           int (*fn_ptr)() = old_fn;
 
+          struct [[deprecated]] bob
+          {
+            [[deprecated]] bob(int i);
+            [[deprecated]] void test();
+          };
+
           int main () {}
   "
   DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
@@ -332,6 +338,12 @@ CHECK_CXX_SOURCE_COMPILES(
           __attribute__((deprecated)) int old_fn ();
           int old_fn () { return 0; }
           int (*fn_ptr)() = old_fn;
+
+          struct __attribute__((deprecated)) bob
+          {
+            __attribute__((deprecated)) bob(int i);
+            __attribute__((deprecated)) void test();
+          };
 
           int main () {}
   "
