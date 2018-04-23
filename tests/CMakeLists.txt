@@ -30,6 +30,26 @@ MACRO(SET_IF_EMPTY _variable)
 ENDMACRO()
 
 SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
+SET_IF_EMPTY(DEAL_II_DIR $ENV{DEAL_II_DIR})
+
+#
+# A bit of necessary setup if tests are configured as a stand-alone
+# project:
+#
+
+IF(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+  FIND_PACKAGE(deal.II 9.0.0 REQUIRED HINTS ${DEAL_II_DIR})
+  DEAL_II_INITIALIZE_CACHED_VARIABLES()
+  PROJECT(TESTSUITE CXX)
+  FILE(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+    "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
+    )
+ENDIF()
+
+#
+# A bit of necessary setup if tests are included via ADD_SUBDIRECTORY from
+# the top-level CMake project:
+#
 
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
