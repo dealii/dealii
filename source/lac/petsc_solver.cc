@@ -755,13 +755,21 @@ namespace PETScWrappers
          * factorization here we start to see differences with the base
          * class solve function
          */
+#if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
         ierr = PCFactorSetMatSolverPackage (solver_data->pc, MATSOLVERMUMPS);
+#else
+        ierr = PCFactorSetMatSolverType (solver_data->pc, MATSOLVERMUMPS);
+#endif
         AssertThrow (ierr == 0, ExcPETScError (ierr));
 
         /**
          * set up the package to call for the factorization
          */
+#if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
         ierr = PCFactorSetUpMatSolverPackage (solver_data->pc);
+#else
+        ierr = PCFactorSetUpMatSolverType (solver_data->pc);
+#endif
         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
         /**
