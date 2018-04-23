@@ -1,0 +1,99 @@
+<h1>Results</h1>
+
+<h3>Program output</h3>
+
+Like in step-37, we evaluate the multigrid solver in terms of run time.  In
+two space dimensions with elements of degree 3, a possible output could look
+as follows:
+@code
+Running with 12 MPI processes
+
+Cycle 0
+Number of degrees of freedom: 1024
+Total setup time              0.0246709 s
+Time solve (12 iterations)    0.0093796 s
+Verification via L2 error:    0.0155167
+
+Cycle 1
+Number of degrees of freedom: 4096
+Total setup time              0.0159565 s
+Time solve (12 iterations)    0.0100399 s
+Verification via L2 error:    0.00130939
+
+Cycle 2
+Number of degrees of freedom: 16384
+Total setup time              0.0210655 s
+Time solve (12 iterations)    0.0117574 s
+Verification via L2 error:    9.22924e-05
+
+Cycle 3
+Number of degrees of freedom: 65536
+Total setup time              0.0570049 s
+Time solve (12 iterations)    0.0228628 s
+Verification via L2 error:    5.99019e-06
+
+Cycle 4
+Number of degrees of freedom: 262144
+Total setup time              0.144457 s
+Time solve (12 iterations)    0.0545919 s
+Verification via L2 error:    3.78568e-07
+
+Cycle 5
+Number of degrees of freedom: 1048576
+Total setup time              0.487433 s
+Time solve (12 iterations)    0.230212 s
+Verification via L2 error:    2.37412e-08
+
+Cycle 6
+Number of degrees of freedom: 4194304
+Total setup time              1.87463 s
+Time solve (12 iterations)    1.16517 s
+Verification via L2 error:    1.48553e-09
+@endcode
+
+Like in step-37, the number of CG iterations remains constant with increasing
+problem size.
+
+Not much changes if we run the program in three spatial dimensions. Since we
+use uniform mesh refinement, we get eight times as many elements and
+approximately eight times as many degrees of freedom with each cycle:
+
+@code
+Running with 12 MPI processes
+
+Cycle 0
+Number of degrees of freedom: 512
+Total setup time              0.0297214 s
+Time solve (12 iterations)    0.0137131 s
+Verification via L2 error:    1.69792
+
+Cycle 1
+Number of degrees of freedom: 4096
+Total setup time              0.0322271 s
+Time solve (12 iterations)    0.0120323 s
+Verification via L2 error:    0.346758
+
+Cycle 2
+Number of degrees of freedom: 32768
+Total setup time              0.0566789 s
+Time solve (12 iterations)    0.0226668 s
+Verification via L2 error:    0.0231837
+
+Cycle 3
+Number of degrees of freedom: 262144
+Total setup time              0.135041 s
+Time solve (12 iterations)    0.0597281 s
+Verification via L2 error:    0.00198009
+
+Cycle 4
+Number of degrees of freedom: 2097152
+Total setup time              0.762947 s
+Time solve (12 iterations)    0.502595 s
+Verification via L2 error:    0.000140762
+
+Cycle 5
+Number of degrees of freedom: 16777216
+Total setup time              5.63233 s
+Time solve (12 iterations)    4.77959 s
+Verification via L2 error:    9.16255e-06
+@endcode
