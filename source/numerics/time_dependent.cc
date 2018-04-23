@@ -1074,7 +1074,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
     {
       Triangulation<dim> *previous_tria
         = dynamic_cast<const TimeStepBase_Tria<dim>*>(previous_timestep)->tria;
-
+      Assert(previous_tria != nullptr, ExcInternalError());
 
       // if we used the dual estimator, we
       // computed the error information on
