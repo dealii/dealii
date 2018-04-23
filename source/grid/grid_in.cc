@@ -2738,7 +2738,7 @@ void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
   char c;
   // loop over the following comment
   // lines
-  while ((c=in.get()) == comment_start)
+  while (in.get(c) && c == comment_start)
     // loop over the characters after
     // the comment starter
     while (in.get() != '\n')
@@ -2747,7 +2747,8 @@ void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
 
   // put back first character of
   // first non-comment line
-  in.putback (c);
+  if (in)
+    in.putback (c);
 
   // at last: skip additional empty lines, if present
   skip_empty_lines(in);
