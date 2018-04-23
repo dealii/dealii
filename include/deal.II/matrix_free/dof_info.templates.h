@@ -19,10 +19,12 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/matrix_free/dof_info.h>
-#include <deal.II/matrix_free/helper_functions.h>
+#include <deal.II/matrix_free/task_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -142,8 +144,12 @@ namespace internal
       ghost_dofs.clear();
       dofs_per_cell.clear();
       dofs_per_face.clear();
+      vectorization_length = 1;
       dimension = 2;
-      n_components = 0;
+      global_base_element_offset = 0;
+      n_base_elements = 0;
+      n_components.clear();
+      start_components.clear();
       row_starts_plain_indices.clear();
       plain_dof_indices.clear();
       store_plain_indices = false;
@@ -155,12 +161,13 @@ namespace internal
 
 
     void
-    DoFInfo::read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
-                               const std::vector<unsigned int> &lexicographic_inv,
-                               const ConstraintMatrix          &constraints,
-                               const unsigned int               cell_number,
-                               ConstraintValues<double> &constraint_values,
-                               bool                            &cell_at_boundary)
+    DoFInfo
+    ::read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
+                        const std::vector<unsigned int> &lexicographic_inv,
+                        const ConstraintMatrix          &constraints,
+                        const unsigned int               cell_number,
+                        ConstraintValues<double>        &constraint_values,
+                        bool                            &cell_at_subdomain_boundary)
     {
       Assert (vector_partitioner.get() != nullptr, ExcInternalError());
       const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
@@ -170,120 +177,127 @@ namespace internal
               ExcMessage("The size local range of owned indices must not "
                          "exceed the size of unsigned int"));
       const unsigned int n_owned     = last_owned - first_owned;
-      std::pair<unsigned short,unsigned short> constraint_iterator (0,0);
 
-      unsigned int dofs_this_cell = (cell_active_fe_index.empty()) ?
-                                    dofs_per_cell[0] : dofs_per_cell[cell_active_fe_index[cell_number]];
-      for (unsigned int i=0; i<dofs_this_cell; i++)
+      Assert(dofs_per_cell.size() == 1 || cell_number < cell_active_fe_index.size(),
+             ExcInternalError());
+      const unsigned int fe_index = dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell_number];
+      const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
+      const unsigned int n_components = start_components.back();
+      for (unsigned int comp=0; comp<n_components; ++comp)
         {
-          types::global_dof_index current_dof =
-            local_indices[lexicographic_inv[i]];
-          const std::vector<std::pair<types::global_dof_index,double> >
-          *entries_ptr =
-            constraints.get_constraint_entries(current_dof);
-
-          // dof is constrained
-          if (entries_ptr != nullptr)
+          std::pair<unsigned short,unsigned short> constraint_iterator (0,0);
+          for (unsigned int i=component_dof_indices_offset[fe_index][comp];
+               i<component_dof_indices_offset[fe_index][comp+1]; i++)
             {
-              // in case we want to access plain indices, we need to know
-              // about the location of constrained indices as well (all the
-              // other indices are collected by the cases below)
-              if (current_dof < first_owned || current_dof >= last_owned)
-                {
-                  ghost_dofs.push_back (current_dof);
-                  cell_at_boundary = true;
-                }
-
-              // check whether this dof is identity constrained to another
-              // dof. then we can simply insert that dof and there is no need
-              // to actually resolve the constraint entries
+              types::global_dof_index current_dof =
+                local_indices[lexicographic_inv[i]];
               const std::vector<std::pair<types::global_dof_index,double> >
-              &entries = *entries_ptr;
-              const types::global_dof_index n_entries = entries.size();
-              if (n_entries == 1 && std::fabs(entries[0].second-1.)<1e-14)
+              *entries_ptr =
+                constraints.get_constraint_entries(current_dof);
+
+              // dof is constrained
+              if (entries_ptr != nullptr)
                 {
-                  current_dof = entries[0].first;
-                  goto no_constraint;
-                }
-
-              // append a new index to the indicators
-              constraint_indicator.push_back (constraint_iterator);
-              constraint_indicator.back().second =
-                constraint_values.insert_entries (entries);
-
-              // reset constraint iterator for next round
-              constraint_iterator.first = 0;
-
-              // add the local_to_global indices computed in the
-              // insert_entries function. transform the index to local index
-              // space or mark it as ghost if necessary
-              if (n_entries > 0)
-                {
-                  const std::vector<types::global_dof_index> &constraint_indices =
-                    constraint_values.constraint_indices;
-                  for (unsigned int j=0; j<n_entries; ++j)
+                  // in case we want to access plain indices, we need to know
+                  // about the location of constrained indices as well (all the
+                  // other indices are collected by the cases below)
+                  if (current_dof < first_owned || current_dof >= last_owned)
                     {
-                      if (n_mpi_procs > 1 &&
-                          (constraint_indices[j] < first_owned ||
-                           constraint_indices[j] >= last_owned))
-                        {
-                          dof_indices.push_back (n_owned + ghost_dofs.size());
+                      ghost_dofs.push_back (current_dof);
+                      cell_at_subdomain_boundary = true;
+                    }
 
-                          // collect ghosts so that we can later construct an
-                          // IndexSet for them. also store whether the current
-                          // cell is on the boundary
-                          ghost_dofs.push_back(constraint_indices[j]);
-                          cell_at_boundary = true;
+                  // check whether this dof is identity constrained to another
+                  // dof. then we can simply insert that dof and there is no need
+                  // to actually resolve the constraint entries
+                  const std::vector<std::pair<types::global_dof_index,double> >
+                  &entries = *entries_ptr;
+                  const types::global_dof_index n_entries = entries.size();
+                  if (n_entries == 1 && std::abs(entries[0].second-1.)<
+                      100*std::numeric_limits<double>::epsilon())
+                    {
+                      current_dof = entries[0].first;
+                      goto no_constraint;
+                    }
+
+                  // append a new index to the indicators
+                  constraint_indicator.push_back (constraint_iterator);
+                  constraint_indicator.back().second =
+                    constraint_values.insert_entries (entries);
+
+                  // reset constraint iterator for next round
+                  constraint_iterator.first = 0;
+
+                  // add the local_to_global indices computed in the
+                  // insert_entries function. transform the index to local index
+                  // space or mark it as ghost if necessary
+                  if (n_entries > 0)
+                    {
+                      const std::vector<types::global_dof_index> &constraint_indices =
+                        constraint_values.constraint_indices;
+                      for (unsigned int j=0; j<n_entries; ++j)
+                        {
+                          if (n_mpi_procs > 1 &&
+                              (constraint_indices[j] < first_owned ||
+                               constraint_indices[j] >= last_owned))
+                            {
+                              dof_indices.push_back (n_owned + ghost_dofs.size());
+
+                              // collect ghosts so that we can later construct an
+                              // IndexSet for them. also store whether the current
+                              // cell is on the boundary
+                              ghost_dofs.push_back(constraint_indices[j]);
+                              cell_at_subdomain_boundary = true;
+                            }
+                          else
+                            // not ghost, so transform to the local index space
+                            // directly
+                            dof_indices.push_back
+                            (static_cast<unsigned int>(constraint_indices[j] -
+                                                       first_owned));
                         }
-                      else
-                        // not ghost, so transform to the local index space
-                        // directly
-                        dof_indices.push_back
-                        (static_cast<unsigned int>(constraint_indices[j] -
-                                                   first_owned));
                     }
                 }
-            }
-          else
-            {
-no_constraint:
-              // Not constrained, we simply have to add the local index to the
-              // indices_local_to_global list and increment constraint
-              // iterator. transform to local index space/mark as ghost
-              if (n_mpi_procs > 1 &&
-                  (current_dof < first_owned ||
-                   current_dof >= last_owned))
-                {
-                  ghost_dofs.push_back(current_dof);
-                  current_dof = n_owned + ghost_dofs.size()-1;
-                  cell_at_boundary = true;
-                }
               else
-                current_dof -= first_owned;
+                {
+no_constraint:
+                  // Not constrained, we simply have to add the local index to the
+                  // indices_local_to_global list and increment constraint
+                  // iterator. transform to local index space/mark as ghost
+                  if (n_mpi_procs > 1 &&
+                      (current_dof < first_owned ||
+                       current_dof >= last_owned))
+                    {
+                      ghost_dofs.push_back(current_dof);
+                      current_dof = n_owned + ghost_dofs.size()-1;
+                      cell_at_subdomain_boundary = true;
+                    }
+                  else
+                    current_dof -= first_owned;
 
-              dof_indices.push_back (static_cast<unsigned int>(current_dof));
+                  dof_indices.push_back (static_cast<unsigned int>(current_dof));
 
-              // make sure constraint_iterator.first is always within the
-              // bounds of unsigned short
-              Assert (constraint_iterator.first <
-                      (1<<(8*sizeof(unsigned short)))-1,
-                      ExcInternalError());
-              constraint_iterator.first++;
+                  // make sure constraint_iterator.first is always within the
+                  // bounds of unsigned short
+                  Assert (constraint_iterator.first <
+                          (1<<(8*sizeof(unsigned short)))-1,
+                          ExcInternalError());
+                  constraint_iterator.first++;
+                }
             }
+          row_starts[cell_number*n_components+comp+1].first = dof_indices.size();
+          row_starts[cell_number*n_components+comp+1].second = constraint_indicator.size();
         }
-      row_starts[cell_number+1][0] = dof_indices.size();
-      row_starts[cell_number+1][1] = constraint_indicator.size();
-      row_starts[cell_number+1][2] = 0;
 
       // now to the plain indices: in case we have constraints on this cell,
       // store the indices without the constraints resolve once again
       if (store_plain_indices == true)
         {
           if (cell_number == 0)
-            row_starts_plain_indices.resize (row_starts.size());
+            row_starts_plain_indices.resize ((row_starts.size()-1)/n_components+1);
           row_starts_plain_indices[cell_number] = plain_dof_indices.size();
-          bool cell_has_constraints = (row_starts[cell_number+1][1] >
-                                       row_starts[cell_number][1]);
+          const bool cell_has_constraints = (row_starts[(cell_number+1)*n_components].second >
+                                             row_starts[cell_number*n_components].second);
           if (cell_has_constraints == true)
             {
               for (unsigned int i=0; i<dofs_this_cell; ++i)
@@ -296,7 +310,7 @@ no_constraint:
                     {
                       ghost_dofs.push_back(current_dof);
                       current_dof = n_owned + ghost_dofs.size()-1;
-                      cell_at_boundary = true;
+                      cell_at_subdomain_boundary = true;
                     }
                   else
                     current_dof -= first_owned;
@@ -310,7 +324,8 @@ no_constraint:
 
 
     void
-    DoFInfo::assign_ghosts (const std::vector<unsigned int> &boundary_cells)
+    DoFInfo
+    ::assign_ghosts (const std::vector<unsigned int> &boundary_cells)
     {
       Assert (boundary_cells.size() < row_starts.size(), ExcInternalError());
 
@@ -324,6 +339,7 @@ no_constraint:
         AssertIndexRange (*dof, n_owned+n_ghosts);
 #endif
 
+      const unsigned int n_components = start_components.back();
       std::vector<unsigned int> ghost_numbering (n_ghosts);
       IndexSet ghost_indices (vector_partitioner->size());
       if (n_ghosts > 0)
@@ -376,9 +392,8 @@ no_constraint:
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
-              unsigned int *data_ptr = const_cast<unsigned int *> (begin_indices(boundary_cells[i]));
-
-              const unsigned int *row_end = end_indices(boundary_cells[i]);
+              unsigned int *data_ptr = const_cast<unsigned int *> (&dof_indices[row_starts[boundary_cells[i]*n_components].first]);
+              const unsigned int *row_end = &dof_indices[row_starts[(boundary_cells[i]+1)*n_components].first];
               for ( ; data_ptr != row_end; ++data_ptr)
                 *data_ptr = ((*data_ptr < n_owned)
                              ?
@@ -390,10 +405,13 @@ no_constraint:
               // now the same procedure for plain indices
               if (store_plain_indices == true)
                 {
-                  if (row_length_indicators(boundary_cells[i]) > 0)
+                  if (row_starts[boundary_cells[i]*n_components].second !=
+                      row_starts[(boundary_cells[i]+1)*n_components].second)
                     {
-                      unsigned int *data_ptr = const_cast<unsigned int *> (begin_indices_plain(boundary_cells[i]));
-                      const unsigned int *row_end = end_indices_plain(boundary_cells[i]);
+                      unsigned int *data_ptr = const_cast<unsigned int *> (&plain_dof_indices[row_starts_plain_indices[boundary_cells[i]]]);
+                      const unsigned int *row_end = data_ptr +
+                                                    dofs_per_cell[cell_active_fe_index.size() == 0 ?
+                                                                  0 : cell_active_fe_index[i]];
                       for ( ; data_ptr != row_end; ++data_ptr)
                         *data_ptr = ((*data_ptr < n_owned)
                                      ?
@@ -420,154 +438,119 @@ no_constraint:
 
 
     void
-    DoFInfo::reorder_cells (const TaskInfo                   &task_info,
-                            const std::vector<unsigned int>  &renumbering,
-                            const std::vector<unsigned int>  &constraint_pool_row_index,
-                            const std::vector<unsigned char> &irregular_cells,
-                            const unsigned int                vectorization_length)
+    DoFInfo
+    ::reorder_cells (const TaskInfo                  &task_info,
+                     const std::vector<unsigned int> &renumbering,
+                     const std::vector<unsigned int> &constraint_pool_row_index,
+                     const std::vector<unsigned char> &irregular_cells)
     {
+      (void)constraint_pool_row_index;
+
       // first reorder the active fe index.
+      const bool have_hp = dofs_per_cell.size() > 1;
       if (cell_active_fe_index.size() > 0)
         {
           std::vector<unsigned int> new_active_fe_index;
           new_active_fe_index.reserve (task_info.cell_partition_data.back());
-          std::vector<unsigned int> fe_indices(vectorization_length);
           unsigned int position_cell = 0;
           for (unsigned int cell=0; cell<task_info.cell_partition_data.back(); ++cell)
             {
               const unsigned int n_comp = (irregular_cells[cell] > 0 ?
                                            irregular_cells[cell] : vectorization_length);
-              for (unsigned int j=0; j<n_comp; ++j)
-                fe_indices[j]=cell_active_fe_index[renumbering[position_cell+j]];
 
-              // by construction, all cells should have the same fe index.
+              // take maximum FE index among the ones present (we might have
+              // lumped some lower indices into higher ones)
+              unsigned int fe_index = cell_active_fe_index[renumbering[position_cell]];
               for (unsigned int j=1; j<n_comp; ++j)
-                Assert (fe_indices[j] == fe_indices[0], ExcInternalError());
+                fe_index=std::max(fe_index,
+                                  cell_active_fe_index[renumbering[position_cell+j]]);
 
-              new_active_fe_index.push_back(fe_indices[0]);
+              new_active_fe_index.push_back(fe_index);
               position_cell += n_comp;
             }
           std::swap (new_active_fe_index, cell_active_fe_index);
         }
+      if (have_hp)
+        AssertDimension(cell_active_fe_index.size(),
+                        task_info.cell_partition_data.back());
 
-      std::vector<std::array<unsigned int, 3> > new_row_starts;
+      const unsigned int n_components = start_components.back();
+
+      std::vector<std::pair<unsigned int, unsigned int> >
+      new_row_starts(vectorization_length * n_components * task_info.cell_partition_data.back()+1);
       std::vector<unsigned int> new_dof_indices;
       std::vector<std::pair<unsigned short,unsigned short> >
       new_constraint_indicator;
       std::vector<unsigned int> new_plain_indices, new_rowstart_plain;
       unsigned int position_cell = 0;
-      new_row_starts.resize(task_info.cell_partition_data.back()+1);
       new_dof_indices.reserve (dof_indices.size());
       new_constraint_indicator.reserve (constraint_indicator.size());
       if (store_plain_indices == true)
         {
-          new_rowstart_plain.resize (task_info.cell_partition_data.back()+1,
+          new_rowstart_plain.resize (vectorization_length *
+                                     task_info.cell_partition_data.back() + 1,
                                      numbers::invalid_unsigned_int);
           new_plain_indices.reserve (plain_dof_indices.size());
         }
 
-      // copy the indices and the constraint indicators to the new data field:
-      // Store the indices in a way so that adjacent data fields in local
-      // vectors are adjacent, i.e., first dof index 0 for all vectors, then
-      // dof index 1 for all vectors, and so on. This involves some extra
-      // resorting.
-      std::vector<const unsigned int *> glob_indices (vectorization_length);
-      std::vector<const unsigned int *> plain_glob_indices (vectorization_length);
-      std::vector<const std::pair<unsigned short,unsigned short>*>
-      constr_ind(vectorization_length), constr_end(vectorization_length);
-      std::vector<unsigned int> index(vectorization_length);
+      // copy the indices and the constraint indicators to the new data field,
+      // where we will go through the cells in the renumbered way. in case the
+      // vectorization length does not exactly match up, we fill invalid
+      // numbers to the rowstart data. for contiguous cell indices, we skip
+      // the rowstarts field completely and directly go into the
+      // new_dof_indices field (this layout is used in FEEvaluation).
       for (unsigned int i=0; i<task_info.cell_partition_data.back(); ++i)
         {
-          const unsigned int dofs_mcell =
-            dofs_per_cell[cell_active_fe_index.size() == 0 ? 0 :
-                          cell_active_fe_index[i]] * vectorization_length;
-          new_row_starts[i][0] = new_dof_indices.size();
-          new_row_starts[i][1] = new_constraint_indicator.size();
-          new_row_starts[i][2] = irregular_cells[i];
-
-          const unsigned int n_comp = (irregular_cells[i]>0 ?
+          const unsigned int n_vect = (irregular_cells[i]>0 ?
                                        irregular_cells[i] : vectorization_length);
+          const unsigned int dofs_per_cell = have_hp ?
+                                             this->dofs_per_cell[cell_active_fe_index[i]] : this->dofs_per_cell[0];
 
-          for (unsigned int j=0; j<n_comp; ++j)
+          for (unsigned int j=0; j<n_vect; ++j)
             {
-              glob_indices[j] = begin_indices(renumbering[position_cell+j]);
-              constr_ind[j] = begin_indicators(renumbering[position_cell+j]);
-              constr_end[j] = end_indicators(renumbering[position_cell+j]);
-              index[j] = 0;
-            }
+              const unsigned int cell_no = renumbering[position_cell+j]*n_components;
+              for (unsigned int comp=0; comp<n_components; ++comp)
+                {
+                  new_row_starts[(i*vectorization_length+j)*n_components+comp].first
+                    = new_dof_indices.size();
+                  new_row_starts[(i*vectorization_length+j)*n_components+comp].second
+                    = new_constraint_indicator.size();
 
-          bool has_constraints = false;
-          if (store_plain_indices == true)
-            {
-              for (unsigned int j=0; j<n_comp; ++j)
-                if (begin_indicators(renumbering[position_cell+j]) <
-                    end_indicators(renumbering[position_cell+j]))
-                  {
-                    plain_glob_indices[j] =
-                      begin_indices_plain (renumbering[position_cell+j]);
-                    has_constraints = true;
-                  }
-                else
-                  plain_glob_indices[j] =
-                    begin_indices (renumbering[position_cell+j]);
-              if (has_constraints == true)
-                new_rowstart_plain[i] = new_plain_indices.size();
+                  new_dof_indices.insert(new_dof_indices.end(),
+                                         &dof_indices[row_starts[cell_no+comp].first],
+                                         &dof_indices[row_starts[cell_no+comp+1].first]);
+                  for (unsigned int index = row_starts[cell_no+comp].second;
+                       index != row_starts[cell_no+comp+1].second; ++index)
+                    new_constraint_indicator.push_back(constraint_indicator[index]);
+                }
+              if (store_plain_indices && row_starts[cell_no].second !=
+                  row_starts[cell_no+n_components].second)
+                {
+                  new_rowstart_plain[i*vectorization_length+j] =
+                    new_plain_indices.size();
+                  new_plain_indices.insert(new_plain_indices.end(),
+                                           &plain_dof_indices[row_starts_plain_indices[cell_no/n_components]],
+                                           &plain_dof_indices[row_starts_plain_indices[cell_no/n_components]]+dofs_per_cell);
+                }
             }
-
-          unsigned int m_ind_local = 0, m_index = 0;
-          while (m_ind_local < dofs_mcell)
-            for (unsigned int j=0; j<vectorization_length; ++j)
+          for (unsigned int j=n_vect; j<vectorization_length; ++j)
+            for (unsigned int comp=0; comp<n_components; ++comp)
               {
-                // last cell: nothing to do
-                if (j >= n_comp)
-                  {
-                    ++m_ind_local;
-                    continue;
-                  }
-
-                // otherwise, check if we are a constrained dof. The dof is
-                // not constrained if we are at the end of the row for the
-                // constraints (indi[j] == n_indi[j]) or if the local index[j]
-                // is smaller than the next position for a constraint. Then,
-                // just copy it. otherwise, copy all the entries that come
-                // with this dof
-                if (constr_ind[j] == constr_end[j] ||
-                    index[j] < constr_ind[j]->first)
-                  {
-                    new_dof_indices.push_back (*glob_indices[j]);
-                    ++m_index;
-                    ++index[j];
-                    ++glob_indices[j];
-                  }
-                else
-                  {
-                    const unsigned short constraint_loc = constr_ind[j]->second;
-                    new_constraint_indicator.emplace_back (m_index, constraint_loc);
-                    for (unsigned int k=constraint_pool_row_index[constraint_loc];
-                         k<constraint_pool_row_index[constraint_loc+1];
-                         ++k, ++glob_indices[j])
-                      new_dof_indices.push_back (*glob_indices[j]);
-                    ++constr_ind[j];
-                    m_index = 0;
-                    index[j] = 0;
-                  }
-                if (store_plain_indices==true && has_constraints==true)
-                  new_plain_indices.push_back (*plain_glob_indices[j]++);
-                ++m_ind_local;
+                new_row_starts[(i*vectorization_length+j)*n_components+comp].first
+                  = new_dof_indices.size();
+                new_row_starts[(i*vectorization_length+j)*n_components+comp].second
+                  = new_constraint_indicator.size();
               }
-
-          for (unsigned int j=0; j<n_comp; ++j)
-            Assert (glob_indices[j]==end_indices(renumbering[position_cell+j]),
-                    ExcInternalError());
-          position_cell += n_comp;
+          position_cell += n_vect;
         }
-      AssertDimension (position_cell+1, row_starts.size());
-
-      new_row_starts[task_info.cell_partition_data.back()][0] = new_dof_indices.size();
-      new_row_starts[task_info.cell_partition_data.back()][1] = new_constraint_indicator.size();
-      new_row_starts[task_info.cell_partition_data.back()][2] = 0;
+      AssertDimension (position_cell*n_components+1, row_starts.size());
 
       AssertDimension(dof_indices.size(), new_dof_indices.size());
+      new_row_starts[task_info.cell_partition_data.back()*vectorization_length*n_components].first
+        = new_dof_indices.size();
+      new_row_starts[task_info.cell_partition_data.back()*vectorization_length*n_components].second
+        = new_constraint_indicator.size();
+
       AssertDimension(constraint_indicator.size(),
                       new_constraint_indicator.size());
 
@@ -592,9 +575,11 @@ no_constraint:
       // constraint pool.
       for (unsigned int row=0; row<task_info.cell_partition_data.back(); ++row)
         {
-          const unsigned int row_length_ind = row_length_indices(row);
+          const unsigned int row_length_ind = row_starts[(row*vectorization_length+1)*n_components].first -
+                                              row_starts[row*vectorization_length*n_components].first;
           const std::pair<unsigned short,unsigned short>
-          *con_it = begin_indicators(row), * end_con = end_indicators(row);
+          *con_it = &constraint_indicator[row_starts[row*vectorization_length*n_components].second],
+           * end_con = &constraint_indicator[row_starts[(row*vectorization_length+1)*n_components].second];
           for ( ; con_it != end_con; ++con_it)
             {
               AssertIndexRange (con_it->first, row_length_ind+1);
@@ -612,6 +597,251 @@ no_constraint:
           n_active_cells += vectorization_length;
       AssertDimension(n_active_cells, task_info.n_active_cells);
 #endif
+
+      compute_cell_index_compression(irregular_cells);
+    }
+
+
+
+    void
+    DoFInfo::compute_cell_index_compression
+    (const std::vector<unsigned char> &irregular_cells)
+    {
+      const bool have_hp = dofs_per_cell.size() > 1;
+      const unsigned int n_components = start_components.back();
+
+      Assert(row_starts.size() % vectorization_length == 1, ExcInternalError());
+      if (vectorization_length > 1)
+        AssertDimension(row_starts.size()/vectorization_length/n_components,
+                        irregular_cells.size());
+      index_storage_variants[2].resize(irregular_cells.size(),
+                                       IndexStorageVariants::full);
+      n_vectorization_lanes_filled[2].resize(irregular_cells.size());
+      for (unsigned int i=0; i<irregular_cells.size(); ++i)
+        if (irregular_cells[i] > 0)
+          n_vectorization_lanes_filled[2][i] = irregular_cells[i];
+        else
+          n_vectorization_lanes_filled[2][i] = vectorization_length;
+
+      dof_indices_contiguous[2].resize(irregular_cells.size()*vectorization_length,
+                                       numbers::invalid_unsigned_int);
+      dof_indices_interleaved.resize(dof_indices.size(), numbers::invalid_unsigned_int);
+
+      std::vector<unsigned int> index_kinds(static_cast<unsigned int>(IndexStorageVariants::contiguous)+1);
+      std::vector<unsigned int> offsets(vectorization_length);
+      for (unsigned int i=0; i<irregular_cells.size(); ++i)
+        {
+          const unsigned int ndofs = dofs_per_cell[have_hp ? cell_active_fe_index[i] : 0];
+          const unsigned int n_comp = n_vectorization_lanes_filled[2][i];
+
+          // check 1: Check if there are constraints -> no compression possible
+          bool has_constraints = false;
+          for (unsigned int j=0; j<n_comp; ++j)
+            {
+              const unsigned int cell_no = i*vectorization_length+j;
+              if (row_starts[cell_no*n_components].second != row_starts[(cell_no+1)*n_components].second)
+                {
+                  has_constraints = true;
+                  break;
+                }
+            }
+          if (has_constraints)
+            index_storage_variants[2][i] = IndexStorageVariants::full;
+          else
+            {
+              bool indices_are_contiguous = true;
+              for (unsigned int j=0; j<n_comp; ++j)
+                {
+                  const unsigned int cell_no = i*vectorization_length+j;
+                  const unsigned int *dof_indices = &this->dof_indices[row_starts[cell_no*n_components].first];
+                  AssertDimension(ndofs, row_starts[(cell_no+1)*n_components].first-
+                                  row_starts[cell_no*n_components].first);
+                  for (unsigned int i=1; i<ndofs; ++i)
+                    if (dof_indices[i] != dof_indices[0]+i)
+                      {
+                        indices_are_contiguous = false;
+                        break;
+                      }
+                }
+              bool indices_are_interleaved_and_contiguous = (ndofs > 1 &&
+                                                             n_comp == vectorization_length);
+              {
+                const unsigned int *dof_indices =
+                  &this->dof_indices[row_starts[i*vectorization_length*n_components].first];
+                for (unsigned int k=0; k<ndofs; ++k)
+                  for (unsigned int j=0; j<n_comp; ++j)
+                    if (dof_indices[j*ndofs+k] != dof_indices[0] + k*n_comp + j)
+                      {
+                        indices_are_interleaved_and_contiguous = false;
+                        break;
+                      }
+              }
+              if (indices_are_contiguous ||
+                  indices_are_interleaved_and_contiguous)
+                {
+                  for (unsigned int j=0; j<n_comp; ++j)
+                    dof_indices_contiguous[2][i*vectorization_length+j] =
+                      this->dof_indices[row_starts[(i*vectorization_length+j)*n_components].first];
+                }
+
+              if (indices_are_contiguous)
+                {
+                  index_storage_variants[2][i] = IndexStorageVariants::contiguous;
+                }
+              else
+                {
+                  const unsigned int *dof_indices =
+                    &this->dof_indices[row_starts[i*vectorization_length*n_components].first];
+                  if (n_comp == vectorization_length)
+                    index_storage_variants[2][i] = IndexStorageVariants::interleaved;
+                  else
+                    index_storage_variants[2][i] = IndexStorageVariants::full;
+                  for (unsigned int k=0; k<ndofs; ++k)
+                    for (unsigned int j=0; j<n_comp; ++j)
+                      if (dof_indices[j*ndofs+k] == dof_indices[k])
+                        {
+                          index_storage_variants[2][i] = IndexStorageVariants::full;
+                          break;
+                        }
+                  if (index_storage_variants[2][i] != IndexStorageVariants::full)
+                    {
+                      unsigned int *interleaved_dof_indices =
+                        &this->dof_indices_interleaved[row_starts[i*vectorization_length*n_components].first];
+                      for (unsigned int k=0; k<ndofs; ++k)
+                        for (unsigned int j=0; j<n_comp; ++j)
+                          interleaved_dof_indices[k*n_comp+j] = dof_indices[j*ndofs+k];
+                    }
+                }
+            }
+          index_kinds[static_cast<unsigned int>(index_storage_variants[2][i])]++;
+        }
+    }
+
+
+
+    template <int length>
+    void
+    DoFInfo::compute_face_index_compression
+    (const std::vector<FaceToCellTopology<length> > &faces)
+    {
+      AssertDimension(length, vectorization_length);
+
+      index_storage_variants[0].resize(faces.size(), IndexStorageVariants::full);
+      dof_indices_contiguous[0].resize(faces.size()*length, numbers::invalid_unsigned_int);
+      n_vectorization_lanes_filled[0].resize(faces.size());
+
+      // all interior faces come before the boundary faces
+      unsigned int n_plus_faces = 0;
+      for (; n_plus_faces < faces.size(); ++n_plus_faces)
+        if (faces[n_plus_faces].cells_exterior[0] == numbers::invalid_unsigned_int)
+          break;
+      index_storage_variants[1].resize(n_plus_faces, IndexStorageVariants::full);
+      dof_indices_contiguous[1].resize(n_plus_faces*length, numbers::invalid_unsigned_int);
+      n_vectorization_lanes_filled[1].resize(n_plus_faces);
+
+      for (unsigned int face=0; face<faces.size(); ++face)
+        {
+          auto face_computation = [&](const unsigned int  face_index,
+                                      const unsigned int *cell_indices_face)
+          {
+            bool is_contiguous = false;
+            bool needs_full_storage = false;
+            for (unsigned int v=0; v<length && cell_indices_face[v] !=
+                 numbers::invalid_unsigned_int; ++v)
+              {
+                n_vectorization_lanes_filled[face_index][face]++;
+                if (index_storage_variants[2][cell_indices_face[v]/length] ==
+                    IndexStorageVariants::contiguous)
+                  is_contiguous = true;
+                if (index_storage_variants[2][cell_indices_face[v]/length] <
+                    IndexStorageVariants::contiguous)
+                  needs_full_storage = true;
+              }
+            if (is_contiguous)
+              for (unsigned int v=0; v<n_vectorization_lanes_filled[face_index][face]; ++v)
+                dof_indices_contiguous[face_index][face*length+v] =
+                  dof_indices_contiguous[2][cell_indices_face[v]];
+            if (is_contiguous && !needs_full_storage)
+              index_storage_variants[face_index][face] = IndexStorageVariants::contiguous;
+            else
+              index_storage_variants[face_index][face] = IndexStorageVariants::full;
+          };
+
+          face_computation(0, faces[face].cells_interior);
+          if (face < n_plus_faces)
+            face_computation(1, faces[face].cells_exterior);
+        }
+    }
+
+
+
+    template <int length>
+    void
+    DoFInfo::compute_vector_zero_access_pattern
+    (const TaskInfo                                 &task_info,
+     const std::vector<FaceToCellTopology<length> > &faces)
+    {
+      // compute a list that tells us the first time a degree of freedom is
+      // touched by a cell
+      AssertDimension(length, vectorization_length);
+      const unsigned int n_components = start_components.back();
+      const unsigned int n_dofs = vector_partitioner->local_size() +
+                                  vector_partitioner->n_ghost_indices();
+      std::vector<unsigned int> touched_by((n_dofs+chunk_size_zero_vector-1)/
+                                           chunk_size_zero_vector,
+                                           numbers::invalid_unsigned_int);
+      for (unsigned int part = 0; part < task_info.partition_row_index.size()-2; ++part)
+        for (unsigned int chunk = task_info.partition_row_index[part];
+             chunk < task_info.partition_row_index[part+1]; ++chunk)
+          {
+            for (unsigned int cell = task_info.cell_partition_data[chunk];
+                 cell < task_info.cell_partition_data[chunk+1]; ++cell)
+              {
+                for (unsigned int it = row_starts[cell*vectorization_length*n_components].first;
+                     it != row_starts[(cell+1)*vectorization_length*n_components].first; ++it)
+                  {
+                    const unsigned int myindex = dof_indices[it]/chunk_size_zero_vector;
+                    if (touched_by[myindex]==numbers::invalid_unsigned_int)
+                      touched_by[myindex] = chunk;
+                  }
+              }
+            if (faces.size() > 0)
+              for (unsigned int face = task_info.face_partition_data[chunk];
+                   face < task_info.face_partition_data[chunk+1]; ++face)
+                for (unsigned int v=0; v<length &&
+                     faces[face].cells_exterior[v] != numbers::invalid_unsigned_int; ++v)
+                  {
+                    const unsigned int cell=faces[face].cells_exterior[v];
+                    for (unsigned int it = row_starts[cell*n_components].first;
+                         it != row_starts[(cell+1)*n_components].first; ++it)
+                      {
+                        const unsigned int myindex = dof_indices[it]/chunk_size_zero_vector;
+                        if (touched_by[myindex]==numbers::invalid_unsigned_int)
+                          touched_by[myindex] = chunk;
+                      }
+                  }
+          }
+
+      vector_zero_range_list_index.resize(1 + task_info.partition_row_index
+                                          [task_info.partition_row_index.size()-2],
+                                          numbers::invalid_unsigned_int);
+      std::map<unsigned int, std::vector<unsigned int> > chunk_must_zero_vector;
+      for (unsigned int i=0; i<touched_by.size(); ++i)
+        chunk_must_zero_vector[touched_by[i]].push_back(i);
+      vector_zero_range_list.clear();
+      vector_zero_range_list_index[0] = 0;
+      for (unsigned int chunk=0; chunk<vector_zero_range_list_index.size()-1; ++chunk)
+        {
+          auto it = chunk_must_zero_vector.find(chunk);
+          if (it != chunk_must_zero_vector.end())
+            {
+              for (unsigned int i : it->second)
+                vector_zero_range_list.push_back(i);
+              vector_zero_range_list_index[chunk+1] = vector_zero_range_list.size();
+            }
+          else
+            vector_zero_range_list_index[chunk+1] = vector_zero_range_list_index[chunk];
+        }
     }
 
 
@@ -660,6 +890,8 @@ no_constraint:
         }
       };
 
+
+
       // We construct the connectivity graph in parallel. we use one lock for
       // 256 degrees of freedom to keep the number of locks down to a
       // reasonable level and reduce the cost of locking to some extent.
@@ -672,13 +904,13 @@ no_constraint:
                                std::vector<unsigned int>   &row_lengths)
       {
         std::vector<unsigned int> scratch;
-        constexpr unsigned int n_components = 1;
+        const unsigned int n_components = dof_info.start_components.back();
         for (unsigned int block=begin; block<end; ++block)
           {
             scratch.clear();
             scratch.insert(scratch.end(),
-                           &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
-                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]]);
+                           &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
+                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first]);
             std::sort(scratch.begin(), scratch.end());
             std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
@@ -707,13 +939,13 @@ no_constraint:
                                   dealii::SparsityPattern         &connectivity_dof)
       {
         std::vector<unsigned int> scratch;
-        const unsigned int n_components = 1;
+        const unsigned int n_components = dof_info.start_components.back();
         for (unsigned int block=begin; block<end; ++block)
           {
             scratch.clear();
             scratch.insert(scratch.end(),
-                           &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
-                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]]);
+                           &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
+                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first]);
             std::sort(scratch.begin(), scratch.end());
             std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
@@ -738,14 +970,14 @@ no_constraint:
                              DynamicSparsityPattern          &connectivity)
       {
         ordered_vector row_entries;
-        const unsigned int n_components = 1;
+        const unsigned int n_components = dof_info.start_components.back();
         for (unsigned int block=begin; block < end; ++block)
           {
             row_entries.clear();
 
             const unsigned int
-            *it = &dof_info.dof_indices[dof_info.row_starts[block*n_components][0]],
-             *end_cell = &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components][0]];
+            *it = &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
+             *end_cell = &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first];
             for ( ; it != end_cell; ++it)
               {
                 SparsityPattern::iterator sp = connectivity_dof.begin(*it);
@@ -758,6 +990,7 @@ no_constraint:
           }
       }
     }
+
 
 
     void
@@ -828,25 +1061,33 @@ no_constraint:
 
 
 
-    void DoFInfo::renumber_dofs (std::vector<types::global_dof_index> &renumbering)
+    void DoFInfo
+    ::compute_dof_renumbering (std::vector<types::global_dof_index> &renumbering)
     {
-      // first renumber all locally owned degrees of freedom
-      AssertDimension (vector_partitioner->local_size(),
-                       vector_partitioner->size());
       const unsigned int local_size = vector_partitioner->local_size();
       renumbering.resize (0);
       renumbering.resize (local_size, numbers::invalid_dof_index);
 
       types::global_dof_index counter = 0;
-      std::vector<unsigned int>::iterator dof_ind = dof_indices.begin(),
-                                          end_ind = dof_indices.end();
-      for ( ; dof_ind != end_ind; ++dof_ind)
+      const unsigned int n_components = start_components.back();
+      const unsigned int n_macro_cells = n_vectorization_lanes_filled[2].size();
+      Assert(n_macro_cells <= (row_starts.size()-1)/vectorization_length/n_components,
+             ExcInternalError());
+      for (unsigned int cell_no=0; cell_no<n_macro_cells; ++cell_no)
         {
-          if (*dof_ind < local_size)
+          // do not renumber in case we have constraints
+          if (row_starts[cell_no*n_components*vectorization_length].second ==
+              row_starts[(cell_no+1)*n_components*vectorization_length].second)
             {
-              if (renumbering[*dof_ind] == numbers::invalid_dof_index)
-                renumbering[*dof_ind] = counter++;
-              *dof_ind = renumbering[*dof_ind];
+              const unsigned int ndofs = dofs_per_cell.size() == 1 ? dofs_per_cell[0] :
+                                         (dofs_per_cell[cell_active_fe_index.size()>0 ?
+                                                        cell_active_fe_index[cell_no] : 0]);
+              const unsigned int *dof_ind = &dof_indices[row_starts[cell_no*n_components*vectorization_length].first];
+              for (unsigned int i=0; i<ndofs; ++i)
+                for (unsigned int j=0; j<n_vectorization_lanes_filled[2][cell_no]; ++j)
+                  if (dof_ind[j*ndofs+i]<local_size)
+                    if (renumbering[dof_ind[j*ndofs+i]] == numbers::invalid_dof_index)
+                      renumbering[dof_ind[j*ndofs+i]] = counter++;
             }
         }
 
@@ -854,19 +1095,6 @@ no_constraint:
       for (std::size_t i=0; i<renumbering.size(); ++i)
         if (renumbering[i] == numbers::invalid_dof_index)
           renumbering[i] = counter++;
-
-      // adjust the constrained DoFs
-      std::vector<unsigned int> new_constrained_dofs (constrained_dofs.size());
-      for (std::size_t i=0; i<constrained_dofs.size(); ++i)
-        new_constrained_dofs[i] = renumbering[constrained_dofs[i]];
-
-      // the new constrained DoFs should be sorted already as they are not
-      // contained in dof_indices and then get contiguous numbers
-#ifdef DEBUG
-      for (std::size_t i=1; i<new_constrained_dofs.size(); ++i)
-        Assert (new_constrained_dofs[i] > new_constrained_dofs[i-1], ExcInternalError());
-#endif
-      std::swap (constrained_dofs, new_constrained_dofs);
 
       // transform indices to global index space
       for (std::size_t i=0; i<renumbering.size(); ++i)
@@ -881,7 +1109,7 @@ no_constraint:
     DoFInfo::memory_consumption () const
     {
       std::size_t memory = sizeof(*this);
-      memory += (row_starts.capacity()*sizeof(std::array<unsigned int,3>));
+      memory += (row_starts.capacity()*sizeof(std::pair<unsigned int,unsigned int>));
       memory += MemoryConsumption::memory_consumption (dof_indices);
       memory += MemoryConsumption::memory_consumption (row_starts_plain_indices);
       memory += MemoryConsumption::memory_consumption (plain_dof_indices);
@@ -899,7 +1127,7 @@ no_constraint:
     {
       out << "       Memory row starts indices:    ";
       task_info.print_memory_statistics
-      (out, (row_starts.capacity()*sizeof(std::array<unsigned int, 3>)));
+      (out, (row_starts.capacity()*sizeof(*row_starts.begin())));
       out << "       Memory dof indices:           ";
       task_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));
@@ -926,16 +1154,18 @@ no_constraint:
       const unsigned int n_rows = row_starts.size() - 1;
       for (unsigned int row=0 ; row<n_rows ; ++row)
         {
+          if (row_starts[row].first == row_starts[row+1].first)
+            continue;
           out << "Entries row " << row << ": ";
-          const unsigned int *glob_indices = begin_indices(row),
-                              *end_row = end_indices(row);
+          const unsigned int *glob_indices = &dof_indices[row_starts[row].first],
+                              *end_row = &dof_indices[row_starts[row+1].first];
           unsigned int index = 0;
           const std::pair<unsigned short,unsigned short>
-          *con_it = begin_indicators(row),
-           * end_con = end_indicators(row);
+          *con_it = &constraint_indicator[row_starts[row].second],
+           * end_con = &constraint_indicator[row_starts[row+1].second];
           for ( ; con_it != end_con; ++con_it)
             {
-              for ( ; index<con_it->first; index++)
+              for (unsigned int j=0; j<con_it->first; ++j, ++index)
                 {
                   Assert (glob_indices+index != end_row, ExcInternalError());
                   out << glob_indices[index] << " ";
@@ -948,9 +1178,7 @@ no_constraint:
                 {
                   Assert (glob_indices+index != end_row, ExcInternalError());
                   out << glob_indices[index] << "/"
-                      << constraint_pool_data[k];
-                  if (k<constraint_pool_row_index[con_it->second+1]-1)
-                    out << " ";
+                      << constraint_pool_data[k] << " ";
                 }
               out << "] ";
             }

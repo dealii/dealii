@@ -29,14 +29,6 @@ for (deal_II_dimension : DIMENSIONS)
     template void MatrixFree<deal_II_dimension,float>::
     print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
 
-    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
-
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension,deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension,deal_II_dimension,float>;
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension-1,deal_II_dimension,double>;
-    template struct internal::MatrixFreeFunctions::MappingInfoStorage<deal_II_dimension-1,deal_II_dimension,float>;
-
 #ifndef DEAL_II_MSVC
     template
     void

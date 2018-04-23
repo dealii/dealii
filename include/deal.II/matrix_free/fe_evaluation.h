@@ -758,18 +758,22 @@ protected:
    * operation for several vectors at a time.
    */
   template <typename VectorType, typename VectorOperation>
-  void read_write_operation (const VectorOperation &operation,
-                             VectorType            *vectors[]) const;
+  void
+  read_write_operation (const VectorOperation &operation,
+                        VectorType            *vectors[],
+                        const bool             apply_constraints = true) const;
 
   /**
-   * For a collection of several vector @p src, read out the values on the
-   * degrees of freedom of the current cell for @p n_components (template
-   * argument), and store them internally. Similar functionality as the
-   * function DoFAccessor::read_dof_values. Note that if vectorization is
-   * enabled, the DoF values for several cells are set.
+   * A unified function to read from and write into vectors based on the given
+   * template operation for the case when we do not have an underlying
+   * MatrixFree object. It can perform the operation for @p read_dof_values,
+   * @p distribute_local_to_global, and @p set_dof_values. It performs the
+   * operation for several vectors at a time, depending on n_components.
    */
-  template <typename VectorType>
-  void read_dof_values_plain (const VectorType *src_data[]);
+  template <typename VectorType, typename VectorOperation>
+  void
+  read_write_operation_global (const VectorOperation &operation,
+                               VectorType            *vectors[]) const;
 
   /**
    * This is the general array for all data fields.
@@ -2338,9 +2342,10 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   :
   scratch_data_array (data_in.acquire_scratch_data()),
   quad_no            (quad_no_in),
-  n_fe_components    (data_in.get_dof_info(dof_no).n_components),
+  n_fe_components    (data_in.get_dof_info(dof_no).start_components.back()),
   active_fe_index    (fe_degree != numbers::invalid_unsigned_int ?
-                      data_in.get_dof_info(dof_no).fe_index_from_degree(fe_degree)
+                      data_in.get_dof_info(dof_no).fe_index_from_degree
+                      (first_selected_component, fe_degree)
                       :
                       0),
   active_quad_index  (fe_degree != numbers::invalid_unsigned_int ?
@@ -2363,8 +2368,9 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   dof_info           (&data_in.get_dof_info(dof_no)),
   mapping_data       (internal::MatrixFreeFunctions::MappingInfoCellsOrFaces<dim,Number,is_face>::get(data_in.get_mapping_info(), quad_no)),
   data               (&data_in.get_shape_info
-                      (dof_no, quad_no_in, active_fe_index,
-                       active_quad_index)),
+                      (dof_no, quad_no_in,
+                       dof_info->component_to_base_index[first_selected_component],
+                       active_fe_index, active_quad_index)),
   jacobian           (nullptr),
   J_value            (nullptr),
   normal_vectors     (nullptr),
@@ -2390,13 +2396,17 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
                    n_quadrature_points);
   AssertDimension (n_quadrature_points,
                    mapping_data->descriptor[active_quad_index].n_q_points);
-  Assert (n_fe_components == 1 ||
-          n_components == 1 ||
-          n_components == n_fe_components,
-          ExcMessage ("The underlying FE is vector-valued. In this case, the "
-                      "template argument n_components must be a the same "
-                      "as the number of underlying vector components."));
-
+  Assert(dof_info->start_components.back() == 1 ||
+         (int)n_components_ <=
+         (int)dof_info->start_components[dof_info->component_to_base_index[first_selected_component]+1] - first_selected_component,
+         ExcMessage("You tried to construct a vector-valued evaluator with " +
+                    Utilities::to_string(n_components) + " components. However, "
+                    "the current base element has only " +
+                    Utilities::to_string(dof_info->start_components[dof_info->component_to_base_index[first_selected_component]+1] - first_selected_component)
+                    + " components left when starting from local element index " +
+                    Utilities::to_string(first_selected_component-dof_info->start_components[dof_info->component_to_base_index[first_selected_component]])
+                    + " (global index " + Utilities::to_string(first_selected_component)
+                    + ")"));
 
   // do not check for correct dimensions of data fields here, should be done
   // in derived classes
@@ -3020,9 +3030,9 @@ namespace internal
       write_pos = sum;
     }
 
-    void process_empty (Number &res) const
+    void process_empty (VectorizedArray<Number> &res) const
     {
-      res = Number();
+      res = VectorizedArray<Number>();
     }
   };
 
@@ -3100,7 +3110,7 @@ namespace internal
     {
     }
 
-    void process_empty (Number &) const
+    void process_empty (VectorizedArray<Number> &) const
     {
     }
   };
@@ -3163,7 +3173,7 @@ namespace internal
     {
     }
 
-    void process_empty (Number &) const
+    void process_empty (VectorizedArray<Number> &) const
     {
     }
   };
@@ -3247,350 +3257,293 @@ inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
 ::read_write_operation (const VectorOperation &operation,
-                        VectorType            *src[]) const
+                        VectorType            *src[],
+                        const bool             apply_constraints) const
 {
-  // This functions processes all the functions read_dof_values,
-  // distribute_local_to_global, and set_dof_values with the same code. The
-  // distinction between these three cases is made by the input
-  // VectorOperation that either reads values from a vector and puts the data
-  // into the local data field or write local data into the vector. Certain
-  // operations are no-ops for the given use case.
-
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization
   if (matrix_info == nullptr)
     {
-      Assert (!local_dof_indices.empty(), ExcNotInitialized());
+      read_write_operation_global(operation, src);
+      return;
+    }
 
-      unsigned int index = first_selected_component * this->data->dofs_per_component_on_cell;
-      for (unsigned int comp = 0; comp<n_components; ++comp)
+  Assert (dof_info != nullptr, ExcNotInitialized());
+  Assert (matrix_info->indices_initialized() == true,
+          ExcNotInitialized());
+
+  constexpr unsigned int face_vector_access_index = 2;
+
+  const unsigned int n_vectorization = VectorizedArray<Number>::n_array_elements;
+  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
+  if (dof_info->index_storage_variants[is_face ? face_vector_access_index : 2][cell] ==
+      internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::interleaved)
+    {
+      const unsigned int *dof_indices =
+        &dof_info->dof_indices_interleaved[dof_info->row_starts[cell*n_vectorization*n_fe_components+first_selected_component].first];
+      if (n_components == 1 || n_fe_components == 1)
+        for (unsigned int i=0; i<dofs_per_component; ++i, dof_indices += n_vectorization)
+          for (unsigned int comp=0; comp<n_components; ++comp)
+            operation.process_dof_gather (dof_indices, *src[comp],
+                                          values_dofs[comp][i],
+                                          std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
+      else
+        for (unsigned int comp=0; comp<n_components; ++comp)
+          for (unsigned int i=0; i<dofs_per_component; ++i, dof_indices += n_vectorization)
+            operation.process_dof_gather (dof_indices,
+                                          *src[0], values_dofs[comp][i],
+                                          std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
+      return;
+    }
+
+  const unsigned int *dof_indices[n_vectorization];
+  VectorizedArray<Number> **values_dofs =
+    const_cast<VectorizedArray<Number> * *>(&this->values_dofs[0]);
+
+  unsigned int cells_copied[VectorizedArray<Number>::n_array_elements];
+  const unsigned int *cells;
+  unsigned int n_vectorization_actual =
+    dof_info->n_vectorization_lanes_filled[face_vector_access_index][cell];
+  bool has_constraints = false;
+  if (is_face)
+    {
+      if (face_vector_access_index == 2)
+        for (unsigned int v=0; v<n_vectorization_actual; ++v)
+          cells_copied[v] = cell*VectorizedArray<Number>::n_array_elements+v;
+      cells =
+        face_vector_access_index == 2 ?
+        &cells_copied[0]
+        :
+        (is_interior_face ?
+         &this->matrix_info->get_face_info(cell).cells_interior[0] :
+         &this->matrix_info->get_face_info(cell).cells_exterior[0]);
+      for (unsigned int v=0; v<n_vectorization_actual; ++v)
         {
-          for (unsigned int i=0; i<this->data->dofs_per_component_on_cell; ++i, ++index)
-            {
-              operation.process_dof_global(local_dof_indices[this->data->lexicographic_numbering[index]],
-                                           *src[0], values_dofs[comp][i][0]);
-              for (unsigned int v=1; v<VectorizedArray<Number>::n_array_elements; ++v)
-                operation.process_empty(values_dofs[comp][i][v]);
-            }
+          Assert(cells[v] < dof_info->row_starts.size()-1, ExcInternalError());
+          has_constraints = has_constraints &&
+                            dof_info->row_starts[cells[v]*n_fe_components+first_selected_component+n_components].second !=
+                            dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].second;
+          dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].first];
+        }
+    }
+  else
+    {
+      AssertIndexRange((cell+1)*n_vectorization*n_fe_components, dof_info->row_starts.size());
+      const unsigned int n_components_read = n_fe_components > 1 ? n_components : 1;
+      for (unsigned int v=0; v<n_vectorization_actual; ++v)
+        {
+          if (dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+n_components_read].second !=
+              dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].second)
+            has_constraints = true;
+          dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first];
+        }
+    }
+
+  // Case where we have no constraints throughout the whole cell: Can go
+  // through the list of DoFs directly
+  if (!has_constraints)
+    {
+      if (n_vectorization_actual < n_vectorization)
+        for (unsigned int comp=0; comp<n_components; ++comp)
+          for (unsigned int i=0; i<dofs_per_component; ++i)
+            operation.process_empty(values_dofs[comp][i]);
+      if (n_components == 1 || n_fe_components == 1)
+        {
+          for (unsigned int v=0; v<n_vectorization_actual; ++v)
+            for (unsigned int i=0; i<dofs_per_component; ++i)
+              for (unsigned int comp=0; comp<n_components; ++comp)
+                operation.process_dof (dof_indices[v][i], *src[comp],
+                                       values_dofs[comp][i][v]);
+        }
+      else
+        {
+          for (unsigned int comp=0; comp<n_components; ++comp)
+            for (unsigned int v=0; v<n_vectorization_actual; ++v)
+              for (unsigned int i=0; i<dofs_per_component; ++i)
+                operation.process_dof (dof_indices[v][comp*dofs_per_component+i],
+                                       *src[0], values_dofs[comp][i][v]);
         }
       return;
     }
 
-  // Some standard checks
-  Assert (dof_info != nullptr, ExcNotInitialized());
-  Assert (matrix_info->indices_initialized() == true,
-          ExcNotInitialized());
-  Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-
-  // loop over all local dofs. ind_local holds local number on cell, index
-  // iterates over the elements of index_local_to_global and dof_indices
-  // points to the global indices stored in index_local_to_global
-  const unsigned int *dof_indices = dof_info->begin_indices(cell);
-  const std::pair<unsigned short,unsigned short> *indicators =
-    dof_info->begin_indicators(cell);
-  const std::pair<unsigned short,unsigned short> *indicators_end =
-    dof_info->end_indicators(cell);
-  unsigned int ind_local = 0;
-  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
-
-  const unsigned int n_irreg_components_filled = dof_info->row_starts[cell][2];
-  const bool at_irregular_cell = n_irreg_components_filled > 0;
-
-  // scalar case (or case when all components have the same degrees of freedom
-  // and sit on a different vector each)
-  if (n_fe_components == 1)
+  // In the case where there are some constraints to be resolved, loop over
+  // all vector components that are filled and then over local dofs. ind_local
+  // holds local number on cell, index iterates over the elements of
+  // index_local_to_global and dof_indices points to the global indices stored
+  // in index_local_to_global
+  if (n_vectorization_actual < n_vectorization)
+    for (unsigned int comp=0; comp<n_components; ++comp)
+      for (unsigned int i=0; i<dofs_per_component; ++i)
+        operation.process_empty(values_dofs[comp][i]);
+  for (unsigned int v=0; v<n_vectorization_actual; ++v)
     {
-      for (unsigned int c=0; c<n_components; ++c)
-        Assert(src[c] != nullptr,
-               ExcMessage("The finite element underlying this FEEvaluation "
-                          "object is scalar, but you requested " +
-                          std::to_string(n_components) +
-                          " components via the template argument in "
-                          "FEEvaluation. In that case, you must pass an "
-                          "std::vector<VectorType> or a BlockVector to " +
-                          "read_dof_values and distribute_local_to_global."));
-
-      const unsigned int n_local_dofs =
-        VectorizedArray<Number>::n_array_elements * dofs_per_component;
-      for (unsigned int comp=0; comp<n_components; ++comp)
-        internal::check_vector_compatibility (*src[comp], *dof_info);
-      Number *local_data [n_components];
-      for (unsigned int comp=0; comp<n_components; ++comp)
-        local_data[comp] =
-          const_cast<Number *>(&values_dofs[comp][0][0]);
-
-      // standard case where there are sufficiently many cells to fill all
-      // vectors
-      if (at_irregular_cell == false)
+      unsigned int index_indicators, next_index_indicators;
+      const unsigned int n_components_read = n_fe_components > 1 ? n_components : 1;
+      if (is_face)
         {
-          // check whether there is any constraint on the current cell
-          if (indicators != indicators_end)
-            {
-              for ( ; indicators != indicators_end; ++indicators)
-                {
-                  // run through values up to next constraint
-                  for (unsigned int j=0; j<indicators->first; ++j)
-                    for (unsigned int comp=0; comp<n_components; ++comp)
-                      operation.process_dof (dof_indices[j], *src[comp],
-                                             local_data[comp][ind_local+j]);
-
-                  ind_local += indicators->first;
-                  dof_indices   += indicators->first;
-
-                  // constrained case: build the local value as a linear
-                  // combination of the global value according to constraints
-                  Number value [n_components];
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.pre_constraints (local_data[comp][ind_local],
-                                               value[comp]);
-
-                  const Number *data_val =
-                    matrix_info->constraint_pool_begin(indicators->second);
-                  const Number *end_pool =
-                    matrix_info->constraint_pool_end(indicators->second);
-                  for ( ; data_val != end_pool; ++data_val, ++dof_indices)
-                    for (unsigned int comp=0; comp<n_components; ++comp)
-                      operation.process_constraint (*dof_indices, *data_val,
-                                                    *src[comp], value[comp]);
-
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.post_constraints (value[comp],
-                                                local_data[comp][ind_local]);
-
-                  ind_local++;
-                }
-
-              // get the dof values past the last constraint
-              for (; ind_local < n_local_dofs; ++dof_indices, ++ind_local)
-                {
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_dof (*dof_indices, *src[comp],
-                                           local_data[comp][ind_local]);
-                }
-            }
-          else
-            {
-              // no constraint at all: compiler can unroll at least the
-              // vectorization loop
-              AssertDimension (dof_info->end_indices(cell)-dof_indices,
-                               static_cast<int>(n_local_dofs));
-              for (unsigned int j=0, ind=0; j<dofs_per_component; ++j, ind += VectorizedArray<Number>::n_array_elements)
-                for (unsigned int comp=0; comp<n_components; ++comp)
-                  operation.process_dof_gather(dof_indices+ind,
-                                               *src[comp], values_dofs[comp][j],
-                                               std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
-            }
+          index_indicators = dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].second;
+          next_index_indicators = dof_info->row_starts[cells[v]*n_fe_components+first_selected_component+1].second;
         }
-
-      // non-standard case: need to fill in zeros for those components that
-      // are not present (a bit more expensive), but there is not more than
-      // one such cell
       else
         {
-          Assert (n_irreg_components_filled > 0, ExcInternalError());
-          for ( ; indicators != indicators_end; ++indicators)
-            {
-              for (unsigned int j=0; j<indicators->first; ++j)
-                {
-                  // non-constrained case: copy the data from the global
-                  // vector, src, to the local one, local_src.
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_dof (dof_indices[j], *src[comp],
-                                           local_data[comp][ind_local]);
+          index_indicators = dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].second;
+          next_index_indicators = dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+1].second;
+        }
 
-                  // here we jump over all the components that are artificial
-                  ++ind_local;
-                  while (ind_local % VectorizedArray<Number>::n_array_elements
-                         >= n_irreg_components_filled)
-                    {
-                      for (unsigned int comp=0; comp<n_components; ++comp)
-                        operation.process_empty (local_data[comp][ind_local]);
-                      ++ind_local;
-                    }
-                }
-              dof_indices += indicators->first;
+      if (apply_constraints == false &&
+          dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].second !=
+          dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+n_components_read].second)
+        {
+          Assert(dof_info->row_starts_plain_indices[cell*n_vectorization+v]
+                 != numbers::invalid_unsigned_int,
+                 ExcNotInitialized());
+          dof_indices[v] = is_face ?
+                           &dof_info->plain_dof_indices[dof_info->row_starts_plain_indices[cells[v]]]
+                           :
+                           &dof_info->plain_dof_indices[dof_info->row_starts_plain_indices[cell*n_vectorization+v]];
+          dof_indices[v] += dof_info->component_dof_indices_offset[active_fe_index][first_selected_component];
+          next_index_indicators = index_indicators;
+        }
+
+      if (n_components == 1 || n_fe_components == 1)
+        {
+          for (unsigned int c=0; c<n_components; ++c)
+            Assert(src[c] != nullptr,
+                   ExcMessage("The finite element underlying this FEEvaluation "
+                              "object is scalar, but you requested " +
+                              std::to_string(n_components) +
+                              " components via the template argument in "
+                              "FEEvaluation. In that case, you must pass an "
+                              "std::vector<VectorType> or a BlockVector to " +
+                              "read_dof_values and distribute_local_to_global."));
+
+          unsigned int ind_local = 0;
+          for ( ; index_indicators != next_index_indicators; ++index_indicators)
+            {
+              std::pair<unsigned short,unsigned short> indicator =
+                dof_info->constraint_indicator[index_indicators];
+              // run through values up to next constraint
+              for (unsigned int j=0; j<indicator.first; ++j)
+                for (unsigned int comp=0; comp<n_components; ++comp)
+                  operation.process_dof (dof_indices[v][j], *src[comp],
+                                         values_dofs[comp][ind_local+j][v]);
+
+              ind_local += indicator.first;
+              dof_indices[v] += indicator.first;
 
               // constrained case: build the local value as a linear
-              // combination of the global value according to constraint
+              // combination of the global value according to constraints
               Number value [n_components];
               for (unsigned int comp=0; comp<n_components; ++comp)
-                operation.pre_constraints (local_data[comp][ind_local],
+                operation.pre_constraints (values_dofs[comp][ind_local][v],
                                            value[comp]);
 
               const Number *data_val =
-                matrix_info->constraint_pool_begin(indicators->second);
+                matrix_info->constraint_pool_begin(indicator.second);
               const Number *end_pool =
-                matrix_info->constraint_pool_end(indicators->second);
-
-              for ( ; data_val != end_pool; ++data_val, ++dof_indices)
+                matrix_info->constraint_pool_end(indicator.second);
+              for ( ; data_val != end_pool; ++data_val, ++dof_indices[v])
                 for (unsigned int comp=0; comp<n_components; ++comp)
-                  operation.process_constraint (*dof_indices, *data_val,
+                  operation.process_constraint (*dof_indices[v], *data_val,
                                                 *src[comp], value[comp]);
 
               for (unsigned int comp=0; comp<n_components; ++comp)
                 operation.post_constraints (value[comp],
-                                            local_data[comp][ind_local]);
+                                            values_dofs[comp][ind_local][v]);
               ind_local++;
-              while (ind_local % VectorizedArray<Number>::n_array_elements
-                     >= n_irreg_components_filled)
-                {
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_empty (local_data[comp][ind_local]);
-                  ++ind_local;
-                }
             }
-          for (; ind_local<n_local_dofs; ++dof_indices)
-            {
-              Assert (dof_indices != dof_info->end_indices(cell),
-                      ExcInternalError());
 
-              // non-constrained case: copy the data from the global vector,
-              // src, to the local one, local_dst.
-              for (unsigned int comp=0; comp<n_components; ++comp)
-                operation.process_dof (*dof_indices, *src[comp],
-                                       local_data[comp][ind_local]);
-              ++ind_local;
-              while (ind_local % VectorizedArray<Number>::n_array_elements
-                     >= n_irreg_components_filled)
-                {
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    operation.process_empty(local_data[comp][ind_local]);
-                  ++ind_local;
-                }
-            }
+          AssertIndexRange(ind_local, dofs_per_component+1);
+
+          for (; ind_local < dofs_per_component; ++dof_indices[v], ++ind_local)
+            for (unsigned int comp=0; comp<n_components; ++comp)
+              operation.process_dof (*dof_indices[v], *src[comp],
+                                     values_dofs[comp][ind_local][v]);
         }
-    }
-  else
-    // case with vector-valued finite elements where all components are
-    // included in one single vector. Assumption: first come all entries to
-    // the first component, then all entries to the second one, and so
-    // on. This is ensured by the way MatrixFree reads out the indices.
-    {
-      internal::check_vector_compatibility (*src[0], *dof_info);
-      Assert (n_fe_components == n_components_, ExcNotImplemented());
-      const unsigned int n_local_dofs =
-        dofs_per_component*VectorizedArray<Number>::n_array_elements * n_components;
-      Number   *local_data =
-        const_cast<Number *>(&values_dofs[0][0][0]);
-      if (at_irregular_cell == false)
+      else
         {
-          // check whether there is any constraint on the current cell
-          if (indicators != indicators_end)
+          // case with vector-valued finite elements where all components are
+          // included in one single vector. Assumption: first come all entries
+          // to the first component, then all entries to the second one, and
+          // so on. This is ensured by the way MatrixFree reads out the
+          // indices.
+          for (unsigned int comp=0; comp<n_components; ++comp)
             {
-              for ( ; indicators != indicators_end; ++indicators)
+              unsigned int ind_local = 0;
+
+              // check whether there is any constraint on the current cell
+              for ( ; index_indicators != next_index_indicators; ++index_indicators)
                 {
+                  std::pair<unsigned short,unsigned short> indicator =
+                    dof_info->constraint_indicator[index_indicators];
+
                   // run through values up to next constraint
-                  for (unsigned int j=0; j<indicators->first; ++j)
-                    operation.process_dof (dof_indices[j], *src[0],
-                                           local_data[ind_local+j]);
-                  ind_local += indicators->first;
-                  dof_indices   += indicators->first;
+                  for (unsigned int j=0; j<indicator.first; ++j)
+                    operation.process_dof (dof_indices[v][j], *src[0],
+                                           values_dofs[comp][ind_local+j][v]);
+                  ind_local      += indicator.first;
+                  dof_indices[v] += indicator.first;
 
                   // constrained case: build the local value as a linear
                   // combination of the global value according to constraints
                   Number value;
-                  operation.pre_constraints (local_data[ind_local], value);
+                  operation.pre_constraints (values_dofs[comp][ind_local][v], value);
 
                   const Number *data_val =
-                    matrix_info->constraint_pool_begin(indicators->second);
+                    matrix_info->constraint_pool_begin(indicator.second);
                   const Number *end_pool =
-                    matrix_info->constraint_pool_end(indicators->second);
+                    matrix_info->constraint_pool_end(indicator.second);
 
-                  for ( ; data_val != end_pool; ++data_val, ++dof_indices)
-                    operation.process_constraint (*dof_indices, *data_val,
+                  for ( ; data_val != end_pool; ++data_val, ++dof_indices[v])
+                    operation.process_constraint (*dof_indices[v], *data_val,
                                                   *src[0], value);
 
-                  operation.post_constraints (value, local_data[ind_local]);
+                  operation.post_constraints (value, values_dofs[comp][ind_local][v]);
                   ind_local++;
                 }
 
+              AssertIndexRange(ind_local, dofs_per_component+1);
+
               // get the dof values past the last constraint
-              for (; ind_local<n_local_dofs; ++dof_indices, ++ind_local)
-                operation.process_dof (*dof_indices, *src[0],
-                                       local_data[ind_local]);
-              Assert (dof_indices == dof_info->end_indices(cell),
-                      ExcInternalError());
-            }
-          else
-            {
-              // no constraint at all: compiler can unroll at least the
-              // vectorization loop
-              AssertDimension (dof_info->end_indices(cell)-dof_indices,
-                               static_cast<int>(n_local_dofs));
-              for (unsigned int comp=0, ind=0; comp<n_components; ++comp)
-                for (unsigned int j=0; j<dofs_per_component; ++j, ind += VectorizedArray<Number>::n_array_elements)
-                  operation.process_dof_gather(dof_indices+ind,
-                                               *src[0], values_dofs[comp][j],
-                                               std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
+              for (; ind_local<dofs_per_component; ++dof_indices[v], ++ind_local)
+                {
+                  AssertIndexRange(*dof_indices[v], src[0]->size());
+                  operation.process_dof (*dof_indices[v], *src[0],
+                                         values_dofs[comp][ind_local][v]);
+                }
+
+              if (apply_constraints == true)
+                {
+                  if (is_face)
+                    next_index_indicators = dof_info->row_starts[cells[v]*n_fe_components+first_selected_component+comp+2].second;
+                  else
+                    next_index_indicators = dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+comp+2].second;
+                }
             }
         }
+    }
+}
 
-      // non-standard case: need to fill in zeros for those components that
-      // are not present (a bit more expensive), but there is not more than
-      // one such cell
-      else
+
+
+template <int dim, int n_components_, typename Number, bool is_face>
+template <typename VectorType, typename VectorOperation>
+inline
+void
+FEEvaluationBase<dim,n_components_,Number,is_face>
+::read_write_operation_global (const VectorOperation &operation,
+                               VectorType            *src[]) const
+{
+  Assert (!local_dof_indices.empty(), ExcNotInitialized());
+
+  unsigned int index = first_selected_component * data->dofs_per_component_on_cell;
+  for (unsigned int comp = 0; comp<n_components; ++comp)
+    {
+      for (unsigned int i=0; i<data->dofs_per_component_on_cell; ++i, ++index)
         {
-          Assert (n_irreg_components_filled > 0, ExcInternalError());
-          for ( ; indicators != indicators_end; ++indicators)
-            {
-              for (unsigned int j=0; j<indicators->first; ++j)
-                {
-                  // non-constrained case: copy the data from the global
-                  // vector, src, to the local one, local_src.
-                  operation.process_dof (dof_indices[j], *src[0],
-                                         local_data[ind_local]);
-
-                  // here we jump over all the components that are artificial
-                  ++ind_local;
-                  while (ind_local % VectorizedArray<Number>::n_array_elements
-                         >= n_irreg_components_filled)
-                    {
-                      operation.process_empty (local_data[ind_local]);
-                      ++ind_local;
-                    }
-                }
-              dof_indices += indicators->first;
-
-              // constrained case: build the local value as a linear
-              // combination of the global value according to constraint
-              Number value;
-              operation.pre_constraints (local_data[ind_local], value);
-
-              const Number *data_val =
-                matrix_info->constraint_pool_begin(indicators->second);
-              const Number *end_pool =
-                matrix_info->constraint_pool_end(indicators->second);
-
-              for ( ; data_val != end_pool; ++data_val, ++dof_indices)
-                operation.process_constraint (*dof_indices, *data_val,
-                                              *src[0], value);
-
-              operation.post_constraints (value, local_data[ind_local]);
-              ind_local++;
-              while (ind_local % VectorizedArray<Number>::n_array_elements
-                     >= n_irreg_components_filled)
-                {
-                  operation.process_empty (local_data[ind_local]);
-                  ++ind_local;
-                }
-            }
-          for (; ind_local<n_local_dofs; ++dof_indices)
-            {
-              Assert (dof_indices != dof_info->end_indices(cell),
-                      ExcInternalError());
-
-              // non-constrained case: copy the data from the global vector,
-              // src, to the local one, local_dst.
-              operation.process_dof (*dof_indices, *src[0],
-                                     local_data[ind_local]);
-              ++ind_local;
-              while (ind_local % VectorizedArray<Number>::n_array_elements
-                     >= n_irreg_components_filled)
-                {
-                  operation.process_empty (local_data[ind_local]);
-                  ++ind_local;
-                }
-            }
+          operation.process_empty(values_dofs[comp][i]);
+          operation.process_dof_global(local_dof_indices[data->lexicographic_numbering[index]],
+                                       *src[0], values_dofs[comp][i][0]);
         }
     }
 }
@@ -3613,7 +3566,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
     src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d+first_index);
 
   internal::VectorReader<Number> reader;
-  read_write_operation (reader, src_data);
+  read_write_operation (reader, src_data, true);
 
 #ifdef DEBUG
   dof_values_initialized = true;
@@ -3632,12 +3585,17 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
-  const typename internal::BlockVectorSelector<VectorType,
-        IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
+  typename internal::BlockVectorSelector<VectorType,
+           IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
     src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d+first_index);
 
-  read_dof_values_plain (src_data);
+  internal::VectorReader<Number> reader;
+  read_write_operation (reader, src_data, false);
+
+#ifdef DEBUG
+  dof_values_initialized = true;
+#endif
 }
 
 
@@ -3686,141 +3644,6 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 
   internal::VectorSetter<Number> setter;
   read_write_operation (setter, dst_data);
-}
-
-
-
-template <int dim, int n_components_, typename Number, bool is_face>
-template <typename VectorType>
-inline
-void
-FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_dof_values_plain (const VectorType *src[])
-{
-  // Case without MatrixFree initialization object
-  if (matrix_info == nullptr)
-    {
-      internal::VectorReader<Number> reader;
-      read_write_operation (reader, src);
-      return;
-    }
-
-  // this is different from the other three operations because we do not use
-  // constraints here, so this is a separate function.
-  Assert (dof_info != nullptr, ExcNotInitialized());
-  Assert (matrix_info->indices_initialized() == true,
-          ExcNotInitialized());
-  Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
-  Assert (dof_info->store_plain_indices == true, ExcNotInitialized());
-
-  // loop over all local dofs. ind_local holds local number on cell, index
-  // iterates over the elements of index_local_to_global and dof_indices
-  // points to the global indices stored in index_local_to_global
-  const unsigned int *dof_indices = dof_info->begin_indices_plain(cell);
-  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
-
-  const unsigned int n_irreg_components_filled = dof_info->row_starts[cell][2];
-  const bool at_irregular_cell = n_irreg_components_filled > 0;
-
-  // scalar case (or case when all components have the same degrees of freedom
-  // and sit on a different vector each)
-  if (n_fe_components == 1)
-    {
-      for (unsigned int c=0; c<n_components; ++c)
-        Assert(src[c] != nullptr,
-               ExcMessage("The finite element underlying this FEEvaluation "
-                          "object is scalar, but you requested " +
-                          std::to_string(n_components) +
-                          " components via the template argument in "
-                          "FEEvaluation. In that case, you must pass an "
-                          "std::vector<VectorType> or a BlockVector to " +
-                          "read_dof_values_plain."));
-
-      const unsigned int n_local_dofs =
-        VectorizedArray<Number>::n_array_elements * dofs_per_component;
-      for (unsigned int comp=0; comp<n_components; ++comp)
-        internal::check_vector_compatibility (*src[comp], *dof_info);
-      Number *local_src_number [n_components];
-      for (unsigned int comp=0; comp<n_components; ++comp)
-        local_src_number[comp] = &values_dofs[comp][0][0];
-
-      // standard case where there are sufficiently many cells to fill all
-      // vectors
-      if (at_irregular_cell == false)
-        {
-          for (unsigned int j=0; j<n_local_dofs; ++j)
-            for (unsigned int comp=0; comp<n_components; ++comp)
-              local_src_number[comp][j] =
-                internal::vector_access (*src[comp], dof_indices[j]);
-        }
-
-      // non-standard case: need to fill in zeros for those components that
-      // are not present (a bit more expensive), but there is not more than
-      // one such cell
-      else
-        {
-          Assert (n_irreg_components_filled > 0, ExcInternalError());
-          for (unsigned int ind_local=0; ind_local<n_local_dofs;
-               ++dof_indices)
-            {
-              // non-constrained case: copy the data from the global vector,
-              // src, to the local one, local_dst.
-              for (unsigned int comp=0; comp<n_components; ++comp)
-                local_src_number[comp][ind_local] =
-                  internal::vector_access (*src[comp], *dof_indices);
-              ++ind_local;
-              while (ind_local % VectorizedArray<Number>::n_array_elements >= n_irreg_components_filled)
-                {
-                  for (unsigned int comp=0; comp<n_components; ++comp)
-                    local_src_number[comp][ind_local] = 0.;
-                  ++ind_local;
-                }
-            }
-        }
-    }
-  else
-    // case with vector-valued finite elements where all components are
-    // included in one single vector. Assumption: first come all entries to
-    // the first component, then all entries to the second one, and so
-    // on. This is ensured by the way MatrixFree reads out the indices.
-    {
-      internal::check_vector_compatibility (*src[0], *dof_info);
-      Assert (n_fe_components == n_components_, ExcNotImplemented());
-      const unsigned int n_local_dofs =
-        dofs_per_component * VectorizedArray<Number>::n_array_elements * n_components;
-      Number *local_src_number = &values_dofs[0][0][0];
-      if (at_irregular_cell == false)
-        {
-          for (unsigned int j=0; j<n_local_dofs; ++j)
-            local_src_number[j] =
-              internal::vector_access (*src[0], dof_indices[j]);
-        }
-
-      // non-standard case: need to fill in zeros for those components that
-      // are not present (a bit more expensive), but there is not more than
-      // one such cell
-      else
-        {
-          Assert (n_irreg_components_filled > 0, ExcInternalError());
-          for (unsigned int ind_local=0; ind_local<n_local_dofs; ++dof_indices)
-            {
-              // non-constrained case: copy the data from the global vector,
-              // src, to the local one, local_dst.
-              local_src_number[ind_local] =
-                internal::vector_access (*src[0], *dof_indices);
-              ++ind_local;
-              while (ind_local % VectorizedArray<Number>::n_array_elements >= n_irreg_components_filled)
-                {
-                  local_src_number[ind_local] = 0.;
-                  ++ind_local;
-                }
-            }
-        }
-    }
-
-#ifdef DEBUG
-  dof_values_initialized = true;
-#endif
 }
 
 
@@ -5693,13 +5516,14 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
             }
           else
             for (unsigned int no=0; no<this->matrix_info->n_components(); ++no)
-              if (this->matrix_info->get_shape_info(no,0,this->active_fe_index,0).fe_degree
-                  == static_cast<unsigned int>(fe_degree))
-                {
-                  proposed_dof_comp = no;
-                  proposed_fe_comp = 0;
-                  break;
-                }
+              for (unsigned int nf=0; nf<this->matrix_info->n_base_elements(no); ++nf)
+                if (this->matrix_info->get_shape_info(no,0,nf,this->active_fe_index,0).fe_degree
+                    == static_cast<unsigned int>(fe_degree))
+                  {
+                    proposed_dof_comp = no;
+                    proposed_fe_comp = nf;
+                    break;
+                  }
           if (n_q_points ==
               this->mapping_data->descriptor[this->active_quad_index].n_q_points)
             proposed_quad_comp = this->quad_no;
@@ -5778,12 +5602,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
               ExcMessage(message));
     }
   if (dof_no != numbers::invalid_unsigned_int)
-    {
-      AssertDimension (n_q_points,
-                       this->mapping_data->descriptor[this->active_quad_index].n_q_points);
-      AssertDimension (this->data->dofs_per_component_on_cell * this->n_fe_components,
-                       this->dof_info->dofs_per_cell[this->active_fe_index]);
-    }
+    AssertDimension (n_q_points,
+                     this->mapping_data->descriptor[this->active_quad_index].n_q_points);
 #endif
 }
 
