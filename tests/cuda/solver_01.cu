@@ -75,8 +75,6 @@ int main()
   Utilities::CUDA::Handle cuda_handle;
   test(cuda_handle);
 
-  GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
-
   deallog << "OK" <<std::endl;
 
   return 0;
