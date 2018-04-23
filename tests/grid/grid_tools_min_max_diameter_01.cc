@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+// test GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter with a mapping
+
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
@@ -39,6 +41,7 @@
 #include <sstream>
 
 #define PRECISION 2
+
 
 template <int dim, int spacedim>
 void test(const unsigned int degree)

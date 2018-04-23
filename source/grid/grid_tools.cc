@@ -2776,7 +2776,7 @@ next_cell:
     double diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
                     const Mapping<dim,spacedim> &mapping)
     {
-      auto vertices = mapping.get_vertices(cell);
+      const auto vertices = mapping.get_vertices(cell);
       switch (dim)
         {
         case 1:
