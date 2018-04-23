@@ -1,0 +1,205 @@
+<br>
+
+<i>This program was contributed by Luca Heltai and Giovanni Alzetta, SISSA, Trieste.
+
+<a name="Introduction"></a><h1>Introduction</h1>
+
+
+<a name="DistributedLagrangemultipliers"></a><h3> Distributed Lagrange multipliers</h3>
+
+
+In this tutorial we consider the case of two domains, $\Omega$ in
+$R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$, where $\Gamma$ is
+embedded in $\Omega$ and thus $\Gamma \subseteq \Omega$. We want to solve a
+partial differential equation on $\Omega$, enforcing some conditions on the
+solution of the problem *on the embedded domain* $\Gamma$.
+
+There are two interesting scenarios:
+
+- the geometrical dimension `dim` of the embedded domain $\Gamma$ is the
+same of the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure
+of $\Gamma$ is not zero, or
+
+- the embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
+than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
+zero; for example it is a curve embedded in a two
+dimensional domain, or a surface embedded in a three-dimensional domain.
+
+In both cases define the restriction operator $\gamma$ as the operator
+that, given a continuous function on $\Omega$, returns its (continuous)
+restriction on $\Gamma$, i.e.,
+\f[
+\gamma : C^0(\Omega) \mapsto C^0(\Gamma), \quad \text{ s.t. } \gamma u = u|_{\Gamma} \in C^0(\Gamma),
+\quad \forall u \in C^0(\Omega).
+\f]
+
+It is well known that the operator $\gamma$ can be extended to a continuous
+operator on $H^1(\Omega)$, mapping functions in $H^1(\Omega)$ to functions in
+$H^1(\Gamma)$ when the intrinsic dimension of $\Gamma$ is the same of $\Omega$.
+
+The same is true, with a less regular range space (namely $H^{1/2}(\Gamma)$),
+when the dimension of $\Gamma$ is one less with respect to $\Omega$, and
+$\Gamma$ does not have a boundary. In this second case, the operator $\gamma$
+is also known as the *trace* operator, and it is well defined for Lipschitz
+co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$.
+
+The co-dimension two case is a little more complicated, and in general it is
+not possible to construct a continous trace operator, not even from
+$H^1(\Omega)$ to $L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one
+respectively in two and three dimensions.
+
+In this tutorial program we're not interested in further details on $\gamma$:
+we take the extension $\gamma$ for granted, assuming that the dimension of the
+embedded domain (`dim`) is always smaller by one or equal w.r.t. the dimension
+of the embedding domain $\Omega$ (`spacedim`).
+
+We are going to solve the following differential problem: given a sufficiently
+regular function $g$ on $\Gamma$, find the solution $u$ to
+
+@f{eqnarray*}
+- \Delta u + \gamma^T \lambda &=& 0 & \text{ in } \Omega\\
+\gamma u &=& g &  \text{ in } \Gamma \\
+u & = & 0 & \text{ on } \partial\Omega.
+@f}
+
+This is a constrained problem, where we are looking for a harmonic function
+$u$, that satisfies homogeneous boundary conditions on $\partial\Omega$, subject
+to the constraint $\gamma u = g$ using a Lagrange multiplier.
+
+The variational formulation can be derived by introducing two infinite
+dimensional spaces $V(\Omega)$ and $Q^*(\Gamma)$, respectively for the solution
+$u$ and for the Lagrange multiplier $\lambda$.
+
+Multiplying the first equation by $v \in V(\Omega)$ and the second by $q \in
+Q(\Gamma)$, integrating by parts when possible, and exploiting the boundary
+conditions on $\partial\Omega$, we obtain the following variational problem:
+
+Given a sufficiently regular function $g$ on $\Gamma$, find the solution $u$ to
+@f{eqnarray*}
+(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& 0 & \forall v \in V(\Omega) \\
+(\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} &  \forall q \in Q(\Gamma),
+@f}
+
+where $(\cdot, \cdot)_{\Omega}$ (respectively $(\cdot, \cdot)_{\Gamma}$)
+represent the $L^2$ scalar product in $\Omega$ (respectively in $\Gamma$).
+
+Inspection of the variational formulation tells us that the space $V(\Omega)$
+can be taken to be $H^1_0(\Omega)$. The space $Q(\Gamma)$, in the co-dimension
+zero case, should be taken as $H^1(\Gamma)$, while in the co-dimension one case
+should be taken as $H^{1/2}(\Gamma)$.
+
+The function $g$, therefore, should be either in $H^1(\Gamma)$ (for the
+co-dimension zero case) or $H^{1/2}(\Gamma)$ (for the co-dimension one case).
+This leaves us with a Lagrange multiplier $\lambda$ in $Q^*(\Gamma)$, which is
+either $(H^1(\Gamma))^*$ or $H^{-1/2}(\Gamma)$.
+
+There are two options for the discretisation of the problem above. One could choose
+matching discretisations, where the Triangulation for $\Gamma$ is aligned with the
+Triangulation for $\Omega$, or one could choose to discretize the two domains in
+a completely independent way.
+
+While the first option is clearly more indicated for the simple problem we
+proposed above, if the domain $\Gamma$ was to be time dependent, then the
+second option could be a more viable solution.
+
+The technique we describe here is indicated in the literature with many names:
+the **immersed finite element method**, the **fictitious boundary method**, the
+**distributed Lagrange multiplier method**, and others. The main principle is
+that the discretisation of the two grids and of the two finite element spaces
+are kept completely independent. This technique is particularly efficient for
+the simulation of fluid-structure interaction problems, where the configuration
+of the embedded structure is part of the problem itself, and one solves a
+(possibly non-linear) elastic problem to determine the (time dependent)
+configuration of $\Gamma$, and a (possibly non-linear) flow problem in $\Omega
+\setminus \Gamma$, plus coupling conditions on the interface between the fluid
+and the solid.
+
+In this tutorial program we keep things a little simpler, and we assume that the
+configuration of the embedded domain is given in one of two possible ways:
+
+- as a deformation mapping $\psi: \Gamma_0 \mapsto \Gamma \subseteq \Omega$,
+defined on a continuous finite dimensional space on $\Gamma_0$ and representing,
+for any point $x \in \Gamma_0$ its coordinate $\psi(x)$ in $\Omega$;
+
+- as a displacement mapping $\delta \psi(x) = \psi(x)-x$ for $x\in \Gamma_0$,
+representing for any point $x$ the displacement vector to apply in order to
+deform $x$ to its actual configuration $\psi(x) = x +\delta\psi(x)$.
+
+We define the embedded reference domain $\Gamma_0$ `embedded_grid`, and on
+this domain, we construct a finite dimensional space (`embedded_configuration_dh`)
+to describe either the deformation or the displacement, through a FiniteElement
+system of FE_Q objects (`embedded_configuration_fe`). This finite dimensional
+space is used only to interpolate a user supplied function
+(`embedded_configuration_function`) representing either $\psi$ (if the
+parameter `use_displacement` is set to false) or $\delta\psi$ (if the parameter
+`use_displacement` is set to true).
+
+The Lagrange multiplier $\lambda$ and the user supplied function $g$ are
+defined through another finite dimensional space `embedded_dh`, and through
+another FiniteElement `embedded_fe`, using the same reference domain. In
+order to take into account the deformation of the domain, a MappingFEField or a
+MappingQEulerian object are initialized with the `embedded_configuration` vector.
+
+In the embedding space, a standard finite dimensional space `space_dh` is
+constructed on the embedding grid `space_grid` (`space_dh`), using the
+FiniteElement `space_fe`, following almost verbatim what was done in step-6.
+
+We represent the discretizations of the spaces $V$ and $Q$ with
+\f[
+V_h(\Omega) = \text{span} \{v_i\}_{i=1}^n
+\f]
+and
+\f[
+Q_h(\Gamma) = \text{span} \{q_i\}_{i=1}^m
+\f]
+respectively, where $n$ is the dimension of `space_dh`, and $m$
+the dimension of `embedded_dh`.
+
+Once all the finite dimensional spaces are defined, we are left with the following
+finite dimensional system of equations:
+
+\f[
+\begin{pmatrix}
+K & C^T \\
+C & 0
+\end{pmatrix}
+\begin{pmatrix}
+u \\
+\lambda
+\end{pmatrix}
+=
+\begin{pmatrix}
+0 \\
+G
+\end{pmatrix}
+\f]
+
+where
+
+@f{eqnarray*}
+K_{ij} &:=& (\nabla v_j, \nabla v_i)_\Omega   & i,j=1,\dots,n \\
+C_{\alpha j} &:=& (v_j, \nabla q_\alpha)_\Gamma  &j=1,\dots,n, \alpha = 1,\dots, m \\\\
+G_{\alpha} &:=& (g, q_\alpha)_\Gamma & \alpha = 1,\dots, m.
+@f}
+
+While the matrix $K$ is the standard stiffness matrix for the Poisson problem
+on $\Omega$, and the vector $G$ is a standard right-hand-side vector for a
+finite element problem with forcing term $g$ on $\Gamma$, (see, for example,
+step-3), the matrix $C$ or its transpose $C^T$ are non-standard since they
+couple information on two non-matching grids.
+
+In particular, the integral that appear in the computation of a single entry of $C$,
+is computed on $\Gamma$. As usual in finite elements, we split this integral on each
+cell of the triangulation used to discretize $\Gamma$, we tranform the integral on $K$ to
+an integral on the reference element $\hat K$, where $F_{K}$ is the corresponding
+shape function, and compute the integral there using a quadrature formula:
+
+\f[
+C_{\alpha j} := (v_j, \nabla q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
+\hat q_\alpha(\hat x) (v_j \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
+\sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
+\f]
+
+We solve the above saddle point problem by iterating over the Schur complement
+(which is described, for example, in step-20),
+and we construct such complement using LinearOperator classes.
