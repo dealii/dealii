@@ -1,0 +1,18 @@
+<br>
+
+<i>
+This program was contributed by Katharina Kormann and Martin
+Kronbichler.
+
+This work was partly supported by the German Research Foundation (DFG) through
+the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
+within the priority program "Software for Exascale Computing" (SPPEXA). </i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3>The symmetric interior penalty formulation for the Laplacian</h3>
+
+<h3>Face integration support in MatrixFree and FEFaceEvaluation</h3>
+
+<h3>An approximate block-Jacobi smoother using the fast diagonalization method</h3>
