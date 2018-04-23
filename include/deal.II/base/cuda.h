@@ -20,7 +20,12 @@
 
 #ifdef DEAL_II_WITH_CUDA
 
+#include <deal.II/base/exceptions.h>
+
+#include <cusolverDn.h>
+#include <cusolverSp.h>
 #include <cusparse.h>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 namespace Utilities
@@ -52,11 +57,63 @@ namespace Utilities
        */
       ~Handle();
 
+      cusolverDnHandle_t cusolver_dn_handle;
+
+      cusolverSpHandle_t cusolver_sp_handle;
+
       /**
        * Handle to the cuSPARSE library.
        */
       cusparseHandle_t cusparse_handle;
     };
+
+    /**
+     * Allocate @p n_elements on the device.
+     */
+    template <typename T>
+    inline void malloc(T *&pointer, const unsigned int n_elements)
+    {
+      cudaError_t cuda_error_code = cudaMalloc(&pointer, n_elements * sizeof(T));
+      AssertCuda(cuda_error_code);
+    }
+
+    /**
+     * Free memory on the device.
+     */
+    template <typename T>
+    inline void free(T *&pointer)
+    {
+      cudaError_t cuda_error_code = cudaFree(pointer);
+      AssertCuda(cuda_error_code);
+      pointer = nullptr;
+    }
+
+    /**
+     * Copy the elements in @p pointer_dev to the host in @p vector_host.
+     */
+    template <typename T>
+    inline void copy_to_host(const T *pointer_dev,
+                             std::vector<T> &vector_host)
+    {
+      cudaError_t cuda_error_code =
+        cudaMemcpy(vector_host.data(), pointer_dev,
+                   vector_host.size() * sizeof(T), cudaMemcpyDeviceToHost);
+      AssertCuda(cuda_error_code);
+    }
+
+    /**
+     * Copy the elements in @p vector_host to the device in @p pointer_dev. The
+     * memory needs to be allocate on the device before this function is called.
+     */
+    template <typename T>
+    inline void copy_to_dev(const std::vector<T> &vector_host,
+                            T *pointer_dev)
+    {
+      cudaError_t cuda_error_code =
+        cudaMemcpy(pointer_dev, vector_host.data(),
+                   vector_host.size() * sizeof(T), cudaMemcpyHostToDevice);
+      AssertCuda(cuda_error_code);
+    }
   }
 }
 
