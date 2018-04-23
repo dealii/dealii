@@ -53,11 +53,21 @@ Another possibility would be to generate meshes of entirely different
 geometries altogether. While for complex geometries there is no way around
 using meshes obtained from mesh generators, there is a good number of
 geometries for which deal.II can create meshes using the functions in the
-GridGenerator namespace. Take a look at what it provides and see how it could
-be used in a program like this.
+GridGenerator namespace. Many of these geometries (such as the one used in this
+example program) contain cells with curved faces: put another way, we expect the
+new vertices placed on the boundary to lie along a circle. deal.II handles complex
+geometries with the Manifold class (and classes inheriting from it); in particular,
+the functions in GridGenerator corresponding to non-Cartesian grids (such as
+GridGenerator::hyper_shell or GridGenerator::truncated_cone) attach a Manifold
+object to the part of the triangulation that should be curved (SphericalManifold
+and CylindricalManifold, respectively) and use another manifold on the parts that
+should be flat (FlatManifold). See the documentation
+of Manifold or the @ref manifold "manifold module" for descriptions of the design
+philosophy and interfaces of these classes. Take a look at what they provide and
+see how they could be used in a program like this.
 
-We also discuss a variety of other ways to create and manipulate meshes to
-step-49.
+We also discuss a variety of other ways to create and manipulate meshes (and
+describe the process of attaching Manifolds) in step-49.
 
 
 <h4> Comments about programming and debugging </h4>

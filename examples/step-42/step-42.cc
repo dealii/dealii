@@ -923,11 +923,14 @@ namespace Step42
         const Point<dim> center(0, 0, 0);
         const double radius = 0.8;
         GridGenerator::half_hyper_ball(triangulation, center, radius);
+        // Since we will attach a different manifold below, we immediately
+        // clear the default manifold description:
+        triangulation.reset_all_manifolds();
 
         GridTools::transform(&rotate_half_sphere, triangulation);
         GridTools::shift(Point<dim>(0.5, 0.5, 0.5), triangulation);
 
-        static SphericalManifold<dim> manifold_description(Point<dim>(0.5, 0.5, 0.5));
+        SphericalManifold<dim> manifold_description(Point<dim>(0.5, 0.5, 0.5));
         GridTools::copy_boundary_to_manifold_id(triangulation);
         triangulation.set_manifold(0, manifold_description);
       }

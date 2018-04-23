@@ -486,12 +486,8 @@ namespace Step29
           }
     // For the circle part of the transducer lens, a SphericalManifold object
     // is used (which, of course, in 2D just represents a circle), with center
-    // computed as above. By marking this object as <code>static</code>, we
-    // ensure that it lives until the end of the program and thereby longer
-    // than the triangulation object we will associate with it. We then assign
-    // this boundary-object to the part of the boundary with boundary indicator 1:
-    static const SphericalManifold<dim> boundary(focal_point);
-    triangulation.set_manifold(1, boundary);
+    // computed as above.
+    triangulation.set_manifold(1, SphericalManifold<dim>(focal_point));
 
     // Now global refinement is executed. Cells near the transducer location
     // will be automatically refined according to the circle shaped boundary

@@ -613,11 +613,6 @@ namespace Step16
         if (cycle == 0)
           {
             GridGenerator::hyper_ball (triangulation);
-
-            static const SphericalManifold<dim> boundary;
-            triangulation.set_all_manifold_ids_on_boundary(0);
-            triangulation.set_manifold (0, boundary);
-
             triangulation.refine_global (1);
           }
         else
