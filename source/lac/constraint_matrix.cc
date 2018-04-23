@@ -104,90 +104,77 @@ const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
 }
 
 
-namespace
-{
-  struct line
-  {
-    types::global_dof_index row;
-    double inhom;
-    std::vector< std::pair<types::global_dof_index, double> > entries;
-
-    template <class Archive>
-    void serialize(Archive &ar, const unsigned int)
-    {
-      ar   &row &entries &inhom;
-    }
-
-    line() {}
-
-    line(const ConstraintMatrix &cm, const types::global_dof_index row)
-      : row (row)
-    {
-      inhom = cm.get_inhomogeneity(row);
-      if (auto v=cm.get_constraint_entries(row))
-        entries = *v;
-    }
-  };
-}
 
 bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
                                                  const IndexSet &locally_active_dofs,
                                                  const MPI_Comm mpi_communicator,
                                                  const bool verbose) const
 {
+  ConstraintLine empty= {};
+  // Helper to return a reference to the ConstraintLine object that belongs to row @p row.
+  // We don't want to make copies but to return a reference, we need an empty object that
+  // we store above.
+  auto get_line = [&] (const size_type row) -> const ConstraintLine&
+  {
+    const size_type line_index = calculate_line_index(row);
+    if (line_index >= lines_cache.size() ||
+        lines_cache[line_index] == numbers::invalid_size_type)
+      {
+        empty.index = row;
+        return empty;
+      }
+    else
+      return lines[lines_cache[line_index]];
+  };
+
   // identify non-owned rows and send to owner:
-  std::map< unsigned int, std::vector<line> > to_send;
+  std::map< unsigned int, std::vector<ConstraintLine> > to_send;
 
   const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int nproc = dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
   // We will send all locally active dofs that are not locally owned for checking. Note
   // that we allow constraints to differ on locally_relevant (and not active) DoFs.
   IndexSet non_owned = locally_active_dofs;
   non_owned.subtract_set(locally_owned_dofs[myid]);
-  for (auto it = non_owned.begin(); it != non_owned.end(); ++it)
+  for (unsigned int owner=0; owner<nproc; ++owner)
     {
-      line l(*this, *it);
-      unsigned int owner;
-      // this is inefficient, but I guess we don't care
-      for (owner=0; owner<locally_owned_dofs.size(); ++owner)
+      // find all lines to send to @p owner
+      IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
+      for (const auto &row_idx : indices_to_send)
         {
-          if (locally_owned_dofs[owner].is_element(*it))
-            {
-              to_send[owner].push_back(l);
-              break;
-            }
+          to_send[owner].push_back(get_line(row_idx));
         }
     }
 
-  std::map<unsigned int, std::vector<line> > received = Utilities::MPI::some_to_some (MPI_COMM_WORLD, to_send);
+  std::map<unsigned int, std::vector<ConstraintLine> > received = Utilities::MPI::some_to_some (mpi_communicator, to_send);
 
   unsigned int inconsistent = 0;
 
-
   // from each processor:
-  for (auto  &kv : received)
+  for (const auto &kv : received)
     {
       // for each incoming line:
       for (auto &lineit : kv.second)
         {
-          line ref(*this, lineit.row);
+          const ConstraintLine &reference = get_line(lineit.index);
 
-          if (lineit.inhom!=ref.inhom)
+          if (lineit.inhomogeneity != reference.inhomogeneity)
             {
               ++inconsistent;
 
               if (verbose)
                 std::cout << "Proc " << myid
-                          << " got line " << lineit.row
+                          << " got line " << lineit.index
                           << " from " << kv.first
-                          << " inhomogeneity " << lineit.inhom << " != " << ref.inhom << std::endl;
+                          << " inhomogeneity " << lineit.inhomogeneity << " != " << reference.inhomogeneity << std::endl;
             }
-          else if (ref.entries != lineit.entries)
+          else if (lineit.entries != reference.entries)
             {
               ++inconsistent;
               if (verbose)
                 std::cout << "Proc " << myid
-                          << " got line " << lineit.row
+                          << " got line " << lineit.index
                           << " from " << kv.first
                           << " wrong values!"
                           << std::endl;

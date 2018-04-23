@@ -1177,6 +1177,16 @@ public:
      * object.
      */
     std::size_t memory_consumption () const;
+
+    /**
+     * Support for boost:serialization.
+     */
+    template <class Archive>
+    void serialize(Archive &ar, const unsigned int)
+    {
+      ar &index &entries &inhomogeneity;
+    }
+
   };
 
 
