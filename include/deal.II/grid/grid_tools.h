@@ -158,14 +158,16 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   double
-  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation,
+                         const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
    * Return the diameter of the largest active cell of a triangulation.
    */
   template <int dim, int spacedim>
   double
-  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation,
+                         const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
    * Given a list of vertices (typically obtained using
