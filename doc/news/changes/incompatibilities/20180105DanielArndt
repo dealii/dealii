@@ -1,5 +1,6 @@
-Changed: The classes NormalProjectionBoundary, DirectionalProjectionBoundary
-and NormalToMeshProjectionBoundary in the Opencascade namespace are rebased 
+Changed: The classes OpenCASCADE::NormalProjectionBoundary,
+OpenCASCADE::DirectionalProjectionBoundary
+and OpenCASCADE::NormalToMeshProjectionBoundary are rebased
 from Boundary to FlatManifold.
 <br>
 (Daniel Arndt, 2018/01/05)
