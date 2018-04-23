@@ -1530,7 +1530,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       else if (cell_type == 15)
         {
           // read the indices of nodes given
-          unsigned int node_index;
+          unsigned int node_index = 0;
           switch (gmsh_file_format)
             {
             case 1:
@@ -1544,6 +1544,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
               in >> node_index;
               break;
             }
+            default:
+              Assert(false, ExcInternalError());
             }
 
           // we only care about boundary indicators assigned to individual
