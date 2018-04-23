@@ -827,7 +827,7 @@ namespace hp
     /**
      * Store a copy of the finite element set given latest to distribute_dofs().
      */
-    std::unique_ptr<const hp::FECollection<dim,spacedim> > fe_collection;
+    hp::FECollection<dim,spacedim> fe_collection;
 
     /**
      * An object that describes how degrees of freedom should be distributed and
@@ -1201,10 +1201,10 @@ namespace hp
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe () const
   {
-    Assert (fe_collection,
+    Assert (fe_collection.size() > 0,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return *fe_collection;
+    return fe_collection;
   }
 
 
@@ -1215,10 +1215,10 @@ namespace hp
   DoFHandler<dim,spacedim>::get_fe
   (const unsigned int number) const
   {
-    Assert (fe_collection,
+    Assert (fe_collection.size() > 0,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return (*fe_collection)[number];
+    return fe_collection[number];
   }
 
 
@@ -1228,10 +1228,10 @@ namespace hp
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe_collection () const
   {
-    Assert (fe_collection,
+    Assert (fe_collection.size() > 0,
             ExcMessage ("No finite element collection is associated with "
                         "this DoFHandler"));
-    return *fe_collection;
+    return fe_collection;
   }
 
 

@@ -772,8 +772,8 @@ namespace internal
           // and then only deal with those that are not identical of which we can
           // handle at most 2
           dealii::Table<2,std::unique_ptr<DoFIdentities> >
-          line_dof_identities (dof_handler.fe_collection->size(),
-                               dof_handler.fe_collection->size());
+          line_dof_identities (dof_handler.fe_collection.size(),
+                               dof_handler.fe_collection.size());
 
           for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                cell=dof_handler.begin_active();
@@ -1004,8 +1004,8 @@ namespace internal
           // higher, and for quads only in 4d and higher, so this
           // isn't a particularly frequent case
           dealii::Table<2,std::unique_ptr<DoFIdentities> >
-          quad_dof_identities (dof_handler.fe_collection->size(),
-                               dof_handler.fe_collection->size());
+          quad_dof_identities (dof_handler.fe_collection.size(),
+                               dof_handler.fe_collection.size());
 
           for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                cell=dof_handler.begin_active();

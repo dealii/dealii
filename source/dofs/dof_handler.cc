@@ -653,7 +653,6 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
-  fe_collection(nullptr),
   faces(nullptr),
   mg_faces (nullptr)
 {
@@ -674,8 +673,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
 template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
-  tria(nullptr, typeid(*this).name()),
-  fe_collection(nullptr)
+  tria(nullptr, typeid(*this).name())
 {}
 
 
@@ -1002,8 +1000,8 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 
   // Only recreate the FECollection if we don't already store
   // the exact same FiniteElement object.
-  if (fe_collection == nullptr || &((*fe_collection)[0]) != &ff)
-    fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
+  if  (fe_collection.size() == 0 || &(fe_collection[0]) != &ff)
+    fe_collection = hp::FECollection<dim, spacedim>(ff);
 
   // delete all levels and set them
   // up newly. note that we still
@@ -1094,9 +1092,6 @@ void DoFHandler<dim,spacedim>::initialize_local_block_info ()
 template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear ()
 {
-  // release lock to old fe
-  fe_collection.reset();
-
   // release memory
   clear_space ();
   clear_mg_space ();

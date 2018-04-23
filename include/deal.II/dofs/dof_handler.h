@@ -1034,10 +1034,10 @@ private:
 
 
   /**
-   * Store a pointer to a hp::FECollection object containing the (one)
+   * Store a hp::FECollection object containing the (one)
    * FiniteElement this object is initialized with.
    */
-  std::unique_ptr<const hp::FECollection<dim,spacedim> > fe_collection;
+  hp::FECollection<dim,spacedim> fe_collection;
 
   /**
    * An object that describes how degrees of freedom should be distributed and
@@ -1328,9 +1328,9 @@ inline
 const hp::FECollection<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe_collection () const
 {
-  Assert(fe_collection != nullptr,
+  Assert(fe_collection.size() > 0,
          ExcMessage("You are trying to access the DoFHandler's FECollection object before it has been initialized."));
-  return *fe_collection;
+  return fe_collection;
 }
 
 
