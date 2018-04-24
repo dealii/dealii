@@ -21,7 +21,7 @@
 #   GMSH_EXECUTABLE
 #
 
-SET(GMSH_DIR "" CACHE PATH "An optional hint to a GMSH installation containing the gmsh executable")
+SET(GMSH_DIR "" CACHE PATH "An optional hint to a Gmsh installation containing the gmsh executable")
 SET_IF_EMPTY(GMSH_DIR "$ENV{GMSH_DIR}")
 
 DEAL_II_FIND_PROGRAM(GMSH_EXE gmsh${CMAKE_EXECUTABLE_SUFFIX}

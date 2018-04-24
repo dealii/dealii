@@ -924,7 +924,7 @@ public:
   /**
    * Write the triangulation in the msh format.
    *
-   * Msh is the format used by Gmsh and it is described in the gmsh user's
+   * Msh is the format used by Gmsh and it is described in the Gmsh user's
    * guide. Besides the usual output of the grid only, you can decide through
    * additional flags (see below, and the documentation of the
    * GridOutFlags::Msh() class) whether boundary faces with non-zero boundary
@@ -1172,7 +1172,7 @@ public:
   void set_flags (const GridOutFlags::DX &flags);
 
   /**
-   * Set flags for GMSH output
+   * Set flags for Gmsh output
    */
   void set_flags (const GridOutFlags::Msh &flags);
 
@@ -1303,7 +1303,7 @@ private:
   GridOutFlags::DX dx_flags;
 
   /**
-   * Flags for GMSH output. Can be changed by using the set_flags(const
+   * Flags for Gmsh output. Can be changed by using the set_flags(const
    * GridOutFlags::Msh&) function.
    */
   GridOutFlags::Msh     msh_flags;
@@ -1368,7 +1368,7 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since, in GMSH, geometric elements are continuously numbered, this
+   * Since, in Gmsh, geometric elements are continuously numbered, this
    * function requires a parameter @p next_element_index providing the next
    * geometric element number. This index should have a numerical value equal
    * to one more than the index previously used to write a geometric element
@@ -1378,7 +1378,7 @@ private:
    *
    * @warning @p next_element_index should be (at least) one larger than the
    * current number of triangulation elements (lines, cells, faces) that have
-   * been written to @p out. GMSH will not load the saved file correctly if
+   * been written to @p out. Gmsh will not load the saved file correctly if
    * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
@@ -1421,7 +1421,7 @@ private:
    * printed which are on the boundary and which have a boundary indicator not
    * equal to zero, since the latter is the default for boundary faces.
    *
-   * Since, in GMSH, geometric elements are continuously numbered, this
+   * Since, in Gmsh, geometric elements are continuously numbered, this
    * function requires a parameter @p next_element_index providing the next
    * geometric element number. This index should have a numerical value equal
    * to one more than the index previously used to write a geometric element
@@ -1431,7 +1431,7 @@ private:
    *
    * @warning @p next_element_index should be (at least) one larger than the
    * current number of triangulation elements (lines, cells, faces) that have
-   * been written to @p out. GMSH will not load the saved file correctly if
+   * been written to @p out. Gmsh will not load the saved file correctly if
    * there are repeated indices.
    *
    * This function unfortunately can not be included in the regular @p
