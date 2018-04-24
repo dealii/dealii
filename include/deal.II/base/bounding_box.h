@@ -46,13 +46,14 @@ enum class NeighborType
   attached_neighbors = 2,
 
   /**
-   * mergeable neighbors: neighbors which can be expressed with a single Bounding Box, e.g.
-  *  @code
-  *  .--V--W    .-----V
-  *  |  |  | =  |     |
-  *  V--W--.    V-----.
-  *  @endcode
-  *  or one is inside the other
+   * mergeable neighbors: neighbors which can be expressed with a single
+   * Bounding Box, e.g.
+   *  @code
+   *  .--V--W    .-----V
+   *  |  |  | =  |     |
+   *  V--W--.    V-----.
+   *  @endcode
+   * or one is inside the other
    */
   mergeable_neighbors = 3
 };

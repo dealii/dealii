@@ -46,7 +46,7 @@ namespace CUDAWrappers
   {
   public:
     /**
-     *  Declare type for container size.
+     * Declare type for container size.
      */
     typedef unsigned int size_type;
 

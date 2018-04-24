@@ -98,18 +98,18 @@ namespace Utilities
                   const unsigned int column_block_size);
 
       /**
-      * Destructor.
-      */
+       * Destructor.
+       */
       ~ProcessGrid();
 
       /**
-      * Return the number of rows in the processes grid.
-      */
+       * Return the number of rows in the processes grid.
+       */
       unsigned int get_process_grid_rows() const;
 
       /**
-      * Return the number of columns in the processes grid.
-      */
+       * Return the number of columns in the processes grid.
+       */
       unsigned int get_process_grid_columns() const;
 
       /**
@@ -134,58 +134,58 @@ namespace Utilities
                   const std::pair<unsigned int,unsigned int> &grid_dimensions);
 
       /**
-      * An MPI communicator with all processes (active and inactive).
-      */
+       * An MPI communicator with all processes (active and inactive).
+       */
       MPI_Comm mpi_communicator;
 
       /**
-      * An MPI communicator with inactive processes and the process with rank zero.
-      */
+       * An MPI communicator with inactive processes and the process with rank zero.
+       */
       MPI_Comm mpi_communicator_inactive_with_root;
 
       /**
-      * BLACS context. This is equivalent to MPI communicators and is
-      * used by ScaLAPACK.
-      */
+       * BLACS context. This is equivalent to MPI communicators and is
+       * used by ScaLAPACK.
+       */
       int blacs_context;
 
       /**
-      * Rank of this MPI process.
-      */
+       * Rank of this MPI process.
+       */
       const unsigned int this_mpi_process;
 
       /**
-      * Total number of MPI processes.
-      */
+       * Total number of MPI processes.
+       */
       const unsigned int n_mpi_processes;
 
       /**
-      * Number of rows in the processes grid.
-      */
+       * Number of rows in the processes grid.
+       */
       int n_process_rows;
 
       /**
-      * Number of columns in the processes grid.
-      */
+       * Number of columns in the processes grid.
+       */
       int n_process_columns;
 
       /**
-      * Row of this process in the grid.
-      *
-      * It's negative for in-active processes.
-      */
+       * Row of this process in the grid.
+       *
+       * It's negative for in-active processes.
+       */
       int this_process_row;
 
       /**
-      * Column of this process in the grid.
-      *
-      * It's negative for in-active processes.
-      */
+       * Column of this process in the grid.
+       *
+       * It's negative for in-active processes.
+       */
       int this_process_column;
 
       /**
-      * A flag which is true for processes within the 2D process grid.
-      */
+       * A flag which is true for processes within the 2D process grid.
+       */
       bool mpi_process_is_active;
     };
 

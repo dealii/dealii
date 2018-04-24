@@ -129,8 +129,8 @@ protected:
 
 private:
   /**
-  * An array for temporary data.
-  */
+   * An array for temporary data.
+   */
   mutable AlignedVector<Number> tmp_array;
 
   /**

@@ -585,8 +585,8 @@ private:
   const bool uses_dof_handler_vector;
 
   /**
-  * Signals used by this object
-  */
+   * Signals used by this object
+   */
   mg::Signals signals;
 };
 

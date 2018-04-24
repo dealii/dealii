@@ -823,7 +823,7 @@ namespace internal
    * location for shape functions and evaluation space (quadrature points).
    *
    * @author Katharina Kormann, 2012
-  */
+   */
   template <int dim, int fe_degree, int n_components, typename Number>
   struct FEEvaluationImplCollocation
   {

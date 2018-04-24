@@ -990,7 +990,7 @@ private:
    * not on the local processor but that are needed to evaluate the cell
    * integrals. In cell_level_index_end_local, we store the number of local
    * cells.
-   **/
+   */
   unsigned int cell_level_index_end_local;
 
   /**
