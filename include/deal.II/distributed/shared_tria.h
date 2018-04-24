@@ -112,12 +112,12 @@ namespace parallel
        *
        * The constructor requires that exactly one of
        * <code>partition_auto</code>, <code>partition_metis</code>,
-       * <code>partition_zorder</code>, <code>partition_zoltan> and
+       * <code>partition_zorder</code>, <code>partition_zoltan</code> and
        * <code>partition_custom_signal</code> is set. If
        * <code>partition_auto</code> is chosen, it will use
        * <code>partition_zoltan</code> (if available), then
        * <code>partition_metis</code> (if available) and finally
-       * <code>partition_zorder>.
+       * <code>partition_zorder</code>.
        */
       enum Settings
       {

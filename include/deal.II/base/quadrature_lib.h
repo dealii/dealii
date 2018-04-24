@@ -705,7 +705,7 @@ public:
  * \begin{pmatrix}
  * \hat x^\beta (1-\hat y)\\
  * \hat x^\beta \hat y
- * end{pmatrix}
+ * \end{pmatrix}
  * \f]
  *
  * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
@@ -748,7 +748,7 @@ public:
    * Call the above constructor with QGauss<1>(n) quadrature formulas for
    * both the radial and angular quadratures.
    *
-   * @param n
+   * @param n Order of QGauss quadrature
    */
   QDuffy(const unsigned int n,
          const double beta);

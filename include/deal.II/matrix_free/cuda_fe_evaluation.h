@@ -49,7 +49,7 @@ namespace CUDAWrappers
    *
    * This class has five template arguments:
    *
-   * @ptaram dim Dimension in which this class is to be used
+   * @tparam dim Dimension in which this class is to be used
    *
    * @tparam fe_degree Degree of the tensor prodict finite element with fe_degree+1
    * degrees of freedom per coordinate direction

@@ -355,7 +355,7 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
                        const bool               evaluate_hessians);
 
   /**
-   * Based on the the run time parameters stored in @shape_info this function
+   * Based on the the run time parameters stored in @p shape_info this function
    * chooses an appropriate evaluation strategy for the integrate function, i.e.
    * this calls internal::FEEvaluationImpl::integrate(),
    * internal::FEEvaluationImplCollocation::integrate() or

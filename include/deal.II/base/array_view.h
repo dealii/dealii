@@ -947,7 +947,7 @@ make_array_view (const Table<2,ElementType> &table)
  * Consequently, the return type of this function is a view to a set of
  * @p non-const objects.
  *
- * @param[in] table The LAPACKFullMatrix for which we want to have an array
+ * @param[in] matrix The LAPACKFullMatrix for which we want to have an array
  * view object. The array view corresponds to the <em>entire</em> object but
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.
@@ -973,7 +973,7 @@ make_array_view (LAPACKFullMatrix<ElementType> &matrix)
  * type because they contain immutable elements. Consequently, the return type
  * of this function is a view to a set of @p const objects.
  *
- * @param[in] table The LAPACKFullMatrix for which we want to have an array
+ * @param[in] matrix The LAPACKFullMatrix for which we want to have an array
  * view object. The array view corresponds to the <em>entire</em> object but
  * the order in which the entries are presented in the array is an
  * implementation detail and should not be relied upon.

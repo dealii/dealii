@@ -142,14 +142,14 @@ namespace SUNDIALS
    * \f]
    * must be solved for each stage $z_i , i = 1, \ldot, s$, where
    * we have the data
-   * \[
+   * \f[
    *  a_i :=  M y_{n−1} + h_n \sum_{j=1}^{i−1} [ A^E_{i,j} f_E(t^E_{n,j}, z_j)
    *  + A^I_{i,j} f_I (t^I_{n,j}, z_j)]
-   * \]
+   * \f]
    * for the ARK methods, or
-   * \[
+   * \f[
    *  a_i :=  M y_{n−1} + h_n \sum_{j=1}^{i−1} A^I_{i,j} f_I (t^I_{n,j}, z_j)
-   * \]
+   * \f]
    * for the DIRK methods. Here $A^I_{i,j}$ and $A^E_{i,j}$ are the Butcher's
    * tables for the chosen solver.
    *
@@ -161,25 +161,25 @@ namespace SUNDIALS
    *
    * For systems of either type, ARKode allows a choice of solution strategy.
    * The default solver choice is a variant of Newton’s method,
-   * \[
+   * \f[
    *  z_i^{m+1} = z_i^m +\delta^{m+1},
-   * \]
+   * \f]
    * where $m$ is the Newton index, and the Newton update $\delta^{m+1}$
    * requires the solution of the linear Newton system
-   * \[
+   * \f[
    *  N(z_i^m) \delta^{m+1} = -G(z_i^m),
-   * \]
+   * \f]
    * where
-   * \[
+   * \f[
    * N := M - \gamma J, \quad J := \frac{\partial f_I}{\partial y},
    * \qquad \gamma:= h_n A^I_{i,i}.
-   * \]
+   * \f]
    *
    * As an alternate to Newton’s method, ARKode may solve for each stage $z_i ,i
    * = 1, \ldots , s$ using an Anderson-accelerated fixed point iteration
-   * \[
+   * \f[
    * z_i^{m+1} = g(z_i^{m}), m=0,1,\ldots.
-   * \]
+   * \f]
    *
    * Unlike with Newton’s method, this option does not require the solution of
    * a linear system at each iteration, instead opting for solution of a
