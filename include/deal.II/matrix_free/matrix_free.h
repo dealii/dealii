@@ -95,6 +95,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * For details on usage of this class, see the description of FEEvaluation.
  *
+ * @ingroup matrixfree
+ *
  * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
  */
 

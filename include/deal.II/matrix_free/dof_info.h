@@ -54,6 +54,8 @@ namespace internal
      * hanging nodes are the same and need to be stored only once. The
      * combination will be handled in the MatrixFree class.
      *
+     * @ingroup matrixfree
+     *
      * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
      */
     struct DoFInfo

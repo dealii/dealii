@@ -41,6 +41,8 @@ namespace internal
      * An enum to identify various types of cells and faces. The most general
      * type is what we typically compute in the FEValues context but for many
      * geometries we can save significant storage.
+     *
+     * @ingroup matrixfree
      */
     enum GeometryType : unsigned char
     {
@@ -95,6 +97,8 @@ namespace internal
      * permutations of how to go through quadrature points in case of face
      * data. The latter comes in a vector for the support of hp adaptivity,
      * with several data fields for the individual quadrature formulas.
+     *
+     * @ingroup matrixfree
      *
      * @author Katharina Kormann, Martin Kronbichler, 2018
      */
@@ -269,6 +273,8 @@ namespace internal
     /**
      * The class that stores all geometry-dependent data related with cell
      * interiors for use in the matrix-free class.
+     *
+     * @ingroup matrixfree
      *
      * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, 2017
      */
