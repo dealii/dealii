@@ -909,7 +909,10 @@ inline
 typename Tensor<0,dim,Number>::real_type
 DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::norm_square () const
 {
+  // We cannot use Assert inside a CUDA kernel
+#ifndef DEAL_II_WITH_CUDA
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#endif
   return numbers::NumberTraits<Number>::abs_square (value);
 }
 
