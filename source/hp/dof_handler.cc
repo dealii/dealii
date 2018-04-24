@@ -1281,6 +1281,8 @@ namespace hp
                       "in the constructor before you can distribute DoFs."));
     Assert (tria->n_levels() > 0,
             ExcMessage("The Triangulation you are using is empty!"));
+    Assert (ff.size() > 0,
+            ExcMessage("The hp::FECollection given is empty!"));
 
     if (&fe_collection != &ff)
       fe_collection = hp::FECollection<dim, spacedim>(ff);
