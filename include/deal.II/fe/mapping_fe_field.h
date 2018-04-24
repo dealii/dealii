@@ -24,6 +24,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <array>
 
@@ -125,8 +126,6 @@ public:
   virtual
   std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
-
-
   /**
    * See the documentation of Mapping::preserves_vertex_locations()
    * for the purpose of this function. The implementation in this
@@ -135,6 +134,16 @@ public:
   virtual
   bool preserves_vertex_locations () const override;
 
+  /**
+   * Return the mapped vertices of a cell.
+   *
+   * This mapping ignores the vertices of the Triangulation it is associated to,
+   * and constructs the position of the vertices according to the @p euler_vector
+   * that was passed at construction time.
+   */
+  virtual
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -205,7 +214,6 @@ public:
   /**
    * @}
    */
-
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
@@ -574,6 +582,17 @@ private:
    */
   std::vector<unsigned int> fe_to_real;
 
+  /**
+   * FEValues object used to query the given finite element field at the
+   * support points in the reference configuration.
+   */
+  mutable FEValues<dim,spacedim> fe_values;
+
+  /**
+   * A variable to guard access to the fe_values variable.
+   */
+  mutable Threads::Mutex fe_values_mutex;
+
   void
   compute_data (const UpdateFlags      update_flags,
                 const Quadrature<dim>  &q,
@@ -598,9 +617,6 @@ private:
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
-
-
-
 
 #endif // DOXYGEN
 
