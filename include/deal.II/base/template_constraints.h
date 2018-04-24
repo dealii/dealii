@@ -35,7 +35,7 @@ namespace internal
 
     /**
      * A helper class whose `value` member is true or false depending on
-    // whether all of the given boolean template arguments are true.
+     * whether all of the given boolean template arguments are true.
      */
     template <bool... Values>
     struct all_true

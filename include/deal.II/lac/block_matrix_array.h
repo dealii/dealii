@@ -322,12 +322,12 @@ protected:
     PointerMatrixBase<typename BlockVectorType::BlockType > *matrix;
 
     /**
-    * Assignment operator.
-    *
-    * @note Since the copy constructor is destructive (see its documentation)
-    * and only exists for convenience there is no reasonable way to implement
-    * this, so it is explicitly deleted.
-    */
+     * Assignment operator.
+     *
+     * @note Since the copy constructor is destructive (see its documentation)
+     * and only exists for convenience there is no reasonable way to implement
+     * this, so it is explicitly deleted.
+     */
     Entry &operator= (const Entry &) = delete;
   };
 

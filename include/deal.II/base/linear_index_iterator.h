@@ -277,7 +277,7 @@ public:
 
 protected:
   /**
-   *The inheriting class should have a default constructor.
+   * The inheriting class should have a default constructor.
    */
   LinearIndexIterator () = default;
 

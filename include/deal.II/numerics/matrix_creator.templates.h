@@ -81,29 +81,23 @@ namespace MatrixCreator
       typedef typename DoFHandlerType::active_cell_iterator active_cell_iterator;
 
       /**
-       * Abbreviation for a pair of
-       * iterators.
+       * Abbreviation for a pair of iterators.
        */
       typedef std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
 
       /**
-       * Constructor. Initialize
-       * the two values by the
-       * given values.
+       * Constructor. Initialize the two values by the given values.
        */
       IteratorRange (const active_cell_iterator &first,
                      const active_cell_iterator &second);
 
       /**
-       * Constructor taking a pair
-       * of values for
-       * initialization.
+       * Constructor taking a pair of values for initialization.
        */
       IteratorRange (const iterator_pair &ip);
 
       /**
-       * Pair of iterators denoting
-       * a half-open range.
+       * Pair of iterators denoting a half-open range.
        */
       active_cell_iterator first, second;
     };

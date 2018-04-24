@@ -49,7 +49,7 @@ namespace internal
      * same size as the unsigned integers on most architectures.
      *
      * @author Katharina Kormann, Martin Kronbichler, 2018
-     **/
+     */
     template <int vectorization_width>
     struct FaceToCellTopology
     {

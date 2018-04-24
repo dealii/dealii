@@ -53,12 +53,12 @@ namespace SparsityTools
   enum class Partitioner
   {
     /**
-    * Use METIS partitioner.
-    */
+     * Use METIS partitioner.
+     */
     metis = 0,
     /**
-    * Use ZOLTAN partitioner.
-    */
+     * Use ZOLTAN partitioner.
+     */
     zoltan
   };
 
@@ -319,8 +319,8 @@ namespace SparsityTools
                   << "The array has size " << arg1 << " but should have size "
                   << arg2);
   /**
-  * Exception
-  */
+   * Exception
+   */
   DeclExceptionMsg (ExcZOLTANNotInstalled,
                     "The function you called requires ZOLTAN, but you did not "
                     "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");

@@ -325,8 +325,9 @@ namespace internal
                          unsigned int                 &partition) const;
 
       /**
-      * Update fields of task info for task graph set up in make_thread_graph.
-      */
+       * Update fields of task info for task graph set up in
+       * make_thread_graph.
+       */
       void
       update_task_info (const unsigned int     partition);
 
