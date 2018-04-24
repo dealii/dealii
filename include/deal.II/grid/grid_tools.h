@@ -153,19 +153,34 @@ namespace GridTools
                  const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
-   * Return the diameter of the smallest active cell of a triangulation. See
-   * step-24 for an example of use of this function.
+   * Return an approximation of the diameter of the smallest active cell of a
+   * triangulation. See step-24 for an example of use of this function.
+   *
+   * Notice that, even if you pass a non-trivial mapping, the returned value is
+   * computed only using information on the vertices of the triangulation,
+   * possibly transformed by the mapping. While this is accurate most of the
+   * times, it may fail to give the correct result when the triangulation
+   * contains very distorted cells.
    */
   template <int dim, int spacedim>
   double
-  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+  minimal_cell_diameter (const Triangulation<dim, spacedim> &triangulation,
+                         const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
-   * Return the diameter of the largest active cell of a triangulation.
+   * Return an approximation of the diameter of the largest active cell of a
+   * triangulation.
+   *
+   * Notice that, even if you pass a non-trivial mapping to this function, the
+   * returned value is computed only using information on the vertices of the
+   * triangulation, possibly transformed by the mapping. While this is accurate
+   * most of the times, it may fail to give the correct result when the
+   * triangulation contains very distorted cells.
    */
   template <int dim, int spacedim>
   double
-  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation);
+  maximal_cell_diameter (const Triangulation<dim, spacedim> &triangulation,
+                         const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
    * Given a list of vertices (typically obtained using

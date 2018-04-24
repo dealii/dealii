@@ -1,0 +1,55 @@
+
+DEAL::dim = 2, spacedim = 2
+DEAL::degree = 1
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 2, spacedim = 3
+DEAL::degree = 1
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 3, spacedim = 3
+DEAL::degree = 1
+DEAL::Min diameter        : 0.433013
+DEAL::Max diameter        : 0.866025
+DEAL::Min mapped diameter : 0.866025
+DEAL::Max mapped diameter : 1.73205
+DEAL::dim = 2, spacedim = 2
+DEAL::degree = 2
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 2, spacedim = 3
+DEAL::degree = 2
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 3, spacedim = 3
+DEAL::degree = 2
+DEAL::Min diameter        : 0.433013
+DEAL::Max diameter        : 0.866025
+DEAL::Min mapped diameter : 0.866025
+DEAL::Max mapped diameter : 1.73205
+DEAL::dim = 2, spacedim = 2
+DEAL::degree = 3
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 2, spacedim = 3
+DEAL::degree = 3
+DEAL::Min diameter        : 0.353553
+DEAL::Max diameter        : 0.707107
+DEAL::Min mapped diameter : 0.707107
+DEAL::Max mapped diameter : 1.41421
+DEAL::dim = 3, spacedim = 3
+DEAL::degree = 3
+DEAL::Min diameter        : 0.433013
+DEAL::Max diameter        : 0.866025
+DEAL::Min mapped diameter : 0.866025
+DEAL::Max mapped diameter : 1.73205
