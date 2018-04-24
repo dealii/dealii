@@ -102,7 +102,7 @@ public:
    * the second argument. The first dim components of this function will be
    * interpreted as the displacement we use in defining the mapping, relative
    * to the location of cells of the underlying triangulation.
-   * @param[in] level. Is the multi-grid level at which the mapping will
+   * @param[in] level The multi-grid level at which the mapping will
    * be used. It is mainly used to check if the size of the @p euler_vector
    * is consistent with the @p euler_dof_handler .
    */
