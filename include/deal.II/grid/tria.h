@@ -821,7 +821,8 @@ namespace internal
  * material id associated with a cell during assembly of the bilinear form,
  * and use it to determine (e.g., by table lookup, or a sequence of if-else
  * statements) what the correct material coefficients would be for that cell.
- * See also @ref GlossMaterialId "this glossary entry".
+ * See also
+ * @ref GlossMaterialId "this glossary entry".
  *
  * This material_id may be set upon construction of a triangulation (through
  * the CellData data structure), or later through use of cell iterators. For a
@@ -1018,8 +1019,8 @@ namespace internal
  * cell, new face midpoints, and (in 3D) new line midpoints. Therefore if your
  * new boundary vertex is too near the center of the old quadrilateral or
  * hexahedron, the distance to the midpoint vertex will become too small, thus
- * generating distorted cells. This issue is discussed extensively in @ref
- * GlossDistorted "distorted cells".
+ * generating distorted cells. This issue is discussed extensively in
+ * @ref GlossDistorted "distorted cells".
  *
  * <h3>Getting notice when a triangulation changes</h3>
  *

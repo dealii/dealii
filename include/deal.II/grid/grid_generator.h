@@ -34,14 +34,16 @@ DEAL_II_NAMESPACE_OPEN
  * triangulations for some basic geometries.
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts of
- * the boundary receive different @ref GlossBoundaryIndicator "boundary
- * indicators" allowing them to be distinguished for the purpose of evaluating
+ * the boundary receive different
+ * @ref GlossBoundaryIndicator "boundary indicators"
+ * allowing them to be distinguished for the purpose of evaluating
  * different boundary conditions.
  *
  * If the domain is curved, each of the domain parts that should be
  * refined by following an appropriate Manifold description will
- * receive a different @ref GlossManifoldIndicator "manifold
- * indicator", and the correct Manifold descriptor will be attached to
+ * receive a different
+ * @ref GlossManifoldIndicator "manifold indicator",
+ * and the correct Manifold descriptor will be attached to
  * the Triangulation. Notice that if you later tranform the
  * triangulation, you have to make sure you attach the correct new Manifold
  * to the triangulation.

@@ -41,8 +41,7 @@ template <int dim> struct CellData;
  * boundary ids to cells or faces (see
  * @ref GlossMaterialId "this"
  * and
- * @ref
- * GlossBoundaryIndicator "this"
+ * @ref GlossBoundaryIndicator "this"
  * glossary entry for more information).
  *
  * @note Since deal.II only supports line, quadrilateral and hexahedral

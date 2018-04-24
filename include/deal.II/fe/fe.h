@@ -2138,7 +2138,8 @@ public:
    * support points of the reference cell, this function then computes what
    * the nodal values of the element are, i.e., $\Psi_i[f]$, where $\Psi_i$
    * are the node functionals of the element
-   * (see also @ref GlossNodes "Node values or node functionals").
+   * (see also
+   * @ref GlossNodes "Node values or node functionals").
    * The values $\Psi_i[f]$ are then the expansion coefficients
    * for the shape functions of the finite element function that
    * <i>interpolates</i> the given function $f(x)$, i.e.,
@@ -2163,7 +2164,8 @@ public:
    * of information.
    *
    * The exact form of $f_i$ depends on the element. For example, for scalar
-   * @ref GlossLagrange "Lagrange elements", we have that in fact
+   * @ref GlossLagrange "Lagrange elements",
+   * we have that in fact
    * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)$. If you combine multiple
    * scalar Lagrange elements via an FESystem object, then
    * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)_{c(i)}$ where $c(i)$

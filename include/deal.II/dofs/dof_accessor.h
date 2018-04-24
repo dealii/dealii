@@ -1798,7 +1798,9 @@ public:
    * @note When using parallel meshes, either through the
    * parallel::shared::Triangulation or parallel::distributed::Triangulation
    * classes, it is only allowed to call this function on locally
-   * owned cells (see @ref GlossLocallyOwnedCell "this glossary entry"). This
+   * owned cells (see
+   * @ref GlossLocallyOwnedCell "this glossary entry").
+   * This
    * is because otherwise a common source of errors would be if one
    * processor sets a different @p active_fe_index on a ghost cell than
    * the processor that actually owns the cell does. To avoid this mistake,

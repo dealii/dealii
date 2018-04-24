@@ -316,8 +316,10 @@ namespace Utilities
      * A data structure to store the result of the min_max_avg() function.
      * The structure stores the minimum, maximum, and average of one
      * value contributed by each processor that participates in an
-     * @ref GlossMPICommunicator "MPI communicator". The structure also stores
-     * the indices (or, more precisely, the @ref GlossMPIRank "MPI rank")
+     * @ref GlossMPICommunicator "MPI communicator".
+     * The structure also stores
+     * the indices (or, more precisely, the
+     * @ref GlossMPIRank "MPI rank")
      * of the processors that hold the minimum and maximum values,
      * as well as the sum over all values.
      *
@@ -345,15 +347,21 @@ namespace Utilities
       double max;
 
       /**
-       * One of the ranks (i.e., @ref GlossMPIRank "MPI rank" within an
-       * @ref GlossMPICommunicator "MPI communicator") of the
+       * One of the ranks (i.e.,
+       * @ref GlossMPIRank "MPI rank"
+       * within an
+       * @ref GlossMPICommunicator "MPI communicator")
+       * of the
        * processors that hold the minimal value.
        */
       unsigned int min_index;
 
       /**
-       * One of the ranks (i.e., @ref GlossMPIRank "MPI rank" within an
-       * @ref GlossMPICommunicator "MPI communicator") of the
+       * One of the ranks (i.e.,
+       * @ref GlossMPIRank "MPI rank"
+       * within an
+       * @ref GlossMPICommunicator "MPI communicator")
+       * of the
        * processors that hold the maximal value.
        */
       unsigned int max_index;
