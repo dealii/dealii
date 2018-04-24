@@ -73,9 +73,10 @@ public:
               bool symmetric = false);
 
 
-//@}
-///@name Non-modifying operators
-//@{
+  //@}
+
+  ///@name Non-modifying operators
+  //@{
 
   /**
    * Number of rows of this matrix. Note that the matrix is an <i>m x
@@ -96,11 +97,10 @@ public:
    */
   bool all_zero () const;
 
+  //@}
 
-
-//@}
-///@name Element access
-//@{
+  ///@name Element access
+  //@{
   /**
    * Read-only access to a value. This is restricted to the case where
    * <i>|i-j| <= 1</i>.
@@ -118,9 +118,10 @@ public:
    */
   number &operator()(size_type i, size_type j);
 
-//@}
-///@name Multiplications with vectors
-//@{
+  //@}
+
+  ///@name Multiplications with vectors
+  //@{
 
   /**
    * Matrix-vector-multiplication. Multiplies <tt>v</tt> from the right and
@@ -186,9 +187,10 @@ public:
    */
   number matrix_norm_square (const Vector<number> &v) const;
 
-//@}
-///@name LAPACK operations
-//@{
+  //@}
+
+  ///@name LAPACK operations
+  //@{
   /**
    * Compute the eigenvalues of the symmetric tridiagonal matrix.
    *
@@ -200,9 +202,10 @@ public:
    * After calling compute_eigenvalues(), you can access each eigenvalue here.
    */
   number eigenvalue(const size_type i) const;
-//@}
-///@name Miscellanea
-//@{
+  //@}
+
+  ///@name Miscellanea
+  //@{
   /**
    * Output of the matrix in user-defined format.
    */
@@ -210,6 +213,7 @@ public:
   void print(OutputStream &s,
              const unsigned int  width=5,
              const unsigned int  precision=2) const;
+  //@}
 
 private:
   /**

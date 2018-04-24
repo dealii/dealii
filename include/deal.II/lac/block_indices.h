@@ -51,7 +51,8 @@ DEAL_II_NAMESPACE_OPEN
  * ones.
  *
  * @ingroup data
- * @see @ref GlossBlockLA "Block (linear algebra)"
+ * @see
+ * @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007, 2011
  */
 class BlockIndices : public Subscriptor

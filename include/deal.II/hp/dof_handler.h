@@ -150,7 +150,8 @@ namespace hp
    * @p active_fe_index used there. That's because we don't even know
    * whether these cells exist at all, and even if they did, the
    * current processor does not know anything specific about them.
-   * See @ref GlossArtificialCell "the glossary entry on artificial cells"
+   * See
+   * @ref GlossArtificialCell "the glossary entry on artificial cells"
    * for more information.
    *
    *

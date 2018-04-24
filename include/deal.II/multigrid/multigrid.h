@@ -99,7 +99,8 @@ namespace mg
 /**
  * Implementation of the multigrid method. The implementation supports both
  * continuous and discontinuous elements and follows the procedure described in
- * the @ref mg_paper "multigrid paper by Janssen and Kanschat".
+ * the
+ * @ref mg_paper "multigrid paper by Janssen and Kanschat".
  *
  * The function which starts a multigrid cycle on the finest level is cycle().
  * Depending on the cycle type chosen with the constructor (see enum Cycle),

@@ -769,10 +769,13 @@ namespace DoFRenumbering
    *   of cells is independent of the mesh's history, and so yields a
    *   predictable DoF numbering.
    * - For meshes based on parallel::distributed::Triangulation,
-   *   the @ref GlossLocallyOwnedCell "locally owned cells" of
+   *   the
+   *   @ref GlossLocallyOwnedCell "locally owned cells"
+   *   of
    *   each MPI process are contiguous in Z order. That means that
    *   numbering degrees of freedom by visiting cells in Z order yields
-   *   @ref GlossLocallyOwnedDof "locally owned DoF indices" that consist
+   *   @ref GlossLocallyOwnedDof "locally owned DoF indices"
+   *   that consist
    *   of contiguous ranges for each process. This is also true for the
    *   default ordering of DoFs on such triangulations, but the default
    *   ordering creates an enumeration that also depends on how many
@@ -786,7 +789,9 @@ namespace DoFRenumbering
    * a partitioning algorithm (selected by passing an object of type
    * parallel::shared::Triangulation::Settings to the constructor of the
    * triangulation), and in general these partitioning algorithms may
-   * assign cells to @ref GlossSubdomainId "subdomains" based on
+   * assign cells to
+   * @ref GlossSubdomainId "subdomains"
+   * based on
    * decisions that may have nothing to do with the Z order. (Though it
    * is possible to select these flags in a way so that partitioning
    * uses the Z order.) As a consequence, the cells of one subdomain

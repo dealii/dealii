@@ -1100,7 +1100,8 @@ namespace deal_II_exceptions
  * error checking. It asserts that a certain condition is fulfilled, otherwise
  * issues an error and aborts the program.
  *
- * A more detailed description can be found in the @ref Exceptions documentation
+ * A more detailed description can be found in the
+ * @ref Exceptions
  * module. It is first used in step-5 and step-6.
  * See also the <tt>ExceptionBase</tt> class for more information.
  *
@@ -1141,7 +1142,8 @@ namespace deal_II_exceptions
  * the exception that would be thrown to deallog and continues normally
  * without throwing an exception.
  *
- * A more detailed description can be found in the @ref Exceptions documentation
+ * A more detailed description can be found in the
+ * @ref Exceptions
  * module, in the discussion about the corner case at the bottom of the page.
  *
  * @note Active in DEBUG mode only
@@ -1178,7 +1180,8 @@ namespace deal_II_exceptions
  * be caught via a @p catch clause, as is shown in step-6 and all following
  * tutorial programs.
  *
- * A more detailed description can be found in the @ref Exceptions documentation
+ * A more detailed description can be found in the
+ * @ref Exceptions
  * module. It is first used in step-9 and step-13.
  * See also the <tt>ExceptionBase</tt> class for more information.
  *
