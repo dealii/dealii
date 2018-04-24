@@ -496,7 +496,7 @@ namespace Utilities
        * @p ghost_array to zero for the implementation-dependent cases when it
        * was not already done in the import_from_ghosted_array_start() call.
        *
-       * @param locally_owned_array The array of data where the resulting data
+       * @param locally_owned_storage The array of data where the resulting data
        * sent by remote processes to the calling process will be accumulated
        * into.
        *
@@ -511,7 +511,7 @@ namespace Utilities
       template <typename Number>
       void
       import_from_ghosted_array_finish(const VectorOperation::values  vector_operation,
-                                       const ArrayView<const Number> &temporary_array,
+                                       const ArrayView<const Number> &temporary_storage,
                                        const ArrayView<Number>       &locally_owned_storage,
                                        const ArrayView<Number>       &ghost_array,
                                        std::vector<MPI_Request>      &requests) const;

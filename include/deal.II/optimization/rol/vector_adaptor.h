@@ -198,7 +198,7 @@ namespace Rol
     value_type dot (const ROL::Vector<value_type> &rol_vector) const;
 
     /**
-     * Return the \f$ L^{2} \f$ norm of the wrapped vector.
+     * Return the $L^{2}$ norm of the wrapped vector.
      *
      * The returned type is of VectorAdaptor::value_type so as to maintain
      * consistency with ROL::Vector<VectorAdaptor::value_type> and
@@ -215,7 +215,7 @@ namespace Rol
 
     /**
      * Create and return a Teuchos smart reference counting pointer to the basis
-     * vector corresponding to the @p i \f${}^{th}\f$ element of
+     * vector corresponding to the @p i ${}^{th}$ element of
      * the wrapper vector.
      */
     Teuchos::RCP<ROL::Vector<value_type>> basis (const int i) const;

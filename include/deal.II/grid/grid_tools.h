@@ -220,7 +220,7 @@ namespace GridTools
   BoundingBox<spacedim> compute_bounding_box(const Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Return the point on the geometrical object @object closest to the given
+   * Return the point on the geometrical object @p object closest to the given
    * point @p trial_point. For example, if @p object is a one-dimensional line
    * or edge, then the returned point will be a point on the geodesic that
    * connects the vertices as the manifold associated with the object sees it
@@ -643,7 +643,7 @@ namespace GridTools
    *  - Cells, is a vector of a vector cells of the all cells
    *   containing at least one of the @p points .
    *  - A vector qpoints of vector of points, containing in @p qpoints[i]
-   *   the reference positions of all points that fall within the cell @P cells[i] .
+   *   the reference positions of all points that fall within the cell @p cells[i] .
    *  - A vector indices of vector of integers, containing the mapping between
    *   local numbering in qpoints, and global index in points
    *
@@ -712,7 +712,7 @@ namespace GridTools
    * - cells : a vector of cells of the all cells containing at
    *  least a point.
    * - qpoints : a vector of vector of points; containing in @p qpoints[i]
-   *   the reference positions of all points that fall within the cell @P cells[i] .
+   *   the reference positions of all points that fall within the cell @p cells[i] .
    * - maps : a vector of vector of integers, containing the mapping between
    *  the numbering in qpoints (previous element of the tuple), and the vector
    *  of local points of the process owning the points.
