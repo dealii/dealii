@@ -141,7 +141,7 @@ namespace internal
                 locally_used_vertices[cell->vertex_index(v)] = true;
 
           std::vector<std::vector<bool> >
-          vertex_fe_association (dof_handler.fe_collection->size(),
+          vertex_fe_association (dof_handler.fe_collection.size(),
                                  std::vector<bool> (dof_handler.tria->n_vertices(), false));
 
           for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
@@ -162,10 +162,10 @@ namespace internal
               if (dof_handler.tria->vertex_used(v) == true)
                 {
                   unsigned int fe=0;
-                  for (; fe<dof_handler.fe_collection->size(); ++fe)
+                  for (; fe<dof_handler.fe_collection.size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       break;
-                  Assert (fe != dof_handler.fe_collection->size(), ExcInternalError());
+                  Assert (fe != dof_handler.fe_collection.size(), ExcInternalError());
                 }
 #endif
 
@@ -184,7 +184,7 @@ namespace internal
                 {
                   dof_handler.vertex_dof_offsets[v] = vertex_slots_needed;
 
-                  for (unsigned int fe=0; fe<dof_handler.fe_collection->size(); ++fe)
+                  for (unsigned int fe=0; fe<dof_handler.fe_collection.size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       vertex_slots_needed += dof_handler.get_fe(fe).dofs_per_vertex + 1;
 
@@ -201,7 +201,7 @@ namespace internal
               if (locally_used_vertices[v] == true)
                 {
                   unsigned int current_index = dof_handler.vertex_dof_offsets[v];
-                  for (unsigned int fe=0; fe<dof_handler.fe_collection->size(); ++fe)
+                  for (unsigned int fe=0; fe<dof_handler.fe_collection.size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       {
                         // if this vertex uses this fe, then set the
@@ -598,9 +598,7 @@ namespace internal
         void
         reserve_space (DoFHandler<1,spacedim> &dof_handler)
         {
-          Assert (dof_handler.fe_collection,
-                  (typename DoFHandler<1,spacedim>::ExcNoFESelected()));
-          Assert (dof_handler.fe_collection->size() > 0,
+          Assert (dof_handler.fe_collection.size() > 0,
                   (typename DoFHandler<1,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
@@ -620,9 +618,7 @@ namespace internal
         void
         reserve_space (DoFHandler<2,spacedim> &dof_handler)
         {
-          Assert (dof_handler.fe_collection,
-                  (typename DoFHandler<2,spacedim>::ExcNoFESelected()));
-          Assert (dof_handler.fe_collection->size() > 0,
+          Assert (dof_handler.fe_collection.size() > 0,
                   (typename DoFHandler<2,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
@@ -648,9 +644,7 @@ namespace internal
         {
           const unsigned int dim = 3;
 
-          Assert (dof_handler.fe_collection,
-                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
-          Assert (dof_handler.fe_collection->size() > 0,
+          Assert (dof_handler.fe_collection.size() > 0,
                   (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
@@ -679,7 +673,7 @@ namespace internal
               // given fe's, by setting a bit. in a later step, we
               // then actually allocate memory for the required dofs
               std::vector<std::vector<bool> >
-              line_fe_association (dof_handler.fe_collection->size(),
+              line_fe_association (dof_handler.fe_collection.size(),
                                    std::vector<bool> (dof_handler.tria->n_raw_lines(),
                                                       false));
 
@@ -696,7 +690,7 @@ namespace internal
               // case we do not have to allocate any memory at all
               std::vector<bool> line_is_used (dof_handler.tria->n_raw_lines(), false);
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
-                for (unsigned int fe=0; fe<dof_handler.fe_collection->size(); ++fe)
+                for (unsigned int fe=0; fe<dof_handler.fe_collection.size(); ++fe)
                   if (line_fe_association[fe][line] == true)
                     {
                       line_is_used[line] = true;
@@ -718,7 +712,7 @@ namespace internal
                   {
                     dof_handler.faces->lines.dof_offsets[line] = line_slots_needed;
 
-                    for (unsigned int fe=0; fe<dof_handler.fe_collection->size(); ++fe)
+                    for (unsigned int fe=0; fe<dof_handler.fe_collection.size(); ++fe)
                       if (line_fe_association[fe][line] == true)
                         line_slots_needed += dof_handler.get_fe(fe).dofs_per_line + 1;
                     ++line_slots_needed;
@@ -732,7 +726,7 @@ namespace internal
                 if (line_is_used[line] == true)
                   {
                     unsigned int pointer = dof_handler.faces->lines.dof_offsets[line];
-                    for (unsigned int fe=0; fe<dof_handler.fe_collection->size(); ++fe)
+                    for (unsigned int fe=0; fe<dof_handler.fe_collection.size(); ++fe)
                       if (line_fe_association[fe][line] == true)
                         {
                           // if this line uses this fe, then set the
@@ -760,8 +754,8 @@ namespace internal
         max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
         {
           return std::min(static_cast<types::global_dof_index> (3*
-                                                                dof_handler.fe_collection->max_dofs_per_vertex() +
-                                                                2*dof_handler.fe_collection->max_dofs_per_line()),
+                                                                dof_handler.fe_collection.max_dofs_per_vertex() +
+                                                                2*dof_handler.fe_collection.max_dofs_per_line()),
                           dof_handler.n_dofs());
         }
 
@@ -795,29 +789,29 @@ namespace internal
           switch (dof_handler.tria->max_adjacent_cells())
             {
             case 4:
-              max_couplings=19*dof_handler.fe_collection->max_dofs_per_vertex() +
-                            28*dof_handler.fe_collection->max_dofs_per_line() +
-                            8*dof_handler.fe_collection->max_dofs_per_quad();
+              max_couplings=19*dof_handler.fe_collection.max_dofs_per_vertex() +
+                            28*dof_handler.fe_collection.max_dofs_per_line() +
+                            8*dof_handler.fe_collection.max_dofs_per_quad();
               break;
             case 5:
-              max_couplings=21*dof_handler.fe_collection->max_dofs_per_vertex() +
-                            31*dof_handler.fe_collection->max_dofs_per_line() +
-                            9*dof_handler.fe_collection->max_dofs_per_quad();
+              max_couplings=21*dof_handler.fe_collection.max_dofs_per_vertex() +
+                            31*dof_handler.fe_collection.max_dofs_per_line() +
+                            9*dof_handler.fe_collection.max_dofs_per_quad();
               break;
             case 6:
-              max_couplings=28*dof_handler.fe_collection->max_dofs_per_vertex() +
-                            42*dof_handler.fe_collection->max_dofs_per_line() +
-                            12*dof_handler.fe_collection->max_dofs_per_quad();
+              max_couplings=28*dof_handler.fe_collection.max_dofs_per_vertex() +
+                            42*dof_handler.fe_collection.max_dofs_per_line() +
+                            12*dof_handler.fe_collection.max_dofs_per_quad();
               break;
             case 7:
-              max_couplings=30*dof_handler.fe_collection->max_dofs_per_vertex() +
-                            45*dof_handler.fe_collection->max_dofs_per_line() +
-                            13*dof_handler.fe_collection->max_dofs_per_quad();
+              max_couplings=30*dof_handler.fe_collection.max_dofs_per_vertex() +
+                            45*dof_handler.fe_collection.max_dofs_per_line() +
+                            13*dof_handler.fe_collection.max_dofs_per_quad();
               break;
             case 8:
-              max_couplings=37*dof_handler.fe_collection->max_dofs_per_vertex() +
-                            56*dof_handler.fe_collection->max_dofs_per_line() +
-                            16*dof_handler.fe_collection->max_dofs_per_quad();
+              max_couplings=37*dof_handler.fe_collection.max_dofs_per_vertex() +
+                            56*dof_handler.fe_collection.max_dofs_per_line() +
+                            16*dof_handler.fe_collection.max_dofs_per_quad();
               break;
             default:
               Assert (false, ExcNotImplemented());
@@ -844,10 +838,10 @@ namespace internal
 
           types::global_dof_index max_couplings;
           if (max_adjacent_cells <= 8)
-            max_couplings=7*7*7*dof_handler.fe_collection->max_dofs_per_vertex() +
-                          7*6*7*3*dof_handler.fe_collection->max_dofs_per_line() +
-                          9*4*7*3*dof_handler.fe_collection->max_dofs_per_quad() +
-                          27*dof_handler.fe_collection->max_dofs_per_hex();
+            max_couplings=7*7*7*dof_handler.fe_collection.max_dofs_per_vertex() +
+                          7*6*7*3*dof_handler.fe_collection.max_dofs_per_line() +
+                          9*4*7*3*dof_handler.fe_collection.max_dofs_per_quad() +
+                          27*dof_handler.fe_collection.max_dofs_per_hex();
           else
             {
               Assert (false, ExcNotImplemented());
@@ -1106,7 +1100,7 @@ namespace hp
   template <int dim, int spacedim>
   types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
-    Assert (fe_collection, ExcNoFESelected());
+    Assert(fe_collection.size() > 0, ExcNoFESelected());
 
     std::set<types::global_dof_index> boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
@@ -1140,7 +1134,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
   {
-    Assert (fe_collection, ExcNoFESelected());
+    Assert(fe_collection.size() > 0, ExcNoFESelected());
     Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
@@ -1287,9 +1281,11 @@ namespace hp
                       "in the constructor before you can distribute DoFs."));
     Assert (tria->n_levels() > 0,
             ExcMessage("The Triangulation you are using is empty!"));
+    Assert (ff.size() > 0,
+            ExcMessage("The hp::FECollection given is empty!"));
 
-    if (fe_collection == nullptr || &(*fe_collection) != &ff)
-      fe_collection = std_cxx14::make_unique<const hp::FECollection<dim, spacedim>>(ff);
+    if (&fe_collection != &ff)
+      fe_collection = hp::FECollection<dim, spacedim>(ff);
 
     // at the beginning, make sure every processor knows the
     // active_fe_indices on both its own cells and all ghost cells
@@ -1328,9 +1324,9 @@ namespace hp
     // cover all fe indices presently in use on the mesh
     for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
       if (cell->is_locally_owned())
-        Assert (cell->active_fe_index() < fe_collection->size(),
+        Assert (cell->active_fe_index() < fe_collection.size(),
                 ExcInvalidFEIndex (cell->active_fe_index(),
-                                   fe_collection->size()));
+                                   fe_collection.size()));
 
 
     // then allocate space for all the other tables
@@ -1372,7 +1368,7 @@ namespace hp
       Threads::TaskGroup<> tg;
       for (int level=levels.size()-1; level>=0; --level)
         tg += Threads::new_task (&dealii::internal::hp::DoFLevel::compress_data<dim,spacedim>,
-                                 *levels[level], *fe_collection);
+                                 *levels[level], fe_collection);
       tg.join_all ();
     }
 
@@ -1410,9 +1406,6 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear ()
   {
-    // release lock to old fe
-    fe_collection = nullptr;
-
     // release memory
     clear_space ();
   }
@@ -1458,7 +1451,7 @@ namespace hp
       Threads::TaskGroup<> tg;
       for (int level=levels.size()-1; level>=0; --level)
         tg += Threads::new_task (&dealii::internal::hp::DoFLevel::uncompress_data<dim,spacedim>,
-                                 *levels[level], *fe_collection);
+                                 *levels[level], fe_collection);
       tg.join_all ();
     }
 
@@ -1470,7 +1463,7 @@ namespace hp
       Threads::TaskGroup<> tg;
       for (int level=levels.size()-1; level>=0; --level)
         tg += Threads::new_task (&dealii::internal::hp::DoFLevel::compress_data<dim,spacedim>,
-                                 *levels[level], *fe_collection);
+                                 *levels[level], fe_collection);
       tg.join_all ();
     }
   }
@@ -1481,7 +1474,7 @@ namespace hp
   unsigned int
   DoFHandler<dim, spacedim>::max_couplings_between_dofs () const
   {
-    Assert (fe_collection, ExcNoFESelected());
+    Assert(fe_collection.size() > 0, ExcNoFESelected());
     return dealii::internal::hp::DoFHandlerImplementation::Implementation::max_couplings_between_dofs (*this);
   }
 
@@ -1491,16 +1484,16 @@ namespace hp
   unsigned int
   DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
   {
-    Assert (fe_collection, ExcNoFESelected());
+    Assert (fe_collection.size() > 0, ExcNoFESelected());
 
     switch (dim)
       {
       case 1:
-        return fe_collection->max_dofs_per_vertex();
+        return fe_collection.max_dofs_per_vertex();
       case 2:
-        return (3*fe_collection->max_dofs_per_vertex()
+        return (3*fe_collection.max_dofs_per_vertex()
                 +
-                2*fe_collection->max_dofs_per_line());
+                2*fe_collection.max_dofs_per_line());
       case 3:
         // we need to take refinement of one boundary face into
         // consideration here; in fact, this function returns what
@@ -1511,9 +1504,9 @@ namespace hp
         // time. fortunately, omitting it for now does no harm since
         // the matrix will cry foul if its requirements are not
         // satisfied
-        return (19*fe_collection->max_dofs_per_vertex() +
-                28*fe_collection->max_dofs_per_line() +
-                8*fe_collection->max_dofs_per_quad());
+        return (19*fe_collection.max_dofs_per_vertex() +
+                28*fe_collection.max_dofs_per_line() +
+                8*fe_collection.max_dofs_per_quad());
       default:
         Assert (false, ExcNotImplemented());
         return 0;
@@ -1625,7 +1618,7 @@ namespace hp
     // indicators are zero anyway, and there is no point trying to set
     // anything (besides, we would trip over an assertion in
     // set_active_fe_index)
-    if (fe_collection)
+    if (fe_collection.size() > 0)
       {
         cell_iterator cell = begin(),
                       endc = end ();
