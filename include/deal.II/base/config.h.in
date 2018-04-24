@@ -200,7 +200,7 @@
 
 
 /*
- * gmsh:
+ * Gmsh:
  */
 #ifdef DEAL_II_WITH_GMSH
 #  define DEAL_II_GMSH_EXECUTABLE_PATH "@GMSH_EXECUTABLE@"

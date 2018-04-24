@@ -139,8 +139,8 @@ template <int dim> struct CellData;
  * several example files. If the reader does not grok your files, it should be
  * fairly simple to extend it.
  *
- * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p GMSH mesh
- * generator (see http://www.geuz.org/gmsh/). The documentation in the @p GMSH
+ * <li> <tt>Gmsh 1.0 mesh</tt> format: this format is used by the @p Gmsh mesh
+ * generator (see http://www.geuz.org/gmsh/). The documentation in the @p Gmsh
  * manual explains how to generate meshes compatible with the deal.II library
  * (i.e. quads rather than triangles). In order to use this format, Gmsh has
  * to output the file in the old format 1.0. This is done adding the line
@@ -435,7 +435,7 @@ public:
 
   /**
    * Read grid data from an msh file, either version 1 or version 2 of that
-   * file format. The GMSH formats are documented at
+   * file format. The Gmsh formats are documented at
    * http://www.geuz.org/gmsh/.
    *
    * @note The input function of deal.II does not distinguish between newline
