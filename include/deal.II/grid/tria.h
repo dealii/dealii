@@ -112,7 +112,7 @@ namespace hp
  * material id has no meaning, and the @p material_id field is reused
  * to store a @p boundary_id instead to designate which part of the boundary
  * the face or edge belongs to (see
- * @ref GlossBoundaryId "the glossary entry on boundary ids").
+ * @ref GlossBoundaryIndicator "the glossary entry on boundary ids").
  *
  * An example showing how this class can be used is in the
  * <code>create_coarse_grid()</code> function of step-14. There are also
@@ -201,7 +201,7 @@ struct CellData
  * By default, Triangulation::create_triangulation() simply assigns
  * default boundary indicators and manifold indicators to edges and
  * quads at the boundary of the mesh. (See the glossary entries on
- * @ref GlossBoundaryId "boundary ids"
+ * @ref GlossBoundaryIndicator "boundary ids"
  * and
  * @ref GlossManifoldIndicator "manifold ids"
  * for more information on what they represent.) As a consequence,

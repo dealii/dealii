@@ -380,6 +380,7 @@ public:
    * @param filename Input file name
    * @param output_filename Output file name
    * @param output_style_for_prm_format How to write the output file if format is `prm`
+   * @param prm The ParameterHandler to use
    */
   static void initialize(const std::string &filename="",
                          const std::string &output_filename="",
