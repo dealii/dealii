@@ -181,6 +181,9 @@ public:
   virtual
   FiniteElementDomination::Domination
   compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  /**
+   * @}
+   */
 
   /**
    * Return a list of constant modes of the element. For this element, it
