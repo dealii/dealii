@@ -67,6 +67,15 @@ IF(DEFINED LAPACK_LIBRARIES)
 ENDIF()
 
 #
+# Work around a bug in CMake 3.11 by simply filtering out out
+# "PkgConf::PKGC_BLAS". See bug
+#   https://gitlab.kitware.com/cmake/cmake/issues/17934
+#
+IF(DEFINED BLAS_LIBRARIES)
+  LIST(REMOVE_ITEM BLAS_LIBRARIES "PkgConfig::PKGC_BLAS")
+ENDIF()
+
+#
 # Well, in case of static archives we have to manually pick up the
 # complete link interface. *sigh*
 #
