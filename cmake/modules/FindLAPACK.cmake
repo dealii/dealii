@@ -67,7 +67,7 @@ IF(DEFINED LAPACK_LIBRARIES)
 ENDIF()
 
 #
-# Work around a bug in CMake 3.11 by simply filtering out out
+# Work around a bug in CMake 3.11 by simply filtering out
 # "PkgConf::PKGC_BLAS". See bug
 #   https://gitlab.kitware.com/cmake/cmake/issues/17934
 #
