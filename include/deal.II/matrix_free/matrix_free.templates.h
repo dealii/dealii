@@ -1325,6 +1325,7 @@ void MatrixFree<dim,Number>::initialize_indices
                 dof_info[no].vector_partitioner;
             else
               {
+                bool has_noncontiguous_cell = false;
                 for (unsigned int f=0; f<n_inner_face_batches(); ++f)
                   for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements &&
                        face_info.faces[f].cells_interior[v] != numbers::invalid_unsigned_int; ++v)
@@ -1357,7 +1358,14 @@ void MatrixFree<dim,Number>::initialize_indices
                               }
                           AssertDimension(i, dof_info[no].dofs_per_cell[0]*stride);
                         }
+                      else if (dof_info[no].index_storage_variants[1][f] <
+                               internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
+                        has_noncontiguous_cell = true;
                     }
+                has_noncontiguous_cell =
+                  Utilities::MPI::min((int)has_noncontiguous_cell,
+                                      task_info.communicator);
+
                 std::sort(ghost_indices.begin(), ghost_indices.end());
                 ghost_indices.erase(std::unique(ghost_indices.begin(), ghost_indices.end()),
                                     ghost_indices.end());
@@ -1368,7 +1376,7 @@ void MatrixFree<dim,Number>::initialize_indices
                   Utilities::MPI::min((int)(compressed_set.n_elements() ==
                                             dof_info[no].vector_partitioner->ghost_indices().n_elements()),
                                       dof_info[no].vector_partitioner->get_mpi_communicator());
-                if (all_ghosts_equal)
+                if (all_ghosts_equal || has_noncontiguous_cell)
                   dof_info[no].vector_partitioner_face_variants[1] =
                     dof_info[no].vector_partitioner;
                 else
@@ -1390,7 +1398,9 @@ void MatrixFree<dim,Number>::initialize_indices
               if (shape_info(dof_info[no].global_base_element_offset+c,0,0,0).element_type
                   != internal::MatrixFreeFunctions::tensor_symmetric_hermite)
                 all_hermite = false;
-            if (all_hermite == false)
+            if (all_hermite == false ||
+                dof_info[no].vector_partitioner_face_variants[1].get() ==
+                dof_info[no].vector_partitioner.get())
               dof_info[no].vector_partitioner_face_variants[2] =
                 dof_info[no].vector_partitioner;
             else
@@ -1515,7 +1525,7 @@ namespace internal
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             {
               // Only inner faces couple different cells
-              if (dcell->at_boundary() == false &&
+              if (dcell->at_boundary(f) == false &&
                   dcell->neighbor_or_periodic_neighbor(f)->level_subdomain_id() ==
                   dcell->level_subdomain_id())
                 {
