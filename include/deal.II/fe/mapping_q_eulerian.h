@@ -246,6 +246,11 @@ private:
     const SupportQuadrature support_quadrature;
 
     /**
+     * A clone of the finite element used in euler_dh.
+     */
+    std::unique_ptr<FiniteElement<dim,spacedim> > fe;
+
+    /**
      * FEValues object used to query the given finite element field at the
      * support points in the reference configuration.
      *

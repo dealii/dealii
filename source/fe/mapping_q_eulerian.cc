@@ -48,7 +48,8 @@ MappingQEulerianGeneric (const unsigned int                                 degr
   MappingQGeneric<dim,spacedim>(degree),
   mapping_q_eulerian (mapping_q_eulerian),
   support_quadrature(degree),
-  fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
+  fe(mapping_q_eulerian.euler_dof_handler->get_fe().clone()),
+  fe_values(*fe,
             support_quadrature,
             update_values | update_quadrature_points)
 {}
