@@ -627,9 +627,6 @@ namespace Step15
     // the origin, created in the same way as shown in step-6. The mesh is
     // globally refined twice followed later on by several adaptive cycles:
     GridGenerator::hyper_ball (triangulation);
-    static const SphericalManifold<dim> boundary;
-    triangulation.set_all_manifold_ids_on_boundary(0);
-    triangulation.set_manifold (0, boundary);
     triangulation.refine_global(2);
 
     // The Newton iteration starts next. During the first step we do not have
