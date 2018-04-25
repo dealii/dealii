@@ -412,13 +412,20 @@ COVERAGE=TRUE.
       )
   ENDIF()
 
-  FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
-  IF(GCOV_COMMAND MATCHES "-NOTFOUND")
-    MESSAGE(FATAL_ERROR "
-Coverage enabled but could not find the gcov executable. Please install
-gcov, which is part of the GNU Compiler Collection.
-"
-      )
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    FIND_PROGRAM(GCOV_COMMAND NAMES llvm-cov)
+    SET(GCOV_COMMAND "${GCOV_COMMAND} gcov")
+    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+                           llvm-cov executable, which is part of LLVM.")
+    ENDIF()
+  ELSE()
+    FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
+    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+                           gcov executable, which is part of the
+                           GNU Compiler Collection.")
+    ENDIF()
   ENDIF()
 
   SET(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
@@ -541,6 +548,13 @@ IF("${_res}" STREQUAL "0")
       CREATE_TARGETDIRECTORIES_TXT()
       MESSAGE("-- Running CTEST_COVERAGE()")
       CTEST_COVERAGE()
+      SET (CODE_COV_BASH "${CMAKE_CURRENT_LIST_DIR}/../contrib/utilities/programs/codecov/codecov-bash.sh")
+      IF (EXISTS ${CODE_COV_BASH})
+        MESSAGE("-- Running codecov-bash")
+        EXECUTE_PROCESS(COMMAND bash "${CODE_COV_BASH}"
+                                     "-t ac85e7ce-5316-4bc1-a237-2fe724028c7b" "-x '${GCOV_COMMAND}'"
+                        OUTPUT_QUIET)
+      ENDIF()
       CLEAR_TARGETDIRECTORIES_TXT()
     ENDIF(COVERAGE)
 
@@ -583,4 +597,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 584 lines long... )
+# .oO( This script is freaky 600 lines long... )
