@@ -1383,6 +1383,7 @@ MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix,PetscScalar);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix,PetscScalar);
 BLOCK_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
+MATRIX_VECTOR_FUNCTIONS(PETScWrappers::SparseMatrix, PETScWrappers::MPI::Vector);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix,PETScWrappers::MPI::BlockVector);
 #endif
 
