@@ -414,9 +414,6 @@ namespace Step11
   void LaplaceProblem<dim>::run ()
   {
     GridGenerator::hyper_ball (triangulation);
-    static const SphericalManifold<dim> boundary;
-    triangulation.set_all_manifold_ids_on_boundary(0);
-    triangulation.set_manifold (0, boundary);
 
     for (unsigned int cycle=0; cycle<6; ++cycle, triangulation.refine_global(1))
       {
