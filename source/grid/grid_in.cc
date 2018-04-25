@@ -23,6 +23,8 @@
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
 
+#include <boost/io/ios_state.hpp>
+
 #include <map>
 #include <algorithm>
 #include <fstream>
@@ -1528,7 +1530,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       else if (cell_type == 15)
         {
           // read the indices of nodes given
-          unsigned int node_index;
+          unsigned int node_index = 0;
           switch (gmsh_file_format)
             {
             case 1:
@@ -1542,6 +1544,8 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
               in >> node_index;
               break;
             }
+            default:
+              Assert(false, ExcInternalError());
             }
 
           // we only care about boundary indicators assigned to individual
@@ -2738,7 +2742,7 @@ void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
   char c;
   // loop over the following comment
   // lines
-  while ((c=in.get()) == comment_start)
+  while (in.get(c) && c == comment_start)
     // loop over the characters after
     // the comment starter
     while (in.get() != '\n')
@@ -2747,7 +2751,8 @@ void GridIn<dim, spacedim>::skip_comment_lines (std::istream &in,
 
   // put back first character of
   // first non-comment line
-  in.putback (c);
+  if (in)
+    in.putback (c);
 
   // at last: skip additional empty lines, if present
   skip_empty_lines(in);
@@ -3532,6 +3537,9 @@ cont:
 
     AssertThrow (output, ExcIO());
 
+    // save old formatting options
+    const boost::io::ios_base_all_saver formatting_saver(output);
+
     // Write out title - Note: No other commented text can be inserted below the
     // title in a UCD file
     output << "# Abaqus to UCD mesh conversion" << std::endl;
@@ -3560,54 +3568,47 @@ cont:
     //    keyword used to represent them in the file.
 
     // Write out header
-    output
-        << node_list.size() << "\t"
-        << (cell_list.size() + face_list.size()) << "\t0\t0\t0"
-        << std::endl;
+    output << node_list.size() << "\t"
+           << (cell_list.size() + face_list.size()) << "\t0\t0\t0"
+           << std::endl;
+
+    output.width (16);
+    output.precision (8);
 
     // Write out node numbers
-    for (unsigned int ii = 0; ii < node_list.size(); ++ii) // Loop over all nodes
+    // Loop over all nodes
+    for (unsigned int ii = 0; ii < node_list.size(); ++ii)
       {
-        for (unsigned int jj = 0; jj < dim + 1; ++jj) // Loop over entries to be outputted
+        // Node number
+        output << node_list[ii][0] << "\t";
+
+        // Node coordinates
+        output.setf (std::ios::scientific, std::ios::floatfield);
+        for (unsigned int jj = 1; jj < dim + 1; ++jj)
           {
-            if (jj == 0)        // Node number
-              {
-                output.precision();
-                output << node_list[ii][jj] << "\t";
-              }
-            else                // Node coordinates
-              {
-                output.width (16);
-                output.setf (std::ios::scientific,
-                             std::ios::floatfield);
-                output.precision (8);
-                if (std::abs (node_list[ii][jj]) > tolerance) // invoke tolerance -> set points close to zero equal to zero
-                  output << static_cast<double> (node_list[ii][jj]) << "\t";
-                else
-                  output << 0.0 << "\t";
-              }
+            // invoke tolerance -> set points close to zero equal to zero
+            if (std::abs (node_list[ii][jj]) > tolerance)
+              output << static_cast<double> (node_list[ii][jj]) << "\t";
+            else
+              output << 0.0 << "\t";
           }
         if (dim == 2)
           output << 0.0 << "\t";
 
-        output
-            << std::endl;
+        output << std::endl;
         output.unsetf (std::ios::floatfield);
       }
 
     // Write out cell node numbers
     for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
       {
-        output
-            << ii + 1 << "\t"
-            << cell_list[ii][0] << "\t"
-            << (dim == 2 ? "quad" : "hex") << "\t";
+        output << ii + 1 << "\t"
+               << cell_list[ii][0] << "\t"
+               << (dim == 2 ? "quad" : "hex") << "\t";
         for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_cell + 1; ++jj)
-          output
-              << cell_list[ii][jj] << "\t";
+          output << cell_list[ii][jj] << "\t";
 
-        output
-            << std::endl;
+        output << std::endl;
       }
 
     // Write out quad node numbers
@@ -3618,11 +3619,9 @@ cont:
             << face_list[ii][0] << "\t"
             << (dim == 2 ? "line" : "quad") << "\t";
         for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_face + 1; ++jj)
-          output
-              << face_list[ii][jj] << "\t";
+          output << face_list[ii][jj] << "\t";
 
-        output
-            << std::endl;
+        output << std::endl;
       }
   }
 }

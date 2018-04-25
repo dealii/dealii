@@ -516,7 +516,8 @@ namespace Utilities
           else
             {
               const int ierr = MPI_Finalize();
-              AssertThrowMPI(ierr);
+              (void) ierr;
+              AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
             }
         }
 #endif
