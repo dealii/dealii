@@ -547,10 +547,14 @@ IF("${_res}" STREQUAL "0")
     IF(COVERAGE)
       CREATE_TARGETDIRECTORIES_TXT()
       MESSAGE("-- Running CTEST_COVERAGE()")
-      #CTEST_COVERAGE()
-      FILE(DOWNLOAD "https://codecov.io/bash" "${CMAKE_CURRENT_BINARY_DIR}/tests/codecov-bash")
-      EXECUTE_PROCESS(COMMAND bash "${CMAKE_CURRENT_BINARY_DIR}/tests/codecov-bash"
-                              "-t ac85e7ce-5316-4bc1-a237-2fe724028c7b" "-x '${GCOV_COMMAND}'")
+      CTEST_COVERAGE()
+      SET (CODE_COV_BASH "${CMAKE_CURRENT_LIST_DIR}/../contrib/utilities/programs/codecov/codecov-bash.sh")
+      IF (EXISTS ${CODE_COV_BASH})
+        MESSAGE("-- Running codecov-bash")
+        EXECUTE_PROCESS(COMMAND bash "${CODE_COV_BASH}"
+                                     "-t ac85e7ce-5316-4bc1-a237-2fe724028c7b" "-x '${GCOV_COMMAND}'"
+                        OUTPUT_QUIET)
+      ENDIF()
       CLEAR_TARGETDIRECTORIES_TXT()
     ENDIF(COVERAGE)
 
@@ -593,4 +597,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 596 lines long... )
+# .oO( This script is freaky 600 lines long... )
