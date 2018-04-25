@@ -36,6 +36,25 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
+    # If Adolc is configured to use the Boost allocator (of an external
+    # boost library) we must not use a bundled Boost library for deal.II.
+    #
+    IF(ADOLC_WITH_BOOST_ALLOCATOR AND FEATURE_BOOST_BUNDLED_CONFIGURED)
+      MESSAGE(STATUS
+        "Could not find a sufficient ADOL-C installation: "
+        "ADOL-C links against external Boost but deal.II was configured "
+        "with bundled Boost."
+        )
+      SET(ADOLC_ADDITIONAL_ERROR_STRING
+        ${ADOLC_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient ADOL-C installation:\n"
+        "ADOL-C links against external Boost but deal.II was configured "
+        "with bundled Boost.\n\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    #
     # Check whether we have a recent enough ADOL-C library that can return
     # values from constant objects.
     #
@@ -65,7 +84,7 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
       {
         const adouble val_taped = 1.0;
         const adtl::adouble val_tapeless = 1.0;
-        
+
         std::ostringstream ss;
         ss << val_taped;
         ss << val_tapeless;
@@ -81,7 +100,7 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C cast check failed.\n"
-        "deal.II needs ADOL-C version 2.6.4 or newer."
+        "deal.II needs ADOL-C version 2.6.4 or newer.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -95,7 +114,7 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C stream output check failed.\n"
-        "deal.II needs ADOL-C version 2.6.4 or newer."
+        "deal.II needs ADOL-C version 2.6.4 or newer.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()
@@ -104,8 +123,9 @@ ENDMACRO()
 
 
 MACRO(FEATURE_ADOLC_CONFIGURE_EXTERNAL)
-  SET(DEAL_II_ADOLC_WITH_ATRIG_ERF ${ADOLC_WITH_ATRIG_ERF})
   SET(DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING ${ADOLC_WITH_ADVANCED_BRANCHING})
+  SET(DEAL_II_ADOLC_WITH_ATRIG_ERF ${ADOLC_WITH_ATRIG_ERF})
+  SET(DEAL_II_ADOLC_WITH_BOOST_ALLOCATOR ${ADOLC_WITH_BOOST_ALLOCATOR})
 
   SET(DEAL_II_EXPAND_ADOLC_TYPES "adouble; adtl::adouble")
 ENDMACRO()
