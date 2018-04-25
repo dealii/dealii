@@ -1,5 +1,5 @@
 //----------------------------  function_manifold ---------------------------
-//    Copyright (C) 2011 - 2017 by the mathLab team.
+//    Copyright (C) 2011 - 2018 by the mathLab team.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
