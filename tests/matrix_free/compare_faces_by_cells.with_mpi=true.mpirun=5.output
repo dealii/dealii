@@ -1,0 +1,30 @@
+
+DEAL:2d::Number of DoFs: 1280
+DEAL:2d::Error in diagonal on active cells: 0
+DEAL:2d::Error in diagonal on level 0:      0
+DEAL:2d::Error in diagonal on level 1:      0
+DEAL:2d::Error in diagonal on level 2:      0
+DEAL:2d::Error in diagonal on level 3:      0
+DEAL:2d::Number of DoFs: 720
+DEAL:2d::Error in diagonal on active cells: 0
+DEAL:2d::Error in diagonal on level 0:      0
+DEAL:2d::Error in diagonal on level 1:      0
+DEAL:2d::Error in diagonal on level 2:      0
+DEAL:2d::Number of DoFs: 1280
+DEAL:2d::Error in diagonal on active cells: 0
+DEAL:2d::Error in diagonal on level 0:      0
+DEAL:2d::Error in diagonal on level 1:      0
+DEAL:2d::Error in diagonal on level 2:      0
+DEAL:2d::Error in diagonal on level 3:      0
+DEAL:3d::Number of DoFs: 320
+DEAL:3d::Error in diagonal on active cells: 0
+DEAL:3d::Error in diagonal on level 0:      0
+DEAL:3d::Error in diagonal on level 1:      0
+DEAL:3d::Number of DoFs: 1080
+DEAL:3d::Error in diagonal on active cells: 0
+DEAL:3d::Error in diagonal on level 0:      0
+DEAL:3d::Error in diagonal on level 1:      0
+DEAL:3d::Number of DoFs: 320
+DEAL:3d::Error in diagonal on active cells: 0
+DEAL:3d::Error in diagonal on level 0:      0
+DEAL:3d::Error in diagonal on level 1:      0

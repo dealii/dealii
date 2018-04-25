@@ -1,0 +1,17 @@
+
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGauss(2))
+DEAL:2d::Norm of difference:          0
+DEAL:2d::Norm of difference parallel: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGauss(3))
+DEAL:2d::Norm of difference:          0
+DEAL:2d::Norm of difference parallel: 0
+DEAL:2d::
+DEAL:3d::Testing FE_DGQArbitraryNodes<3>(QGauss(2))
+DEAL:3d::Norm of difference:          0
+DEAL:3d::Norm of difference parallel: 0
+DEAL:3d::
+DEAL:3d::Testing FE_DGQArbitraryNodes<3>(QGauss(3))
+DEAL:3d::Norm of difference:          0
+DEAL:3d::Norm of difference parallel: 0
+DEAL:3d::

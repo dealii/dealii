@@ -1,0 +1,9 @@
+
+DEAL:2d::Testing FE_DGQ<2>(1)
+DEAL:2d::Norm of difference:          0
+DEAL:2d::Testing FE_DGQ<2>(2)
+DEAL:2d::Norm of difference:          0
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          0
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          0
