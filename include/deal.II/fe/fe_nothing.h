@@ -34,9 +34,9 @@ DEAL_II_NAMESPACE_OPEN
  * active region where normal elements are used, and an inactive region where
  * FE_Nothing elements are used.  The hp::DoFHandler will therefore assign no
  * degrees of freedom to the FE_Nothing cells, and this subregion is therefore
- * implicitly deleted from the computation. step-46 shows a use case for this
- * element. An interesting application for this element is also presented in
- * the paper A. Cangiani, J. Chapman, E. Georgoulis, M. Jensen:
+ * implicitly deleted from the computation. step-10 and step-46 show use cases
+ * for this element. An interesting application for this element is also
+ * presented in the paper A. Cangiani, J. Chapman, E. Georgoulis, M. Jensen:
  * <b>Implementation of the Continuous-Discontinuous Galerkin Finite Element
  * Method</b>, arXiv:1201.2878v1 [math.NA], 2012 (see
  * http://arxiv.org/abs/1201.2878).
