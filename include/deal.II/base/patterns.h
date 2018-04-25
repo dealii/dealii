@@ -1297,7 +1297,9 @@ namespace Patterns
      *
      * @code
      * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
-     * to_value("2 % 3 : mondo", t);
+     * // replace the value of 't' by the parsed content of the string argument:
+     * Patterns::Tools::to_value("2 % 3 : mondo", t);
+     *
      * auto s = Patterns::Tools::to_string(t);
      * std::cout << s; // will print "2 % 3 : mondo""
      * @endcode
@@ -1306,6 +1308,10 @@ namespace Patterns
      * helper class Patterns::Tools::RankInfo for details on the separators you
      * should use in your string patterns when converting from a string to a
      * container type.
+     *
+     * Notice that the current content of variable @p t is ignored. Its type is
+     * used to infer how to interpret the string. If the string is succesfully
+     * parsed, then @p t will be set to the parsed content of @p s.
      *
      * @author Luca Heltai, 2018
      */
