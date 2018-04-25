@@ -1,0 +1,8 @@
+Fixed: MappingQEulerian uses an FEValues internally. This FEValues was initialized with the FiniteElement
+obtained by DoFHandler::get_fe(). Unfortunately, the FiniteElement that is inside the DoFHandler is
+not guaranteed to remain unaltered upon successive refinements, so we now make a new clone 
+inside MappingQEulerian to guarantee that successive calls to DoFHandler::distribute_dofs don't 
+trigger an exception. 
+<br>
+(Luca Heltai, 2018/04/25)
+
