@@ -1247,7 +1247,7 @@ next_cell:
     Assert (local_triangulation.n_active_cells() == uniform_cells.size(), ExcInternalError());
     local_triangulation.clear_user_flags ();
     unsigned int index=0;
-    // Create a map between cells of class DofHandler into class Triangulation
+    // Create a map between cells of class DoFHandler into class Triangulation
     std::map<typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator,
         typename Container::cell_iterator> patch_to_global_tria_map_tmp;
     for (typename Triangulation<Container::dimension,Container::space_dimension>::cell_iterator coarse_cell = local_triangulation.begin();
