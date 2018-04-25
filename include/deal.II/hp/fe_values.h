@@ -279,7 +279,7 @@ namespace hp
      * passed to the constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>. Consequently, the
      * hp::FECollection argument given to this object should really be the
-     * same as that used in the construction of the hp::DofHandler associated
+     * same as that used in the construction of the hp::DoFHandler associated
      * with the present cell. On the other hand, if a value is given for this
      * argument, it overrides the choice of
      * <code>cell-@>active_fe_index()</code>.
@@ -414,7 +414,7 @@ namespace hp
      * passed to the constructor of this class with index given by
      * <code>cell-@>active_fe_index()</code>. Consequently, the
      * hp::FECollection argument given to this object should really be the
-     * same as that used in the construction of the hp::DofHandler associated
+     * same as that used in the construction of the hp::DoFHandler associated
      * with the present cell. On the other hand, if a value is given for this
      * argument, it overrides the choice of
      * <code>cell-@>active_fe_index()</code>.

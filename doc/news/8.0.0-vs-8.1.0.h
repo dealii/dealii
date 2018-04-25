@@ -497,7 +497,7 @@ inconvenience this causes.
   </li>
 
   <li>
-  Fixed: DoFTools::extract_locally_*_dofs now instantiated for hp::DofHandler.
+  Fixed: DoFTools::extract_locally_*_dofs now instantiated for hp::DoFHandler.
   <br>
   (Jean-Paul Pelteret, 2013/09/11)
   </li>
