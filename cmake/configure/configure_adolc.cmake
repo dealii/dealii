@@ -17,14 +17,7 @@
 # Configuration for the ADOL-C library:
 #
 
-IF(NOT FEATURE_BOOST_PROCESSED)
-  MESSAGE(FATAL_ERROR "\n"
-    "Internal build system error: The configuration of "
-    "DEAL_II_WITH_ADOLC depends on "
-    "DEAL_II_WITH_BOOST, but CONFIGURE_FEATURE(ADOLC) "
-    "was called before CONFIGURE_FEATURE(BOOST).\n\n"
-    )
-ENDIF()
+SET(FEATURE_ADOLC_AFTER BOOST)
 
 MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
   FIND_PACKAGE(ADOLC)
