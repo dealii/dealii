@@ -1133,6 +1133,8 @@ namespace internal
           return 0;
         else
           Assert(false, ExcNotImplemented("Not possible in dim=" + std::to_string(dim)));
+
+        return numbers::invalid_unsigned_int;
       }
 
 
