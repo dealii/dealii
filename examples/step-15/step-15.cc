@@ -703,9 +703,12 @@ namespace Step15
         const std::string filename = "solution-" +
                                      Utilities::int_to_string (refinement, 2) +
                                      ".vtk";
-        std::ofstream output (filename.c_str());
-        data_out.write_vtk (output);
-
+        std::ofstream output (filename);
+        DataOutBase::VtkFlags vtk_flags;
+        vtk_flags.compression_level =
+          DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+        data_out.set_flags(vtk_flags);
+        data_out.write_vtu (output);
       }
   }
 }
