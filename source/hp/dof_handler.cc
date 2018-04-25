@@ -1284,8 +1284,9 @@ namespace hp
     Assert (ff.size() > 0,
             ExcMessage("The hp::FECollection given is empty!"));
 
-    if (&fe_collection != &ff)
-      fe_collection = hp::FECollection<dim, spacedim>(ff);
+    // don't create a new object if the one we have is already appropriate
+    if (fe_collection != ff)
+      fe_collection = hp::FECollection<dim,spacedim>(ff);
 
     // at the beginning, make sure every processor knows the
     // active_fe_indices on both its own cells and all ghost cells
