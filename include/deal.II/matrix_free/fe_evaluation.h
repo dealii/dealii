@@ -67,14 +67,16 @@ template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1,
  *
  * This class has three template arguments:
  *
- * @param dim Dimension in which this class is to be used
+ * @tparam dim Dimension in which this class is to be used
  *
- * @param n_components Number of vector components when solving a system of
+ * @tparam n_components Number of vector components when solving a system of
  * PDEs. If the same operation is applied to several components of a PDE (e.g.
  * a vector Laplace equation), they can be applied simultaneously with one
  * call (and often more efficiently)
  *
- * @param Number Number format, usually @p double or @p float
+ * @tparam Number Number format, usually @p double or @p float
+ *
+ * @ingroup matrixfree
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010-2018
  */
@@ -1043,6 +1045,8 @@ private:
  * Generic access is achieved through the base class, and specializations for
  * scalar and vector-valued elements are defined separately.
  *
+ * @ingroup matrixfree
+ *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
 template <int dim, int n_components_, typename Number, bool is_face>
@@ -1103,6 +1107,8 @@ protected:
  * Partial specialization for scalar fields that defines access with simple
  * data fields, i.e., scalars for the values and Tensor<1,dim> for the
  * gradients.
+ *
+ * @ingroup matrixfree
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
@@ -1221,6 +1227,8 @@ protected:
  * space dimension, i.e., values are of type Tensor<1,dim> and gradients of
  * type Tensor<2,dim>. Provides some additional functions for access, like the
  * symmetric gradient and divergence.
+ *
+ * @ingroup matrixfree
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */
@@ -1360,6 +1368,8 @@ protected:
  * Partial specialization for scalar fields in 1d that defines access with
  * simple data fields, i.e., scalars for the values and Tensor<1,1> for the
  * gradients.
+ *
+ * @ingroup matrixfree
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, Shiva
  * Rudraraju, 2014
@@ -2022,6 +2032,8 @@ protected:
  *
  * @tparam Number Number format, usually @p double or @p float. Defaults to @p
  * double
+ *
+ * @ingroup matrixfree
  *
  * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
  */

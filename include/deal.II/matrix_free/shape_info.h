@@ -81,6 +81,8 @@ namespace internal
      * quadrature formula on the unit cell. Because of this structure, only
      * one-dimensional data is stored.
      *
+     * @ingroup matrixfree
+     *
      * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
      */
     template <typename Number>
