@@ -129,6 +129,7 @@ void Subscriptor::check_no_subscribers () const
 
 Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 {
+  check_no_subscribers();
   object_info = s.object_info;
   return *this;
 }
@@ -137,6 +138,7 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 
 Subscriptor &Subscriptor::operator = (Subscriptor &&s) noexcept
 {
+  check_no_subscribers();
   s.check_no_subscribers();
   object_info = s.object_info;
   return *this;

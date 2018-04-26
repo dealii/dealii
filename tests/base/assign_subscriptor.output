@@ -1,0 +1,34 @@
+
+DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::check_no_subscribers() const
+The violated condition was: 
+    counter == 0
+Additional information: 
+    (none)
+--------------------------------------------------------
+
+DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::check_no_subscribers() const
+The violated condition was: 
+    counter == 0
+Additional information: 
+    (none)
+--------------------------------------------------------
+
+DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::check_no_subscribers() const
+The violated condition was: 
+    counter == 0
+Additional information: 
+    (none)
+--------------------------------------------------------
+
