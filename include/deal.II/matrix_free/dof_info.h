@@ -507,10 +507,10 @@ namespace internal
       return 0;
     }
 
+#endif  // ifndef DOXYGEN
+
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
-
-#endif  // ifndef DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
