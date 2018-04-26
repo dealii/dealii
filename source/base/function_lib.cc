@@ -2194,11 +2194,11 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     const double r = p.distance(center);
-#ifdef DEAL_II_HAVE_JN
-    return jn(order, r*wave_number);
-#else
+#ifndef DEAL_II_HAVE_JN
     Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return r;
+#else
+    return jn(order, r*wave_number);
 #endif
   }
 
@@ -2232,7 +2232,11 @@ namespace Functions
                           const unsigned int) const
   {
     Assert(dim==2, ExcNotImplemented());
-#ifdef DEAL_II_HAVE_JN
+#ifndef DEAL_II_HAVE_JN
+    (void) p;
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
+    return Tensor<1,dim>();
+#else
     const double r = p.distance(center);
     const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
     const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
@@ -2244,10 +2248,6 @@ namespace Functions
     result[0] = wave_number * co * dJn;
     result[1] = wave_number * si * dJn;
     return result;
-#else
-    (void) p;
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-    return Tensor<1,dim>();
 #endif
   }
 

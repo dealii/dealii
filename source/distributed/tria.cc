@@ -514,14 +514,14 @@ namespace
 
   template <int dim, int spacedim>
   void
-  match_quadrant (const dealii::Triangulation<dim,spacedim>      *tria,
-                  unsigned int                                    dealii_index,
-                  typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
-                  types::subdomain_id                             ghost_owner)
+  match_quadrant (const dealii::Triangulation<dim,spacedim>            *tria,
+                  unsigned int                                          dealii_index,
+                  const typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
+                  types::subdomain_id                                   ghost_owner)
   {
-    int l = ghost_quadrant.level;
+    const int l = ghost_quadrant.level;
 
-    for (int i = 0; i < l; i++)
+    for (int i = 0; i < l; ++i)
       {
         typename Triangulation<dim,spacedim>::cell_iterator cell (tria, i, dealii_index);
         if (cell->has_children () == false)
