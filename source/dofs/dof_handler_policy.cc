@@ -122,8 +122,7 @@ namespace internal
                   void *)
           {
             if (cell->has_children()
-                ||
-                (!cell->has_children() && !cell->is_artificial()))
+                || !cell->is_artificial())
               cell->update_cell_dof_indices_cache ();
           };
 

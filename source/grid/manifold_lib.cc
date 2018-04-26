@@ -615,7 +615,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   // be good enough. This tolerance was chosen such that the first iteration
   // for a at least three time refined HyperShell mesh with radii .5 and 1.
   // doesn't already succeed.
-  if (max_distance < 2e-2 || spacedim<3)
+  if (max_distance < 2e-2)
     {
       for (unsigned int row=0; row<weight_rows; ++row)
         new_points[row] = center + new_candidates[row].first * new_candidates[row].second;
@@ -1469,7 +1469,7 @@ namespace
 
         for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
           {
-            const double my_weight = line%2 ? chart_point[line/2] : 1-chart_point[line/2];
+            const double my_weight = (line%2) ? chart_point[line/2] : 1-chart_point[line/2];
             const double line_point = chart_point[1-line/2];
 
             // Same manifold or invalid id which will go back to the same

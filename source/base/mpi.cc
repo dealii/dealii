@@ -307,7 +307,7 @@ namespace Utilities
                           "in a program since it initializes the MPI system."));
 
 
-      int ierr;
+      int ierr = 0;
 #ifdef DEAL_II_WITH_MPI
       // if we have PETSc, we will initialize it and let it handle MPI.
       // Otherwise, we will do it.

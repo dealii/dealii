@@ -519,10 +519,9 @@ namespace
                   typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
                   types::subdomain_id                             ghost_owner)
   {
-    int i, child_id;
     int l = ghost_quadrant.level;
 
-    for (i = 0; i < l; i++)
+    for (int i = 0; i < l; i++)
       {
         typename Triangulation<dim,spacedim>::cell_iterator cell (tria, i, dealii_index);
         if (cell->has_children () == false)
@@ -532,7 +531,7 @@ namespace
             return;
           }
 
-        child_id = internal::p4est::functions<dim>::quadrant_ancestor_id (&ghost_quadrant, i + 1);
+        const int child_id = internal::p4est::functions<dim>::quadrant_ancestor_id (&ghost_quadrant, i + 1);
         dealii_index = cell->child_index(child_id);
       }
 
@@ -1223,7 +1222,7 @@ namespace
      * order that p4est will encounter the cells, and they do not contain
      * ghost cells or artificial cells.
      */
-    PartitionWeights (const std::vector<unsigned int> &cell_weights);
+    explicit PartitionWeights (const std::vector<unsigned int> &cell_weights);
 
     /**
      * A callback function that we pass to the p4est data structures when a

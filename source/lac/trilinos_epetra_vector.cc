@@ -145,8 +145,7 @@ namespace LinearAlgebra
           // Check if the communication pattern already exists and if it can be
           // reused.
           if ((source_stored_elements.size() != V.get_stored_elements().size()) ||
-              ((source_stored_elements.size() == V.get_stored_elements().size()) &&
-               (source_stored_elements != V.get_stored_elements())))
+              (source_stored_elements != V.get_stored_elements()))
             {
               create_epetra_comm_pattern(V.get_stored_elements(),
                                          dynamic_cast<const Epetra_MpiComm &>(vector->Comm()).Comm());
