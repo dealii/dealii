@@ -57,3 +57,15 @@ div.image img[src="fe_enriched_h-refinement.png"] {
   margin-left: auto;
   margin-right: auto;
 }
+
+/*
+ * environment for aligning pictures in one column.
+ */
+.onecolumn {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column-gap: 5%;
+  grid-row-gap: 5%;
+  margin-left: auto;
+  margin-right: auto;
+}

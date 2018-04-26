@@ -627,9 +627,6 @@ namespace Step15
     // the origin, created in the same way as shown in step-6. The mesh is
     // globally refined twice followed later on by several adaptive cycles:
     GridGenerator::hyper_ball (triangulation);
-    static const SphericalManifold<dim> boundary;
-    triangulation.set_all_manifold_ids_on_boundary(0);
-    triangulation.set_manifold (0, boundary);
     triangulation.refine_global(2);
 
     // The Newton iteration starts next. During the first step we do not have
@@ -703,9 +700,12 @@ namespace Step15
         const std::string filename = "solution-" +
                                      Utilities::int_to_string (refinement, 2) +
                                      ".vtk";
-        std::ofstream output (filename.c_str());
-        data_out.write_vtk (output);
-
+        std::ofstream output (filename);
+        DataOutBase::VtkFlags vtk_flags;
+        vtk_flags.compression_level =
+          DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+        data_out.set_flags(vtk_flags);
+        data_out.write_vtu (output);
       }
   }
 }
