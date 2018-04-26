@@ -614,17 +614,17 @@ no_constraint:
       if (vectorization_length > 1)
         AssertDimension(row_starts.size()/vectorization_length/n_components,
                         irregular_cells.size());
-      index_storage_variants[2].resize(irregular_cells.size(),
-                                       IndexStorageVariants::full);
-      n_vectorization_lanes_filled[2].resize(irregular_cells.size());
+      index_storage_variants[dof_access_cell].resize(irregular_cells.size(),
+                                                     IndexStorageVariants::full);
+      n_vectorization_lanes_filled[dof_access_cell].resize(irregular_cells.size());
       for (unsigned int i=0; i<irregular_cells.size(); ++i)
         if (irregular_cells[i] > 0)
-          n_vectorization_lanes_filled[2][i] = irregular_cells[i];
+          n_vectorization_lanes_filled[dof_access_cell][i] = irregular_cells[i];
         else
-          n_vectorization_lanes_filled[2][i] = vectorization_length;
+          n_vectorization_lanes_filled[dof_access_cell][i] = vectorization_length;
 
-      dof_indices_contiguous[2].resize(irregular_cells.size()*vectorization_length,
-                                       numbers::invalid_unsigned_int);
+      dof_indices_contiguous[dof_access_cell].resize(irregular_cells.size()*vectorization_length,
+                                                     numbers::invalid_unsigned_int);
       dof_indices_interleaved.resize(dof_indices.size(), numbers::invalid_unsigned_int);
 
       std::vector<unsigned int> index_kinds(static_cast<unsigned int>(IndexStorageVariants::contiguous)+1);
@@ -632,7 +632,7 @@ no_constraint:
       for (unsigned int i=0; i<irregular_cells.size(); ++i)
         {
           const unsigned int ndofs = dofs_per_cell[have_hp ? cell_active_fe_index[i] : 0];
-          const unsigned int n_comp = n_vectorization_lanes_filled[2][i];
+          const unsigned int n_comp = n_vectorization_lanes_filled[dof_access_cell][i];
 
           // check 1: Check if there are constraints -> no compression possible
           bool has_constraints = false;
@@ -646,7 +646,7 @@ no_constraint:
                 }
             }
           if (has_constraints)
-            index_storage_variants[2][i] = IndexStorageVariants::full;
+            index_storage_variants[dof_access_cell][i] = IndexStorageVariants::full;
           else
             {
               bool indices_are_contiguous = true;
@@ -680,30 +680,33 @@ no_constraint:
                   indices_are_interleaved_and_contiguous)
                 {
                   for (unsigned int j=0; j<n_comp; ++j)
-                    dof_indices_contiguous[2][i*vectorization_length+j] =
+                    dof_indices_contiguous[dof_access_cell][i*vectorization_length+j] =
                       this->dof_indices[row_starts[(i*vectorization_length+j)*n_components].first];
                 }
 
               if (indices_are_contiguous)
                 {
-                  index_storage_variants[2][i] = IndexStorageVariants::contiguous;
+                  index_storage_variants[dof_access_cell][i] = IndexStorageVariants::contiguous;
                 }
               else
                 {
                   const unsigned int *dof_indices =
                     &this->dof_indices[row_starts[i*vectorization_length*n_components].first];
                   if (n_comp == vectorization_length)
-                    index_storage_variants[2][i] = IndexStorageVariants::interleaved;
+                    index_storage_variants[dof_access_cell][i] = IndexStorageVariants::interleaved;
                   else
-                    index_storage_variants[2][i] = IndexStorageVariants::full;
+                    index_storage_variants[dof_access_cell][i] = IndexStorageVariants::full;
+
+                  // do not use interleaved storage if two vectorized
+                  // components point to the same field (scatter not possible)
                   for (unsigned int k=0; k<ndofs; ++k)
-                    for (unsigned int j=0; j<n_comp; ++j)
+                    for (unsigned int j=1; j<n_comp; ++j)
                       if (dof_indices[j*ndofs+k] == dof_indices[k])
                         {
-                          index_storage_variants[2][i] = IndexStorageVariants::full;
+                          index_storage_variants[dof_access_cell][i] = IndexStorageVariants::full;
                           break;
                         }
-                  if (index_storage_variants[2][i] != IndexStorageVariants::full)
+                  if (index_storage_variants[dof_access_cell][i] != IndexStorageVariants::full)
                     {
                       unsigned int *interleaved_dof_indices =
                         &this->dof_indices_interleaved[row_starts[i*vectorization_length*n_components].first];
@@ -713,7 +716,7 @@ no_constraint:
                     }
                 }
             }
-          index_kinds[static_cast<unsigned int>(index_storage_variants[2][i])]++;
+          index_kinds[static_cast<unsigned int>(index_storage_variants[dof_access_cell][i])]++;
         }
     }
 
@@ -726,22 +729,24 @@ no_constraint:
     {
       AssertDimension(length, vectorization_length);
 
-      index_storage_variants[0].resize(faces.size(), IndexStorageVariants::full);
-      dof_indices_contiguous[0].resize(faces.size()*length, numbers::invalid_unsigned_int);
-      n_vectorization_lanes_filled[0].resize(faces.size());
+      index_storage_variants[dof_access_face_interior]
+      .resize(faces.size(), IndexStorageVariants::full);
+      dof_indices_contiguous[dof_access_face_interior]
+      .resize(faces.size()*length, numbers::invalid_unsigned_int);
+      n_vectorization_lanes_filled[dof_access_face_interior].resize(faces.size());
 
       // all interior faces come before the boundary faces
-      unsigned int n_plus_faces = 0;
-      for (; n_plus_faces < faces.size(); ++n_plus_faces)
-        if (faces[n_plus_faces].cells_exterior[0] == numbers::invalid_unsigned_int)
+      unsigned int n_exterior_faces = 0;
+      for (; n_exterior_faces < faces.size(); ++n_exterior_faces)
+        if (faces[n_exterior_faces].cells_exterior[0] == numbers::invalid_unsigned_int)
           break;
-      index_storage_variants[1].resize(n_plus_faces, IndexStorageVariants::full);
-      dof_indices_contiguous[1].resize(n_plus_faces*length, numbers::invalid_unsigned_int);
-      n_vectorization_lanes_filled[1].resize(n_plus_faces);
+      index_storage_variants[dof_access_face_exterior].resize(n_exterior_faces, IndexStorageVariants::full);
+      dof_indices_contiguous[dof_access_face_exterior].resize(n_exterior_faces*length, numbers::invalid_unsigned_int);
+      n_vectorization_lanes_filled[dof_access_face_exterior].resize(n_exterior_faces);
 
       for (unsigned int face=0; face<faces.size(); ++face)
         {
-          auto face_computation = [&](const unsigned int  face_index,
+          auto face_computation = [&](const DoFAccessIndex face_index,
                                       const unsigned int *cell_indices_face)
           {
             bool is_contiguous = false;
@@ -750,26 +755,26 @@ no_constraint:
                  numbers::invalid_unsigned_int; ++v)
               {
                 n_vectorization_lanes_filled[face_index][face]++;
-                if (index_storage_variants[2][cell_indices_face[v]/length] ==
+                if (index_storage_variants[dof_access_cell][cell_indices_face[v]/length] ==
                     IndexStorageVariants::contiguous)
                   is_contiguous = true;
-                if (index_storage_variants[2][cell_indices_face[v]/length] <
+                if (index_storage_variants[dof_access_cell][cell_indices_face[v]/length] <
                     IndexStorageVariants::contiguous)
                   needs_full_storage = true;
               }
             if (is_contiguous)
               for (unsigned int v=0; v<n_vectorization_lanes_filled[face_index][face]; ++v)
                 dof_indices_contiguous[face_index][face*length+v] =
-                  dof_indices_contiguous[2][cell_indices_face[v]];
+                  dof_indices_contiguous[dof_access_cell][cell_indices_face[v]];
             if (is_contiguous && !needs_full_storage)
               index_storage_variants[face_index][face] = IndexStorageVariants::contiguous;
             else
               index_storage_variants[face_index][face] = IndexStorageVariants::full;
           };
 
-          face_computation(0, faces[face].cells_interior);
-          if (face < n_plus_faces)
-            face_computation(1, faces[face].cells_exterior);
+          face_computation(dof_access_face_interior, faces[face].cells_interior);
+          if (face < n_exterior_faces)
+            face_computation(dof_access_face_exterior, faces[face].cells_exterior);
         }
     }
 
@@ -1070,7 +1075,7 @@ no_constraint:
 
       types::global_dof_index counter = 0;
       const unsigned int n_components = start_components.back();
-      const unsigned int n_macro_cells = n_vectorization_lanes_filled[2].size();
+      const unsigned int n_macro_cells = n_vectorization_lanes_filled[dof_access_cell].size();
       Assert(n_macro_cells <= (row_starts.size()-1)/vectorization_length/n_components,
              ExcInternalError());
       for (unsigned int cell_no=0; cell_no<n_macro_cells; ++cell_no)
@@ -1084,7 +1089,7 @@ no_constraint:
                                                         cell_active_fe_index[cell_no] : 0]);
               const unsigned int *dof_ind = &dof_indices[row_starts[cell_no*n_components*vectorization_length].first];
               for (unsigned int i=0; i<ndofs; ++i)
-                for (unsigned int j=0; j<n_vectorization_lanes_filled[2][cell_no]; ++j)
+                for (unsigned int j=0; j<n_vectorization_lanes_filled[dof_access_cell][cell_no]; ++j)
                   if (dof_ind[j*ndofs+i]<local_size)
                     if (renumbering[dof_ind[j*ndofs+i]] == numbers::invalid_dof_index)
                       renumbering[dof_ind[j*ndofs+i]] = counter++;

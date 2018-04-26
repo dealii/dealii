@@ -918,7 +918,7 @@ protected:
    * Stores the index an FEFaceEvaluation object is currently pointing into
    * (interior face, exterior face, data associated with cell).
    */
-  unsigned int face_vector_access_index;
+  internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index;
 
   /**
    * Stores the current number of a face within the given cell in case
@@ -2762,7 +2762,13 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   quadrature_weights (mapping_data->descriptor[active_quad_index].quadrature_weights.begin()),
   cell               (numbers::invalid_unsigned_int),
   is_interior_face      (is_interior_face),
-  face_vector_access_index (is_face ? (is_interior_face ? 0 : 1) : 2),
+  dof_access_index   (is_face ?
+                      (is_interior_face ?
+                       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior
+                       :
+                       internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior)
+                      :
+                      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell),
   cell_type          (internal::MatrixFreeFunctions::general),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
@@ -2829,7 +2835,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   cell               (0),
   cell_type          (internal::MatrixFreeFunctions::general),
   is_interior_face   (true),
-  face_vector_access_index  (numbers::invalid_unsigned_int),
+  dof_access_index   (internal::MatrixFreeFunctions::DoFInfo::dof_access_cell),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2895,7 +2901,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::general),
   is_interior_face   (other.is_interior_face),
-  face_vector_access_index  (other.face_vector_access_index),
+  dof_access_index   (other.dof_access_index),
   dof_values_initialized    (false),
   values_quad_initialized   (false),
   gradients_quad_initialized(false),
@@ -2969,7 +2975,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   cell = numbers::invalid_unsigned_int;
   cell_type = internal::MatrixFreeFunctions::general;
   is_interior_face = other.is_interior_face;
-  face_vector_access_index = other.face_vector_access_index;
+  dof_access_index = other.dof_access_index;
 
   // Create deep copy of mapped geometry for use in parallel...
   if (other.mapped_geometry.get() != nullptr)
@@ -3649,8 +3655,9 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   // Case 2: contiguous indices which use reduced storage of indices and can
   // use vectorized load/store operations -> go to separate function
   AssertIndexRange(cell,
-                   dof_info->index_storage_variants[face_vector_access_index].size());
-  if (dof_info->index_storage_variants[is_face ? face_vector_access_index : 2][cell] >=
+                   dof_info->index_storage_variants[dof_access_index].size());
+  if (dof_info->index_storage_variants[is_face ? dof_access_index :
+                                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][cell] >=
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
     {
       read_write_operation_contiguous(operation, src);
@@ -3662,11 +3669,13 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 
   constexpr unsigned int n_vectorization = VectorizedArray<Number>::n_array_elements;
   const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
-  if (dof_info->index_storage_variants[is_face ? face_vector_access_index : 2][cell] ==
+  if (dof_info->index_storage_variants[is_face ? dof_access_index :
+                                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][cell] ==
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::interleaved)
     {
       const unsigned int *dof_indices =
-        &dof_info->dof_indices_interleaved[dof_info->row_starts[cell*n_vectorization*n_fe_components+first_selected_component].first];
+        &dof_info->dof_indices_interleaved[dof_info->row_starts[cell*n_fe_components*n_vectorization].first]+
+        dof_info->component_dof_indices_offset[active_fe_index][first_selected_component]*n_vectorization;
       if (n_components == 1 || n_fe_components == 1)
         for (unsigned int i=0; i<dofs_per_component; ++i, dof_indices += n_vectorization)
           for (unsigned int comp=0; comp<n_components; ++comp)
@@ -3689,15 +3698,15 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   unsigned int cells_copied[VectorizedArray<Number>::n_array_elements];
   const unsigned int *cells;
   unsigned int n_vectorization_actual =
-    dof_info->n_vectorization_lanes_filled[face_vector_access_index][cell];
+    dof_info->n_vectorization_lanes_filled[dof_access_index][cell];
   bool has_constraints = false;
   if (is_face)
     {
-      if (face_vector_access_index == 2)
+      if (dof_access_index == internal::MatrixFreeFunctions::DoFInfo::dof_access_cell)
         for (unsigned int v=0; v<n_vectorization_actual; ++v)
           cells_copied[v] = cell*VectorizedArray<Number>::n_array_elements+v;
       cells =
-        face_vector_access_index == 2 ?
+        dof_access_index == internal::MatrixFreeFunctions::DoFInfo::dof_access_cell ?
         &cells_copied[0]
         :
         (is_interior_face ?
@@ -3953,7 +3962,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 
   std::integral_constant<bool,std::is_same<typename VectorType::value_type,Number>::value>
   vector_selector;
-  const unsigned int ind = is_face ? face_vector_access_index : 2;
+  const internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex ind =
+    is_face ? dof_access_index : internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
 
   const std::vector<unsigned int> &dof_indices_cont
     = dof_info->dof_indices_contiguous[ind];
@@ -6362,9 +6372,9 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
     return;
 
   this->cell = face_index;
-  this->face_vector_access_index = this->is_interior_face ? 0 : 1;
-  if (face_index >= this->matrix_info->get_task_info().refinement_edge_face_partition_data[0])
-    this->face_vector_access_index = 0;
+  this->dof_access_index = this->is_interior_face ?
+                           internal::MatrixFreeFunctions::DoFInfo::dof_access_face_interior :
+                           internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior;
   Assert (this->mapping_data != nullptr, ExcNotInitialized());
   const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
   const internal::MatrixFreeFunctions::FaceToCellTopology<n_vectors> &faces =
@@ -6436,7 +6446,7 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   this->face_orientation = 0;
   this->subface_index = GeometryInfo<dim>::max_children_per_cell;
   this->face_no = face_number;
-  this->face_vector_access_index = 2;
+  this->dof_access_index = internal::MatrixFreeFunctions::DoFInfo::dof_access_cell;
 
   const unsigned int offsets =
     this->matrix_info->get_mapping_info().face_data_by_cells[this->quad_no].
@@ -6639,10 +6649,10 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
   internal::VectorReader<Number> reader;
 
-  if (this->dof_info->index_storage_variants[this->face_vector_access_index][this->cell] ==
+  if (this->dof_info->index_storage_variants[this->dof_access_index][this->cell] ==
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous
       &&
-      this->dof_info->n_vectorization_lanes_filled[this->face_vector_access_index][this->cell] ==
+      this->dof_info->n_vectorization_lanes_filled[this->dof_access_index][this->cell] ==
       VectorizedArray<Number>::n_array_elements
       &&
       ((evaluate_gradients == false && this->data->nodal_at_cell_boundaries == true) ||
@@ -6650,7 +6660,7 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
         fe_degree > 1)))
     {
       const unsigned int *indices = &this->dof_info->dof_indices_contiguous
-                                    [this->face_vector_access_index][this->cell*VectorizedArray<Number>::n_array_elements];
+                                    [this->dof_access_index][this->cell*VectorizedArray<Number>::n_array_elements];
       if (evaluate_gradients == true &&
           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_hermite)
         {
@@ -6789,10 +6799,10 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
   internal::VectorDistributorLocalToGlobal<Number> writer;
 
-  if (this->dof_info->index_storage_variants[this->face_vector_access_index][this->cell] ==
+  if (this->dof_info->index_storage_variants[this->dof_access_index][this->cell] ==
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous
       &&
-      this->dof_info->n_vectorization_lanes_filled[this->face_vector_access_index][this->cell] ==
+      this->dof_info->n_vectorization_lanes_filled[this->dof_access_index][this->cell] ==
       VectorizedArray<Number>::n_array_elements
       &&
       ((integrate_gradients == false && this->data->nodal_at_cell_boundaries == true) ||
@@ -6800,7 +6810,7 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
         fe_degree > 1)))
     {
       const unsigned int *indices = &this->dof_info->dof_indices_contiguous
-                                    [this->face_vector_access_index][this->cell*VectorizedArray<Number>::n_array_elements];
+                                    [this->dof_access_index][this->cell*VectorizedArray<Number>::n_array_elements];
 
       if (integrate_gradients == true &&
           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_hermite)
@@ -6914,7 +6924,7 @@ FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::quadrature_point (const unsigned int q) const
 {
   AssertIndexRange (q, n_q_points);
-  if (this->face_vector_access_index < 2)
+  if (this->dof_access_index < 2)
     {
       Assert(this->mapping_data->quadrature_point_offsets.empty() == false,
              ExcNotImplemented());

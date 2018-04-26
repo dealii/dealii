@@ -1333,10 +1333,10 @@ void MatrixFree<dim,Number>::initialize_indices
                       AssertIndexRange(face_info.faces[f].cells_interior[v],
                                        n_macro_cells_before*
                                        VectorizedArray<Number>::n_array_elements);
-                      if (dof_info[no].index_storage_variants[1][f] >=
+                      if (dof_info[no].index_storage_variants[internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior][f] >=
                           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous
                           &&
-                          dof_info[no].dof_indices_contiguous[2][face_info.faces[f].cells_exterior[v]] >=
+                          dof_info[no].dof_indices_contiguous[internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][face_info.faces[f].cells_exterior[v]] >=
                           part.local_size())
                         {
                           const unsigned int p = face_info.faces[f].cells_exterior[v];
@@ -1349,7 +1349,7 @@ void MatrixFree<dim,Number>::initialize_indices
                                     = shape_info(dof_info[no].global_base_element_offset+e,0,0,0);
                                 for (unsigned int j=0; j<shape.dofs_per_component_on_face; ++j)
                                   ghost_indices.push_back(part.local_to_global
-                                                          (dof_info[no].dof_indices_contiguous[2][p]+
+                                                          (dof_info[no].dof_indices_contiguous[internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][p]+
                                                            i+
                                                            shape.face_to_cell_index_nodal
                                                            (face_info.faces[f].exterior_face_no,j)*
@@ -1358,7 +1358,7 @@ void MatrixFree<dim,Number>::initialize_indices
                               }
                           AssertDimension(i, dof_info[no].dofs_per_cell[0]*stride);
                         }
-                      else if (dof_info[no].index_storage_variants[1][f] <
+                      else if (dof_info[no].index_storage_variants[internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior][f] <
                                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous)
                         has_noncontiguous_cell = true;
                     }
@@ -1411,10 +1411,10 @@ void MatrixFree<dim,Number>::initialize_indices
                     {
                       AssertIndexRange(face_info.faces[f].cells_interior[v],
                                        n_macro_cells_before*VectorizedArray<Number>::n_array_elements);
-                      if (dof_info[no].index_storage_variants[1][f] >=
+                      if (dof_info[no].index_storage_variants[internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior][f] >=
                           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous
                           &&
-                          dof_info[no].dof_indices_contiguous[2][face_info.faces[f].cells_exterior[v]] >=
+                          dof_info[no].dof_indices_contiguous[internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][face_info.faces[f].cells_exterior[v]] >=
                           part.local_size())
                         {
                           const unsigned int p = face_info.faces[f].cells_exterior[v];
@@ -1427,7 +1427,7 @@ void MatrixFree<dim,Number>::initialize_indices
                                     = shape_info(dof_info[no].global_base_element_offset+e,0,0,0);
                                 for (unsigned int j=0; j<2*shape.dofs_per_component_on_face; ++j)
                                   ghost_indices.
-                                  push_back(part.local_to_global(dof_info[no].dof_indices_contiguous[2][p]
+                                  push_back(part.local_to_global(dof_info[no].dof_indices_contiguous[internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][p]
                                                                  +i+
                                                                  shape.face_to_cell_index_hermite
                                                                  (face_info.faces[f].exterior_face_no,j)*stride));

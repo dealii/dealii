@@ -247,6 +247,26 @@ namespace internal
       };
 
       /**
+       * Enum used to distinguish the data arrays for the vectorization type
+       * in cells and faces.
+       */
+      enum DoFAccessIndex : unsigned char
+      {
+        /**
+         * The data index for the faces designated as interior
+         */
+        dof_access_face_interior = 0,
+        /**
+         * The data index for the faces designated as exterior
+         */
+        dof_access_face_exterior = 1,
+        /**
+         * The data index for the cells
+         */
+        dof_access_cell = 2
+      };
+
+      /**
        * Stores the dimension of the underlying DoFHandler. Since the indices
        * are not templated, this is the variable that makes the dimension
        * accessible in the (rare) cases it is needed inside this class.
@@ -264,11 +284,11 @@ namespace internal
       unsigned int vectorization_length;
 
       /**
-       * Stores the index storage variant of all cell batches.
+       * Stores the index storage variant of all cell and face batches.
        *
        * The three arrays given here address the types for the faces decorated
        * as interior (0), the faces decorated with as exterior (1), and the
-       * cells (2).
+       * cells (2) according to CellOrFaceAccess.
        */
       std::vector<IndexStorageVariants> index_storage_variants[3];
 
@@ -319,7 +339,7 @@ namespace internal
        *
        * The three arrays given here address the types for the faces decorated
        * as interior (0), the faces decorated with as exterior (1), and the
-       * cells (2).
+       * cells (2) according to CellOrFaceAccess.
        */
       std::vector<unsigned int> dof_indices_contiguous[3];
 
@@ -330,7 +350,7 @@ namespace internal
        *
        * The three arrays given here address the types for the faces decorated
        * as interior (0), the faces decorated with as exterior (1), and the
-       * cells (2).
+       * cells (2) according to CellOrFaceAccess.
        */
       std::vector<unsigned char> n_vectorization_lanes_filled[3];
 
