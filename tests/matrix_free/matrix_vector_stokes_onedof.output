@@ -1,0 +1,20 @@
+
+DEAL::
+DEAL::Test with doubles
+DEAL::
+DEAL:2d::Verification FESystem<2>[FE_Q<2>(2)^2-FE_Q<2>(1)]: 0
+DEAL:2d::
+DEAL:2d::Verification FESystem<2>[FE_Q<2>(3)^2-FE_Q<2>(2)]: 0
+DEAL:2d::
+DEAL:2d::Verification FESystem<2>[FE_Q<2>(4)^2-FE_Q<2>(3)]: 0
+DEAL:2d::
+DEAL:2d::Verification FESystem<2>[FE_DGQ<2>(2)^2-FE_DGQ<2>(1)]: 0
+DEAL:2d::
+DEAL:2d::Verification FESystem<2>[FE_DGQ<2>(1)^2-FE_DGQ<2>(0)]: 0
+DEAL:2d::
+DEAL:2d::Verification FESystem<2>[FE_DGQ<2>(4)^2-FE_DGQ<2>(3)]: 0
+DEAL:2d::
+DEAL:3d::Verification FESystem<3>[FE_Q<3>(2)^3-FE_Q<3>(1)]: 0
+DEAL:3d::
+DEAL:3d::Verification FESystem<3>[FE_DGQ<3>(2)^3-FE_DGQ<3>(1)]: 0
+DEAL:3d::

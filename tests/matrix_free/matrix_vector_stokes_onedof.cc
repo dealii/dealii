@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,11 +15,10 @@
 
 
 
-// this function tests the correctness of the implementation of matrix free
-// matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a hypershell mesh with hanging nodes and constraints
-// between the vector components in the form of no-normal flux constraints on
-// the Stokes equations.
+// correctness matrix free matrix-vector products by comparing with the result
+// of a deal.II sparse matrix. Similar to matrix_vector_stokes_noflux but
+// putting all degrees of freedom into a single DoFHandler, where the
+// selection is done through FEEvaluation
 
 #include "../tests.h"
 
@@ -28,8 +27,9 @@ std::ofstream logfile("output");
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -37,9 +37,10 @@ std::ofstream logfile("output");
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
@@ -68,16 +69,16 @@ public:
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
-    FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0);
-    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure (data, 1);
+    FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0, 0, 0);
+    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure (data, 0, 0, dim);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         velocity.reinit (cell);
-        velocity.read_dof_values (src.block(0));
+        velocity.read_dof_values (src);
         velocity.evaluate (false,true,false);
         pressure.reinit (cell);
-        pressure.read_dof_values (src.block(1));
+        pressure.read_dof_values (src);
         pressure.evaluate (true,false,false);
 
         for (unsigned int q=0; q<velocity.n_q_points; ++q)
@@ -96,9 +97,9 @@ public:
           }
 
         velocity.integrate (false,true);
-        velocity.distribute_local_to_global (dst.block(0));
+        velocity.distribute_local_to_global (dst);
         pressure.integrate (true,false);
-        pressure.distribute_local_to_global (dst.block(1));
+        pressure.distribute_local_to_global (dst);
       }
   }
 
@@ -118,7 +119,7 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void test (const FESystem<dim> &fe)
 {
   SphericalManifold<dim> manifold;
   Triangulation<dim>   triangulation;
@@ -126,7 +127,6 @@ void test ()
                               0.5, 1., 96, true);
   triangulation.set_all_manifold_ids(0);
   triangulation.set_manifold (0, manifold);
-
   triangulation.begin_active()->set_refine_flag();
   triangulation.last()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
@@ -135,54 +135,31 @@ void test ()
   triangulation.execute_coarsening_and_refinement();
 
   MappingQ<dim>        mapping (3);
-  FE_Q<dim>            fe_u_scal (fe_degree+1);
-  FESystem<dim>        fe_u (fe_u_scal,dim);
-  FE_Q<dim>            fe_p (fe_degree);
-  FESystem<dim>        fe (fe_u_scal, dim, fe_p, 1);
-  DoFHandler<dim>      dof_handler_u (triangulation);
-  DoFHandler<dim>      dof_handler_p (triangulation);
   DoFHandler<dim>      dof_handler (triangulation);
 
   MatrixFree<dim,double> mf_data;
 
   ConstraintMatrix     constraints, constraints_u, constraints_p;
 
-  BlockSparsityPattern      sparsity_pattern;
-  BlockSparseMatrix<double> system_matrix;
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
 
-  BlockVector<double> solution;
-  BlockVector<double> system_rhs;
-  BlockVector<double> mf_solution;
+  Vector<double> solution;
+  Vector<double> system_rhs;
+  Vector<double> mf_solution;
 
   dof_handler.distribute_dofs (fe);
-  dof_handler_u.distribute_dofs (fe_u);
-  dof_handler_p.distribute_dofs (fe_p);
-  std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
-  stokes_sub_blocks[dim] = 1;
-  DoFRenumbering::component_wise (dof_handler, stokes_sub_blocks);
 
   std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
   no_normal_flux_boundaries.insert (1);
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
-  VectorTools::compute_no_normal_flux_constraints (dof_handler, 0,
-                                                   no_normal_flux_boundaries,
-                                                   constraints, mapping);
+  if (fe.dofs_per_vertex > 0)
+    VectorTools::compute_no_normal_flux_constraints (dof_handler, 0,
+                                                     no_normal_flux_boundaries,
+                                                     constraints, mapping);
   constraints.close ();
-  DoFTools::make_hanging_node_constraints (dof_handler_u,
-                                           constraints_u);
-  VectorTools::compute_no_normal_flux_constraints (dof_handler_u, 0,
-                                                   no_normal_flux_boundaries,
-                                                   constraints_u, mapping);
-  constraints_u.close ();
-  DoFTools::make_hanging_node_constraints (dof_handler_p,
-                                           constraints_p);
-  constraints_p.close ();
-
-  std::vector<types::global_dof_index> dofs_per_block (2);
-  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
-                                  stokes_sub_blocks);
 
   //std::cout << "Number of active cells: "
   //          << triangulation.n_active_cells()
@@ -193,16 +170,10 @@ void test ()
   //          << std::endl;
 
   {
-    BlockDynamicSparsityPattern csp (2,2);
+    DynamicSparsityPattern dsp (dof_handler.n_dofs(),dof_handler.n_dofs());
 
-    for (unsigned int d=0; d<2; ++d)
-      for (unsigned int e=0; e<2; ++e)
-        csp.block(d,e).reinit (dofs_per_block[d], dofs_per_block[e]);
-
-    csp.collect_sizes();
-
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
-    sparsity_pattern.copy_from (csp);
+    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
+    sparsity_pattern.copy_from (dsp);
   }
 
   system_matrix.reinit (sparsity_pattern);
@@ -269,54 +240,37 @@ void test ()
       }
   }
 
-
-  solution.reinit (2);
-  for (unsigned int d=0; d<2; ++d)
-    solution.block(d).reinit (dofs_per_block[d]);
-  solution.collect_sizes ();
-
+  solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit (solution);
   mf_solution.reinit (solution);
 
   // fill system_rhs with random numbers
-  for (unsigned int j=0; j<system_rhs.block(0).size(); ++j)
-    if (constraints_u.is_constrained(j) == false)
+  for (unsigned int j=0; j<system_rhs.size(); ++j)
+    if (constraints.is_constrained(j) == false)
       {
-        const double val = -1 + 2.*random_value<double>();
-        system_rhs.block(0)(j) = val;
-      }
-  for (unsigned int j=0; j<system_rhs.block(1).size(); ++j)
-    if (constraints_p.is_constrained(j) == false)
-      {
-        const double val = -1 + 2.*random_value<double>();
-        system_rhs.block(1)(j) = val;
+        const double val = -1 + 2.*(double)Testing::rand()/double(RAND_MAX);
+        system_rhs(j) = val;
       }
 
   // setup matrix-free structure
   {
-    std::vector<const DoFHandler<dim>*> dofs;
-    dofs.push_back(&dof_handler_u);
-    dofs.push_back(&dof_handler_p);
-    std::vector<const ConstraintMatrix *> constraints;
-    constraints.push_back (&constraints_u);
-    constraints.push_back (&constraints_p);
     QGauss<1> quad(fe_degree+2);
     // no parallelism
-    mf_data.reinit (mapping, dofs, constraints, quad,
+    mf_data.reinit (mapping, dof_handler, constraints, quad,
                     typename MatrixFree<dim>::AdditionalData
                     (MatrixFree<dim>::AdditionalData::none));
   }
 
   system_matrix.vmult (solution, system_rhs);
 
-  MatrixFreeTest<dim,fe_degree,BlockVector<double> > mf (mf_data);
+  MatrixFreeTest<dim,fe_degree,Vector<double> > mf (mf_data);
   mf.vmult (mf_solution, system_rhs);
 
   // Verification
   mf_solution -= solution;
   const double error = mf_solution.linfty_norm();
   const double relative = solution.linfty_norm();
-  deallog << "Verification fe degree " << fe_degree  <<  ": "
+  deallog << "Verification " << fe.get_name()  <<  ": "
           << error/relative << std::endl << std::endl;
 }
 
@@ -324,19 +278,29 @@ void test ()
 
 int main ()
 {
-  deallog.attach(logfile);
-
-  deallog << std::setprecision (3);
+  initlog();
 
   {
     deallog << std::endl << "Test with doubles" << std::endl << std::endl;
     deallog.push("2d");
-    test<2,1>();
-    test<2,2>();
-    test<2,3>();
+    test<2,1>(FESystem<2>(FE_Q<2>(2),2,
+                          FE_Q<2>(1),1));
+    test<2,2>(FESystem<2>(FE_Q<2>(3),2,
+                          FE_Q<2>(2),1));
+    test<2,3>(FESystem<2>(FE_Q<2>(4),2,
+                          FE_Q<2>(3),1));
+    test<2,1>(FESystem<2>(FE_DGQ<2>(2),2,
+                          FE_DGQ<2>(1),1));
+    test<2,0>(FESystem<2>(FE_DGQ<2>(1),2,
+                          FE_DGQ<2>(0),1));
+    test<2,3>(FESystem<2>(FE_DGQ<2>(4),2,
+                          FE_DGQ<2>(3),1));
     deallog.pop();
     deallog.push("3d");
-    test<3,1>();
+    test<3,1>(FESystem<3>(FE_Q<3>(2),3,
+                          FE_Q<3>(1),1));
+    test<3,1>(FESystem<3>(FE_DGQ<3>(2),3,
+                          FE_DGQ<3>(1),1));
     deallog.pop();
   }
 }
