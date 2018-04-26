@@ -95,6 +95,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    ADD_FLAGS(DEAL_II_CUDA_FLAGS_DEBUG "-G")
   ENDIF()
 ENDMACRO()
 
