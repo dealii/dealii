@@ -1005,8 +1005,7 @@ namespace Polynomials
     // check: does the information
     // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
-          ((recursive_coefficients.size() >= k+1) &&
-           (recursive_coefficients[k].get() == nullptr)) )
+          (recursive_coefficients[k].get() == nullptr))
       // no, then generate the
       // respective coefficients
       {
@@ -1040,20 +1039,20 @@ namespace Polynomials
             // later assign it to the
             // coefficients array to
             // make it const
-            std::vector<double> *c0 = new std::vector<double>(2);
-            (*c0)[0] =  1.;
-            (*c0)[1] = -1.;
+            std::vector<double> c0(2);
+            c0[0] =  1.;
+            c0[1] = -1.;
 
-            std::vector<double> *c1 = new std::vector<double>(2);
-            (*c1)[0] = 0.;
-            (*c1)[1] = 1.;
+            std::vector<double> c1(2);
+            c1[0] = 0.;
+            c1[1] = 1.;
 
             // now make these arrays
             // const
             recursive_coefficients[0] =
-              std::unique_ptr<const std::vector<double> >(c0);
+              std_cxx14::make_unique<const std::vector<double> >(std::move(c0));
             recursive_coefficients[1] =
-              std::unique_ptr<const std::vector<double> >(c1);
+              std_cxx14::make_unique<const std::vector<double> >(std::move(c1));
           }
         else if (k==2)
           {
@@ -1061,16 +1060,16 @@ namespace Polynomials
             compute_coefficients(1);
             coefficients_lock.acquire ();
 
-            std::vector<double> *c2 = new std::vector<double>(3);
+            std::vector<double> c2(3);
 
             const double a = 1.; //1./8.;
 
-            (*c2)[0] =   0.*a;
-            (*c2)[1] =  -4.*a;
-            (*c2)[2] =   4.*a;
+            c2[0] =   0.*a;
+            c2[1] =  -4.*a;
+            c2[2] =   4.*a;
 
             recursive_coefficients[2] =
-              std::unique_ptr<const std::vector<double> >(c2);
+              std_cxx14::make_unique<const std::vector<double> >(std::move(c2));
           }
         else
           {
@@ -1086,17 +1085,17 @@ namespace Polynomials
             compute_coefficients(k-1);
             coefficients_lock.acquire ();
 
-            std::vector<double> *ck = new std::vector<double>(k+1);
+            std::vector<double> ck (k+1);
 
             const double a = 1.; //1./(2.*k);
 
-            (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
+            ck[0] = - a*(*recursive_coefficients[k-1])[0];
 
             for (unsigned int i=1; i<=k-1; ++i)
-              (*ck)[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
-                             - (*recursive_coefficients[k-1])[i] );
+              ck[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
+                          - (*recursive_coefficients[k-1])[i] );
 
-            (*ck)[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
+            ck[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
             // for even degrees, we need
             // to add a multiple of
             // basis fcn phi_2
@@ -1106,15 +1105,15 @@ namespace Polynomials
                 //for (unsigned int i=1; i<=k; i++)
                 //  b /= 2.*i;
 
-                (*ck)[1] += b*(*recursive_coefficients[2])[1];
-                (*ck)[2] += b*(*recursive_coefficients[2])[2];
+                ck[1] += b*(*recursive_coefficients[2])[1];
+                ck[2] += b*(*recursive_coefficients[2])[2];
               }
             // finally assign the newly
             // created vector to the
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std::unique_ptr<const std::vector<double> >(ck);
+              std_cxx14::make_unique<const std::vector<double> >(std::move(ck));
           };
       };
   }

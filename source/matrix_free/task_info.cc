@@ -1413,8 +1413,8 @@ namespace internal
       Assert(!hp_bool || cell_active_fe_index.size() == n_active_cells,
              ExcInternalError());
 
-      unsigned int n_macro_cells_before = 0;
       {
+        unsigned int n_macro_cells_before = 0;
         // Create partitioning within partitions.
 
         // For each block of cells, this variable saves to which partitions
@@ -1426,7 +1426,6 @@ namespace internal
         partition_row_index.resize(partition+1,0);
         cell_partition_data.resize(1,0);
 
-        unsigned int start_up = 0;
         unsigned int counter = 0;
         unsigned int missing_macros;
         for (unsigned int part=0; part<partition; ++part)
@@ -1435,7 +1434,7 @@ namespace internal
             neighbor_list.resize(0);
             bool work = true;
             unsigned int partition_l2 = 0;
-            start_up = partition_size[part];
+            unsigned int start_up = partition_size[part];
             unsigned int partition_counter = 0;
             while (work)
               {
@@ -1680,10 +1679,7 @@ namespace internal
      const std::vector<unsigned int>       &partition_size,
      std::vector<unsigned int>             &partition_color_list)
     {
-
       const unsigned int n_macro_cells = *(cell_partition_data.end()-2);
-      std::vector<unsigned int> neighbor_list;
-      std::vector<unsigned int> neighbor_neighbor_list;
       std::vector<unsigned int> cell_color(n_blocks, n_macro_cells);
       std::vector<bool> color_finder;
 

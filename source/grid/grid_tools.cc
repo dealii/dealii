@@ -566,7 +566,7 @@ namespace GridTools
     class Shift
     {
     public:
-      Shift (const Tensor<1,spacedim> &shift)
+      explicit Shift (const Tensor<1,spacedim> &shift)
         :
         shift(shift)
       {}
@@ -585,7 +585,7 @@ namespace GridTools
     class Rotate2d
     {
     public:
-      Rotate2d (const double angle)
+      explicit Rotate2d (const double angle)
         :
         angle(angle)
       {}
@@ -633,7 +633,7 @@ namespace GridTools
     class Scale
     {
     public:
-      Scale (const double factor)
+      explicit Scale (const double factor)
         :
         factor(factor)
       {}

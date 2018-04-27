@@ -1640,7 +1640,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 #else
   const unsigned int dim=2;
   const unsigned int spacedim=2;
-  const bool output=false;
   Assert (tria != 0, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
@@ -1913,7 +1912,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 #else
   const unsigned int dim=3;
   const unsigned int spacedim=3;
-  const bool output=false;
   Assert (tria != 0, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
@@ -1926,8 +1924,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   NcDim *elements_dim=nc.get_dim("no_of_elements");
   AssertThrow(elements_dim->is_valid(), ExcIO());
   const unsigned int n_cells=elements_dim->size();
-  if (output)
-    std::cout << "n_cell=" << n_cells << std::endl;
   // and n_hexes
   NcDim *hexes_dim=nc.get_dim("no_of_hexaeders");
   AssertThrow(hexes_dim->is_valid(), ExcIO());
@@ -1960,17 +1956,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
     AssertThrow(vertex_indices[i]>=0, ExcIO());
 
-  if (output)
-    {
-      std::cout << "vertex_indices:" << std::endl;
-      for (unsigned int cell=0, v=0; cell<n_cells; ++cell)
-        {
-          for (unsigned int i=0; i<vertices_per_hex; ++i)
-            std::cout << vertex_indices[v++] << " ";
-          std::cout << std::endl;
-        }
-    }
-
   // next we read
   //   double points_xc(no_of_points)
   //   double points_yc(no_of_points)
@@ -1978,8 +1963,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   NcDim *vertices_dim=nc.get_dim("no_of_points");
   AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices=vertices_dim->size();
-  if (output)
-    std::cout << "n_vertices=" << n_vertices << std::endl;
 
   NcVar *points_xc=nc.get_var("points_xc");
   NcVar *points_yc=nc.get_var("points_yc");
@@ -1998,19 +1981,9 @@ void GridIn<3>::read_netcdf (const std::string &filename)
               static_cast<int>(n_vertices), ExcIO());
   std::vector<std::vector<double> > point_values(
     3, std::vector<double> (n_vertices));
-  // we switch y and z
-  const bool switch_y_z=false;
   points_xc->get(&*point_values[0].begin(), n_vertices);
-  if (switch_y_z)
-    {
-      points_yc->get(&*point_values[2].begin(), n_vertices);
-      points_zc->get(&*point_values[1].begin(), n_vertices);
-    }
-  else
-    {
-      points_yc->get(&*point_values[1].begin(), n_vertices);
-      points_zc->get(&*point_values[2].begin(), n_vertices);
-    }
+  points_yc->get(&*point_values[1].begin(), n_vertices);
+  points_zc->get(&*point_values[2].begin(), n_vertices);
 
   // and fill the vertices
   std::vector<Point<spacedim> > vertices (n_vertices);
@@ -2051,18 +2024,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 
   std::vector<int> bvertex_indices(n_bquads*vertices_per_quad);
   bvertex_indices_var->get(&*bvertex_indices.begin(), n_bquads, vertices_per_quad);
-
-  if (output)
-    {
-      std::cout << "bquads: ";
-      for (unsigned int i=0; i<n_bquads; ++i)
-        {
-          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-            std::cout << bvertex_indices[
-                        i*GeometryInfo<dim>::vertices_per_face+v] << " ";
-          std::cout << std::endl;
-        }
-    }
 
   // next we read
   // int boundarymarker_of_surfaces(

@@ -2194,11 +2194,11 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     const double r = p.distance(center);
-#ifdef DEAL_II_HAVE_JN
-    return jn(order, r*wave_number);
-#else
+#ifndef DEAL_II_HAVE_JN
     Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
     return r;
+#else
+    return jn(order, r*wave_number);
 #endif
   }
 
@@ -2212,15 +2212,17 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     AssertDimension(points.size(), values.size());
+#ifndef DEAL_II_HAVE_JN
+    (void) points;
+    (void) values;
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
+#else
     for (unsigned int k=0; k<points.size(); ++k)
       {
-#ifdef DEAL_II_HAVE_JN
         const double r = points[k].distance(center);
         values[k] = jn(order, r*wave_number);
-#else
-        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-#endif
       }
+#endif
   }
 
 
@@ -2230,11 +2232,15 @@ namespace Functions
                           const unsigned int) const
   {
     Assert(dim==2, ExcNotImplemented());
+#ifndef DEAL_II_HAVE_JN
+    (void) p;
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
+    return Tensor<1,dim>();
+#else
     const double r = p.distance(center);
     const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
     const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
-#ifdef DEAL_II_HAVE_JN
     const double dJn = (order==0)
                        ? (-jn(1, r*wave_number))
                        : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
@@ -2242,9 +2248,6 @@ namespace Functions
     result[0] = wave_number * co * dJn;
     result[1] = wave_number * si * dJn;
     return result;
-#else
-    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-    return Tensor<1,dim>();
 #endif
   }
 
@@ -2259,6 +2262,9 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     AssertDimension(points.size(), gradients.size());
+#ifndef DEAL_II_HAVE_JN
+    Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
+#else
     for (unsigned int k=0; k<points.size(); ++k)
       {
         const Point<dim> &p = points[k];
@@ -2266,18 +2272,14 @@ namespace Functions
         const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
         const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
-#ifdef DEAL_II_HAVE_JN
         const double dJn = (order==0)
                            ? (-jn(1, r*wave_number))
                            : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
-#else
-        const double dJn = 0.;
-        Assert(false, ExcMessage("The Bessel function jn was not found by CMake."));
-#endif
         Tensor<1,dim> &result = gradients[k];
         result[0] = wave_number * co * dJn;
         result[1] = wave_number * si * dJn;
       }
+#endif
   }
 
 

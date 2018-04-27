@@ -226,7 +226,7 @@ namespace
     template <typename number>
     number
     compute_threshold (const dealii::Vector<number>   &criteria,
-                       const std::pair<double,double>  global_min_and_max,
+                       const std::pair<double,double> &global_min_and_max,
                        const unsigned int              n_target_cells,
                        MPI_Comm                        mpi_communicator)
     {
@@ -316,7 +316,7 @@ namespace
     template <typename number>
     number
     compute_threshold (const dealii::Vector<number>   &criteria,
-                       const std::pair<double,double>  global_min_and_max,
+                       const std::pair<double,double> &global_min_and_max,
                        const double                    target_error,
                        MPI_Comm                        mpi_communicator)
     {
