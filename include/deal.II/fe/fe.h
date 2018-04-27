@@ -1335,17 +1335,24 @@ public:
   /**
    * Comparison operator.
    *
-   * The implementation in the current class checks for equality of the name
-   * returned by get_name() and for equality of the constraint matrix, as well
-   * as all of the fields in FiniteElementData. This covers most cases where
-   * elements can differ, but there are cases of derived elements that are
-   * different and for which the current function still returns @p true.
-   * For these cases, derived classes should overload this function.
+   * The implementation in the current class checks for equality of the
+   * following pieces of information between the current object and the one
+   * given as argument, in this order:
+   * - the dynamic type (i.e., the type of the most derived class) of the
+   *   current object and of the given object,
+   * - the name returned by get_name(),
+   * - as all of the fields in FiniteElementData,
+   * - constraint matrices,
+   * - restriction matrices,
+   * - prolongation matrices of this object and the argument.
    *
-   * We do not compare the matrix arrays #restriction and #prolongation.
+   * This covers most cases where elements can differ, but there are
+   * cases of derived elements that are different and for which the
+   * current function still returns @p true. For these cases, derived
+   * classes should overload this function.
    */
   virtual
-  bool operator == (const FiniteElement<dim,spacedim> &) const;
+  bool operator == (const FiniteElement<dim,spacedim> &fe) const;
 
   /**
    * Non-equality comparison operator. Defined in terms of the equality comparison operator.

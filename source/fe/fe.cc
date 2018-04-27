@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <functional>
 #include <numeric>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -937,10 +938,20 @@ template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) const
 {
-  return ((static_cast<const FiniteElementData<dim>&>(*this) ==
-           static_cast<const FiniteElementData<dim>&>(f)) &&
-          (interface_constraints == f.interface_constraints) &&
-          (this->get_name() == f.get_name()));
+  // Compare fields in roughly increasing order of how expensive the
+  // comparison is
+  return ((typeid(*this) == typeid(f))
+          &&
+          (this->get_name() == f.get_name())
+          &&
+          (static_cast<const FiniteElementData<dim>&>(*this) ==
+           static_cast<const FiniteElementData<dim>&>(f))
+          &&
+          (interface_constraints == f.interface_constraints)
+          &&
+          (restriction == f.restriction)
+          &&
+          (prolongation == f.prolongation));
 }
 
 
