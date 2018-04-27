@@ -522,6 +522,48 @@ namespace deal_II_exceptions
         }
         }
     }
+
+
+
+    std::string get_cusolver_error_string(cusolverStatus_t error_code)
+    {
+      std::string message;
+      switch (error_code)
+        {
+        case CUSOLVER_STATUS_NOT_INITIALIZED:
+        {
+          return "The cuSolver library was not initialized";
+        }
+        case CUSOLVER_STATUS_ALLOC_FAILED:
+        {
+          return "Resource allocation failed inside the cuSolver library";
+        }
+        case CUSOLVER_STATUS_INVALID_VALUE:
+        {
+          return "An unsupported value of a parameter was passed to the function";
+        }
+        case CUSOLVER_STATUS_ARCH_MISMATCH:
+        {
+          return "The function requires a feature absent from the device architecture";
+        }
+        case CUSOLVER_STATUS_EXECUTION_FAILED:
+        {
+          return "The GPU program failed to execute";
+        }
+        case CUSOLVER_STATUS_INTERNAL_ERROR:
+        {
+          return "An internal cuSolver operation failed";
+        }
+        case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+        {
+          return "The matrix type is not supported by this function";
+        }
+        default:
+        {
+          return "Unknown error";
+        }
+        }
+    }
 #endif
 
   } /*namespace internals*/

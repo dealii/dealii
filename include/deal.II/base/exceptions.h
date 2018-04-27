@@ -23,6 +23,7 @@
 #include <ostream>
 
 #ifdef DEAL_II_WITH_CUDA
+#include <cusolverSp.h>
 #include <cusparse.h>
 #endif
 
@@ -1088,6 +1089,12 @@ namespace deal_II_exceptions
      * function but there is no equivalent function for cuSPARSE.
      */
     std::string get_cusparse_error_string(const cusparseStatus_t error_code);
+
+    /**
+     * Return a string given an error code. This is similar to the cudaGetErrorString
+     * function but there is no equivalent function for cuSOLVER.
+     */
+    std::string get_cusolver_error_string(const cusolverStatus_t error_code);
 #endif
   } /*namespace internals*/
 
@@ -1318,6 +1325,15 @@ AssertThrow(error_code == MPI_SUCCESS, dealii::ExcMPI(error_code))
                                               get_cusparse_error_string(error_code)))
 #else
 #define AssertCusparse(error_code) { (void) (error_code); }
+#endif
+
+#ifdef DEBUG
+#define AssertCusolver(error_code) Assert(error_code == CUSOLVER_STATUS_SUCCESS, \
+                                          dealii::ExcCusparseError( \
+                                              dealii::deal_II_exceptions::internals:: \
+                                              get_cusolver_error_string(error_code)))
+#else
+#define AssertCusolver(error_code) { (void) (error_code); }
 #endif
 
 #endif
