@@ -89,6 +89,16 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * An exception which states that a function has been disabled due to the
+ * configuration of Adol-C with the advanced branching feature enabled.
+ *
+ * @ingroup Exceptions
+ */
+DeclExceptionMsg (ExcADOLCAdvancedBranching,
+                  "This function has not yet been implemented for taped Adol-C "
+                  "numbers when the advanced branching feature is activated.");
+
 
 /* --------------------------- inline and template functions and specializations ------------------------- */
 
