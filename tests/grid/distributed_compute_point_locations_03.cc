@@ -63,7 +63,8 @@ void test_distributed_cpt(unsigned int ref_cube)
   // Computing bounding boxes describing the locally owned part of the mesh
   IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
   std::vector< BoundingBox<dim> > local_bbox = GridTools::compute_mesh_predicate_bounding_box
-                                               (cube_d, locally_owned_cell_predicate,
+                                               (cube_d,
+                                                std::function<bool (const typename Triangulation<dim>::active_cell_iterator &)>(locally_owned_cell_predicate),
                                                 1, false, 4);
 
   // Obtaining the global mesh description through an all to all communication
