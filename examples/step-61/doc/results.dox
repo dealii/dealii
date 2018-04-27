@@ -1,0 +1,88 @@
+<h1>Results</h1>
+
+We run the test example $p = \sin(\pi x) \sin(\pi y)$ with homogenous Dirichelet boundary conditions in the domain $\Omega = (0,1)^2$. And  $\mathbf{K}$ is the identity matrix. We test it on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ and $\mbox{WG}(Q_2,Q_2;RT_{[2]})$. We will visualize pressure values in interiors and on faces. We want to see the pressure maximum is around 1 and the minimum is around 0. With the mesh refinement, the convergence rates of pressure, velocity and flux should be around 1 on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ , 2 on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$, and 3 on $\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
+
+<h3>Test results on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$</h3>
+The following figures are interior pressures and face pressures implemented on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$. The mesh is refined 2 times and 4 times separately. 
+
+<table align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_2d_2.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_3d_2.png" alt=""></td>
+  </tr>
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_2d_4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg000_3d_4.png" alt=""></td>
+  </tr>
+</table>
+
+From the figures, we can see that with the mesh refinement, the maximum and minimum are approaching to what we expect. 
+Since the mesh is a rectangular mesh and numbers of refinement are even, we have symmetric solutions. From the 3d figures, we can see that on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, pressure is a constant in the interior of the cell.
+
+<h4>Convergence table</h4>
+
+We run the code with finer meshes and get the following convergence rates of pressure, 
+velocity and flux.
+
+@code
+number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
+   2                      1.587e-01                5.113e-01                  7.062e-01 
+   3                      8.000e-02                2.529e-01                  3.554e-01  
+   4                      4.006e-02                1.260e-01                  1.780e-01
+   5                      2.004e-02                6.297e-02                  8.902e-02
+Conv.rate                   1.00                     1.00                        1.00  
+@endcode
+We can see that the convergence rates of $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ are around 1.
+
+
+<h3>Test results on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$</h3>
+
+The following figures are interior pressures and face pressures implemented on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$. The mesh is refined 4 times.  Compared to the previous figures on 
+$\mbox{WG}(Q_0,Q_0;RT_{[0]})$, on each cell, the result is not a constant. Because we use higher order polynomials to do approximation. So there are 4 pressure values in one interior, 2 pressure values on each face. We use data_out_face.build_patches (fe.degree)
+to divide each cell interior into 4 subcells.
+
+<table align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg111_2d_4.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg111_3d_4.png" alt=""></td>
+  </tr>
+</table>
+
+<h4>Convergence table</h4>
+
+These are the convergence rates of pressure, velocity and flux on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$
+
+@code
+number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
+   2                      1.613e-02                5.093e-02                  7.167e-02 
+   3                      4.056e-03                1.276e-02                  1.802e-02  
+   4                      1.015e-03                3.191e-03                  4.512e-03
+   5                      2.540e-04                7.979e-04                  1.128e-03
+Conv.rate                   2.00                     2.00                        2.00  
+@endcode
+The convergence rates of $WG(Q_1,Q_1;RT_{[1]})$ are around 2.
+
+<h3>Test results on $WG(Q_2,Q_2;RT_{[2]})$</h3>
+
+These are interior pressures and face pressures implemented on $WG(Q_2,Q_2;RT_{[2]})$, with mesh size $h = 1/32$.
+
+<table align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg222_2d_5.png" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-61.wg222_3d_5.png" alt=""></td>
+  </tr>
+</table>
+
+<h4>Convergence table</h4>
+
+This is the convergence table of $L_2$ errors of pressure, velocity and flux on $\mbox{WG}(Q_2,Q_2;RT_{[2]})$
+
+@code
+number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
+   2                      1.072e-03                3.375e-03                  4.762e-03 
+   3                      1.347e-04                4.233e-04                  5.982e-04  
+   4                      1.685e-05                5.295e-05                  7.487e-05
+   5                      2.107e-06                6.620e-06                  9.362e-06
+Conv.rate                   3.00                     3.00                        3.00  
+@endcode
+The convergence rates of $\mbox{WG}(Q_2,Q_2;RT_{[2]})$ are around 3.

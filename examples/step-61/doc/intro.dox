@@ -1,0 +1,279 @@
+<br>
+
+<i>
+This program was contributed by Zhuoran Wang.
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program presents an implementation of the "weak Galerkin" 
+finite element method for the Poisson equation. In some sense, the motivation for
+considering this method starts from the same point as in step-51: We would like to
+consider discontinuous shape functions, but then need to address the fact that
+the resulting problem has a large number of degrees of freedom (because, for
+example, each vertex carries as many degrees of freedom as there are adjacent cells).
+We also have to address the fact that, in general, every degree of freedom
+on one cell couples with all of the degrees of freedom on each of its face neighbor
+cells. Consequently, the matrix one gets from the "traditional" discontinuous
+Galerkin methods are both large and relatively dense.
+
+Both the hybridized discontinuous Galerkin method (HDG) in step-51 and the weak
+Galerkin (WG) method in this tutorial address the issue of coupling by introducing
+additional degrees of freedom whose shape functions only live on a face between
+cells (i.e., on the "skeleton" of the mesh), and which therefore "insulate" the
+degrees of freedom on the adjacent cells from each other: cell degrees of freedom
+only couple with other cell degrees of freedom on the same cell, as well as face
+degrees of freedom, but not with cell degrees of freedom on neighboring cells.
+Consequently, the shape functions for these cell degrees of freedom are
+discontinuous and only "live" on exactly one cell.
+
+For a given equation, say the second order Poisson equation,
+the difference between the HDG and the WG method is how exactly one formulates
+the problem that connects all of these different shape functions. The HDG does
+things by reformulating second order problems in terms of a system of first
+order equations and then conceptually considers the face degrees of freedom
+to be "fluxes" of this first order system. In contrast, the WG method keeps things
+in second order form and considers the face degrees of freedom as of the same
+type as the primary solution variable, just restricted to the lower-dimensional
+faces. For the purposes of the equation, one then needs to somehow "extend"
+these shape functions into the interior of the cell when defining what it means
+to apply a differential operator to them. Compared to the HDG, the method
+has the advantage that it does not lead to a proliferation of unknowns due
+to rewriting the equation as a first-order system, but it is also not quite
+as easy to implement. However, as we will see in the following, this
+additional effort is not prohibitive.
+ 
+
+<h3>  Weak Galerkin finite element methods</h3>
+
+Weak Galerkin Finite Element Methods (WGFEMs) use discrete weak functions 
+to approximate scalar unknowns and discrete weak gradients to 
+approximate classical gradients. 
+It was introduced by Junping Wang and Xiu Ye 
+in the paper: <i>A weak Galerkin finite element method for second order elliptic problems</i>, 
+J. Comput. Appl. Math., 2013, 103-115. 
+Compared to the continuous Galerkin method, 
+the weak Galerkin method satisfies important physical properties, namely 
+local mass conservation and bulk normal flux continuity. 
+It results in a SPD linear system, and expected convergence rates can 
+be obtained with mesh refinement.
+
+
+<h3> WGFEM applied to the Poisson equation </h3>
+This program solves the Poisson equation 
+using the weak Galerkin finite element method:
+@f{eqnarray*}
+  \nabla \cdot \left( -\mathbf{K} \nabla p \right)
+    = f,
+    \quad \mathbf{x} \in \Omega, \\
+  p =  p_D,\quad \mathbf{x} \in \Gamma^D, \\
+  \mathbf{u} \cdot \mathbf{n} = u_N,
+  \quad \mathbf{x} \in \Gamma^N, 
+@f}
+where $\Omega \subset \mathbb{R}^n (n=2,3)$ is a bounded domain. 
+In the context of the flow of a fluid through a porous medium,
+$p$ is the pressure, $\mathbf{K}$ is a permeability tensor, 
+$ f $ is the source term, and
+$ p_D, u_N $ represent Dirichlet and Neumann boundary conditions.
+We can introduce a flux, $\mathbf{u} = -\mathbf{K} \nabla p$, that corresponds 
+to the Darcy velocity (in the way we did in step-20) and this variable will
+be important in the considerations below.
+
+In this program, we will consider a test case where the exact pressure 
+is $p = \sin \left( \pi x)\sin(\pi y \right)$ on the unit square domain,
+with homogenous Dirichelet boundary conditions and identity matrix $\mathbf{K}$.
+Then we will calculate $L_2$ errors of pressure, velocity and flux.
+
+
+<h3> Weak Galerkin scheme </h3>
+
+Via integration by parts, the weak Galerkin scheme for the Poisson equation is
+@f{equation*}
+\mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left(q \right),
+@f}
+where
+@f{equation*}
+\mathcal{A}_h\left(p_h,q\right)
+  := \sum_{T \in \mathcal{T}_h}
+    \int_T \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q \mathrm{d}x,
+@f}
+and 
+@f{equation*}
+\mathcal{F}\left(q\right)
+  := \sum_{T \in \mathcal{T}_h} \int_T f \, q^\circ \mathrm{d}x
+  - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q^\partial \mathrm{d}x,
+@f}
+$q^\circ$ is the shape function of the polynomial space in the interior, 
+$q^\partial$ is the shape function of the polynomial space on faces, $ \nabla_{w,d} $ means the discrete weak gradient used to approximate the classical gradient. 
+We use FE_DGQ as the interior polynomial space, 
+FE_FaceQ as the face polynomial space, and Raviart-Thomas elements for the velocity 
+$\mathbf{u} = -{\mathbf{K}} \nabla_{w,d} p$. 
+
+<h3> Assembling the linear system </h3>
+
+First, we solve for the pressure. 
+We collect two local spaces together in one FESystem, 
+the first component in this finite element system denotes 
+the space for interior pressure, and the second denotes 
+the space for face pressure. 
+For the interior component, we use the polynomial space FE_DGQ. 
+For the face component, we use FE_FaceQ.
+
+We use shape functions defined on spaces FE_DGQ and FE_FaceQ to 
+approximate pressures, i.e., $p_h = \sum a_i \phi_i,$ 
+where $\phi_i$ are shape functions of FESystem. 
+We construct the local system by using discrete weak gradients of 
+shape functions of FE_DGQ and FE_FaceQ.
+The discrete weak gradients of shape functions $\nabla_{w,d} \phi$ are defined as 
+$\nabla_{w,d} \phi = \sum_{i=1}^m c_i \mathbf{w}_i,$ 
+where $\mathbf{w}_i$ is the basis function of $RT(k)$. 
+
+Using integration by parts, we have a small linear system 
+on each element $T$,
+@f{equation*}
+\int_{T} \left(\nabla_{w,d} \phi \right) \cdot \mathbf{w} \mathrm{d}x= 
+\int_{T^\partial} \phi^{\partial} \left(\mathbf{w} \cdot \mathbf{n}\right) \mathrm{d}x- 
+\int_{T^\circ} \phi^{\circ} \left(\nabla \cdot \mathbf{w}\right) \mathrm{d}x,  
+\quad \forall \mathbf{w} \in RT_{[k]}(E),
+@f}
+
+@f{equation*}
+\sum_{i=1}^m c_i \int_T \mathbf{w}_i \cdot \mathbf{w}_j \mathrm{d}x = 
+\int_{T^{\partial}} \phi_i^{\partial} 
+\left(\mathbf{w}_j \cdot \mathbf{n} \right) \mathrm{d}x - 
+\int_{T^{\circ}} \phi_i^{\circ} \left (\nabla \cdot \mathbf{w}_j \right)\mathrm{d}x,
+@f}
+which can be simplified to be
+@f{equation*}
+\mathbf{C}_{E}\mathbf{M}_{E} = \mathbf{F}_{E},
+@f}
+where $\mathbf{C}_E$ is the matrix with unknown coefficients $c$, 
+$\mathbf{M}_E$ is the Gram matrix 
+$\left[  \int_T \mathbf{w}_i \cdot \mathbf{w}_j \right] \mathrm{d}x$, 
+$\mathbf{F}_E$ is the matrix of right hand side, 
+$\mathbf{w}$ and $\phi_i^{\circ}$ are in FEValues, 
+$\phi_i^{\partial}$ is in FEFaceValues. 
+Then we solve for $\mathbf{C}_E = \mathbf{F}_E \mathbf{M}_E^{-1}$. 
+Now, discrete weak gradients of shape functions are written as 
+linear combinations of basis functions of the $RT$ space. 
+In our code, we name $\mathbf{C}_E$ as <code>cell_matrix_C</code>, 
+$\mathbf{M}_E$ as <code>cell_matrix_rt</code>, 
+$\mathbf{F}_E$ as <code>cell_matrix_F</code>.
+
+The components of the local cell matrices $\mathbf{A}$ are 
+@f{equation*}
+\mathbf{A}_{ij} = 
+\int_{T} \mathbf{K} \nabla_{w,d} \phi_i \cdot \nabla_{w,d} \phi_j \mathrm{d}x.
+@f}
+From previous steps, we know $\nabla_{w,d} \phi_i = \sum_{k=1}^m c_{ik} \mathbf{w}_k,$
+and $\nabla_{w,d} \phi_j = \sum_{l=1}^m c_{jl} \mathbf{w}_l.$
+Then combining the coefficients we have calculated, components of $\mathbf{A}$ are calculated as
+@f{equation*}
+\int_T \sum_{k,l = 1}^{m}c_{ik} c_{jl} \left(\mathbf{K} \mathbf{w}_i \cdot \mathbf{w}_j\right) \mathrm{d}x
+= \sum_{k,l = 1}^{m}c_{ik} c_{jl} \int_{T} \mathbf{K} \mathbf{w}_i \cdot \mathbf{w}_j \mathrm{d}x.
+@f}
+
+Next, we use ConstraintMatrix::distribute_local_to_global to 
+distribute contributions from local matrices $\mathbf{A}$ to the system matrix. 
+
+In the scheme 
+$\mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left( q \right),$ 
+we have system matrix and system right hand side, 
+we can solve for the coefficients of the system matrix. 
+The solution vector of the scheme represents the pressure values in interiors and on faces.
+
+<h3> Post-processing and $L_2$-errors </h3>
+
+After we have calculated the numerical pressure $p$, 
+we use discrete weak gradients of $p$ to calculate the velocity on each element.
+
+On each element the gradient of the numerical pressure $\nabla p$ can be
+approximated by discrete weak gradients  $ \nabla_{w,d}\phi_i$, so
+@f{equation*}
+\nabla_{w,d} p_h = \sum_{i} a_i \nabla_{w,d}\phi_i.
+@f}
+
+The numerical velocity $ \mathbf{u}_h = -\mathbf{K} \nabla_{w,d}p_h$ can be written as
+@f{equation*}
+\mathbf{u}_h = -\mathbf{K} \nabla_{w,d} p = 
+-\sum_{i} \sum_{j} a_ic_{ij}\mathbf{K}\mathbf{w}_j,
+@f}
+where $c_{ij}$ is the coefficient of Gram matrix, 
+$\mathbf{w}_j$ is the basis function of the $RT$ space. 
+$\mathbf{K} \mathbf{w}_j$ may not be in the $RT$ space. 
+So we need $L_2$-projection to project it back to the $RT$ space. 
+
+We define the projection as 
+$ \mathbf{Q}_h \left( \mathbf{K}\mathbf{w}_j \right) = 
+\sum_{k} d_{jk}\mathbf{w}_k$. 
+For any $j$, 
+$\left( \mathbf{Q}_h \left( \mathbf{Kw}_j \right),\mathbf{w}_k \right)_E = 
+\left( \mathbf{Kw}_j,\mathbf{w}_k \right)_E.$ 
+So the numerical velocity becomes
+@f{equation*}
+\mathbf{u}_h = \mathbf{Q}_h \left( -\mathbf{K}\nabla_{w,d}p_h \right) = 
+-\sum_{i=0}^{4} \sum_{j=1}^{4}a_ib_{ij}\mathbf{Q}_h \left( \mathbf{K}\mathbf{w}_j \right),
+@f}
+and we have the following system to solve for the coefficients $d_{jk}$,
+@f{equation*}
+ \left[
+  \begin{matrix}
+  \left(\mathbf{w}_i,\mathbf{w}_j \right) 
+  \end{matrix}
+  \right]
+  \left[
+   \begin{matrix}
+   d_{jk}
+   \end{matrix}
+   \right]
+   =
+   \left[
+    \begin{matrix}
+    \left( \mathbf{Kw}_j,\mathbf{w}_k \right)
+    \end{matrix}
+    \right].
+@f}
+$
+ \left[
+   \begin{matrix}
+   d_{jk}
+   \end{matrix}
+   \right]
+$
+is named <code>cell_matrix_D</code>, 
+$
+\left[
+    \begin{matrix}
+     \left( \mathbf{Kw}_j,\mathbf{w}_k \right)
+    \end{matrix}
+    \right]
+$
+is named <code>cell_matrix_E</code>.
+
+Then the elementwise velocity is
+@f{equation*}
+\mathbf{u}_h = -\sum_{i} \sum_{j}a_ic_{ij}\sum_{k}d_{jk}\mathbf{w}_k = 
+\sum_{k}- \left(\sum_{j} \sum_{i} a_ic_{ij}d_{jk} \right)\mathbf{w}_k,
+@f}
+where $-\sum_{j} \sum_{i} a_ic_{ij}d_{jk}$ is named 
+<code>beta</code> in the code.
+
+We calculate the $L_2$-errors of pressure, velocity and flux 
+by the following formulas,
+@f{eqnarray*}
+\|p-p_h^\circ\|^2
+  = \sum_{T \in \mathcal{T}_h} \|p-p_h^\circ\|_{L^2(E)}^2, \\
+ \|\mathbf{u}-\mathbf{u}_h\|^2
+  = \sum_{T \in \mathcal{T}_h} \|\mathbf{u}-\mathbf{u}_h\|_{L^2(E)^2}^2,\\
+\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|^2
+  = \sum_{T \in \mathcal{T}_h} \sum_{\gamma \subset T^\partial}
+    \frac{|T|}{|\gamma|} \|\mathbf{u} \cdot \mathbf{n} - \mathbf{u}_h \cdot \mathbf{n}\|_{L^2(\gamma)}^2,
+@f}
+where $| T |$ is the area of the element, 
+$\gamma$ are faces of the element, 
+$\mathbf{n}$ are unit normal vectors of each face.
+
+We will extract interior pressure solutions of each cell 
+from the global solution and calculate the $L_2$ error 
+by using function VectorTools::integrate_difference.
