@@ -1265,7 +1265,58 @@ namespace Patterns
                           Convert<T>::to_pattern()) = delete;
     };
 
+    /**
+     * A utility function that simplifies the conversion to strings of arbitrarily
+     * complex types.
+     *
+     * This function calls the method Convert<T>::to_string() with the default
+     * pattern. An example usage is the following:
+     *
+     * @code
+     * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
+     * auto s = Patterns::Tools::to_string(t);
+     *
+     * std::cout << s; // will print "1 % 1 : ciao""
+     * @endcode
+     *
+     * See the documentation of the class Patterns::Tools::Convert, and of the
+     * helper class Patterns::Tools::RankInfo for details on the way separators
+     * are selected when outputting STL container types.
+     *
+     * @author Luca Heltai, 2018
+     */
+    template<typename T>
+    std::string to_string(const T &t);
 
+    /**
+     * A utility function that simplifies the conversion from strings to arbitrary
+     * types.
+     *
+     * This function calls the method Convert<T>::to_value() with the default
+     * pattern. An example usage is the following:
+     *
+     * @code
+     * auto t = std::make_tuple(1.0, std::make_pair(1, "ciao"));
+     * // replace the value of 't' by the parsed content of the string argument:
+     * Patterns::Tools::to_value("2 % 3 : mondo", t);
+     *
+     * auto s = Patterns::Tools::to_string(t);
+     * std::cout << s; // will print "2 % 3 : mondo""
+     * @endcode
+     *
+     * See the documentation of the class Patterns::Tools::Convert, and of the
+     * helper class Patterns::Tools::RankInfo for details on the separators you
+     * should use in your string patterns when converting from a string to a
+     * container type.
+     *
+     * Notice that the current content of variable @p t is ignored. Its type is
+     * used to infer how to interpret the string. If the string is succesfully
+     * parsed, then @p t will be set to the parsed content of @p s.
+     *
+     * @author Luca Heltai, 2018
+     */
+    template<typename T>
+    void to_value(const std::string &s, T &t);
 
     /**
      * @addtogroup Exceptions
@@ -2019,6 +2070,19 @@ namespace Patterns
       }
     };
 
+    // Utility function with default Pattern
+    template<typename T>
+    std::string to_string(const T &t)
+    {
+      return Convert<T>::to_string(t);
+    }
+
+    // Utility function with default Pattern
+    template<typename T>
+    void to_value(const std::string &s, T &t)
+    {
+      t = Convert<T>::to_value(s);
+    }
   }
 }
 
