@@ -85,7 +85,7 @@ void test(const unsigned int max_particles,
 
       deallog << "Proc " << my_proc << "/" << n_procs
               << ": sharing with  "
-              << to_string(shared_procs_set) << std::endl;
+              << Patterns::Tools::to_string(shared_procs_set) << std::endl;
       for (unsigned int i=0; i<n_local_particles*shared_fraction; ++i)
         shared_particles[shared_procs[random_index(shared_procs.size())]]
         .push_back(*(particles.begin()+i));
