@@ -127,10 +127,5 @@ int main ()
 
   deallog << "Output grid: " << std::endl;
   GridOut().write_vtk(tria, deallog.get_file_stream());
-
   deallog << "OK" << std::endl;
-  std::ofstream file_gridout ("grid.vtu");
-  GridOut().write_vtu(tria, file_gridout);
-
-  return 0;
 }

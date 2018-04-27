@@ -4252,7 +4252,7 @@ namespace GridGenerator
                                          const double,
                                          const double,
                                          const unsigned int,
-                                         bool)
+                                         const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -4266,7 +4266,7 @@ namespace GridGenerator
                                     const double outer_radius,
                                     const double, // width,
                                     const unsigned int, // width_repetition,
-                                    bool colorize)
+                                    const bool colorize)
   {
     const int dim = 2;
 
@@ -4278,6 +4278,7 @@ namespace GridGenerator
     hyper_shell (triangulation,
                  center, inner_radius, outer_radius,
                  8);
+    triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
     Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
@@ -4363,7 +4364,7 @@ namespace GridGenerator
                                         const double outer_radius,
                                         const double L,
                                         const unsigned int Nz,
-                                        bool colorize)
+                                        const bool colorize)
   {
     const int dim = 3;
 
@@ -4377,6 +4378,7 @@ namespace GridGenerator
                     L, inner_radius, outer_radius,
                     8,
                     Nz);
+    triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
 
     Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
