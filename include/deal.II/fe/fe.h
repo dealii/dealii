@@ -1333,13 +1333,18 @@ public:
   //@}
 
   /**
-   * Comparison operator. We also check for equality of the name returned by
-   * get_name() and for equality of the constraint matrix, which is quite an
-   * expensive operation.  Do therefore use this function with care, if
-   * possible only for debugging purposes.
+   * Comparison operator.
+   *
+   * The implementation in the current class checks for equality of the name
+   * returned by get_name() and for equality of the constraint matrix, as well
+   * as all of the fields in FiniteElementData. This covers most cases where
+   * elements can differ, but there are cases of derived elements that are
+   * different and for which the current function still returns @p true.
+   * For these cases, derived classes should overload this function.
    *
    * We do not compare the matrix arrays #restriction and #prolongation.
    */
+  virtual
   bool operator == (const FiniteElement<dim,spacedim> &) const;
 
   /**
