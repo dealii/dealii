@@ -4278,6 +4278,7 @@ namespace GridGenerator
     hyper_shell (triangulation,
                  center, inner_radius, outer_radius,
                  8);
+    triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
     Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
@@ -4377,6 +4378,7 @@ namespace GridGenerator
                     L, inner_radius, outer_radius,
                     8,
                     Nz);
+    triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
 
     Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
