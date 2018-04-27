@@ -441,12 +441,14 @@ void Step5<dim>::run ()
   // <code>GridIn</code> class to find out what input formats are presently
   // supported.)
 
-  // The grid in the file describes a circle. Therefore we have to use
-  // a manifold object which tells the triangulation where to put new
-  // points on the boundary when the grid is refined. This works in
-  // the same way as in the first example, but in this case we only
-  // set the manifold ids of the boundary.
-  static const SphericalManifold<dim> boundary;
+  // The grid in the file describes a circle. Therefore we have to use a
+  // manifold object which tells the triangulation where to put new points on
+  // the boundary when the grid is refined. Unlike step-1, since GridIn does
+  // not know that the domain has a circular boundary (unlike
+  // GridGenerator::hyper_shell) we have to explicitly attach a manifold to
+  // the boundary after creating the triangulation to get the correct result
+  // when we refine the mesh.
+  const SphericalManifold<dim> boundary;
   triangulation.set_all_manifold_ids_on_boundary(0);
   triangulation.set_manifold (0, boundary);
 
