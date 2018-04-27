@@ -101,7 +101,7 @@ void Subscriptor::check_no_subscribers () const
             infostring = "<none>";
 
           AssertNothrow (counter == 0,
-                         ExcInUse (counter, object_info->name(), infostring));
+                         ExcInUse (counter.load(), object_info->name(), infostring));
         }
       else
         {
