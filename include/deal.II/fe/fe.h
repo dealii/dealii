@@ -1333,15 +1333,19 @@ public:
   //@}
 
   /**
-   * Comparison operator. We also check for equality of the constraint matrix,
-   * which is quite an expensive operation.  Do therefore use this function
-   * with care, if possible only for debugging purposes.
+   * Comparison operator. We also check for equality of the name returned by
+   * get_name() and for equality of the constraint matrix, which is quite an
+   * expensive operation.  Do therefore use this function with care, if
+   * possible only for debugging purposes.
    *
-   * Since this function is not that important, we avoid an implementational
-   * question about comparing arrays and do not compare the matrix arrays
-   * #restriction and #prolongation.
+   * We do not compare the matrix arrays #restriction and #prolongation.
    */
   bool operator == (const FiniteElement<dim,spacedim> &) const;
+
+  /**
+   * Non-equality comparison operator. Defined in terms of the equality comparison operator.
+   */
+  bool operator != (const FiniteElement<dim,spacedim> &) const;
 
   /**
    * @name Index computations
