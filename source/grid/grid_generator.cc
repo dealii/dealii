@@ -4252,7 +4252,7 @@ namespace GridGenerator
                                          const double,
                                          const double,
                                          const unsigned int,
-                                         bool)
+                                         const bool)
   {
     Assert(false, ExcNotImplemented());
   }
@@ -4266,7 +4266,7 @@ namespace GridGenerator
                                     const double outer_radius,
                                     const double, // width,
                                     const unsigned int, // width_repetition,
-                                    bool colorize)
+                                    const bool colorize)
   {
     const int dim = 2;
 
@@ -4364,7 +4364,7 @@ namespace GridGenerator
                                         const double outer_radius,
                                         const double L,
                                         const unsigned int Nz,
-                                        bool colorize)
+                                        const bool colorize)
   {
     const int dim = 3;
 
