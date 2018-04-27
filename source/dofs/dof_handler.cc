@@ -1000,7 +1000,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 
   // Only recreate the FECollection if we don't already store
   // the exact same FiniteElement object.
-  if  (fe_collection.size() == 0 || &(fe_collection[0]) != &ff)
+  if  (fe_collection.size() == 0 || fe_collection[0] != ff)
     fe_collection = hp::FECollection<dim, spacedim>(ff);
 
   // delete all levels and set them

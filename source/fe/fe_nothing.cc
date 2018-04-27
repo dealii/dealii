@@ -70,7 +70,13 @@ FE_Nothing<dim,spacedim>::get_name () const
   std::ostringstream namebuf;
   namebuf << "FE_Nothing<" << dim << ">(";
   if (this->n_components() > 1)
-    namebuf << this->n_components();
+    {
+      namebuf << this->n_components();
+      if (dominate)
+        namebuf << ", dominating";
+    }
+  else if (dominate)
+    namebuf << "dominating";
   namebuf << ")";
   return namebuf.str();
 }

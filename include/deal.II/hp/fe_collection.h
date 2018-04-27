@@ -101,6 +101,18 @@ namespace hp
     operator= (FECollection<dim,spacedim> &&) = default; // NOLINT
 
     /**
+     * Equality comparison operator. All stored FiniteElement objects are compared in order.
+     */
+    bool
+    operator== (const FECollection<dim,spacedim> &fe_collection) const;
+
+    /**
+     * Non-equality comparison operator. All stored FiniteElement objects are compared in order.
+     */
+    bool
+    operator!= (const FECollection<dim,spacedim> &fe_collection) const;
+
+    /**
      * Add a finite element. This function generates a copy of the given
      * element, i.e. you can do things like <tt>push_back(FE_Q<dim>(1));</tt>.
      * The internal copy is later destroyed by this object upon destruction of
@@ -493,6 +505,35 @@ namespace hp
 
     return finite_elements[0]->n_components ();
   }
+
+
+
+  template <int dim, int spacedim>
+  inline
+  bool
+  FECollection<dim,spacedim>::operator== (const FECollection<dim,spacedim> &fe_collection) const
+  {
+    const unsigned int n_elements = size();
+    if (n_elements != fe_collection.size())
+      return false;
+
+    for (unsigned int i=0; i<n_elements; ++i)
+      if (!(*finite_elements[i] == fe_collection[i]))
+        return false;
+
+    return true;
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline
+  bool
+  FECollection<dim,spacedim>::operator != (const FECollection<dim,spacedim> &fe_collection) const
+  {
+    return !(*this == fe_collection);
+  }
+
 
 
   template <int dim, int spacedim>

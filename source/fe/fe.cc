@@ -939,7 +939,17 @@ FiniteElement<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) 
 {
   return ((static_cast<const FiniteElementData<dim>&>(*this) ==
            static_cast<const FiniteElementData<dim>&>(f)) &&
-          (interface_constraints == f.interface_constraints));
+          (interface_constraints == f.interface_constraints) &&
+          (this->get_name() == f.get_name()));
+}
+
+
+
+template <int dim, int spacedim>
+bool
+FiniteElement<dim,spacedim>::operator != (const FiniteElement<dim,spacedim> &f) const
+{
+  return !(*this == f);
 }
 
 
