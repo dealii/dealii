@@ -42,7 +42,7 @@ std::array<Number,2>
 eigenvalues (const SymmetricTensor<2,2,Number> &T)
 {
   const Number upp_tri_sq = T[0][1]*T[0][1];
-  if (upp_tri_sq == Number(0.0))
+  if (upp_tri_sq == internal::NumberType<Number>::value(0.0))
     {
       // The tensor is diagonal
       std::array<Number,2> eig_vals =
@@ -59,7 +59,7 @@ eigenvalues (const SymmetricTensor<2,2,Number> &T)
       const Number tr_T = trace(T);
       const Number det_T = determinant(T);
       const Number descrim = tr_T*tr_T - 4.0*det_T;
-      Assert(descrim > Number(0.0), ExcMessage("The roots of the characteristic polynomial are complex valued."));
+      Assert(descrim > internal::NumberType<Number>::value(0.0), ExcMessage("The roots of the characteristic polynomial are complex valued."));
       const Number sqrt_desc = std::sqrt(descrim);
 
       const std::array<Number,2> eig_vals =
@@ -81,7 +81,7 @@ std::array<Number,3>
 eigenvalues (const SymmetricTensor<2,3,Number> &T)
 {
   const Number upp_tri_sq = T[0][1]*T[0][1] + T[0][2]*T[0][2] + T[1][2]*T[1][2];
-  if (upp_tri_sq == Number(0.0))
+  if (upp_tri_sq == internal::NumberType<Number>::value(0.0))
     {
       // The tensor is diagonal
       std::array<Number,3> eig_vals
@@ -711,7 +711,6 @@ namespace internal
     }
 
 
-
     template<typename Number>
     Tensor<2,1,Number>
     dediagonalize_tensor (const dealii::SymmetricTensor<2,1,Number> &T,
@@ -956,6 +955,78 @@ eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
             internal::SymmetricTensorImplementation::SortEigenValuesVectors<dim,Number>());
   return eig_vals_vecs;
 }
+
+
+
+#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+
+// Specializations of the above functions for taped Adol-C numbers
+// when the advanced branching feature is activated.
+// We could copy-paste all of these functions and add the appropriate
+// conditional assignments (see the Adol-C manual, section 1.8).
+// However, some of the conditions are quite complicated (with possibly
+// no 1-1 correspondence for the operations along each branch) so this
+// needs some careful attention. For the sake of simplicity and until
+// this can be rigourously checked, at this point in time we simply
+// disable these functions.
+
+namespace internal
+{
+  namespace SymmetricTensorImplementation
+  {
+    template<>
+    struct Inverse<4,3,adouble>
+    {
+      static dealii::SymmetricTensor<4,3,adouble>
+      value (const dealii::SymmetricTensor<4,3,adouble> &/*t*/)
+      {
+        AssertThrow(false, ExcADOLCAdvancedBranching());
+        return dealii::SymmetricTensor<4,3,adouble>();
+      }
+    };
+  }
+}
+
+template<>
+std::array<adouble,1>
+eigenvalues (const SymmetricTensor<2,1,adouble> &/*T*/)
+{
+  AssertThrow(false, ExcADOLCAdvancedBranching());
+  return std::array<adouble,1> ();
+}
+
+
+
+template<>
+std::array<adouble,2>
+eigenvalues (const SymmetricTensor<2,2,adouble> &/*T*/)
+{
+  AssertThrow(false, ExcADOLCAdvancedBranching());
+  return std::array<adouble,2> ();
+}
+
+
+
+template<>
+std::array<adouble,3>
+eigenvalues (const SymmetricTensor<2,3,adouble> &/*T*/)
+{
+  AssertThrow(false, ExcADOLCAdvancedBranching());
+  return std::array<adouble,3> ();
+}
+
+
+
+template <int dim>
+std::array<std::pair<adouble, Tensor<1,dim,adouble> >,std::integral_constant<int, dim>::value>
+eigenvectors (const SymmetricTensor<2,dim,adouble>    &/*T*/,
+              const SymmetricTensorEigenvectorMethod   /*method*/)
+{
+  AssertThrow(false, ExcADOLCAdvancedBranching());
+  return std::array<std::pair<adouble, Tensor<1,dim,adouble> >,std::integral_constant<int, dim>::value> ();
+}
+
+#endif
 
 
 
