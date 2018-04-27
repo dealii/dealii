@@ -19,8 +19,9 @@
 #include <deal.II/base/config.h>
 
 #include <exception>
-#include <string>
 #include <ostream>
+#include <string>
+#include <type_traits>
 
 #ifdef DEAL_II_WITH_CUDA
 #include <cusolverSp.h>
@@ -1039,8 +1040,8 @@ namespace deal_II_exceptions
      * The actual exception object (the last argument) is typically an unnamed
      * object created in place; because we modify it, we can't take it by
      * const reference, and temporaries don't bind to non-const references.
-     * So take it by value (=copy it) -- the performance implications are
-     * pretty minimal anyway.
+     * So take it by value (=copy it) with a templated type to avoid slicing
+     * -- the performance implications are pretty minimal anyway.
      *
      * @ref ExceptionBase
      */
@@ -1072,17 +1073,36 @@ namespace deal_II_exceptions
     }
 
     /**
+     * Internal function that does the work of issue_error_nothrow.
+     */
+    void
+    do_issue_error_nothrow(const ExceptionBase &e) noexcept;
+
+    /**
      * Exception generation mechanism in case we must not throw.
      *
      * @ref ExceptionBase
+     *
+     * @note This function is defined with a template for the same reasons as
+     * issue_error_noreturn().
      */
+    template <class ExceptionType>
     void issue_error_nothrow (ExceptionHandling,
-                              const char       *file,
-                              int               line,
-                              const char       *function,
-                              const char       *cond,
-                              const char       *exc_name,
-                              ExceptionBase     e) noexcept;
+                              const char    *file,
+                              int            line,
+                              const char    *function,
+                              const char    *cond,
+                              const char    *exc_name,
+                              ExceptionType  e) noexcept
+    {
+      static_assert(std::is_base_of<ExceptionBase, ExceptionType>::value,
+      "The provided exception must inherit from ExceptionBase.");
+      // Fill the fields of the exception object
+      e.set_fields (file, line, function, cond, exc_name);
+      // avoid moving a bunch of code into the header by dispatching to
+      // another function:
+      do_issue_error_nothrow(e);
+    }
 #ifdef DEAL_II_WITH_CUDA
     /**
      * Return a string given an error code. This is similar to the cudaGetErrorString
