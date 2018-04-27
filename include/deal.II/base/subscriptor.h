@@ -136,7 +136,7 @@ public:
    * Exception: Object may not be deleted, since it is used.
    */
   DeclException3(ExcInUse,
-                 int, char *, std::string &,
+                 int, std::string, std::string,
                  << "Object of class " << arg2
                  << " is still used by " << arg1 << " other objects."
                  << "\n\n"
@@ -150,7 +150,7 @@ public:
    * A subscriber with the identification string given to
    * Subscriptor::unsubscribe() did not subscribe to the object.
    */
-  DeclException2(ExcNoSubscriber, char *, char *,
+  DeclException2(ExcNoSubscriber, std::string, std::string,
                  << "No subscriber with identifier <" << arg2
                  << "> subscribes to this object of class " << arg1
                  << ". Consequently, it cannot be unsubscribed.");
