@@ -1704,15 +1704,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   // vector<int>::iterator to int *
   marker_var->get(&*marker.begin(), n_markers);
 
-  if (output)
-    {
-      std::cout << "n_cell=" << n_cells << std::endl;
-      std::cout << "marker: ";
-      for (unsigned int i=0; i<n_markers; ++i)
-        std::cout << marker[i] << " ";
-      std::cout << std::endl;
-    }
-
   // next we read
   // int boundarymarker_of_surfaces(
   //   no_of_surfaceelements)
@@ -1755,15 +1746,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   // for marker0 only. For marker1 we
   // then had point[coord]=constant
   // with e.g. constant=1 or -1
-  if (output)
-    {
-      std::cout << "n_bquads_per_bmarker: " << std::endl;
-      std::map<int, unsigned int>::const_iterator
-      iter=n_bquads_per_bmarker.begin();
-      for (; iter!=n_bquads_per_bmarker.end(); ++iter)
-        std::cout << "  n_bquads_per_bmarker[" << iter->first
-                  << "]=" << iter->second << std::endl;
-    }
 
   // next we read
   // int points_of_surfacequadrilaterals(
@@ -1788,17 +1770,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
     AssertThrow(vertex_indices[i]>=0, ExcIO());
 
-  if (output)
-    {
-      std::cout << "vertex_indices:" << std::endl;
-      for (unsigned int i=0, v=0; i<n_bquads; ++i)
-        {
-          for (unsigned int j=0; j<vertices_per_quad; ++j)
-            std::cout << vertex_indices[v++] << " ";
-          std::cout << std::endl;
-        }
-    }
-
   // next we read
   //   double points_xc(no_of_points)
   //   double points_yc(no_of_points)
@@ -1806,8 +1777,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   NcDim *vertices_dim=nc.get_dim("no_of_points");
   AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices=vertices_dim->size();
-  if (output)
-    std::cout << "n_vertices=" << n_vertices << std::endl;
 
   NcVar *points_xc=nc.get_var("points_xc");
   NcVar *points_yc=nc.get_var("points_yc");
@@ -1858,11 +1827,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   unsigned int sum_of_zero_plane_cells=0;
   for (std::map<int, bool>::const_iterator iter=zero_plane_markers.begin();
        iter != zero_plane_markers.end(); ++iter)
-    {
-      sum_of_zero_plane_cells+=n_bquads_per_bmarker[iter->first];
-      if (output)
-        std::cout << "bmarker=" << iter->first << std::endl;
-    }
+    sum_of_zero_plane_cells+=n_bquads_per_bmarker[iter->first];
   AssertThrow(sum_of_zero_plane_cells==n_cells, ExcIO());
 
   // fill cells with all quads
