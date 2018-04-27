@@ -193,6 +193,29 @@ namespace numbers
   bool is_finite (const std::complex<long double> &x);
 
   /**
+   * Return whether two numbers are equal to one another. For intricate data
+   * types (e.g. some automatically differentiable numbers), this function
+   * returns only whether the scalar values stored by the input values are
+   * equal.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  values_are_equal (const Number1 &value_1, const Number2 &value_2);
+
+  /**
+   * Return whether or not a value is equal to zero. For intricate data
+   * types (e.g. some automatically differentiable numbers), this function
+   * returns only whether the scalar value stored by the input value is
+   * equal to zero.
+   */
+  template <typename Number>
+  bool
+  value_is_zero (const Number &value);
+
+  /**
    * A structure that, together with its partial specializations
    * NumberTraits<std::complex<number> >, provides traits and member functions
    * that make it possible to write templates that work on both real number
@@ -540,6 +563,85 @@ namespace internal
                NumberType<T>::value(t.imag()));
     }
   };
+}
+
+namespace numbers
+{
+
+#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+
+  /**
+   * Return whether two numbers are equal to one another. For intricate data
+   * types (e.g. some automatically differentiable numbers), this function
+   * returns only whether the scalar values stored by the input values are
+   * equal.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  // Defined in differentiation/ad/adolc_number_types.cc
+  bool
+  values_are_equal (const adouble &value_1,
+                    const adouble &value_2);
+
+
+  /**
+   * Return whether two numbers are equal to one another. For intricate data
+   * types (e.g. some automatically differentiable numbers), this function
+   * returns only whether the scalar values stored by the input values are
+   * equal.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  template <typename Number>
+  bool
+  values_are_equal (const adouble &value_1,
+                    const Number  &value_2)
+  {
+    // Use the specialized definition for two Adol-C taped types
+    return values_are_equal(value_1, internal::NumberType<adouble>::value(value_2));
+  }
+
+
+  /**
+   * Return whether two numbers are equal to one another. For intricate data
+   * types (e.g. some automatically differentiable numbers), this function
+   * returns only whether the scalar values stored by the input values are
+   * equal.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  template <typename Number>
+  bool
+  values_are_equal (const Number  &value_1,
+                    const adouble &value_2)
+  {
+    // Use the above definition
+    return values_are_equal(value_2, value_1);
+  }
+
+#endif
+
+
+  template <typename Number1,typename Number2>
+  bool
+  values_are_equal (const Number1 &value_1, const Number2 &value_2)
+  {
+    return (value_1 == internal::NumberType<Number1>::value(value_2));
+  }
+
+
+  template <typename Number>
+  bool
+  value_is_zero (const Number &value)
+  {
+    return values_are_equal(value, 0.0);
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
