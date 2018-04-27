@@ -373,7 +373,12 @@ public:
    * integrate(...,true) is called, this specifies what is tested by all basis
    * function gradients on the current cell and integrated over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these two can be
+   * used. Usually, the contribution of a potential call to this function must
+   * be added into the contribution for submit_gradient().
+   *
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -437,16 +442,33 @@ public:
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_divergence()
    * @note Only available for n_components_==dim.
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these two can be
+   * used. Usually, the contribution of a potential call to this function must
+   * be added into the diagonal of the contribution for submit_gradient().
    */
   void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_symmetric_gradient()
    * @note Only available for n_components_==dim.
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these two can be
+   * used. Usually, the contribution of a potential call to this function must
+   * be added to the respective entries of the rank-2 tensor for
+   * submit_gradient().
    */
   void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_curl()
    * @note Only available for n_components_==dim.
+   *
+   * @note This operation writes the data to the same field as
+   * submit_gradient(). As a consequence, only one of these two can be
+   * used. Usually, the contribution of a potential call to this function must
+   * be added to the respective entries of the rank-2 tensor for
+   * submit_gradient().
    */
   void submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
 
@@ -1483,7 +1505,8 @@ protected:
  * quadrature points and cell integrations. In functionality, this class is
  * similar to FEValues, however, it includes a lot of specialized functions
  * that make it much faster (between 5 and 500, depending on the polynomial
- * degree).
+ * degree). For evaluation of face terms in DG, see the class
+ * FEFaceEvaluation.
  *
  * <h3>Usage and initialization</h3>
  *
@@ -2383,8 +2406,6 @@ private:
  * FEEvaluationAccess and FEEvaluatioBase. Furthermore, the relation of this
  * class to FEEvaluation is similar to the relation between FEValues and
  * FEFaceValues.
- *
- * This class has five template arguments:
  *
  * @tparam dim Dimension in which this class is to be used
  *

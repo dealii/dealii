@@ -93,7 +93,8 @@ DEAL_II_NAMESPACE_OPEN
  * operations for several cells with one CPU instruction and is one of the
  * main features of this framework.
  *
- * For details on usage of this class, see the description of FEEvaluation.
+ * For details on usage of this class, see the description of FEEvaluation or
+ * the @ref matrixfree "matrix-free module".
  *
  * @ingroup matrixfree
  *
@@ -595,7 +596,7 @@ public:
    * the data of the calling class and the last argument defines the range of
    * cells which should be worked on (typically more than one cell should be
    * worked on in order to reduce overheads).  One can pass a pointer to an
-   * object in this place if it has an <code>operator()</code> with the
+   * object in this place if it has an `operator()` with the
    * correct set of arguments since such a pointer can be converted to the
    * function object.
    *
