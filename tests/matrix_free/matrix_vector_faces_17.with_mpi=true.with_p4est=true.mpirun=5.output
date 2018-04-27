@@ -1,0 +1,9 @@
+
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGauss(2))
+DEAL:2d::Norm of difference:          0.00 0.00
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGauss(3))
+DEAL:2d::Norm of difference:          0.00 0.00
+DEAL:3d::Testing FE_DGQArbitraryNodes<3>(QGauss(2))
+DEAL:3d::Norm of difference:          0.00 0.00
+DEAL:3d::Testing FE_DGQArbitraryNodes<3>(QGauss(3))
+DEAL:3d::Norm of difference:          0.00 0.00

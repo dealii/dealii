@@ -16,14 +16,16 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
-  matrix_free.cc
   evaluation_selector.cc
+  mapping_info.cc
+  matrix_free.cc
   task_info.cc
   )
 
 SET(_inst
-  matrix_free.inst.in
   evaluation_selector.inst.in
+  mapping_info.inst.in
+  matrix_free.inst.in
   )
 
 FILE(GLOB _header

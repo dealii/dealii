@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2018 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,10 +16,11 @@
 
 
 // this function tests the correctness of the implementation of matrix free
-// matrix-vector products by comparing with the result of deal.II sparse
+// matrix-vector products by comparing with the result of a deal.II sparse
 // matrix. The mesh uses a hypershell mesh with hanging nodes and constraints
-// between the vector components in the form of no-normal flux constraints on
-// the Stokes equations.
+// between the vector components in the form of normal flux constraints on
+// the Stokes equations. Like matrix_vector_stokes_onedof except for
+// different constraints
 
 #include "../tests.h"
 
@@ -28,6 +29,7 @@ std::ofstream logfile("output");
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/grid/tria.h>
@@ -45,6 +47,7 @@ std::ofstream logfile("output");
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
 
+#include <fstream>
 #include <iostream>
 #include <complex>
 
@@ -59,7 +62,7 @@ public:
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data (data_in)
-  {};
+  {}
 
   void
   local_apply (const MatrixFree<dim,Number> &data,
@@ -68,16 +71,16 @@ public:
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     typedef VectorizedArray<Number> vector_t;
-    FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0);
-    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure (data, 1);
+    FEEvaluation<dim,degree_p+1,degree_p+2,dim,Number> velocity (data, 0, 0, 0);
+    FEEvaluation<dim,degree_p,  degree_p+2,1,  Number> pressure (data, 0, 0, dim);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         velocity.reinit (cell);
-        velocity.read_dof_values (src.block(0));
+        velocity.read_dof_values_plain (src);
         velocity.evaluate (false,true,false);
         pressure.reinit (cell);
-        pressure.read_dof_values (src.block(1));
+        pressure.read_dof_values_plain (src);
         pressure.evaluate (true,false,false);
 
         for (unsigned int q=0; q<velocity.n_q_points; ++q)
@@ -96,9 +99,9 @@ public:
           }
 
         velocity.integrate (false,true);
-        velocity.distribute_local_to_global (dst.block(0));
+        velocity.distribute_local_to_global (dst);
         pressure.integrate (true,false);
-        pressure.distribute_local_to_global (dst.block(1));
+        pressure.distribute_local_to_global (dst);
       }
   }
 
@@ -120,43 +123,25 @@ private:
 template <int dim, int fe_degree>
 void test ()
 {
-  SphericalManifold<dim> manifold;
   Triangulation<dim>   triangulation;
-  GridGenerator::hyper_shell (triangulation, Point<dim>(),
-                              0.5, 1., 96, true);
-  triangulation.set_all_manifold_ids(0);
-  triangulation.set_manifold (0, manifold);
+  GridGenerator::hyper_cube (triangulation, 0, 1, true);
+  triangulation.refine_global(5-dim);
 
-  triangulation.begin_active()->set_refine_flag();
-  triangulation.last()->set_refine_flag();
-  triangulation.execute_coarsening_and_refinement();
-  triangulation.refine_global (3-dim);
-  triangulation.last()->set_refine_flag();
-  triangulation.execute_coarsening_and_refinement();
-
-  MappingQ<dim>        mapping (3);
-  FE_Q<dim>            fe_u_scal (fe_degree+1);
-  FESystem<dim>        fe_u (fe_u_scal,dim);
-  FE_Q<dim>            fe_p (fe_degree);
-  FESystem<dim>        fe (fe_u_scal, dim, fe_p, 1);
-  DoFHandler<dim>      dof_handler_u (triangulation);
-  DoFHandler<dim>      dof_handler_p (triangulation);
+  FESystem<dim>        fe (FE_Q<dim>(fe_degree+1), dim, FE_Q<dim>(fe_degree), 1);
   DoFHandler<dim>      dof_handler (triangulation);
 
   MatrixFree<dim,double> mf_data;
 
-  ConstraintMatrix     constraints, constraints_u, constraints_p;
+  ConstraintMatrix     constraints;
 
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;
 
   BlockVector<double> solution;
   BlockVector<double> system_rhs;
-  BlockVector<double> mf_solution;
+  Vector<double> mf_solution, mf_rhs;
 
   dof_handler.distribute_dofs (fe);
-  dof_handler_u.distribute_dofs (fe_u);
-  dof_handler_p.distribute_dofs (fe_p);
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
   DoFRenumbering::component_wise (dof_handler, stokes_sub_blocks);
@@ -166,32 +151,14 @@ void test ()
   no_normal_flux_boundaries.insert (1);
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
-  VectorTools::compute_no_normal_flux_constraints (dof_handler, 0,
-                                                   no_normal_flux_boundaries,
-                                                   constraints, mapping);
+  VectorTools::compute_normal_flux_constraints (dof_handler, 0,
+                                                no_normal_flux_boundaries,
+                                                constraints);
   constraints.close ();
-  DoFTools::make_hanging_node_constraints (dof_handler_u,
-                                           constraints_u);
-  VectorTools::compute_no_normal_flux_constraints (dof_handler_u, 0,
-                                                   no_normal_flux_boundaries,
-                                                   constraints_u, mapping);
-  constraints_u.close ();
-  DoFTools::make_hanging_node_constraints (dof_handler_p,
-                                           constraints_p);
-  constraints_p.close ();
 
   std::vector<types::global_dof_index> dofs_per_block (2);
   DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
                                   stokes_sub_blocks);
-
-  //std::cout << "Number of active cells: "
-  //          << triangulation.n_active_cells()
-  //          << std::endl
-  //          << "Number of degrees of freedom: "
-  //          << dof_handler.n_dofs()
-  //          << " (" << n_u << '+' << n_p << ')'
-  //          << std::endl;
-
   {
     BlockDynamicSparsityPattern csp (2,2);
 
@@ -211,7 +178,7 @@ void test ()
   {
     QGauss<dim>   quadrature_formula(fe_degree+2);
 
-    FEValues<dim> fe_values (mapping, fe, quadrature_formula,
+    FEValues<dim> fe_values (fe, quadrature_formula,
                              update_values    |
                              update_JxW_values |
                              update_gradients);
@@ -276,44 +243,42 @@ void test ()
   solution.collect_sizes ();
 
   system_rhs.reinit (solution);
-  mf_solution.reinit (solution);
 
   // fill system_rhs with random numbers
   for (unsigned int j=0; j<system_rhs.block(0).size(); ++j)
-    if (constraints_u.is_constrained(j) == false)
+    if (constraints.is_constrained(j) == false)
       {
-        const double val = -1 + 2.*random_value<double>();
+        const double val = -1 + 2.*(double)Testing::rand()/double(RAND_MAX);
         system_rhs.block(0)(j) = val;
       }
   for (unsigned int j=0; j<system_rhs.block(1).size(); ++j)
-    if (constraints_p.is_constrained(j) == false)
+    if (constraints.is_constrained(j+system_rhs.block(0).size()) == false)
       {
-        const double val = -1 + 2.*random_value<double>();
+        const double val = -1 + 2.*(double)Testing::rand()/double(RAND_MAX);
         system_rhs.block(1)(j) = val;
       }
 
   // setup matrix-free structure
   {
-    std::vector<const DoFHandler<dim>*> dofs;
-    dofs.push_back(&dof_handler_u);
-    dofs.push_back(&dof_handler_p);
-    std::vector<const ConstraintMatrix *> constraints;
-    constraints.push_back (&constraints_u);
-    constraints.push_back (&constraints_p);
     QGauss<1> quad(fe_degree+2);
     // no parallelism
-    mf_data.reinit (mapping, dofs, constraints, quad,
+    mf_data.reinit (dof_handler, constraints, quad,
                     typename MatrixFree<dim>::AdditionalData
                     (MatrixFree<dim>::AdditionalData::none));
+    mf_data.initialize_dof_vector(mf_solution);
+    mf_data.initialize_dof_vector(mf_rhs);
+    for (unsigned int i=0; i<mf_rhs.size(); ++i)
+      mf_rhs(i) = system_rhs(i);
   }
 
   system_matrix.vmult (solution, system_rhs);
 
-  MatrixFreeTest<dim,fe_degree,BlockVector<double> > mf (mf_data);
-  mf.vmult (mf_solution, system_rhs);
+  MatrixFreeTest<dim,fe_degree,Vector<double> > mf (mf_data);
+  mf.vmult (mf_solution, mf_rhs);
 
   // Verification
-  mf_solution -= solution;
+  for (unsigned int i=0; i<mf_solution.size(); ++i)
+    mf_solution(i) -= solution(i);
   const double error = mf_solution.linfty_norm();
   const double relative = solution.linfty_norm();
   deallog << "Verification fe degree " << fe_degree  <<  ": "
@@ -324,9 +289,7 @@ void test ()
 
 int main ()
 {
-  deallog.attach(logfile);
-
-  deallog << std::setprecision (3);
+  initlog();
 
   {
     deallog << std::endl << "Test with doubles" << std::endl << std::endl;

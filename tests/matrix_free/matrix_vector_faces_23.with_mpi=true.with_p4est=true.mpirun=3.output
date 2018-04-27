@@ -1,0 +1,67 @@
+
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(2)^2] on 288 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(2)^2] on 1152 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(2)^2] on 4608 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(3)^2] on 512 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(3)^2] on 2048 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(3)^2] on 8192 DoFs
+DEAL:2d::Norm of difference to sum of scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:2d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3] on 648 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3] on 5184 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3] on 41472 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     3.83e-16
+DEAL:3d::Norm of difference to single scalar:     5.11e-16
+DEAL:3d::Norm of difference to single scalar:     2.56e-16
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(3)^3] on 1536 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(3)^3] on 12288 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Norm of difference to single scalar:     0.00
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(3)^3] on 98304 DoFs
+DEAL:3d::Norm of difference to sum of scalar:     0.00
+DEAL:3d::Norm of difference to vector/scalar sum: 0.00
+DEAL:3d::Norm of difference to scalar/vector sum: 0.00
+DEAL:3d::Norm of difference to single scalar:     5.07e-16
+DEAL:3d::Norm of difference to single scalar:     4.06e-16
+DEAL:3d::Norm of difference to single scalar:     4.06e-16

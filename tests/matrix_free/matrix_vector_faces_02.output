@@ -1,0 +1,29 @@
+
+DEAL:2d::Testing FE_DGQ<2>(1)
+DEAL:2d::Norm of difference:          0
+DEAL:2d::Norm of difference parallel: 0
+DEAL:2d::
+DEAL:2d:float::Testing FE_DGQ<2>(1)
+DEAL:2d:float::Norm of difference:          0
+DEAL:2d:float::
+DEAL:2d::Testing FE_DGQ<2>(2)
+DEAL:2d::Norm of difference:          0
+DEAL:2d::Norm of difference parallel: 0
+DEAL:2d::
+DEAL:2d:float::Testing FE_DGQ<2>(2)
+DEAL:2d:float::Norm of difference:          0
+DEAL:2d:float::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          0
+DEAL:3d::Norm of difference parallel: 0
+DEAL:3d::
+DEAL:3d:float::Testing FE_DGQ<3>(1)
+DEAL:3d:float::Norm of difference:          0
+DEAL:3d:float::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          0
+DEAL:3d::Norm of difference parallel: 0
+DEAL:3d::
+DEAL:3d:float::Testing FE_DGQ<3>(2)
+DEAL:3d:float::Norm of difference:          0
+DEAL:3d:float::

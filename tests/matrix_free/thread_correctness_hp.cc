@@ -208,6 +208,9 @@ void do_test (const unsigned int parallel_option)
 template <int dim, int fe_degree>
 void test ()
 {
+  // use more threads than usual to stress components a bit more
+  MultithreadInfo::set_thread_limit(7);
+
   // 'misuse' fe_degree for setting the parallel
   // option here
   unsigned int parallel_option = 0;
