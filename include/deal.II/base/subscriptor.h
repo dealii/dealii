@@ -217,11 +217,19 @@ private:
   mutable const std::type_info *object_info;
 
   /**
-   * Check that there are no objects subscribing to this object and throw an
-   * error if there are, in order to guarantee that it is safe to either move
-   * or destroy this object.
+   * Check that there are no objects subscribing to this object. If this check
+   * passes then it is safe to destroy the current object. It this check fails
+   * then this function will either abort or print an error message to deallog
+   * (by using the AssertNothrow mechanism), but will not throw an exception.
+   *
+   * @note Since this function is just a consistency check it does nothing in
+   * release mode.
+   *
+   * @note If this function is called when there is an uncaught exception
+   * then, rather than aborting, this function prints an error message to the
+   * standard error stream and returns.
    */
-  void check_no_subscribers () const;
+  void check_no_subscribers () const noexcept;
 };
 
 //---------------------------------------------------------------------------

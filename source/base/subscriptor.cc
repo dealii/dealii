@@ -63,7 +63,7 @@ Subscriptor::~Subscriptor ()
 }
 
 
-void Subscriptor::check_no_subscribers () const
+void Subscriptor::check_no_subscribers () const noexcept
 {
   // Check whether there are still subscriptions to this object. If so, output
   // the actual name of the class to which this object belongs, i.e. the most
@@ -121,7 +121,6 @@ void Subscriptor::check_no_subscribers () const
                     << std::endl;
         }
     }
-
 #endif
 }
 
