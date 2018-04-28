@@ -700,12 +700,13 @@ no_constraint:
                   // do not use interleaved storage if two vectorized
                   // components point to the same field (scatter not possible)
                   for (unsigned int k=0; k<ndofs; ++k)
-                    for (unsigned int j=1; j<n_comp; ++j)
-                      if (dof_indices[j*ndofs+k] == dof_indices[k])
-                        {
-                          index_storage_variants[dof_access_cell][i] = IndexStorageVariants::full;
-                          break;
-                        }
+                    for (unsigned int l=0; l<n_comp; ++l)
+                      for (unsigned int j=l+1; j<n_comp; ++j)
+                        if (dof_indices[j*ndofs+k] == dof_indices[l*ndofs+k])
+                          {
+                            index_storage_variants[dof_access_cell][i] = IndexStorageVariants::full;
+                            break;
+                          }
                   if (index_storage_variants[dof_access_cell][i] != IndexStorageVariants::full)
                     {
                       unsigned int *interleaved_dof_indices =
