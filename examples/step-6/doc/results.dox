@@ -230,7 +230,7 @@ O}(N^{1/2})$ and because each iteration requires around ${\cal
 O}(N)$ operations the total CPU time grows like ${\cal
 O}(N^{3/2})$ (for the few smallest meshes, the CPU time is so small
 that it doesn't record). Note that even though it is the simplest
-method, Jacobi is the fastest for this problem. 
+method, Jacobi is the fastest for this problem.
 
 The situation changes slightly when the finite element is not a
 bi-quadratic one as set in the constructor of this program, but a
@@ -255,7 +255,7 @@ operations it has to perform. This is not to say that Jacobi
 is actually a good preconditioner -- for problems of appreciable size, it is
 definitely not, and other methods will be substantially better -- but really
 only that it is fast because its implementation is so simple that it can
-compensate for a larger number of iterations. 
+compensate for a larger number of iterations.
 
 The message to take away from this is not that simplicity in
 preconditioners is always best. While this may be true for the current
@@ -272,7 +272,7 @@ of preconditioners that can achieve this, namely geometric (step-16,
 step-37, step-39)
 or algebraic multigrid (step-31, step-40, and several others)
 preconditioners. They are, however, significantly more complex than
-the preconditioners outlined above. 
+the preconditioners outlined above.
 
 Finally, the last message to take
 home is that when the data shown above was generated (in 2008), linear
@@ -287,8 +287,8 @@ solving problems in 3d to high accuracy remains a challenge.
 
 <h4>A better mesh</h4>
 
-If you look at the meshes above, you will see even though the domain is the 
-unit disk, and the jump in the coefficient lies along a circle, the cells 
+If you look at the meshes above, you will see even though the domain is the
+unit disk, and the jump in the coefficient lies along a circle, the cells
 that make up the mesh do not track this geometry well. The reason, already hinted
 at in step-1, is that by default the Triangulation class only sees a bunch of
 coarse grid cells but has, of course, no real idea what kind of geometry they
@@ -516,7 +516,7 @@ on how smooth exactly the boundary of the domain is, and how smooth the right
 hand side is. Some regularity of the solution may be lost at the boundary, but
 one generally has that the solution is twice more differentiable in
 compact subsets of the domain than the right hand side.
-If, in particular, the right hand side satisfies $f\in C^\infty(\Omega)$, then   
+If, in particular, the right hand side satisfies $f\in C^\infty(\Omega)$, then
 $u \in C^\infty(\Omega_i)$ where $\Omega_i$ is any compact subset of $\Omega$
 ($\Omega$ is an open domain, so a compact subset needs to keep a positive distance
 from $\partial\Omega$).
@@ -526,12 +526,12 @@ at an equation with a non-constant coefficient $a(\mathbf x)$:
 @f[
   -\nabla \cdot (a \nabla u) = f.
 @f]
-Here, if $a$ is not smooth, then the solution will not be smooth either, 
+Here, if $a$ is not smooth, then the solution will not be smooth either,
 regardless of $f$. In particular, we expect that wherever $a$ is discontinuous
 along a line (or along a plane in 3d),
 the solution will have a kink. This is easy to see: if for example $f$
-is continuous, then $f=-\nabla \cdot (a \nabla u)$ needs to be 
-continuous. This means that $a \nabla u$ must be continuously differentiable 
+is continuous, then $f=-\nabla \cdot (a \nabla u)$ needs to be
+continuous. This means that $a \nabla u$ must be continuously differentiable
 (not have a kink). Consequently, if $a$ has a discontinuity, then $\nabla u$
 must have an opposite discontinuity so that the two exactly cancel and their
 product yields a function without a discontinuity. But for $\nabla u$ to have
@@ -550,7 +550,7 @@ $W^{1,\infty}$. It is not very difficult to create cases where
 the solution is in a space $H^{1+s}$ where we can get $s$ to become as small
 as we want. Such cases are often used to test adaptive finite element
 methods because the mesh will have to resolve the singularity that causes
-the solution to not be in $W^{1,\infty}$ any more. 
+the solution to not be in $W^{1,\infty}$ any more.
 
 The typical example one uses for this is called the <i>Kellogg problem</i>
 (referring to the paper "On the Poisson equation with intersecting interfaces"
