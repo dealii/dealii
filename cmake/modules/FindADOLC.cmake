@@ -81,7 +81,7 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   # Check whether ADOL-C is configured to use the Boost pool allocator
   #
   FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
-    REGEX "#define USE_BOOST_POOL"
+    REGEX "#define USE_BOOST_POOL 1"
     )
   IF(NOT "${ADOLC_BOOST_POOL_STRING}" STREQUAL "")
     SET(ADOLC_WITH_BOOST_ALLOCATOR TRUE)
