@@ -181,30 +181,15 @@ void grid_3 ()
         }
     }
 
-  // In the second step we will refine the mesh twice. To do this
-  // correctly, we have to associate a geometry object with the
-  // boundary of the hole; since the boundary of the hole has boundary
-  // indicator 1 (see the documentation of the function that generates
-  // the mesh), we need to create an object that describes a spherical
-  // manifold (i.e., a hyper ball) with appropriate center and assign
-  // it to the triangulation. Notice that the function that generates
-  // the triangulation sets the boundary indicators of the inner mesh,
-  // but leaves unchanged the manifold indicator. We copy the boundary
-  // indicator to the manifold indicators in order for the object to
-  // be refined accordingly.
-  // We can then refine twice:
-  GridTools::copy_boundary_to_manifold_id(triangulation);
-  const SphericalManifold<2> boundary_description(Point<2>(0,0));
-  triangulation.set_manifold (1, boundary_description);
+  // In the second step we will refine the mesh twice. To do this correctly,
+  // we should place new points on the interior boundary along the surface of
+  // a circle centered at the origin. Fortunately,
+  // GridGenerator::hyper_cube_with_cylindrical_hole already attaches a
+  // Manifold object to the interior boundary, so we do not need to do
+  // anything but refine the mesh (see the @ref Results results section for a
+  // fully worked example where we <em>do</em> attach a Manifold object).
   triangulation.refine_global(2);
-
-  // The mesh so generated is then passed to the function that generates
-  // output. In a final step we remove the boundary object again so that it is
-  // no longer in use by the triangulation when it is destroyed (the boundary
-  // object is destroyed first in this function since it was declared after
-  // the triangulation).
   print_mesh_info (triangulation, "grid-3.eps");
-  triangulation.reset_manifold(1);
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on

@@ -40,16 +40,18 @@ to use a curved geometry. The way to do this requires three steps:
   <code>manifold_id</code> with a Manifold object. For more information on this
   see the @ref GlossManifoldIndicator "glossary entry on this topic".
 - Finally, you must mark cells and cell faces with the correct
-  <code>manifold_id</code>. For example, you could get an annular domain with
+  <code>manifold_id</code>. For example, you could get an annular sector with
   curved cells in Cartesian coordinates (but rectangles in polar coordinates)
   by doing the following:
   @code
-  PolarManifold<2> polar_manifold;
-  Triangulation<2> triangulation;
-  const types::manifold_id polar_id = 42;
-  GridGenerator::hyper_shell(triangulation, Point<2>(), 0.5, 1.0, 10);
-  triangulation.set_manifold(polar_id, polar_manifold);
-  triangulation.set_all_manifold_ids(polar_id);
+  Triangulation<2> tria;
+  GridGenerator::hyper_cube(tria);
+  const auto cell = tria.begin_active();
+  cell->vertex(2) = Point<2>(-0.5, 1.0);
+  cell->vertex(3) = Point<2>(1.5, 1.0);
+  tria.set_all_manifold_ids(42);
+  tria.set_manifold(42, PolarManifold<2>(Point<2>(0.5, -1.0)));
+  tria.refine_global(3);
   @endcode
   Now, when the grid is refined, all cell splitting calculations will be done in
   polar coordinates.
