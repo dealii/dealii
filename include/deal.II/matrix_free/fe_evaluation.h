@@ -3716,7 +3716,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   VectorizedArray<Number> **values_dofs =
     const_cast<VectorizedArray<Number> * *>(&this->values_dofs[0]);
 
-  unsigned int cells_copied[VectorizedArray<Number>::n_array_elements];
+  unsigned int cells_copied[n_vectorization];
   const unsigned int *cells;
   unsigned int n_vectorization_actual =
     dof_info->n_vectorization_lanes_filled[dof_access_index][cell];
@@ -3741,6 +3741,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
                             dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].second;
           dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].first];
         }
+      for (unsigned int v=n_vectorization_actual; v<n_vectorization; ++v)
+        dof_indices[v] = nullptr;
     }
   else
     {
@@ -3753,6 +3755,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
             has_constraints = true;
           dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first];
         }
+      for (unsigned int v=n_vectorization_actual; v<n_vectorization; ++v)
+        dof_indices[v] = nullptr;
     }
 
   // Case where we have no constraints throughout the whole cell: Can go
@@ -3994,6 +3998,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
   for (unsigned int v=0; v<vectorization_populated; ++v)
     dof_indices[v] = dof_indices_cont[cell*VectorizedArray<Number>::n_array_elements+v] +
                      dof_info->component_dof_indices_offset[active_fe_index][first_selected_component];
+  for (unsigned int v=vectorization_populated; v<VectorizedArray<Number>::n_array_elements; ++v)
+    dof_indices[v] = numbers::invalid_unsigned_int;
 
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
