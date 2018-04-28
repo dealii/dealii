@@ -120,8 +120,11 @@ private:
   // conditions.
   ConstraintMatrix     constraints;
 
-  SparsityPattern      sparsity_pattern;
+  // The sparsity pattern and sparse matrix are deliberately declared in the
+  // opposite of the order used in step-2 through step-5 to demonstrate the
+  // main use of Subscriptor and SmartPointer.
   SparseMatrix<double> system_matrix;
+  SparsityPattern      sparsity_pattern;
 
   Vector<double>       solution;
   Vector<double>       system_rhs;
@@ -161,61 +164,57 @@ Step6<dim>::Step6 ()
 
 // @sect4{Step6::~Step6}
 
-// Here comes the added destructor of the class. The reason why we want to add
-// it is to pick up an issue we already started to discuss in step-1:
-// the <code>boundary</code> object was defined before and not after the
-// <code>triangulation</code> object. Of course we could have left this order
-// unchanged, but we would like to show what happens if the order is reversed
-// since this produces a rather nasty side-effect and results in an error which
-// is difficult to track down if one does not know what happens.
+// Here comes the added destructor of the class. Some objects in deal.II store
+// pointers to other objects: in particular a SparseMatrix stores a SmartPointer
+// pointing to the SparsityPattern with which it was initialized. This example
+// deliberately declares the SparseMatrix before the SparsityPattern to make this
+// dependency clearer. Of course we could have left this order unchanged, but
+// we would like to show what happens if the order is reversed since this
+// produces a rather nasty side-effect and results in an error which is
+// difficult to track down if one does not know what happens.
 //
-// Basically what happens is the following: when we set a manifold description
-// to the triangulation using the function call
-// <code>triangulation.set_manifold (0, boundary)</code>, the
-// <code>Triangulation</code> object also stores a pointer to the
-// <code>Manifold</code> object in use. Since this pointer is used until either
-// another <code>Manifold</code> object is set as boundary description or until
-// the <code>Triangulation</code> object is destroyed, it would be unwise if we
-// would allow the <code>boundary</code> to be deleted before the
-// <code>triangulation</code>. To disallow this, the <code>triangulation</code>
-// increases a counter inside the <code>boundary</code> which counts how many
-// objects use it (this is what the
+// Basically what happens is the following: when we initialize a SparseMatrix,
+// the matrix stores a pointer to the provided SparsityPattern instead of
+// copying it.  Since this pointer is used until either another
+// SparsityPattern is attached or the SparseMatrix is destructed, it would be
+// unwise to allow the SparsityPattern to be destructed before the
+// SparseMatrix. To disallow this, the SparseMatrix increases a counter inside
+// the SparsityPattern which counts how many objects use it (this is what the
 // <code>Subscriptor</code>/<code>SmartPointer</code> class pair is used for,
 // in case you want something like this for your own programs; see step-7 for
-// a more complete discussion of this topic). The <code>boundary</code> will
-// refuse its destruction if that counter is larger than zero, since then some
-// other objects might rely on its persistence. An exception will then be
-// thrown and the program will usually abort upon the attempt to destroy
-// <code>boundary</code>.
+// a more complete discussion of this topic). If the counter is larger than
+// zero then the program will either abort (the default) or print an error
+// message and continue: see the documentation of AssertNothrow for more
+// details. In either case the program contains a bug and this facility will,
+// hopefully, point out where.
 //
-// To be fair, such exceptions about still used objects are not particularly
+// To be fair, such errors due to object dependencies are not particularly
 // popular among programmers using deal.II, since they only tell us that
-// something is wrong, namely that <i>some</i> other object is still using the object
-// that is presently being destroyed, but most of the time not <i>which</i> object is
-// still using it. It is therefore often rather time-consuming to find out where the
-// problem exactly is, although it is then usually straightforward to remedy
-// the situation. However, we believe that the effort to find invalid
-// references to objects that do no longer exist is less if the problem is
-// detected once the reference becomes invalid, rather than when non-existent
-// objects are actually accessed again, since then usually only invalid data
-// is accessed, but no error is immediately raised.
+// something is wrong, namely that <i>some</i> other object is still using the
+// object that is presently being destroyed, but most of the time not
+// <em>which</em> object is still using it. It is therefore often rather
+// time-consuming to find out where the problem exactly is, although it is
+// then usually straightforward to remedy the situation. However, we believe
+// that the effort to find invalid pointers to objects that no longer exist is
+// less if the problem is detected once the pointer becomes invalid, rather
+// than when non-existent objects are actually accessed again, since then
+// usually only invalid data is accessed, but no error is immediately raised.
 //
 // Coming back to the present situation, if we did not write this destructor,
 // the compiler will generate code that triggers exactly the behavior sketched
 // above. The reason is that member variables of the <code>Step6</code> class
 // are destroyed bottom-up (i.e., in reverse order of their declaration in the
-// class), as always in C++. Thus, the boundary object will be
-// destroyed before the triangulation object, since its declaration is below
-// the one of the triangulation. This triggers the situation above, and an
-// exception will be raised when the boundary object is
-// destroyed. What needs to be done is to tell the <code>triangulation</code>
-// object to release its lock to <code>boundary</code>. Of course, the
-// <code>triangulation</code> will only release its lock if it really does not
-// need the <code>boundary</code> any more. For this purpose, the
-// <code>Triangulation</code> class has a function <code>clear</code> which
-// resets the object into a virgin state by deleting all data and releases its
-// lock to the finite element. After this, you can safely destruct the
-// <code>boundary</code> object since its internal counter is then zero.
+// class), as always in C++. Thus, the SparsityPattern will be destroyed
+// before the SparseMatrix, since its declaration is below the one of the
+// sparsity pattern. This triggers the situation above, and an exception will
+// be raised when the SparsityPattern is destroyed. What needs to be done is
+// to tell the SparseMatrix to release its pointer to the SparsityPattern. Of
+// course, the SparseMatrix will only release its pointer if it really does
+// not need the SparsityPattern any more. For this purpose, the SparseMatrix
+// class has a function SparseMatrix::clear() which resets the object to its
+// default-constructed state by deleting all data and resetting its pointer to
+// the SparsityPattern to 0. After this, you can safely destruct the
+// SparsityPattern since its internal counter will be zero.
 //
 // For completeness, we add the output of the exception that would have been
 // triggered without this destructor, to the end of the results section of
@@ -223,7 +222,7 @@ Step6<dim>::Step6 ()
 template <int dim>
 Step6<dim>::~Step6 ()
 {
-  triangulation.clear ();
+  system_matrix.clear();
 }
 
 
