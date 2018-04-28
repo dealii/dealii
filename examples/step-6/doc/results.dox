@@ -55,46 +55,53 @@ The final solution, as written by the program at the end of the
 In each cycle, the program furthermore writes the grid in EPS
 format. These are shown in the following:
 
-
-
-<TABLE WIDTH="100%">
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-0.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-1.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-2.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-4.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-5.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-6.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-7.png" alt="">
-</td>
-</tr>
-</table>
-
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0.svg"
+         alt="Initial grid: the five-cell circle grid with one global refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1.svg"
+         alt="First grid: the five-cell circle grid with two global refinements."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2.svg"
+         alt="Second grid: the five-cell circle grid with one adaptive refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3.svg"
+         alt="Third grid: the five-cell circle grid with two adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4.svg"
+         alt="Fourth grid: the five-cell circle grid with three adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5.svg"
+         alt="Fifth grid: the five-cell circle grid with four adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_6.svg"
+         alt="Sixth grid: the five-cell circle grid with five adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_7.svg"
+         alt="Last grid: the five-cell circle grid with six adaptive
+         refinements, showing that most cells are clustered around the inner circle."
+         width="300" height="300">
+  </div>
+</div>
 
 
 It is clearly visible that the region where the solution has a kink,
@@ -316,7 +323,14 @@ center of the mesh only fails for the central square of the mesh):
 After a few global refinement steps, this would lead to a mesh of the following
 kind:
 
-<img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4-bad.png" alt="">
+
+  <div class="onecolumn" style="width: 80%">
+    <div>
+      <img src="https://www.dealii.org/images/steps/developer/step_6_bad_grid_4.svg"
+           alt="Grid where some central cells are nearly triangular."
+           width="300" height="300">
+    </div>
+  </div>
 
 This is not a good mesh: the central cell has been refined in such a way that
 the children located in the four corners of the original central cell
@@ -411,44 +425,41 @@ originally developed by Konstantin Ladutenko. We will use the following code:
 
 This code then generates the following, much better sequence of meshes:
 
-<TABLE WIDTH="100%">
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-0.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-1.png" alt="">
-</td>
-</tr>
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0_ladutenko.svg"
+         alt="Initial grid: the Ladutenko grid with one global refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1_ladutenko.svg"
+         alt="First adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2_ladutenko.svg"
+         alt="Second adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3_ladutenko.svg"
+         alt="Third adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4_ladutenko.svg"
+         alt="Fourth adaptively refined Ladutenko grid. The cells are clustered
+         along the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+         alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
+         along the inner circle."
+         width="300" height="300">
+  </div>
+</div>
 
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-2.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-5.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-6.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-7.png" alt="">
-</td>
-</tr>
-</table>
- 
 Creating good meshes, and in particular making them fit the geometry you
 want, is a complex topic in itself. You can find much more on this in
 step-49, step-53, and step-54, among other tutorial programs that cover
