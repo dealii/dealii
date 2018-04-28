@@ -191,6 +191,8 @@ public:
    * Copy the contents of the distributed matrix into a differently distributed matrix @p dest.
    * The function also works for matrices with different process grids
    * or block-cyclic distributions.
+   *
+   * @note this function requires MPI version 3.0 or higher.
    */
   void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
 
