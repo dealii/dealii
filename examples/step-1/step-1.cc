@@ -25,10 +25,6 @@
 #include <deal.II/grid/tria_iterator.h>
 // Here are some functions to generate standard grids:
 #include <deal.II/grid/grid_generator.h>
-// We would like to use faces and cells which are not straight lines,
-// or bi-linear quads, so we import some classes which predefine some
-// manifold descriptions:
-#include <deal.II/grid/manifold_lib.h>
 // Output of grids in various graphics formats:
 #include <deal.II/grid/grid_out.h>
 
