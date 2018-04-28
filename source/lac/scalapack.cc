@@ -439,8 +439,8 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
       // there is really no harm in passing MPI_COMM_WORLD as the
       // first argument, even if the program we are currently running
       // and that is calling this function only works on a subset of
-      // processes
-      ierr = MPI_Comm_create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
+      // processes. the same holds for the wrapper/fallback we are using here.
+      ierr = Utilities::MPI::create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*
