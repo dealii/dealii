@@ -109,11 +109,11 @@ private:
   void refine_grid ();
   void output_results (const unsigned int cycle) const;
 
-  Triangulation<dim>           triangulation;
-  const SphericalManifold<dim> boundary;
+  Triangulation<dim> triangulation;
 
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  FE_Q<dim>          fe;
+  DoFHandler<dim>    dof_handler;
+
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
@@ -628,10 +628,6 @@ void Step6<dim>::run ()
       if (cycle == 0)
         {
           GridGenerator::hyper_ball (triangulation);
-
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
           triangulation.refine_global (1);
         }
       else

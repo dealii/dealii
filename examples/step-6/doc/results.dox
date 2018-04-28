@@ -291,47 +291,26 @@ the Triangulation what to do when a cell is refined: where should the new
 vertices at the edge midpoints and the cell midpoint be located so that the
 child cells better represent the desired geometry than the parent cell.
 
-In the code above, we already do this for faces that sit at the boundary:
-There, we use the code
-@code
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-@endcode
-to tell the Triangulation where to ask when refining a boundary face.
-To make the mesh <i>interior</i> also track a circular domain, we need to work
-a bit harder, though.
-
-First, recall that our coarse mesh consists of a central square
+In the code above, we already do this for faces that sit at the boundary: this
+happens automatically since we use GridGenerator::hyper_ball, which attaches a
+SphericalManifold to the boundary of the domain. To make the mesh
+<i>interior</i> also track a circular domain, we need to work a bit harder,
+though. First, recall that our coarse mesh consists of a central square
 cell and four cells around it. Now first consider what would happen if we
 also attached the SphericalManifold object not only to the four exterior faces
 but also the four cells at the perimeter as well as all of their faces. We can
-do this by replacing the existing mesh creation code
-@code
-          GridGenerator::hyper_ball (triangulation);
-
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
-          triangulation.refine_global (1);
-@endcode
-by the following snippet (testing that the center of a cell is larger
-than a small multiple, say one tenth, of the cell diameter away from
+do this by adding the following snippet (testing that the center of a cell is
+larger than a small multiple, say one tenth, of the cell diameter away from
 center of the mesh only fails for the central square of the mesh):
 @code
           GridGenerator::hyper_ball (triangulation);
-
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
+          // after GridGenerator::hyper_ball is called the Triangulation has
+          // a SphericalManifold with id 0. We can use it again on the interior.
           const Point<dim> mesh_center;
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) > cell->diameter()/10)
               cell->set_all_manifold_ids (0);
-	  
+
           triangulation.refine_global (1);
 @endcode
 
@@ -355,10 +334,6 @@ originally developed by Konstantin Ladutenko. We will use the following code:
 @code
           GridGenerator::hyper_ball (triangulation);
 
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
           const Point<dim> mesh_center;
           const double core_radius  = 1.0/5.0,
                        inner_radius = 1.0/3.0;
@@ -374,8 +349,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // We do this shrinking by just scaling the location of each
           // of the vertices, given that the center of the circle is
           // simply the origin of the coordinate system.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) < 1e-5)
               {
                 for (unsigned int v=0;
@@ -385,12 +359,10 @@ originally developed by Konstantin Ladutenko. We will use the following code:
               }
 
           // Step 2: Refine all cells except the central one
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) >= 1e-5)
               cell->set_refine_flag ();
           triangulation.execute_coarsening_and_refinement ();
-
 
           // Step 3: Resize the inner children of the outer cells
           //
@@ -400,8 +372,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // steps. Consequently, move the vertices that were just
           // created in radial direction to a place where we need
           // them.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
               {
                 const double dist = mesh_center.distance (cell->vertex(v));
@@ -420,8 +391,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // and all of its bounding faces to the one that describes
           // the spherical manifold already introduced above and that
           // will be used for all further mesh refinement.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             {
               bool is_in_inner_circle = false;
               for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
@@ -432,6 +402,10 @@ originally developed by Konstantin Ladutenko. We will use the following code:
                   }
 
               if (is_in_inner_circle == false)
+              // The Triangulation already has a SphericalManifold with
+              // manifold id 0 (see the documentation of
+              // GridGenerator::hyper_ball) so we just attach it to the outer
+              // ring here:
                 cell->set_all_manifold_ids (0);
             }
 @endcode
