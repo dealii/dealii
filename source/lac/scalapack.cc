@@ -440,7 +440,9 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
       // first argument, even if the program we are currently running
       // and that is calling this function only works on a subset of
       // processes
-      ierr = MPI_Comm_create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
+      // FIXME: if MPI>=3.0 use MPI_Comm_create_group
+      // ierr = MPI_Comm_create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
+      ierr = MPI_Comm_create(MPI_COMM_WORLD, group_union, &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*
