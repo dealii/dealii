@@ -610,7 +610,8 @@ no_constraint:
       const bool have_hp = dofs_per_cell.size() > 1;
       const unsigned int n_components = start_components.back();
 
-      Assert(row_starts.size() % vectorization_length == 1, ExcInternalError());
+      Assert(vectorization_length == 1 ||
+             row_starts.size() % vectorization_length == 1, ExcInternalError());
       if (vectorization_length > 1)
         AssertDimension(row_starts.size()/vectorization_length/n_components,
                         irregular_cells.size());
