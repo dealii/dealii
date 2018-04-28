@@ -110,7 +110,7 @@ refined most. Furthermore, the central region where the solution is
 very smooth and almost flat, is almost not refined at all, but this
 results from the fact that we did not take into account that the
 coefficient is large there. The region outside is refined rather
-randomly, since the second derivative is constant there and refinement
+arbitrarily, since the second derivative is constant there and refinement
 is therefore mostly based on the size of the cells and their deviation
 from the optimal square.
 
@@ -118,7 +118,7 @@ from the optimal square.
 
 For completeness, we show what happens if the code we commented about
 in the destructor of the <code>Step6</code> class is omitted
-from this example.
+from this example:
 
 ~~~{}
 An error occurred in line <104> of file <.../source/base/subscriptor.cc> in function
@@ -202,7 +202,7 @@ we can use Jacobi as a preconditioner. And by using
   SparseILU<double> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
-we can use a very simply incomplete LU decomposition without any
+we can use a simple incomplete LU decomposition without any
 thresholding or strengthening of the diagonal.
 
 Using these various different preconditioners, we can compare the
@@ -275,11 +275,11 @@ preconditioners. They are, however, significantly more complex than
 the preconditioners outlined above.
 
 Finally, the last message to take
-home is that when the data shown above was generated (in 2008), linear
+home is that when the data shown above was generated (in 2018), linear
 systems with 100,000 unknowns are
-easily solved on a desktop machine in well under 10 seconds, making
+easily solved on a desktop machine in about a second, making
 the solution of relatively simple 2d problems even to very high
-accuracy not that big a task as it used to be even in the recent
+accuracy not that big a task as it used to be even in the
 past. At the time, the situation for 3d problems was entirely different,
 but even that has changed substantially in the intervening time -- though
 solving problems in 3d to high accuracy remains a challenge.

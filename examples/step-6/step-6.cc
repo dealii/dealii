@@ -120,7 +120,7 @@ private:
 
   // The sparsity pattern and sparse matrix are deliberately declared in the
   // opposite of the order used in step-2 through step-5 to demonstrate the
-  // main use of Subscriptor and SmartPointer.
+  // primary use of the Subscriptor and SmartPointer classes.
   SparseMatrix<double> system_matrix;
   SparsityPattern      sparsity_pattern;
 
@@ -171,7 +171,7 @@ Step6<dim>::Step6 ()
 // produces a rather nasty side-effect and results in an error which is
 // difficult to track down if one does not know what happens.
 //
-// Basically what happens is the following: when we initialize a SparseMatrix,
+// What happens is the following: when we initialize a SparseMatrix,
 // the matrix stores a pointer to the provided SparsityPattern instead of
 // copying it.  Since this pointer is used until either another
 // SparsityPattern is attached or the SparseMatrix is destructed, it would be
@@ -180,11 +180,11 @@ Step6<dim>::Step6 ()
 // the SparsityPattern which counts how many objects use it (this is what the
 // <code>Subscriptor</code>/<code>SmartPointer</code> class pair is used for,
 // in case you want something like this for your own programs; see step-7 for
-// a more complete discussion of this topic). If the counter is larger than
-// zero then the program will either abort (the default) or print an error
-// message and continue: see the documentation of AssertNothrow for more
-// details. In either case the program contains a bug and this facility will,
-// hopefully, point out where.
+// a more complete discussion of this topic). If we try to destroy the object
+// while the counter is larger than zero then the program will either abort
+// (the default) or print an error message and continue: see the documentation
+// of AssertNothrow for more details. In either case the program contains a
+// bug and this facility will, hopefully, point out where.
 //
 // To be fair, such errors due to object dependencies are not particularly
 // popular among programmers using deal.II, since they only tell us that
@@ -199,14 +199,15 @@ Step6<dim>::Step6 ()
 // usually only invalid data is accessed, but no error is immediately raised.
 //
 // Coming back to the present situation, if we did not write this destructor,
-// the compiler will generate code that triggers exactly the behavior sketched
-// above. The reason is that member variables of the <code>Step6</code> class
-// are destroyed bottom-up (i.e., in reverse order of their declaration in the
-// class), as always in C++. Thus, the SparsityPattern will be destroyed
-// before the SparseMatrix, since its declaration is below the one of the
-// sparsity pattern. This triggers the situation above, and an exception will
-// be raised when the SparsityPattern is destroyed. What needs to be done is
-// to tell the SparseMatrix to release its pointer to the SparsityPattern. Of
+// then the compiler would generate code that triggers exactly the behavior
+// described above. The reason is that member variables of the
+// <code>Step6</code> class are destroyed bottom-up (i.e., in reverse order of
+// their declaration in the class), as always in C++. Thus, the
+// SparsityPattern will be destroyed before the SparseMatrix, since its
+// declaration is below the declaration of the sparsity pattern. This triggers
+// the situation above, and without manual intervention an exception will be
+// raised when the SparsityPattern is destroyed. What needs to be done is to
+// tell the SparseMatrix to release its pointer to the SparsityPattern. Of
 // course, the SparseMatrix will only release its pointer if it really does
 // not need the SparsityPattern any more. For this purpose, the SparseMatrix
 // class has a function SparseMatrix::clear() which resets the object to its
@@ -226,22 +227,22 @@ Step6<dim>::~Step6 ()
 
 // @sect4{Step6::setup_system}
 
-// The next function is setting up all the variables that describe the linear
-// finite element problem, such as the DoF handler, the matrices, and
+// The next function sets up all the variables that describe the linear
+// finite element problem, such as the DoFHandler, matrices, and
 // vectors. The difference to what we did in step-5 is only that we now also
 // have to take care of hanging node constraints. These constraints are
-// handled almost transparently by the library, i.e. you only need to know
+// handled almost exclusively by the library, i.e. you only need to know
 // that they exist and how to get them, but you do not have to know how they
 // are formed or what exactly is done with them.
 //
 // At the beginning of the function, you find all the things that are the same
 // as in step-5: setting up the degrees of freedom (this time we have
 // quadratic elements, but there is no difference from a user code perspective
-// to the linear -- or cubic, for that matter -- case), generating the
-// sparsity pattern, and initializing the solution and right hand side
+// to the linear -- or any other degree, for that matter -- case), generating
+// the sparsity pattern, and initializing the solution and right hand side
 // vectors. Note that the sparsity pattern will have significantly more
-// entries per row now, since there are now 9 degrees of freedom per cell, not
-// only four, that can couple with each other.
+// entries per row now, since there are now 9 degrees of freedom per cell
+// (rather than only four), that can couple with each other.
 template <int dim>
 void Step6<dim>::setup_system ()
 {
@@ -250,43 +251,30 @@ void Step6<dim>::setup_system ()
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 
-
-  // After setting up all the degrees of freedoms, here are now the
-  // differences compared to step-5, all of which are related to constraints
-  // associated with the hanging nodes. In the class declaration, we have
-  // already allocated space for an object <code>constraints</code> that will
-  // hold a list of these constraints (they form a matrix, which is reflected
-  // in the name of the class, but that is immaterial for the moment). Now we
-  // have to fill this object. This is done using the following function calls
-  // (the first clears the contents of the object that may still be left over
-  // from computations on the previous mesh before the last adaptive
-  // refinement):
+  // We may now populate the ConstraintMatrix with the hanging node
+  // constraints. Since we will call this function in a loop we first clear
+  // the current set of constraints from the last system and then compute new ones:
   constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
 
 
-  // Now we are ready to interpolate the Functions::ZeroFunction to our boundary with
-  // indicator 0 (the whole boundary) and store the resulting constraints in
-  // our <code>constraints</code> object. Note that we do not to apply the
-  // boundary conditions after assembly, like we did in earlier steps.  As
-  // almost all the stuff, the interpolation of boundary values works also for
-  // higher order elements without the need to change your code for that. We
-  // note that for proper results, it is important that the elimination of
-  // boundary nodes from the system of equations happens *after* the
-  // elimination of hanging nodes. For that reason we are filling the boundary
-  // values into the ContraintMatrix after the hanging node constraints.
+  // Now we are ready to interpolate the boundary values with indicator 0 (the
+  // whole boundary) and store the resulting constraints in our
+  // <code>constraints</code> object. Note that we do not to apply the
+  // boundary conditions after assembly, like we did in earlier steps: instead
+  // we put all constraints on our function space in the ConstraintMatrix. We
+  // can add constraints to the ConstraintMatrix in either order: if two
+  // constraints conflict then the constraint matrix will throw an exception.
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             Functions::ZeroFunction<dim>(),
                                             constraints);
 
-
-  // The next step is <code>closing</code> this object. After all constraints
-  // have been added, they need to be sorted and rearranged to perform some
-  // actions more efficiently. This postprocessing is done using the
-  // <code>close()</code> function, after which no further constraints may be
-  // added any more:
+  // After all constraints have been added, they need to be sorted and
+  // rearranged to perform some actions more efficiently. This postprocessing
+  // is done using the <code>close()</code> function, after which no further
+  // constraints may be added any more:
   constraints.close ();
 
   // Now we first build our compressed sparsity pattern like we did in the
@@ -309,12 +297,11 @@ void Step6<dim>::setup_system ()
 
   // Now all non-zero entries of the matrix are known (i.e. those from
   // regularly assembling the matrix and those that were introduced by
-  // eliminating constraints). We can thus copy our intermediate object to the
+  // eliminating constraints). We may copy our intermediate object to the
   // sparsity pattern:
   sparsity_pattern.copy_from(dsp);
 
-  // Finally, the so-constructed sparsity pattern serves as the basis on top
-  // of which we will create the sparse matrix:
+  // We may now, finally, initialize the sparse matrix:
   system_matrix.reinit (sparsity_pattern);
 }
 
@@ -333,8 +320,9 @@ void Step6<dim>::setup_system ()
 //
 // Second, to copy the local matrix and vector on each cell into the global
 // system, we are no longer using a hand-written loop. Instead, we use
-// <code>ConstraintMatrix::distribute_local_to_global</code> that internally
-// executes this loop and eliminates all the constraints at the same time.
+// ConstraintMatrix::distribute_local_to_global() that internally executes
+// this loop while performing Gaussian elimination on rows and columns
+// corresponding to constrained degrees on freedom.
 //
 // The rest of the code that forms the local contributions remains
 // unchanged. It is worth noting, however, that under the hood several things
@@ -345,8 +333,7 @@ void Step6<dim>::setup_system ()
 // code. Secondly, the <code>fe_values</code> object of course needs to do
 // other things as well, since the shape functions are now quadratic, rather
 // than linear, in each coordinate variable. Again, however, this is something
-// that is completely transparent to user code and nothing that you have to
-// worry about.
+// that is completely handled by the library.
 template <int dim>
 void Step6<dim>::assemble_system ()
 {
@@ -404,8 +391,10 @@ void Step6<dim>::assemble_system ()
   // Now we are done assembling the linear system. The constraint matrix took
   // care of applying the boundary conditions and also eliminated hanging node
   // constraints. The constrained nodes are still in the linear system (there
-  // is a one on the diagonal of the matrix and all other entries for this
-  // line are set to zero) but the computed values are invalid. We compute the
+  // is a nonzero entry, chosen in a way that the matrix is well conditioned,
+  // on the diagonal of the matrix and all other entries for this line are set
+  // to zero) but the computed values are invalid (i.e., the correspond entry
+  // in <code>system_rhs</code> is currently meaningless). We compute the
   // correct values for these nodes at the end of the <code>solve</code>
   // function.
 }
@@ -445,8 +434,8 @@ void Step6<dim>::solve ()
 
 // @sect4{Step6::refine_grid}
 
-// Instead of global refinement, we now use a slightly more elaborate
-// scheme. We will use the <code>KellyErrorEstimator</code> class which
+// We use a sophisticated error estimation scheme to refine the mesh instead
+// of global refinement. We will use the KellyErrorEstimator class which
 // implements an error estimator for the Laplace equation; it can in principle
 // handle variable coefficients, but we will not use these advanced features,
 // but rather use its most simple form since we are not interested in
@@ -456,8 +445,8 @@ void Step6<dim>::solve ()
 // Although the error estimator derived by Kelly et al. was originally
 // developed for the Laplace equation, we have found that it is also well
 // suited to quickly generate locally refined grids for a wide class of
-// problems. Basically, it looks at the jumps of the gradients of the solution
-// over the faces of cells (which is a measure for the second derivatives) and
+// problems. This error estimator uses the solution gradient's jump at
+// cell faces (which is a measure for the second derivatives) and
 // scales it by the size of the cell. It is therefore a measure for the local
 // smoothness of the solution at the place of each cell and it is thus
 // understandable that it yields reasonable grids also for hyperbolic
@@ -469,12 +458,11 @@ void Step6<dim>::solve ()
 // The way the estimator works is to take a <code>DoFHandler</code> object
 // describing the degrees of freedom and a vector of values for each degree of
 // freedom as input and compute a single indicator value for each active cell
-// of the triangulation (i.e. one value for each of the
-// <code>triangulation.n_active_cells()</code> cells). To do so, it needs two
-// additional pieces of information: a quadrature formula on the faces
-// (i.e. quadrature formula on <code>dim-1</code> dimensional objects. We use
-// a 3-point Gauss rule again, a pick that is consistent and appropriate with
-// the choice bi-quadratic finite element shape functions in this program.
+// of the triangulation (i.e. one value for each of the active cells). To do
+// so, it needs two additional pieces of information: a face quadrature formula,
+// i.e., a quadrature formula on <code>dim-1</code> dimensional objects. We use
+// a 3-point Gauss rule again, a choice that is consistent and appropriate with
+// the bi-quadratic finite element shape functions in this program.
 // (What constitutes a suitable quadrature rule here of course depends on
 // knowledge of the way the error estimator evaluates the solution field. As
 // said above, the jump of the gradient is integrated over each face, which
@@ -495,7 +483,7 @@ void Step6<dim>::solve ()
 // using the default constructor of the map in the place where the function
 // call expects the respective function argument.
 //
-// The output, as mentioned is a vector of values for all cells. While it may
+// The output is a vector of values for all active cells. While it may
 // make sense to compute the <b>value</b> of a solution degree of freedom
 // very accurately, it is usually not necessary to compute the <b>error indicator</b>
 // corresponding to the solution on a cell particularly accurately. We therefore
