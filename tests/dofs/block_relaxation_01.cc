@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test that setting the kernel size in RelaxationBlock actually works.
+// Test that setting the kernel size in RelaxationBlock actually works. This
+// test uses SVD-based smoothing so it can only be run with LAPACK.
 
 
 #include "../tests.h"
