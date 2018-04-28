@@ -96,7 +96,7 @@ template <int dim>
 class ExactSolution : public Function<dim>
 {
 public:
-  ExactSolution() : Function<dim>() {}
+  ExactSolution() : Function<dim>(2) {}
   virtual double value (const Point<dim> &p,
                         const unsigned int component) const;
   virtual void vector_value (const Point<dim> &p,
