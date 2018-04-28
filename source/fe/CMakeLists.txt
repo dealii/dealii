@@ -30,6 +30,7 @@ SET(_unity_include_src
   fe_dg_vector.cc
   fe_face.cc
   fe_nedelec.cc
+  fe_nedelec_sz.cc
   fe_nothing.cc
   fe_poly.cc
   fe_poly_tensor.cc
@@ -94,6 +95,7 @@ SET(_inst
   fe_face.inst.in
   fe.inst.in
   fe_nedelec.inst.in
+  fe_nedelec_sz.inst.in
   fe_nothing.inst.in
   fe_poly.inst.in
   fe_poly_tensor.inst.in
