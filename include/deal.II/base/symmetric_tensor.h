@@ -719,10 +719,12 @@ public:
    * There are global functions <tt>double_contract</tt> that do the same work
    * as this operator, but rather than returning the result as a return value,
    * they write it into the first argument to the function.
+   *
+   * @deprecated This operator is deprecated, used `double_contract<0,0,1,1>(A,B)` instead.
    */
   template <typename OtherNumber>
   typename internal::SymmetricTensorAccessors::double_contraction_result<rank_,2,dim,Number,OtherNumber>::type
-  operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const;
+  operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const DEAL_II_DEPRECATED;
 
   /**
    * Contraction over two indices of the present object with the rank-4
