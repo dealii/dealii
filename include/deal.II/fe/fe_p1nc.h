@@ -236,7 +236,7 @@ DEAL_II_NAMESPACE_OPEN
  * The original paper for the P1 nonconforming element is
  * accessible at http://epubs.siam.org/doi/abs/10.1137/S0036142902404923
  * and has the following complete reference:
- * @code(.bib)
+ * @code{.bib}
  * @article{park2003p,
  *   title =     {P 1-nonconforming quadrilateral finite element methods for second-order elliptic problems},
  *   author =    {Park, Chunjae and Sheen, Dongwoo},
