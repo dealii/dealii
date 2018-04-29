@@ -3172,11 +3172,8 @@ namespace internal
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
       endc=tria.end();
 
-      // if we are to treat curved
-      // boundaries, then generate a
-      // quadrature formula which will be
-      // used to probe boundary points at
-      // curved faces
+      // If we need to plot curved lines then generate a quadrature formula to
+      // place points via the mapping
       Quadrature<dim> *q_projector=nullptr;
       std::vector<Point<dim-1> > boundary_points;
       if (mapping!=nullptr)
@@ -3201,13 +3198,9 @@ namespace internal
           if (mapping==nullptr ||
               (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells))
             {
-              // write out the four sides
-              // of this cell by putting
-              // the four points (+ the
-              // initial point again) in
-              // a row and lifting the
-              // drawing pencil at the
-              // end
+              // write out the four sides of this cell by putting the four
+              // points (+ the initial point again) in a row and lifting the
+              // drawing pencil at the end
               for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
                 out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i])
                     << ' ' << cell->level()
@@ -3219,11 +3212,8 @@ namespace internal
                   << '\n';
             }
           else
-            // cell is at boundary and we
-            // are to treat curved
-            // boundaries. so loop over
-            // all faces and draw them as
-            // small pieces of lines
+            // cell is at boundary and we are to treat curved boundaries. so
+            // loop over all faces and draw them as small pieces of lines
             {
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -3232,11 +3222,8 @@ namespace internal
                   face = cell->face(face_no);
                   if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
-                      // compute offset
-                      // of quadrature
-                      // points within
-                      // set of projected
-                      // points
+                      // compute offset of quadrature points within set of
+                      // projected points
                       const unsigned int offset=face_no*n_points;
                       for (unsigned int i=0; i<n_points; ++i)
                         out << (mapping->transform_unit_to_real_cell
@@ -3250,11 +3237,8 @@ namespace internal
                     }
                   else
                     {
-                      // if, however, the
-                      // face is not at
-                      // the boundary,
-                      // then draw it as
-                      // usual
+                      // if, however, the face is not at the boundary, then
+                      // draw it as usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
@@ -3273,8 +3257,7 @@ namespace internal
       if (q_projector != nullptr)
         delete q_projector;
 
-      // make sure everything now gets to
-      // disk
+      // make sure everything now gets to disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -3301,11 +3284,8 @@ namespace internal
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
       endc=tria.end();
 
-      // if we are to treat curved
-      // boundaries, then generate a
-      // quadrature formula which will be
-      // used to probe boundary points at
-      // curved faces
+      // If we need to plot curved lines then generate a quadrature formula to
+      // place points via the mapping
       Quadrature<dim> *q_projector=nullptr;
       std::vector<Point<1> > boundary_points;
       if (mapping!=nullptr)
@@ -3319,8 +3299,7 @@ namespace internal
           std::vector<double> dummy_weights(n_points, 1./n_points);
           Quadrature<1> quadrature1d(boundary_points, dummy_weights);
 
-          // tensor product of points,
-          // only one copy
+          // tensor product of points, only one copy
           QIterated<dim-1> quadrature(quadrature1d, 1);
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
@@ -3428,10 +3407,7 @@ namespace internal
                                       cell, q_projector->point(offset+i*n_points+j+1)))
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
-                            // and the
-                            // first
-                            // point
-                            // again
+                            // and the first point again
                             out << p0
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
@@ -3449,14 +3425,9 @@ namespace internal
                                                  &v1=line->vertex(1);
                           if (line->at_boundary() || gnuplot_flags.curved_inner_cells)
                             {
-                              // transform_real_to_unit_cell
-                              // could be
-                              // replaced
-                              // by using
-                              // QProjector<dim>::project_to_line
-                              // which is
-                              // not yet
-                              // implemented
+                              // transform_real_to_unit_cell could be replaced
+                              // by using QProjector<dim>::project_to_line
+                              // which is not yet implemented
                               const Point<spacedim> u0=mapping->transform_real_to_unit_cell(cell, v0),
                                                     u1=mapping->transform_real_to_unit_cell(cell, v1);
 
@@ -3485,8 +3456,7 @@ namespace internal
         delete q_projector;
 
 
-      // make sure everything now gets to
-      // disk
+      // make sure everything now gets to disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
