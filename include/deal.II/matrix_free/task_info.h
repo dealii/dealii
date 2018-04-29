@@ -133,6 +133,10 @@ namespace internal
        * to performing computations. These will be given a certain id in the
        * partitioning.
        *
+       * @param cells_close_to_boundary A list of cells that interact with
+       * boundaries between different subdomains and are involved in sending
+       * data to neighboring processes.
+       *
        * @param dofs_per_cell Gives an expected value for the number of degrees
        * of freedom on a cell, which is used to determine the block size for
        * interleaving cell and face integrals.
@@ -209,9 +213,23 @@ namespace internal
        * represented by a chunk of cells. The cell chunks are formed before
        * subdivision into partitions and colors.
        *
-       * @param renumbering At output, the element j of this variable gives
+       * @param cell_active_fe_index The active FE index corresponding to the
+       * individual indices in the list of all cell indices, in order to be
+       * able to not place cells with different indices into the same cell
+       * batch with vectorization.
+       *
+       * @param connectivity (in/out) Determines whether cells `i` and `j` are
+       * conflicting, expressed by an entry in position (i,j).
+       *
+       * @param renumbering (in/out) At output, the element j of this variable gives
        * the original number of the cell that is reordered to place j by the
        * ordering due to the thread graph.
+       *
+       * @param irregular_cells (in/out) Informs the current function whether
+       * some SIMD lanes in VectorizedArray would not be filled for a given
+       * cell batch index.
+       *
+       * @param hp_bool Defines whether we are in hp mode or not
        */
       void
       make_thread_graph_partition_color (DynamicSparsityPattern     &connectivity,
@@ -233,9 +251,23 @@ namespace internal
        * of cells. The cell chunks are formed after subdivision into the two
        * levels of partitions.
        *
-       * @param renumbering At output, the element j of this variable gives
+       * @param cell_active_fe_index The active FE index corresponding to the
+       * individual indices in the list of all cell indices, in order to be
+       * able to not place cells with different indices into the same cell
+       * batch with vectorization.
+       *
+       * @param connectivity (in/out) Determines whether cells `i` and `j` are
+       * conflicting, expressed by an entry in position (i,j).
+       *
+       * @param renumbering (in/out) At output, the element j of this variable gives
        * the original number of the cell that is reordered to place j by the
        * ordering due to the thread graph.
+       *
+       * @param irregular_cells (in/out) Informs the current function whether
+       * some SIMD lanes in VectorizedArray would not be filled for a given
+       * cell batch index.
+       *
+       * @param hp_bool Defines whether we are in hp mode or not
        */
       void
       make_thread_graph_partition_partition (const std::vector<unsigned int> &cell_active_fe_index,
@@ -249,9 +281,23 @@ namespace internal
        * make_thread_graph_partition_partition() accessible from the outside,
        * depending on the setting in the data structure.
        *
-       * @param renumbering At output, the element j of this variable gives
+       * @param cell_active_fe_index The active FE index corresponding to the
+       * individual indices in the list of all cell indices, in order to be
+       * able to not place cells with different indices into the same cell
+       * batch with vectorization.
+       *
+       * @param connectivity (in/out) Determines whether cells `i` and `j` are
+       * conflicting, expressed by an entry in position (i,j).
+       *
+       * @param renumbering (in/out) At output, the element j of this variable gives
        * the original number of the cell that is reordered to place j by the
        * ordering due to the thread graph.
+       *
+       * @param irregular_cells (in/out) Informs the current function whether
+       * some SIMD lanes in VectorizedArray would not be filled for a given
+       * cell batch index.
+       *
+       * @param hp_bool Defines whether we are in hp mode or not
        */
       void
       make_thread_graph (const std::vector<unsigned int> &cell_active_fe_index,

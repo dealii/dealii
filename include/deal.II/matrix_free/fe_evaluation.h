@@ -425,22 +425,22 @@ public:
   // specialization of the base class, in this case FEEvaluationAccess<dim,dim>.
   // For now, hack-in those functions manually only to fix documentation:
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_divergence()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_divergence()
    * @note Only available for n_components_==dim.
    */
   VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_symmetric_gradient()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_symmetric_gradient()
    * @note Only available for n_components_==dim.
    */
   SymmetricTensor<2, dim, VectorizedArray<Number> > get_symmetric_gradient (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::get_curl()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_curl()
    * @note Only available for n_components_==dim.
    */
   Tensor<1,(dim==2?1:dim), VectorizedArray<Number> > get_curl (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_divergence()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_divergence()
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
@@ -450,7 +450,7 @@ public:
    */
   void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_symmetric_gradient()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_symmetric_gradient()
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
@@ -461,7 +461,7 @@ public:
    */
   void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
 
-  /** @copydoc FEEvaluationAccess<dim,dim,Number>::submit_curl()
+  /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_curl()
    * @note Only available for n_components_==dim.
    *
    * @note This operation writes the data to the same field as
@@ -1129,61 +1129,61 @@ public:
   static constexpr unsigned int dimension          = dim;
   typedef FEEvaluationBase<dim,1,Number,is_face> BaseClass;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_dof_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_dof_value()
    */
   value_type get_dof_value (const unsigned int dof) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_dof_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_dof_value()
    */
   void submit_dof_value (const value_type   val_in,
                          const unsigned int dof);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_value()
    */
   value_type get_value (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
   void submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
                      const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_gradient()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_normal_derivative()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
   value_type get_normal_derivative (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_gradient()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::submit_normal_derivative()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_normal_derivative()
    */
   void submit_normal_derivative(const value_type grad_in,
                                 const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_hessian()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian()
    */
   Tensor<2,dim,VectorizedArray<Number> >
   get_hessian (unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_hessian_diagonal()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_laplacian()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_laplacian()
    */
   value_type get_laplacian (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::integrate_value()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::integrate_value()
    */
   value_type integrate_value () const;
 
@@ -1250,7 +1250,7 @@ public:
   static constexpr unsigned int n_components  = dim;
   typedef FEEvaluationBase<dim,dim,Number,is_face> BaseClass;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_gradient()
+  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
@@ -1276,16 +1276,16 @@ public:
   Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
   get_curl (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_hessian()
+  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian()
    */
   Tensor<3,dim,VectorizedArray<Number> >
   get_hessian (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number>::get_hessian_diagonal()
+  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,dim,Number>::submit_gradient()
+  /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
@@ -1391,71 +1391,71 @@ public:
   static constexpr unsigned int dimension      = 1;
   typedef FEEvaluationBase<1,1,Number,is_face>   BaseClass;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_dof_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_dof_value()
    */
   value_type get_dof_value (const unsigned int dof) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_dof_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_dof_value()
    */
   void submit_dof_value (const value_type   val_in,
                          const unsigned int dof);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_value()
    */
   value_type get_value (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
   void submit_value (const value_type   val_in,
                      const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
   void submit_value (const gradient_type   val_in,
                      const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_gradient()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_gradient()
    */
   gradient_type get_gradient (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<dim,1,Number>::get_normal_derivative()
+  /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
   value_type get_normal_derivative (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_gradient()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
   void submit_gradient(const gradient_type grad_in,
                        const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_gradient()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
   void submit_gradient(const value_type   grad_in,
                        const unsigned int q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_normal_derivative()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
   void submit_normal_derivative(const value_type grad_in,
                                 const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::submit_normal_derivative()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
   void submit_normal_derivative(const gradient_type grad_in,
                                 const unsigned int  q_point);
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_hessian()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian()
    */
   Tensor<2,1,VectorizedArray<Number> >
   get_hessian (unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_hessian_diagonal()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian_diagonal()
    */
   gradient_type get_hessian_diagonal (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::get_laplacian()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_laplacian()
    */
   value_type get_laplacian (const unsigned int q_point) const;
 
-  /** @copydoc FEEvaluationBase<1,1,Number>::integrate_value()
+  /** @copydoc FEEvaluationBase<1,1,Number,is_face>::integrate_value()
    */
   value_type integrate_value () const;
 
