@@ -289,6 +289,11 @@ public:
      * cache the following data on faces: inverse Jacobians, Jacobian
      * determinants (JxW), quadrature points, data for Hessians (derivative of
      * Jacobians), and normal vectors.
+     *
+     * @note In order to be able to perform a `face_operation` or
+     * `boundary_operation` in the MatrixFree::loop()`, either this field or
+     * @p mapping_update_flags_inner_faces must be set to a value different
+     * from UpdateFlags::update_default.
      */
     UpdateFlags         mapping_update_flags_boundary_faces;
 
@@ -305,6 +310,11 @@ public:
      * cache the following data on faces: inverse Jacobians, Jacobian
      * determinants (JxW), quadrature points, data for Hessians (derivative of
      * Jacobians), and normal vectors.
+     *
+     * @note In order to be able to perform a `face_operation` or
+     * `boundary_operation` in the MatrixFree::loop()`, either this field or
+     * @p mapping_update_flags_boundary_faces must be set to a value different
+     * from UpdateFlags::update_default.
      */
     UpdateFlags         mapping_update_flags_inner_faces;
 
@@ -583,6 +593,59 @@ public:
   //@}
 
   /**
+   * This class defines the type of data access for face integrals in loop ()
+   * that is passed on to the `update_ghost_values` and `compress` functions
+   * of the parallel vectors, with the purpose of being able to reduce the
+   * amount of data that must be exchanged. The data exchange is a real
+   * bottleneck in particular for high-degree DG methods, therefore a more
+   * restrictive way of exchange is clearly beneficial. Note that this
+   * selection applies to FEFaceEvaluation objects assigned to the exterior
+   * side of cells accessing `FaceToCellTopology::exterior_cells` only; all
+   * <i>interior</i> objects are available in any case.
+   */
+  enum class DataAccessOnFaces
+  {
+    /**
+     * The loop does not involve any FEFaceEvaluation access into neighbors,
+     * as is the case with only boundary integrals (but no interior face
+     * integrals) or when doing mass matrices in a MatrixFree::cell_loop()
+     * like setup.
+     */
+    none,
+
+    /**
+     * The loop does only involve FEFaceEvaluation access into neighbors by
+     * function values, such as `FEFaceEvaluation::gather_evaluate(src, true,
+     * false)`, but no access to shape function derivatives (which typically
+     * need to access more data). For FiniteElement types where only some of
+     * the shape functions have support on a face, such as an FE_DGQ element
+     * with Lagrange polynomials with nodes on the element surface, the data
+     * exchange is reduced from `(k+1)^dim` to `(k+1)^(dim-1)`.
+     */
+    values,
+
+    /**
+     * The loop does involve FEFaceEvaluation access into neighbors by
+     * function values and gradients, but no second derivatives, such as
+     * `FEFaceEvaluation::gather_evaluate(src, true, true)`. For
+     * FiniteElement types where only some of the shape functions have
+     * non-zero value and first derivative on a face, such as an FE_DGQHermite
+     * element, the data exchange is reduced, e.g. from `(k+1)^dim` to
+     * `2(k+1)^(dim-1)`. Note that for bases that do not have this special
+     * property, the full neighboring data is sent anyway.
+     */
+    gradients,
+
+    /**
+     * General setup where the user does not want to make a restriction. This
+     * is typically more expensive than the other options, but also the most
+     * conservative one because the full data of elements behind the faces to
+     * be computed locally will be exchanged.
+     */
+    unspecified
+  };
+
+  /**
    * @name 2: Loop over cells
    */
   //@{
@@ -590,9 +653,9 @@ public:
    * This method runs the loop over all cells (in parallel) and performs the
    * MPI data exchange on the source vector and destination vector.
    *
-   * @param cell_operation `std::function` with the signature `cell_operation
+   * @param cell_operation `std::function` with the signature <tt>cell_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)` where the first argument passes
+   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument passes
    * the data of the calling class and the last argument defines the range of
    * cells which should be worked on (typically more than one cell should be
    * worked on in order to reduce overheads).  One can pass a pointer to an
@@ -641,13 +704,13 @@ public:
    * (i.e., it is a non-static member function).
    *
    * @param cell_operation Pointer to member function of `CLASS` with the
-   * signature `cell_operation (const MatrixFree<dim,Number> &, OutVector &,
-   * InVector &, std::pair<unsigned int,unsigned int> &)` where the first
+   * signature <tt>cell_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> where the first
    * argument passes the data of the calling class and the last argument
    * defines the range of cells which should be worked on (typically more than
    * one cell should be worked on in order to reduce overheads).
    *
-   * @param owning class The object which provides the `cell_operation`
+   * @param owning_class The object which provides the `cell_operation`
    * call. To be compatible with this interface, the class must allow to call
    * `owning_class->cell_operation(...)`.
    *
@@ -700,86 +763,33 @@ public:
                   const bool      zero_dst_vector = false) const;
 
   /**
-   * This class defines the type of data access for face integrals that is
-   * passed on to the `update_ghost_values` and `compress` functions of the
-   * parallel vectors, with the purpose of being able to reduce the amount of
-   * data that must be exchanged. The data exchange is a real bottleneck in
-   * particular for high-degree DG methods, therefore a more restrictive way
-   * of exchange is clearly beneficial. Note that this selection applies to
-   * FEFaceEvaluation objects assigned to the exterior side of cells accessing
-   * `FaceToCellTopology::exterior_cells` only; all <i>interior</i> objects
-   * are available in any case.
-   */
-  enum class DataAccessOnFaces
-  {
-    /**
-     * The loop does not involve any FEFaceEvaluation access into neighbors,
-     * as is the case with only boundary integrals (but no interior face
-     * integrals) or when doing mass matrices in a MatrixFree::cell_loop()
-     * like setup.
-     */
-    none,
-
-    /**
-     * The loop does only involve FEFaceEvaluation access into neighbors by
-     * function values, such as `FEFaceEvaluation::gather_evaluate(src, true,
-     * false);`, but no access to shape function derivatives (which typically
-     * need to access more data). For FiniteElement types where only some of
-     * the shape functions have support on a face, such as an FE_DGQ element
-     * with Lagrange polynomials with nodes on the element surface, the data
-     * exchange is reduced from `(k+1)^dim` to `(k+1)^(dim-1)`.
-     */
-    values,
-
-    /**
-     * The loop does involve FEFaceEvaluation access into neighbors by
-     * function values and gradients, but no second derivatives, such as
-     * `FEFaceEvaluation::gather_evaluate(src, true, true);`. For
-     * FiniteElement types where only some of the shape functions have
-     * non-zero value and first derivative on a face, such as an FE_DGQHermite
-     * element, the data exchange is reduced, e.g. from `(k+1)^dim` to
-     * `2(k+1)^(dim-1)`. Note that for bases that do not have this special
-     * property, the full neighboring data is sent anyway.
-     */
-    gradients,
-
-    /**
-     * General setup where the user does not want to make a restriction. This
-     * is typically more expensive than the other options, but also the most
-     * conservative one because the full data of elements behind the faces to
-     * be computed locally will be exchanged.
-     */
-    unspecified
-  };
-
-  /**
    * This method runs a loop over all cells (in parallel) and performs the MPI
    * data exchange on the source vector and destination vector. As opposed to
    * the other variants that only runs a function on cells, this method also
    * takes as arguments a function for the interior faces and for the boundary
    * faces, respectively.
    *
-   * @param cell_operation `std::function` with the signature `cell_operation
+   * @param cell_operation `std::function` with the signature <tt>cell_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)` where the first argument passes
+   * std::pair<unsigned int,unsigned int> &)</tt> where the first argument passes
    * the data of the calling class and the last argument defines the range of
    * cells which should be worked on (typically more than one cell should be
-   * worked on in order to reduce overheads).  One can pass a pointer to an
+   * worked on in order to reduce overheads). One can pass a pointer to an
    * object in this place if it has an <code>operator()</code> with the
    * correct set of arguments since such a pointer can be converted to the
    * function object.
    *
-   * @param face_operation `std::function` with the signature `face_operation
+   * @param face_operation `std::function` with the signature <tt>face_operation
    * (const MatrixFree<dim,Number> &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned int> &)` in analogy to `cell_operation`,
+   * std::pair<unsigned int,unsigned int> &)</tt> in analogy to `cell_operation`,
    * but now the part associated to the work on interior faces. Note that the
    * MatrixFree framework treats periodic faces as interior ones, so they will
    * be assigned their correct neighbor after applying periodicity constraints
    * within the face_operation calls.
    *
-   * @param face_operation `std::function` with the signature
-   * `boundary_operation (const MatrixFree<dim,Number> &, OutVector &,
-   * InVector &, std::pair<unsigned int,unsigned int> &)` in analogy to
+   * @param boundary_operation `std::function` with the signature
+   * <tt>boundary_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> in analogy to
    * `cell_operation` and `face_operation`, but now the part associated to the
    * work on boundary faces. Boundary faces are separated by their
    * `boundary_id` and it is possible to query that id using
@@ -860,8 +870,8 @@ public:
    * (i.e., it is a non-static member function).
    *
    * @param cell_operation Pointer to member function of `CLASS` with the
-   * signature `cell_operation (const MatrixFree<dim,Number> &, OutVector &,
-   * InVector &, std::pair<unsigned int,unsigned int> &)` where the first
+   * signature <tt>cell_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> where the first
    * argument passes the data of the calling class and the last argument
    * defines the range of cells which should be worked on (typically more than
    * one cell should be worked on in order to reduce overheads). Note that the
@@ -871,22 +881,27 @@ public:
    * in caches.
    *
    * @param face_operation Pointer to member function of `CLASS` with the
-   * signature `face_operation (const MatrixFree<dim,Number> &, OutVector &,
-   * InVector &, std::pair<unsigned int,unsigned int> &)` in analogy to
+   * signature <tt>face_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</tt> in analogy to
    * `cell_operation`, but now the part associated to the work on interior
    * faces. Note that the MatrixFree framework treats periodic faces as
    * interior ones, so they will be assigned their correct neighbor after
    * applying periodicity constraints within the face_operation calls.
    *
-   * @param face_operation Pointer to member function of `CLASS` with the
-   * signature `boundary_operation (const MatrixFree<dim,Number> &, OutVector
-   * &, InVector &, std::pair<unsigned int,unsigned int> &)` in analogy to
+   * @param boundary_operation Pointer to member function of `CLASS` with the
+   * signature <tt>boundary_operation (const MatrixFree<dim,Number> &, OutVector
+   * &, InVector &, std::pair<unsigned int,unsigned int> &)</tt> in analogy to
    * `cell_operation` and `face_operation`, but now the part associated to the
    * work on boundary faces. Boundary faces are separated by their
    * `boundary_id` and it is possible to query that id using
    * MatrixFree::get_boundary_id(). Note that both interior and faces use the
    * same numbering, and faces in the interior are assigned lower numbers than
    * the boundary faces.
+   *
+   * @param owning_class The object which provides the `cell_operation`
+   * call. To be compatible with this interface, the class must allow to call
+   * `owning_class->cell_operation(...)`, `owning_class->face_operation(...)`,
+   * and `owning_class->boundary_operation(...)`.
    *
    * @param dst Destination vector holding the result. If the vector is of
    * type LinearAlgebra::distributed::Vector (or composite objects thereof
@@ -1143,7 +1158,7 @@ public:
    * general. The cell range in @p cell_loop runs from zero to n_cell_batches()
    * (exclusive), so this is the appropriate size if you want to store arrays
    * of data for all cells to be worked on. This number is approximately
-   * n_physical_cells()/VectorizedArray::n_array_elements (depending on how
+   * `n_physical_cells()/VectorizedArray::n_array_elements` (depending on how
    * many cell chunks that do not get filled up completely).
    */
   unsigned int n_macro_cells () const;
@@ -1154,13 +1169,13 @@ public:
    * general. The cell range in @p cell_loop runs from zero to
    * n_cell_batches() (exclusive), so this is the appropriate size if you want
    * to store arrays of data for all cells to be worked on. This number is
-   * approximately n_physical_cells()/VectorizedArray::n_array_elements
+   * approximately `n_physical_cells()/VectorizedArray::n_array_elements`
    * (depending on how many cell chunks that do not get filled up completely).
    */
   unsigned int n_cell_batches () const;
 
   /**
-   * Returns the number of additional cell batches that this structure keeps
+   * Return the number of additional cell batches that this structure keeps
    * for face integration. Note that not all cells that are ghosted in the
    * triangulation are kept in this data structure, but only the ones which
    * are necessary for evaluating face integrals from both sides.
@@ -1168,7 +1183,7 @@ public:
   unsigned int n_ghost_cell_batches () const;
 
   /**
-   * Returns the number of interior face batches that this structure works on.
+   * Return the number of interior face batches that this structure works on.
    * The batches are formed by application of vectorization over several faces
    * in general. The face range in @p loop runs from zero to
    * n_inner_face_batches() (exclusive), so this is the appropriate size if
@@ -1177,7 +1192,7 @@ public:
   unsigned int n_inner_face_batches () const;
 
   /**
-   * Returns the number of boundary face batches that this structure works on.
+   * Return the number of boundary face batches that this structure works on.
    * The batches are formed by application of vectorization over several faces
    * in general. The face range in @p loop runs from n_inner_face_batches() to
    * n_inner_face_batches()+n_boundary_face_batches() (exclusive), so if you
@@ -1187,7 +1202,7 @@ public:
   unsigned int n_boundary_face_batches () const;
 
   /**
-   * Returns the number of faces that are not processed locally but belong to
+   * Return the number of faces that are not processed locally but belong to
    * locally owned faces.
    */
   unsigned int n_ghost_inner_face_batches() const;
@@ -1201,7 +1216,7 @@ public:
   types::boundary_id get_boundary_id (const unsigned int macro_face) const;
 
   /**
-   * Returns the boundary ids for the faces within a cell, using the cells'
+   * Return the boundary ids for the faces within a cell, using the cells'
    * sorting by lanes in the VectorizedArray.
    */
   std::array<types::boundary_id, VectorizedArray<Number>::n_array_elements>
@@ -1209,14 +1224,14 @@ public:
                                   const unsigned int face_number) const;
 
   /**
-   * In case this structure was built based on a DoFHandler, this returns the
-   * DoFHandler.
+   * Return the DoFHandler with the index as given to the respective
+   * `std::vector` argument in the reinit() function.
    */
   const DoFHandler<dim> &
   get_dof_handler (const unsigned int dof_handler_index = 0) const;
 
   /**
-   * This returns the cell iterator in deal.II speak to a given cell in the
+   * Return the cell iterator in deal.II speak to a given cell in the
    * renumbering of this structure.
    *
    * Note that the cell iterators in deal.II go through cells differently to
@@ -1387,8 +1402,7 @@ public:
   //@}
 
   /**
-   * @name 5: Access of internal data structure (expert mode, interface not
-   * stable between releases)
+   * @name 5: Access of internal data structure (expert mode, interface not stable between releases)
    */
   //@{
   /**
