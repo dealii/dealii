@@ -1,0 +1,30 @@
+
+DEAL::Construct A
+DEAL::Construct B
+DEAL::a mutable
+DEAL::b const
+DEAL::r mutable
+DEAL::s const
+DEAL::t mutable
+DEAL::u const
+DEAL::Construct C
+DEAL::Construct D
+DEAL::Destruct D
+DEAL::Exception: ExcInUse (counter.load(), object_info->name(), infostring)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void dealii::Subscriptor::check_no_subscribers() const
+The violated condition was: 
+    counter == 0
+Additional information: 
+    Object of class 4Test is still used by 1 other objects.
+
+(Additional information: <none>)
+
+See the entry in the Frequently Asked Questions of deal.II (linked to from http://www.dealii.org/) for a lot more information on what this error means and how to fix programs in which it happens.
+--------------------------------------------------------
+
+DEAL::Destruct C
+DEAL::Destruct B
+DEAL::Destruct A

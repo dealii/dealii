@@ -7,7 +7,12 @@ An error occurred in file <subscriptor.cc> in function
 The violated condition was: 
     counter == 0
 Additional information: 
-    (none)
+    Object of class N6dealii11SubscriptorE is still used by 1 other objects.
+
+(Additional information: 
+  from Subscriber v)
+
+See the entry in the Frequently Asked Questions of deal.II (linked to from http://www.dealii.org/) for a lot more information on what this error means and how to fix programs in which it happens.
 --------------------------------------------------------
 
 DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
@@ -18,7 +23,12 @@ An error occurred in file <subscriptor.cc> in function
 The violated condition was: 
     counter == 0
 Additional information: 
-    (none)
+    Object of class N6dealii11SubscriptorE is still used by 1 other objects.
+
+(Additional information: 
+  from Subscriber v)
+
+See the entry in the Frequently Asked Questions of deal.II (linked to from http://www.dealii.org/) for a lot more information on what this error means and how to fix programs in which it happens.
 --------------------------------------------------------
 
 DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
@@ -29,6 +39,11 @@ An error occurred in file <subscriptor.cc> in function
 The violated condition was: 
     counter == 0
 Additional information: 
-    (none)
+    Object of class N6dealii11SubscriptorE is still used by 1 other objects.
+
+(Additional information: 
+  from Subscriber v)
+
+See the entry in the Frequently Asked Questions of deal.II (linked to from http://www.dealii.org/) for a lot more information on what this error means and how to fix programs in which it happens.
 --------------------------------------------------------
 

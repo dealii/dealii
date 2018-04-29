@@ -441,25 +441,16 @@ namespace deal_II_exceptions
 {
   namespace internals
   {
-
-    void issue_error_nothrow (ExceptionHandling,
-                              const char       *file,
-                              int               line,
-                              const char       *function,
-                              const char       *cond,
-                              const char       *exc_name,
-                              ExceptionBase     e) noexcept
+    void do_issue_error_nothrow (const ExceptionBase &exc) noexcept
     {
-      // Fill the fields of the exception object
-      e.set_fields (file, line, function, cond, exc_name);
       if (dealii::deal_II_exceptions::abort_on_exception)
-        internal_abort(e);
+        internal_abort(exc);
       else
         {
           // We are not allowed to throw, and not allowed to abort.
           // Just print the exception name to deallog and continue normally:
-          deallog << "Exception: " << e.get_exc_name() << std::endl;
-          deallog << e.what() << std::endl;
+          deallog << "Exception: " << exc.get_exc_name() << std::endl;
+          deallog << exc.what() << std::endl;
         }
     }
 
