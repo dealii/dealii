@@ -1032,8 +1032,7 @@ namespace internal
     {
       // Only permit copy-constructing const iterators from non-const
       // iterators, and not vice versa (i.e., Constness must always be
-      // true). As mentioned above, try to check this at compile time if C++11
-      // support is available.
+      // true).
       static_assert(Constness == true,
                     "Constructing a non-const iterator from a const iterator "
                     "does not make sense.");
