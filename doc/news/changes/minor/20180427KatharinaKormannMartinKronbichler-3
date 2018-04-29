@@ -5,4 +5,5 @@ FEEvaluation::integrate() and
 FEEvaluation::distribute_local_to_global(), respectively. This allows to
 write somewhat more compact code and is also more efficient in the case
 of FEFaceEvaluation where equivalent functions exists.
+<br>
 (Katharina Kormann, Martin Kronbichler, 2018/04/27)

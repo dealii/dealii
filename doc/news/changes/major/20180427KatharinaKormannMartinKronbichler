@@ -4,4 +4,5 @@ workers on cells, interior faces and boundary faces. The loop can perform the
 data exchange with MPI and is also parallelized with threads taking into
 account the face dependencies. The new class FEFaceEvaluation implements the
 respective evaluation and access routines for face terms.
+<br>
 (Katharina Kormann, Martin Kronbichler, 2018/04/27)
