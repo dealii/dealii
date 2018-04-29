@@ -857,22 +857,19 @@ namespace Step13
       // std::placeholders::_1)</code> then calling <code>p(1,2)</code> will
       // result in calling <code>f(2,1)</code>.
       //
-      // @note Once deal.II can rely on every compiler being able to
-      // fully understand the syntax of the C++11 standard, one can
-      // use C++'s version of <a
+      // @note An alternative to using <code>std::bind</code> is to use C++'s
+      // version of <a
       // href="http://en.wikipedia.org/wiki/Anonymous_function">lambda
-      // functions</a> to achieve the same goal. In essence, a lambda
-      // function is a function without a name that is defined right
-      // at the one place where it is going to be used -- i.e., where
-      // we pass the third and fourth argument to WorkStream::run. The
-      // functions one would define in these locations would take 3
-      // and 1 arguments, respectively, and all they do is call
+      // functions</a>. In essence, a lambda function is a function without a
+      // name that is defined right at the one place where it is going to be
+      // used -- i.e., where we pass the third and fourth argument to
+      // WorkStream::run. The functions one would define in these locations
+      // would take 3 and 1 arguments, respectively, and all they do is call
       // <code>Solver::local_assemble_matrix</code> and
-      // <code>Solver::copy_local_to_global</code> with the required
-      // number of arguments, utilizing what the lambda function has
-      // gotten as arguments itself. We won't show the syntax this
-      // would require since it is no less confusing than the one used
-      // above.
+      // <code>Solver::copy_local_to_global</code> with the required number of
+      // arguments, utilizing what the lambda function has gotten as arguments
+      // itself. We won't show the syntax this would require since it is no
+      // less confusing than the one used above.
 
       // At this point, we have assembled the matrix and condensed
       // it. The right hand side may or may not have been completely

@@ -232,8 +232,8 @@ namespace LinearAlgebra
      * };
      * @endcode
      *
-     * @note This function requires C++11 and read_write_vector.templates.h
-     * needs to be included.
+     * @note This function requires that the header read_write_vector.templates.h
+     * be included.
      */
     template <typename Functor>
     void apply(const Functor &func);
