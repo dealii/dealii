@@ -244,12 +244,12 @@ namespace internal
                           // involved, so both processors will generate the same
                           // list that we will later order
                           const CellId id_neigh = neighbor->id();
-                          inner_faces_at_proc_boundary[neigh_domain].shared_faces.
-                          push_back(my_domain < neigh_domain
-                                    ?
-                                    std::make_pair(id_mine, id_neigh)
-                                    :
-                                    std::make_pair(id_neigh, id_mine));
+                          if (my_domain < neigh_domain)
+                            inner_faces_at_proc_boundary[neigh_domain].shared_faces.
+                            emplace_back(id_mine, id_neigh);
+                          else
+                            inner_faces_at_proc_boundary[neigh_domain].shared_faces.
+                            emplace_back(id_neigh, id_mine);
                         }
                     }
                 }
@@ -801,10 +801,10 @@ namespace internal
         }
 
       info.face_orientation = 0;
-      unsigned int  left_face_orientation =
+      const unsigned int  left_face_orientation =
         !cell->face_orientation(face_no) + 2 * cell->face_flip(face_no) +
         4 * cell->face_rotation(face_no);
-      unsigned int right_face_orientation =
+      const unsigned int right_face_orientation =
         !neighbor->face_orientation(info.exterior_face_no) +
         2 * neighbor->face_flip(info.exterior_face_no) +
         4 * neighbor->face_rotation(info.exterior_face_no);
@@ -927,7 +927,7 @@ namespace internal
                       goto face_found;
                     }
                 }
-              faces_type.push_back(std::vector<unsigned int>(1, face));
+              faces_type.emplace_back(1, face);
 face_found :
               {}
             }
