@@ -193,10 +193,11 @@ namespace numbers
   bool is_finite (const std::complex<long double> &x);
 
   /**
-   * Return whether two numbers are equal to one another. For intricate data
-   * types (e.g. some automatically differentiable numbers), this function
-   * returns only whether the scalar values stored by the input values are
-   * equal.
+   * Return whether two numbers are equal to one another.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
    *
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
@@ -206,14 +207,87 @@ namespace numbers
   values_are_equal (const Number1 &value_1, const Number2 &value_2);
 
   /**
-   * Return whether or not a value is equal to zero. For intricate data
-   * types (e.g. some automatically differentiable numbers), this function
-   * returns only whether the scalar value stored by the input value is
-   * equal to zero.
+   * Return whether two numbers are not equal to one another.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  values_are_not_equal (const Number1 &value_1, const Number2 &value_2);
+
+  /**
+   * Return whether or not a value is equal to zero.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
    */
   template <typename Number>
   bool
   value_is_zero (const Number &value);
+
+  /**
+   * Return whether @p value_1 is less than that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  value_is_less_than (const Number1 &value_1, const Number2 &value_2);
+
+  /**
+   * Return whether @p value_1 is less than or equal to that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  value_is_less_than_or_equal_to (const Number1 &value_1, const Number2 &value_2);
+
+
+
+  /**
+   * Return whether @p value_1 is greater than that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  value_is_greater_than (const Number1 &value_1, const Number2 &value_2);
+
+  /**
+   * Return whether @p value_1 is greater than or equal to that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note This function expects that @p value_2 is castable to the type
+   * of @p value_1.
+   */
+  template <typename Number1,typename Number2>
+  bool
+  value_is_greater_than_or_equal_to (const Number1 &value_1, const Number2 &value_2);
 
   /**
    * A structure that, together with its partial specializations
@@ -625,22 +699,120 @@ namespace numbers
     return values_are_equal(value_2, value_1);
   }
 
+  /**
+   * Return whether @p value_1 is less than that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  // Defined in differentiation/ad/adolc_number_types.cc
+  bool
+  value_is_less_than (const adouble &value_1,
+                      const adouble &value_2);
+
+
+  /**
+   * Return whether @p value_1 is less than that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  template <typename Number>
+  bool
+  value_is_less_than (const adouble &value_1,
+                      const Number  &value_2)
+  {
+    // Use the specialized definition for two Adol-C taped types
+    return value_is_less_than(value_1, internal::NumberType<adouble>::value(value_2));
+  }
+
+
+  /**
+   * Return whether @p value_1 is less than that of @p value_2.
+   *
+   * For intricate data types (e.g. some automatically differentiable numbers),
+   * this function returns the result of the comparison of scalar values stored
+   * by the input arguments.
+   *
+   * @note When Adol-C is compiled with the "advanced branching" feature, then
+   * this specialization is only intended for use in assertions and
+   * other code paths that do not affect the end result of a computation.
+   */
+  template <typename Number>
+  bool
+  value_is_less_than (const Number  &value_1,
+                      const adouble &value_2)
+  {
+    // Use the specialized definition for two Adol-C taped types
+    return value_is_less_than(internal::NumberType<adouble>::value(value_1), value_2);
+  }
+
 #endif
 
 
   template <typename Number1,typename Number2>
-  bool
+  inline bool
   values_are_equal (const Number1 &value_1, const Number2 &value_2)
   {
     return (value_1 == internal::NumberType<Number1>::value(value_2));
   }
 
 
+  template <typename Number1,typename Number2>
+  inline bool
+  values_are_not_equal (const Number1 &value_1, const Number2 &value_2)
+  {
+    return !(values_are_equal(value_1,value_2));
+  }
+
+
   template <typename Number>
-  bool
+  inline bool
   value_is_zero (const Number &value)
   {
     return values_are_equal(value, 0.0);
+  }
+
+
+  template <typename Number1,typename Number2>
+  inline bool
+  value_is_less_than (const Number1 &value_1, const Number2 &value_2)
+  {
+    return (value_1 < internal::NumberType<Number1>::value(value_2));
+  }
+
+
+  template <typename Number1,typename Number2>
+  inline bool
+  value_is_less_than_or_equal_to (const Number1 &value_1, const Number2 &value_2)
+  {
+    return (value_is_less_than(value_1,value_2) || values_are_equal(value_1,value_2));
+  }
+
+
+  template <typename Number1,typename Number2>
+  bool
+  value_is_greater_than (const Number1 &value_1, const Number2 &value_2)
+  {
+    return !(value_is_less_than_or_equal_to(value_1,value_2));
+  }
+
+
+  template <typename Number1,typename Number2>
+  inline bool
+  value_is_greater_than_or_equal_to (const Number1 &value_1, const Number2 &value_2)
+  {
+    return !(value_is_less_than(value_1,value_2));
   }
 }
 

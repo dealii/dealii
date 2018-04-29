@@ -63,6 +63,18 @@ namespace numbers
       return dealii::internal::NumberType<adouble>::value(a == b);
     });
   }
+
+  bool
+  value_is_less_than (const adouble &value_1,
+                      const adouble &value_2)
+  {
+    return internal::adouble_boolean_comparator(
+             value_1, value_2,
+             [](const adouble &a,const adouble &b) -> adouble
+    {
+      return dealii::internal::NumberType<adouble>::value(a < b);
+    });
+  }
 }
 
 #endif
