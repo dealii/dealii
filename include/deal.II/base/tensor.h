@@ -24,6 +24,10 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
+#ifdef DEAL_II_WITH_ADOLC
+#include <adolc/adouble.h> // Taped double
+#endif
+
 #include <cmath>
 #include <ostream>
 #include <vector>
@@ -2256,6 +2260,56 @@ linfty_norm (const Tensor<2,dim,Number> &t)
 }
 
 //@}
+
+
+#ifndef DOXYGEN
+
+
+#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+
+// Specialization of functions for Adol-C number types when
+// the advanced branching feature is used
+template <int dim>
+inline
+adouble
+l1_norm (const Tensor<2,dim,adouble> &t)
+{
+  adouble max = internal::NumberType<adouble>::value(0.0);
+  for (unsigned int j=0; j<dim; ++j)
+    {
+      adouble sum = internal::NumberType<adouble>::value(0.0);
+      for (unsigned int i=0; i<dim; ++i)
+        sum += std::fabs(t[i][j]);
+
+      condassign(max, (sum > max), sum, max);
+    }
+
+  return max;
+}
+
+
+template <int dim>
+inline
+adouble
+linfty_norm (const Tensor<2,dim,adouble> &t)
+{
+  adouble max = internal::NumberType<adouble>::value(0.0);
+  for (unsigned int i=0; i<dim; ++i)
+    {
+      adouble sum = internal::NumberType<adouble>::value(0.0);
+      for (unsigned int j=0; j<dim; ++j)
+        sum += std::fabs(t[i][j]);
+
+      condassign(max, (sum > max), sum, max);
+    }
+
+  return max;
+}
+
+#endif // DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
