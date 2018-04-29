@@ -54,7 +54,7 @@ same directory as the source:
 Since the <code>verbose</code> parameter is set to <code>false</code>,
 we do not get any kind of output besides the number of the time step
 the program is currently working on.
-If we we were to set it to <code>true</code> we would get information on what the program is doing and
+If we were to set it to <code>true</code> we would get information on what the program is doing and
 how many steps each iterative process had to make to converge, etc.
 
 Let us plot the obtained results for $t=1,5,12,20,25$ (i.e. time steps

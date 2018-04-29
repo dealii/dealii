@@ -119,7 +119,7 @@ namespace MatrixFreeOperators
    * <h4>Selective use of blocks in MatrixFree</h4>
    *
    * MatrixFree allows to use several DoFHandler/ConstraintMatrix combinations
-   * by passing an std::vector with pointers to the respective objects into
+   * by passing a std::vector with pointers to the respective objects into
    * the MatrixFree::reinit function. This class supports to select only some
    * of the blocks in the underlying MatrixFree object by optional integer
    * lists that specify the chosen blocks.
@@ -154,7 +154,7 @@ namespace MatrixFreeOperators
    * vector of two pointers pointing to the same DoFHandler object and a
    * vector of two pointers to the two ConstraintMatrix objects. If the first
    * constraint matrix is the one including the zero Dirichlet constraints,
-   * one would give an std::vector<unsigned int>(1, 0) to the initialize()
+   * one would give a std::vector<unsigned int>(1, 0) to the initialize()
    * function, i.e., a vector of length 1 that selects exactly the first
    * constraint matrix with index 0.
    *

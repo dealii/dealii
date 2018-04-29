@@ -134,7 +134,7 @@ namespace LinearAlgebra
       virtual Vector &operator+= (const VectorSpaceVector<double> &V) override;
 
       /**
-       * Substract the vector @p V from the present one.
+       * Subtract the vector @p V from the present one.
        */
       virtual Vector &operator-= (const VectorSpaceVector<double> &V) override;
 

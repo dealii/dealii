@@ -167,7 +167,7 @@
  *                              10);
  *  // again disable all manifolds for demonstration purposes
  *  triangulation.reset_all_manifolds();
- *  // reenable the
+ *  // reenable the manifold:
  *  triangulation.set_all_manifold_ids(0);
  *  triangulation.set_manifold (0, manifold);
  *  triangulation.refine_global (3);

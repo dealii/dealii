@@ -41,7 +41,7 @@ import sys
 SKIP = ["//", "*", "}", "|", "};", ">", "\"", "|", "/",
         "numbers::invalid_unsigned_int,", "std::string,", "int,"]
 
-with open(sys.argv[1], 'r') as handle:
+with open(sys.argv[1], 'r', encoding='utf-8') as handle:
     previous_line = ""
     for line_n, line in enumerate(handle):
         line = line.strip()
@@ -53,13 +53,15 @@ with open(sys.argv[1], 'r') as handle:
             continue
         if words[0] in ["*", "//"]:
             words = words[1:]
+        if len(words) == 0:
+            continue
 
         # See if the last word on the previous line is equal to the first word
         # on the current line.
         if len(previous_words) != 0:
             if words[0] not in SKIP and previous_words[-1] == words[0]:
-                print(sys.argv[1] + ":{}: {}".format(line_n + 1, previous_line))
-                print(sys.argv[1] + ":{}: {}".format(line_n + 2, line))
+                print(sys.argv[1] + ":{}: {}".format(line_n, previous_line))
+                print(sys.argv[1] + ":{}: {}".format(line_n + 1, line))
         previous_line = line
 
         for left_word, right_word in zip(words[:-1], words[1:]):

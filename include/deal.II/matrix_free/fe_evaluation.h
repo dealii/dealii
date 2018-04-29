@@ -546,7 +546,7 @@ public:
   /**
    * Return a read-only pointer to the first field of the dof values. This is
    * the data field the read_dof_values() functions write into. First come the
-   * the dof values for the first component, then all values for the second
+   * dof values for the first component, then all values for the second
    * component, and so on. This is related to the internal data structures
    * used in this class. In general, it is safer to use the get_dof_value()
    * function instead.

@@ -1909,7 +1909,7 @@ inline void psyevr(const char *jobz,
   /*
    * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pdsyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
-   * to pdsyevr into the following code to supress the exception.
+   * to pdsyevr into the following code to suppress the exception.
    */
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;
@@ -1951,7 +1951,7 @@ inline void psyevr(const char *jobz,
   /*
    * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pssyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
-   * to pssyevr into the following code to supress the exception.
+   * to pssyevr into the following code to suppress the exception.
    */
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;

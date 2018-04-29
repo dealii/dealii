@@ -959,7 +959,7 @@ public:
    * correct function in the results section of step-49.
    *
    * @warning You should never set the boundary indicator of an interior face
-   * (a face not at the boundary of the domain), or set set the boundary
+   * (a face not at the boundary of the domain), or set the boundary
    * indicator of an exterior face to numbers::internal_face_boundary_id (this
    * value is reserved for another purpose). Algorithms may not work or
    * produce very confusing results if boundary cells have a boundary

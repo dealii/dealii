@@ -312,7 +312,7 @@ the velocity as $\mathbf{\tilde v}=\nabla \phi$.
 
 Notice that the evaluation of the above formula for $\mathbf{x} \in
 \Omega$ should yield zero as a result, since the integration of the
-the Dirac delta $\delta(\mathbf{x})$ in the domain
+Dirac delta $\delta(\mathbf{x})$ in the domain
 $\mathbb{R}^n\backslash\Omega$ is always zero by definition.
 
 As a final test, let us verify that this velocity indeed satisfies the

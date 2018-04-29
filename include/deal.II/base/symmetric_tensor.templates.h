@@ -850,7 +850,7 @@ eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
           // described by an Ogden-type model (i.e. using an eigen-decomposition of the right
           // Cauchy-Green tensor). Using this comparison between the well-understood result expected
           // from the Neo-Hookean model and its Ogden equivalent, these parameters are a first
-          // approximation to those required to collectively minimise error in the energy values,
+          // approximation to those required to collectively minimize error in the energy values,
           // first and second derivatives. What's apparent is that all AD numbers and
           // eigen-decomposition algorithms are not made equal!
           double sf = 1.0;

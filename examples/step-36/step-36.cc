@@ -201,7 +201,7 @@ namespace Step36
     // is initialized using an IndexSet. IndexSet is used not only to resize the
     // PETScWrappers::MPI::Vector but it also associates an index in the
     // PETScWrappers::MPI::Vector with a degree of freedom (see step-40 for a
-    // a more detailed explanation). The function complete_index_set() creates
+    // more detailed explanation). The function complete_index_set() creates
     // an IndexSet where every valid index is part of the set. Note that this
     // program can only be run sequentially and will throw an exception if used
     // in parallel.

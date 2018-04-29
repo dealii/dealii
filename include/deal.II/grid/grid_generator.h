@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * receive a different
  * @ref GlossManifoldIndicator "manifold indicator",
  * and the correct Manifold descriptor will be attached to
- * the Triangulation. Notice that if you later tranform the
+ * the Triangulation. Notice that if you later transform the
  * triangulation, you have to make sure you attach the correct new Manifold
  * to the triangulation.
  *

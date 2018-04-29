@@ -147,8 +147,8 @@ void second_grid ()
   for (unsigned int step=0; step<5; ++step)
     {
       // Next, we need to loop over the active cells of the triangulation. You
-      // can think of a triangulation as a collection of cells. If it was an
-      // an array, you would just get a pointer that you increment from one
+      // can think of a triangulation as a collection of cells. If it were an
+      // array, you would just get a pointer that you increment from one
       // element to the next using the operator `++`. The cells of a
       // triangulation aren't stored as a simple array, but the concept of an
       // <i>iterator</i> generalizes how pointers work to arbitrary collections

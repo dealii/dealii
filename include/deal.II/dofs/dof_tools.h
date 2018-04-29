@@ -1100,7 +1100,7 @@ namespace DoFTools
    * and any combination of that...
    * @endcode
    *
-   * Optionally a matrix @p matrix along with an std::vector @p
+   * Optionally a matrix @p matrix along with a std::vector @p
    * first_vector_components can be specified that describes how DoFs on @p
    * face_1 should be modified prior to constraining to the DoFs of @p face_2.
    * Here, two declarations are possible: If the std::vector @p

@@ -1142,7 +1142,7 @@ namespace Step42
   // element with a set of interpolation points derived from the same quadrature
   // formula. The remainder of the function is relatively straightforward: we
   // put the resulting matrix into the given argument; because we know the
-  // matrix is diagonal, it is sufficient to have a loop over only $i$ not
+  // matrix is diagonal, it is sufficient to have a loop over only $i$ and
   // not over $j$. Strictly speaking, we could even avoid multiplying the
   // shape function's values at quadrature point <code>q_point</code> by itself
   // because we know the shape value to be a vector with exactly one one which
@@ -1629,10 +1629,9 @@ namespace Step42
   //   will have an inhomogeneity and will look like $x_0 = x_1/2 + \text{gap}/2$.
   //   So the corresponding entries in the
   //   ride-hang-side are non-zero with a
-  //   meaningless value. These values we have to
-  //   to set to zero.
+  //   meaningless value. These values we have to set to zero.
   // - Like in step-40, we need to shuffle between vectors that do and do
-  //   do not have ghost elements when solving or using the solution.
+  //   not have ghost elements when solving or using the solution.
   //
   // The rest of the function is similar to step-40 and
   // step-41 except that we use a BiCGStab solver

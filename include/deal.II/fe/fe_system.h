@@ -840,8 +840,8 @@ public:
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    *
-   * This function returns @p true iff all its base elements return @p true
-   * for this function.
+   * This function returns @p true if and only if all its base elements return
+   * @p true for this function.
    */
   virtual bool hp_constraints_are_implemented () const;
 
