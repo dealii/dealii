@@ -41,7 +41,10 @@ DEAL_II_NAMESPACE_CLOSE
 
 // Declare / Import auto-differentiable math functions in(to) standard
 // namespace before numbers::NumberTraits is defined
+#ifdef DEAL_II_WITH_ADOLC
+#include <adolc/adouble.h> // Taped double
 #include <deal.II/differentiation/ad/adolc_math.h>
+#endif
 // Ideally we'd like to #include <deal.II/differentiation/ad/sacado_math.h>
 // but header indirectly references numbers.h. We therefore simply
 // import the whole Sacado header at this point to get the math
