@@ -604,12 +604,12 @@ private:
   const bool owns_pointers;
 
   /**
-   * The expresssion used to construct the push_forward function.
+   * The expression used to construct the push_forward function.
    */
   const std::string push_forward_expression;
 
   /**
-   * The expresssion used to construct the pull_back function.
+   * The expression used to construct the pull_back function.
    */
   const std::string pull_back_expression;
 

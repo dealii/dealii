@@ -616,7 +616,7 @@ namespace Step25
     }
 
     // For completeness, we output the zeroth time step to a file just like
-    // any other other time step.
+    // any other time step.
     output_results (0);
 
     // Now we perform the time stepping: at every time step we solve the

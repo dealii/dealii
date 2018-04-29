@@ -117,7 +117,7 @@ namespace Physics
       /**
        * The fourth-order spatial deviatoric tensor. Also known as the deviatoric
        * operator, this tensor projects a second-order symmetric tensor onto a
-       * a deviatoric space (for which the hydrostatic component is removed).
+       * deviatoric space (for which the hydrostatic component is removed).
        *
        * This is defined as
        * @f[

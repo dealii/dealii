@@ -64,7 +64,7 @@ formulation. To this end, by setting $v = u_t$, it is easy to see that the sine-
 \f}
 
 <h3>Discretization of the equations in time</h3>
-Now, we can discretize the split formulation in time using the the
+Now, we can discretize the split formulation in time using the
 $\theta$-method, which has a stencil of only two time steps. By
 choosing a $\theta\in [0,1]$, the latter discretization allows us to
 choose from a continuum of schemes. In particular, if we pick

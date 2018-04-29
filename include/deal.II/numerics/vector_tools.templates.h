@@ -3402,7 +3402,7 @@ namespace VectorTools
       // from a practical viewpoint such
       // problems should be much rarer. in
       // particular, meshes have to be very
-      // very fine for a vertex to land on
+      // fine for a vertex to land on
       // this line if the original body had a
       // vertex on the diagonal as well
       switch (dim)

@@ -1094,7 +1094,7 @@ namespace Step9
     // deal.II). Alternatively, the neighbor could be on the same level
     // and be further refined; then we have to find which of its children
     // are next to the present cell and select these (note that if a child
-    // of of neighbor of an active cell that is next to this active cell,
+    // of a neighbor of an active cell that is next to this active cell,
     // needs necessarily be active itself, due to the one-refinement rule
     // cited above).
     //

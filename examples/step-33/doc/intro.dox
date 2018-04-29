@@ -365,7 +365,6 @@ correctly done, and consequently nothing in the <code>ConservationLaw</code>
 would have to be modified.
 
 Similarly, if we wanted to improve on the linear or nonlinear solvers, or on
-the time stepping scheme (as hinted at at the end of the <a
+the time stepping scheme (as hinted at the end of the <a
 href="#Results">results section</a>), then this would not require changes in
 the <code>EulerEquations</code> at all.
-

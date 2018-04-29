@@ -159,7 +159,7 @@ processors.
 different processors run through different blocks of code in their
 copy of the executable. Programs internally also often communicate
 in other ways than through collectives. But in practice, %parallel finite
-finite element codes almost always follow the scheme where every copy
+element codes almost always follow the scheme where every copy
 of the program runs through the same blocks of code at the same time,
 interspersed by phases where all processors communicate with each other.)
 
@@ -193,4 +193,3 @@ The techniques this program then demonstrates are:
 
 Since all this can only be demonstrated using actual code, let us go straight to the
 code without much further ado.
-

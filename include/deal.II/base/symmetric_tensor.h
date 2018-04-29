@@ -3028,7 +3028,7 @@ namespace internal
 
       /**
        * A struct that is used to sort arrays of pairs of eign=envalues and
-       * eigenvectors. Sorting is performed in in descending order of eigenvalue.
+       * eigenvectors. Sorting is performed in descending order of eigenvalue.
        */
       template <int dim, typename Number>
       struct SortEigenValuesVectors

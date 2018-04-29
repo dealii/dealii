@@ -243,7 +243,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note This situation can only happen if you do coarsening. If all cells
  * remain as they are or are refined, then SolutionTransfer::interpolate()
- * computes a new vector of nodel values, but the function represented is of
+ * computes a new vector of nodal values, but the function represented is of
  * course exactly the same because the old finite element space is a subspace
  * of the new one. Thus, if the old function was conforming (i.e., satisfied
  * hanging node constraints), then so does the new one, and it is not

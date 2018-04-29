@@ -1974,7 +1974,7 @@ namespace Step32
   //
   // In this function as well as many below, we measure how much time
   // we spend here and collect that in a section called "Setup dof
-  // systems" across function invokations. This is done using an
+  // systems" across function invocations. This is done using an
   // TimerOutput::Scope object that gets a timer going in the section
   // with above name of the `computing_timer` object upon construction
   // of the local variable; the timer is stopped again when the

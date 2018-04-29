@@ -445,7 +445,7 @@ namespace internal
      * A class that is used to compare floating point arrays (e.g. std::vectors,
      * Tensor<1,dim>, etc.). The idea of this class is to consider two arrays as
      * equal if they are the same within a given tolerance. We use this
-     * comparator class within an std::map<> of the given arrays. Note that this
+     * comparator class within a std::map<> of the given arrays. Note that this
      * comparison operator does not satisfy all the mathematical properties one
      * usually wants to have (consider e.g. the numbers a=0, b=0.1, c=0.2 with
      * tolerance 0.15; the operator gives a<c, but neither of a<b? or b<c? is

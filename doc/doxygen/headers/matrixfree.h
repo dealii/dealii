@@ -61,7 +61,7 @@
  * library uses SIMD vectorization and highly optimized kernels based on
  * templates of the polynomial degree to achieve this goal. To give a
  * perspective, a sparse matrix-vector product for quadratic elements FE_Q
- * used to be equally fast as the matrix-free implementation on procesors
+ * used to be equally fast as the matrix-free implementation on processors
  * designed around 2005-2007 (e.g. Pentium 4 or AMD Opteron Barcelona
  * with 2-4 cores per chip). By 2018, the matrix-free evaluation is around
  * eight times as fast (measured on Intel Skylake Server, 14 cores).
@@ -352,7 +352,7 @@
  * found. In this case, we also do not look for opportunities to find the same
  * pattern on more than one cell, even though such cases might exist such as
  * for extruded meshes. This search operation, which is based on inserting
- * data into an `std::map` using a custom floating point comparator
+ * data into a `std::map` using a custom floating point comparator
  * `FPArrayComparator`, is efficient enough when a single data field per cell
  * is used. However, it would be pretty expensive if done for all quadrature
  * points of all cells (with many different cases).
@@ -362,8 +362,8 @@
  * two components can be easily held apart. What makes the code a bit awkward
  * to read is the fact that we need to batch several objects together from the
  * original scalar evaluation done in an FEValues object, that we need to
- * identify data fields that are repetitive, and that we need to fine the
- * compression over several cells throught an `std::map` for the Cartesian and
+ * identify data fields that are repetitive, and that we need to define the
+ * compression over several cells with a `std::map` for the Cartesian and
  * affine cases.
  *
  * The data computation part of MappingInfo is parallelized by tasks besides

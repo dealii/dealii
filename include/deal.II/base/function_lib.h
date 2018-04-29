@@ -943,7 +943,6 @@ namespace Functions
   public:
     /**
      * Constructor. Arguments are the center of the ball and its radius.
-     * radius.
      *
      * If an argument <tt>select</tt> is given, the cut-off function will be
      * non-zero for this component only.
@@ -990,7 +989,6 @@ namespace Functions
   public:
     /**
      * Constructor. Arguments are the center of the ball and its radius.
-     * radius.
      *
      * If an argument <tt>select</tt> is given, the cut-off function will be
      * non-zero for this component only.

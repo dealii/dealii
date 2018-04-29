@@ -1408,7 +1408,7 @@ syevr(const char *jobz,
   /*
    * Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero) within the call to dsyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
-   * to dsyevr into the following code to supress the exception.
+   * to dsyevr into the following code to suppress the exception.
    */
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;
@@ -1448,7 +1448,7 @@ syevr(const char *jobz,
   /*
    * Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero) within the call to ssyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
-   * to ssyevr into the following code to supress the exception.
+   * to ssyevr into the following code to suppress the exception.
    */
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;

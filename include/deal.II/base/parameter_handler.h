@@ -717,7 +717,7 @@ class MultipleParameterLoop;
  * parameter; initially, the content of the file equals the default value of
  * the parameter.
  * - <code>default_value</code>: The content of this file is the default value
- * value of the parameter.
+ * of the parameter.
  * - <code>pattern</code>: A textual representation of the pattern that
  * describes the parameter's possible values.
  * - <code>pattern_index</code>: A number that indexes the Patterns::PatternBase
@@ -1404,7 +1404,7 @@ public:
                   "> of file <" << arg2 << ">: " << arg3);
 
   /**
-   * Exception for an an entry in a parameter file that does not match the
+   * Exception for an entry in a parameter file that does not match the
    * provided pattern. The arguments are, in order, the line number, file
    * name, entry value, entry name, and a description of the pattern.
    */
