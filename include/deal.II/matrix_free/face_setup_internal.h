@@ -854,7 +854,7 @@ namespace internal
     struct FaceComparator
     {
       bool operator() (const FaceToCellTopology<length> &face1,
-                       const FaceToCellTopology<length> &face2)
+                       const FaceToCellTopology<length> &face2) const
       {
         for (unsigned int i=0; i<length; ++i)
           if (face1.cells_interior[i] < face2.cells_interior[i])
