@@ -3193,6 +3193,7 @@ namespace internal
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
 
+      std::vector<Point<spacedim>> point_cache;
       for (; cell!=endc; ++cell)
         {
           if (gnuplot_flags.write_cell_numbers)
@@ -3225,6 +3226,7 @@ namespace internal
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                 {
+                  point_cache.clear();
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
                   if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
@@ -3233,8 +3235,22 @@ namespace internal
                       // projected points
                       const unsigned int offset=face_no*n_points;
                       for (unsigned int i=0; i<n_points; ++i)
-                        out << (mapping->transform_unit_to_real_cell
-                                (cell, q_projector->point(offset+i)))
+                        point_cache.push_back(mapping->transform_unit_to_real_cell
+                                              (cell, q_projector->point(offset+i)));
+                      while (point_cache.size() > 2)
+                        {
+                          Tensor<1, spacedim> first_difference = point_cache[1] - point_cache[0];
+                          first_difference /= first_difference.norm();
+                          Tensor<1, spacedim> second_difference = point_cache[2] - point_cache[1];
+                          second_difference /= second_difference.norm();
+                          // If the three points are colinear then remove the middle one.
+                          if ((first_difference - second_difference).norm() < 1e-10)
+                            point_cache.erase(point_cache.begin() + 1);
+                          else
+                            break;
+                        }
+                      for (const Point<spacedim> &point : point_cache)
+                        out << point
                             << ' ' << cell->level()
                             << ' ' << static_cast<unsigned int>(cell->material_id())
                             << '\n';
