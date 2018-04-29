@@ -3219,11 +3219,8 @@ namespace internal
                   << '\n';
             }
           else
-            // cell is at boundary and we
-            // are to treat curved
-            // boundaries. so loop over
-            // all faces and draw them as
-            // small pieces of lines
+            // cell is at boundary and we are to treat curved boundaries. so
+            // loop over all faces and draw them as small pieces of lines
             {
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
@@ -3232,11 +3229,8 @@ namespace internal
                   face = cell->face(face_no);
                   if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
-                      // compute offset
-                      // of quadrature
-                      // points within
-                      // set of projected
-                      // points
+                      // compute offset of quadrature points within set of
+                      // projected points
                       const unsigned int offset=face_no*n_points;
                       for (unsigned int i=0; i<n_points; ++i)
                         out << (mapping->transform_unit_to_real_cell
@@ -3250,11 +3244,8 @@ namespace internal
                     }
                   else
                     {
-                      // if, however, the
-                      // face is not at
-                      // the boundary,
-                      // then draw it as
-                      // usual
+                      // if, however, the face is not at the boundary, then
+                      // draw it as usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
