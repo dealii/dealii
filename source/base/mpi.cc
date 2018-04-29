@@ -363,7 +363,12 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_P4EST
       //Initialize p4est and libsc components
+#if !(DEAL_II_P4EST_VERSION_GTE(2,0,0,0))
+      // This feature is broken in version 2.0.0 for calls to
+      // MPI_Comm_create_group. Disabling it leads to more verbose
+      // p4est error messages which should be fine.
       sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
+#endif
       p4est_init (nullptr, SC_LP_SILENT);
 #endif
 
