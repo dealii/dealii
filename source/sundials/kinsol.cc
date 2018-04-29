@@ -264,6 +264,11 @@ namespace SUNDIALS
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
     AssertKINSOL(status);
 
+#if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
+    SUNMatrix J;
+    SUNLinearSolver LS;
+#endif
+
     if (solve_jacobian_system)
       {
         KINMem KIN_mem = (KINMem) kinsol_mem;
@@ -279,8 +284,8 @@ namespace SUNDIALS
     else
       {
 #if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
-        const auto J = SUNDenseMatrix(system_size, system_size);
-        const auto LS = SUNDenseLinearSolver(u_scale, J);
+        J = SUNDenseMatrix(system_size, system_size);
+        LS = SUNDenseLinearSolver(u_scale, J);
         status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
 #else
         status = KINDense(kinsol_mem, system_size);
@@ -322,7 +327,10 @@ namespace SUNDIALS
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
     AssertKINSOL(status);
 
-
+#if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
+    SUNMatDestroy(J);
+    SUNLinSolFree(LS);
+#endif
     KINFree(&kinsol_mem);
 
     return (unsigned int) nniters;
