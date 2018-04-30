@@ -121,8 +121,8 @@ namespace GridTools
   operator ~ (const CacheUpdateFlags f1)
   {
     return static_cast<CacheUpdateFlags> (
-             ~static_cast<unsigned int> (f1)
-           );
+             static_cast<unsigned int> (f1) ^
+             static_cast<unsigned int> (update_all));
   }
 
 
