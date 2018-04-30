@@ -3193,9 +3193,45 @@ namespace internal
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
 
+      std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> interior_cells_to_not_skip;
       std::vector<Point<spacedim>> point_cache;
       for (; cell!=endc; ++cell)
         {
+          if (!cell->at_boundary() &&
+              interior_cells_to_not_skip.find(cell) == interior_cells_to_not_skip.end())
+            {
+              bool skip_cell = true;
+              for (unsigned int neighbor_n = 0;
+                   neighbor_n < GeometryInfo<dim>::faces_per_cell;
+                   ++neighbor_n)
+                {
+                  const auto neighbor = cell->neighbor(neighbor_n);
+                  Assert(neighbor != endc, ExcInternalError());
+                  // do not skip if the neighbor is coarser
+                  if (neighbor->level() < cell->level())
+                    {
+                      skip_cell = false;
+                      break;
+                    }
+                }
+              if (skip_cell)
+                {
+                  for (unsigned int neighbor_n = 0;
+                       neighbor_n < GeometryInfo<dim>::faces_per_cell;
+                       ++neighbor_n)
+                    {
+                      const auto neighbor = cell->neighbor(neighbor_n);
+                      if (neighbor->active() && !neighbor->at_boundary())
+                        interior_cells_to_not_skip.insert(cell->neighbor(neighbor_n));
+                    }
+                  continue;
+                }
+            }
+
+          const auto current_set_iter = interior_cells_to_not_skip.find(cell);
+          if (current_set_iter != interior_cells_to_not_skip.end())
+            interior_cells_to_not_skip.erase(current_set_iter);
+
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
 
