@@ -140,6 +140,22 @@ number get_real_assert_zero_imag(const number &a)
 // we put this into a namespace to not conflict with stdlib
 namespace Testing
 {
+  /**
+   * This function defines how to deal with signed overflow, which is undefined
+   * behavior otherwise, in sums. Since unsigned overflow is well-defined there
+   * is no reason to resort to this function.
+   * The way we want to define the overflow is the following:
+   * The value after the maximal value is the minimal one and the value
+   * before the minimal one is the maximal one. Hence, we have to distinguish
+   * three cases:
+   * 1. $a+b>max$: This can only happen if both @p a and @p b are positive. By
+   *               adding $min-max-1$ we are mapping $max+n$ to $min+n-1$ for
+   *               $n>1$.
+   * 2. $a+b<min$: This can only happen if both @p a and @p b are negative. By
+   *               adding $max-min+1$ we are mapping $min-n$ to $max-n+1$ for
+   *               $n>1$.
+   * 3. $min<=a+b<=max$: No overflow.
+   */
   template <typename Number>
   Number nonoverflow_add (Number a, Number b)
   {
