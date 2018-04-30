@@ -817,9 +817,9 @@ namespace Particles
     }
 
     // Put the received particles into the domain if they are in the triangulation
-    const void *recv_data_it = static_cast<const void *> (&recv_data.front());
+    const void *recv_data_it = static_cast<const void *> (recv_data.data());
 
-    while (reinterpret_cast<std::size_t> (recv_data_it) - reinterpret_cast<std::size_t> (&recv_data.front()) < total_recv_data)
+    while (reinterpret_cast<std::size_t> (recv_data_it) - reinterpret_cast<std::size_t> (recv_data.data()) < total_recv_data)
       {
         CellId::binary_type binary_cellid;
         memcpy(&binary_cellid, recv_data_it, cellid_size);
@@ -837,7 +837,7 @@ namespace Particles
                                        recv_data_it);
       }
 
-    AssertThrow(recv_data_it == &recv_data.back()+1,
+    AssertThrow(total_recv_data == 0 || recv_data_it == &recv_data.back()+1,
                 ExcMessage("The amount of data that was read into new particles "
                            "does not match the amount of data sent around."));
   }
