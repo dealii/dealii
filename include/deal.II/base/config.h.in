@@ -317,6 +317,20 @@
     (major)*10000 + (minor)*100 + (subminor))
 #endif
 
+/*
+ * MPI
+ */
+
+#ifdef DEAL_II_WITH_MPI
+#  define DEAL_II_MPI_VERSION_MAJOR @MPI_VERSION_MAJOR@
+#  define DEAL_II_MPI_VERSION_MINOR @MPI_VERSION_MINOR@
+
+#  define DEAL_II_MPI_VERSION_GTE(major,minor) \
+ ((DEAL_II_MPI_VERSION_MAJOR * 100 + \
+    DEAL_II_MPI_VERSION_MINOR) \
+    >=  \
+    (major)*100 + (minor))
+#endif
 
 /***********************************************************************
  * Two macro names that we put at the top and bottom of all deal.II files

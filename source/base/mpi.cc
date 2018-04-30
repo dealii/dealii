@@ -91,6 +91,85 @@ namespace Utilities
     }
 
 
+
+    int create_group(const MPI_Comm  &comm,
+                     const MPI_Group &group,
+                     const int        tag,
+                     MPI_Comm        *new_comm)
+    {
+#if DEAL_II_MPI_VERSION_GTE(3, 0)
+      return MPI_Comm_create_group(comm, group, tag, new_comm);
+#else
+      int rank;
+      int ierr = MPI_Comm_rank(comm, &rank);
+      AssertThrowMPI(ierr);
+
+      int grp_rank;
+      ierr = MPI_Group_rank(group, &grp_rank);
+      AssertThrowMPI(ierr);
+      if (grp_rank == MPI_UNDEFINED)
+        {
+          *new_comm = MPI_COMM_NULL;
+          return MPI_SUCCESS;
+        }
+
+      int grp_size;
+      ierr = MPI_Group_size(group, &grp_size);
+      AssertThrowMPI(ierr);
+
+      ierr = MPI_Comm_dup(MPI_COMM_SELF, new_comm);
+      AssertThrowMPI(ierr);
+
+      MPI_Group parent_grp;
+      ierr = MPI_Comm_group(comm, &parent_grp);
+      AssertThrowMPI(ierr);
+
+      std::vector<int> pids(grp_size);
+      std::vector<int> grp_pids(grp_size);
+      std::iota(grp_pids.begin(), grp_pids.end(), 0);
+      ierr = MPI_Group_translate_ranks(group, grp_size, grp_pids.data(), parent_grp, pids.data());
+      AssertThrowMPI(ierr);
+      ierr = MPI_Group_free(&parent_grp);
+      AssertThrowMPI(ierr);
+
+      MPI_Comm comm_old = *new_comm;
+      MPI_Comm ic;
+      for (int merge_sz = 1; merge_sz < grp_size; merge_sz *=2)
+        {
+          const int gid = grp_rank/merge_sz;
+          comm_old = *new_comm;
+          if (gid % 2 == 0)
+            {
+              if ((gid + 1) * merge_sz < grp_size)
+                {
+                  ierr = (MPI_Intercomm_create(*new_comm, 0, comm, pids[(gid + 1) * merge_sz], tag, &ic));
+                  AssertThrowMPI(ierr);
+                  ierr = MPI_Intercomm_merge(ic, 0 /* LOW */, new_comm);
+                  AssertThrowMPI(ierr);
+                }
+            }
+          else
+            {
+              ierr = MPI_Intercomm_create(*new_comm, 0, comm, pids[(gid - 1) * merge_sz], tag, &ic);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Intercomm_merge(ic, 1 /* HIGH */, new_comm);
+              AssertThrowMPI(ierr);
+            }
+          if (*new_comm != comm_old)
+            {
+              ierr = MPI_Comm_free(&ic);
+              AssertThrowMPI(ierr);
+              ierr = MPI_Comm_free(&comm_old);
+              AssertThrowMPI(ierr);
+            }
+        }
+
+      return MPI_SUCCESS;
+#endif
+    }
+
+
+
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern (const MPI_Comm &mpi_comm,
                                                   const std::vector<unsigned int> &destinations)
@@ -365,8 +444,9 @@ namespace Utilities
       //Initialize p4est and libsc components
 #if !(DEAL_II_P4EST_VERSION_GTE(2,0,0,0))
       // This feature is broken in version 2.0.0 for calls to
-      // MPI_Comm_create_group. Disabling it leads to more verbose
-      // p4est error messages which should be fine.
+      // MPI_Comm_create_group (see cburstedde/p4est#30).
+      // Disabling it leads to more verbose p4est error messages
+      // which should be fine.
       sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
 #endif
       p4est_init (nullptr, SC_LP_SILENT);
