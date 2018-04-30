@@ -205,8 +205,8 @@ Step6<dim>::Step6 ()
 // their declaration in the class), as always in C++. Thus, the
 // SparsityPattern will be destroyed before the SparseMatrix, since its
 // declaration is below the declaration of the sparsity pattern. This triggers
-// the situation above, and without manual intervention an exception will be
-// raised when the SparsityPattern is destroyed. What needs to be done is to
+// the situation above, and without manual intervention the program will abort
+// when the SparsityPattern is destroyed. What needs to be done is to
 // tell the SparseMatrix to release its pointer to the SparsityPattern. Of
 // course, the SparseMatrix will only release its pointer if it really does
 // not need the SparsityPattern any more. For this purpose, the SparseMatrix
@@ -215,9 +215,8 @@ Step6<dim>::Step6 ()
 // the SparsityPattern to 0. After this, you can safely destruct the
 // SparsityPattern since its internal counter will be zero.
 //
-// For completeness, we add the output of the exception that would have been
-// triggered without this destructor, to the end of the results section of
-// this example.
+// We show the output of the other case (where we do not call
+// SparseMatrix::clear()) in the results section below.
 template <int dim>
 Step6<dim>::~Step6 ()
 {
@@ -265,7 +264,8 @@ void Step6<dim>::setup_system ()
   // boundary conditions after assembly, like we did in earlier steps: instead
   // we put all constraints on our function space in the ConstraintMatrix. We
   // can add constraints to the ConstraintMatrix in either order: if two
-  // constraints conflict then the constraint matrix will throw an exception.
+  // constraints conflict then the constraint matrix either abort or throw an
+  // exception via the Assert macro.
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             Functions::ZeroFunction<dim>(),

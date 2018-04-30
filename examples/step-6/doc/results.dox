@@ -157,7 +157,7 @@ victim: The one object that still uses the SparsityPattern is the
 SparseMatrix.
 
 The stacktrace gives an indication of where the problem happened. We
-see that the exception was triggered in the
+see that the AssertNothrow macro was triggered in the
 destructor of the SparseMatrix class (which inherits from Subscriptor) that was called
 through a few more functions from the destructor of the
 <code>Step6</code> class, exactly where we have commented out
@@ -583,8 +583,9 @@ double coefficient (const Point<dim> &p)
     }
 }
 @endcode
-(Adding the <code>Assert</code> at the end ensures that an exception
-is thrown if we ever get to that point -- which of course we shouldn't,
+(Adding the <code>Assert</code> at the end ensures that either an exception
+is thrown or that the program aborts if we ever get to that point
+-- which of course we shouldn't,
 but this is a good way to insure yourself: we all make mistakes by
 sometimes not thinking of all cases, for example by checking
 for <code>p[0]</code> to be less than and greater than zero,
