@@ -155,7 +155,7 @@ namespace Step51
     protected SolutionBase<dim>
   {
   public:
-    SolutionAndGradient () : Function<dim>(dim) {}
+    SolutionAndGradient () : Function<dim>(dim+1) {}
 
     virtual void vector_value (const Point<dim>   &p,
                                Vector<double>     &v) const;
