@@ -140,6 +140,18 @@ number get_real_assert_zero_imag(const number &a)
 // we put this into a namespace to not conflict with stdlib
 namespace Testing
 {
+  template <typename Number>
+  Number nonoverflow_add (Number a, Number b)
+  {
+    constexpr Number max = std::numeric_limits<Number>::max();
+    constexpr Number min = std::numeric_limits<Number>::min();
+    if (b > 0 && a > max-b)
+      return (min+a)+(b-max)-1;
+    if (b < 0 && a < min-b)
+      return (max+a)+(b-min)+1;
+    return a+b;
+  }
+
   int rand(const bool reseed=false,
            const int seed=1)
   {
@@ -157,7 +169,7 @@ namespace Testing
           {
             // This does:
             //   r[i] = (16807 * r[i-1]) % 2147483647;
-            // buit avoids overflowing 31 bits.
+            // but avoids overflowing 31 bits.
             const long int hi = word / 127773;
             const long int lo = word % 127773;
             word = 16807 * lo - 2836 * hi;
@@ -174,7 +186,7 @@ namespace Testing
 
         for (int i=34; i<344; i++)
           {
-            r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+            r[k%32] = nonoverflow_add(r[(k+32-31)%32], r[(k+32-3)%32]);
             k=(k+1)%32;
           }
         inited=true;
@@ -182,7 +194,7 @@ namespace Testing
           return 0;// do not generate new no
       }
 
-    r[k%32] = r[(k+32-31)%32] + r[(k+32-3)%32];
+    r[k%32] = nonoverflow_add(r[(k+32-31)%32], r[(k+32-3)%32]);
     int ret = r[k%32];
     k=(k+1)%32;
     return (unsigned int)ret >> 1;
