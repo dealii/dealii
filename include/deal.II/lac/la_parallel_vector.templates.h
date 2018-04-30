@@ -518,7 +518,7 @@ namespace LinearAlgebra
     Vector<Number>::zero_out_ghosts () const
     {
       if (values != nullptr)
-        std::fill_n (&values[partitioner->local_size()],
+        std::fill_n (values.get()+partitioner->local_size(),
                      partitioner->n_ghost_indices(),
                      Number());
       vector_is_ghosted = false;
