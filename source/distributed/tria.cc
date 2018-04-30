@@ -1413,12 +1413,12 @@ namespace parallel
 
           unsigned int bytes_for_buffer () const
           {
-            return (sizeof(unsigned int) +
-                    tree_index.size() * sizeof(unsigned int) +
-                    quadrants.size() * sizeof(typename dealii::internal::p4est
-                                              ::types<dim>::quadrant) +
-                    vertices.size() * sizeof(dealii::Point<spacedim>)) +
-                   vertex_indices.size() * sizeof(unsigned int);
+            return sizeof(unsigned int) +
+                   tree_index.size() * sizeof(unsigned int) +
+                   quadrants.size() * sizeof(typename dealii::internal::p4est
+                                             ::types<dim>::quadrant) +
+                   vertex_indices.size() * sizeof(unsigned int) +
+                   vertices.size() * sizeof(dealii::Point<spacedim>);
           }
 
           void pack_data (std::vector<char> &buffer) const
@@ -1447,7 +1447,6 @@ namespace parallel
                         vertex_indices.data(),
                         vertex_indices.size() * sizeof(unsigned int));
             ptr += vertex_indices.size() * sizeof(unsigned int);
-
             std::memcpy(ptr,
                         vertices.data(),
                         vertices.size() * sizeof(dealii::Point<spacedim>));
@@ -1502,16 +1501,11 @@ namespace parallel
             first_vertices.resize(cells);
             for (unsigned int c=0; c<cells; ++c)
               {
-                // We need to store a pointer to the first vertex.
-                const dealii::Point<spacedim> *const vertex
-                  = reinterpret_cast<const dealii::Point<spacedim> *>(ptr);
                 first_indices[c] = vertices.size();
-                vertices.push_back(*vertex);
-                ptr += sizeof(dealii::Point<spacedim>);
-                vertices.resize(vertices.size() + n_vertices_on_cell[c]-1);
-                memcpy(&vertices[vertices.size() - (n_vertices_on_cell[c]-1)],
-                       ptr, (n_vertices_on_cell[c]-1)*sizeof(dealii::Point<spacedim>));
-                ptr += (n_vertices_on_cell[c]-1)*sizeof(dealii::Point<spacedim>);
+                vertices.resize(vertices.size() + n_vertices_on_cell[c]);
+                memcpy(&vertices[vertices.size() - n_vertices_on_cell[c]],
+                       ptr, n_vertices_on_cell[c]*sizeof(dealii::Point<spacedim>));
+                ptr += n_vertices_on_cell[c]*sizeof(dealii::Point<spacedim>);
               }
             for (unsigned int c=0; c<cells; ++c)
               first_vertices[c] = &vertices[first_indices[c]];
