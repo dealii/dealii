@@ -69,7 +69,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim,spacedim>::Particle (const void *&data,
-                                    PropertyPool &new_property_pool)
+                                    PropertyPool *const new_property_pool)
   {
     const types::particle_index *id_data = static_cast<const types::particle_index *> (data);
     id = *id_data++;
@@ -81,14 +81,18 @@ namespace Particles
     for (unsigned int i = 0; i < dim; ++i)
       reference_location(i) = *pdata++;
 
-    property_pool = &new_property_pool;
-    properties = property_pool->allocate_properties_array();
+    property_pool = new_property_pool;
+    if (property_pool != nullptr)
+      properties = property_pool->allocate_properties_array();
+    else
+      properties = PropertyPool::invalid_handle;
 
     // See if there are properties to load
     if (has_properties())
       {
         const ArrayView<double> particle_properties = property_pool->get_properties(properties);
-        for (unsigned int i = 0; i < particle_properties.size(); ++i)
+        const unsigned int size = particle_properties.size();
+        for (unsigned int i = 0; i < size; ++i)
           particle_properties[i] = *pdata++;
       }
 
@@ -159,7 +163,7 @@ namespace Particles
   template <int dim, int spacedim>
   Particle<dim,spacedim>::~Particle ()
   {
-    if (properties != PropertyPool::invalid_handle)
+    if (property_pool != nullptr && properties != PropertyPool::invalid_handle)
       property_pool->deallocate_properties_array(properties);
   }
 

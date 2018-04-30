@@ -830,7 +830,7 @@ namespace Particles
 
         typename std::multimap<internal::LevelInd,Particle <dim,spacedim> >::iterator recv_particle =
           received_particles.insert(std::make_pair(internal::LevelInd(cell->level(),cell->index()),
-                                                   Particle<dim,spacedim>(recv_data_it,*property_pool)));
+                                                   Particle<dim,spacedim>(recv_data_it,property_pool.get())));
 
         if (load_callback)
           recv_data_it = load_callback(particle_iterator(received_particles,recv_particle),
@@ -1060,11 +1060,11 @@ namespace Particles
 #ifdef DEAL_II_WITH_CXX14
             position_hint = particles.emplace_hint(position_hint,
                                                    std::make_pair(cell->level(),cell->index()),
-                                                   Particle<dim,spacedim>(pdata,*property_pool));
+                                                   Particle<dim,spacedim>(pdata,property_pool.get()));
 #else
             position_hint = particles.insert(position_hint,
                                              std::make_pair(std::make_pair(cell->level(),cell->index()),
-                                                            Particle<dim,spacedim>(pdata,*property_pool)));
+                                                            Particle<dim,spacedim>(pdata,property_pool.get())));
 #endif
             ++position_hint;
           }
@@ -1082,11 +1082,11 @@ namespace Particles
 #ifdef DEAL_II_WITH_CXX14
             position_hint = particles.emplace_hint(position_hint,
                                                    std::make_pair(cell->level(),cell->index()),
-                                                   Particle<dim,spacedim>(pdata,*property_pool));
+                                                   Particle<dim,spacedim>(pdata,property_pool.get()));
 #else
             position_hint = particles.insert(position_hint,
                                              std::make_pair(std::make_pair(cell->level(),cell->index()),
-                                                            Particle<dim,spacedim>(pdata,*property_pool)));
+                                                            Particle<dim,spacedim>(pdata,property_pool.get())));
 #endif
             const Point<dim> p_unit = mapping->transform_real_to_unit_cell(cell, position_hint->second.get_location());
             position_hint->second.set_reference_location(p_unit);
@@ -1104,7 +1104,7 @@ namespace Particles
 
         for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
           {
-            Particle<dim,spacedim> p (pdata,*property_pool);
+            Particle<dim,spacedim> p (pdata,property_pool.get());
 
             for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
               {
