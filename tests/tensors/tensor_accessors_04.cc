@@ -130,7 +130,7 @@ int main()
     deallog << "left:   " << left2 << std::endl;
     deallog << "middle: " << middle4 << std::endl;
     deallog << "right:  " << middle << std::endl;
-    deallog << "Result: " << TensorAccessors::contract3<2, 2, 5, int>(left2, middle4, middle)  << std::endl;
+    deallog << "Result: " << TensorAccessors::contract3<2, 2, 5, long int>(left2, middle4, middle)  << std::endl;
     deallog << std::endl;
 //     manually verified to be equal to the old implementation
 //     deallog << contract3(left2, middle4, middle) << std::endl;
