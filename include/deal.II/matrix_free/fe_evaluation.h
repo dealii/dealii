@@ -911,12 +911,12 @@ protected:
 
   /**
    * A pointer to the normal vectors at faces.
-   **/
+   */
   const Tensor<1,dim,VectorizedArray<Number> > *normal_vectors;
 
   /**
    * A pointer to the normal vectors times the jacobian at faces.
-   **/
+   */
   const Tensor<1,dim,VectorizedArray<Number> > *normal_x_jacobian;
 
   /**
@@ -933,7 +933,7 @@ protected:
   /**
    * Flag holding information whether a face is an interior or exterior face
    * according to the defined direction of the normal.  Not used for cells.
-   **/
+   */
   bool is_interior_face;
 
   /**
