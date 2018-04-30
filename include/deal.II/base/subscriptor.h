@@ -56,9 +56,6 @@ DEAL_II_NAMESPACE_OPEN
  * contents will not be recognized to be the same. The handling in
  * SmartPointer will take care of this.
  *
- * @note This feature is switched off if multithreading is used (i.e., if
- * <code>DEAL_II_WITH_THREADS</code> is on).
- *
  * @ingroup memory
  * @author Guido Kanschat, 1998 - 2005
  */
