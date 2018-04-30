@@ -28,6 +28,16 @@
 #include <deal.II/lac/constraint_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+/**
+ * A namespace for functions offering tools to handle two meshes with no
+ * alignment requirements, but where one of the meshes is embedded
+ * inside the other in the real-space.
+ *
+ * Typically these functions allow for computations on the real-space
+ * intersection between the two meshes e.g. surface integrals and
+ * construction of mass matrices.
+ */
 namespace NonMatching
 {
   /**
