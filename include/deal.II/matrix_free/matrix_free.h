@@ -385,7 +385,7 @@ public:
      * the fabric, it may be faster to not overlap and wait for the data to
      * arrive. The default is true, i.e., communication and computation are
      * overlapped.
-     **/
+     */
     bool                overlap_communication_computation;
 
     /**
@@ -394,7 +394,7 @@ public:
      * MatrixFree should have access to all neighbors on locally owned cells,
      * this option enables adding the respective faces at the end of the face
      * range.
-     **/
+     */
     bool                hold_all_faces_to_owned_cells;
 
     /**
