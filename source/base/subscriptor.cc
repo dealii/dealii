@@ -156,7 +156,6 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 void
 Subscriptor::subscribe(const char *id) const
 {
-#ifdef DEBUG
   if (object_info == nullptr)
     object_info = &typeid(*this);
   ++counter;
@@ -173,16 +172,12 @@ Subscriptor::subscribe(const char *id) const
 
   else
     it->second++;
-#else
-  (void)id;
-#endif
 }
 
 
 void
 Subscriptor::unsubscribe(const char *id) const
 {
-#ifdef DEBUG
   const char *name = (id != nullptr) ? id : unknown_subscriber;
   AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
@@ -202,9 +197,6 @@ Subscriptor::unsubscribe(const char *id) const
   AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
-#else
-  (void)id;
-#endif
 }
 
 
