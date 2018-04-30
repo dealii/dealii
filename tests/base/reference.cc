@@ -60,44 +60,37 @@ int main()
 
   initlog();
 
-  try
-    {
-      Test a("A");
-      const Test &b("B");
+  Test a("A");
+  const Test &b("B");
 
-      SmartPointer<Test,Test>       r(&a, "Test R");
-      SmartPointer<const Test,Test> s(&a, "const Test S");
+  SmartPointer<Test,Test>       r(&a, "Test R");
+  SmartPointer<const Test,Test> s(&a, "const Test S");
 //  SmartPointer<Test,Test>       t=&b;    // this one should not work
-      SmartPointer<Test,Test>       t(const_cast<Test *>(&b), "Test T");
-      SmartPointer<const Test,Test> u(&b, "const Test");
+  SmartPointer<Test,Test>       t(const_cast<Test *>(&b), "Test T");
+  SmartPointer<const Test,Test> u(&b, "const Test");
 
 
-      deallog << "a ";
-      a.f();            // should print "mutable", since #a# is not const
-      deallog << "b ";
-      b.f();            // should print "const", since #b# is const
-      deallog << "r ";
-      r->f();           // should print "mutable", since it points to the non-const #a#
-      deallog << "s ";
-      s->f();           // should print "const", since it points to the const #b#
-      // but we made it const
-      deallog << "t ";
-      t->f();           // should print "mutable", since #b# is const, but
-      // we casted the constness away
-      deallog << "u ";
-      u->f();           // should print "const" since #b# is const
-      // Now try if subscriptor works
-      Test c("C");
-      r = &c;
-      Test d("D");
-      r = &d;
-      // Destruction of "Test R" will cause a spurious ExcNotUsed here,
-      // since D was deleted first
-    }
-  catch (ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
-
+  deallog << "a ";
+  a.f();            // should print "mutable", since #a# is not const
+  deallog << "b ";
+  b.f();            // should print "const", since #b# is const
+  deallog << "r ";
+  r->f();           // should print "mutable", since it points to the non-const #a#
+  deallog << "s ";
+  s->f();           // should print "const", since it points to the const #b#
+  // but we made it const
+  deallog << "t ";
+  t->f();           // should print "mutable", since #b# is const, but
+  // we casted the constness away
+  deallog << "u ";
+  u->f();           // should print "const" since #b# is const
+  // Now try if subscriptor works
+  Test c("C");
+  r = &c;
+  Test d("D");
+  r = &d;
+  // Destruction of "Test R" will cause a spurious ExcNotUsed here,
+  // since D was deleted first. This shows up in address sanitizers
+  // as stack-use-after-scope, but we can't do anything about it.
 }
 
