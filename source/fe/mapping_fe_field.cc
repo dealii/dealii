@@ -202,6 +202,27 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::fourth_der
 
 
 
+namespace
+{
+  // Construct a quadrature formula containing the vertices of the reference
+  // cell in dimension dim (with invalid weights)
+  template<int dim>
+  Quadrature<dim> &get_vertex_quadrature()
+  {
+    static Quadrature<dim> quad;
+    if (quad.size() == 0)
+      {
+        std::vector<Point<dim> > points(GeometryInfo<dim>::vertices_per_cell);
+        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+          points[i] = GeometryInfo<dim>::unit_cell_vertex(i);
+        quad = Quadrature<dim>(points);
+      }
+    return quad;
+  }
+}
+
+
+
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 (const DoFHandlerType            &euler_dof_handler,
@@ -212,7 +233,8 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
   euler_dof_handler(&euler_dof_handler),
   fe_mask(mask.size() ? mask :
           ComponentMask(euler_dof_handler.get_fe().get_nonzero_components(0).size(), true)),
-  fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
+  fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int),
+  fe_values(this->euler_dof_handler->get_fe(), get_vertex_quadrature<dim>(), update_values)
 {
   unsigned int size = 0;
   for (unsigned int i=0; i<fe_mask.size(); ++i)
@@ -231,15 +253,16 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
   euler_vector(mapping.euler_vector),
   euler_dof_handler(mapping.euler_dof_handler),
   fe_mask(mapping.fe_mask),
-  fe_to_real(mapping.fe_to_real)
+  fe_to_real(mapping.fe_to_real),
+  fe_values(mapping.euler_dof_handler->get_fe(), get_vertex_quadrature<dim>(), update_values)
 {}
 
 
 
-template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 inline
 const double &
-MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::shape
 (const unsigned int qpoint,
  const unsigned int shape_nr) const
 {
@@ -251,11 +274,47 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
 
 
 
-template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 bool
-MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::preserves_vertex_locations () const
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::preserves_vertex_locations () const
 {
   return false;
+}
+
+
+
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
+get_vertices
+(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
+{
+  // we transform our tria iterator into a dof iterator so we can access
+  // data not associated with triangulations
+  const typename DoFHandler<dim,spacedim>::cell_iterator dof_cell(*cell,
+      euler_dof_handler);
+
+  Assert (dof_cell->active() == true, ExcInactiveCell());
+  AssertDimension(GeometryInfo<dim>::vertices_per_cell, fe_values.n_quadrature_points);
+  AssertDimension(fe_to_real.size(), euler_dof_handler->get_fe().n_components());
+
+  std::vector<Vector<typename VectorType::value_type> >
+  values(fe_values.n_quadrature_points,
+         Vector<typename VectorType::value_type> (euler_dof_handler->get_fe().n_components()));
+
+  {
+    Threads::Mutex::ScopedLock lock(fe_values_mutex);
+    fe_values.reinit(dof_cell);
+    fe_values.get_function_values(*euler_vector, values);
+  }
+  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    for (unsigned int j=0; j<fe_to_real.size(); ++j)
+      if (fe_to_real[j] != numbers::invalid_unsigned_int)
+        vertices[i][fe_to_real[j]] = values[i][j];
+
+  return vertices;
 }
 
 
