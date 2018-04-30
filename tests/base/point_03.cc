@@ -49,7 +49,7 @@ void check ()
   for (unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
     diff += std::abs(distance_vec[v]);
 
-  AssertThrow(diff < 1e-10,
+  AssertThrow(diff < 100 * std::numeric_limits<number>::epsilon(),
               ExcMessage("diff is " + std::to_string(diff)));
 
   deallog << "Ok" << std::endl;
