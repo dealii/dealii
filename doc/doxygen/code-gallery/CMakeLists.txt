@@ -96,6 +96,25 @@ IF (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
     LIST(REMOVE_ITEM _relative_src_files doc/dependencies)
     LIST(REMOVE_ITEM _relative_src_files doc/builds-on)
 
+
+    # Also remove files that were created by running 'cmake' in the
+    # code-gallery directory. These greatly confuse doxygen when we
+    # run them through doxygen.
+    #
+    # We would really like to also exclude executables, but there is
+    # no option to cmake's 'IF' command to test for that :-(
+    FOREACH(_file ${_relative_src_files})
+      IF(IS_DIRECTORY ${_file}
+         OR
+         ${_file} MATCHES "CMakeFiles/.*"
+         OR
+         ${_file} MATCHES "CMakeCache.txt")
+        LIST(REMOVE_ITEM _relative_src_files ${_file})
+      ENDIF()
+    ENDFOREACH()
+
+    MESSAGE(STATUS "    Setting up ${_relative_src_files}")
+
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
       COMMAND ${PERL_EXECUTABLE}
