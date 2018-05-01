@@ -610,7 +610,7 @@ namespace LinearAlgebra
     /**
      * Pointer to the array of local elements of this vector.
      */
-    std::unique_ptr<Number[]> values;
+    std::unique_ptr<Number[], decltype (free) *> values;
 
     /**
      * For parallel loops with TBB, this member variable stores the affinity
@@ -668,6 +668,9 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector ()
+    :
+    Subscriptor(),
+    values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -681,7 +684,8 @@ namespace LinearAlgebra
   inline
   ReadWriteVector<Number>::ReadWriteVector (const ReadWriteVector<Number> &v)
     :
-    Subscriptor()
+    Subscriptor(),
+    values(nullptr, free)
   {
     this->operator=(v);
   }
@@ -691,6 +695,9 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector (const size_type size)
+    :
+    Subscriptor(),
+    values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
@@ -703,6 +710,9 @@ namespace LinearAlgebra
   template <typename Number>
   inline
   ReadWriteVector<Number>::ReadWriteVector (const IndexSet &locally_stored_indices)
+    :
+    Subscriptor(),
+    values(nullptr, free)
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
