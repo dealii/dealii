@@ -3459,11 +3459,15 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_indices
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
   AssertDimension (dof_indices.size(), this->get_fe().dofs_per_cell);
 
-  const types::global_dof_index *cache
-    = this->dof_handler->levels[this->present_level]
-      ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
-  for (unsigned int i=0; i<this->get_fe().dofs_per_cell; ++i, ++cache)
-    dof_indices[i] = *cache;
+  const auto dofs_per_cell = this->get_fe().dofs_per_cell;
+  if (dofs_per_cell > 0)
+    {
+      const types::global_dof_index *cache
+        = this->dof_handler->levels[this->present_level]
+          ->get_cell_cache_start (this->present_index, dofs_per_cell);
+      for (unsigned int i=0; i<dofs_per_cell; ++i, ++cache)
+        dof_indices[i] = *cache;
+    }
 }
 
 

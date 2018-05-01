@@ -122,7 +122,7 @@ namespace internal
               cell_dof_indices_cache.size(),
               ExcInternalError());
 
-      return &cell_dof_indices_cache[obj_index*dofs_per_cell];
+      return cell_dof_indices_cache.data()+(obj_index*dofs_per_cell);
     }
 
 
