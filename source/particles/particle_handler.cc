@@ -837,7 +837,7 @@ namespace Particles
                                        recv_data_it);
       }
 
-    AssertThrow(total_recv_data == 0 || recv_data_it == &recv_data.back()+1,
+    AssertThrow(recv_data_it == recv_data.data() + recv_data.size(),
                 ExcMessage("The amount of data that was read into new particles "
                            "does not match the amount of data sent around."));
   }
