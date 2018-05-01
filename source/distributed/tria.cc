@@ -1413,12 +1413,16 @@ namespace parallel
 
           unsigned int bytes_for_buffer () const
           {
-            return (sizeof(unsigned int) +
-                    tree_index.size() * sizeof(unsigned int) +
-                    quadrants.size() * sizeof(typename dealii::internal::p4est
-                                              ::types<dim>::quadrant) +
-                    vertices.size() * sizeof(dealii::Point<spacedim>)) +
-                   vertex_indices.size() * sizeof(unsigned int);
+            unsigned int size
+              = sizeof(unsigned int) +
+                tree_index.size() * sizeof(unsigned int) +
+                quadrants.size() * sizeof(typename dealii::internal::p4est
+                                          ::types<dim>::quadrant) +
+                vertex_indices.size() * sizeof(unsigned int);
+            // align to sizeof(double)
+            size += sizeof(double)-size % sizeof(double);
+            size += vertices.size() * sizeof(dealii::Point<spacedim>);
+            return size;
           }
 
           void pack_data (std::vector<char> &buffer) const
@@ -1447,7 +1451,8 @@ namespace parallel
                         vertex_indices.data(),
                         vertex_indices.size() * sizeof(unsigned int));
             ptr += vertex_indices.size() * sizeof(unsigned int);
-
+            // align to sizeof(double)
+            ptr += sizeof(double) - (std::ptrdiff_t)ptr % sizeof(double);
             std::memcpy(ptr,
                         vertices.data(),
                         vertices.size() * sizeof(dealii::Point<spacedim>));
@@ -1498,6 +1503,8 @@ namespace parallel
             for (unsigned int c=0; c<cells; ++c)
               first_vertex_indices[c] = &vertex_indices[first_indices[c]];
 
+            // align to sizeof(double)
+            ptr += sizeof(double) - (std::ptrdiff_t)ptr % sizeof(double);
             vertices.clear();
             first_vertices.resize(cells);
             for (unsigned int c=0; c<cells; ++c)
