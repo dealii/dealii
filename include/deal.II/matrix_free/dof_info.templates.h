@@ -392,9 +392,8 @@ no_constraint:
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
-              unsigned int *data_ptr =
-                const_cast<unsigned int *> (dof_indices.data() +
-                                            row_starts[boundary_cells[i]*n_components].first);
+              unsigned int *data_ptr = dof_indices.data() +
+                                       row_starts[boundary_cells[i]*n_components].first;
               const unsigned int *row_end = dof_indices.data() +
                                             row_starts[(boundary_cells[i]+1)*n_components].first;
               for ( ; data_ptr != row_end; ++data_ptr)
@@ -411,9 +410,8 @@ no_constraint:
                   if (row_starts[boundary_cells[i]*n_components].second !=
                       row_starts[(boundary_cells[i]+1)*n_components].second)
                     {
-                      unsigned int *data_ptr =
-                        const_cast<unsigned int *> (plain_dof_indices.data() +
-                                                    row_starts_plain_indices[boundary_cells[i]]);
+                      unsigned int *data_ptr = plain_dof_indices.data() +
+                                               row_starts_plain_indices[boundary_cells[i]];
                       const unsigned int *row_end = data_ptr +
                                                     dofs_per_cell[cell_active_fe_index.size() == 0 ?
                                                                   0 : cell_active_fe_index[i]];
