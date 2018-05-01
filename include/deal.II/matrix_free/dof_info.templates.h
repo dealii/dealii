@@ -392,8 +392,10 @@ no_constraint:
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
-              unsigned int *data_ptr = const_cast<unsigned int *> (&dof_indices[row_starts[boundary_cells[i]*n_components].first]);
-              const unsigned int *row_end = &dof_indices[row_starts[(boundary_cells[i]+1)*n_components].first];
+              unsigned int *data_ptr = dof_indices.data() +
+                                       row_starts[boundary_cells[i]*n_components].first;
+              const unsigned int *row_end = dof_indices.data() +
+                                            row_starts[(boundary_cells[i]+1)*n_components].first;
               for ( ; data_ptr != row_end; ++data_ptr)
                 *data_ptr = ((*data_ptr < n_owned)
                              ?
@@ -408,7 +410,8 @@ no_constraint:
                   if (row_starts[boundary_cells[i]*n_components].second !=
                       row_starts[(boundary_cells[i]+1)*n_components].second)
                     {
-                      unsigned int *data_ptr = const_cast<unsigned int *> (&plain_dof_indices[row_starts_plain_indices[boundary_cells[i]]]);
+                      unsigned int *data_ptr = plain_dof_indices.data() +
+                                               row_starts_plain_indices[boundary_cells[i]];
                       const unsigned int *row_end = data_ptr +
                                                     dofs_per_cell[cell_active_fe_index.size() == 0 ?
                                                                   0 : cell_active_fe_index[i]];
@@ -439,9 +442,9 @@ no_constraint:
 
     void
     DoFInfo
-    ::reorder_cells (const TaskInfo                  &task_info,
-                     const std::vector<unsigned int> &renumbering,
-                     const std::vector<unsigned int> &constraint_pool_row_index,
+    ::reorder_cells (const TaskInfo                   &task_info,
+                     const std::vector<unsigned int>  &renumbering,
+                     const std::vector<unsigned int>  &constraint_pool_row_index,
                      const std::vector<unsigned char> &irregular_cells)
     {
       (void)constraint_pool_row_index;
@@ -517,8 +520,8 @@ no_constraint:
                     = new_constraint_indicator.size();
 
                   new_dof_indices.insert(new_dof_indices.end(),
-                                         &dof_indices[row_starts[cell_no+comp].first],
-                                         &dof_indices[row_starts[cell_no+comp+1].first]);
+                                         dof_indices.data()+row_starts[cell_no+comp].first,
+                                         dof_indices.data()+row_starts[cell_no+comp+1].first);
                   for (unsigned int index = row_starts[cell_no+comp].second;
                        index != row_starts[cell_no+comp+1].second; ++index)
                     new_constraint_indicator.push_back(constraint_indicator[index]);
@@ -529,8 +532,9 @@ no_constraint:
                   new_rowstart_plain[i*vectorization_length+j] =
                     new_plain_indices.size();
                   new_plain_indices.insert(new_plain_indices.end(),
-                                           &plain_dof_indices[row_starts_plain_indices[cell_no/n_components]],
-                                           &plain_dof_indices[row_starts_plain_indices[cell_no/n_components]]+dofs_per_cell);
+                                           plain_dof_indices.data()+row_starts_plain_indices[cell_no/n_components],
+                                           plain_dof_indices.data()+
+                                           row_starts_plain_indices[cell_no/n_components]+dofs_per_cell);
                 }
             }
           for (unsigned int j=n_vect; j<vectorization_length; ++j)
@@ -577,9 +581,11 @@ no_constraint:
         {
           const unsigned int row_length_ind = row_starts[(row*vectorization_length+1)*n_components].first -
                                               row_starts[row*vectorization_length*n_components].first;
+          AssertIndexRange(row_starts[(row*vectorization_length+1)*n_components].second,
+                           constraint_indicator.size()+1);
           const std::pair<unsigned short,unsigned short>
-          *con_it = &constraint_indicator[row_starts[row*vectorization_length*n_components].second],
-           * end_con = &constraint_indicator[row_starts[(row*vectorization_length+1)*n_components].second];
+          *con_it = constraint_indicator.data() + row_starts[row*vectorization_length*n_components].second,
+           * end_con = constraint_indicator.data() + row_starts[(row*vectorization_length+1)*n_components].second;
           for ( ; con_it != end_con; ++con_it)
             {
               AssertIndexRange (con_it->first, row_length_ind+1);
@@ -654,7 +660,8 @@ no_constraint:
               for (unsigned int j=0; j<n_comp; ++j)
                 {
                   const unsigned int cell_no = i*vectorization_length+j;
-                  const unsigned int *dof_indices = &this->dof_indices[row_starts[cell_no*n_components].first];
+                  const unsigned int *dof_indices = this->dof_indices.data() +
+                                                    row_starts[cell_no*n_components].first;
                   AssertDimension(ndofs, row_starts[(cell_no+1)*n_components].first-
                                   row_starts[cell_no*n_components].first);
                   for (unsigned int i=1; i<ndofs; ++i)
@@ -668,7 +675,7 @@ no_constraint:
                                                              n_comp == vectorization_length);
               {
                 const unsigned int *dof_indices =
-                  &this->dof_indices[row_starts[i*vectorization_length*n_components].first];
+                  this->dof_indices.data() + row_starts[i*vectorization_length*n_components].first;
                 for (unsigned int k=0; k<ndofs; ++k)
                   for (unsigned int j=0; j<n_comp; ++j)
                     if (dof_indices[j*ndofs+k] != dof_indices[0] + k*n_comp + j)
@@ -692,7 +699,7 @@ no_constraint:
               else
                 {
                   const unsigned int *dof_indices =
-                    &this->dof_indices[row_starts[i*vectorization_length*n_components].first];
+                    this->dof_indices.data() + row_starts[i*vectorization_length*n_components].first;
                   if (n_comp == vectorization_length)
                     index_storage_variants[dof_access_cell][i] = IndexStorageVariants::interleaved;
                   else
@@ -711,7 +718,7 @@ no_constraint:
                   if (index_storage_variants[dof_access_cell][i] != IndexStorageVariants::full)
                     {
                       unsigned int *interleaved_dof_indices =
-                        &this->dof_indices_interleaved[row_starts[i*vectorization_length*n_components].first];
+                        this->dof_indices_interleaved.data() + row_starts[i*vectorization_length*n_components].first;
                       for (unsigned int k=0; k<ndofs; ++k)
                         for (unsigned int j=0; j<n_comp; ++j)
                           interleaved_dof_indices[k*n_comp+j] = dof_indices[j*ndofs+k];
@@ -916,8 +923,8 @@ no_constraint:
           {
             scratch.clear();
             scratch.insert(scratch.end(),
-                           &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
-                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first]);
+                           dof_info.dof_indices.data()+dof_info.row_starts[block*n_components].first,
+                           dof_info.dof_indices.data()+dof_info.row_starts[(block+1)*n_components].first);
             std::sort(scratch.begin(), scratch.end());
             std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
@@ -951,8 +958,8 @@ no_constraint:
           {
             scratch.clear();
             scratch.insert(scratch.end(),
-                           &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
-                           &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first]);
+                           dof_info.dof_indices.data()+dof_info.row_starts[block*n_components].first,
+                           dof_info.dof_indices.data()+dof_info.row_starts[(block+1)*n_components].first);
             std::sort(scratch.begin(), scratch.end());
             std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
@@ -983,8 +990,8 @@ no_constraint:
             row_entries.clear();
 
             const unsigned int
-            *it = &dof_info.dof_indices[dof_info.row_starts[block*n_components].first],
-             *end_cell = &dof_info.dof_indices[dof_info.row_starts[(block+1)*n_components].first];
+            *it = dof_info.dof_indices.data() + dof_info.row_starts[block*n_components].first,
+             *end_cell = dof_info.dof_indices.data() + dof_info.row_starts[(block+1)*n_components].first;
             for ( ; it != end_cell; ++it)
               {
                 SparsityPattern::iterator sp = connectivity_dof.begin(*it);
@@ -1089,7 +1096,8 @@ no_constraint:
               const unsigned int ndofs = dofs_per_cell.size() == 1 ? dofs_per_cell[0] :
                                          (dofs_per_cell[cell_active_fe_index.size()>0 ?
                                                         cell_active_fe_index[cell_no] : 0]);
-              const unsigned int *dof_ind = &dof_indices[row_starts[cell_no*n_components*vectorization_length].first];
+              const unsigned int *dof_ind = dof_indices.data()+
+                                            row_starts[cell_no*n_components*vectorization_length].first;
               for (unsigned int i=0; i<ndofs; ++i)
                 for (unsigned int j=0; j<n_vectorization_lanes_filled[dof_access_cell][cell_no]; ++j)
                   if (dof_ind[j*ndofs+i]<local_size)
