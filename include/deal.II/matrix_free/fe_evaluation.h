@@ -3695,7 +3695,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
       internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::interleaved)
     {
       const unsigned int *dof_indices =
-        &dof_info->dof_indices_interleaved[dof_info->row_starts[cell*n_fe_components*n_vectorization].first]+
+        dof_info->dof_indices_interleaved.data() +
+        dof_info->row_starts[cell*n_fe_components*n_vectorization].first+
         dof_info->component_dof_indices_offset[active_fe_index][first_selected_component]*n_vectorization;
       if (n_components == 1 || n_fe_components == 1)
         for (unsigned int i=0; i<dofs_per_component; ++i, dof_indices += n_vectorization)
@@ -3739,7 +3740,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
           has_constraints = has_constraints &&
                             dof_info->row_starts[cells[v]*n_fe_components+first_selected_component+n_components].second !=
                             dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].second;
-          dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].first];
+          dof_indices[v] = dof_info->dof_indices.data() +
+                           dof_info->row_starts[cells[v]*n_fe_components+first_selected_component].first;
         }
       for (unsigned int v=n_vectorization_actual; v<n_vectorization; ++v)
         dof_indices[v] = nullptr;
@@ -3753,7 +3755,14 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
           if (dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+n_components_read].second !=
               dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].second)
             has_constraints = true;
-          dof_indices[v] = &dof_info->dof_indices[dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first];
+          Assert(dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component+n_components_read].first ==
+                 dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first ||
+                 dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first <
+                 dof_info->dof_indices.size(),
+                 ExcIndexRange(0, dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first,
+                               dof_info->dof_indices.size()));
+          dof_indices[v] = dof_info->dof_indices.data() +
+                           dof_info->row_starts[(cell*n_vectorization+v)*n_fe_components+first_selected_component].first;
         }
       for (unsigned int v=n_vectorization_actual; v<n_vectorization; ++v)
         dof_indices[v] = nullptr;
@@ -3817,11 +3826,12 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
           Assert(dof_info->row_starts_plain_indices[cell*n_vectorization+v]
                  != numbers::invalid_unsigned_int,
                  ExcNotInitialized());
-          dof_indices[v] = is_face ?
-                           &dof_info->plain_dof_indices[dof_info->row_starts_plain_indices[cells[v]]]
-                           :
-                           &dof_info->plain_dof_indices[dof_info->row_starts_plain_indices[cell*n_vectorization+v]];
-          dof_indices[v] += dof_info->component_dof_indices_offset[active_fe_index][first_selected_component];
+          dof_indices[v] = dof_info->plain_dof_indices.data() +
+                           dof_info->component_dof_indices_offset[active_fe_index][first_selected_component] +
+                           (is_face ?
+                            dof_info->row_starts_plain_indices[cells[v]]
+                            :
+                            dof_info->row_starts_plain_indices[cell*n_vectorization+v]);
           next_index_indicators = index_indicators;
         }
 
