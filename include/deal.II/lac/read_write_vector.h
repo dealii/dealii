@@ -27,6 +27,7 @@
 #include <deal.II/lac/vector_operation.h>
 
 #include <cstring>
+#include <cstdlib>
 #include <iomanip>
 
 #ifdef DEAL_II_WITH_TRILINOS
