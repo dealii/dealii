@@ -10,7 +10,7 @@ DEAL::u const
 DEAL::Construct C
 DEAL::Construct D
 DEAL::Destruct D
-DEAL::Exception: ExcInUse (counter, object_info->name(), infostring)
+DEAL::Exception: ExcInUse (counter.load(), object_info->name(), infostring)
 DEAL::
 --------------------------------------------------------
 An error occurred in file <subscriptor.cc> in function
