@@ -67,6 +67,9 @@ namespace internal
        * part of the vector at a time to keep the values that are zeroed in
        * caches, saving one global vector access for the case where this is
        * applied rather than `vector = 0.;`.
+       *
+       * Size of the chunk is set to 64 kByte which generally fits to current
+       * caches.
        */
       static const unsigned int chunk_size_zero_vector = 8192;
 
