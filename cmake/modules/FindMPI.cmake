@@ -78,7 +78,19 @@ CHECK_CXX_SOURCE_COMPILES(
 RESET_CMAKE_REQUIRED()
 
 #
-# Manually assemble some version information:
+# Newer versions of FindMPI.cmake only populate MPI_CXX_* (and MPI_C_*,
+# MPI_Fortran_*) variables. Let's rename these version names
+#
+
+IF(NOT DEFINED MPI_VERSION AND DEFINED MPI_CXX_VERSION)
+  SET(MPI_VERSION ${MPI_CXX_VERSION})
+  SET(MPI_VERSION_MAJOR ${MPI_CXX_VERSION_MAJOR})
+  SET(MPI_VERSION_MINOR ${MPI_CXX_VERSION_MINOR})
+ENDIF()
+
+#
+# Really old versions of CMake do not export any version information. In
+# this case, query the mpi.h header for the necessary information:
 #
 
 DEAL_II_FIND_FILE(MPI_MPI_H
@@ -97,11 +109,6 @@ IF(NOT MPI_MPI_H MATCHES "-NOTFOUND" AND NOT DEFINED MPI_VERSION)
     MPI_VERSION_MINOR "${MPI_VERSION_MINOR_STRING}"
     )
   SET(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
-  IF("${MPI_VERSION}" STREQUAL ".")
-    SET(MPI_VERSION)
-    SET(MPI_VERSION_MAJOR)
-    SET(MPI_VERSION_MINOR)
-  ENDIF()
 ENDIF()
 
 DEAL_II_PACKAGE_HANDLE(MPI
