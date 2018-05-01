@@ -79,64 +79,53 @@
  * <tt>boundary_id</tt> that uniquely identifies which part of the
  * boundary this face is on. If nothing is specified at creation time,
  * each boundary face has a zero boundary id and each triangulation
- * object has an invalid manifold id. On the other hand, the boundary
+ * object has an flat manifold id. On the other hand, the boundary
  * id of faces and the manifold id of objects can be set either at
  * creation time or later by looping over all cells and querying their
  * faces.
  *
- * It is then possible to associate objects describing the geometry to
- * certain boundary_id values used in a triangulation and to certain
+ * It is then possible to associate objects describing the geometry to certain
  * manifold_id values.
  *
- * Before version 8.2, the library allowed only boundary faces to
- * follow a curved geometric description. Since version 8.2 this has
- * been introduced also for interior faces and cells, and the
- * boundary_id has been separated from the manifold_id.
+ * Before version 8.2, the library allowed only boundary faces to follow a
+ * curved geometric description. Since version 8.2 this has been introduced also
+ * for interior faces and cells, and the boundary_id has been separated from the
+ * manifold_id. The former is used to identify the type of boundary conditions
+ * to apply, while the latter is used to identify the geometry and describe how
+ * new vertices should be created upon refinement of the mesh, or where high
+ * order Mapping objects should place their support points on the exact
+ * geometry.
  *
- * Although the old behavior is still supported, one should use the
- * boundary indicator only for the physical meaning associated, for
- * example, to boundary conditions, and revert to manifold_ids to
- * describe the geometry of the triangulation.
+ * Since version 9.0 of the library, the boundary_id associated to the boundary
+ * faces is ignored by Manifold objects, and Manifold descriptors can only be
+ * attached to manifold ids.
  *
- * The behavior of the Triangulation class w.r.t. geometry
- * descriptions is the following: Triangulation::set_boundary() and
- * Triangulation::set_manifold() do the exact same thing: they attach
- * a manifold descriptor to the specified id. The first function
- * expects a Boundary descriptor (which is a specialization of a
- * Manifold description) and is provided mainly for backward
- * compatibility, while the second class expects a Manifold
- * descriptor. Notice that the Triangulation class only uses the
- * Manifold interface, and you could describe both the interior and
- * the boundary of the domain using the same object. The additional
- * information contained in the Boundary interface is related to the
- * computation of the exact normals. 
+ * The behavior of the Triangulation class w.r.t. geometry descriptions is the
+ * following: Triangulation::set_manifold() attaches a manifold descriptor to
+ * the specified manifold id. The function expects a Manifold descriptor, and
+ * you could describe both the interior and the boundary of the domain using the
+ * same object.
  *
- * Whenever a new vertex is needed in an object, the Triangulation
- * queries the manifold_id of the object which needs refinement. If
- * the manifold_id is set to numbers::invalid_manifold_id, then the
- * Triangulation queries the boundary_id (if the face is on the
- * boundary) or the material_id (if the Triangulation is of
- * codimension one and the object is a cell). If the previous queries
- * resulted in a number different from numbers::invalid_manifold_id,
- * then the Triangulation looks whether a previous call to
- * Triangulation::set_manifold() (or set_boundary()) was performed
- * with the given id, and if yes, it uses the stored object to obtain
- * new vertices, otherwise it uses a FlatManifold or StraightBoundary
- * object.
+ * Whenever a new vertex is needed in an object, the Triangulation queries the
+ * manifold_id of the object which needs refinement. If the query resulted in a
+ * number different from numbers::flat_manifold_id, then the Triangulation looks
+ * whether a previous call to Triangulation::set_manifold() was performed with
+ * the given id, and if yes, it uses the stored object to obtain new vertices,
+ * otherwise it uses a FlatManifold object.
  *
- * @note This behavior is backward compatible to that of deal.II versions
- * prior to 8.2. If one ignores the manifold_id of an object (i.e., if it has
- * never been set), by default it is and remains set to
- * numbers::invalid_manifold_id. In that case, the first query above will
- * trigger a query to the old style boundary_id. This behavior will be
- * maintained for a while, but might eventually be changed. The suggested
- * strategy is to use manifold_ids to describe the geometry, and boundary_ids
- * to describe boundary conditions.
- * 
+ * @note This behavior is **not** backward compatible to that of deal.II
+ * versions prior to 9.0. If one ignores the manifold_id of an object (i.e., if
+ * it has never been set), by default it is and remains set to
+ * numbers::flat_manifold_id. In previous versions of the library, the
+ * boundary_id of the boundary faces would be queried and used in place of the
+ * manifold_id. If you have old programs that only set boundary ids, you should
+ * modify them to use manifold ids instead (or you could use
+ * GridTools::copy_boundary_to_manifold_ids or
+ * GridTools::map_boundary_to_manifold_ids)
  *
  * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
  * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, Luca Heltai, 1998-2014
+ * @author Wolfgang Bangerth, Luca Heltai, 1998-2018
  */
