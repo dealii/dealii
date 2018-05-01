@@ -265,8 +265,8 @@ namespace SUNDIALS
     AssertKINSOL(status);
 
 #if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
-    SUNMatrix J;
-    SUNLinearSolver LS;
+    SUNMatrix J = nullptr;
+    SUNLinearSolver LS = nullptr;
 #endif
 
     if (solve_jacobian_system)
