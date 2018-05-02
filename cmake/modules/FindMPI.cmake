@@ -109,6 +109,20 @@ IF(NOT MPI_MPI_H MATCHES "-NOTFOUND" AND NOT DEFINED MPI_VERSION)
     MPI_VERSION_MINOR "${MPI_VERSION_MINOR_STRING}"
     )
   SET(MPI_VERSION "${MPI_VERSION_MAJOR}.${MPI_VERSION_MINOR}")
+
+  #
+  # Except - this doesn't always work. Some distributions install a header
+  # stub mpi.h that includes the right mpi header depending on the
+  # architecture. In this case we are really out of luck. It is not
+  # straightforward to find the correct header file to query the version
+  # information from. Just set a very conservative default:
+  #
+  IF(MPI_VERSION STREQUAL ".")
+    SET(MPI_VERSION "0.0")
+    SET(MPI_VERSION_MAJOR "0")
+    SET(MPI_VERSION_MINOR "0")
+  ENDIF()
+
 ENDIF()
 
 DEAL_II_PACKAGE_HANDLE(MPI
