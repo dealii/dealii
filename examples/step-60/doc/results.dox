@@ -1,7 +1,8 @@
 <h1>Results</h1>
 
-The first time the code is run, an exception is thrown and nothing is actually
-computed. You'll get the following output:
+Currently there is no `parameters.prm` file: objects can't be initialized.
+For this reason the first time the code is run, an exception is thrown
+and nothing is actually computed. You'll get the following output:
 @code
 ----------------------------------------------------
 Exception on processing: 
@@ -321,7 +322,7 @@ such that we have
     set Variable names      = x,y,t
   end
 @endcode
-produce the saddle on the right.
+produces the saddle on the right.
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -368,16 +369,23 @@ of this hot air balloon shape. Why? What's the difference with the following?
   </tr>
 </table>
 
-To solve this problem we need to improve the way in which adaptive refinement is
-performed. Currently the vector of support points contains the vertices of
-$\Gamma$, if the finite dimensional space for the configuration is of degree
-one: these are too far away to make $\Omega$ refine properly and simply
-increasing the refinements of $\Gamma$ will not be enough, the conjugate
-gradient won't converge.
+<h4> Preconditioner </h4>
 
-As you modify the code you shall notice that, for instance, with complex
-geometries there shall be other convergence problems: parameters are handy, but do
-not solve all problems!
+At the moment, we have no preconditioner on the Schur complement. This is ok for
+two dimensional problems, where a few hundred iterations bring the residual down
+to the machine precision, but it's not going to work in three dimensions.
+
+It is not obvious what a good preconditioner would be here. The physical problem
+we are solving with the Schur complement, is to associate to the Dirichlet data
+$g$, the value of the Lagrange multiplier $\lambda$. $\lambda$ can be
+interpreted as the *jump* in the normal gradient that need to be imposed on $u$
+across $\Gamma$, in order to obtain the Dirichlet data $g$.
+
+So $S$ is some sort of Neumann to Dirichlet map, and we would like to have a
+good approximation for the Dirichlet to Neumann map. A possibility would be to
+use a Boundary Element approximation of the problem on $\Gamma$, and construct a
+rough approximation of the hyper-singular operator for the Poisson problem
+associated to $\Gamma$, which is precisely a Dirichlet to Neumann map.
 
 <h4> Parallel Code </h4>
 

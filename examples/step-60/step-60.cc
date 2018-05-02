@@ -398,11 +398,9 @@ namespace Step60
 
     SparsityPattern           stiffness_sparsity;
     SparsityPattern           coupling_sparsity;
-    SparsityPattern           embedded_sparsity;
 
     SparseMatrix<double>      stiffness_matrix;
     SparseMatrix<double>      coupling_matrix;
-    SparseMatrix<double>      embedded_stiffness_matrix;
 
     ConstraintMatrix          constraints;
 
@@ -876,10 +874,6 @@ namespace Step60
                   (parameters.embedded_space_finite_element_degree);
     embedded_dh->distribute_dofs(*embedded_fe);
 
-    DynamicSparsityPattern dsp(embedded_dh->n_dofs(), embedded_dh->n_dofs());
-    DoFTools::make_sparsity_pattern(*embedded_dh, dsp);
-    embedded_sparsity.copy_from(dsp);
-    embedded_stiffness_matrix.reinit(embedded_sparsity);
     // By definition the rhs of the system we're solving involves only a zero
     // vector and $G$, which is computed using only $\Gamma$'s DoFs
     lambda.reinit(embedded_dh->n_dofs());
@@ -924,24 +918,23 @@ namespace Step60
     {
       TimerOutput::Scope timer_section(monitor, "Assemble system");
 
-      // Embedding stiffness matrix $K$
+      // Embedding stiffness matrix $K$, and the right hand side $G$.
       MatrixTools::create_laplace_matrix(*space_dh, QGauss<spacedim>(2*space_fe->degree+1),
                                          stiffness_matrix, (const Function<spacedim> *) nullptr, constraints);
 
-      // Embedded stiffness matrix and rhs vector $G$
-      MatrixTools::create_laplace_matrix(*embedded_mapping,
-                                         *embedded_dh,
-                                         QGauss<dim>(2*embedded_fe->degree+1),
-                                         embedded_stiffness_matrix,
-                                         embedded_value_function,
-                                         embedded_rhs);
+      VectorTools::create_right_hand_side(*embedded_mapping,
+                                          *embedded_dh,
+                                          QGauss<dim>(2*embedded_fe->degree+1),
+                                          embedded_value_function,
+                                          embedded_rhs);
     }
     {
       TimerOutput::Scope timer_section(monitor, "Assemble coupling system");
 
-      // To compute the coupling matrix we use the NonMatching::create_coupling_mass_matrix
-      // tool, which works similarly to NonMatching::create_coupling_sparsity_pattern,
-      // requiring only an additional parameter: a constraint matrix
+      // To compute the coupling matrix we use the
+      // NonMatching::create_coupling_mass_matrix tool, which works similarly to
+      // NonMatching::create_coupling_sparsity_pattern, requiring only an
+      // additional parameter: a constraint matrix
       QGauss<dim> quad(parameters.coupling_quadrature_order);
       NonMatching::create_coupling_mass_matrix(*space_dh,
                                                *embedded_dh,
@@ -968,7 +961,6 @@ namespace Step60
 
     // Initializing the operators, as described in the introduction
     auto K = linear_operator(stiffness_matrix);
-    auto A = linear_operator(embedded_stiffness_matrix);
     auto Ct = linear_operator(coupling_matrix);
     auto C = transpose_operator(Ct);
 
@@ -977,7 +969,7 @@ namespace Step60
     // Using the Schur complement method
     auto S = C*K_inv*Ct;
     SolverCG<Vector<double> > solver_cg(schur_solver_control);
-    auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity() );
+    auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity());
 
     lambda = S_inv * embedded_rhs;
 
@@ -1023,7 +1015,7 @@ namespace Step60
 
 
 
-int main()
+int main(int argc, char **argv)
 {
   try
     {
@@ -1032,15 +1024,26 @@ int main()
 
       const unsigned int dim=1, spacedim=2;
 
-      // Differently to what happens in other tutorial programs, here we the
+      // Differently to what happens in other tutorial programs, here we use
       // ParameterAcceptor style of initialization, i.e., all objects are first
       // constructed, and then a single call to the static method
       // ParameterAcceptor::initialize is issued to fill all parameters of the
       // classes that are derived from ParameterAcceptor.
+      //
+      // We check if the user has specified a parameter file name to use when
+      // the program was launched. If so, try to read that parameter file,
+      // otherwise, try to read the file "parameters.prm".
+      //
+      // If the parameter file that was specified (implicitly or explicitly)
+      // does not exist, ParameterAcceptor::initialize will create one for you,
+      // and exit the program.
 
       DistributedLagrangeProblem<dim, spacedim>::DistributedLagrangeProblemParameters parameters;
       DistributedLagrangeProblem<dim, spacedim> problem(parameters);
-      ParameterAcceptor::initialize("parameters.prm", "used_parameters.prm");
+      std::string parameter_file = "parameters.prm";
+      if (argc > 1)
+        parameter_file = argv[1];
+      ParameterAcceptor::initialize(parameter_file, "used_parameters.prm");
       problem.run();
     }
   catch (std::exception &exc)
