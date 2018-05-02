@@ -39,18 +39,18 @@
  *   thing to do. The classes derived from the Manifold base class therefore
  *   describe the geometry of a domain. One can then attach an object of a class
  *   derived from this base class to the Triangulation object using the
- *   Triangulation::set_manifold() function associating it with a manifold id
- *   (see types::manifold_id), use this manifold id on the cells, faces or edges
+ *   Triangulation::set_manifold() function associating it with a manifold_id
+ *   (see types::manifold_id), use this manifold_id on the cells, faces or edges
  *   of the triangulation that should be described by this manifold using the
  *   TriaAccessor::set_manifold_id() function, and then the Triangulation will
  *   ask the manifold object where a new vertex to be located on a cell, face or
  *   edge so attributed should be located upon mesh refinement. Several classes
  *   already exist to support the most common geometries, e.g.,
- *   CylinderManifold, or PolarManifold, which represent respectively the
+ *   CylindricalManifold, or PolarManifold, which represent respectively the
  *   geometry obtained when describing your space in cylindrical coordinates or
- *   in polar coordinates, and by default, all curved geometries generated using
- *   functions in the GridGenerator namespace attach by default the correct
- *   Manifold object to the curved parts of the domain.
+ *   in polar coordinates. By default, all curved geometries generated using
+ *   functions in the GridGenerator namespace attach the correct Manifold object
+ *   to the curved parts of the domain.
  *
  *   <li> Integration: When using higher order finite element methods, it is
  *   often necessary to compute cell terms (like cell contributions to the

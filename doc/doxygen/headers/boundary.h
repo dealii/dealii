@@ -79,8 +79,8 @@
  * <tt>boundary_id</tt> that uniquely identifies which part of the
  * boundary this face is on. If nothing is specified at creation time,
  * each boundary face has a zero boundary id and each triangulation
- * object has an flat manifold id. On the other hand, the boundary
- * id of faces and the manifold id of objects can be set either at
+ * object has a flat_manifold_id. On the other hand, the boundary
+ * id of faces and the manifold_id of objects can be set either at
  * creation time or later by looping over all cells and querying their
  * faces.
  *
@@ -100,18 +100,18 @@
  * faces is ignored by Manifold objects, and Manifold descriptors can only be
  * attached to manifold ids.
  *
- * The behavior of the Triangulation class w.r.t. geometry descriptions is the
- * following: Triangulation::set_manifold() attaches a manifold descriptor to
- * the specified manifold id. The function expects a Manifold descriptor, and
- * you could describe both the interior and the boundary of the domain using the
- * same object.
+ * The behavior of the Triangulation class with respect to geometry descriptions
+ * is the following: Triangulation::set_manifold() attaches a manifold
+ * descriptor to the specified manifold_id. The function expects a Manifold
+ * descriptor, and you could describe both the interior and the boundary of the
+ * domain using the same object.
  *
  * Whenever a new vertex is needed in an object, the Triangulation queries the
  * manifold_id of the object which needs refinement. If the query resulted in a
  * number different from numbers::flat_manifold_id, then the Triangulation looks
  * whether a previous call to Triangulation::set_manifold() was performed with
- * the given id, and if yes, it uses the stored object to obtain new vertices,
- * otherwise it uses a FlatManifold object.
+ * the given id. If it was, then the triangulation uses the stored object to
+ * obtain new vertices, otherwise it uses a FlatManifold object.
  *
  * @note This behavior is **not** backward compatible to that of deal.II
  * versions prior to 9.0. If one ignores the manifold_id of an object (i.e., if
