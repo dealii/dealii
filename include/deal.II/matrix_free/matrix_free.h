@@ -2638,7 +2638,7 @@ namespace internal
            this->requests[component_in_block_vector]);
 
           matrix_free.release_scratch_data_non_threadsafe(tmp_data[component_in_block_vector]);
-          tmp_data[component_in_block_vector] = 0;
+          tmp_data[component_in_block_vector] = nullptr;
 #endif
         }
     }
@@ -2717,7 +2717,7 @@ namespace internal
            this->requests[component_in_block_vector]);
 
           matrix_free.release_scratch_data_non_threadsafe(tmp_data[component_in_block_vector]);
-          tmp_data[component_in_block_vector] = 0;
+          tmp_data[component_in_block_vector] = nullptr;
 #endif
         }
     }

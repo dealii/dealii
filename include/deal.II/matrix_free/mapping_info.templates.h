@@ -1190,11 +1190,11 @@ namespace internal
                 faces[face].cells_exterior[0] == numbers::invalid_unsigned_int;
 
               if (is_boundary_face &&
-                  fe_boundary_face_values_container[my_q][0].get() == 0)
+                  fe_boundary_face_values_container[my_q][0] == nullptr)
                 fe_boundary_face_values_container[my_q][0].reset
                 (new FEFaceValues<dim> (mapping, dummy_fe, quadrature,
                                         update_flags_boundary));
-              else if (fe_face_values_container[my_q][0].get() == 0)
+              else if (fe_face_values_container[my_q][0] == nullptr)
                 fe_face_values_container[my_q][0].reset
                 (new FEFaceValues<dim> (mapping, dummy_fe, quadrature,
                                         update_flags_inner));
@@ -1306,7 +1306,7 @@ namespace internal
                       cell_it (&tria, cells[faces[face].cells_exterior[v]].first,
                                cells[faces[face].cells_exterior[v]].second);
 
-                      const FEValuesBase<dim> *actual_fe_face_values = 0;
+                      const FEValuesBase<dim> *actual_fe_face_values = nullptr;
                       if (faces[face].subface_index >=
                           GeometryInfo<dim>::max_children_per_cell)
                         {
@@ -1315,7 +1315,7 @@ namespace internal
                         }
                       else
                         {
-                          if (fe_subface_values_container[my_q][0].get() == 0)
+                          if (fe_subface_values_container[my_q][0] == nullptr)
                             fe_subface_values_container[my_q][0].reset
                             (new FESubfaceValues<dim> (mapping, dummy_fe, quadrature,
                                                        update_flags_inner));

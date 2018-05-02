@@ -75,8 +75,8 @@ namespace internal
 
         void operator() () const
         {
-          MFWorkerInterface *used_worker = worker != 0 ? worker : *worker_pointer;
-          Assert(used_worker != 0, ExcInternalError());
+          MFWorkerInterface *used_worker = worker != nullptr ? worker : *worker_pointer;
+          Assert(used_worker != nullptr, ExcInternalError());
           used_worker->cell(std::make_pair(task_info.cell_partition_data[partition],
                                            task_info.cell_partition_data[partition+1]));
 
@@ -305,7 +305,7 @@ namespace internal
           worker.vector_update_ghosts_finish();
         else
           worker.vector_compress_start();
-        return 0;
+        return nullptr;
       }
 
     private:
