@@ -1,26 +1,383 @@
 <h1>Results</h1>
 
-<h3> Test case 1: </h3>
+The first time the code is run, an exception is thrown and nothing is actually
+computed. You'll get the following output:
+@code
+----------------------------------------------------
+Exception on processing: 
 
-For the default problem the value of u on Gamma is 1: this is like imposing a constant
-Dirichlet boundary on the portion of $\Omega$ inside gamma.
-<p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-60_1_no_grid.png" alt=""
-   style="width: 50%; height: 50%">
-</p>
-In this second image we can appreciate how, using GridTools::compute_point_locations ,
-we have been able to adaptively refine $\Omega$ exactly where the solution is varying
-the most:
+--------------------------------------------------------
+An error occurred in line <74> of file <../source/base/parameter_acceptor.cc> in function
+    static void dealii::ParameterAcceptor::initialize(const std::string &, const std::string &, const ParameterHandler::OutputStyle, dealii::ParameterHandler &)
+The violated condition was: 
+    false
+Additional information: 
+    You specified <parameters.prm> as input parameter file, but it does not exist. We created it for you.
+--------------------------------------------------------
 
-<p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-60_1_grid.png" alt=""
-   style="width: 50%; height: 50%">
-</p>
+Aborting!
+----------------------------------------------------
+@endcode
+
+By inspecting the parameter file, we see the following:
+
+@code
+# Listing of Parameters
+# ---------------------
+subsection Distributed Lagrange<1,2>
+  set Coupling quadrature order                    = 3
+  set Embedded configuration finite element degree = 1
+  set Embedded space finite element degree         = 1
+  set Embedding space finite element degree        = 1
+  set Homogeneous Dirichlet boundary ids           = 0, 1, 2, 3
+  set Initial embedded space refinement            = 7
+  set Initial embedding space refinement           = 4
+  set Local refinements steps near embedded domain = 3
+  set Use displacement in embedded interface       = false
+  set Verbosity level                              = 10
+
+
+  subsection Embedded configuration
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    # 
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  = R=.3, Cx=.4, Cy=.4                 # default: 
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    # 
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy # default: 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
+  subsection Embedded value
+    # Sometimes it is convenient to use symbolic constants in the expression
+    # that describes the function, rather than having to use its numeric value
+    # everywhere the constant appears. These values can be defined using this
+    # parameter, in the form `var1=value1, var2=value2, ...'.
+    # 
+    # A typical example would be to set this runtime parameter to
+    # `pi=3.1415926536' and then use `pi' in the expression of the actual
+    # formula. (That said, for convenience this class actually defines both
+    # `pi' and `Pi' by default, but you get the idea.)
+    set Function constants  = 
+
+    # The formula that denotes the function you want to evaluate for
+    # particular values of the independent variables. This expression may
+    # contain any of the usual operations such as addition or multiplication,
+    # as well as all of the common functions such as `sin' or `cos'. In
+    # addition, it may contain expressions like `if(x>0, 1, -1)' where the
+    # expression evaluates to the second argument if the first argument is
+    # true, and to the third argument otherwise. For a full overview of
+    # possible expressions accepted see the documentation of the muparser
+    # library at http://muparser.beltoforion.de/.
+    # 
+    # If the function you are describing represents a vector-valued function
+    # with multiple components, then separate the expressions for individual
+    # components by a semicolon.
+    set Function expression = 1     # default: 0
+
+    # The names of the variables as they will be used in the function,
+    # separated by commas. By default, the names of variables at which the
+    # function will be evaluated are `x' (in 1d), `x,y' (in 2d) or `x,y,z' (in
+    # 3d) for spatial coordinates and `t' for time. You can then use these
+    # variable names in your function expression and they will be replaced by
+    # the values of these variables at which the function is currently
+    # evaluated. However, you can also choose a different set of names for the
+    # independent variables at which to evaluate your function expression. For
+    # example, if you work in spherical coordinates, you may wish to set this
+    # input parameter to `r,phi,theta,t' and then use these variable names in
+    # your function expression.
+    set Variable names      = x,y,t
+  end
+
+  subsection Schur solver control
+    set Log frequency = 1
+    set Log history   = false
+    set Log result    = true
+    set Max steps     = 1000   # default: 100
+    set Reduction     = 1.e-12 # default: 1.e-2
+    set Tolerance     = 1.e-12 # default: 1.e-10
+  end
+
+end
+@endcode
+
+If you now run the program, you will get a file called `used_parameters.prm`,
+containing a shorter version of the above parameters (without comments and
+documentation), documenting all parameters that were used to run your program:
+@code
+# Parameter file generated with 
+# DEAL_II_PACKAGE_VERSION = 9.0.0-pre
+subsection Distributed Lagrange<1,2>
+  set Coupling quadrature order                    = 3
+  set Embedded configuration finite element degree = 1
+  set Embedded space finite element degree         = 1
+  set Embedding space finite element degree        = 1
+  set Homogeneous Dirichlet boundary ids           = 0, 1, 2, 3
+  set Initial embedded space refinement            = 7
+  set Initial embedding space refinement           = 4
+  set Local refinements steps near embedded domain = 3
+  set Use displacement in embedded interface       = false
+  set Verbosity level                              = 10
+  subsection Embedded configuration
+    set Function constants  = R=.3, Cx=.4, Cy=.4
+    set Function expression = R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy
+    set Variable names      = x,y,t
+  end
+  subsection Embedded value
+    set Function constants  = 
+    set Function expression = 1
+    set Variable names      = x,y,t
+  end
+  subsection Schur solver control
+    set Log frequency = 1
+    set Log history   = false
+    set Log result    = true
+    set Max steps     = 1000
+    set Reduction     = 1.e-12
+    set Tolerance     = 1.e-12
+  end
+end
+@endcode
+
+The rationale behind creating first `parameters.prm` file (the first time the
+program is run) and then a `used_parameters.prm` (every other times you run the
+program), is because you may want to leave most parameters to their default
+values, and only modify a handful of them.
+
+For example, you could use the following (perfectly valid) parameter file with
+this tutorial program:
+@code
+subsection Distributed Lagrange<1,2>
+  set Initial embedded space refinement            = 7
+  set Initial embedding space refinement           = 4
+  set Local refinements steps near embedded domain = 3
+  subsection Embedded configuration
+    set Function constants  = R=.3, Cx=.4, Cy=.4
+    set Function expression = R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy
+    set Variable names      = x,y,t
+  end
+  subsection Embedded value
+    set Function constants  =
+    set Function expression = 1
+    set Variable names      = x,y,t
+  end
+end
+@endcode
+
+and you would obtain exactly the same results as in test case 1 below.
+
+<h2> Test case 1: </h2>
+
+For the default problem the value of $u$ on Gamma is set to the constant $1$:
+this is like imposing a constant Dirichlet boundary condition on $\Gamma$, seen
+as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
+\Omega$ we have zero Dirichlet boundary conditions.
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_no_grid.png" alt="">
+    </td>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_grid.png" alt="">
+    </td>
+  </tr>
+</table>
+
+The output of the program will look like the following on your pc:
+
+@code
+DEAL::Embedded dofs: 129
+DEAL::Embedding minimal diameter: 0.0110485, embedded maximal diameter: 0.00781250, ratio: 0.707107
+DEAL::Embedding dofs: 2429
+DEAL:cg::Starting value 0.166266
+DEAL:cg::Convergence step 108 value 7.65958e-13
+
+
++---------------------------------------------+------------+------------+
+| Total CPU time elapsed since start          |     0.586s |            |
+|                                             |            |            |
+| Section                         | no. calls |  CPU time  | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble coupling system        |         1 |     0.132s |        23% |
+| Assemble system                 |         1 |    0.0733s |        12% |
+| Output results                  |         1 |     0.087s |        15% |
+| Setup coupling                  |         1 |    0.0244s |       4.2% |
+| Setup grids and dofs            |         1 |    0.0907s |        15% |
+| Solve system                    |         1 |     0.178s |        30% |
++---------------------------------+-----------+------------+------------+
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.301s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble coupling system        |         1 |    0.0385s |        13% |
+| Assemble system                 |         1 |    0.0131s |       4.3% |
+| Output results                  |         1 |    0.0736s |        24% |
+| Setup coupling                  |         1 |    0.0234s |       7.7% |
+| Setup grids and dofs            |         1 |    0.0679s |        23% |
+| Solve system                    |         1 |    0.0832s |        28% |
++---------------------------------+-----------+------------+------------+
+
+@endcode
+
+You may notice that, in terms of CPU time, assembling the coupling system is
+twice more expensive than assembling the standard Poisson system, even though
+the matrix is smaller. This is due to the non-matching nature of the
+discretization. Wether this is acceptable or not, depends on the applications.
+
+If the problem was set in a three-dimensional setting, and the immersed mesh was
+time dependent, it would be much more expensive to recreate the mesh at each
+step rather than use the technique we present here. Moreover, you may be able to
+create a very fast and optimized solver on a uniformly refined square or cubic
+grid, and embed the domain where you want to perform your computation using the
+technique presented here. This would require you to only have a surface
+representatio of your domain (a much cheaper and easier mesh to produce).
+
+To play around a little bit, we are going to complicate a little the ficticious
+domain as well as the boundary conditions we impose on it.
+
+<h2> Test case 2 and 3: </h2>
+
+If we use the following parameter file:
+@code
+subsection Distributed Lagrange<1,2>
+  set Coupling quadrature order                    = 3
+  set Embedded configuration finite element degree = 1
+  set Embedded space finite element degree         = 1
+  set Embedding space finite element degree        = 1
+  set Homogeneous Dirichlet boundary ids           = 0,1,2,3
+  set Initial embedded space refinement            = 8
+  set Initial embedding space refinement           = 4
+  set Local refinements steps near embedded domain = 4
+  set Use displacement in embedded interface       = false
+  set Verbosity level                              = 10
+  subsection Embedded configuration
+    set Function constants  = R=.3, Cx=.5, Cy=.5, r=.1, w=12
+    set Function expression = (R+r*cos(w*pi*x))*cos(2*pi*x)+Cx; (R+r*cos(w*pi*x))*sin(2*pi*x)+Cy
+    set Variable names      = x,y,t
+  end
+  subsection Embedded value
+    set Function constants  = 
+    set Function expression = x-.5
+    set Variable names      = x,y,t
+  end
+  subsection Schur solver control
+    set Log frequency = 1
+    set Log history   = false
+    set Log result    = true
+    set Max steps     = 100000
+    set Reduction     = 1.e-12
+    set Tolerance     = 1.e-12
+  end
+end
+@endcode
+
+we get a "flowery" looking domain, where we impose a linear boundary condition
+$g=x-.5$. This test shows that the method is actually quite accurate in
+recovering an exactly linear function from its boundary conditions, and even
+though the meshes are not aligned, we obtain a pretty good result.
+
+Replacing $x-.5$ with $2(x-.5)^2-2(y-.5)^2$, i.e., modifying the parameter file
+such that we have
+@code
+  ... 
+  subsection Embedded value
+    set Function constants  = 
+    set Function expression = 2*(x-.5)^2-2*(y-.5)^2
+    set Variable names      = x,y,t
+  end
+@endcode
+produce the saddle on the right.
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.3_grid.png" alt="">
+    </td>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.4_grid.png" alt="">
+    </td>
+  </tr>
+</table>
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
-Add something
+The `parameters.prm` file is a perfect tool to play with: we can easily impose a
+Neumann boundary, change the parametrization, the function values and the
+refinements.
+
+However, non aligned meshes are complex to handle, as you shall see after some
+changes. For example set the following parameters:
+
+@code
+subsection Distributed Lagrange<1,2>
+  set Homogeneous Dirichlet boundary ids           = 0, 1, 3
+  subsection Embedded configuration
+    set Function constants  = R=.2, Cx=.5, Cy=.4
+    set Function expression = R*sin(2*pi*x)+0.5*R*sin(4*pi*x)+Cx; 1.5*R*cos(2*pi*x)+Cy
+  end
+end
+@endcode
+
+Keeping the default refinement options you shall notice some glitch in the upper part
+of this hot air balloon shape. Why? What's the difference with the following?
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.2_no_grid.png" alt="">
+    </td>
+    <td ALIGN="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.2_grid.png" alt="">
+    </td>
+  </tr>
+</table>
+
+To solve this problem we need to improve the way in which adaptive refinement is
+performed. Currently the vector of support points contains the vertices of
+$\Gamma$, if the finite dimensional space for the configuration is of degree
+one: these are too far away to make $\Omega$ refine properly and simply
+increasing the refinements of $\Gamma$ will not be enough, the conjugate
+gradient won't converge.
+
+As you modify the code you shall notice that, for instance, with complex
+geometries there shall be other convergence problems: parameters are handy, but do
+not solve all problems!
 
 <h4> Parallel Code </h4>
 
@@ -33,14 +390,18 @@ parallel::distributed::Triangulation ).
 When using non-matching grids in parallel a problem arises:
 to compute the matrix $C$ a process needs information about both
 meshes on the same portion of real space but, when working with
-distributed meshes, this might not be the case.
+distributed meshes, this information may not be available.
+
 Various strategies can be implemented to tackle this problem:
 
 - distribute the two meshes so that this constraint is satisfied
-- use communication for the parts of real space where the constraint is
- not satisfied
-- make use of a shared triangulation and a distributed triangulation
 
-The latter strategy is clearly the easier to implement, as all
-the function used in this tutorial program can work letting $\Omega$
-be distributed and $\Gamma$ be a shared triangulation.
+- use communication for the parts of real space where the constraint is not
+  satisfied
+
+- use a shared triangulation for the embedding space, and a distributed
+  triangulation for the emdedded configuration
+
+The latter strategy is clearly the easiest to implement, as most of the
+functions used in this tutorial program will work unchanged also in the parallel
+case.
