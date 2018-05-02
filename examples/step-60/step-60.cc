@@ -13,7 +13,7 @@
  *
  * ---------------------------------------------------------------------
  *
- * Author: Luca Heltai, Giovanni Alzetta,
+ * Authors: Luca Heltai, Giovanni Alzetta,
  * International School for Advanced Studies, Trieste, 2018
  */
 
@@ -243,10 +243,12 @@ namespace Step60
       // $\Gamma$.
       unsigned int initial_embedded_refinement                  = 7;
 
-      // A list of boundary ids where we impose homogeneous Dirichlet boundary
+      // The list of boundary ids where we impose homogeneous Dirichlet boundary
       // conditions. On the remaining boundary ids (if any), we impose
-      // homogeneous Neumann boundary conditions
-      std::list<types::boundary_id> homogeneous_dirichlet_ids   {0};
+      // homogeneous Neumann boundary conditions.
+      // As a default problem we have zero Dirichlet boundary conditions on
+      // $\partial \Omega$
+      std::list<types::boundary_id> homogeneous_dirichlet_ids   {0,1,2,3};
 
       // FiniteElement degree of the embedding space: $V_h(\Omega)$
       unsigned int embedding_space_finite_element_degree        = 1;
@@ -648,7 +650,10 @@ namespace Step60
     // Initializing $\Omega$:
     // constructing the Triangulation and wrapping it into a unique_ptr
     space_grid = std_cxx14::make_unique<Triangulation<spacedim> >();
-    GridGenerator::hyper_cube(*space_grid);
+    // The last argument is set to true: this activates colorize, which
+    // we use to assign the Dirichlet and Neumann conditions. See
+    // GridGenerator::hyper_rectangle for the details on the ids used.
+    GridGenerator::hyper_cube(*space_grid,0,1,true);
     // Requesting the varius values to the parameters object, which is
     // of type DistributedLagrangeProblemParameters
     space_grid->refine_global(parameters.initial_refinement);
@@ -738,6 +743,9 @@ namespace Step60
       DoFTools::map_dofs_to_support_points(*embedded_mapping,
                                            *embedded_dh,
                                            support_points);
+
+    for (unsigned int i=1; i<embedded_dh->n_dofs(); ++i)
+      support_points.emplace_back((support_points[i-1]+support_points[i])/2);
 
     // Once we have the support points of the embedded finite element space, we
     // would like to identify what cells of the embedding space contain what
@@ -958,9 +966,6 @@ namespace Step60
     SparseDirectUMFPACK K_inv_umfpack;
     K_inv_umfpack.initialize(stiffness_matrix);
 
-    // Same thing, for the embedded space
-//    SparseDirectUMFPACK A_inv_umfpack;
-//    A_inv_umfpack.initialize(embedded_stiffness_matrix);
     // Initializing the operators, as described in the introduction
     auto K = linear_operator(stiffness_matrix);
     auto A = linear_operator(embedded_stiffness_matrix);
@@ -968,12 +973,11 @@ namespace Step60
     auto C = transpose_operator(Ct);
 
     auto K_inv = linear_operator(K, K_inv_umfpack);
-//    auto A_inv = linear_operator(A, A_inv_umfpack);
 
-    auto S = C*K_inv*Ct;
     // Using the Schur complement method
+    auto S = C*K_inv*Ct;
     SolverCG<Vector<double> > solver_cg(schur_solver_control);
-    auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity() );//A_inv);
+    auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity() );
 
     lambda = S_inv * embedded_rhs;
 

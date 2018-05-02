@@ -66,6 +66,10 @@ This is a constrained problem, where we are looking for a harmonic function
 $u$ that satisfies homogeneous boundary conditions on $\partial\Omega$, subject
 to the constraint $\gamma u = g$ using a Lagrange multiplier.
 
+As a first example we study the zero Dirichlet boundary condition on
+$\partial\Omega$. The same equations apply if we apply zero Neumann boundary
+conditions on $\partial\Omega$ or a mix of the two.
+
 The variational formulation can be derived by introducing two infinite
 dimensional spaces $V(\Omega)$ and $Q^*(\Gamma)$, respectively for the solution
 $u$ and for the Lagrange multiplier $\lambda$.
@@ -88,7 +92,7 @@ can be taken to be $H^1_0(\Omega)$. The space $Q(\Gamma)$, in the co-dimension
 zero case, should be taken as $H^1(\Gamma)$, while in the co-dimension one case
 should be taken as $H^{1/2}(\Gamma)$.
 
-The function $g$ should, therefore, should be either in $H^1(\Gamma)$ (for the
+The function $g$ should therefore be either in $H^1(\Gamma)$ (for the
 co-dimension zero case) or $H^{1/2}(\Gamma)$ (for the co-dimension one case).
 This leaves us with a Lagrange multiplier $\lambda$ in $Q^*(\Gamma)$, which is
 either $(H^1(\Gamma))^*$ or $H^{-1/2}(\Gamma)$.
@@ -183,17 +187,18 @@ C_{\alpha j} &:=& (v_j, q_\alpha)_\Gamma  &j=1,\dots,n, \alpha = 1,\dots, m \\\\
 G_{\alpha} &:=& (g, q_\alpha)_\Gamma & \alpha = 1,\dots, m.
 @f}
 
-While the matrix $K$ is the standard stiffness matrix for the Poisson problem
-on $\Omega$, and the vector $G$ is a standard right-hand-side vector for a
-finite element problem with forcing term $g$ on $\Gamma$, (see, for example,
-step-3), the matrix $C$ or its transpose $C^T$ are non-standard since they
-couple information on two non-matching grids.
+While the matrix $K$ is the standard stiffness matrix for the Poisson problem on
+$\Omega$, and the vector $G$ is a standard right-hand-side vector for a finite
+element problem with forcing term $g$ on $\Gamma$, (see, for example, step-3),
+the matrix $C$ or its transpose $C^T$ are non-standard since they couple
+information on two non-matching grids.
 
-In particular, the integral that appears in the computation of a single entry of $C$,
-is computed on $\Gamma$. As usual in finite elements, we split this integral on each
-cell of the triangulation used to discretize $\Gamma$, we tranform the integral on $K$ to
-an integral on the reference element $\hat K$, where $F_{K}$ is the corresponding
-shape function, and compute the integral there using a quadrature formula:
+In particular, the integral that appears in the computation of a single entry of
+$C$, is computed on $\Gamma$. As usual in finite elements, we split this
+integral on each cell of the triangulation used to discretize $\Gamma$, we
+tranform the integral on $K$ to an integral on the reference element $\hat K$,
+where $F_{K}$ is the mapping from $\hat K$ to $K$, and compute the integral
+on $\hat K$ using a quadrature formula:
 
 \f[
 C_{\alpha j} := (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
@@ -201,19 +206,48 @@ C_{\alpha j} := (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
 \sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
 
-Computing this sum is difficult because we have to evaluate $(v_j \circ F_{K}) (\hat x_i)$; this
-complicated process is illustrated in the following picture:
+Computing this sum is non-trivial because we have to evaluate $(v_j \circ F_{K})
+(\hat x_i)$. In general, if $\Gamma$ and $\Omega$ are not aligned, the point
+$F_{K}(\hat x_i)$ is completely arbitrary with respect to $\Omega$, and unless
+we figure out a way to interpolate all basis functions of $V_h(\Omega)$ on an
+arbitrary point on $\Omega$, we cannot compute the integral needed for an entry
+of the matrix $C$.
 
-<p align="center">
-  <img src="https://www.dealii.org/images/steps/developer/step-60_C_interpolation.png" alt="">
-</p>
+The process is described by the following algorithm (and by the picture below):
 
-This translates in the following algorithm:
-- Fix the cell $K$ in $\Gamma$ and compute the real point $y_i \coloneqq F_{K} (\hat x_i)$
+- For a given cell $K$ in $\Gamma$ compute the real point $y_i \coloneqq F_{K}
+(\hat x_i)$, where $x_i$ is one of the quadrature points used for the integral
+on $K \subseteq \Gamma$.
+
 - Find the cell of $\Omega$ in which $y_i$ lies, say it's $T$.
-- To evaluate the basis function use invert shape function $G_{T}$ on $T$:
- $v_j(y_i) = \hat v_j \circ G^{-1}_{T} (y_i)$.
 
-We solve the above saddle point problem by iterating over the Schur complement
-(which is described, for example, in step-20),
-and we construct such complement using LinearOperator classes.
+- To evaluate the basis function use the inverse of the mapping $G_T$ that
+transforms the reference element $\hat T$ into the element $T$: $v_j(y_i) = \hat
+v_j \circ G^{-1}_{T} (y_i)$.
+
+<p align="center"> <img
+  src="https://www.dealii.org/images/steps/developer/step-60_C_interpolation.png"
+  alt=""> </p>
+
+The three steps above can be computed by calling, in turn:
+
+- GridTools::find_active_cell_around_point, followed by
+
+- Mapping::tranform_real_to_unit_cell
+
+- construct a custom Quadrature formula, containing the point in the reference
+cell
+
+- construct an FEValues object, with the given quadrature formula, and initialized with the cell obtained in the first step.
+
+The deal.II library offers a convenient wrapper to perform the first three steps
+on a collection of points: GridTools::compute_point_locations. If one is
+actually interested in computing the full coupling matrix, then it is possible
+to call the method NonMatching::create_coupling_mass_matrix, that performs the
+above steps in an efficient way, reusing all possible data structures, and
+gathering expensive steps together. This is the function we'll be using later
+in this tutorial. 
+
+We solve the final saddle point problem by an iterative solver, applied to the
+Schur complement $S$ (whose construction is described, for example, in step-20), and
+we construct $S$ using LinearOperator classes.
