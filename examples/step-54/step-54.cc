@@ -282,12 +282,12 @@ namespace Step54
     switch (surface_projection_kind)
       {
       case NormalProjection:
+      {
         OpenCASCADE::NormalProjectionBoundary<2,3>
         normal_projector(bow_surface, tolerance);
-
         tria.set_manifold(1,normal_projector);
-
-        break;
+      }
+      break;
 
       // @p If surface_projection_kind value is @p DirectionalProjection, we select the
       // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points will
@@ -297,12 +297,12 @@ namespace Step54
       // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
       // the projection is done along the y-axis.
       case DirectionalProjection:
+      {
         OpenCASCADE::DirectionalProjectionBoundary<2,3>
         directional_projector(bow_surface, Point<3>(0.0,1.0,0.0), tolerance);
-
         tria.set_manifold(1,directional_projector);
-
-        break;
+      }
+      break;
 
       // As a third option, if @p surface_projection_kind value
       // is @p NormalToMeshProjection, we select the
@@ -314,12 +314,12 @@ namespace Step54
       // requires a shape (containing at least a face) and a
       // tolerance.
       case NormalToMeshProjection:
+      {
         OpenCASCADE::NormalToMeshProjectionBoundary<2,3>
         normal_to_mesh_projector(bow_surface, tolerance);
-
         tria.set_manifold(1,normal_to_mesh_projector);
-
-        break;
+      }
+      break;
 
       // Finally, we use good software cleanliness by ensuring that this
       // really covers all possible options of the @p case statement. If we
