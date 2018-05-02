@@ -130,7 +130,7 @@ MatrixFree<dim,Number>::get_dof_handler (const unsigned int dof_index) const
     }
   else
     {
-      Assert (false, ExcNotImplemented());
+      AssertThrow (false, ExcNotImplemented());
       // put pseudo return argument to avoid compiler error, but trigger a
       // segfault in case this is only run in optimized mode
       return *dof_handlers.dof_handler[numbers::invalid_unsigned_int];

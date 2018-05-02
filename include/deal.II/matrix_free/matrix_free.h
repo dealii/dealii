@@ -2729,7 +2729,7 @@ namespace internal
 
       if (vector_face_access == dealii::MatrixFree<dim,Number>::DataAccessOnFaces::unspecified ||
           vec.size() == 0)
-        const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).zero_out_ghosts();
+        vec.zero_out_ghosts();
       else
         {
 #ifdef DEAL_II_WITH_MPI
@@ -2738,7 +2738,7 @@ namespace internal
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part = get_partitioner(mf_component);
           if (&part == matrix_free.get_dof_info(mf_component).vector_partitioner.get())
-            const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec).zero_out_ghosts();
+            vec.zero_out_ghosts();
           else if (part.n_ghost_indices() > 0)
             {
               for (std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
@@ -3375,7 +3375,7 @@ namespace internal
     {}
 
     // Runs the cell work. If no function is given, nothing is done
-    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range)
+    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range) override
     {
       if (cell_function != nullptr && cell_range.second > cell_range.first)
         (container.*cell_function)(matrix_free, this->dst, this->src, cell_range);
@@ -3383,7 +3383,7 @@ namespace internal
 
     // Runs the assembler on interior faces. If no function is given, nothing
     // is done
-    virtual void face(const std::pair<unsigned int,unsigned int> &face_range)
+    virtual void face(const std::pair<unsigned int,unsigned int> &face_range) override
     {
       if (face_function != nullptr && face_range.second > face_range.first)
         (container.*face_function)(matrix_free, this->dst, this->src, face_range);
@@ -3391,7 +3391,7 @@ namespace internal
 
     // Runs the assembler on boundary faces. If no function is given, nothing
     // is done
-    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range)
+    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range) override
     {
       if (boundary_function != nullptr && face_range.second > face_range.first)
         (container.*boundary_function)(matrix_free, this->dst, this->src, face_range);
@@ -3403,27 +3403,27 @@ namespace internal
     // the problem that reading from a vector that we also write to is usually
     // not intended in case there is overlap, but this is up to the
     // application code to decide and we cannot catch this case here).
-    virtual void vector_update_ghosts_start()
+    virtual void vector_update_ghosts_start() override
     {
       if (!src_and_dst_are_same)
         internal::update_ghost_values_start(src, src_data_exchanger);
     }
 
     // Finishes the communication for the update ghost values operation
-    virtual void vector_update_ghosts_finish()
+    virtual void vector_update_ghosts_finish() override
     {
       if (!src_and_dst_are_same)
         internal::update_ghost_values_finish(src, src_data_exchanger);
     }
 
     // Starts the communication for the vector compress operation
-    virtual void vector_compress_start()
+    virtual void vector_compress_start() override
     {
       internal::compress_start(dst, dst_data_exchanger);
     }
 
     // Finishes the communication for the vector compress operation
-    virtual void vector_compress_finish()
+    virtual void vector_compress_finish() override
     {
       internal::compress_finish(dst, dst_data_exchanger);
       if (!src_and_dst_are_same)
@@ -3431,7 +3431,7 @@ namespace internal
     }
 
     // Zeros the given input vector
-    virtual void zero_dst_vector_range(const unsigned int range_index)
+    virtual void zero_dst_vector_range(const unsigned int range_index) override
     {
       if (zero_dst_vector_setting)
         internal::zero_vector_region(range_index, dst, dst_data_exchanger);

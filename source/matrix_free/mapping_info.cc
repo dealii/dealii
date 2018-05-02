@@ -25,5 +25,6 @@ DEAL_II_NAMESPACE_OPEN
 #include "mapping_info.inst"
 
 template struct internal::MatrixFreeFunctions::FPArrayComparator<double>;
+template struct internal::MatrixFreeFunctions::FPArrayComparator<float>;
 
 DEAL_II_NAMESPACE_CLOSE

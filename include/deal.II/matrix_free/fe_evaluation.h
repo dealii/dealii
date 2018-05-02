@@ -752,8 +752,8 @@ protected:
    * A unified function to read from and write into vectors based on the given
    * template operation for DG-type schemes where all degrees of freedom on
    * cells are contiguous. It can perform the operation for read_dof_values(),
-   * distribute_local_to_global(), and set_dof_values() for for several
-   * vectors at a time, depending on n_components.
+   * distribute_local_to_global(), and set_dof_values() for several vectors at
+   * a time, depending on n_components.
    */
   template <typename VectorType, typename VectorOperation>
   void
@@ -2056,7 +2056,7 @@ public:
   typedef FEEvaluationAccess<dim,n_components_,Number,false> BaseClass;
 
   /**
-   * A underlying number type specified as template argument.
+   * An underlying number type specified as template argument.
    */
   typedef Number                            number_type;
 
@@ -2224,7 +2224,7 @@ public:
   FEEvaluation &operator= (const FEEvaluation &other);
 
   /**
-   * Initializes the operation pointer to the current cell batch index. Unlike
+   * Initialize the operation pointer to the current cell batch index. Unlike
    * the reinit functions taking a cell iterator as argument below and the
    * FEValues::reinit() methods, where the information related to a particular
    * cell is generated in the reinit call, this function is very cheap since
@@ -2261,7 +2261,7 @@ public:
   void reinit (const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
-   * Evaluates the function values, the gradients, and the Hessians of the
+   * Evaluate the function values, the gradients, and the Hessians of the
    * polynomial interpolation from the DoF values in the input vector to the
    * quadrature points on the unit cell.  The function arguments specify which
    * parts shall actually be computed. This function has to be called first so
@@ -2274,7 +2274,7 @@ public:
                  const bool evaluate_hessians = false);
 
   /**
-   * Evaluates the function values, the gradients, and the Hessians of the
+   * Evaluate the function values, the gradients, and the Hessians of the
    * polynomial interpolation from the DoF values in the input array @p
    * values_array to the quadrature points on the unit cell. If multiple
    * components are involved in the current FEEvaluation object, the sorting
@@ -2291,7 +2291,7 @@ public:
                  const bool                     evaluate_hessians = false);
 
   /**
-   * Reads from the input vector and evaluates the function values, the
+   * Read from the input vector and evaluates the function values, the
    * gradients, and the Hessians of the polynomial interpolation of the vector
    * entries from @p input_vector associated with the current cell to the
    * quadrature points on the unit cell. The function arguments specify which
