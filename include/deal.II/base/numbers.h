@@ -47,7 +47,11 @@ DEAL_II_NAMESPACE_CLOSE
 // import the whole Sacado header at this point to get the math
 // functions imported into the standard namespace.
 #ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_CUDA
+#include <Sacado_No_Kokkos.hpp>
+#else
 #include <Sacado.hpp>
+#endif
 #endif
 
 namespace std

@@ -28,7 +28,12 @@
 
 #include "../tests.h"
 
+#ifdef DEAL_II_WITH_CUDA
+#include <Sacado_No_Kokkos.hpp>
+#else
 #include <Sacado.hpp>
+#endif
+
 #include <Sacado_trad.hpp>
 
 // The function to differentiate
