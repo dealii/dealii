@@ -24,8 +24,6 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/timer.h>
 
-#include <deal.II/base/parameter_acceptor.h>
-
 // The parameter acceptor class is the first novelty of this tutorial program:
 // in general parameter files are used to steer the execution of a program
 // at run time. While even a simple approach saves compiling time, as the same
@@ -61,6 +59,8 @@
 // In this example, we'll use both strategies, using ParameterAcceptorProxy for
 // deal.II classes, and deriving our own parameter classes directly from
 // ParameterAcceptor.
+
+#include <deal.II/base/parameter_acceptor.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -229,13 +229,14 @@ namespace Step60
       unsigned int initial_refinement                           = 4;
 
       // The interaction between the embedded grid $\Omega$ and the embedding
-      // grid $\Gamma$ is handled throught the computation of $C$, which
+      // grid $\Gamma$ is handled through the computation of $C$, which
       // involves all cells of $\Omega$ overlapping with parts of $\Gamma$:
-      // a higher refinement of such cells might improve the results quality.
+      // a higher refinement of such cells might improve quality of our
+      // computations.
       // For this reason we define `delta_refinement`: if it is greater
       // than zero, then we mark each cell of the space grid that contains
-      // a vertex of the embedded grid, execute the refinement, and repeat
-      // this process `delta_refinement` times.
+      // a vertex of the embedded grid and its neighbors, execute the
+      // refinement, and repeat this process `delta_refinement` times.
       unsigned int delta_refinement                             = 3;
 
       // Starting refinement of the embedded grid, corresponding to the domain
@@ -323,7 +324,7 @@ namespace Step60
     std::unique_ptr<DoFHandler<dim, spacedim> > embedded_configuration_dh;
     Vector<double> embedded_configuration;
 
-    // The ParameterAcceptorProxy class, is a "transparent" wrapper, derived
+    // The ParameterAcceptorProxy class is a "transparent" wrapper derived
     // from both ParameterAcceptor and the type passed as its template
     // parameter. At construction, the arguments are split into two parts: the
     // first argument is an std::string, forwarded to the ParameterAcceptor
@@ -588,7 +589,7 @@ namespace Step60
     // for the embedded_value_function to be the constant one, and specify some
     // sensible values for the SolverControl object.
     //
-    // It is fundamental for $\Gamma% to be embedded: from the definition of
+    // It is fundamental for $\Gamma$ to be embedded: from the definition of
     // $C_{\alpha j}$ is clear that, if $\Gamma \not\subseteq \Omega$, certain
     // rows of the matrix $C$ shall be zero. This would be a problem, as the Schur
     // complement method requires $C$ needs to have full column rank.
@@ -747,17 +748,17 @@ namespace Step60
     // space, until we find one that returns points in the unit reference cell,
     // or it can be done in a more intelligent way.
     //
-    // The GridTools::find_active_cell_around_point is a possible option, that
+    // The GridTools::find_active_cell_around_point is a possible option that
     // performs the above task in a cheaper way, by first identifying the
     // closest vertex of the embedding Triangulation to the target point, and
     // then by calling Mapping::tranform_real_to_unit_cell only for those cells
     // that share the found vertex.
     //
-    // In fact, there are algorithm in the GridTools namespace that exploit a
+    // In fact, there are algorithms in the GridTools namespace that exploit a
     // GridTools::Cache object, and possibly a KDTree object to speed up these
     // operations as much as possible.
     //
-    // The simplest way to exploit the maximum speed, is by calling a
+    // The simplest way to exploit the maximum speed is by calling a
     // specialized method, GridTools::compute_point_locations, that will store a
     // lot of useful information and data structures during the first point
     // search, and then reuse all of this for subsequent points.
@@ -770,7 +771,7 @@ namespace Step60
     // When we need to assemble a coupling matrix, however, we'll also need the
     // reference location of each point to evaluate the basis functions of the
     // embedding space. The other elements of the tuple returned by
-    // GridTools::compute_point_locations allows you to reconstruct, for each
+    // GridTools::compute_point_locations allow you to reconstruct, for each
     // point, what cell contains it, and what is the location in the reference
     // cell of the given point. Since this information is better grouped into
     // cells, then this is what the algorithm returns: a tuple, containing a
@@ -780,7 +781,8 @@ namespace Step60
     //
     // In the following loop, we will be ignoring all returned objects except
     // the first, identifying all cells contain at least one support point of
-    // the embedded space.
+    // the embedded space. This allows for a simple adaptive refinement strategy:
+    // refining these cells and their neighbors.
     //
     // Notice that we need to do some sanity checks, in the sense that we want
     // to have an embedding grid which is well refined around the embedded grid,
@@ -800,7 +802,15 @@ namespace Step60
                                      support_points);
         const auto &cells = std::get<0>(point_locations);
         for (auto cell : cells)
-          cell->set_refine_flag();
+          {
+            cell->set_refine_flag();
+            for (unsigned int face_no=0; face_no<GeometryInfo<spacedim>::faces_per_cell; ++face_no)
+              if (! cell->face(face_no)->at_boundary())
+                {
+                  auto neighbor = cell->neighbor(face_no);
+                  neighbor->set_refine_flag();
+                }
+          }
         space_grid->execute_coarsening_and_refinement();
         embedding_space_minimal_diameter = GridTools::minimal_cell_diameter(*space_grid);
         AssertThrow(embedded_space_maximal_diameter < embedding_space_minimal_diameter,
@@ -949,8 +959,8 @@ namespace Step60
     K_inv_umfpack.initialize(stiffness_matrix);
 
     // Same thing, for the embedded space
-    SparseDirectUMFPACK A_inv_umfpack;
-    A_inv_umfpack.initialize(embedded_stiffness_matrix);
+//    SparseDirectUMFPACK A_inv_umfpack;
+//    A_inv_umfpack.initialize(embedded_stiffness_matrix);
     // Initializing the operators, as described in the introduction
     auto K = linear_operator(stiffness_matrix);
     auto A = linear_operator(embedded_stiffness_matrix);
@@ -958,12 +968,12 @@ namespace Step60
     auto C = transpose_operator(Ct);
 
     auto K_inv = linear_operator(K, K_inv_umfpack);
-    auto A_inv = linear_operator(A, A_inv_umfpack);
+//    auto A_inv = linear_operator(A, A_inv_umfpack);
 
     auto S = C*K_inv*Ct;
     // Using the Schur complement method
     SolverCG<Vector<double> > solver_cg(schur_solver_control);
-    auto S_inv = inverse_operator(S, solver_cg, A_inv);
+    auto S_inv = inverse_operator(S, solver_cg, PreconditionIdentity() );//A_inv);
 
     lambda = S_inv * embedded_rhs;
 
@@ -1018,7 +1028,7 @@ int main()
 
       const unsigned int dim=1, spacedim=2;
 
-      // Differently to what happens in other tutorial programs, here we the the
+      // Differently to what happens in other tutorial programs, here we the
       // ParameterAcceptor style of initialization, i.e., all objects are first
       // constructed, and then a single call to the static method
       // ParameterAcceptor::initialize is issued to fill all parameters of the

@@ -3,15 +3,12 @@
 <h3> Test case 1: </h3>
 
 For the default problem the value of u on Gamma is 1 and on $\partial\Omega$
-is 0. This means we expect the following solution:
-
-
-
+is 0. In fact this is the solution:
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
-<h4> Different Parameters</h4>
+Add something
 
 <h4> Parallel Code </h4>
 
@@ -33,5 +30,5 @@ Various strategies can be implemented to tackle this problem:
 - make use of a shared triangulation and a distributed triangulation
 
 The latter strategy is clearly the easier to implement, as all
-the function used in this tutorial program can work lettin $\Omega$
+the function used in this tutorial program can work letting $\Omega$
 be distributed and $\Gamma$ be a shared triangulation.
