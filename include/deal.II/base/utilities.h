@@ -436,7 +436,8 @@ namespace Utilities
    * function below.
    *
    * If the library has been compiled with ZLIB enabled, then the output buffer
-   * is compressed.
+   * can be compressed. This can be triggered with the parameter
+   * @p allow_compression, and is only of effect if ZLIB is enabled.
    *
    * If many consecutive calls with the same buffer are considered, it is
    * recommended for reasons of performance to ensure that its capacity is
@@ -445,7 +446,9 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  size_t pack (const T &object, std::vector<char> &dest_buffer);
+  size_t pack (const T &object,
+               std::vector<char> &dest_buffer,
+               const bool allow_compression = true);
 
   /**
    * Creates and returns a buffer solely for the given object, using the
@@ -491,11 +494,16 @@ namespace Utilities
    * Same unpack function as above, but takes constant iterators on
    * (a fraction of) a given packed buffer of type std::vector<char> instead.
    *
+   * The @p allow_compression parameter denotes if the buffer to
+   * read from could have been previously compressed with ZLIB, and
+   * is only of effect if ZLIB is enabled.
+   *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  T unpack (const std::vector<char>::iterator &begin,
-            const std::vector<char>::iterator &end);
+  T unpack (const std::vector<char>::const_iterator &cbegin,
+            const std::vector<char>::const_iterator &cend,
+            const bool allow_compression = true);
 
   /**
    * Given a vector of characters, obtained through a call to the function
@@ -535,12 +543,17 @@ namespace Utilities
    * Same unpack function as above, but takes constant iterators on
    * (a fraction of) a given packed buffer of type std::vector<char> instead.
    *
+   * The @p allow_compression parameter denotes if the buffer to
+   * read from could have been previously compressed with ZLIB, and
+   * is only of effect if ZLIB is enabled.
+   *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
-  void unpack (const std::vector<char>::iterator &begin,
-               const std::vector<char>::iterator &end,
-               T (&unpacked_object)[N]);
+  void unpack (const std::vector<char>::const_iterator &cbegin,
+               const std::vector<char>::const_iterator &cend,
+               T (&unpacked_object)[N],
+               const bool allow_compression = true);
 
   /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
@@ -1000,7 +1013,9 @@ namespace Utilities
 // --------------------- non-inline functions
 
   template <typename T>
-  size_t pack (const T &object, std::vector<char> &dest_buffer)
+  size_t pack (const T &object,
+               std::vector<char> &dest_buffer,
+               const bool allow_compression)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1030,27 +1045,31 @@ namespace Utilities
         // use buffer as the target of a compressing
         // stream into which we serialize the current object
         const size_t previous_size = dest_buffer.size();
-        {
 #ifdef DEAL_II_WITH_ZLIB
-          boost::iostreams::filtering_ostream out;
-          out.push(boost::iostreams::gzip_compressor
-                   (boost::iostreams::gzip_params
-                    (boost::iostreams::gzip::best_compression)));
-          out.push(boost::iostreams::back_inserter(dest_buffer));
+        if (allow_compression)
+          {
+            boost::iostreams::filtering_ostream out;
+            out.push(boost::iostreams::gzip_compressor
+                     (boost::iostreams::gzip_params
+                      (boost::iostreams::gzip::best_compression)));
+            out.push(boost::iostreams::back_inserter(dest_buffer));
 
-          boost::archive::binary_oarchive archive(out);
-          archive << object;
-          out.flush();
-#else
-          std::ostringstream out;
-          boost::archive::binary_oarchive archive(out);
-          archive << object;
-
-          const std::string &s = out.str();
-          dest_buffer.reserve (dest_buffer.size() + s.size());
-          std::move (s.begin(), s.end(), std::back_inserter(dest_buffer));
+            boost::archive::binary_oarchive archive(out);
+            archive << object;
+            out.flush();
+          }
+        else
 #endif
-        }
+          {
+            std::ostringstream out;
+            boost::archive::binary_oarchive archive(out);
+            archive << object;
+
+            const std::string &s = out.str();
+            dest_buffer.reserve (dest_buffer.size() + s.size());
+            std::move (s.begin(), s.end(), std::back_inserter(dest_buffer));
+          }
+
         return (dest_buffer.size() - previous_size);
       }
   }
@@ -1067,7 +1086,8 @@ namespace Utilities
 
   template <typename T>
   T unpack (const std::vector<char>::const_iterator &cbegin,
-            const std::vector<char>::const_iterator &cend)
+            const std::vector<char>::const_iterator &cend,
+            const bool allow_compression)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1096,16 +1116,19 @@ namespace Utilities
         T object;
 
         // first decompress the buffer
-        {
 #ifdef DEAL_II_WITH_ZLIB
-          boost::iostreams::filtering_ostream decompressing_stream;
-          decompressing_stream.push(boost::iostreams::gzip_decompressor());
-          decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-          decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
-#else
-          decompressed_buffer.assign (cbegin, cend);
+        if (allow_compression)
+          {
+            boost::iostreams::filtering_ostream decompressing_stream;
+            decompressing_stream.push(boost::iostreams::gzip_decompressor());
+            decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+            decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
+          }
+        else
 #endif
-        }
+          {
+            decompressed_buffer.assign (cbegin, cend);
+          }
 
         // then restore the object from the buffer
         std::istringstream in(decompressed_buffer);
@@ -1127,7 +1150,8 @@ namespace Utilities
   template <typename T, int N>
   void unpack (const std::vector<char>::const_iterator &cbegin,
                const std::vector<char>::const_iterator &cend,
-               T (&unpacked_object)[N])
+               T (&unpacked_object)[N],
+               const bool allow_compression)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1153,16 +1177,19 @@ namespace Utilities
         std::string decompressed_buffer;
 
         // first decompress the buffer
-        {
 #ifdef DEAL_II_WITH_ZLIB
-          boost::iostreams::filtering_ostream decompressing_stream;
-          decompressing_stream.push(boost::iostreams::gzip_decompressor());
-          decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-          decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
-#else
-          decompressed_buffer.assign (cbegin, cend);
+        if (allow_compression)
+          {
+            boost::iostreams::filtering_ostream decompressing_stream;
+            decompressing_stream.push(boost::iostreams::gzip_decompressor());
+            decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+            decompressing_stream.write (&*cbegin, std::distance(cbegin, cend));
+          }
+        else
 #endif
-        }
+          {
+            decompressed_buffer.assign (cbegin, cend);
+          }
 
         // then restore the object from the buffer
         std::istringstream in(decompressed_buffer);
