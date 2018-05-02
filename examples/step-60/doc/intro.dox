@@ -201,6 +201,19 @@ C_{\alpha j} := (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
 \sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
 
+Computing this sum is difficult because we have to evaluate $(v_j \circ F_{K}) (\hat x_i)$; this
+complicated process is illustrated in the following picture:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-60_C_interpolation.png" alt="">
+</p>
+
+This translates in the following algorithm:
+- Fix the cell $K$ in $\Gamma$ and compute the real point $y_i \coloneqq F_{K} (\hat x_i)$
+- Find the cell of $\Omega$ in which $y_i$ lies, say it's $T$.
+- To evaluate the basis function use invert shape function $G_{T}$ on $T$:
+ $v_j(y_i) = \hat v_j \circ G^{-1}_{T} (y_i)$.
+
 We solve the above saddle point problem by iterating over the Schur complement
 (which is described, for example, in step-20),
 and we construct such complement using LinearOperator classes.

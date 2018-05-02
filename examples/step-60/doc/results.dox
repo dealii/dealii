@@ -2,8 +2,20 @@
 
 <h3> Test case 1: </h3>
 
-For the default problem the value of u on Gamma is 1 and on $\partial\Omega$
-is 0. In fact this is the solution:
+For the default problem the value of u on Gamma is 1: this is like imposing a constant
+Dirichlet boundary on the portion of $\Omega$ inside gamma.
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-60_1_no_grid.png" alt=""
+   style="width: 50%; height: 50%">
+</p>
+In this second image we can appreciate how, using GridTools::compute_point_locations ,
+we have been able to adaptively refine $\Omega$ exactly where the solution is varying
+the most:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-60_1_grid.png" alt=""
+   style="width: 50%; height: 50%">
+</p>
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
