@@ -70,17 +70,18 @@ void test()
 
   QGauss<dim> quad(3); // Quadrature for coupling
 
+  ConstraintMatrix constraints;
 
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
     NonMatching::create_coupling_sparsity_pattern(space_dh, dh,
-                                                  quad, dsp, space_mask);
+                                                  quad, dsp, constraints, space_mask);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
   NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling,
-                                           ConstraintMatrix(), space_mask);
+                                           constraints, space_mask);
 
   SparsityPattern mass_sparsity;
   {

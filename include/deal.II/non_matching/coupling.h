@@ -19,6 +19,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/quadrature.h>
 
+#include <deal.II/grid/grid_tools_cache.h>
+
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe.h>
@@ -89,14 +91,34 @@ namespace NonMatching
                                         const DoFHandler<dim1, spacedim> &immersed_dh,
                                         const Quadrature<dim1>           &quad,
                                         Sparsity                         &sparsity,
+                                        const ConstraintMatrix           &constraints = ConstraintMatrix(),
                                         const ComponentMask              &space_comps = ComponentMask(),
                                         const ComponentMask              &immersed_comps = ComponentMask(),
                                         const Mapping<dim0, spacedim>    &space_mapping = StaticMappingQ1<dim0,spacedim>::mapping,
                                         const Mapping<dim1, spacedim>    &immersed_mapping = StaticMappingQ1<dim1, spacedim>::mapping);
 
   /**
-   * Create a coupling mass matrix for non-matching, overlapping grids.
+   * Same as above, but takes an additional GridTools::Cache object, instead of
+   * creating one internally. In this version of the function, the parameter @p
+   * space_mapping cannot be specified, since it is taken from the @p cache
+   * parameter.
    *
+   * @author Luca Heltai, 2018
+   */
+  template<int dim0, int dim1, int spacedim, typename Sparsity>
+  void create_coupling_sparsity_pattern(const GridTools::Cache<dim0, spacedim> &cache,
+                                        const DoFHandler<dim0, spacedim> &space_dh,
+                                        const DoFHandler<dim1, spacedim> &immersed_dh,
+                                        const Quadrature<dim1>           &quad,
+                                        Sparsity                         &sparsity,
+                                        const ConstraintMatrix           &constraints = ConstraintMatrix(),
+                                        const ComponentMask              &space_comps = ComponentMask(),
+                                        const ComponentMask              &immersed_comps = ComponentMask(),
+                                        const Mapping<dim1, spacedim>    &immersed_mapping = StaticMappingQ1<dim1, spacedim>::mapping);
+
+
+  /**
+   * Create a coupling mass matrix for non-matching, overlapping grids.
    *
    * Given two non-matching triangulations, representing the domains $\Omega$
    * and $B$, with $B \subseteq \Omega$, and two finite element spaces
@@ -124,7 +146,7 @@ namespace NonMatching
    *
    * If the domain $B$ does not fall within $\Omega$, an exception will be
    * thrown by the algorithm that computes the quadrature point locations. In
-   * particular, notice that this function only makes sens for `dim1` lower or
+   * particular, notice that this function only makes sense for `dim1` lower or
    * equal than `dim0`. A static assert guards that this is actually the case.
    *
    * For both spaces, it is possible to specify a custom Mapping, which
@@ -147,6 +169,25 @@ namespace NonMatching
                                    const ComponentMask              &immersed_comps = ComponentMask(),
                                    const Mapping<dim0, spacedim>    &space_mapping = StaticMappingQ1<dim0,spacedim>::mapping,
                                    const Mapping<dim1, spacedim>    &immersed_mapping = StaticMappingQ1<dim1, spacedim>::mapping);
+
+  /**
+   * Same as above, but takes an additional GridTools::Cache object, instead of
+   * creating one internally. In this version of the function, the parameter @p
+   * space_mapping cannot specified, since it is taken from the @p cache
+   * parameter.
+   *
+   * @author Luca Heltai, 2018
+   */
+  template<int dim0, int dim1, int spacedim, typename Matrix>
+  void create_coupling_mass_matrix(const GridTools::Cache<dim0, spacedim> &cache,
+                                   const DoFHandler<dim0, spacedim>       &space_dh,
+                                   const DoFHandler<dim1, spacedim>       &immersed_dh,
+                                   const Quadrature<dim1>                 &quad,
+                                   Matrix                                 &matrix,
+                                   const ConstraintMatrix                 &constraints = ConstraintMatrix(),
+                                   const ComponentMask                    &space_comps = ComponentMask(),
+                                   const ComponentMask                    &immersed_comps = ComponentMask(),
+                                   const Mapping<dim1, spacedim>          &immersed_mapping = StaticMappingQ1<dim1, spacedim>::mapping);
 }
 DEAL_II_NAMESPACE_CLOSE
 
