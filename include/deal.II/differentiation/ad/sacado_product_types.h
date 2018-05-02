@@ -23,7 +23,11 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
+#ifdef DEAL_II_WITH_CUDA
+#include <Sacado_No_Kokkos.hpp>
+#else
 #include <Sacado.hpp>
+#endif
 // It appears that some versions of Trilinos do not directly or indirectly
 // include all the headers for all forward and reverse Sacado AD types.
 // So we directly include these both here as a precaution.

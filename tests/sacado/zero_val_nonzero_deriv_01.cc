@@ -29,7 +29,11 @@
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/differentiation/ad.h>
+#ifdef DEAL_II_WITH_CUDA
+#include <Sacado_No_Kokkos.hpp>
+#else
 #include <Sacado.hpp>
+#endif
 
 int main()
 {
