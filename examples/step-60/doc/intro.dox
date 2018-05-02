@@ -63,7 +63,7 @@ u & = & 0 & \text{ on } \partial\Omega.
 @f}
 
 This is a constrained problem, where we are looking for a harmonic function
-$u$, that satisfies homogeneous boundary conditions on $\partial\Omega$, subject
+$u$ that satisfies homogeneous boundary conditions on $\partial\Omega$, subject
 to the constraint $\gamma u = g$ using a Lagrange multiplier.
 
 The variational formulation can be derived by introducing two infinite
@@ -80,21 +80,21 @@ Given a sufficiently regular function $g$ on $\Gamma$, find the solution $u$ to
 (\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} &  \forall q \in Q(\Gamma),
 @f}
 
-where $(\cdot, \cdot)_{\Omega}$ (respectively $(\cdot, \cdot)_{\Gamma}$)
-represent the $L^2$ scalar product in $\Omega$ (respectively in $\Gamma$).
+where $(\cdot, \cdot){\Omega}$ and $(\cdot, \cdot){\Gamma}$ represent,
+respectively, $L^2$ scalar products in $\Omega$ and in $\Gamma$.
 
 Inspection of the variational formulation tells us that the space $V(\Omega)$
 can be taken to be $H^1_0(\Omega)$. The space $Q(\Gamma)$, in the co-dimension
 zero case, should be taken as $H^1(\Gamma)$, while in the co-dimension one case
 should be taken as $H^{1/2}(\Gamma)$.
 
-The function $g$, therefore, should be either in $H^1(\Gamma)$ (for the
+The function $g$ should, therefore, should be either in $H^1(\Gamma)$ (for the
 co-dimension zero case) or $H^{1/2}(\Gamma)$ (for the co-dimension one case).
 This leaves us with a Lagrange multiplier $\lambda$ in $Q^*(\Gamma)$, which is
 either $(H^1(\Gamma))^*$ or $H^{-1/2}(\Gamma)$.
 
-There are two options for the discretisation of the problem above. One could choose
-matching discretisations, where the Triangulation for $\Gamma$ is aligned with the
+There are two options for the discretization of the problem above. One could choose
+matching discretizations, where the Triangulation for $\Gamma$ is aligned with the
 Triangulation for $\Omega$, or one could choose to discretize the two domains in
 a completely independent way.
 
@@ -102,10 +102,10 @@ While the first option is clearly more indicated for the simple problem we
 proposed above, if the domain $\Gamma$ was to be time dependent, then the
 second option could be a more viable solution.
 
-The technique we describe here is indicated in the literature with many names:
+The technique we describe here is presented in the literature using one of many names:
 the **immersed finite element method**, the **fictitious boundary method**, the
 **distributed Lagrange multiplier method**, and others. The main principle is
-that the discretisation of the two grids and of the two finite element spaces
+that the discretization of the two grids and of the two finite element spaces
 are kept completely independent. This technique is particularly efficient for
 the simulation of fluid-structure interaction problems, where the configuration
 of the embedded structure is part of the problem itself, and one solves a
@@ -119,30 +119,31 @@ configuration of the embedded domain is given in one of two possible ways:
 
 - as a deformation mapping $\psi: \Gamma_0 \mapsto \Gamma \subseteq \Omega$,
 defined on a continuous finite dimensional space on $\Gamma_0$ and representing,
-for any point $x \in \Gamma_0$ its coordinate $\psi(x)$ in $\Omega$;
+for any point $x \in \Gamma_0$, its coordinate $\psi(x)$ in $\Omega$;
 
 - as a displacement mapping $\delta \psi(x) = \psi(x)-x$ for $x\in \Gamma_0$,
-representing for any point $x$ the displacement vector to apply in order to
+representing for any point $x$ the displacement vector applied in order to
 deform $x$ to its actual configuration $\psi(x) = x +\delta\psi(x)$.
 
 We define the embedded reference domain $\Gamma_0$ `embedded_grid`, and on
 this domain, we construct a finite dimensional space (`embedded_configuration_dh`)
-to describe either the deformation or the displacement, through a FiniteElement
+to describe either the deformation or the displacement through a FiniteElement
 system of FE_Q objects (`embedded_configuration_fe`). This finite dimensional
 space is used only to interpolate a user supplied function
 (`embedded_configuration_function`) representing either $\psi$ (if the
-parameter `use_displacement` is set to false) or $\delta\psi$ (if the parameter
-`use_displacement` is set to true).
+parameter `use_displacement` is set to @p false) or $\delta\psi$ (if the
+parameter `use_displacement` is set to @p true).
 
 The Lagrange multiplier $\lambda$ and the user supplied function $g$ are
 defined through another finite dimensional space `embedded_dh`, and through
 another FiniteElement `embedded_fe`, using the same reference domain. In
-order to take into account the deformation of the domain, a MappingFEField or a
-MappingQEulerian object are initialized with the `embedded_configuration` vector.
+order to take into account the deformation of the domain, either a MappingFEField
+or a MappingQEulerian object are initialized with the `embedded_configuration`
+vector.
 
 In the embedding space, a standard finite dimensional space `space_dh` is
 constructed on the embedding grid `space_grid` (`space_dh`), using the
-FiniteElement `space_fe`, following almost verbatim what was done in step-6.
+FiniteElement `space_fe`, following almost verbatim the approach taken in step-6.
 
 We represent the discretizations of the spaces $V$ and $Q$ with
 \f[
@@ -178,7 +179,7 @@ where
 
 @f{eqnarray*}
 K_{ij} &:=& (\nabla v_j, \nabla v_i)_\Omega   & i,j=1,\dots,n \\
-C_{\alpha j} &:=& (v_j, \nabla q_\alpha)_\Gamma  &j=1,\dots,n, \alpha = 1,\dots, m \\\\
+C_{\alpha j} &:=& (v_j, q_\alpha)_\Gamma  &j=1,\dots,n, \alpha = 1,\dots, m \\\\
 G_{\alpha} &:=& (g, q_\alpha)_\Gamma & \alpha = 1,\dots, m.
 @f}
 
@@ -188,14 +189,14 @@ finite element problem with forcing term $g$ on $\Gamma$, (see, for example,
 step-3), the matrix $C$ or its transpose $C^T$ are non-standard since they
 couple information on two non-matching grids.
 
-In particular, the integral that appear in the computation of a single entry of $C$,
+In particular, the integral that appears in the computation of a single entry of $C$,
 is computed on $\Gamma$. As usual in finite elements, we split this integral on each
 cell of the triangulation used to discretize $\Gamma$, we tranform the integral on $K$ to
 an integral on the reference element $\hat K$, where $F_{K}$ is the corresponding
 shape function, and compute the integral there using a quadrature formula:
 
 \f[
-C_{\alpha j} := (v_j, \nabla q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
+C_{\alpha j} := (v_j, q_\alpha)_\Gamma  = \sum_{K\in \Gamma} \int_{\hat K}
 \hat q_\alpha(\hat x) (v_j \circ F_{K}) (\hat x) J_K (\hat x) \mathrm{d} \hat x =
 \sum_{K\in \Gamma} \sum_{i=1}^{n_q}  \big(\hat q_\alpha(\hat x_i)  (v_j \circ F_{K}) (\hat x_i) J_K (\hat x_i) w_i \big)
 \f]
