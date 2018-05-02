@@ -1640,7 +1640,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 #else
   const unsigned int dim=2;
   const unsigned int spacedim=2;
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
   //
@@ -1877,7 +1877,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 #else
   const unsigned int dim=3;
   const unsigned int spacedim=3;
-  Assert (tria != 0, ExcNoTriangulationSelected());
+  Assert (tria != nullptr, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
 

@@ -150,7 +150,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   AssertIndexRange (macro_cell_number, task_info.cell_partition_data.back());
   AssertIndexRange (vector_number, n_components_filled(macro_cell_number));
 
-  const DoFHandler<dim> *dofh = 0;
+  const DoFHandler<dim> *dofh = nullptr;
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
     {
       AssertDimension (dof_handlers.dof_handler.size(),

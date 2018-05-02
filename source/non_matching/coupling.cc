@@ -58,7 +58,7 @@ namespace NonMatching
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
     Assert((dynamic_cast<const parallel::distributed::Triangulation<dim1,spacedim> *>
-            (&immersed_dh.get_triangulation()) == 0), ExcNotImplemented());
+            (&immersed_dh.get_triangulation()) == nullptr), ExcNotImplemented());
 
     const auto &space_fe = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -158,7 +158,7 @@ namespace NonMatching
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
     Assert((dynamic_cast<const parallel::distributed::Triangulation<dim1,spacedim>*>
-            (&immersed_dh.get_triangulation()) == 0), ExcNotImplemented());
+            (&immersed_dh.get_triangulation()) == nullptr), ExcNotImplemented());
 
     const auto &space_fe = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();

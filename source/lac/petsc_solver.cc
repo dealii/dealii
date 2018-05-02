@@ -697,7 +697,7 @@ namespace PETScWrappers
     /**
      * creating a solver object if this is necessary
      */
-    if (solver_data.get() == 0)
+    if (solver_data == nullptr)
       {
         solver_data = std_cxx14::make_unique<SolverDataMUMPS >();
 
