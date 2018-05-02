@@ -558,12 +558,6 @@ namespace
                                      void *)
                                 > > &pack_callbacks)
   {
-    typedef std::list<std::pair<unsigned int, typename std::function<
-    void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
-         typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
-         void *)
-    > > > callback_list_t;
-
     int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                                &p4est_cell,
                                internal::p4est::functions<dim>::quadrant_compare);
