@@ -872,12 +872,12 @@ namespace parallel
 
         /**
          * List of callback functions registered by register_data_attach() that
-         * are going to be called for packing data. The key of this map
-         * variable is the offset at which each callback is allowed to
-         * write into the per-cell buffer (counted in bytes) whereas the
-         * value of the map is the callback function object.
+         * are going to be called for packing data. The callback functions objects
+         * will be stored together with their offset at which each callback is
+         * allowed to write into the per-cell buffer (counted in bytes). These
+         * pairs will be stored in the order on how they have been registered.
          */
-        std::map<unsigned int, pack_callback_t> pack_callbacks;
+        std::vector< std::pair<unsigned int, pack_callback_t> > pack_callbacks;
       };
 
       CellAttachedData cell_attached_data;

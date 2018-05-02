@@ -125,9 +125,9 @@ void test()
             }
         }
 
-      unsigned int offset = tr.register_data_attach(sizeof(int), pack_function<dim>);
+      unsigned int handle = tr.register_data_attach(sizeof(int), pack_function<dim>);
 
-      deallog << "offset=" << offset << std::endl;
+      deallog << "handle=" << handle << std::endl;
       tr.execute_coarsening_and_refinement();
 
       deallog << "cells after: " << tr.n_global_active_cells() << std::endl;
@@ -141,7 +141,7 @@ void test()
       deallog << "myid=" << myid << " cellid=" << cell->id() << std::endl;
       }*/
 
-      tr.notify_ready_to_unpack(offset, unpack_function<dim>);
+      tr.notify_ready_to_unpack(handle, unpack_function<dim>);
 
       const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "

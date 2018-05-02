@@ -426,9 +426,10 @@ namespace Particles
     /**
      * This variable is set by the register_store_callback_function()
      * function and used by the register_load_callback_function() function
-     * to check where the particle data was stored.
+     * to check where the particle data was registered in the corresponding
+     * triangulation object.
      */
-    unsigned int data_offset;
+    unsigned int handle;
 
 #ifdef DEAL_II_WITH_MPI
     /**

@@ -438,10 +438,10 @@ namespace parallel
       FullMatrix<double> matrix_quadrature;
 
       /**
-       * The offset that the parallel::distributed::Triangulation has assigned
-       * to this object starting at which we are allowed to read.
+       * The handle that the parallel::distributed::Triangulation has assigned
+       * to this object while registering the pack_callback function.
        */
-      unsigned int offset;
+      unsigned int handle;
 
       /**
        * A pointer to the CellDataStorage class whose data will be transferred.
@@ -674,7 +674,7 @@ namespace parallel
       n_q_points(rhs_quadrature.size()),
       project_to_fe_matrix(projection_fe->dofs_per_cell,n_q_points),
       project_to_qp_matrix(n_q_points,projection_fe->dofs_per_cell),
-      offset(0),
+      handle(numbers::invalid_unsigned_int),
       data_storage(nullptr),
       triangulation(nullptr)
     {
@@ -732,7 +732,7 @@ namespace parallel
       matrix_quadrature.reinit(n_q_points,number_of_values);
       data_size_in_bytes = sizeof(double) * dofs_per_cell * number_of_values;
 
-      offset = triangulation->register_data_attach(data_size_in_bytes,
+      handle = triangulation->register_data_attach(data_size_in_bytes,
                                                    std::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::pack_function,
                                                              this,
                                                              std::placeholders::_1,
@@ -745,7 +745,7 @@ namespace parallel
     template <int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::interpolate ()
     {
-      triangulation->notify_ready_to_unpack(offset,
+      triangulation->notify_ready_to_unpack(handle,
                                             std::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::unpack_function,
                                                       this,
                                                       std::placeholders::_1,

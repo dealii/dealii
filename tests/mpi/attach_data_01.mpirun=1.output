@@ -16,7 +16,7 @@ DEAL:0::myid=0 cellid=3_1:0 coarsening
 DEAL:0::myid=0 cellid=3_1:1 coarsening
 DEAL:0::myid=0 cellid=3_1:2 coarsening
 DEAL:0::myid=0 cellid=3_1:3 coarsening
-DEAL:0::offset=4
+DEAL:0::handle=0
 DEAL:0::packing cell 0_1:0 with data=0 status=REFINE
 DEAL:0::packing cell 0_1:1 with data=1 status=PERSIST
 DEAL:0::packing cell 0_1:2 with data=2 status=PERSIST

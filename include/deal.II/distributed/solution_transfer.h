@@ -233,10 +233,10 @@ namespace parallel
       std::vector<const VectorType *> input_vectors;
 
       /**
-       * The offset that the Triangulation has assigned to this object
-       * starting at which we are allowed to write.
+       * The handle that the Triangulation has assigned to this object
+       * with which we can access our memory offset and our pack function.
        */
-      unsigned int offset;
+      unsigned int handle;
 
       /**
        * A callback function used to pack the data on the current mesh into
