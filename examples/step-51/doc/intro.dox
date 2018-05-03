@@ -43,8 +43,8 @@ order system, and each field is then discretized via a DG method.  At this
 point, the  single-valued "trace" values on the skeleton of the
 mesh, i.e. element faces, are taken to be independent unknown quantities.
 This yields unknowns in the discrete formulation that fall into two categories:
-- Face unknowns that only couple with the unknowns from both sides of the face;
-- Cell unknowns that only couple with each other and the other unknowns
+- Face unknowns that only couple with the cell unknowns from both sides of the face;
+- Cell unknowns that only couple with the cell and face unknowns
   defined within the same cell. Crucially, no cell interior degree of freedom
   on one cell ever couples to any interior cell degree of freedom of a
   different cell.
