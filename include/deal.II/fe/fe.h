@@ -1333,14 +1333,37 @@ public:
   //@}
 
   /**
-   * Comparison operator. We also check for equality of the name returned by
-   * get_name() and for equality of the constraint matrix, which is quite an
-   * expensive operation.  Do therefore use this function with care, if
-   * possible only for debugging purposes.
+   * Comparison operator.
    *
-   * We do not compare the matrix arrays #restriction and #prolongation.
+   * The implementation in the current class checks for equality of the
+   * following pieces of information between the current object and the one
+   * given as argument, in this order:
+   * - the dynamic type (i.e., the type of the most derived class) of the
+   *   current object and of the given object,
+   * - the name returned by get_name(),
+   * - as all of the fields in FiniteElementData,
+   * - constraint matrices.
+   *
+   * This covers most cases where elements can differ, but there are
+   * cases of derived elements that are different and for which the
+   * current function still returns @p true. For these cases, derived
+   * classes should overload this function.
+   *
+   * @note This operator specifically does not check the following
+   *   member variables of the current class:
+   *   - restriction matrices,
+   *   - prolongation matrices of this object and the argument.
+   *  This is because these member variables may be initialized only
+   *  on demand by derived classes, rather than being available immediately.
+   *  Consequently, comparing these members would not only be costly because
+   *  these are generall big arrays, but also because their computation may
+   *  be expensive. On the other hand, derived classes for which these
+   *  arrays may differ for two objects even though the above list compares
+   *  as equal, will probably want to implement their own operator==()
+   *  anyway.
    */
-  bool operator == (const FiniteElement<dim,spacedim> &) const;
+  virtual
+  bool operator == (const FiniteElement<dim,spacedim> &fe) const;
 
   /**
    * Non-equality comparison operator. Defined in terms of the equality comparison operator.
