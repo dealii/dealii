@@ -792,18 +792,8 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Range, Domain, Payload>
 identity_operator(const LinearOperator<Range, Domain, Payload> &op)
 {
-  const LinearOperator<Range, Domain, Payload> id_op
-    = identity_operator<Range,Payload>(op.reinit_range_vector);
-  LinearOperator<Range, Domain, Payload> return_op (
-    op.identity_payload()
-  );
-
-  return_op.reinit_range_vector = id_op.reinit_range_vector;
-  return_op.reinit_domain_vector = id_op.reinit_domain_vector;
-  return_op.vmult = id_op.vmult;
-  return_op.vmult_add = id_op.vmult_add;
-  return_op.Tvmult = id_op.Tvmult;
-  return_op.Tvmult_add = id_op.Tvmult_add;
+  auto return_op = identity_operator<Range, Payload>(op.reinit_range_vector);
+  static_cast<Payload &>(return_op) = op.identity_payload();
 
   return return_op;
 }
@@ -846,6 +836,74 @@ null_operator(const LinearOperator<Range, Domain, Payload> &op)
 
   return_op.Tvmult_add = [](Domain &, const Range &)
   {};
+
+  return return_op;
+}
+
+
+/**
+ * @relatesalso LinearOperator
+ *
+ * Return a LinearOperator that acts as a mean value filter. The vmult()
+ * functions of this matrix subtract the mean values of the vector.
+ *
+ * The function takes an <code>std::function</code> object @p reinit_vector as
+ * an argument to initialize the <code>reinit_range_vector</code> and
+ * <code>reinit_domain_vector</code> objects of the LinearOperator object.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
+LinearOperator<Range, Range, Payload>
+mean_value_filter(const std::function<void(Range &, bool)> &reinit_vector)
+{
+  LinearOperator<Range, Range, Payload> return_op ((Payload()));
+
+  return_op.reinit_range_vector = reinit_vector;
+  return_op.reinit_domain_vector = reinit_vector;
+
+  return_op.vmult = [](Range &v, const Range &u)
+  {
+    const auto mean = u.mean_value();
+
+    v = u;
+    v.add(-mean);
+  };
+
+  return_op.vmult_add = [](Range &v, const Range &u)
+  {
+    const auto mean = u.mean_value();
+
+    v += u;
+    v.add(-mean);
+  };
+
+  return_op.Tvmult = return_op.vmult_add;
+  return_op.Tvmult_add = return_op.vmult_add;
+
+  return return_op;
+}
+
+
+/**
+ * @relatesalso LinearOperator
+ *
+ * Return a LinearOperator that acts as a mean value filter. The vmult()
+ * functions of this matrix subtract the mean values of the vector.
+ *
+ * The function takes a LinearOperator @p op and uses its range initializer
+ * to create an mean value filter operator. The function also ensures that
+ * the underlying Payload matches that of the input @p op.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+mean_value_filter(const LinearOperator<Range, Domain, Payload> &op)
+{
+  auto return_op = mean_value_filter<Range, Payload>(op.reinit_range_vector);
+  static_cast<Payload &>(return_op) = op.identity_payload();
 
   return return_op;
 }
