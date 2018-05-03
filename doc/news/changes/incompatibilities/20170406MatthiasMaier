@@ -4,6 +4,7 @@ new LinearOperator concept:
   <li>BlockDiagonalMatrix
   <li>InverseMatrixRichardson
   <li>IterativeInverse
+  <li>MeanValueFilter
   <li>ProductMatrix
   <li>ProductSparseMatrix
   <li>ScaledMatrix
@@ -15,4 +16,4 @@ new LinearOperator concept:
 Use the LinearOperator class instead, see the module on
 @ref LAOperators "linear operators" for more details.
 <br>
-(Matthias Maier, 2017/04/06 - 2017/07/03)
+(Matthias Maier, 2017/04/06 - 2018/05/03)
