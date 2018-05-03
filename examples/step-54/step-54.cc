@@ -258,17 +258,14 @@ namespace Step54
     // point that lies on the wire and splits it into two equal arcs
     // lying between the edge vertices. We first check
     // that the wires vector contains at least one element and then
-    // create a boundary object for it. (The object is marked as
-    // @p static to ensure that it survives past the end of the
-    // current function, as we want to attach it to the triangulation
-    // object for later use).
+    // create a Manifold object for it.
     //
     // Once the projector is created, we then assign it to all the parts of
     // the triangulation with manifold_id = 2:
     Assert(wires.size() > 0,
            ExcMessage("I could not find any wire in the CAD file you gave me. Bailing out."));
 
-    static OpenCASCADE::ArclengthProjectionLineManifold<2,3>
+    OpenCASCADE::ArclengthProjectionLineManifold<2,3>
     line_projector (wires[0], tolerance);
 
     tria.set_manifold(2, line_projector);
@@ -285,12 +282,12 @@ namespace Step54
     switch (surface_projection_kind)
       {
       case NormalProjection:
-        static OpenCASCADE::NormalProjectionBoundary<2,3>
+      {
+        OpenCASCADE::NormalProjectionBoundary<2,3>
         normal_projector(bow_surface, tolerance);
-
         tria.set_manifold(1,normal_projector);
-
-        break;
+      }
+      break;
 
       // @p If surface_projection_kind value is @p DirectionalProjection, we select the
       // OpenCASCADE::DirectionalProjectionBoundary class. The new mesh points will
@@ -300,12 +297,12 @@ namespace Step54
       // OpenCASCADE::DirectionalProjectionBoundary constructor. In this case,
       // the projection is done along the y-axis.
       case DirectionalProjection:
-        static OpenCASCADE::DirectionalProjectionBoundary<2,3>
+      {
+        OpenCASCADE::DirectionalProjectionBoundary<2,3>
         directional_projector(bow_surface, Point<3>(0.0,1.0,0.0), tolerance);
-
         tria.set_manifold(1,directional_projector);
-
-        break;
+      }
+      break;
 
       // As a third option, if @p surface_projection_kind value
       // is @p NormalToMeshProjection, we select the
@@ -317,12 +314,12 @@ namespace Step54
       // requires a shape (containing at least a face) and a
       // tolerance.
       case NormalToMeshProjection:
-        static OpenCASCADE::NormalToMeshProjectionBoundary<2,3>
+      {
+        OpenCASCADE::NormalToMeshProjectionBoundary<2,3>
         normal_to_mesh_projector(bow_surface, tolerance);
-
         tria.set_manifold(1,normal_to_mesh_projector);
-
-        break;
+      }
+      break;
 
       // Finally, we use good software cleanliness by ensuring that this
       // really covers all possible options of the @p case statement. If we
