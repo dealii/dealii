@@ -45,9 +45,13 @@ template <typename number> class SparseMatrix;
  * 1n {\mathbf v} \cdot {\mathbf 1}_n\right]{\mathbf 1}_n$ subtracts from every
  * vector element the mean value of all elements.
  *
+ * @deprecated Use a LinearOperator, or a BlockLinearOperator instead. you
+ * can construct such a filter by using mean_value_filter, or
+ * block_diagonal_operator (with a mean_value_filter block), respectively.
+ *
  * @author Guido Kanschat, 2002, 2003
  */
-class MeanValueFilter : public Subscriptor
+class DEAL_II_DEPRECATED MeanValueFilter : public Subscriptor
 {
 public:
   /**
