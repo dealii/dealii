@@ -792,18 +792,8 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Range, Domain, Payload>
 identity_operator(const LinearOperator<Range, Domain, Payload> &op)
 {
-  const LinearOperator<Range, Domain, Payload> id_op
-    = identity_operator<Range,Payload>(op.reinit_range_vector);
-  LinearOperator<Range, Domain, Payload> return_op (
-    op.identity_payload()
-  );
-
-  return_op.reinit_range_vector = id_op.reinit_range_vector;
-  return_op.reinit_domain_vector = id_op.reinit_domain_vector;
-  return_op.vmult = id_op.vmult;
-  return_op.vmult_add = id_op.vmult_add;
-  return_op.Tvmult = id_op.Tvmult;
-  return_op.Tvmult_add = id_op.Tvmult_add;
+  auto return_op = identity_operator<Range, Payload>(op.reinit_range_vector);
+  static_cast<Payload &>(return_op) = op.identity_payload();
 
   return return_op;
 }
