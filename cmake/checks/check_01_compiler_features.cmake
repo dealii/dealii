@@ -302,7 +302,7 @@ ENDIF()
 # GCC and some other compilers have an attribute of the form
 # __attribute__((deprecated)) that can be used to make the
 # compiler warn whenever a deprecated function is used. C++14
-# provides a standardized attribute of the form [[deprecated]
+# provides a standardized attribute of the form [[deprecated]]
 # with the exact same functionality.
 # See if one of these attribute is available.
 #
@@ -350,10 +350,10 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
   )
 
-IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
-  SET(DEAL_II_DEPRECATED "[[deprecated]]")
-ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
+ELSEIF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
+  SET(DEAL_II_DEPRECATED "[[deprecated]]")
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
@@ -447,4 +447,3 @@ RESET_CMAKE_REQUIRED()
 IF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
   ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
 ENDIF()
-
