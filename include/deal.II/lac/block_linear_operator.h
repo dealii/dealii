@@ -356,6 +356,16 @@ namespace internal
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
+        // Bug: We need a mechanism similar to
+        // "apply_with_intermediate_storage" for LinearOperator to do the
+        // matrix vector multiplication correctly. Currently, if u and v
+        // are equal, the first vmult will garble up the ith block and
+        // subsequent multiplications are wrong.
+        Assert(!PointerComparison::equal(&v, &u),
+               ExcMessage("BlockLinearOperator::vmult currently requires that "
+                          "source and destination vectors are different memory "
+                          "locations"));
+
         for (unsigned int i = 0; i < m; ++i)
           {
             op.block(i, 0).vmult(v.block(i), u.block(0));
@@ -371,6 +381,16 @@ namespace internal
         Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
         Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
 
+        // Bug: We need a mechanism similar to
+        // "apply_with_intermediate_storage" for LinearOperator to do the
+        // matrix vector multiplication correctly. Currently, if u and v
+        // are equal, the first vmult will garble up the ith block and
+        // subsequent multiplications are wrong.
+        Assert(!PointerComparison::equal(&v, &u),
+               ExcMessage("BlockLinearOperator::vmult_add currently requires that "
+                          "source and destination vectors are different memory "
+                          "locations"));
+
         for (unsigned int i = 0; i < m; ++i)
           for (unsigned int j = 0; j < n; ++j)
             op.block(i, j).vmult_add(v.block(i), u.block(j));
@@ -382,6 +402,16 @@ namespace internal
         const unsigned int m = op.n_block_rows();
         Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
         Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+        // Bug: We need a mechanism similar to
+        // "apply_with_intermediate_storage" for LinearOperator to do the
+        // matrix vector multiplication correctly. Currently, if u and v
+        // are equal, the first vmult will garble up the ith block and
+        // subsequent multiplications are wrong.
+        Assert(!PointerComparison::equal(&v, &u),
+               ExcMessage("BlockLinearOperator::Tvmult currently requires that "
+                          "source and destination vectors are different memory "
+                          "locations"));
 
         for (unsigned int i = 0; i < n; ++i)
           {
@@ -397,6 +427,16 @@ namespace internal
         const unsigned int m = op.n_block_rows();
         Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
         Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+
+        // Bug: We need a mechanism similar to
+        // "apply_with_intermediate_storage" for LinearOperator to do the
+        // matrix vector multiplication correctly. Currently, if u and v
+        // are equal, the first vmult will garble up the ith block and
+        // subsequent multiplications are wrong.
+        Assert(!PointerComparison::equal(&v, &u),
+               ExcMessage("BlockLinearOperator::Tvmult_add currently requires that "
+                          "source and destination vectors are different memory "
+                          "locations"));
 
         for (unsigned int i = 0; i < n; ++i)
           for (unsigned int j = 0; j < m; ++j)
