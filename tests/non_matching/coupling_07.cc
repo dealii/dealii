@@ -19,7 +19,6 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -33,8 +32,9 @@
 using namespace dealii;
 
 // Test that a coupling matrix can be constructed for each pair of dimension and
-// immersed dimension, with a non trivial component selection in the space_dh,
-// and check that constants are projected correctly.
+// immersed dimension, and check that constants are projected correctly.
+//
+// Even when locally refined grids are used.
 
 template<int dim, int spacedim>
 void test()
@@ -49,12 +49,12 @@ void test()
   GridGenerator::hyper_cube(space_tria,-1,1);
 
   tria.refine_global(1);
-  space_tria.refine_global(2);
+  space_tria.refine_global(1);
+  space_tria.begin_active()->set_refine_flag();
+  space_tria.execute_coarsening_and_refinement();
 
   FE_Q<dim,spacedim> fe(1);
-  FESystem<spacedim,spacedim> space_fe(FE_Q<spacedim,spacedim>(1), spacedim+1);
-  ComponentMask space_mask(spacedim+1, false);
-  space_mask.set(spacedim, true);
+  FE_Q<spacedim,spacedim> space_fe(1);
 
   deallog << "FE      : " << fe.get_name() << std::endl
           << "Space FE: " << space_fe.get_name() << std::endl;
@@ -65,23 +65,28 @@ void test()
   dh.distribute_dofs(fe);
   space_dh.distribute_dofs(space_fe);
 
+  ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints(space_dh, constraints);
+
+  constraints.close();
+
   deallog << "Dofs      : " << dh.n_dofs() << std::endl
-          << "Space dofs: " << space_dh.n_dofs() << std::endl;
+          << "Space dofs: " << space_dh.n_dofs() << std::endl
+          << "Constrained dofs: " << constraints.n_constraints() << std::endl;
 
   QGauss<dim> quad(3); // Quadrature for coupling
 
-  ConstraintMatrix constraints;
 
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
     NonMatching::create_coupling_sparsity_pattern(space_dh, dh,
-                                                  quad, dsp, constraints, space_mask);
+                                                  quad, dsp, constraints);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad, coupling,
-                                           constraints, space_mask);
+  NonMatching::create_coupling_mass_matrix(space_dh, dh, quad,
+                                           coupling, constraints);
 
   SparsityPattern mass_sparsity;
   {

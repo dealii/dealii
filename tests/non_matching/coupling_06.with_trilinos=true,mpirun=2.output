@@ -1,0 +1,83 @@
+
+DEAL:0::dim: 1, spacedim: 2
+DEAL:0::FE      : FE_Q<1,2>(2)
+DEAL:0::Space FE: FE_Q<2>(2)
+DEAL:0::Dofs      : 17
+DEAL:0::Space dofs: 289
+DEAL:0::Local dofs      : 9
+DEAL:0::Local space dofs: 153
+DEAL:0::Convergence step 9 value 4.51115e-14
+DEAL:0::Squares norm    : 0.275853
+DEAL:0::Error on squares: 1.07673e-12
+DEAL:0::dim: 2, spacedim: 2
+DEAL:0::FE      : FE_Q<2>(2)
+DEAL:0::Space FE: FE_Q<2>(2)
+DEAL:0::Dofs      : 289
+DEAL:0::Space dofs: 289
+DEAL:0::Local dofs      : 153
+DEAL:0::Local space dofs: 153
+DEAL:0::Convergence step 12 value 2.66570e-13
+DEAL:0::Squares norm    : 1.98578
+DEAL:0::Error on squares: 4.16199e-10
+DEAL:0::dim: 2, spacedim: 3
+DEAL:0::FE      : FE_Q<2,3>(2)
+DEAL:0::Space FE: FE_Q<3>(2)
+DEAL:0::Dofs      : 289
+DEAL:0::Space dofs: 4913
+DEAL:0::Local dofs      : 153
+DEAL:0::Local space dofs: 2601
+DEAL:0::Convergence step 12 value 2.66570e-13
+DEAL:0::Squares norm    : 1.98578
+DEAL:0::Error on squares: 4.16199e-10
+DEAL:0::dim: 3, spacedim: 3
+DEAL:0::FE      : FE_Q<3>(2)
+DEAL:0::Space FE: FE_Q<3>(2)
+DEAL:0::Dofs      : 4913
+DEAL:0::Space dofs: 4913
+DEAL:0::Local dofs      : 2601
+DEAL:0::Local space dofs: 2601
+DEAL:0::Convergence step 12 value 6.65914e-13
+DEAL:0::Squares norm    : 11.6248
+DEAL:0::Error on squares: 4.61425e-08
+
+DEAL:1::dim: 1, spacedim: 2
+DEAL:1::FE      : FE_Q<1,2>(2)
+DEAL:1::Space FE: FE_Q<2>(2)
+DEAL:1::Dofs      : 17
+DEAL:1::Space dofs: 289
+DEAL:1::Local dofs      : 8
+DEAL:1::Local space dofs: 136
+DEAL:1::Convergence step 9 value 4.51115e-14
+DEAL:1::Squares norm    : 0.275853
+DEAL:1::Error on squares: 1.07673e-12
+DEAL:1::dim: 2, spacedim: 2
+DEAL:1::FE      : FE_Q<2>(2)
+DEAL:1::Space FE: FE_Q<2>(2)
+DEAL:1::Dofs      : 289
+DEAL:1::Space dofs: 289
+DEAL:1::Local dofs      : 136
+DEAL:1::Local space dofs: 136
+DEAL:1::Convergence step 12 value 2.66570e-13
+DEAL:1::Squares norm    : 1.98578
+DEAL:1::Error on squares: 4.16199e-10
+DEAL:1::dim: 2, spacedim: 3
+DEAL:1::FE      : FE_Q<2,3>(2)
+DEAL:1::Space FE: FE_Q<3>(2)
+DEAL:1::Dofs      : 289
+DEAL:1::Space dofs: 4913
+DEAL:1::Local dofs      : 136
+DEAL:1::Local space dofs: 2312
+DEAL:1::Convergence step 12 value 2.66570e-13
+DEAL:1::Squares norm    : 1.98578
+DEAL:1::Error on squares: 4.16199e-10
+DEAL:1::dim: 3, spacedim: 3
+DEAL:1::FE      : FE_Q<3>(2)
+DEAL:1::Space FE: FE_Q<3>(2)
+DEAL:1::Dofs      : 4913
+DEAL:1::Space dofs: 4913
+DEAL:1::Local dofs      : 2312
+DEAL:1::Local space dofs: 2312
+DEAL:1::Convergence step 12 value 6.65914e-13
+DEAL:1::Squares norm    : 11.6248
+DEAL:1::Error on squares: 4.61425e-08
+

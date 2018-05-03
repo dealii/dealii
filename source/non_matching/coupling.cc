@@ -49,10 +49,31 @@ namespace NonMatching
                                         const DoFHandler<dim1, spacedim> &immersed_dh,
                                         const Quadrature<dim1>           &quad,
                                         Sparsity                         &sparsity,
+                                        const ConstraintMatrix           &constraints,
                                         const ComponentMask              &space_comps,
                                         const ComponentMask              &immersed_comps,
                                         const Mapping<dim0, spacedim>    &space_mapping,
                                         const Mapping<dim1, spacedim>    &immersed_mapping)
+  {
+    GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
+    create_coupling_sparsity_pattern(cache, space_dh, immersed_dh,
+                                     quad, sparsity, constraints,
+                                     space_comps, immersed_comps,
+                                     immersed_mapping);
+  }
+
+
+
+  template<int dim0, int dim1, int spacedim, typename Sparsity>
+  void create_coupling_sparsity_pattern(const GridTools::Cache<dim0,spacedim> &cache,
+                                        const DoFHandler<dim0, spacedim>      &space_dh,
+                                        const DoFHandler<dim1, spacedim>      &immersed_dh,
+                                        const Quadrature<dim1>                &quad,
+                                        Sparsity                              &sparsity,
+                                        const ConstraintMatrix                &constraints,
+                                        const ComponentMask                   &space_comps,
+                                        const ComponentMask                   &immersed_comps,
+                                        const Mapping<dim1, spacedim>         &immersed_mapping)
   {
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
@@ -74,8 +95,6 @@ namespace NonMatching
 
     FEValues<dim1,spacedim> fe_v(immersed_mapping, immersed_fe, quad,
                                  update_quadrature_points);
-
-    GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
 
     // Take care of components
     const ComponentMask space_c
@@ -102,6 +121,25 @@ namespace NonMatching
       if (immersed_c[i])
         immersed_gtl[i] = j++;
 
+    // [TODO]: when the add_entries_local_to_global below will implement
+    // the version with the dof_mask, this should be uncommented.
+    //
+    // // Construct a dof_mask, used to distribute entries to the sparsity
+    // able< 2, bool > dof_mask(space_fe.dofs_per_cell,
+    //                          immersed_fe.dofs_per_cell);
+    // of_mask.fill(false);
+    // or (unsigned int i=0; i<space_fe.dofs_per_cell; ++i)
+    //  {
+    //    const auto comp_i = space_fe.system_to_component_index(i).first;
+    //    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
+    //      for (unsigned int j=0; j<immersed_fe.dofs_per_cell; ++j)
+    //        {
+    //          const auto comp_j = immersed_fe.system_to_component_index(j).first;
+    //          if (immersed_gtl[comp_j] == space_gtl[comp_i])
+    //            dof_mask(i,j) = true;
+    //        }
+    //  }
+
     for (; cell != endc; ++cell)
       {
         // Reinitialize the cell and the fe_values
@@ -123,19 +161,10 @@ namespace NonMatching
             if (ocell->is_locally_owned())
               {
                 ocell->get_dof_indices(odofs);
-                for (unsigned int i=0; i<odofs.size(); ++i)
-                  {
-                    const auto comp_i = space_fe.system_to_component_index(i).first;
-                    if (space_gtl[comp_i] != numbers::invalid_unsigned_int)
-                      {
-                        for (unsigned int j=0; j<dofs.size(); ++j)
-                          {
-                            const auto comp_j = immersed_fe.system_to_component_index(j).first;
-                            if (immersed_gtl[comp_j] == space_gtl[comp_i])
-                              sparsity.add(odofs[i],dofs[j]);
-                          }
-                      }
-                  }
+                // [TODO]: When the following function will be implemented
+                // for the case of non-trivial dof_mask, we should
+                // uncomment the missing part.
+                constraints.add_entries_local_to_global(odofs, dofs, sparsity); //, true, dof_mask);
               }
           }
       }
@@ -154,6 +183,25 @@ namespace NonMatching
                                    const Mapping<dim0, spacedim>    &space_mapping,
                                    const Mapping<dim1, spacedim>    &immersed_mapping)
   {
+    GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
+    create_coupling_mass_matrix(cache, space_dh, immersed_dh,
+                                quad, matrix, constraints, space_comps, immersed_comps,
+                                immersed_mapping);
+  }
+
+
+
+  template<int dim0, int dim1, int spacedim, typename Matrix>
+  void create_coupling_mass_matrix(const GridTools::Cache<dim0, spacedim> &cache,
+                                   const DoFHandler<dim0, spacedim>       &space_dh,
+                                   const DoFHandler<dim1, spacedim>       &immersed_dh,
+                                   const Quadrature<dim1>                 &quad,
+                                   Matrix                                 &matrix,
+                                   const ConstraintMatrix                 &constraints,
+                                   const ComponentMask                    &space_comps,
+                                   const ComponentMask                    &immersed_comps,
+                                   const Mapping<dim1, spacedim>          &immersed_mapping)
+  {
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
@@ -166,8 +214,6 @@ namespace NonMatching
     // Dof indices
     std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
     std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
-
-    GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
 
     // Take care of components
     const ComponentMask space_c
@@ -232,7 +278,7 @@ namespace NonMatching
                 const std::vector< Point<dim0> > &qps = qpoints[c];
                 const std::vector< unsigned int > &ids = maps[c];
 
-                FEValues<dim0,spacedim> o_fe_v(space_mapping, space_dh.get_fe(), qps,
+                FEValues<dim0,spacedim> o_fe_v(cache.get_mapping(), space_dh.get_fe(), qps,
                                                update_values);
                 o_fe_v.reinit(ocell);
                 ocell->get_dof_indices(odofs);
