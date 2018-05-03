@@ -25,17 +25,17 @@
 #include <deal.II/base/timer.h>
 
 // The parameter acceptor class is the first novelty of this tutorial program:
-// in general parameter files are used to steer the execution of a program
-// at run time. While even a simple approach saves compiling time, as the same
+// in general parameter files are used to steer the execution of a program at
+// run time. While even a simple approach saves compile time, as the same
 // executable can be run with different parameter settings, it can become
 // difficult to handle hundreds of parameters simultaneously while maintaining
 // compatibility between different programs. This is where the class
-// ParameterAcceptor proves useful.
+// Parame terAcceptor proves useful.
 //
 // This class is used to define a public interface for classes that want to use
 // a single global ParameterHandler to handle parameters. The class provides a
 // static ParameterHandler member, namely ParameterAcceptor::prm, and
-// implements the "Command design patter" (see, for example, E. Gamma, R. Helm,
+// implements the "Command design pattern" (see, for example, E. Gamma, R. Helm,
 // R. Johnson, J. Vlissides, Design Patterns: Elements of Reusable
 // Object-Oriented Software, Addison-Wesley Professional, 1994.
 // https://goo.gl/FNYByc).
@@ -44,8 +44,8 @@
 // object of a class derived from ParameterAcceptor is constructed, a pointer
 // to that object-of-derived-type is registered, together with a section entry
 // in the parameter file. Such registry is traversed upon invocation of the
-// single function ParameterAcceptor::initialize(file.prm) which in turn makes
-// sure that all classes stored in the global register declare the parameters
+// single function ParameterAcceptor::initialize("file.prm") which in turn makes
+// sure that all classes stored in the global registry declare the parameters
 // they will be using, and after having declared them, it reads the content of
 // `file.prm` to parse the actual parameters.
 //
@@ -59,32 +59,37 @@
 // In this example, we'll use both strategies, using ParameterAcceptorProxy for
 // deal.II classes, and deriving our own parameter classes directly from
 // ParameterAcceptor.
-
 #include <deal.II/base/parameter_acceptor.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <deal.II/grid/grid_tools_cache.h>
-
 // The other new include file is the one that contains the GridTools::Cache
 // class. The structure of deal.II, as many modern numerical libraries, is
 // organized following a Directed Acyclic Graph (DAG). A DAG is a directed graph
 // with topological ordering: each node structurally represents an object, and
-// one or more directed edges represent how it can be used to generate new
-// objects. This has several advantages, but intrinsically creates “asymmetries”
-// as certain operations are fast unlike their inverse. For example, in deal.II
-// finding the vertices of a cell has very low computational cost, while finding
-// all the cells that share a vertex requires a non-trivial computation unless a
-// new data structure is added.
+// is connected to child nodes by one (or more) oriented edges, from the parent
+// to the child. The most significative example of this structure is the
+// Triangulation and its Triangulation::cell_iterator structure. From a
+// Triangulation (the main node), we can access each cell (children nodes of the
+// triangulation). From the cells themselves we can access over all vertices of
+// the cell. In this simple example, the DAG structure can be represented as
+// thre node types (the triangulation, the cell iterator, and the vertex)
+// connected by oriented edges from the triangulation to the cell iterators, and
+// from the cell iterator to the vertices. This has several advantages, but it
+// intrinsically creates “asymmetries”, making certain operations fast and their
+// inverse very slow: finding the vertices of a cell has low computational cost,
+// and can be done by simply traversing the DAG, while finding all the cells
+// that share a vertex requires a non-trivial computation unless a new DAG data
+// structure is added that represents the inverse search.
 //
 // Since inverse operations are usually not needed in a finite element code,
 // these are implemented in GridTools without the use of extra data structures
 // related to the Triangulation which would make them much faster. One such data
 // structure, for example, is a map from the vertices of a Triangulation to all
 // cells that share those vertices, which would reduce the computations needed
-// to answer to the previous example.
+// to answer to the previous question.
 //
 // Some methods, for example GridTools::find_active_cell_around_point, make
 // heavy usage of these non-standard operations. If you need to call these
@@ -93,18 +98,16 @@
 // previously computed objects, or computing them on the fly (and then storing
 // them inside the class for later use), and making sure that whenever the
 // Triangulation is updated, also the relevant data strucutres are recomputed.
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <deal.II/fe/mapping_q_eulerian.h>
-#include <deal.II/fe/mapping_fe_field.h>
-
 // In this example, we will be using a reference domain to describe an embedded
 // Triangulation, deformed through a finite element vector field.
 //
-// The two include files above contain the definition of two classes that can be
+// The next two include files contain the definition of two classes that can be
 // used in these cases. MappingQEulerian allows one to describe a domain through
 // a *displacement* field, based on a FESystem[FE_Q(p)^spacedim] finite element
 // space. The second is a little more generic, and allows you to use arbitrary
@@ -115,28 +118,28 @@
 // Which one is used depends on how the user wants to specify the reference
 // domain, and/or the actual configuration. We'll provide both options, and
 // experiment a little in the results section of this tutorial program.
+#include <deal.II/fe/mapping_q_eulerian.h>
+#include <deal.II/fe/mapping_fe_field.h>
 
 #include <deal.II/dofs/dof_tools.h>
-
-#include <deal.II/base/parsed_function.h>
 
 // The parsed function class is another new entry. It allows one to create a
 // Function object, starting from a string in a parameter file which is parsed
 // into an object that you can use anywhere deal.II accepts a Function (for
 // example, for interpolation, boundary conditions, etc.).
+#include <deal.II/base/parsed_function.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
-
-#include <deal.II/non_matching/coupling.h>
 
 // This is the last new entry for this tutorial program. The namespace
 // NonMatching contains a few methods that are useful when performing
 // computations on non-matching grids, or on curves that are not aligned with
 // the underlying mesh.
 //
-// We'll discuss its use in details later on in the `setup_coupling` method.
+// We'll discuss its use in detail later on in the `setup_coupling` method.
+#include <deal.II/non_matching/coupling.h>
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -153,6 +156,8 @@ namespace Step60
 {
   using namespace dealii;
 
+  // @sect3{DistributedLagrangeProblem}
+  //
   // In the DistributedLagrangeProblem, we need two parameters describing the
   // dimensions of the domain $\Gamma$ (`dim`) and of the domain $\Omega$
   // (`spacedim`).
@@ -160,7 +165,7 @@ namespace Step60
   // These will be used to initialize a Triangulation<dim,spacedim> (for
   // $\Gamma$) and a Triangulation<spacedim,spacedim> (for $\Omega$).
   //
-  // A novelty w.r.t. other tutorial programs is the heavy use of
+  // A novelty with respect to other tutorial programs is the heavy use of
   // std::unique_ptr. These behave like classical pointers, with the advantage
   // of doing automatic house-keeping: the contained object is automatically
   // destroyed as soon as the unique_ptr goes out of scope, even if it is inside
@@ -171,27 +176,27 @@ namespace Step60
   // parameter file.
   //
   // We construct the parameters of our problem in the internal class
-  // DistributedLagrangeProblemParameters, derived from ParameterAcceptor. The
-  // DistributedLagrangeProblem class takes a const reference to a
-  // DistributedLagrangeProblemParameters object, so that it is not possible to
-  // modify the parameters from within the DistributedLagrangeProblem class
+  // `Parameters`, derived from ParameterAcceptor. The
+  // `DistributedLagrangeProblem` class takes a const reference to a
+  // `Parameters` object, so that it is not possible
+  // to modify the parameters from within the DistributedLagrangeProblem class
   // itself.
   //
   // We could have initialized the parameters first, and then pass the
   // parameters to the DistributedLagrangeProblem assuming all entries are set to
   // the desired values, but this has two disadvantages:
   //
-  // - we should not make assumptions on how the user initializes a class that
+  // - We should not make assumptions on how the user initializes a class that
   // is not under our direct control. If the user fails to initialize the
   // class, we should notice and throw an exception;
   //
-  // - not all objects that need to read parameters from a parameter file may
-  // be available when we construct the DistributedLagrangeProblemParameters;
+  // - Not all objects that need to read parameters from a parameter file may
+  // be available when we construct the Parameters;
   // this is often the case for complex programs, with multiple physics, or
   // where we reuse existing code in some external classes. We simulate this by
   // keeping some "complex" objects, like ParsedFunction objects, inside the
-  // DistributedLagrangeProblem instead of inside the
-  // DistributedLagrangeProblemParameters.
+  // `DistributedLagrangeProblem` instead of inside the
+  // `Parameters`.
   //
   // Here we assume that upon construction, the classes that build up our
   // problem are not usable yet. Parsing the parameter file is what ensures we have
@@ -203,26 +208,26 @@ namespace Step60
   {
   public:
 
-    // The DistributedLagrangeProblemParameters is derived from
-    // ParameterAcceptor. This allows us to use the
-    // ParameterAcceptor::add_parameter methods in its constructor.
+    // @sect3{Parameters}
+    //
+    // The `Parameters` class is derived from ParameterAcceptor. This allows us
+    // to use the ParameterAcceptor::add_parameter() method in its constructor.
     //
     // The members of this function are all non-const, but the
-    // DistributedLagrangeProblem class takes a const reference to a
-    // DistributedLagrangeProblemParameters object: this ensures that
-    // parameters are not modified from within the DistributedLagrangeProblem
+    // `DistributedLagrangeProblem` class takes a const reference to a
+    // `Parameters` object: this ensures that
+    // parameters are not modified from within the `DistributedLagrangeProblem`
     // class.
-
-    class DistributedLagrangeProblemParameters : public ParameterAcceptor
+    class Parameters : public ParameterAcceptor
     {
     public:
-      DistributedLagrangeProblemParameters();
+      Parameters();
 
-      // The parameters now described can all be set externally
-      // using a parameter file: if no parameter file is present when running
-      // the executable, the program shall create a parameters.prm file with
-      // the default parameters here encoded, and then abort as no
-      // parameters.prm file was found.
+      // The parameters now described can all be set externally using a
+      // parameter file: if no parameter file is present when running the
+      // executable, the program will create a "parameters.prm" file with the
+      // default values defined here, and then abort to give the user a chance
+      // to modify the parameters.prm file.
 
       // Initial refinement for the embedding grid, corresponding to the domain
       // $\Omega$.
@@ -241,7 +246,7 @@ namespace Step60
 
       // Starting refinement of the embedded grid, corresponding to the domain
       // $\Gamma$.
-      unsigned int initial_embedded_refinement                  = 7;
+      unsigned int initial_embedded_refinement                  = 8;
 
       // The list of boundary ids where we impose homogeneous Dirichlet boundary
       // conditions. On the remaining boundary ids (if any), we impose
@@ -274,17 +279,17 @@ namespace Step60
       bool initialized                                          = false;
     };
 
-    DistributedLagrangeProblem(const DistributedLagrangeProblemParameters &parameters);
+    DistributedLagrangeProblem(const Parameters &parameters);
 
     // Entry point for the DistributedLagrangeProblem
     void run();
 
   private:
     // Object containing the actual parameters
-    const DistributedLagrangeProblemParameters &parameters;
+    const Parameters &parameters;
 
     // The following functions are similar to all other tutorial programs, with
-    // the exception that we now need to setup things for two different
+    // the exception that we now need to set up things for two different
     // families of objects, namely the ones related to the *embedding* grids, and the
     // ones related to the *embedded* one.
 
@@ -306,25 +311,25 @@ namespace Step60
     void output_results();
 
 
-    // First we gather all the objects related to the embedding space geometry
+    // first we gather all the objects related to the embedding space geometry
 
-    std::unique_ptr<Triangulation<spacedim> > space_grid;
+    std::unique_ptr<Triangulation<spacedim> >              space_grid;
     std::unique_ptr<GridTools::Cache<spacedim, spacedim> > space_grid_tools_cache;
-    std::unique_ptr<FiniteElement<spacedim> > space_fe;
-    std::unique_ptr<DoFHandler<spacedim> > space_dh;
+    std::unique_ptr<FiniteElement<spacedim> >              space_fe;
+    std::unique_ptr<DoFHandler<spacedim> >                 space_dh;
 
     // Then the ones related to the embedded grid, with the DoFHandler associated
     // to the Lagrange multiplier `lambda`
 
     std::unique_ptr<Triangulation<dim, spacedim> > embedded_grid;
     std::unique_ptr<FiniteElement<dim, spacedim> > embedded_fe;
-    std::unique_ptr<DoFHandler<dim, spacedim> > embedded_dh;
+    std::unique_ptr<DoFHandler<dim, spacedim> >    embedded_dh;
 
     // And finally, everything that is needed to *deform* the embedded
     // triangulation
     std::unique_ptr<FiniteElement<dim, spacedim> > embedded_configuration_fe;
-    std::unique_ptr<DoFHandler<dim, spacedim> > embedded_configuration_dh;
-    Vector<double> embedded_configuration;
+    std::unique_ptr<DoFHandler<dim, spacedim> >    embedded_configuration_dh;
+    Vector<double>                                 embedded_configuration;
 
     // The ParameterAcceptorProxy class is a "transparent" wrapper derived
     // from both ParameterAcceptor and the type passed as its template
@@ -340,29 +345,30 @@ namespace Step60
     // have the members `declare_parameters()` and `parse_parameters()`.
     //
     // This is the case here, making it fairly easy to exploit the
-    // Functions::ParsedFunction class: instead of requiring the user to create
-    // new Function objects in its code for the RHS, boundary functions, etc.,
+    // Functions::ParsedFunction class: instead of requiring users to create new
+    // Function objects in their code for the RHS, boundary functions, etc.,
     // (like it is done in most of the other tutorials), here we allow the user
     // to use deal.II interface to muParser (http://muparser.beltoforion.de),
     // where the specification of the function is not done at compile time, but
-    // at run time, using a string that is parsed into an actual Function object.
+    // at run time, using a string that is parsed into an actual Function
+    // object.
     //
     // In this case, the `embedded_configuration_function` is a vector valued
     // Function that can be interpreted as either a *deformation* or a
     // *displacement* according to the boolean value of
-    // parameters.use_displacement. The number of components is specified later
-    // on in the construction.
+    // `parameters.use_displacement`. The number of components is specified
+    // later on in the construction.
 
     ParameterAcceptorProxy<Functions::ParsedFunction<spacedim> >
     embedded_configuration_function;
 
 
     // The embedded mapping. Notice that the order in which we construct these
-    // unique pointers is important. They will be destroied in the reversed
-    // order, so it is important that we respect the dependency tree. In
-    // particular, the embedded mapping will depend on both the `embedded_dh`
-    // and the `embedded_configuration`. If we declare it after the above two,
-    // we are fine, otherwise we would have do release this pointer manually in the
+    // unique pointers is important. They will be destroyed in reversed order,
+    // so it is important that we respect the dependency tree. In particular,
+    // the embedded mapping will depend on both the `embedded_dh` and the
+    // `embedded_configuration`. If we declare it after the above two, we are
+    // fine, otherwise we would have do release this pointer manually in the
     // destructor, or we'd get an error like
     //
     // @code
@@ -376,26 +382,22 @@ namespace Step60
     // @endcode
     //
     // at the end of the program.
-
     std::unique_ptr<Mapping<dim,spacedim> > embedded_mapping;
 
     // We do the same thing to specify the value of the function $g$,
     // which is what we want our solution to be in the embedded space.
     // In this case the Function is a scalar one.
-
     ParameterAcceptorProxy<Functions::ParsedFunction<spacedim> >
     embedded_value_function;
 
     // Similarly to what we have done with the Functions::ParsedFunction class,
     // we repeat the same for the ReductionControl class, allowing us to
-    // specify all possible stopping criterions for the Schur complement
+    // specify all possible stopping criteria for the Schur complement
     // iterative solver we'll use later on.
-
     ParameterAcceptorProxy<ReductionControl> schur_solver_control;
 
     // Next we gather all SparsityPattern, SparseMatrix, and Vector objects
     // we'll need
-
     SparsityPattern           stiffness_sparsity;
     SparsityPattern           coupling_sparsity;
 
@@ -416,11 +418,13 @@ namespace Step60
     TimerOutput monitor;
   };
 
+  // @sect3{DistributedLagrangeProblem::Parameters}
+  //
   // At construction time, we initialize also the ParameterAcceptor class, with
   // the section name we want our problem to use when parsing the parameter
   // file.
   //
-  // Parameter files can be organized into section/subsection/etc. :
+  // Parameter files can be organized into section/subsection/etc.:
   // this has the advantage that defined objects share parameters when
   // sharing the same section/subsection/etc. ParameterAcceptor allows
   // to specify the section name using unix conventions on paths.
@@ -430,7 +434,7 @@ namespace Step60
   // the landing subsection for the current class.
   //
   // For example, if you construct your class using
-  // ParameterAcceptor("/first/second/third/My Class"), the parameters will be
+  // `ParameterAcceptor("/first/second/third/My Class")`, the parameters will be
   // organized as follows:
   //
   // @code
@@ -445,24 +449,24 @@ namespace Step60
   // end
   // @endcode
   //
-  // Internally, the *current path* stored in ParameterAcceptor, is now
+  // Internally, the *current path* stored in ParameterAcceptor is now
   // considered to be "/first/second/third/", i.e. when you specify an
   // absolute path, ParameterAcceptor *changes* the current section to the
   // current path, i.e. to the path of the section name until the *last* "/".
   //
   // You can now construct another class derived from ParameterAcceptor using a
-  // relative path (e.g., ParameterAcceptor("My Other Class")) instead of the
-  // absolute one (e.g. ParameterAcceptor("/first/second/third/My Other Class")),
+  // relative path (e.g., `ParameterAcceptor("My Other Class")`) instead of the
+  // absolute one (e.g. `ParameterAcceptor("/first/second/third/My Other Class")`),
   // obtaining:
   // @code
   // subsection first
   //   subsection second
   //     subsection third
-  //       subsection MyClass
-  //        ... # all the parameters
+  //       subsection My Class
+  //         ... # all the parameters
   //       end
   //       subsection My Other Class
-  //        ... # all the parameters of MyOtherClass
+  //         ... # all the parameters of MyOtherClass
   //       end
   //     end
   //   end
@@ -472,64 +476,64 @@ namespace Step60
   // If the section name *ends* with a slash then subsequent classes will
   // interpret this as a full path: for example, similar to the one above, if
   // we have two classes, one initialized with
-  // ParameterAcceptor("/first/second/third/My Class/")
-  // and the other with ParameterAcceptor("My Other Class"), then the
+  // `ParameterAcceptor("/first/second/third/My Class/")`
+  // and the other with `ParameterAcceptor("My Other Class")`, then the
   // resulting parameter file will look like:
   //
   // @code
   // subsection first
   //   subsection second
   //     subsection third
-  //       subsection MyClass
-  //        ... # all the parameters
-  //        ... # notice MyClass subsection does not end here
-  //        subsection My Other Class
-  //         ... # all the parameters of MyOtherClass
-  //        end
-  //       end # of subsection MyClass
+  //       subsection My Class
+  //         ... # all the parameters of MyClass
+  //         ... # notice My Class subsection does not end here
+  //         subsection My Other Class
+  //           ... # all the parameters of MyOtherClass
+  //         end # of subsection My Other Class
+  //       end # of subsection My Class
   //     end
   //   end
   // end
   // @endcode
   //
   // We are going to exploit this, by making our
-  // DistributedLagrangeProblemParameters
-  // the *parent* of all subsequently constructed classes. Since most of the other
-  // classes are members of DistributedLagrangeProblem this allows, for example,
-  // to construct two DistributedLagrangeProblem for two different dimensions, without
-  // having conflicts in the parameters for the two problems.
-
+  // `Parameters` the *parent* of all subsequently
+  // constructed classes. Since most of the other classes are members of
+  // `DistributedLagrangeProblem` this allows, for example, to construct two
+  // `DistributedLagrangeProblem` for two different dimensions, without having
+  // conflicts in the parameters for the two problems.
   template<int dim, int spacedim>
-  DistributedLagrangeProblem<dim,spacedim>::DistributedLagrangeProblemParameters::
-  DistributedLagrangeProblemParameters() :
+  DistributedLagrangeProblem<dim,spacedim>::Parameters::Parameters() :
     ParameterAcceptor("/Distributed Lagrange<" + Utilities::int_to_string(dim)
                       + "," + Utilities::int_to_string(spacedim) +">/")
   {
 
-    // The ParameterAcceptor::add_parameter does a few things:
+    // The ParameterAcceptor::add_parameter() function does a few things:
     //
     // - enters the subsection specified at construction time to ParameterAcceptor
     //
-    // - calls the ParameterAcceptor::prm.add_parameter
+    // - calls the ParameterAcceptor::prm.add_parameter() function
     //
     // - calls any signal you may have attached to
     // ParameterAcceptor::declare_parameters_call_back
     //
     // - leaves the subsection
     //
-    // In turns, ParameterAcceptor::prm.add_parameter
+    // In turn, ParameterAcceptor::prm.add_parameter
     //
     // - declares an entry in the parameter handler for the given variable;
     //
-    // - reads the value of the variable,
+    // - takes the current value of the variable
     //
     // - transforms it to a string, used as the default value for the parameter
     // file
     //
-    // - attaches an *action* to ParameterAcceptor::prm that monitors when a file
-    // is parsed, or when an entry is set, and when this happens, it updates the
-    // content of the given variable to the value parsed by the string
-
+    // - attaches an *action* to ParameterAcceptor::prm that monitors when a
+    // file is parsed, or when an entry is set, and when this happens, it
+    // updates the value of the variable passed to `add_parameter()` by setting
+    // it to whatever was specified in the input file (of course, after the
+    // input file has been parsed and the text representation converted to the
+    // type of the variable).
     add_parameter("Initial embedding space refinement",
                   initial_refinement);
 
@@ -560,19 +564,18 @@ namespace Step60
     add_parameter("Verbosity level",
                   verbosity_level);
 
-    // If we get parsed, then the parameters are good to go. Set the internal
-    // variable `initialized` to true.
+    // Once the parameter file has been parsed, then the parameters are good to
+    // go. Set the internal variable `initialized` to true.
     parse_parameters_call_back.connect(
       [&]() -> void {initialized = true;}
     );
   }
 
-  // The constructor is pretty standard, with the exception of the `ParameterAcceptorProxy`
-  // objects, as explained earlier on.
-
+  // The constructor is pretty standard, with the exception of the
+  // `ParameterAcceptorProxy` objects, as explained earlier.
   template<int dim, int spacedim>
   DistributedLagrangeProblem<dim,spacedim>::DistributedLagrangeProblem(
-    const DistributedLagrangeProblemParameters &parameters) :
+    const Parameters &parameters) :
     parameters(parameters),
     embedded_configuration_function("Embedded configuration", spacedim),
     embedded_value_function("Embedded value"),
@@ -584,21 +587,24 @@ namespace Step60
     // Here is a way to set default values for a ParameterAcceptor class
     // that was constructed using ParameterAcceptorProxy.
     //
-    // In this case, we set the default deformation of the embedded grid to be
-    // a circle with radius `R` and center (Cx, Cy), we set the default value
+    // In this case, we set the default deformation of the embedded grid to be a
+    // circle with radius $R$ and center $(Cx, Cy)$, we set the default value
     // for the embedded_value_function to be the constant one, and specify some
     // sensible values for the SolverControl object.
     //
     // It is fundamental for $\Gamma$ to be embedded: from the definition of
     // $C_{\alpha j}$ is clear that, if $\Gamma \not\subseteq \Omega$, certain
-    // rows of the matrix $C$ shall be zero. This would be a problem, as the Schur
-    // complement method requires $C$ needs to have full column rank.
-
+    // rows of the matrix $C$ will be zero. This would be a problem, as the Schur
+    // complement method requires $C$ to have full column rank.
     embedded_configuration_function.declare_parameters_call_back.connect(
       [] () -> void
     {
-      ParameterAcceptor::prm.set("Function constants", "R=.3, Cx=.4, Cy=.4");
-      ParameterAcceptor::prm.set("Function expression", "R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy");
+      ParameterAcceptor::prm.set("Function constants",
+      "R=.3, Cx=.4, Cy=.4");
+
+
+      ParameterAcceptor::prm.set("Function expression",
+      "R*cos(2*pi*x)+Cx; R*sin(2*pi*x)+Cy");
     });
 
     embedded_value_function.declare_parameters_call_back.connect(
@@ -617,56 +623,44 @@ namespace Step60
 
   }
 
-  // Nothing special here, except that we check if parsing was done before
-  // we actually attempt to run our program.
 
-  template<int dim, int spacedim>
-  void DistributedLagrangeProblem<dim, spacedim>::run()
-  {
-    AssertThrow(parameters.initialized,
-                ExcNotInitialized());
-    deallog.depth_console(parameters.verbosity_level);
-
-    setup_grids_and_dofs();
-    setup_coupling();
-    assemble_system();
-    solve();
-    output_results();
-  }
-
-
-  // The function DistributedLagrangeProblem::setup_grids_and_dofs
-  // is used to set up the finite element spaces. Notice how
-  // @code std_cxx14::make_unique @endcode is used to create objects
-  // wrapped inside unique pointers
-
+  // The function `DistributedLagrangeProblem::setup_grids_and_dofs()` is used
+  // to set up the finite element spaces. Notice how `std_cxx14::make_unique` is
+  // used to create objects wrapped inside `std::unique_ptr` objects.
   template<int dim, int spacedim>
   void DistributedLagrangeProblem<dim,spacedim>::setup_grids_and_dofs()
   {
     TimerOutput::Scope timer_section(monitor, "Setup grids and dofs");
 
-    // Initializing $\Omega$:
-    // constructing the Triangulation and wrapping it into a unique_ptr
+    // Initializing $\Omega$: constructing the Triangulation and wrapping it
+    // into a `std::unique_ptr` object
     space_grid = std_cxx14::make_unique<Triangulation<spacedim> >();
-    // The last argument is set to true: this activates colorize, which
-    // we use to assign the Dirichlet and Neumann conditions. See
-    // GridGenerator::hyper_rectangle for the details on the ids used.
+
+    // Next, we actually create the triangulation using
+    // GridGenerator::hyper_cube(). The last argument is set to true: this
+    // activates colorization (i.e., assigning different boundary indicators to
+    // different parts of the boundary), which we use to assign the Dirichlet
+    // and Neumann conditions.
     GridGenerator::hyper_cube(*space_grid,0,1,true);
-    // Requesting the varius values to the parameters object, which is
-    // of type DistributedLagrangeProblemParameters
+
+    // Once we constructed a Triangulation, we refine it globally according to
+    // the specifications in the parameter file, and construct a
+    // GridTools::Cache with it.
     space_grid->refine_global(parameters.initial_refinement);
     space_grid_tools_cache =
       std_cxx14::make_unique<GridTools::Cache<spacedim, spacedim> >(*space_grid);
-    // The refinement of $\Omega$ depends on $\Gamma$: this means we need to
-    // set up $\Gamma$ before we can finish with $\Omega$
+
+    // The same is done with the embedded grid. Since the embedded grid is
+    // deformed, we first need to setup the deformation mapping. We do so in the
+    // following few lines:
     embedded_grid = std_cxx14::make_unique<Triangulation<dim,spacedim> >();
     GridGenerator::hyper_cube(*embedded_grid);
     embedded_grid->refine_global(parameters.initial_embedded_refinement);
 
-    // At this point we need to configure the deformation of the embedded grid
     embedded_configuration_fe =
       std_cxx14::make_unique<FESystem<dim,spacedim> >
-      (FE_Q<dim,spacedim>(parameters.embedded_configuration_finite_element_degree), spacedim);
+      (FE_Q<dim,spacedim>(parameters.embedded_configuration_finite_element_degree),
+       spacedim);
 
     embedded_configuration_dh =
       std_cxx14::make_unique<DoFHandler<dim, spacedim> >(*embedded_grid);
@@ -674,22 +668,23 @@ namespace Step60
     embedded_configuration_dh->distribute_dofs(*embedded_configuration_fe);
     embedded_configuration.reinit(embedded_configuration_dh->n_dofs());
 
-    // Interpolating the embedded configuration function
+    // Once we have defined a finite dimensional space for the deformation, we
+    // interpolate the `embedded_configuration_function` defined in the
+    // parameter file:
     VectorTools::interpolate(*embedded_configuration_dh,
                              embedded_configuration_function,
                              embedded_configuration);
 
-    // Once we have the embedded configuration vector stored, we can interpret
-    // it according to what the user has specified in the parameter file, as a
-    // displacement, in which case we construct a mapping that *displaces* the
-    // position of each support point of our configuration finite element space
-    // by the specified amount on the corresponding configuration vector, or as
-    // an absolution position.
+    // Now we can interpret it according to what the user has specified in the
+    // parameter file: as a displacement, in which case we construct a mapping
+    // that *displaces* the position of each support point of our configuration
+    // finite element space by the specified amount on the corresponding
+    // configuration vector, or as an absolution position.
     //
     // In the first case, the class MappingQEulerian offers its services, while
     // in the second one, we'll use the class MappingFEField. They are in fact
     // very similar. MappingQEulerian will only work for systems of FE_Q finite
-    // element spaces, where the displacment vector is stored in the first
+    // element spaces, where the displacement vector is stored in the first
     // `spacedim` components of the FESystem, and the degree given as a
     // parameter at construction time, must match the degree of the first
     // `spacedim` components.
@@ -702,7 +697,7 @@ namespace Step60
     // to implement iso-geometric analysis codes in deal.II, by combining it
     // with the FEBernstein finite element class. In this example, we'll use the
     // two interchangeably, by taking into account the fact that one
-    // configuration will be a `displacment`, while the other will be an
+    // configuration will be a `displacement`, while the other will be an
     // absolute `deformation` field.
 
     if (parameters.use_displacement == true)
@@ -716,15 +711,44 @@ namespace Step60
         (*embedded_configuration_dh,
          embedded_configuration);
 
-    // Estimating the diameter of the largest active cell of $\Gamma$, and
-    // the smalles one of $\Omega$
-    double embedded_space_maximal_diameter =
+    // In order to construct a well posed coupling interpolation operator $C$,
+    // there are some constraints on the relative dimension of the grids between
+    // the embedding and the embedded domains. The coupling operator $C$ and the
+    // spaces $V$ and $Q$ have to satisfy an inf-sup condition in order for the
+    // problem to have a solution. It turns out that the non-matching $L^2$
+    // projection satisfies such inf-sup, provided that the spaces $V$ and $Q$
+    // are compatible between each other (for example, provided that they are
+    // chosen to be the ones described in the introduction).
+    //
+    // However, the *discrete* inf-sup condition must also hold. No
+    // complications arise here, but it turns out that the discrete inf-sup
+    // constant deteriorates when the non-matching grids have local diameters
+    // that are too far away from each other. In particular, it turns out that
+    // if you choose an embedding grid which is *finer* with respect to the
+    // embedded grid, the inf-sup constant deteriorates much more than if you
+    // let the embedded grid be finer.
+    //
+    // In order to avoid issues, in this tutorial we will throw an exception if
+    // the parameters chosen by the user are such that the maximal diameter of
+    // the embedded grid is greater than the minimal diameter of the embedding
+    // grid.
+    //
+    // This choice guarantees that almost every cell of the embedded grid spans
+    // no more than two cells of the embedding grid, with some rare exceptions,
+    // that are negligible in terms of the resulting inf-sup.
+    const double embedded_space_maximal_diameter =
       GridTools::maximal_cell_diameter(*embedded_grid, *embedded_mapping);
     double embedding_space_minimal_diameter =
       GridTools::minimal_cell_diameter(*space_grid);
-    // Setting up the $\Gamma$'s DoFs
+
     setup_embedded_dofs();
 
+    // In this tutorial program we not only refine $\Omega$ globally,
+    // but also allow a local refinement depending on the position of $\Gamma$,
+    // according to the value of `parameters.delta_refinement`, that we use to
+    // decide how many rounds of local refinement we should do on $\Omega$,
+    // corresponding to the the position of $\Gamma$.
+    //
     // With the mapping in place, it is now possible to query what is the
     // location of all support points associated with the `embedded_dh`, by
     // calling the method DoFTools::map_dofs_to_support_points.
@@ -735,24 +759,20 @@ namespace Step60
     // which can manipulate them accordingly.
     //
     // This is precisely what the `embedded_mapping` is there for.
-
     std::vector<Point<spacedim> > support_points(embedded_dh->n_dofs());
     if (parameters.delta_refinement != 0)
       DoFTools::map_dofs_to_support_points(*embedded_mapping,
                                            *embedded_dh,
                                            support_points);
 
-    for (unsigned int i=1; i<embedded_dh->n_dofs(); ++i)
-      support_points.emplace_back((support_points[i-1]+support_points[i])/2);
-
     // Once we have the support points of the embedded finite element space, we
     // would like to identify what cells of the embedding space contain what
     // support point, to get a chance at refining the embedding grid where it is
     // necessary, i.e., where the embedded grid is. This can be done manually,
-    // by looping over each point, and then calling the method
-    // Mapping::tranform_real_to_unit_cell for each cell of the embedding
-    // space, until we find one that returns points in the unit reference cell,
-    // or it can be done in a more intelligent way.
+    // by looping over each support point, and then calling the method
+    // Mapping::tranform_real_to_unit_cell for each cell of the embedding space,
+    // until we find one that returns points in the unit reference cell, or it
+    // can be done in a more intelligent way.
     //
     // The GridTools::find_active_cell_around_point is a possible option that
     // performs the above task in a cheaper way, by first identifying the
@@ -801,7 +821,6 @@ namespace Step60
     // as the amount of local refinement they want around the embedded grid, we
     // make sure that the resulting meshes satisfy our requirements, and if this
     // is not the case, we bail out with an exception.
-
     for (unsigned int i=0; i<parameters.delta_refinement; ++i)
       {
         const auto point_locations = GridTools::compute_point_locations(*space_grid_tools_cache,
@@ -811,25 +830,27 @@ namespace Step60
           {
             cell->set_refine_flag();
             for (unsigned int face_no=0; face_no<GeometryInfo<spacedim>::faces_per_cell; ++face_no)
-              if (! cell->face(face_no)->at_boundary())
+              if (! cell->at_boundary(face_no))
                 {
                   auto neighbor = cell->neighbor(face_no);
                   neighbor->set_refine_flag();
                 }
           }
         space_grid->execute_coarsening_and_refinement();
-        embedding_space_minimal_diameter = GridTools::minimal_cell_diameter(*space_grid);
-        AssertThrow(embedded_space_maximal_diameter < embedding_space_minimal_diameter,
-                    ExcMessage("The embedding grid is too refined (or the embedded grid"
-                               "is too coarse). Adjust the parameters so that the minimal"
-                               "grid size of the embedding grid is larger "
-                               "than the maximal grid size of the embedded grid."))
       }
+
+    embedding_space_minimal_diameter = GridTools::minimal_cell_diameter(*space_grid);
 
     deallog << "Embedding minimal diameter: " << embedding_space_minimal_diameter
             << ", embedded maximal diameter: " << embedded_space_maximal_diameter
             << ", ratio: "
             << embedded_space_maximal_diameter/embedding_space_minimal_diameter << std::endl;
+
+    AssertThrow(embedded_space_maximal_diameter < embedding_space_minimal_diameter,
+                ExcMessage("The embedding grid is too refined (or the embedded grid "
+                           "is too coarse). Adjust the parameters so that the minimal "
+                           "grid size of the embedding grid is larger "
+                           "than the maximal grid size of the embedded grid."));
 
     // $\Omega$ has been refined and we can now set up its DoFs
     setup_embedding_dofs();
@@ -837,7 +858,7 @@ namespace Step60
 
   // We now set up the DoFs of $\Omega$ and $\Gamma$: since they are fundamentally
   // independent (except for the fact that $\Omega$'s mesh is more refined "around"
-  // $\Gamma$) the procedure is standard
+  // $\Gamma$) the procedure is standard.
   template<int dim, int spacedim>
   void DistributedLagrangeProblem<dim,spacedim>::setup_embedding_dofs()
   {
@@ -847,7 +868,7 @@ namespace Step60
     space_dh->distribute_dofs(*space_fe);
 
     DoFTools::make_hanging_node_constraints(*space_dh, constraints);
-    for (auto id:parameters.homogeneous_dirichlet_ids)
+    for (auto id : parameters.homogeneous_dirichlet_ids)
       {
         VectorTools::interpolate_boundary_values(*space_dh, id,
                                                  Functions::ZeroFunction<spacedim>(),
@@ -900,18 +921,19 @@ namespace Step60
 
     DynamicSparsityPattern dsp(space_dh->n_dofs(), embedded_dh->n_dofs());
 
-    NonMatching::create_coupling_sparsity_pattern(*space_dh,
+    NonMatching::create_coupling_sparsity_pattern(*space_grid_tools_cache,
+                                                  *space_dh,
                                                   *embedded_dh,
                                                   quad,
-                                                  dsp, ComponentMask(), ComponentMask(),
-                                                  StaticMappingQ1<spacedim>::mapping,
+                                                  dsp, ConstraintMatrix(),
+                                                  ComponentMask(), ComponentMask(),
                                                   *embedded_mapping);
     coupling_sparsity.copy_from(dsp);
     coupling_matrix.reinit(coupling_sparsity);
   }
 
-  // This function creates the matrices: as noted before computing
-  // the stiffness matrix and the rhs is a standard procedure
+  // The following function creates the matrices: as noted before computing the
+  // stiffness matrix and the rhs is a standard procedure.
   template<int dim, int spacedim>
   void DistributedLagrangeProblem<dim,spacedim>::assemble_system()
   {
@@ -933,15 +955,14 @@ namespace Step60
 
       // To compute the coupling matrix we use the
       // NonMatching::create_coupling_mass_matrix tool, which works similarly to
-      // NonMatching::create_coupling_sparsity_pattern, requiring only an
-      // additional parameter: a constraint matrix
+      // NonMatching::create_coupling_sparsity_pattern.
       QGauss<dim> quad(parameters.coupling_quadrature_order);
-      NonMatching::create_coupling_mass_matrix(*space_dh,
+      NonMatching::create_coupling_mass_matrix(*space_grid_tools_cache,
+                                               *space_dh,
                                                *embedded_dh,
                                                quad,
                                                coupling_matrix, ConstraintMatrix(),
                                                ComponentMask(), ComponentMask(),
-                                               StaticMappingQ1<spacedim>::mapping,
                                                *embedded_mapping);
 
       VectorTools::interpolate(*embedded_dh, embedded_value_function, embedded_value);
@@ -978,8 +999,8 @@ namespace Step60
     constraints.distribute(solution);
   }
 
-  // Standard result output on two separate files, one
-  // for each mesh
+  // The following function simply generates standard result output on two
+  // separate files, one for each mesh.
   template<int dim, int spacedim>
   void DistributedLagrangeProblem<dim,spacedim>::output_results()
   {
@@ -994,7 +1015,7 @@ namespace Step60
     embedding_out.build_patches(parameters.embedding_space_finite_element_degree);
     embedding_out.write_vtu(embedding_out_file);
 
-    // The only difference between the two output routines, is that in the
+    // The only difference between the two output routines is that in the
     // second case, we want to output the data on the current configuration, and
     // not on the reference one. This is possible by passing the actual
     // embedded_mapping to the DataOut::build_patches function. The mapping will
@@ -1010,6 +1031,24 @@ namespace Step60
     embedded_out.build_patches(*embedded_mapping,
                                parameters.embedded_space_finite_element_degree);
     embedded_out.write_vtu(embedded_out_file);
+  }
+
+  // Similar to all other tutorial programs, the `run()` function simply calls
+  // all other methods in the correct order. Nothing special to note, except
+  // that we check if parsing was done before we actually attempt to run our
+  // program.
+  template<int dim, int spacedim>
+  void DistributedLagrangeProblem<dim, spacedim>::run()
+  {
+    AssertThrow(parameters.initialized,
+                ExcNotInitialized());
+    deallog.depth_console(parameters.verbosity_level);
+
+    setup_grids_and_dofs();
+    setup_coupling();
+    assemble_system();
+    solve();
+    output_results();
   }
 }
 
@@ -1038,11 +1077,15 @@ int main(int argc, char **argv)
       // does not exist, ParameterAcceptor::initialize will create one for you,
       // and exit the program.
 
-      DistributedLagrangeProblem<dim, spacedim>::DistributedLagrangeProblemParameters parameters;
+      DistributedLagrangeProblem<dim, spacedim>::Parameters parameters;
       DistributedLagrangeProblem<dim, spacedim> problem(parameters);
-      std::string parameter_file = "parameters.prm";
+
+      std::string parameter_file;
       if (argc > 1)
         parameter_file = argv[1];
+      else
+        parameter_file = "parameters.prm";
+
       ParameterAcceptor::initialize(parameter_file, "used_parameters.prm");
       problem.run();
     }

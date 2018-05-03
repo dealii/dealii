@@ -2,32 +2,32 @@
 
 <i>This program was contributed by Luca Heltai and Giovanni Alzetta, SISSA, Trieste.
 
-<a name="Introduction"></a><h1>Introduction</h1>
+<h1>Introduction</h1>
 
-
-<a name="DistributedLagrangemultipliers"></a><h3> Distributed Lagrange multipliers</h3>
+<h3>Distributed Lagrange multipliers</h3>
 
 
 In this tutorial we consider the case of two domains, $\Omega$ in
 $R^{\text{spacedim}}$ and $\Gamma$ in $R^{\text{dim}}$, where $\Gamma$ is
-embedded in $\Omega$ and thus $\Gamma \subseteq \Omega$. We want to solve a
-partial differential equation on $\Omega$, enforcing some conditions on the
-solution of the problem *on the embedded domain* $\Gamma$.
+embedded in $\Omega$ ($\Gamma \subseteq \Omega$). We want to solve a partial
+differential equation on $\Omega$, enforcing some conditions on the solution of
+the problem *on the embedded domain* $\Gamma$.
 
 There are two interesting scenarios:
 
-- the geometrical dimension `dim` of the embedded domain $\Gamma$ is the
-same of the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure
-of $\Gamma$ is not zero, or
+- the geometrical dimension `dim` of the embedded domain $\Gamma$ is the same of
+the domain $\Omega$ (`spacedim`), that is, the spacedim-dimensional measure of
+$\Gamma$ is not zero, or
 
 - the embedded domain $\Gamma$ has an intrinsic dimension `dim` which is smaller
 than that of $\Omega$ (`spacedim`), thus its spacedim-dimensional measure is
-zero; for example it is a curve embedded in a two
-dimensional domain, or a surface embedded in a three-dimensional domain.
+zero; for example it is a curve embedded in a two dimensional domain, or a
+surface embedded in a three-dimensional domain.
 
-In both cases define the restriction operator $\gamma$ as the operator
-that, given a continuous function on $\Omega$, returns its (continuous)
-restriction on $\Gamma$, i.e.,
+In both cases define the restriction operator $\gamma$ as the operator that,
+given a continuous function on $\Omega$, returns its (continuous) restriction on
+$\Gamma$, i.e.,
+
 \f[
 \gamma : C^0(\Omega) \mapsto C^0(\Gamma), \quad \text{ s.t. } \gamma u = u|_{\Gamma} \in C^0(\Gamma),
 \quad \forall u \in C^0(\Omega).
@@ -39,19 +39,19 @@ $H^1(\Gamma)$ when the intrinsic dimension of $\Gamma$ is the same of $\Omega$.
 
 The same is true, with a less regular range space (namely $H^{1/2}(\Gamma)$),
 when the dimension of $\Gamma$ is one less with respect to $\Omega$, and
-$\Gamma$ does not have a boundary. In this second case, the operator $\gamma$
-is also known as the *trace* operator, and it is well defined for Lipschitz
-co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$ (read on
-<a href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
+$\Gamma$ does not have a boundary. In this second case, the operator $\gamma$ is
+also known as the *trace* operator, and it is well defined for Lipschitz
+co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$ (read on <a
+href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
 for further details on the trace operator).
 
-The co-dimension two case is a little more complicated, and in general it is
-not possible to construct a continous trace operator, not even from
-$H^1(\Omega)$ to $L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one
-respectively in two and three dimensions.
+The co-dimension two case is a little more complicated, and in general it is not
+possible to construct a continous trace operator, not even from $H^1(\Omega)$ to
+$L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one respectively in two
+and three dimensions.
 
-In this tutorial program we're not interested in further details on $\gamma$:
-we take the extension $\gamma$ for granted, assuming that the dimension of the
+In this tutorial program we're not interested in further details on $\gamma$: we
+take the extension $\gamma$ for granted, assuming that the dimension of the
 embedded domain (`dim`) is always smaller by one or equal w.r.t. the dimension
 of the embedding domain $\Omega$ (`spacedim`).
 
@@ -64,22 +64,21 @@ regular function $g$ on $\Gamma$, find the solution $u$ to
 u & = & 0 & \text{ on } \partial\Omega.
 @f}
 
-This is a constrained problem, where we are looking for a harmonic function
-$u$ that satisfies homogeneous boundary conditions on $\partial\Omega$, subject
-to the constraint $\gamma u = g$ using a Lagrange multiplier.
+This is a constrained problem, where we are looking for a harmonic function $u$
+that satisfies homogeneous boundary conditions on $\partial\Omega$, subject to
+the constraint $\gamma u = g$ using a Lagrange multiplier.
 
 This problem has a physical interpretation: harmonic functions, i.e., functions
-that satisfy the Laplace equation, can be thought of as the displacements of
-a membrane whose boundary values are prescribed. The current situation then
+that satisfy the Laplace equation, can be thought of as the displacements of a
+membrane whose boundary values are prescribed. The current situation then
 corresponds to finding the shape of a membrane for which not only the
-displacement at the boundary, but also on $\Gamma$ is prescribed.
-For example, if $\Gamma$ is a closed curve in 2d space, then that would model
-a soap film that is held in place by a wire loop along $\partial \Omega$ as
-well as a second loop along $\Gamma$. In cases where $\Gamma$ is a whole area,
-you can think of this as a membrane that is stretched over an obstacle where
-$\Gamma$ is the contact area. (If the contact area is not known we have a
-different problem -- called the "obstacle problem" -- which is modeled in
-step-41.)
+displacement at the boundary, but also on $\Gamma$ is prescribed. For example,
+if $\Gamma$ is a closed curve in 2d space, then that would model a soap film
+that is held in place by a wire loop along $\partial \Omega$ as well as a second
+loop along $\Gamma$. In cases where $\Gamma$ is a whole area, you can think of
+this as a membrane that is stretched over an obstacle where $\Gamma$ is the
+contact area. (If the contact area is not known we have a different problem --
+called the "obstacle problem" -- which is modeled in step-41.)
 
 As a first example we study the zero Dirichlet boundary condition on
 $\partial\Omega$. The same equations apply if we apply zero Neumann boundary
@@ -280,3 +279,49 @@ in this tutorial.
 We solve the final saddle point problem by an iterative solver, applied to the
 Schur complement $S$ (whose construction is described, for example, in step-20), and
 we construct $S$ using LinearOperator classes.
+
+
+<h3>The testcase</h3>
+
+The problem we solve here is identical to step-4, with the difference that we
+impose some constraints on an embedded domain $\Gamma$. The tutorial is written
+in a dimension independent way, and in the results section we show how to vary
+both `dim` and `spacedim`.
+
+The tutorial is compiled for `dim` equal to one and `spacedim` equal to two. If
+you want to run the program in embedding dimension `spacedim` equal to three,
+you will most likely want to change the reference domain for $\Gamma$ to be, for
+example, something you read from file, or a closed sphere that you later deform
+to something more interesting.
+
+In the default scenario, $\Gamma$ has co-dimension one, and this tutorial
+program implements the Fictitious Boundary Method. As it turns out, the same
+techniques are used in the Variational Immersed Finite Element Method, and
+the coupling operator $C$ defined above is the same in almost all of these
+non-matching methods.
+
+The embedded domain is assumed to be included in $\Omega$, which we take as the
+unit square $[0,1]^2$. The definition of the fictitious domain $\Gamma$ can be
+modified through the parameter file, and can be given as a mapping from the
+reference interval $[0,1]$ to a curve in $\Omega$.
+
+If the curve is closed, then the results will be similar to running the same
+problem on a grid whose boundary is $\Gamma$. The program will happily run also
+with a non closed $\Gamma$, although in those cases, the mathematical
+formulation of the problem is more difficult, since $\Gamma$ will have a
+boundary by itself that has co-dimension two with respect to the domain
+$\Omega$.
+
+<h3>References</h3>
+
+- Glowinski, R., T.-W. Pan, T.I. Hesla, and D.D. Joseph. 1999. “A Distributed
+  Lagrange Multiplier/fictitious Domain Method for Particulate Flows.”
+  International Journal of Multiphase Flow 25 (5). Pergamon: 755–94.
+
+- Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
+  Hyper-Elastic Formulation of the Immersed Boundary Method.” Computer Methods
+  in Applied Mechanics and Engineering 197 (25–28).
+
+- Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
+  Finite Element Methods.” Computer Methods in Applied Mechanics and Engineering
+  229–232.
