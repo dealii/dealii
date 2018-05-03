@@ -97,6 +97,36 @@ namespace internal
 
     return shape_function_to_row_table;
   }
+
+  namespace
+  {
+    // Check to see if a DoF value is zero, implying that subsequent operations
+    // with the value have no effect.
+    template <typename Number, typename T = void>
+    struct CheckForZero
+    {
+      static bool
+      value (const Number &value)
+      {
+        return value == dealii::internal::NumberType<Number>::value(0.0);
+      }
+    };
+
+    // For auto-differentiable numbers, the fact that a DoF value is zero
+    // does not imply that its derivatives are zero as well. So we
+    // can't filter by value for these number types.
+    // Note that we also want to avoid actually checking the value itself,
+    // since some AD numbers are not contextually convertible to booleans.
+    template <typename Number>
+    struct CheckForZero<Number, typename std::enable_if<Differentiation::AD::is_ad_number<Number>::value>::type>
+    {
+      static bool
+      value (const Number &/*value*/)
+      {
+        return false;
+      }
+    };
+  }
 }
 
 
@@ -489,9 +519,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is zero
             // does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (!Differentiation::AD::is_ad_number<Number>::value)
-              if (value == dealii::internal::NumberType<Number>::value(0.0) )
-                continue;
+            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+              continue;
 
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
@@ -527,9 +556,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is zero
             // does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (!Differentiation::AD::is_ad_number<Number>::value)
-              if (value == dealii::internal::NumberType<Number>::value(0.0) )
-                continue;
+            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+              continue;
 
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
@@ -563,9 +591,8 @@ namespace FEValuesViews
             // For auto-differentiable numbers, the fact that a DoF value is zero
             // does not imply that its derivatives are zero as well. So we
             // can't filter by value for these number types.
-            if (!Differentiation::AD::is_ad_number<Number>::value)
-              if (value == dealii::internal::NumberType<Number>::value(0.0))
-                continue;
+            if (dealii::internal::CheckForZero<Number>::value(value) == true)
+              continue;
 
             const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
               &shape_hessians[shape_function_data[shape_function].row_index][0];
@@ -605,9 +632,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -659,9 +685,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -715,9 +740,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -772,9 +796,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -837,9 +860,8 @@ namespace FEValuesViews
               // For auto-differentiable numbers, the fact that a DoF value is zero
               // does not imply that its derivatives are zero as well. So we
               // can't filter by value for these number types.
-              if (!Differentiation::AD::is_ad_number<Number>::value)
-                if (value == dealii::internal::NumberType<Number>::value(0.0))
-                  continue;
+              if (dealii::internal::CheckForZero<Number>::value(value) == true)
+                continue;
 
               if (snc != -1)
                 {
@@ -900,9 +922,8 @@ namespace FEValuesViews
               // For auto-differentiable numbers, the fact that a DoF value is zero
               // does not imply that its derivatives are zero as well. So we
               // can't filter by value for these number types.
-              if (!Differentiation::AD::is_ad_number<Number>::value)
-                if (value == dealii::internal::NumberType<Number>::value(0.0))
-                  continue;
+              if (dealii::internal::CheckForZero<Number>::value(value) == true)
+                continue;
 
               if (snc != -1)
                 {
@@ -1026,9 +1047,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -1084,9 +1104,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -1142,9 +1161,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -1234,9 +1252,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -1294,9 +1311,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -1358,9 +1374,8 @@ namespace FEValuesViews
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (snc != -1)
             {
@@ -2847,9 +2862,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (fe.is_primitive(shape_func))
             {
@@ -2928,9 +2942,8 @@ namespace internal
         // For auto-differentiable numbers, the fact that a DoF value is zero
         // does not imply that its derivatives are zero as well. So we
         // can't filter by value for these number types.
-        if (!Differentiation::AD::is_ad_number<Number>::value)
-          if (value == dealii::internal::NumberType<Number>::value(0.0))
-            continue;
+        if (dealii::internal::CheckForZero<Number>::value(value) == true)
+          continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
           = &shape_derivatives[shape_func][0];
@@ -2992,9 +3005,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (fe.is_primitive(shape_func))
             {
@@ -3127,9 +3139,8 @@ namespace internal
           // For auto-differentiable numbers, the fact that a DoF value is zero
           // does not imply that its derivatives are zero as well. So we
           // can't filter by value for these number types.
-          if (!Differentiation::AD::is_ad_number<Number>::value)
-            if (value == dealii::internal::NumberType<Number>::value(0.0))
-              continue;
+          if (dealii::internal::CheckForZero<Number>::value(value) == true)
+            continue;
 
           if (fe.is_primitive(shape_func))
             {

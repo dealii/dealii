@@ -17,6 +17,7 @@
 #define dealii_elasticity_standard_tensors_h
 
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
@@ -292,7 +293,7 @@ SymmetricTensor<4, dim, Number>
 Physics::Elasticity::StandardTensors<dim>::Dev_P (const Tensor<2, dim, Number> &F)
 {
   const Number det_F = determinant(F);
-  Assert(det_F > Number(0.0),
+  Assert(numbers::value_is_greater_than(det_F,0.0),
          ExcMessage("Deformation gradient has a negative determinant."));
   const Tensor<2,dim,Number> C_ns = transpose(F)*F;
   const SymmetricTensor<2,dim,Number> C = symmetrize(C_ns);
@@ -316,7 +317,7 @@ SymmetricTensor<4, dim, Number>
 Physics::Elasticity::StandardTensors<dim>::Dev_P_T (const Tensor<2, dim, Number> &F)
 {
   const Number det_F = determinant(F);
-  Assert(det_F > Number(0.0),
+  Assert(numbers::value_is_greater_than(det_F,0.0),
          ExcMessage("Deformation gradient has a negative determinant."));
   const Tensor<2,dim,Number> C_ns = transpose(F)*F;
   const SymmetricTensor<2,dim,Number> C = symmetrize(C_ns);

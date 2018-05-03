@@ -1073,7 +1073,7 @@ inline
 SymmetricTensor<rank_,dim,Number> &
 SymmetricTensor<rank_,dim,Number>::operator = (const Number &d)
 {
-  Assert (d==internal::NumberType<Number>::value(0.0), ExcMessage ("Only assignment with zero is allowed"));
+  Assert (numbers::value_is_zero(d), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
   data = internal::NumberType<Number>::value(0.0);

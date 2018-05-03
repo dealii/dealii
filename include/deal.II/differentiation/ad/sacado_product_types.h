@@ -17,8 +17,6 @@
 #define dealii_differentiation_ad_sacado_product_types_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/template_constraints.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
