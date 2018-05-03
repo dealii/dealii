@@ -31,9 +31,10 @@ int main()
   initlog();
 
   const std::function<void(Vector<double> &, bool)> reinit_vector =
-    [](Vector<double> &v, bool omit_zeroing_entries) {
-      v.reinit(3, omit_zeroing_entries);
-    };
+    [](Vector<double> &v, bool omit_zeroing_entries)
+  {
+    v.reinit(3, omit_zeroing_entries);
+  };
 
   auto id = identity_operator(reinit_vector);
   const auto filter = mean_value_filter(id);
