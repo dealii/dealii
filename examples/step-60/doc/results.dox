@@ -1,8 +1,10 @@
 <h1>Results</h1>
 
-Currently there is no `parameters.prm` file: objects can't be initialized.
-For this reason the first time the code is run, an exception is thrown
-and nothing is actually computed. You'll get the following output:
+The directory in which this program is run does not contain a parameter file by
+default. On the other hand, this program wants to read its parameters from a
+file called parameters.prm -- and so, when you execute it the first time, you
+will get an exception that no such file can be found:
+
 @code
 ----------------------------------------------------
 Exception on processing: 
@@ -20,7 +22,10 @@ Aborting!
 ----------------------------------------------------
 @endcode
 
-By inspecting the parameter file, we see the following:
+However, as the error message already states, the code that triggers the
+exception will also generate a parameters.prm file that simply contains the
+default values for all parameters this program cares about. By inspection of the
+parameter file, we see the following:
 
 @code
 # Listing of Parameters
@@ -137,7 +142,7 @@ containing a shorter version of the above parameters (without comments and
 documentation), documenting all parameters that were used to run your program:
 @code
 # Parameter file generated with 
-# DEAL_II_PACKAGE_VERSION = 9.0.0-pre
+# DEAL_II_PACKAGE_VERSION = 9.0.0
 subsection Distributed Lagrange<1,2>
   set Coupling quadrature order                    = 3
   set Embedded configuration finite element degree = 1
@@ -199,7 +204,7 @@ and you would obtain exactly the same results as in test case 1 below.
 
 <h2> Test case 1: </h2>
 
-For the default problem the value of $u$ on Gamma is set to the constant $1$:
+For the default problem the value of $u$ on $\Gamma$ is set to the constant $1$:
 this is like imposing a constant Dirichlet boundary condition on $\Gamma$, seen
 as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
 \Omega$ we have zero Dirichlet boundary conditions.
@@ -215,7 +220,7 @@ as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
   </tr>
 </table>
 
-The output of the program will look like the following on your pc:
+The output of the program will look like the following:
 
 @code
 DEAL::Embedded dofs: 129
@@ -256,9 +261,9 @@ DEAL:cg::Convergence step 108 value 7.65958e-13
 @endcode
 
 You may notice that, in terms of CPU time, assembling the coupling system is
-twice more expensive than assembling the standard Poisson system, even though
-the matrix is smaller. This is due to the non-matching nature of the
-discretization. Wether this is acceptable or not, depends on the applications.
+twice as expensive as assembling the standard Poisson system, even though the
+matrix is smaller. This is due to the non-matching nature of the discretization.
+Wether this is acceptable or not, depends on the applications.
 
 If the problem was set in a three-dimensional setting, and the immersed mesh was
 time dependent, it would be much more expensive to recreate the mesh at each
@@ -307,7 +312,7 @@ subsection Distributed Lagrange<1,2>
 end
 @endcode
 
-we get a "flowery" looking domain, where we impose a linear boundary condition
+We get a "flowery" looking domain, where we impose a linear boundary condition
 $g=x-.5$. This test shows that the method is actually quite accurate in
 recovering an exactly linear function from its boundary conditions, and even
 though the meshes are not aligned, we obtain a pretty good result.
@@ -338,38 +343,31 @@ produces the saddle on the right.
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
-The `parameters.prm` file is a perfect tool to play with: we can easily impose a
-Neumann boundary, change the parametrization, the function values and the
-refinements.
+<h4> Running with `spacedim` equal to three</h4>
 
-However, non aligned meshes are complex to handle, as you shall see after some
-changes. For example set the following parameters:
+While the current tutorial program is written for `spacedim` equal to two, there
+are only minor changes you have to do in order for the program to run in
+different combinations of dimensions.
 
-@code
-subsection Distributed Lagrange<1,2>
-  set Homogeneous Dirichlet boundary ids           = 0, 1, 3
-  subsection Embedded configuration
-    set Function constants  = R=.2, Cx=.5, Cy=.4
-    set Function expression = R*sin(2*pi*x)+0.5*R*sin(4*pi*x)+Cx; 1.5*R*cos(2*pi*x)+Cy
-  end
-end
-@endcode
+If you want to run with `spacedim` equal to three and `dim` equal to two, then
+you will almost certainly want to perform the following changes:
 
-Keeping the default refinement options you shall notice some glitch in the upper part
-of this hot air balloon shape. Why? What's the difference with the following?
+- use a different reference domain for the embedded grid, maybe reading it from
+  a file. It is not possible to construct a smooth closed surface with one
+  single parametrization of a square domain, therefore you'll most likely want
+  to use a reference domain that is topologically equivalent to a the boundary
+  of a sphere.
 
-<TABLE WIDTH="60%" ALIGN="center">
-  <tr>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.2_no_grid.png" alt="">
-    </td>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.2_grid.png" alt="">
-    </td>
-  </tr>
-</table>
+- use a displacement instead of the deformation to map $\Gamma_0$ into $\Gamma$
 
-<h4> Preconditioner </h4>
+<h4> More general domains </h4>
+
+We have seen in other tutorials (for example in step-5 and step-54) how to read
+grids from input files. A nice generalization for this tutorial program would be
+to allow the user to select a grid to read from the parameter file itself,
+instead of hardcoding the mesh type in the tutorial program itself.
+
+<h4> Preconditioner</h4>
 
 At the moment, we have no preconditioner on the Schur complement. This is ok for
 two dimensional problems, where a few hundred iterations bring the residual down
@@ -378,7 +376,7 @@ to the machine precision, but it's not going to work in three dimensions.
 It is not obvious what a good preconditioner would be here. The physical problem
 we are solving with the Schur complement, is to associate to the Dirichlet data
 $g$, the value of the Lagrange multiplier $\lambda$. $\lambda$ can be
-interpreted as the *jump* in the normal gradient that need to be imposed on $u$
+interpreted as the *jump* in the normal gradient that needs to be imposed on $u$
 across $\Gamma$, in order to obtain the Dirichlet data $g$.
 
 So $S$ is some sort of Neumann to Dirichlet map, and we would like to have a
@@ -393,23 +391,31 @@ The simple code proposed here can serve as a starting point for more
 complex problems which, to be solved, need to be run on parallel
 code, possibly using distributed meshes (see step-17, step-40, and the
 documentation for parallel::shared::Triangulation and
-parallel::distributed::Triangulation ).
+parallel::distributed::Triangulation).
 
-When using non-matching grids in parallel a problem arises:
-to compute the matrix $C$ a process needs information about both
-meshes on the same portion of real space but, when working with
-distributed meshes, this information may not be available.
+When using non-matching grids in parallel a problem arises: to compute the
+matrix $C$ a process needs information about both meshes on the same portion of
+real space but, when working with distributed meshes, this information may not
+be available, because the locally owned part of the $\Omega$ triangulation
+stored on a given processor may not be physically co-located with the locally
+owned part of the $\Gamma$ triangulation stored on the same processor.
 
 Various strategies can be implemented to tackle this problem:
 
-- distribute the two meshes so that this constraint is satisfied
+- distribute the two meshes so that this constraint is satisfied;
 
 - use communication for the parts of real space where the constraint is not
-  satisfied
+  satisfied;
 
-- use a shared triangulation for the embedding space, and a distributed
-  triangulation for the emdedded configuration
+- use a distributed triangulation for the embedding space, and a shared
+  triangulation for the emdedded configuration.
 
 The latter strategy is clearly the easiest to implement, as most of the
 functions used in this tutorial program will work unchanged also in the parallel
-case.
+case. Of course one could use the reversal strategy (that is, have a distributed
+embedded Triangulation and a shared embedding Triangulation).
+
+However, this strategy is most likely going to be more expensive, since by
+definition the embedding grid is larger than the embedded grid, and it makes
+more sense to distribute the largest of the two grids, maintaining the smallest
+one shared among all processors.
