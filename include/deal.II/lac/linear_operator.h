@@ -910,7 +910,7 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Range, Domain, Payload>
 mean_value_filter(const LinearOperator<Range, Domain, Payload> &op)
 {
-  auto return_op = mean_value_operator<Range, Payload>(op.reinit_range_vector);
+  auto return_op = mean_value_filter<Range, Payload>(op.reinit_range_vector);
   static_cast<Payload &>(return_op) = op.identity_payload();
 
   return return_op;
