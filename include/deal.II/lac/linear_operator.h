@@ -866,15 +866,17 @@ mean_value_filter(const std::function<void(Range &, bool)> &reinit_vector)
   return_op.vmult = [](Range &v, const Range &u)
   {
     const auto mean = u.mean_value();
-    for (types::global_dof_index i = 0; i<v.size(); ++i)
-      v(i) = u(i) - mean;
+
+    v = u;
+    v.add(-mean);
   };
 
   return_op.vmult_add = [](Range &v, const Range &u)
   {
     const auto mean = u.mean_value();
-    for (types::global_dof_index i = 0; i<v.size(); ++i)
-      v(i) += u(i) - mean;
+
+    v += u;
+    v.add(-mean);
   };
 
   return_op.Tvmult = return_op.vmult_add;
