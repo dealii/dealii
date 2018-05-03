@@ -179,6 +179,29 @@ FE_Nothing<dim,spacedim>::is_dominating() const
 }
 
 
+
+template <int dim, int spacedim>
+bool
+FE_Nothing<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) const
+{
+  // Compare fields stored in the base class
+  if (! (this->FiniteElement<dim,spacedim>::operator== (f)))
+    return false;
+
+  // Then make sure the other object is really of type FE_Nothing,
+  // and compare the data that has been passed to both objects'
+  // constructors.
+  if (const FE_Nothing<dim,spacedim> *f_nothing
+      = dynamic_cast<const FE_Nothing<dim,spacedim> *>(&f))
+    return ((dominate == f_nothing->dominate)
+            &&
+            (this->components == f_nothing->components));
+  else
+    return false;
+}
+
+
+
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_Nothing<dim,spacedim> ::
