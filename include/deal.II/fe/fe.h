@@ -1342,14 +1342,25 @@ public:
    *   current object and of the given object,
    * - the name returned by get_name(),
    * - as all of the fields in FiniteElementData,
-   * - constraint matrices,
-   * - restriction matrices,
-   * - prolongation matrices of this object and the argument.
+   * - constraint matrices.
    *
    * This covers most cases where elements can differ, but there are
    * cases of derived elements that are different and for which the
    * current function still returns @p true. For these cases, derived
    * classes should overload this function.
+   *
+   * @note This operator specifically does not check the following
+   *   member variables of the current class:
+   *   - restriction matrices,
+   *   - prolongation matrices of this object and the argument.
+   *  This is because these member variables may be initialized only
+   *  on demand by derived classes, rather than being available immediately.
+   *  Consequently, comparing these members would not only be costly because
+   *  these are generall big arrays, but also because their computation may
+   *  be expensive. On the other hand, derived classes for which these
+   *  arrays may differ for two objects even though the above list compares
+   *  as equal, will probably want to implement their own operator==()
+   *  anyway.
    */
   virtual
   bool operator == (const FiniteElement<dim,spacedim> &fe) const;

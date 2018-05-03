@@ -947,11 +947,7 @@ FiniteElement<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) 
           (static_cast<const FiniteElementData<dim>&>(*this) ==
            static_cast<const FiniteElementData<dim>&>(f))
           &&
-          (interface_constraints == f.interface_constraints)
-          &&
-          (restriction == f.restriction)
-          &&
-          (prolongation == f.prolongation));
+          (interface_constraints == f.interface_constraints));
 }
 
 
