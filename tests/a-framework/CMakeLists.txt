@@ -10,14 +10,25 @@ SET(TEST_TARGET_DEBUG dummy.debug)
 DEAL_II_PICKUP_TESTS()
 
 #
-# Limit concurrency between the two parameter file tests:
+# Limit concurrency between the two parameter file tests.
 #
-FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  STRING(TOLOWER ${_build} _build)
-  SET_TESTS_PROPERTIES(a-framework/parameter_file_2.${_build} PROPERTIES
-    DEPENDS a-framework/parameter_file_1.${_build}
-    )
-ENDFOREACH()
+# We only do this for CMake-3.4 or newer that has policy CMP0064 and
+# supports the IF(TEST ...) operator. For older CMake versions that do not
+# support the IF(TEST ...) operator we cannot much do (and people have to
+# live with spurious test failures.)
+#
+IF(POLICY CMP0064)
+  CMAKE_POLICY(SET CMP0064 NEW)
+  FOREACH(_build ${DEAL_II_BUILD_TYPES})
+    STRING(TOLOWER ${_build} _build)
+    IF( TEST a-framework/parameter_file_2.${_build} AND
+        TEST a-framework/parameter_file_1.${_build} )
+      SET_TESTS_PROPERTIES(a-framework/parameter_file_2.${_build} PROPERTIES
+        DEPENDS a-framework/parameter_file_1.${_build}
+        )
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
 
 
 #
