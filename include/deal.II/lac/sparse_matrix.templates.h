@@ -171,11 +171,21 @@ namespace internal
     typedef types::global_dof_index size_type;
 
     template <typename T>
-    void zero_subrange (const size_type begin,
-                        const size_type end,
-                        T *dst)
+    typename std::enable_if<std::is_trivial<T>::value>::type
+    zero_subrange (const size_type begin,
+                   const size_type end,
+                   T              *dst)
     {
       std::memset (dst+begin,0,(end-begin)*sizeof(T));
+    }
+
+    template <typename T>
+    typename std::enable_if<!std::is_trivial<T>::value>::type
+    zero_subrange (const size_type begin,
+                   const size_type end,
+                   T              *dst)
+    {
+      std::fill (dst+begin,dst+end,0);
     }
   }
 }
