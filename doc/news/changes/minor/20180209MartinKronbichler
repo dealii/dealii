@@ -1,6 +1,0 @@
-New: The new polynomial class Polynomials::HermiteLikeInterpolation is a
-modification of the Hermite polynomials with good conditioning of
-interpolation for all degrees, as opposed to the
-Polynomials::HermiteInterpolation class.
-<br>
-(Anian Fuchs, Martin Kronbichler, 2018/02/09)

@@ -1,4 +1,0 @@
-New: Utilities::MPI::all_gather and Utilities::MPI::some_to_some functions have been 
-added to perform general collective communications between processors. 
-<br> 
-(Giovanni Alzetta, Luca Heltai, 2017/11/18)

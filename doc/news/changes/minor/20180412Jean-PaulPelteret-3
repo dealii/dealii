@@ -1,9 +1,0 @@
-Fixed: When using diagonal SymmetricTensors with automatic-differentiable numbers, computations
-using the eigenvalue() and eigenvector() functions would return correct values of the
-eigenvalues/vectors. However, the derivatives of these values/vectors were incorrect as
-the sensitivities of the eigenvalues/vectors with respect to one another was not encoded
-in the returned result. Therefore, under these specific conditions the returned result is now
-a more coarse approximation for the eigenvalues/vectors but with the trade-off that a
-meaningful approximation of the derivative of the result can now be computed.
-<br>
-(Jean-Paul Pelteret, 2018/04/12)

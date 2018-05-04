@@ -1,4 +1,0 @@
-New: Added GridTools::exchange_local_bounding_boxes function and tests to exchange
-vectors of bounding boxes and gather them in every process.
-<br>
-(Giovanni Alzetta, 2017/10/30)

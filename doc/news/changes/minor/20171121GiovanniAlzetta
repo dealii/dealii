@@ -1,3 +1,0 @@
-Fixed: Added a tolerance inside GridTools::find_active_cell_around_point to errors with boundary points and a test with such points.
-<br>
-(Giovanni Alzetta, 2017/11/21)

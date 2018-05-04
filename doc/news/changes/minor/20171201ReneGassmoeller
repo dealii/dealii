@@ -1,5 +1,0 @@
-Improved: SphericalManifold::get_new_points now computes a lot
-of information outside of the loop over all points in get_new_point,
-which saves a significant amount of time for spherical geometries.
-<br>
-(Rene Gassmoeller, 2017/12/01)

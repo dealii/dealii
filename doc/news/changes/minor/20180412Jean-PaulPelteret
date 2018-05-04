@@ -1,5 +1,0 @@
-Fixed: Some compile-times errors would previously appear for some arithmetic functions
-when using Sacado::Fad::DFad types (e.g. Physics::Elasticity::Kinematics::F_iso() ). 
-By defining the ProductType Sacado expression templates, this issue is now avoided.
-<br>
-(Jean-Paul Pelteret, 2018/04/12)

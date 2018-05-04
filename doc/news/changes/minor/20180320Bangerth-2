@@ -1,9 +1,0 @@
-Fixed: Previously, it was not possible to iterate over the local range
-of rows of PETSc matrix objects because one would have to call
-`matrix.end(row)` where `row` is the last locally owned row, and that
-triggered an assertion because this end iterator is also the begin
-iterator of the next row -- which is not locally owned any more.
-<br>
-This is now fixed.
-<br>
-(Feimi Yu, Wolfgang Bangerth, 2018/03/20)

@@ -1,5 +1,0 @@
-New: MatrixFreeOperators::Base now also stores the diagonal of the operator that
-shall be populated in derived class in compute_diagonal() method. The read access
-is provided by MatrixFreeOperators::Base::get_matrix_diagonal().
-<br>
-(Denis Davydov, 2017/10/19)

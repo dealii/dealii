@@ -1,6 +1,0 @@
-New: The two new functions Polynomials::jacobi_polynomial_value() and
-Polynomials::jacobi_polynomial_roots() provide a user-visible
-implementation of Jacobi polynomials. This functionality has previously only
-been available internally in the library.
-<br>
-(Martin Kronbichler, 2018/04/06)

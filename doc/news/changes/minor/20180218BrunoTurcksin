@@ -1,5 +1,0 @@
-New: Add a new class CUDAWrappers::SparseMatrix, i.e., wrappers for cuSPARSE csr
-sparse matrix. The matrix is copied from  deal.II own's SparseMatrix and copied
-to the device.
-<br>
-(Bruno Turcksin, 2018/02/18)

@@ -1,3 +1,0 @@
-Fixed and improved: The GridTools::compute_point_locations() now always return the correct number of cells. The new algorithm is also significantly faster.
-<br>
-(Giovanni Alzetta, 2017/11/15)

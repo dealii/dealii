@@ -1,5 +1,0 @@
-Fixed: In FE_Enriched element, avoid evaluating quadrature points if no dofs are
-assigned. This happens when FE_Nothing is used together with other FE
-(i.e. FE_Q) as enrichments in FE_Enriched constructor.
-<br>
-(Nivesh Dommaraju, 2018/01/15)

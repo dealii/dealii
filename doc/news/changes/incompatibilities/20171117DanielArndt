@@ -1,4 +1,0 @@
-Removed: The default constructor for ArrayView was removed since
-an object constructed in this way can't be used in any sensible way.
-<br>
-(Daniel Arndt, 2017/11/17)

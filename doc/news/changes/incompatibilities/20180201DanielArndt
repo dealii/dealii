@@ -1,6 +1,0 @@
-Changed: TableIndices uses std::size_t for index access, 
-LAPACKFullMatrix::size_type is types::blas_int and 
-FullMatrix::size_type is std::size_t.
-<br>
-(Daniel Arndt, 2018/02/02)
-

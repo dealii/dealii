@@ -1,3 +1,0 @@
-New: Added CellId::serialize function and a test for it using pack/unpack
-<br>
-(Giovanni Alzetta, 2017/11/28)

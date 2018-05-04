@@ -1,3 +1,0 @@
-Changed: The function Mapping::clone (and all inheriting classes' implementations, such as MappingQ1Eulerian::clone) now return a <code>unique_ptr<Mapping<dim,spacedim>></code>.
-<br>
-(David Wells, 2018/02/08)

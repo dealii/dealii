@@ -1,4 +1,0 @@
-New: LAPACKFullMatrix: make operators *= and /= use Lapack function,
-LAPACKFullMatrix::add() uses BLAS 1 routine instead of handwritten loops
-<br>
-(Benjamin Brands, 2018/02/20)

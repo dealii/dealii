@@ -1,4 +1,0 @@
-New: LAPACKFullMatrix::remove_row_and_column() to remove certain row and column
-of the matrix.
-<br>
-(Denis Davydov, 2017/12/20)

@@ -1,5 +1,0 @@
-New: The class Utilities::MPI::Partitioner now supports handling only a
-selection of ghost indices within a larger ghost set. Use this feature by
-adding a second, larger, IndexSet to Partitioner::set_ghost_indices().
-<br>
-(Martin Kronbichler, 2017/10/17)

@@ -1,3 +1,0 @@
-New: GridGenerator::extract_boundary_mesh now correctly extracts also Manifold information. 
-<br> 
-(Luca Heltai, Dirk Peschka, 2017/12/04)

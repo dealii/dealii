@@ -1,5 +1,0 @@
-New: Enhanced Raviart-Thomas finite element FE_RT_Bubbles,
-allows for local elimination of a vector variable in 
-multipoint flux mixed finite element methods and similar.
-<br>
-(Eldar Khattatov, 2018/01/11)

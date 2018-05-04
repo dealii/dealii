@@ -1,6 +1,0 @@
-New: The new field
-MatrixFree::AdditionalData::cell_vectorization_categories allows to
-control the way batches of cells are formed in MatrixFree by assigning
-different numbers to different parts in the domain.
-<br>
-(Katharina Kormann, Martin Kronbichler, 2018/04/27)

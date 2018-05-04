@@ -1,4 +1,0 @@
-Fixed: The SymmetricTensor class was previously not instantiated for
-auto-differentiable numbers.
-<br>
-(Jean-Paul Pelteret, 2018/04/12)

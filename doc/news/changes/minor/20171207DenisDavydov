@@ -1,5 +1,0 @@
-New: Improve support of triangular matrices in LAPACKFullMatrix wrappers.
-Add LAPACKFullMatrix::solve() to solve a system of equations either when
-the matrix is factorized (Cholesky/LU) or triangular.
-<br>
-(Denis Davydov, 2017/12/07)

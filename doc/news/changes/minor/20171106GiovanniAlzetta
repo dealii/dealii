@@ -1,4 +1,0 @@
-Modified: Function Functions::FEFieldFunction::compute_point_locations now calls GridTools::compute_point_locations
-Modified: Function GridTools::compute_point_locations now accepts a cell hint (a test for this hint has been added)
-<br>
-(Giovanni Alzetta, 2017/11/06)

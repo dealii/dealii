@@ -1,5 +1,0 @@
-New: Add move constructor for TrilinosWrappers::SparseMatrix and
-TrilinosWrappers::SparsityPattern
-<br>
-(Bruno Turcksin, 2017/12/10)
-

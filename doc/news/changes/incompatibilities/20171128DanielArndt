@@ -1,4 +1,0 @@
-Changed: The default partitioner for parallel::shared::Triangulation
-is Zoltan.
-<br>
-(Daniel Arndt, 2017/11/28)

@@ -1,5 +1,0 @@
-Changed: GridTools::distributed_compute_point_locations now takes as input the
-global description of the manifold using bounding boxes.
-<br>
-(Giovanni Alzetta, 2018/04/16)
-

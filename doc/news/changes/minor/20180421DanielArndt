@@ -1,4 +1,0 @@
-Changed: In accordance with dealii::DoFHandler, hp::DoFHandler stores a copy
-of the FECollection instead of a pointer.
-<br>
-(Daniel Arndt, 2018/04/21)

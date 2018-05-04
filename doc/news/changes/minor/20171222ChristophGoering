@@ -1,4 +1,0 @@
-Improved: SparseMatrix::mmult(..) is now using the
-DynamicSparsityPattern::compute_mmult_pattern(..) function to create
-the sparsity pattern of the final matrix C.
-<br> (Christoph Goering, 2017/12/22)

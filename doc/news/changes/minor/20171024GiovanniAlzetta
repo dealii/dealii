@@ -1,3 +1,0 @@
-Added: Function GridTools::compute_point_locations and a test for it. The function uses the recently added Cache to improve performance.
-<br>
-(Giovanni Alzetta, 2017/10/24)

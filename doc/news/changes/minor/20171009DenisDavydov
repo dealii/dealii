@@ -1,3 +1,0 @@
-New: Add LAPACKFullMatrix::trace() to calculate trace of a matrix.
-<br>
-(Denis Davydov, 2017/10/09)

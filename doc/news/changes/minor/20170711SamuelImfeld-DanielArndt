@@ -1,5 +1,0 @@
-New: Adding the functions FE_FaceQ::hp_vertex_dof_identities(),
-FE_FaceQ::hp_line_dof_identities() and FE_FaceQ::hp_quad_dof_identities()
-allows FE_FaceQ to be used in combination with a hp::DoFHandler.
-<br>
-(Samuel Imfeld, Daniel Arndt, 2017/07/11)

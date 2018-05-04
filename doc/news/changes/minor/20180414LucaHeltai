@@ -1,8 +1,0 @@
-New: Introduced Triangulation::reset_manifold(), as a substitute for Triangulation::set_manifold()
-with only one argument. The set_manifold() method with one argument only was used to reset the manifold
-object. This method is now deprecated, in favor of the new, more explicative, method. 
-An additional Triangulation::reset_all_manifolds() method has been added to remove all manifold 
-objects from the triangulation.
-<br>
-(Luca Heltai, 2018/04/14)
-

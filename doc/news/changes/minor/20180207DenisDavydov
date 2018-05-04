@@ -1,4 +1,0 @@
-Extend VectorTools::project() function with MatrixFree quadrature data to
-optionally take the finite element component index.
-<br>
-(Denis Davydov, 2018/02/07)

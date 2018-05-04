@@ -1,6 +1,0 @@
-Fixed: The spherical manifold used to do a division
-by zero inside of SphericalManifold::get_new_point() 
-if the new point was exactly at the center of the
-manifold. This is fixed now.
-<br>
-(Rene Gassmoeller, 2017/10/31)

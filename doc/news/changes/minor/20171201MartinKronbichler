@@ -1,5 +1,0 @@
-Fixed: MappingQGeneric::transform_real_to_unit_cell() with degree 1 would
-previously fail for Cartesian meshes with certain combinations of roundoff
-errors. This is now fixed.
-<br>
-(Martin Kronbichler, 2017/12/01)

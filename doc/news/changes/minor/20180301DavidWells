@@ -1,3 +1,0 @@
-New: A template class LinearIndexIterator has been added with the intent of
-using it to generalize iterators over contiguously stored data.
-<br> (David Wells, 2018/03/01)

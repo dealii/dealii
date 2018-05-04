@@ -1,5 +1,0 @@
-New: Added QSimplex, QTrianglePolar, QDuffy, and QSplit classes to perform quadratures 
-on reference simplices, on their affine transformations, and on hyper cubes
-split by a given point.
-<br> 
-(Luca Heltai, 2017/12/21)

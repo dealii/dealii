@@ -1,7 +1,0 @@
-Changed: It is now necessary to explicitly enable MPI support when
-configuring deal.II via -DDEAL_II_WITH_MPI=ON, or -DWITH_MPI=ON on the
-command line. The old behavior of just specifying an MPI compiler wrapper
-via environment, or CMAKE_(C|CXX)_COMPILER does not work any more.
-<br>
-(Matthias Maier, 2018/01/01)
-

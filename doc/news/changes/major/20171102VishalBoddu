@@ -1,7 +1,0 @@
-New: The new namespace Rol contains an adaptor class that provides
-the implementation of the ROL::Vector interface. 
-The Trilinos package, Rapid Optimization Library (ROL), can solve unconstrained
-and constrained optimization problems, and optimization problems under
-uncertainty.
-<br>
-(Vishal Boddu 2017/11/02)

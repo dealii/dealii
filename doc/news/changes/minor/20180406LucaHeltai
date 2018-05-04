@@ -1,5 +1,0 @@
-New: Patterns::Tools::to_string() and Patterns::Tools::to_value() simplify the conversion to and from
-strings of arbitrarily complex types. 
-<br>
-(Luca Heltai, 2018/04/06)
-

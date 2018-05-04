@@ -1,5 +1,0 @@
-New: The class FEEvaluation can now be constructed for only a subset of
-the components inside an FESystem, picking e.g. the pressure part
-outside of a Taylor-Hood element.
-<br>
-(Katharina Kormann, Martin Kronbichler, 2018/04/27)

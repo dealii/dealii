@@ -1,5 +1,0 @@
-Changed: The GridOut::write_mesh_per_processor_as_vtu function now 
-only includes processor info in the .vtu filename and writes a .pvtu file 
-when using a <code>parallel::Triangulation</code>.
-<br>
-(Conrad Clevenger, 2018/02/19)

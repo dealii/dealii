@@ -1,4 +1,0 @@
-New: Add ScaLAPACKMatrix and ProcessGrid wrappers for high-performance dense linear
-algebra routines for parallel distributed memory machines.
-<br>
-(Denis Davydov, Benjamin Brands, 2017/11/20)

@@ -1,5 +1,0 @@
-Changed: Core functions in the FEValues and FEValuesViews classes have been
-updated to allow the use of certain automatically differentiable numbers to
-represent degree-of-freedom values.
-<br>
-(Jean-Paul Pelteret, 2017/11/16)

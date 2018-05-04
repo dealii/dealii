@@ -1,3 +1,0 @@
-New: Added BoundingBox::get_neighbor_type() which returns the neighboring relation between two bounding boxes. Added the function GridTools::compute_mesh_predicate_bounding_box() which returns a vector of BoundingBoxes covering the cells for which a given predicate is true.
-<br>
-(Giovanni Alzetta, 2017/10/20)

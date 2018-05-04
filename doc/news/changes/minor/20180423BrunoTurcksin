@@ -1,4 +1,0 @@
-New: Add direct solvers (Cholesky and LU factorization) to solve problems on the
-GPU
-<br>
-(Bruno Turcksin, 2018/04/23)

@@ -1,6 +1,0 @@
-New: Every function in the GridGenerator namespace now attaches a default manifold to the 
-curved parts of the boundary of the domain, and sets reasonable defaults for manifold indicators in the
-domain, independently on the boundary indicators. 
-<br>
-(Luca Heltai, Daniel Arndt, Jean-Paul Pelteret, David Wells, 2018/04/17)
-

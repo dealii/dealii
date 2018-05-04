@@ -1,6 +1,0 @@
-New: The implementation of the divergence in FEValuesExtractors::Tensor
-was changed so that the gradient operator is contracted from the right.
-This is done in order to make it consistent with gradient of the
-second order tensor, namely $Grad(T) : I = Div(T)$.
-<br>
-(Denis Davydov, 2018/04/12)

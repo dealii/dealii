@@ -1,6 +1,0 @@
-New: The function
-LinearAlgebra::distributed::Vector::copy_locally_owned_data_from() can copy
-the locally owned range in a parallel vector without considering the ghost
-entries which might be different between the two vectors.
-<br>
-(Martin Kronbichler, 2017/10/24)

@@ -1,5 +1,0 @@
-New: Cell weighting can now be taken into account by the Metis partitioner. This can be done directly
-using the new GridTools::partition_triangulation() function that accepts a vector of cell weights,
-or by adding the appropriate signal to the triangulation itself (Triangulation::Signals::cell_weight).
-<br>
-(Jean-Paul Pelteret, 2018/04/17)

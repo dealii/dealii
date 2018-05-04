@@ -1,5 +1,0 @@
-Fixed: The algorithm in Manifold::normal_vector could
-cause division-by-zero errors for special cases. This
-was fixed.
-<br>
-(Rene Gassmoeller, 2017/11/03)

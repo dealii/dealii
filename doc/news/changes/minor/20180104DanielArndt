@@ -1,4 +1,0 @@
-New: Implementing CylindricalManifold::push_forward_gradient allows to compute
-normal vectors for boundaries described by CylindricalManifold objects.
-<br>
-(Daniel Arndt, 2018/01/04)

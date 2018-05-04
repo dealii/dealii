@@ -1,5 +1,0 @@
-New: Add MGTransferBlockMatrixFree which allows using geometric multi-grids with
-LinearAlgebra::distributed::BlockVector<Number> where each block uses the same
-index space of degrees of freedom.
-<br>
-(Denis Davydov, 2017/08/18)
