@@ -86,6 +86,8 @@ namespace LAPACKSupport
         return "inverse matrix";
       case lu:
         return "lu decomposition";
+      case cholesky:
+        return "cholesky decomposition";
       case eigenvalues:
         return "eigenvalues";
       case svd:
