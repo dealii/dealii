@@ -116,7 +116,7 @@ around the vertices of our mesh by a finite amount before solving the
 next linear problem is an inconsistent approach. We should therefore
 note that it is not surprising that the equations discussed below
 can't be found in the literature: <b>The model considered here has
-little to do with reality!</b> On the other hand, the implementational
+little to do with reality!</b> On the other hand, the implementation
 techniques we consider are very much what one would need to use when
 implementing a <i>real</i> model, as we will see in step-44.
 
@@ -334,8 +334,8 @@ is concerned
 was that only the first processor generated output for the entire domain.
 Since generating graphical output is expensive, this did not scale well when
 larger numbers of processors were involved. We will address this here. (For a
-definition of what it means for a program to "scale", see 
-@ref GlossParallelScaling "this glossary entry.)
+definition of what it means for a program to "scale", see
+@ref GlossParallelScaling "this glossary entry".)
 
 Basically, what we need to do is let every process
 generate graphical output for that subset of cells that it owns, write them
@@ -486,7 +486,7 @@ sequence of operations on the present mesh:
   local contributions to the matrix in the following elegant way (the variable
   <code>stress_strain_tensor</code>, corresponding to the tensor $C$, has
   previously been initialized with the result of the first function above):
-  @verbatim
+  @code
 for (unsigned int i=0; i<dofs_per_cell; ++i)
   for (unsigned int j=0; j<dofs_per_cell; ++j)
     for (unsigned int q_point=0; q_point<n_q_points;
@@ -501,7 +501,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
               *
               fe_values.JxW (q_point));
       }
-  @endverbatim
+  @endcode
   It is worth noting the expressive power of this piece of code, and to
   compare it with the complications we had to go through in previous examples
   for the elasticity problem. (To be fair, the SymmetricTensor class
@@ -527,7 +527,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   <code>local_quadrature_points_data</code> that allows to access the stress
   $\sigma^{n-1}_q$ in each quadrature point. With this the code for the right
   hand side looks as this, again rather elegant:
-  @verbatim
+  @code
 for (unsigned int i=0; i<dofs_per_cell; ++i)
   {
     const unsigned int
@@ -547,7 +547,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
                        fe_values.JxW (q_point);
       }
   }
-  @endverbatim
+  @endcode
   Note that in the multiplication $\mathbf{f}(\mathbf{x}_q) \cdot \varphi_i(\mathbf{x}_q)$, we have made use of the fact that for the chosen finite element, only
   one vector component (namely <code>component_i</code>) of $\varphi_i$ is
   nonzero, and that we therefore also have to consider only one component of
@@ -596,6 +596,3 @@ addition, gravity acts on the body.
 The program text will reveal more about how to implement this situation, and
 the results section will show what displacement pattern comes out of this
 simulation.
-
-
-
