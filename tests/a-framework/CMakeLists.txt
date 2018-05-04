@@ -10,13 +10,16 @@ SET(TEST_TARGET_DEBUG dummy.debug)
 DEAL_II_PICKUP_TESTS()
 
 #
-# Limit concurrency between the two parameter file tests:
+# Limit concurrency between the two parameter file tests.
 #
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${_build} _build)
-  SET_TESTS_PROPERTIES(a-framework/parameter_file_2.${_build} PROPERTIES
-    DEPENDS a-framework/parameter_file_1.${_build}
-    )
+  IF(TARGET parameter_file_2.${_build}.diff AND
+     TARGET parameter_file_1.${_build}.diff )
+    SET_TESTS_PROPERTIES(a-framework/parameter_file_2.${_build} PROPERTIES
+      DEPENDS a-framework/parameter_file_1.${_build}
+      )
+  ENDIF()
 ENDFOREACH()
 
 
