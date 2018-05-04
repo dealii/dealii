@@ -198,11 +198,11 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
 #
 # belong the corresponding file:
 #
-#   ./cmake/checks/check_01_compiler_features.cmake
 #   ./cmake/checks/check_01_cpu_features.cmake
 #   ./cmake/checks/check_01_cxx_features.cmake
-#   ./cmake/checks/check_01_system_features.cmake
-#   ./cmake/checks/check_02_compiler_bugs.cmake
+#   ./cmake/checks/check_02_compiler_features.cmake
+#   ./cmake/checks/check_02_system_features.cmake
+#   ./cmake/checks/check_03_compiler_bugs.cmake
 #
 </pre>
   </ul>
@@ -215,13 +215,9 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
 <p>
   The next step in the configuration process is to include all
   checks residing under <code>./cmake/checks</code>. Currently
-  there are:
+  there are (included and executed in alphabetical order):
 
 <pre>
-./cmake/checks/check_01_compiler_features.cmake
-  - Search for support for compiler dependent features such as stack
-    trace support, demangler support, etc.
-
 ./cmake/checks/check_01_cpu_features.cmake
   - Platform introspection for CPU features goes here and must be
     guarded with DEAL_II_ALLOW_PLATFORM_INTROSPECTION
@@ -230,11 +226,15 @@ SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
   - Check for supported C++ language features such as sufficient C++11
     support
 
-./cmake/checks/check_01_system_features.cmake
+./cmake/checks/check_02_compiler_features.cmake
+  - Search for support for compiler dependent features such as stack
+    trace support, demangler support, etc.
+
+./cmake/checks/check_02_system_features.cmake
   - Checks for specific platform (Linux/Darwin/CYGWIN/Windows..)
     features and support
 
-./cmake/checks/check_02_compiler_bugs.cmake
+./cmake/checks/check_03_compiler_bugs.cmake
   - Check for compiler bugs
 </pre>
 
