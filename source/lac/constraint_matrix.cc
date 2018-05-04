@@ -1475,7 +1475,7 @@ ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 namespace internals
 {
 #define SCRATCH_INITIALIZER(MatrixScalar,VectorScalar,Name)                  \
-  ConstraintMatrixData<MatrixScalar,VectorScalar>::ScratchData scratch_data_initializer_##Name; \
+  static ConstraintMatrixData<MatrixScalar,VectorScalar>::ScratchData scratch_data_initializer_##Name; \
   template <> Threads::ThreadLocalStorage<ConstraintMatrixData<MatrixScalar,VectorScalar>::ScratchData> \
   ConstraintMatrixData<MatrixScalar,VectorScalar>::scratch_data(scratch_data_initializer_##Name)
 
