@@ -2159,7 +2159,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
     tria.create_triangulation (
       std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
@@ -2243,7 +2243,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
@@ -2309,7 +2309,7 @@ namespace GridGenerator
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
         cells[i].manifold_id = i==2 ? 1 : numbers::flat_manifold_id;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
@@ -2366,7 +2366,7 @@ namespace GridGenerator
 
         vertices[i]   += center;
         vertices[i+N] += center;
-      };
+      }
 
     std::vector<CellData<2> > cells (N, CellData<2>());
 
@@ -2378,7 +2378,7 @@ namespace GridGenerator
         cells[i].vertices[3] = N+((i+1)%N);
 
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       vertices, cells, SubCellData());
@@ -2472,7 +2472,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<dim> >(std::begin(vertices), std::end(vertices)),
@@ -2539,7 +2539,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<4; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
@@ -2624,7 +2624,7 @@ namespace GridGenerator
 
         vertices[i]     += center;
         vertices[i+N+1] += center;
-      };
+      }
 
 
     std::vector<CellData<2> > cells (N, CellData<2>());
@@ -2637,7 +2637,7 @@ namespace GridGenerator
         cells[i].vertices[3] = N+1+((i+1)%(N+1));
 
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (vertices, cells, SubCellData());
 
@@ -2706,7 +2706,7 @@ namespace GridGenerator
 
         vertices[i]     += center;
         vertices[i+N+1] += center;
-      };
+      }
 
 
     std::vector<CellData<2> > cells (N, CellData<2>());
@@ -2719,7 +2719,7 @@ namespace GridGenerator
         cells[i].vertices[3] = N+1+((i+1)%(N+1));
 
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (vertices, cells, SubCellData());
 
@@ -2785,7 +2785,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
@@ -3012,7 +3012,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
@@ -3084,7 +3084,7 @@ namespace GridGenerator
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
         cells[i].manifold_id = i == 0 ? numbers::flat_manifold_id : 1;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
@@ -3181,7 +3181,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
@@ -3284,7 +3284,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<dim> >(std::begin(vertices), std::end(vertices)),
@@ -3391,7 +3391,7 @@ namespace GridGenerator
         for (unsigned int j=0; j<8; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
-      };
+      }
 
     tria.create_triangulation (
       std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
@@ -3739,7 +3739,7 @@ namespace GridGenerator
             for (unsigned int j=0; j<8; ++j)
               cells[i].vertices[j] = cell_vertices[i][j];
             cells[i].material_id = 0;
-          };
+          }
 
         tria.create_triangulation (
           std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
@@ -3901,7 +3901,7 @@ namespace GridGenerator
         vertices_2d[i] = Point<2>( std::cos(2*pi * i/N_r),
                                    std::sin(2*pi * i/N_r)) * outer_radius;
         vertices_2d[i+N_r] = vertices_2d[i] * (inner_radius/outer_radius);
-      };
+      }
 
     std::vector<Point<3> > vertices_3d;
     vertices_3d.reserve (2*N_r*(N_z+1));

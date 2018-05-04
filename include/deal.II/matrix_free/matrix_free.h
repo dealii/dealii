@@ -220,7 +220,7 @@ public:
       overlap_communication_computation(overlap_communication_computation),
       hold_all_faces_to_owned_cells(hold_all_faces_to_owned_cells),
       cell_vectorization_categories_strict(cell_vectorization_categories_strict)
-    {};
+    {}
 
     /**
      * Set the scheme for task parallelism. There are four options available.

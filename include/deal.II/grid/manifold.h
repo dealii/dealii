@@ -960,7 +960,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~ChartManifold () = default;
+  virtual ~ChartManifold () override = default;
 
   /**
    * Refer to the general documentation of this class and the documentation of

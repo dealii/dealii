@@ -1803,7 +1803,7 @@ public:
    * Destructor. Declare this only to have a virtual destructor, which is
    * safer as we have virtual functions. It actually does nothing spectacular.
    */
-  virtual ~MultipleParameterLoop () = default;
+  virtual ~MultipleParameterLoop () override = default;
 
   /**
    * Read input from a stream until the stream returns the <tt>eof</tt>

@@ -974,7 +974,7 @@ namespace internals
     bool operator < (const Distributing &in) const
     {
       return global_row<in.global_row;
-    };
+    }
 
     size_type global_row;
     size_type local_row;

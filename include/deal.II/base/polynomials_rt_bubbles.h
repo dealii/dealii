@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomials_rt_bubbles_h
-#define dealii__polynomials_rt_bubbles_h
+#ifndef dealii_polynomials_rt_bubbles_h
+#define dealii_polynomials_rt_bubbles_h
 
 
 #include <deal.II/base/config.h>

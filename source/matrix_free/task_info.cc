@@ -141,7 +141,8 @@ namespace internal
           partition (partition_in),
           task_info (task_info_in),
           is_blocked (is_blocked_in)
-        {};
+        {}
+
         tbb::task *execute ()
         {
           tbb::empty_task *root = new( tbb::task::allocate_root() )tbb::empty_task;
@@ -227,7 +228,8 @@ namespace internal
           worker (worker_in),
           task_info (task_info_in),
           partition (partition_in)
-        {};
+        {}
+
         void operator()(const tbb::blocked_range<unsigned int> &r) const
         {
           const unsigned int start_index = task_info.cell_partition_data[partition]
@@ -263,7 +265,8 @@ namespace internal
           partition (partition_in),
           task_info (task_info_in),
           is_blocked (is_blocked_in)
-        {};
+        {}
+
         tbb::task *execute ()
         {
           const unsigned int n_chunks = (task_info.cell_partition_data[partition+1]-
@@ -297,7 +300,7 @@ namespace internal
         :
         worker(worker_in),
         do_compress(do_compress)
-      {};
+      {}
 
       tbb::task *execute ()
       {

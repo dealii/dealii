@@ -1064,10 +1064,11 @@ namespace deal_II_exceptions
           dealii::deal_II_exceptions::internals::abort(e);
         case throw_on_exception:
           throw e;
+        // this function should never return (and AssertNothrow can);
+        // something must have gone wrong in the error handling code for us
+        // to get this far, so throw an exception.
+        case abort_nothrow_on_exception:
         default:
-          // this function should never return; something must have gone wrong
-          // in the error handling code for us to get this far, so throw an
-          // exception.
           throw ::dealii::StandardExceptions::ExcInternalError();
         }
     }

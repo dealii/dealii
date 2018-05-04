@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__particles_property_pool_h
-#define dealii__particles_property_pool_h
+#ifndef dealii_particles_property_pool_h
+#define dealii_particles_property_pool_h
 
 #include <deal.II/base/array_view.h>
 

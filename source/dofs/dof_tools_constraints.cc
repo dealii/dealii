@@ -2753,7 +2753,7 @@ namespace DoFTools
                 communicator = tria.get_communicator ();
                 is_called_in_parallel = true;
               }
-            catch (std::bad_cast &exp)
+            catch (std::bad_cast &)
               {
                 // Nothing bad happened: the user used serial Triangulation
               }

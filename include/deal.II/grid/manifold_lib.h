@@ -522,7 +522,7 @@ public:
   /**
    * If needed, we delete the pointers we own.
    */
-  ~FunctionManifold();
+  virtual ~FunctionManifold() override;
 
   /**
    * Make a clone of this Manifold object.
@@ -834,7 +834,7 @@ public:
   /**
    * Destructor.
    */
-  ~TransfiniteInterpolationManifold();
+  virtual ~TransfiniteInterpolationManifold() override;
 
   /**
    * Make a clone of this Manifold object.

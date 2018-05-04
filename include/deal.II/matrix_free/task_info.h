@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef __deal2__matrix_free_task_info_h
-#define __deal2__matrix_free_task_info_h
+#ifndef dealii_matrix_free_task_info_h
+#define dealii_matrix_free_task_info_h
 
 
 #include <deal.II/base/exceptions.h>

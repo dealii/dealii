@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__matrix_free_evaluation_selector_h
-#define dealii__matrix_free_evaluation_selector_h
+#ifndef dealii_matrix_free_evaluation_selector_h
+#define dealii_matrix_free_evaluation_selector_h
 
 #include <deal.II/matrix_free/evaluation_kernels.h>
 

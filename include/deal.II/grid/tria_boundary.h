@@ -89,7 +89,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~Boundary () = default;
+  virtual ~Boundary () override = default;
 
   /**
    * Clone this Boundary.
