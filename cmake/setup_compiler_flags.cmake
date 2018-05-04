@@ -53,11 +53,11 @@
 #
 # belong the corresponding file:
 #
-#   ./cmake/checks/check_01_compiler_features.cmake
 #   ./cmake/checks/check_01_cpu_features.cmake
 #   ./cmake/checks/check_01_cxx_features.cmake
-#   ./cmake/checks/check_01_system_features.cmake
-#   ./cmake/checks/check_02_compiler_bugs.cmake
+#   ./cmake/checks/check_02_compiler_features.cmake
+#   ./cmake/checks/check_02_system_features.cmake
+#   ./cmake/checks/check_03_compiler_bugs.cmake
 #
 
 
