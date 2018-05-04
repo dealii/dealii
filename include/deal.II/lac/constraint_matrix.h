@@ -1218,10 +1218,10 @@ public:
    * in a distributed computation.
    *
    * This method checks if all processors agree on the constraints for their
-   * local lines as returned by get_local_lines(). This method is a collective
+   * local lines as given by @p locally_active_dofs. This method is a collective
    * operation and will return @p true only if all processors are consistent.
    *
-   * Please supply the owned DoFs per processor as return by
+   * Please supply the owned DoFs per processor as returned by
    * DoFHandler::locally_owned_dofs_per_processor() as @p locally_owned_dofs
    * and the result of DoFTools::extract_locally_active_dofs() as
    * @p locally_active_dofs. The
@@ -1233,7 +1233,9 @@ public:
    *
    * @note This method exchanges all constraint information of locally active
    * lines and is as such slow for large computations and should probably
-   * only be used in debug mode.
+   * only be used in debug mode. We do not check all lines returned by
+   * get_local_lines() but only the locally active ones, as we allow processors
+   * to not know about some locally relevant rows.
    *
    * @return Whether all ConstraintMatrix objects are consistent. Returns the
    * same value on all processors.
