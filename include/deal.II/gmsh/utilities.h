@@ -81,7 +81,7 @@ namespace Gmsh
 
 #ifdef DEAL_II_WITH_OPENCASCADE
   /**
-   * Given a smooth closed curve, creates a triangulation from it, using
+   * Given a smooth closed curve creates a triangulation from it using
    * Gmsh.
    *
    * The input curve @p boundary should be closed.

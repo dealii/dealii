@@ -1,3 +1,18 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
 #include <deal.II/gmsh/utilities.h>
 #include <deal.II/opencascade/utilities.h>
 
@@ -42,11 +57,17 @@ namespace Gmsh
     if (base_name == "")
       base_name = std::tmpnam(nullptr);
 
-    dealii::OpenCASCADE::write_IGES(boundary, base_name+".iges");
+    const std::string iges_file_name     = base_name+".iges";
+    const std::string geo_file_name      = base_name+".geo";
+    const std::string msh_file_name     = base_name+".msh";
+    const std::string log_file_name      = base_name+".log";
+    const std::string warnings_file_name = base_name+"_warn.log";
+
+    dealii::OpenCASCADE::write_IGES(boundary, iges_file_name);
 
     ofstream geofile;
-    geofile.open( base_name+".geo");
-    geofile << "Merge \"" << base_name << ".iges\";" << std::endl
+    geofile.open(geo_file_name);
+    geofile << "Merge \"" << iges_file_name << "\";" << std::endl
             << "Line Loop (2) = {1};" << std::endl
             << "Plane Surface (3) = {2};" << std::endl
             << "Characteristic Length { 1 } = " << prm.characteristic_length << ";" << std::endl
@@ -55,18 +76,17 @@ namespace Gmsh
 
     geofile.close();
 
-    // std::system("gmsh -2 -algo front3d temp_model.geo 1>temp_out.log 2>temp_warn.log");
     std::stringstream command;
     command << DEAL_II_GMSH_EXECUTABLE_PATH << " -2 "
-            << base_name << ".geo 1> "
-            << base_name << ".log 2> "
-            << base_name << "_warn.log";
+            << geo_file_name << " 1> "
+            << log_file_name << " 2> "
+            << warnings_file_name;
 
-    auto ret_value = std::system(command.str().c_str());
+    const auto ret_value = std::system(command.str().c_str());
     AssertThrow(ret_value == 0,
-                ExcMessage("Gmsh failed to run. Check the "+base_name+".log file."));
+                ExcMessage("Gmsh failed to run. Check the "+log_file_name+" file."));
 
-    std::ifstream grid_file(base_name+".msh");
+    std::ifstream grid_file(msh_file_name);
     Assert(grid_file, ExcIO());
 
     GridIn<2,spacedim> gridin;
@@ -75,11 +95,26 @@ namespace Gmsh
 
     if (base_name != prm.output_base_name)
       {
-        std::remove((base_name + ".geo").c_str());
-        std::remove((base_name + ".log").c_str());
-        std::remove((base_name + "_warn.log").c_str());
-        std::remove((base_name + ".msh").c_str());
-        std::remove((base_name + ".iges").c_str());
+        {
+          const auto ret_value = std::remove(iges_file_name.c_str());
+          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+iges_file_name));
+        }
+        {
+          const auto ret_value = std::remove(geo_file_name.c_str());
+          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+geo_file_name));
+        }
+        {
+          const auto ret_value = std::remove(msh_file_name.c_str());
+          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+msh_file_name));
+        }
+        {
+          const auto ret_value = std::remove(log_file_name.c_str());
+          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+log_file_name));
+        }
+        {
+          const auto ret_value = std::remove(warnings_file_name.c_str());
+          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+warnings_file_name));
+        }
       }
   }
 #endif
