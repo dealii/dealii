@@ -481,7 +481,7 @@ struct load_pointer_type {
     };
 
     template<class T>
-    static const basic_pointer_iserializer * register_type(Archive &ar, const T & /*t*/){
+    static const basic_pointer_iserializer * register_type(Archive &ar, const T* const /*t*/){
         // there should never be any need to load an abstract polymorphic 
         // class pointer.  Inhibiting code generation for this
         // permits abstract base classes to be used - note: exception
@@ -520,7 +520,7 @@ struct load_pointer_type {
     }
 
     template<class T>
-    static void check_load(T & /* t */){
+    static void check_load(T * const /* t */){
         check_pointer_level< T >();
         check_pointer_tracking< T >();
     }
@@ -534,8 +534,8 @@ struct load_pointer_type {
 
     template<class Tptr>
     static void invoke(Archive & ar, Tptr & t){
-        check_load(*t);
-        const basic_pointer_iserializer * bpis_ptr = register_type(ar, *t);
+        check_load(t);
+        const basic_pointer_iserializer * bpis_ptr = register_type(ar, t);
         const basic_pointer_iserializer * newbpis_ptr = ar.load_pointer(
             // note major hack here !!!
             // I tried every way to convert Tptr &t (where Tptr might
