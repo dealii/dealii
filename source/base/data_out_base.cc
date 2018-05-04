@@ -285,7 +285,7 @@ namespace
               (uint32_t)compressed_data_length
             }; /* list of compressed sizes of blocks */
 
-        char *encoded_header = encode_block ((char *)&compression_header[0],
+        char *encoded_header = encode_block (reinterpret_cast<const char *>(&compression_header[0]),
                                              4 * sizeof(compression_header[0]));
         output_stream << encoded_header;
         delete[] encoded_header;
