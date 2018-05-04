@@ -339,3 +339,4 @@ design of the smoother parameters by selecting better values.
 Another way of extending the program would be to include support for adaptive
 meshes, for which an interface operation at edges of different refinement
 level becomes necessary, as discussed in step-39.
+
