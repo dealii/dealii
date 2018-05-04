@@ -586,6 +586,7 @@ namespace Threads
      * <code>std::exception</code> is caught, it passes over control to this
      * function, which will then provide some output.
      */
+    [[noreturn]]
     void handle_std_exception (const std::exception &exc);
 
     /**
@@ -595,6 +596,7 @@ namespace Threads
      * <code>std::exception</code>, so there is little way to provide
      * something more useful.
      */
+    [[noreturn]]
     void handle_unknown_exception ();
 
     /**

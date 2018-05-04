@@ -50,6 +50,7 @@ namespace Threads
 
 
 
+    [[noreturn]]
     void handle_std_exception (const std::exception &exc)
     {
       // lock the following context
@@ -87,6 +88,7 @@ namespace Threads
 
 
 
+    [[noreturn]]
     void handle_unknown_exception ()
     {
       // lock the following context
