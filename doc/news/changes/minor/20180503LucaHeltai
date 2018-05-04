@@ -1,0 +1,5 @@
+New: Gmsh::create_triangulation_from_boundary_curve is a new method that constructs a grid from an 
+OpenCASCADE TopoDS_Edge object. It offers the reverse functionality of the method 
+OpenCASCADE::create_curves_from_triangulation_boundary().
+<br>
+(Luca Heltai, 2018/05/03)
