@@ -819,30 +819,8 @@ namespace Step18
               cell->face(f)->set_boundary_id (3);
           }
 
-    // In order to make sure that new vertices are placed correctly on
-    // mesh refinement, we have to associate objects describing those
-    // parts of the boundary that do not consist of straight
-    // parts. Corresponding to the cylinder shell generator function
-    // used above, there are classes that can be used to describe the
-    // geometry of cylinders. The library implements both boundary
-    // classes as well as manifold classes, where also the interior
-    // part of mesh is refined according to the geometrical
-    // description. For this example, we use a single cylindrical
-    // manifold both for the interior part and for the boundary
-    // parts. Note that the manifold object need to live as long as
-    // the triangulation does; we can achieve this by making the
-    // objects static, which means that they live as long as the
-    // program runs:
-    static const CylindricalManifold<dim> cylindrical_manifold (2);
-
-    // We tell the triangulation to reset all its manifold indicators
-    // to 0, and then attach the cylindrical manifold to it:
-    triangulation.set_all_manifold_ids(0);
-    triangulation.set_manifold (0, cylindrical_manifold);
-
     // Once all this is done, we can refine the mesh once globally:
     triangulation.refine_global (1);
-
 
     // As the final step, we need to set up a clean state of the data that we
     // store in the quadrature points on all cells that are treated on the
