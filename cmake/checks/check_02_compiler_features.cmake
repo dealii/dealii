@@ -315,6 +315,15 @@ ENDIF()
 # - Wolfgang Bangerth, 2012
 #
 
+# some compilers compile the attributes but they do not work:
+# "warning: use of the 'deprecated' attribute is a C++14 extension" (clang in c++11 mode)
+# "warning #1292: unknown attribute "deprecated"" (icc)
+PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS}")
+PUSH_CMAKE_REQUIRED("-Werror")
+PUSH_CMAKE_REQUIRED("-Wno-deprecated-declarations")
+PUSH_CMAKE_REQUIRED("-Wno-deprecated")
+PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
+
 # first see if the compiler accepts the attribute
 CHECK_CXX_SOURCE_COMPILES(
   "
@@ -349,6 +358,8 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
   )
+
+RESET_CMAKE_REQUIRED()
 
 IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "[[deprecated]]")
