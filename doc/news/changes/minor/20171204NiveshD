@@ -1,4 +1,0 @@
-New: Add color_sparsity_pattern function to color a graph represented by SparsityPattern Object.
-The function uses coloring function from ZOLTAN library.
-<br>
-(Nivesh Dommaraju, 2017/12/04)

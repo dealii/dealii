@@ -1,5 +1,0 @@
-New: Extend GridGenerator::extrude_triangulation to using exact slicing z-axis
-values and reimplement the exsiting GridGenerator::extrude_triangulation using
-the newly developed overload.
-<br>
-(Weixiong Zheng, 2018/04/05)

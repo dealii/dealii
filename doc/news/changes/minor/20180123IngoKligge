@@ -1,5 +1,0 @@
-Improved: The implementation of the SolverQMRS iteration has been renewed to 
-perform much faster and to be adaptable to left and right side preconditioning 
-of the system matrix. 
-<br> 
-(Ingo Kligge, 2018/01/23)

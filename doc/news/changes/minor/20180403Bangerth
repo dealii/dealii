@@ -1,4 +1,0 @@
-New: There is now a function Utilities::dynamic_unique_cast() that does for
-`std::unique_ptr` objects what `dynamic_cast` does for regular pointers.
-<br>
-(Wolfgang Bangerth, 2018/04/03)

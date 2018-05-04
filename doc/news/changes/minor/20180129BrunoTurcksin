@@ -1,3 +1,0 @@
-New: Add AssertCusparse macro to assert the error code of cuSPARSE function
-<br>
-(Bruno Turcksin, 2018/01/29)

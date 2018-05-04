@@ -1,7 +1,0 @@
-Fixed: Manifold::normal_vector() used to pick two directions that are almost
-linearly dependent quite often, which resulted in very bad accuracy of the
-normal vectors. This has been fixed. The downstream use of this function on
-curved geometries in VectorTools::compute_no_normal_flux_constraints() has now
-become much more accurate and robust.
-<br>
-(Martin Kronbichler, 2017/12/02)

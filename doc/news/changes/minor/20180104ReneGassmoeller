@@ -1,6 +1,0 @@
-Fixed: The DataOut::write_vtu output pretended to write double precision data,
-while in reality the data was first converted to float and then written as
-double. This was fixed by writing all data (including vertex positions) as
-single precision float and adjusting the output types accordingly.
-<br>
-(Rene Gassmoeller, 2018/01/04)

@@ -1,5 +1,0 @@
-Fixed: MGTransferMatrixFree::restrict() and MGTransferMatrixFree::prolongate()
-would produce a segmentation fault when used with multi-component systems for
-polynomial degrees larger than 10. This is now fixed.
-<br>
-(Martin Kronbichler, 2018/01/30)

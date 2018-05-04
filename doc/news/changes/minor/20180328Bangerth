@@ -1,8 +1,0 @@
-Fixed: Threads::Thread<T> and Threads::Task<T> objects can now also be
-used when @p T is a type that is only move-constructable or movable,
-but not necessarily copy-constructible or copyable. Consequently, one
-can now also call functions that return such objects on tasks and
-threads. In particular, this is relevant for functions that return
-std::unique_ptr objects that have this property.
-<br>
-(Wolfgang Bangerth, 2018/03/28)

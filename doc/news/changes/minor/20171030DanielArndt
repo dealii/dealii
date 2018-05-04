@@ -1,4 +1,0 @@
-Fixed: The treatment of inhomogeneous boundary conditions in VectorTools::project
-has been fixed.
-<br>
-(Daniel Arndt, 2017/10/30)

@@ -1,5 +1,0 @@
-New: New function GridTools::distributed_compute_point_locations ; similarly to GridTools::compute_point_locations , given
-a vector of points, it returns vectors containing them, their reference position and the process owning them as it works
-with shared and distributed meshes.
-<br>
-(Giovanni Alzetta, 2018/01/19)

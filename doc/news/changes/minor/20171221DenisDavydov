@@ -1,4 +1,0 @@
-New: add LinearAlgebra::distributed::BlockVector::norm_sqr() and
-LinearAlgebra::distributed::Vector::norm_sqr() that return square of the l2 norm.
-<br>
-(Denis Davydov, 2017/12/21)

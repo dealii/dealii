@@ -1,4 +1,0 @@
-Fixed: Ensure that numbers::NumberTraits and its corresponding operations are 
-well defined for all supported auto-differentiable numbers.
-<br>
-(Jean-Paul Pelteret, 2018/04/12)

@@ -1,8 +1,0 @@
-New: NonMatching::create_coupling_sparsity_pattern and NonMatching::create_coupling_mass_matrix now have an
-overloaded version that takes an additional GridTools::Cache, instead of 
-building it inside the functions. In the process, NonMatching::create_coupling_sparsity_pattern
-gained also an additional ConstraintMatrix argument to reflect the same argument list of 
-its companion function NonMatching::create_coupling_mass_matrix. 
-<br>
-(Luca Heltai, 2018/05/02)
-

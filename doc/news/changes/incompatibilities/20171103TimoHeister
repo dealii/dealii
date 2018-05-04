@@ -1,5 +1,0 @@
-Changed: ParameterHandler::print_parameters() in LaTeX format now correctly
-escapes special characters. As a consequence, the names of labels changed
-because they are now mangled. See the documentation for more details.
-<br>
-(Timo Heister, 2017/11/03)

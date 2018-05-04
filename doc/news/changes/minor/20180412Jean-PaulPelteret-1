@@ -1,4 +1,0 @@
-Fixed: The Tensor::invert() function would previously not work with some Sacado
-number types. This has now been fixed.
-<br>
-(Jean-Paul Pelteret, 2018/04/12)

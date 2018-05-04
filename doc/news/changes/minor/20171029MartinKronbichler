@@ -1,5 +1,0 @@
-Improved: The step-37 tutorial program now describes how to deal with
-inhomogeneous Dirichlet boundary values with the matrix-free framework in the
-results section of the tutorial.
-<br>
-(Martin Kronbichler, 2017/10/29)

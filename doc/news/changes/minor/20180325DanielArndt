@@ -1,5 +1,0 @@
-Fixed: GridTools::minimal_cell_diameter() and GridTools::maximal_cell_diameter()
-return the maximal respectively minimal cell diameter over the whole mesh for
-parallel::distributed::Triangulation object, too.
-<br>
-(Daniel Arndt, 2018/03/25)

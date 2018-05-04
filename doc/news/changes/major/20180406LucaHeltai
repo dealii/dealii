@@ -1,8 +1,0 @@
-New: Triangulation now uses std::unique_ptr to store Manifolds, and duplicates the Manifolds when 
-Triangulation::set_manifold() is called. This allows the construction of the Manifold objects
-to be independent of the Triangulation. In particular, it will be possible to associate
-to the Triangulation reasonable default Manifold descriptors, that will be copied 
-around together with the Triangulation itself. 
-<br>
-(Luca Heltai, 2018/04/06)
-

@@ -1,6 +1,0 @@
-New: The function MatrixFree::cell_loop takes an optional boolean
-argument that enables the class to zero vectors within the loop for
-better cache locality, clearing only that part of the vector that will
-be accessed soon.
-<br>
-(Katharina Kormann, Martin Kronbichler, 2018/04/27)

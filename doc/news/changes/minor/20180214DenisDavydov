@@ -1,6 +1,0 @@
-New: Add LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &, const LAPACKFullMatrix<number> &, const Vector<number> &, const bool) const
-to do a triple matrix product with a diagonal matrix in the middle. Add
-LAPACKFullMatrix::scale_rows() to scale rows via a given vector. Make
-LAPACKFullMatrix::Tmmult() and LAPACKFullMatrix::mTmult() use Xsyrk if A==B.
-<br>
-(Denis Davydov, 2018/02/14)

@@ -1,7 +1,0 @@
-Fixed: Copying a Trilinos::MPI::Vector to a local deal.II Vector using 
-operator=() resulted in only a partial copy of data to the local vector. In 
-addition, the copied  elements  were offset incorrectly on each process. 
-Similar held for copying a  Trilinos::MPI::BlockVector to a local deal.II 
-BlockVector. This has been fixed and now works as expected.
-<br>
-(Jean-Paul Pelteret, 2018/03/07)

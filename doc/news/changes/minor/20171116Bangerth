@@ -1,5 +1,0 @@
-New: In parallel, the starting indices of
-DoFRenumbering::Cuthill_McKee() can now also be locally active
-indices. They no longer need to be locally owned DoF indices.
-<br>
-(Wolfgang Bangerth, 2017/11/16)

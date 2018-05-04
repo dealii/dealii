@@ -1,3 +1,0 @@
-Fixed: FETools::extrapolate also works for BlockVector types.
-<br>
-(Daniel Arndt, 2017/04/13)

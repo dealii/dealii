@@ -1,4 +1,0 @@
-New: LAPACKFullMatrix::compute_inverse_svd_with_kernel allows to
-set an expected kernel size for an inverse singular value decomposition.
-<br>
-(Daniel Arndt, 2018/03/07)

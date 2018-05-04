@@ -1,4 +1,0 @@
-New: There is now a function TableHandler::declare_entry() that
-creates a column of a table without actually putting a value into it.
-<br>
-(Wolfgang Bangerth, 2017/04/11)

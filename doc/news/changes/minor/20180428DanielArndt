@@ -1,5 +1,0 @@
-New: Utilities::MPI::create_group allows using the functionality provided by
-MPI_Comm_create_group to be used also for a non-MPI-3.0-conforming MPI
-dependency.
-<br>
-(Daniel Arndt, 2018/04/28)

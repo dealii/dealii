@@ -1,5 +1,0 @@
-Fixed: FETools::get_interpolation_difference_matrix() used to not
-clear content of the matrix passed as argument, but instead just add
-to it. This resulted in wrong output, but is now fixed.
-<br>
-(Wolfgang Bangerth, 2018/03/18)

@@ -1,5 +1,0 @@
-New: TrilinosWrappers::DirectSolver::solve() with two
-LinearAlgebra::distributed::Vector arguments now re-uses the factorization of
-a matrix set in the TrilinosWrappers::DirectSolver::initialize() call.
-<br>
-(Martin Kronbichler, 2017/11/10)

@@ -1,4 +1,0 @@
-Removed: The BZIP2 dependency has been removed as it was not used
-in the library anymore.
-<br>
-(Daniel Arndt, 2017/10/25)

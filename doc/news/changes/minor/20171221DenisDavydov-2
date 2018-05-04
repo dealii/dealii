@@ -1,4 +1,0 @@
-New: add LAPACK_WITH_64BIT_BLAS_INDICES configure option and introduce
-types::blas_int to support 64bit BLAS indices.
-<br>
-(Denis Davydov, 2017/12/21)

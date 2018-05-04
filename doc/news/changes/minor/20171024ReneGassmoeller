@@ -1,6 +1,0 @@
-Fixed: The computation of the inverse jacobians in the
-MappingCartesian class was broken. It would trigger an
-assertion at runtime complaining that only an assignment
-with zero is allowed. This is fixed now.
-<br>
-(Rene Gassmoeller, 2017/10/24)

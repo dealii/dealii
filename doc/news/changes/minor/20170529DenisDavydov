@@ -1,7 +1,0 @@
-New: deal.IIFeatureConfig.cmake will contain detailed information about
-feature configuration and is installed along with other CMake files.
-These variables can be loaded by calling INCLUDE(\${DEAL_II_FEATURE_CONFIG}).
-This is useful when users want to link in additional parts of dependencies, not
-required by deal.II (i.e. filesystem library from Boost package).
-<br>
-(Denis Davydov and Matthias Maier, 2017/05/29)

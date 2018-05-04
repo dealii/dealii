@@ -1,3 +1,0 @@
-New: Given a vector of points, the GridTools::guess_point_owner() function uses bounding boxes describing the mesh to guess the processes that own these points. A test for the function has been added.
-<br>
-(Giovanni Alzetta, 2017/11/13)

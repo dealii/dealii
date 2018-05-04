@@ -1,6 +1,0 @@
-Changed: The direction argument of the DoFRenumbering::downstream()
-and related functions have been changed from a Point<dim> to a
-Tensor<1,dim> type, since that is the correct data type for a
-direction vector.
-<br>
-(Wolfgang Bangerth, 2017/10/23)

@@ -1,5 +1,0 @@
-Fixed: GridTools::distributed_compute_point_locations now returns the correct
-maps values (third component of the output tuple). Added a test to check it.
-<br>
-(Giovanni Alzetta, 2018/04/23)
-

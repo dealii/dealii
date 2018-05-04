@@ -1,4 +1,0 @@
-Fixed: ChartManifold now implements the method
-Manifold::get_intermediate_point().
-<br>
-(Martin Kronbichler, 2017/11/02)

@@ -1,4 +1,0 @@
-New: Add save/load functions for ScaLAPACKMatrix to save/load distributed matrix to/from disc using HDF5. If HDF is configured with MPI, parallel I/O is used to save/load the matrix.
-<br>
-(Benjamin Brands, 2018/01/25)
-

@@ -1,3 +1,0 @@
-Fixed: FullMatrix::residual(), FullMatrix::add_col(), and FullMatrix::add_row()
-now work correctly with rectangular matrices.
-<br> (David Wells, 2018/03/17)

@@ -1,6 +1,0 @@
-Fixed: The SparsityPattern::copy_from() variant that takes a
-FullMatrix argument was previously of quadratic complexity in the
-number of nonzero entries per row. This is now fixed, and the function
-is now linear.
-<br>
-(Ben Shields, Wolfgang Bangerth, 2018/03/20)

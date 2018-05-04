@@ -1,4 +1,0 @@
-New: TransposeTable (the base class of LAPACKFullMatrix and ScaLAPACKMatrix) now
-has a random access iterator implementation similar to the one provided by
-SparseMatrix.
-<br> (David Wells, 2018/02/25)

@@ -1,5 +1,0 @@
-New: GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter now take an optional Mapping 
-argument, that allows one to compute minimal and maximal cell diameters of deformed grids. 
-<br>
-(Luca Heltai, 2018/04/23)
-

@@ -1,5 +1,0 @@
-Improved: DoFTools::extract_hanging_node_dofs works for 
-parallel::shared::Triangualtion and parallel::distributed::Triangulation
-and reports locally relevant DoFs.
-<br>
-(Daniel Arndt, 2017/12/21)

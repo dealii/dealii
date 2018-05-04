@@ -1,4 +1,0 @@
-New: A new version of GridTools::find_active_cell_around_point()
-has been added that exploits a GridTools::Cache object.
-<br>
-(Luca Heltai, 2017/10/18)

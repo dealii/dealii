@@ -1,9 +1,0 @@
-Improved: The support for non-Lagrangian elements with generalized support
-points has been vastly improved. FESystem::get_generalized_support_point()
-now returns a list of unique generalized support points for the finite
-element system. In order to do interpolation a function
-FiniteElement::convert_generalized_support_points_to_dof_values() can be
-used. This interface is implement for a wide variety of base classes and
-FESystem. TODO
-<br> (Matthias Maier, Luca Heltai, 2017/08/31)
-

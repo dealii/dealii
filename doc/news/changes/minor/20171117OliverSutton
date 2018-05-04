@@ -1,5 +1,0 @@
-Fixed: The function GridRefinement::refine_and_coarsen_fixed_number 
-no longer produces an EXC_BAD_ACCESS exception when either of the 
-arguments top_fraction or bottom_fraction are set to 1.0.
-<br>
-(Oliver Sutton, 2017/11/17)

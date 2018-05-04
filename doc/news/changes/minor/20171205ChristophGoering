@@ -1,5 +1,0 @@
-Fixed: SparsityPattern::print_svg(...) has the right size for the
-white rectangle so there is a small margin between the first and last
-row/column of the printed matrix.
-<br> 
-(Christoph Goering, 2017/12/05)

@@ -1,4 +1,0 @@
-Add default constructor and member function `initialize` to hp::DoFHandler,
-making the interface consistent with DoFHandler.
-<br>
-(Ce Qin, 2018/04/20)

@@ -1,4 +1,0 @@
-Fixed: parallel::distributed::Triangulation::add_periodicity missed to
-update the ghost_owners in the NumberCache member variable.
-<br>
-(Daniel Arndt, Sambit Das, 2017/12/11)
