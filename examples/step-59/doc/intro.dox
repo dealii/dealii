@@ -277,3 +277,15 @@ relaxation parameter (which would be around 0.7 in 2D and 0.5 in 3D for the
 block-Jacobi smoother), and often increases smoothing efficiency a bit over
 plain Jacobi smoothing in that it enables lower the time to solution when
 setting the degree of the Chebyshev polynomial to one or two.
+
+Note that the block-Jacobi smoother has an additional benefit: The fast
+diagonalization method can also be interpreted as a change from the
+Hermite-like polynomials underlying FE_DGQHermite to a basis where the cell
+Laplacian is diagonal. Thus, it cancels the effect of the basis, and we get
+the same iteration counts irrespective of whether we use FE_DGQHermite or
+FE_DGQ. This is in contrast to using the PreconditionChebyshev class with only
+the diagonal (a point-Jacobi scheme), where FE_DGQ and FE_DGQHermite do indeed
+behave differently and FE_DGQ needs 2-5 less iterations than FE_DGQHermite,
+despite the modification made to the Hermite-like shape functions to ensure a
+good conditioning.
+
