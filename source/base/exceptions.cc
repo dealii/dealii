@@ -42,21 +42,21 @@ DEAL_II_NAMESPACE_OPEN
 namespace deal_II_exceptions
 {
 
-  static std::string additional_assert_output;
+  std::string additional_assert_output;
 
   void set_additional_assert_output (const char *const p)
   {
     additional_assert_output = p;
   }
 
-  static bool show_stacktrace = true;
+  bool show_stacktrace = true;
 
   void suppress_stacktrace_in_exceptions ()
   {
     show_stacktrace = false;
   }
 
-  static bool abort_on_exception = true;
+  bool abort_on_exception = true;
 
   void disable_abort_on_exception ()
   {
