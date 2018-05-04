@@ -106,7 +106,7 @@ namespace Threads
        * of course does nothing. We still don't declare it as 'default' to avoid
        * warnings about objects of this class being unused.
        */
-      ~ScopedLock () {};
+      ~ScopedLock () {}
     };
 
     /**

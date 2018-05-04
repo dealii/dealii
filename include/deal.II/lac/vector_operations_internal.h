@@ -140,7 +140,7 @@ namespace internal
         n_chunks = (vec_size + chunk_size - 1) / chunk_size;
         AssertIndexRange((n_chunks-1)*chunk_size, vec_size);
         AssertIndexRange(vec_size, n_chunks*chunk_size+1);
-      };
+      }
 
       void operator() (const tbb::blocked_range<size_type> &range) const
       {
@@ -1235,7 +1235,7 @@ namespace internal
           }
         else
           array_ptr = &small_array[0];
-      };
+      }
 
       /**
        * An operator used by TBB to work on a given @p range of chunks
