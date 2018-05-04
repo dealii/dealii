@@ -711,8 +711,8 @@ namespace GridGenerator
    * both the faces and the edges of these boundaries. If the flag is @p
    * false, both have indicator zero.
    *
-   * All manifold ids are set to zero, and a SphericalManifold is attached to the
-   * the triangulation.
+   * All manifold ids are set to zero, and a SphericalManifold is attached to
+   * every cell and face of the triangulation.
    *
    * In 2d, the number <tt>n_cells</tt> of elements for this initial
    * triangulation can be chosen arbitrarily. If the number of initial cells
@@ -722,38 +722,14 @@ namespace GridGenerator
    * In 3d, only certain numbers are allowed, 6 (or the default 0) for a
    * surface based on a hexahedron (i.e. 6 panels on the inner sphere extruded
    * in radial direction to form 6 cells), 12 for the rhombic dodecahedron,
-   * and 96 (see below).
+   * and 96. This choice dates from an older version of deal.II before the
+   * Manifold classes were implemented: today all three choices are roughly
+   * equivalent (after performing global refinement, of course).
    *
-   * While the SphericalManifold, that is demonstrated in the documentation of
-   * the
-   * @ref manifold "documentation module on manifolds",
-   * creates reasonable meshes for any number of @p n_cells if attached to all
-   * cells and boundaries, the situation is less than ideal when only
-   * attaching a HyperShellBoundary. Then, only vertices on the boundaries are
-   * placed at the correct distance from the center. As an example, the 3d
-   * meshes give rise to the following meshes upon one refinement:
+   * The grids with 12 and 96 cells are plotted below:
    *
-   * @image html hypershell3d-6.png
    * @image html hypershell3d-12.png
-   *
-   * Neither of these meshes is particularly good since one ends up with
-   * poorly shaped cells at the inner edge upon refinement. For example, this
-   * is the middle plane of the mesh for the <code>n_cells=6</code>:
-   *
-   * @image html hyper_shell_6_cross_plane.png
-   *
-   * The mesh generated with <code>n_cells=12</code> is better but still not
-   * good. As a consequence, you may also specify <code>n_cells=96</code> as a
-   * third option. The mesh generated in this way is based on a once refined
-   * version of the one with <code>n_cells=12</code>, where all internal nodes
-   * are re-placed along a shell somewhere between the inner and outer
-   * boundary of the domain. The following two images compare half of the
-   * hyper shell for <code>n_cells=12</code> and <code>n_cells=96</code> (note
-   * that the doubled radial lines on the cross section are artifacts of the
-   * visualization):
-   *
-   * @image html hyper_shell_12_cut.png
-   * @image html hyper_shell_96_cut.png
+   * @image html hypershell3d-96.png
    *
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.

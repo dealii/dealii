@@ -3543,114 +3543,15 @@ namespace GridGenerator
       }
     else if (n == 96)
       {
-        // create a triangulation based on the
-        // 12-cell one where we refine the mesh
-        // once and then re-arrange all
-        // interior nodes so that the mesh is
-        // the least distorted
-        SphericalManifold<3> boundary (p);
+        // create a triangulation based on the 12-cell version. This function
+        // was needed before SphericalManifold was written: it manually
+        // adjusted the interior vertices to lie along concentric
+        // spheres. Nowadays we can just refine globally:
         Triangulation<3> tmp;
         hyper_shell (tmp, p, inner_radius, outer_radius, 12);
-        tmp.set_manifold(0, boundary);
-        tmp.set_manifold(1, boundary);
         tmp.refine_global (1);
 
-        // let's determine the distance at
-        // which the interior nodes should be
-        // from the center. let's say we
-        // measure distances in multiples of
-        // outer_radius and call
-        // r=inner_radius.
-        //
-        // then note
-        // that we now have 48 faces on the
-        // inner and 48 on the outer sphere,
-        // each with an area of approximately
-        // 4*pi/48*r^2 and 4*pi/48, for
-        // a face edge length of approximately
-        // sqrt(pi/12)*r and sqrt(pi/12)
-        //
-        // let's say we put the interior nodes
-        // at a distance rho, then a measure of
-        // deformation for the inner cells
-        // would be
-        //   di=max(sqrt(pi/12)*r/(rho-r),
-        //          (rho-r)/sqrt(pi/12)/r)
-        // and for the outer cells
-        //   do=max(sqrt(pi/12)/(1-rho),
-        //          (1-rho)/sqrt(pi/12))
-        //
-        // we now seek a rho so that the
-        // deformation of cells on the inside
-        // and outside is equal. there are in
-        // principle four possibilities for one
-        // of the branches of do== one of the
-        // branches of di, though not all of
-        // them satisfy do==di, of
-        // course. however, we are not
-        // interested in cases where the inner
-        // cell is long and skinny and the
-        // outer one tall -- yes, they have the
-        // same aspect ratio, but in different
-        // space directions.
-        //
-        // so it only boils down to the
-        // following two possibilities: the
-        // first branch of each max(.,.)
-        // functions are equal, or the second
-        // one are. on the other hand, since
-        // they two branches are reciprocals of
-        // each other, if one pair of branches
-        // is equal, so is the other
-        //
-        // this yields the following equation
-        // for rho:
-        //   sqrt(pi/12)*r/(rho-r)
-        //   == sqrt(pi/12)/(1-rho)
-        // with solution rho=2r/(1+r)
-        const double r = inner_radius / outer_radius;
-        const double rho = 2*r/(1+r);
-
-        // then this is the distance of the
-        // interior nodes from the center:
-        const double middle_radius = rho * outer_radius;
-
-        // mark vertices we've already moved or
-        // that we want to ignore: we don't
-        // want to move vertices at the inner
-        // or outer boundaries
-        std::vector<bool> vertex_already_treated (tmp.n_vertices(), false);
-        for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
-             cell != tmp.end(); ++cell)
-          for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-            if (cell->at_boundary(f))
-              for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
-                vertex_already_treated[cell->face(f)->vertex_index(v)] = true;
-
-        // now move the remaining vertices
-        for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
-             cell != tmp.end(); ++cell)
-          for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-            if (vertex_already_treated[cell->vertex_index(v)] == false)
-              {
-                // this is a new interior
-                // vertex. mesh refinement may
-                // have placed it at a number
-                // of places in radial
-                // direction and oftentimes not
-                // in a particularly good
-                // one. move it to halfway
-                // between inner and outer
-                // sphere
-                const Tensor<1,3> old_distance = cell->vertex(v) - p;
-                const double old_radius = cell->vertex(v).distance(p);
-                cell->vertex(v) = p + old_distance * (middle_radius / old_radius);
-
-                vertex_already_treated[cell->vertex_index(v)] = true;
-              }
-
-        // now copy the resulting level 1 cells
-        // into the new triangulation,
+        // now copy the resulting level 1 cells into the new triangulation,
         cells.resize(tmp.n_active_cells(), CellData<3>());
         for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
              cell != tmp.end(); ++cell)
