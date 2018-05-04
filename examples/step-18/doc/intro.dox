@@ -116,7 +116,7 @@ around the vertices of our mesh by a finite amount before solving the
 next linear problem is an inconsistent approach. We should therefore
 note that it is not surprising that the equations discussed below
 can't be found in the literature: <b>The model considered here has
-little to do with reality!</b> On the other hand, the implementational
+little to do with reality!</b> On the other hand, the implementation
 techniques we consider are very much what one would need to use when
 implementing a <i>real</i> model, as we will see in step-44.
 
