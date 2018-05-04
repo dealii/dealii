@@ -42,6 +42,7 @@
 #include <numeric>
 #include <set>
 #include <ostream>
+#include <boost/serialization/utility.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -100,6 +101,91 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
 {
   return boost::make_iterator_range(lines.begin(), lines.end());
+}
+
+
+
+bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                                 const IndexSet &locally_active_dofs,
+                                                 const MPI_Comm mpi_communicator,
+                                                 const bool verbose) const
+{
+  ConstraintLine empty= {};
+  // Helper to return a reference to the ConstraintLine object that belongs to row @p row.
+  // We don't want to make copies but to return a reference, we need an empty object that
+  // we store above.
+  auto get_line = [&] (const size_type row) -> const ConstraintLine&
+  {
+    const size_type line_index = calculate_line_index(row);
+    if (line_index >= lines_cache.size() ||
+        lines_cache[line_index] == numbers::invalid_size_type)
+      {
+        empty.index = row;
+        return empty;
+      }
+    else
+      return lines[lines_cache[line_index]];
+  };
+
+  // identify non-owned rows and send to owner:
+  std::map< unsigned int, std::vector<ConstraintLine> > to_send;
+
+  const unsigned int myid = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int nproc = dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
+
+  // We will send all locally active dofs that are not locally owned for checking. Note
+  // that we allow constraints to differ on locally_relevant (and not active) DoFs.
+  IndexSet non_owned = locally_active_dofs;
+  non_owned.subtract_set(locally_owned_dofs[myid]);
+  for (unsigned int owner=0; owner<nproc; ++owner)
+    {
+      // find all lines to send to @p owner
+      IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
+      for (const auto &row_idx : indices_to_send)
+        {
+          to_send[owner].push_back(get_line(row_idx));
+        }
+    }
+
+  std::map<unsigned int, std::vector<ConstraintLine> > received = Utilities::MPI::some_to_some (mpi_communicator, to_send);
+
+  unsigned int inconsistent = 0;
+
+  // from each processor:
+  for (const auto &kv : received)
+    {
+      // for each incoming line:
+      for (auto &lineit : kv.second)
+        {
+          const ConstraintLine &reference = get_line(lineit.index);
+
+          if (lineit.inhomogeneity != reference.inhomogeneity)
+            {
+              ++inconsistent;
+
+              if (verbose)
+                std::cout << "Proc " << myid
+                          << " got line " << lineit.index
+                          << " from " << kv.first
+                          << " inhomogeneity " << lineit.inhomogeneity << " != " << reference.inhomogeneity << std::endl;
+            }
+          else if (lineit.entries != reference.entries)
+            {
+              ++inconsistent;
+              if (verbose)
+                std::cout << "Proc " << myid
+                          << " got line " << lineit.index
+                          << " from " << kv.first
+                          << " wrong values!"
+                          << std::endl;
+            }
+        }
+    }
+
+  const unsigned int total = Utilities::MPI::sum(inconsistent, mpi_communicator);
+  if (verbose && total>0 && myid==0)
+    std::cout << total << " inconsistent lines discovered!" << std::endl;
+  return total==0;
 }
 
 
