@@ -16,7 +16,7 @@
 #ifndef dealii_distributed_grid_tools_h
 #define dealii_distributed_grid_tools_h
 
-#warning "This file is deprecated and will be removed before the 9.0 release. Use <deal.II/grid/grid_tools.h> instead and remove 'parallel::'."
+#warning "This file is deprecated and will be removed after the 9.0 release. Use <deal.II/grid/grid_tools.h> instead and remove 'parallel::'."
 
 #include <deal.II/grid/grid_tools.h>
 
