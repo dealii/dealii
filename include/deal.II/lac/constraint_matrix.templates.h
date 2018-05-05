@@ -1062,9 +1062,12 @@ namespace internals
           // at least one element when we get here, subtracting 1 works fine.
           data.resize(2*data.size());
           for (size_type i=individual_size.size()-1; i>0; --i)
-            std::memmove(&data[i*row_length*2], &data[i*row_length],
-                         individual_size[i]*
-                         sizeof(std::pair<size_type,double>));
+            {
+              const auto ptr = data.data();
+              std::move_backward(ptr + i*row_length,
+                                 ptr + i*row_length + individual_size[i],
+                                 ptr + i*2*row_length + individual_size[i]);
+            }
           row_length *= 2;
         }
       data[index*row_length+my_length] = pair;
