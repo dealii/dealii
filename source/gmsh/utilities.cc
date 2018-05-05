@@ -127,7 +127,10 @@ namespace Gmsh
   }
 #endif
 
+  // explicit instantiations
+#ifdef DEAL_II_WITH_OPENCASCADE
 #include "utilities.inst"
+#endif
 }
 
 DEAL_II_NAMESPACE_CLOSE
