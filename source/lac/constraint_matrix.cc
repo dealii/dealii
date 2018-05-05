@@ -110,7 +110,9 @@ bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &lo
                                                  const MPI_Comm mpi_communicator,
                                                  const bool verbose) const
 {
-  ConstraintLine empty= {};
+  ConstraintLine empty;
+  empty.inhomogeneity = 0.0;
+
   // Helper to return a reference to the ConstraintLine object that belongs to row @p row.
   // We don't want to make copies but to return a reference, we need an empty object that
   // we store above.
