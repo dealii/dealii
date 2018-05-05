@@ -33,7 +33,11 @@ namespace Particles
   PropertyPool::Handle
   PropertyPool::allocate_properties_array ()
   {
-    return new double[n_properties];
+    PropertyPool::Handle handle = PropertyPool::invalid_handle;
+    if (n_properties > 0)
+      handle = new double[n_properties];
+
+    return handle;
   }
 
 

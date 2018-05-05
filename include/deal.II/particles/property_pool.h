@@ -56,11 +56,12 @@ namespace Particles
     /**
      * Constructor. Stores the number of properties per reserved slot.
      */
-    PropertyPool (const unsigned int n_properties_per_slot=1);
+    PropertyPool (const unsigned int n_properties_per_slot);
 
     /**
      * Return a new handle that allows accessing the reserved block
-     * of memory.
+     * of memory. If the number of properties is zero this will return an
+     * invalid handle.
      */
     Handle allocate_properties_array ();
 
