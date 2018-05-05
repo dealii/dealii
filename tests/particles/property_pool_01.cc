@@ -26,7 +26,7 @@
 void test ()
 {
   {
-    Particles::PropertyPool pool;
+    Particles::PropertyPool pool(1);
 
     typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
 
