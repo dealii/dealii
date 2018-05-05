@@ -54,12 +54,16 @@ namespace Gmsh
                                            const AdditionalParameters &prm)
   {
     std::string base_name = prm.output_base_name;
+    FILE *tmp_file = nullptr;
     if (base_name == "")
-      base_name = std::tmpnam(nullptr);
+      {
+        tmp_file = std::tmpfile();
+        AssertThrow(tmp_file != nullptr, ExcMessage("Creating temporary file failed!"));
+      }
 
     const std::string iges_file_name     = base_name+".iges";
     const std::string geo_file_name      = base_name+".geo";
-    const std::string msh_file_name     = base_name+".msh";
+    const std::string msh_file_name      = base_name+".msh";
     const std::string log_file_name      = base_name+".log";
     const std::string warnings_file_name = base_name+"_warn.log";
 
@@ -95,6 +99,10 @@ namespace Gmsh
 
     if (base_name != prm.output_base_name)
       {
+        // clean up if the filenames are temporary ones
+        AssertThrow(tmp_file != nullptr, ExcInternalError());
+        const int ret = std::fclose(tmp_file);
+        AssertThrow(ret == 0, ExcInternalError());
         {
           const auto ret_value = std::remove(iges_file_name.c_str());
           AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+iges_file_name));
