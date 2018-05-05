@@ -55,7 +55,7 @@ void test ()
     particle.write_data(write_pointer);
 
     const void *read_pointer = static_cast<const void *> (&data.front());
-    Particles::PropertyPool pool;
+    Particles::PropertyPool pool(0);
     const Particles::Particle<dim,spacedim> new_particle(read_pointer,pool);
 
     deallog << "Copy particle location: " << new_particle.get_location() << std::endl
