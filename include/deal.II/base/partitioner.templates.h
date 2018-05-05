@@ -335,7 +335,14 @@ namespace Utilities
                                   "vector_operation argument was passed to "
                                   "import_from_ghosted_array_start as is passed "
                                   "to import_from_ghosted_array_finish."));
-          std::memset(ghost_array.data(), 0, sizeof(Number)*ghost_array.size());
+#ifdef DEAL_II_WITH_CXX17
+          if constexpr (std::is_trivial<Number>::value)
+#else
+          if (std::is_trivial<Number>::value)
+#endif
+            std::memset(ghost_array.data(), 0, sizeof(Number)*ghost_array.size());
+          else
+            std::fill(ghost_array.data(), ghost_array.data()+ghost_array.size(), 0);
           return;
         }
 #endif
@@ -407,7 +414,14 @@ namespace Utilities
       if (ghost_array.size()>0)
         {
           Assert(ghost_array.begin()!=nullptr, ExcInternalError());
-          std::memset(ghost_array.data(), 0, sizeof(Number)*n_ghost_indices());
+#ifdef DEAL_II_WITH_CXX17
+          if constexpr (std::is_trivial<Number>::value)
+#else
+          if (std::is_trivial<Number>::value)
+#endif
+            std::memset(ghost_array.data(), 0, sizeof(Number)*n_ghost_indices());
+          else
+            std::fill(ghost_array.data(), ghost_array.data()+n_ghost_indices(), 0);
         }
 
       // clear the compress requests

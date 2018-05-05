@@ -1009,14 +1009,15 @@ namespace Utilities
     // we have to work around the fact that GCC 4.8.x claims to be C++
     // conforming, but is not actually as it does not implement
     // std::is_trivially_copyable.
-    if (
 #if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
+    if (  __has_trivial_copy(T) && sizeof(T)<256)
 #else
-      std::is_trivially_copyable<T>()
+#  ifdef DEAL_II_WITH_CXX17
+    if constexpr (std::is_trivially_copyable<T>() && sizeof(T)<256)
+#  else
+    if (std::is_trivially_copyable<T>() && sizeof(T)<256)
+#  endif
 #endif
-      &&
-      sizeof(T)<256)
       {
         const size_t previous_size = dest_buffer.size();
         dest_buffer.resize (previous_size + sizeof(T));
@@ -1076,14 +1077,15 @@ namespace Utilities
     // we have to work around the fact that GCC 4.8.x claims to be C++
     // conforming, but is not actually as it does not implement
     // std::is_trivially_copyable.
-    if (
 #if __GNUG__ && __GNUC__ < 5
-      __has_trivial_copy(T)
+    if (  __has_trivial_copy(T) && sizeof(T)<256)
 #else
-      std::is_trivially_copyable<T>()
+#  ifdef DEAL_II_WITH_CXX17
+    if constexpr (std::is_trivially_copyable<T>() && sizeof(T)<256)
+#  else
+    if (std::is_trivially_copyable<T>() && sizeof(T)<256)
+#  endif
 #endif
-      &&
-      sizeof(T)<256)
       {
         Assert (std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         T object;
