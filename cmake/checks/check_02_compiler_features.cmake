@@ -325,6 +325,7 @@ PUSH_CMAKE_REQUIRED("-Wno-deprecated")
 PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
 
 # first see if the compiler accepts the attribute
+UNSET(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
           [[deprecated]] int old_fn ();
@@ -342,6 +343,7 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
   )
 
+ UNSET(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
           __attribute__((deprecated)) int old_fn ();
