@@ -2139,8 +2139,8 @@ next_cell:
     // processors and shifting the indices accordingly
     const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
     std::vector<types::global_vertex_index> indices(n_cpu);
-    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, indices.data(),
-                             1, DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
+    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_VERTEX_INDEX_MPI_TYPE, indices.data(),
+                             1, DEAL_II_VERTEX_INDEX_MPI_TYPE, triangulation.get_communicator());
     AssertThrowMPI(ierr);
     Assert(indices.begin() + triangulation.locally_owned_subdomain() < indices.end(),
            ExcInternalError());
