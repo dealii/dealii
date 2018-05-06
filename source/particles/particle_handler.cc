@@ -301,7 +301,10 @@ namespace Particles
 
 #ifdef DEAL_II_WITH_MPI
     types::particle_index particles_to_add_locally = positions.size();
-    MPI_Scan(&particles_to_add_locally, &local_start_index, 1, PARTICLE_INDEX_MPI_TYPE, MPI_SUM, triangulation->get_communicator());
+    const int ierr = MPI_Scan(&particles_to_add_locally, &local_start_index, 1,
+                              PARTICLE_INDEX_MPI_TYPE, MPI_SUM,
+                              triangulation->get_communicator());
+    AssertThrowMPI(ierr);
     local_start_index -= particles_to_add_locally;
 #endif
 
@@ -777,10 +780,19 @@ namespace Particles
     {
       std::vector<MPI_Request> n_requests(2*n_neighbors);
       for (unsigned int i=0; i<n_neighbors; ++i)
-        MPI_Irecv(&(n_recv_data[i]), 1, MPI_INT, neighbors[i], 0, triangulation->get_communicator(), &(n_requests[2*i]));
+        {
+          const int ierr = MPI_Irecv(&(n_recv_data[i]), 1, MPI_INT, neighbors[i],
+                                     0, triangulation->get_communicator(), &(n_requests[2*i]));
+          AssertThrowMPI(ierr);
+        }
       for (unsigned int i=0; i<n_neighbors; ++i)
-        MPI_Isend(&(n_send_data[i]), 1, MPI_INT, neighbors[i], 0, triangulation->get_communicator(), &(n_requests[2*i+1]));
-      MPI_Waitall(2*n_neighbors,&n_requests[0],MPI_STATUSES_IGNORE);
+        {
+          const int ierr = MPI_Isend(&(n_send_data[i]), 1, MPI_INT, neighbors[i],
+                                     0, triangulation->get_communicator(), &(n_requests[2*i+1]));
+          AssertThrowMPI(ierr);
+        }
+      const int ierr = MPI_Waitall(2*n_neighbors,&n_requests[0],MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
     }
 
     // Determine how many particles and data we will receive
@@ -803,17 +815,24 @@ namespace Particles
       for (unsigned int i=0; i<n_neighbors; ++i)
         if (n_recv_data[i] > 0)
           {
-            MPI_Irecv(&(recv_data[recv_offsets[i]]), n_recv_data[i], MPI_CHAR, neighbors[i], 1, triangulation->get_communicator(),&(requests[send_ops]));
+            const int ierr = MPI_Irecv(&(recv_data[recv_offsets[i]]), n_recv_data[i], MPI_CHAR,
+                                       neighbors[i], 1, triangulation->get_communicator(),
+                                       &(requests[send_ops]));
+            AssertThrowMPI(ierr);
             send_ops++;
           }
 
       for (unsigned int i=0; i<n_neighbors; ++i)
         if (n_send_data[i] > 0)
           {
-            MPI_Isend(&(send_data[send_offsets[i]]), n_send_data[i], MPI_CHAR, neighbors[i], 1, triangulation->get_communicator(),&(requests[send_ops+recv_ops]));
+            const int ierr = MPI_Isend(&(send_data[send_offsets[i]]), n_send_data[i], MPI_CHAR,
+                                       neighbors[i], 1, triangulation->get_communicator(),
+                                       &(requests[send_ops+recv_ops]));
+            AssertThrowMPI(ierr);
             recv_ops++;
           }
-      MPI_Waitall(send_ops+recv_ops,&requests[0],MPI_STATUSES_IGNORE);
+      const int ierr = MPI_Waitall(send_ops+recv_ops,&requests[0],MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
     }
 
     // Put the received particles into the domain if they are in the triangulation
