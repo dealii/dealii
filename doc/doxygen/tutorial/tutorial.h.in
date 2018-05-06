@@ -426,6 +426,13 @@
  *       <td> Incompressible, stationary Navier Stokes equations.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-59</td>
+ *       <td> Solving a Poisson problem discretized with an interior penalty DG
+ *       method and a multilevel preconditioner in a matrix-free fashion using
+ *       a massively parallel implementation.
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -556,9 +563,11 @@
  *     </td>
  *     <td>
  *       step-32,
+ *       step-37,
  *       step-40,
  *       step-42,
- *       step-55
+ *       step-55,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -623,7 +632,8 @@
  *       step-21,
  *       step-39,
  *       step-46,
- *       step-51
+ *       step-51,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -664,7 +674,8 @@
  *     <td> Periodic boundary conditions
  *     </td>
  *     <td>
- *       step-45
+ *       step-45,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -673,7 +684,8 @@
  *     </td>
  *     <td>
  *       step-37,
- *       step-48
+ *       step-48,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -721,7 +733,8 @@
  *       step-41,
  *       step-42,
  *       step-43,
- *       step-56
+ *       step-56,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -735,7 +748,8 @@
  *       step-37,
  *       step-40,
  *       step-42,
- *       step-55
+ *       step-55,
+ *       step-59
  *     </td>
  *   </tr>
  *
