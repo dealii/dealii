@@ -175,8 +175,10 @@ namespace Utilities
                              &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 
-      MPI_Group_free(&all_group);
-      MPI_Group_free(&inactive_with_root_group);
+      ierr = MPI_Group_free(&all_group);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Group_free(&inactive_with_root_group);
+      AssertThrowMPI(ierr);
 
       // Double check that the process with rank 0 in subgroup is active:
 #ifdef DEBUG
