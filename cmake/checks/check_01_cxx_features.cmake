@@ -169,16 +169,19 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # This test does not guarantee full C++14 support, but virtually every
-    # compiler with some C++14 support implements this.
+    # We assume std::max has a constexpr version and make_unique works
     #
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
+      #include <cmath>
+
       int main()
       {
-          auto ptr = std::make_unique<int>(42);
-          return 0;
+        auto ptr = std::make_unique<int>(42);
+        constexpr int bob = std::max(sizeof(ptr), sizeof(char[8]));
+        int bobs[bob];
+        return 0;
       }
       "
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
