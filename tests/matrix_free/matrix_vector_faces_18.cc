@@ -80,13 +80,16 @@ void test ()
   refinements_left[1] = 5;
   refinements_right[1] = 5;
   refinements_bottom[1] = 1;
-  refinements_left[2] = 4;
-  refinements_right[2] = 4;
-  refinements_bottom[2] = 4;
   refinements_left[0] = 10;
   refinements_right[0] = 20;
   refinements_bottom[0] = 20;
 
+  if (dim == 3)
+    {
+      refinements_left[2] = 4;
+      refinements_right[2] = 4;
+      refinements_bottom[2] = 4;
+    }
   GridGenerator::subdivided_hyper_rectangle(left, refinements_left,left_one,left_two,false);
   GridGenerator::subdivided_hyper_rectangle(right, refinements_right,right_one,right_two,false);
   GridGenerator::subdivided_hyper_rectangle(bottom, refinements_bottom,bottom_one,bottom_two,false);
