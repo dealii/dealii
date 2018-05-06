@@ -35,6 +35,17 @@
 #                                                                      #
 ########################################################################
 
+
+#
+#                              BIG DISCLAIMER
+#
+# Frankly speaking - this whole file is a mess and has to be rewritten and
+# restructured at some point. So, if you are the lucky one who wants to add
+# DEAL_II_WITH_CXX2X support, do not add yet another 300 lines of spaghetti
+# code but restructure the whole thing to something sane.
+#
+
+
 #
 IF(DEAL_II_WITH_CXX17 AND DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
   MESSAGE(FATAL_ERROR
@@ -115,6 +126,11 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
     PUSH_CMAKE_REQUIRED("-Werror")
 
+    UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX17_SAVED
+      "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+      DEAL_II_HAVE_CXX17_ATTRIBUTES
+      )
+
     #
     # Test that the c++17 attributes are supported.
     #
@@ -165,22 +181,27 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
   _check_version("14" "1y")
 
   IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
+
+    UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX14_SAVED
+      "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
+      DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN
+      DEAL_II_HAVE_CXX14_MAKE_UNIQUE
+      )
+
     # Set CMAKE_REQUIRED_FLAGS for the unit tests
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # We assume std::max has a constexpr version and make_unique works
+    # We assume std::make_unique works
     #
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
-      #include <cmath>
 
       int main()
       {
         auto ptr = std::make_unique<int>(42);
-        constexpr int bob = std::max(sizeof(ptr), sizeof(char[8]));
-        int bobs[bob];
         return 0;
       }
       "
@@ -188,7 +209,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
 
     #
     # This test checks constexpr std::max/min support. Unfortunately,
-    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # gcc-4.9 claims to support C++14 but fails to provide a constexpr
     # compatible std::max/min. Disable C++14 support in this case.
     #
     CHECK_CXX_SOURCE_COMPILES(
@@ -247,6 +268,15 @@ ENDIF()
 IF("${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
   _check_version("11" "0x")
 ENDIF()
+
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX11_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+  DEAL_II_HAVE_CXX11_FEATURES
+  DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
+  DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK
+  DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK
+  DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK
+  )
 
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 CHECK_CXX_SOURCE_COMPILES(
@@ -459,6 +489,21 @@ ELSE()
     "DEAL_II_WITH_CXX17 and DEAL_II_WITH_CXX14 are both disabled")
 ENDIF()
 
+
+########################################################################
+#                                                                      #
+#                   Check for various C++ features:                    #
+#                                                                      #
+########################################################################
+
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+  DEAL_II_HAVE_FP_EXCEPTIONS
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  )
+
 #
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
 # but a compiler extension in earlier language versions: check both
@@ -500,21 +545,14 @@ ELSE()
   ENDIF()
 ENDIF()
 
-
-########################################################################
-#                                                                      #
-#                   Check for various C++ features:                    #
-#                                                                      #
-########################################################################
-
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <type_traits>
   int main(){ std::is_trivially_copyable<int> bob; }
   "
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-
 
 #
 # Check that we can use feenableexcept through the C++11 header file cfenv:
@@ -525,9 +563,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # - Timo Heister, 2015
 #
-
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  CHECK_CXX_SOURCE_RUNS(
+SET(_snippet
     "
     #include <cfenv>
     #include <limits>
@@ -544,30 +580,15 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       return 0;
     }
     "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+    )
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  CHECK_CXX_SOURCE_RUNS("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ELSE()
   #
   # If we are not allowed to do platform introspection, just test whether
   # we can compile above code.
   #
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <cfenv>
-    #include <limits>
-    #include <sstream>
-
-    int main()
-    {
-      feenableexcept(FE_DIVBYZERO|FE_INVALID);
-      std::ostringstream description;
-      const double lower_bound = -std::numeric_limits<double>::max();
-
-      description << lower_bound;
-
-      return 0;
-    }
-    "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+  CHECK_CXX_SOURCE_COMPILES("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ENDIF()
 
 #
@@ -593,4 +614,5 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+
 RESET_CMAKE_REQUIRED()
