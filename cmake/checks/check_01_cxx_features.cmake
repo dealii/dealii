@@ -180,23 +180,22 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # This test does not guarantee full C++14 support, but virtually every
-    # compiler with some C++14 support implements this.
+    # We assume std::make_unique works
     #
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
       int main()
       {
-          auto ptr = std::make_unique<int>(42);
-          return 0;
+        auto ptr = std::make_unique<int>(42);
+        return 0;
       }
       "
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
 
     #
     # This test checks constexpr std::max/min support. Unfortunately,
-    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # gcc-4.9 claims to support C++14 but fails to provide a constexpr
     # compatible std::max/min. Disable C++14 support in this case.
     #
     CHECK_CXX_SOURCE_COMPILES(
