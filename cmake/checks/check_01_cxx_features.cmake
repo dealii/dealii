@@ -477,6 +477,14 @@ ENDIF()
 #                                                                      #
 ########################################################################
 
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+  DEAL_II_HAVE_FP_EXCEPTIONS
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  )
+
 #
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
 # but a compiler extension in earlier language versions: check both
