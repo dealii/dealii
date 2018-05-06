@@ -19,7 +19,10 @@ the aspect ratio of the generated output is actually 1:1, i.e. a
 circle is drawn as a circle on your screen, rather than as an
 ellipse. The third line switches off the key in the graphic, as that
 will only print information (the filename) which is not that important
-right now. Similarly, the third and fourth disable tic marks.
+right now. Similarly, the third and fourth disable tic marks. The plot
+is then generated with a specific line width ("`lw`", here set to 4)
+and line type ("`lt`", here chosen by saying that the line should be
+drawn using the RGB color "black").
 
 The following table shows the triangulated computational domain for $Q_1$,
 $Q_2$, and $Q_3$ mappings, for the original coarse grid (left), and a once
@@ -209,5 +212,8 @@ that are based on the <i>p</i>+1 point Gauss-Lobatto quadrature rule that
 selects the support points in such a way that the quadrature rule converges at
 order 2<i>p</i>. Even though these points are here only used for interpolation
 of a <i>p</i>th order polynomial, we get a superconvergence effect when
-numerically evaluating the integral that actually gives this high order of
-convergence.
+numerically evaluating the integral, resulting in the observed high order of
+convergence. (This effect is also discussed in detail in the following
+publication: A. Bonito, A. Demlow, and J. Owen: "A priori error
+estimates for finite element approximations to eigenvalues and
+eigenfunctions of the Laplace-Beltrami operator", submitted, 2018.)
