@@ -35,6 +35,17 @@
 #                                                                      #
 ########################################################################
 
+
+#
+#                              BIG DISCLAIMER
+#
+# Frankly speaking - this whole file is a mess and has to be rewritten and
+# restructured at some point. So, if you are the lucky one who wants to add
+# DEAL_II_WITH_CXX2X support, do not add yet another 300 lines of spaghetti
+# code but restructure the whole thing to something sane.
+#
+
+
 #
 IF(DEAL_II_WITH_CXX17 AND DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
   MESSAGE(FATAL_ERROR
@@ -456,6 +467,13 @@ ELSE()
     "DEAL_II_WITH_CXX17 and DEAL_II_WITH_CXX14 are both disabled")
 ENDIF()
 
+
+########################################################################
+#                                                                      #
+#                   Check for various C++ features:                    #
+#                                                                      #
+########################################################################
+
 #
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
 # but a compiler extension in earlier language versions: check both
@@ -497,21 +515,14 @@ ELSE()
   ENDIF()
 ENDIF()
 
-
-########################################################################
-#                                                                      #
-#                   Check for various C++ features:                    #
-#                                                                      #
-########################################################################
-
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <type_traits>
   int main(){ std::is_trivially_copyable<int> bob; }
   "
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-
 
 #
 # Check that we can use feenableexcept through the C++11 header file cfenv:
@@ -522,9 +533,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # - Timo Heister, 2015
 #
-
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  CHECK_CXX_SOURCE_RUNS(
+SET(_snippet
     "
     #include <cfenv>
     #include <limits>
@@ -541,30 +550,15 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       return 0;
     }
     "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+    )
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  CHECK_CXX_SOURCE_RUNS("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ELSE()
   #
   # If we are not allowed to do platform introspection, just test whether
   # we can compile above code.
   #
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <cfenv>
-    #include <limits>
-    #include <sstream>
-
-    int main()
-    {
-      feenableexcept(FE_DIVBYZERO|FE_INVALID);
-      std::ostringstream description;
-      const double lower_bound = -std::numeric_limits<double>::max();
-
-      description << lower_bound;
-
-      return 0;
-    }
-    "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+  CHECK_CXX_SOURCE_COMPILES("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ENDIF()
 
 #
@@ -590,4 +584,5 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+
 RESET_CMAKE_REQUIRED()
