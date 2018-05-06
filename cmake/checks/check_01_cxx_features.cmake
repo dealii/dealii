@@ -118,6 +118,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
     #
     # Test that the c++17 attributes are supported.
     #
+    UNSET(DEAL_II_HAVE_CXX17_ATTRIBUTES CACHE)
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <iostream>
@@ -169,34 +170,35 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # We assume std::max has a constexpr version and make_unique works
+    # We assume std::make_unique works
     #
+    UNSET(DEAL_II_HAVE_CXX14_MAKE_UNIQUE CACHE)
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
-      #include <cmath>
 
       int main()
       {
         auto ptr = std::make_unique<int>(42);
-        constexpr int bob = std::max(sizeof(ptr), sizeof(char[8]));
-        int bobs[bob];
         return 0;
       }
       "
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
 
+
     #
     # This test checks constexpr std::max/min support. Unfortunately,
-    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # gcc-4.9 claims to support C++14 but fails to provide a constexpr
     # compatible std::max/min. Disable C++14 support in this case.
+    # ICC 18 only has a constexpr std::max if C++17 support is requested.
     #
+    UNSET(DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN CACHE)
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <algorithm>
       int main()
       {
-          constexpr int max = std::max(0,1);
+        constexpr int max = std::max(0,1);
       }
       "
       DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN)
@@ -208,6 +210,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     #
     # https://llvm.org/bugs/show_bug.cgi?id=16876
     #
+    UNSET(DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK CACHE)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS_DEBUG}")
     CHECK_CXX_SOURCE_COMPILES(
       "
@@ -249,6 +252,7 @@ IF("${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
 ENDIF()
 
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+UNSET(DEAL_II_HAVE_CXX11_FEATURES CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   // common C++11 include files
@@ -280,6 +284,7 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_CXX11_FEATURES)
 
 # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
+UNSET(DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <functional>
@@ -297,6 +302,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # Matthias Maier, 2013
 #
+UNSET(DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <ctype.h>
@@ -318,6 +324,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # [1] http://software.intel.com/en-us/forums/topic/328902
 #
+UNSET(DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <limits>
@@ -341,6 +348,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # - Matthias Maier, 2013
 #
+UNSET(DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <vector>
@@ -472,6 +480,7 @@ ELSE()
   PUSH_CMAKE_REQUIRED("-Werror")
   PUSH_CMAKE_REQUIRED("-Wextra")
   PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  UNSET(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH CACHE)
   CHECK_CXX_SOURCE_COMPILES(
     "
     int main()
@@ -508,6 +517,7 @@ ENDIF()
 ########################################################################
 
 PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+UNSET(DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE CACHE)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <type_traits>
@@ -526,6 +536,7 @@ CHECK_CXX_SOURCE_COMPILES(
 # - Timo Heister, 2015
 #
 
+UNSET(DEAL_II_HAVE_FP_EXCEPTIONS CACHE)
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   CHECK_CXX_SOURCE_RUNS(
     "
@@ -576,6 +587,7 @@ ENDIF()
 #
 # - Matthias Maier, 2015
 #
+UNSET(DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <complex>
