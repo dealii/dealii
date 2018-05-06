@@ -180,18 +180,15 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # We assume std::max has a constexpr version and make_unique works
+    # We assume std::make_unique works
     #
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
-      #include <cmath>
 
       int main()
       {
         auto ptr = std::make_unique<int>(42);
-        constexpr int bob = std::max(sizeof(ptr), sizeof(char[8]));
-        int bobs[bob];
         return 0;
       }
       "
@@ -199,7 +196,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
 
     #
     # This test checks constexpr std::max/min support. Unfortunately,
-    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # gcc-4.9 claims to support C++14 but fails to provide a constexpr
     # compatible std::max/min. Disable C++14 support in this case.
     #
     CHECK_CXX_SOURCE_COMPILES(
