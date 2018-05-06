@@ -38,6 +38,17 @@
 #   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
 #
 
+#
+# A couple of test results depend on compiler flags and the C++ mode. Rerun
+# these tests if necessary
+#
+
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
+  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+  )
+
 
 #
 # Check whether the compiler allows to use arithmetic operations
