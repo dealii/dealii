@@ -34,10 +34,6 @@ fi
 export PATH=$DEAL_II_RESOURCES/bin:$PATH
 export DEAL_II_DIR=$DEAL_II_RESOURCES
 
-# Do whatever the external library tells us to
-if [ -f $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf ]; then
-    . $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf
-fi
 
 if [ -z "$DEAL_II_CONF_SILENT" ]; then
     # Clear screen
@@ -85,4 +81,9 @@ if ! [[ -x /usr/bin/xcodebuild ]]; then
     Please install XCode before you continue.
 
 EOF
+fi
+
+# Lastly, do whatever the external library installation tells us to
+if [ -f $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf ]; then
+    . $DEAL_II_RESOURCES/@DEAL_II_CPACK_EXTERNAL_LIBS@/external.conf
 fi
