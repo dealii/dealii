@@ -473,10 +473,16 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
       Cblacs_gridexit(union_blacs_context);
 
       if (mpi_communicator_union != MPI_COMM_NULL)
-        MPI_Comm_free(&mpi_communicator_union);
-      MPI_Group_free(&group_source);
-      MPI_Group_free(&group_dest);
-      MPI_Group_free(&group_union);
+        {
+          ierr = MPI_Comm_free(&mpi_communicator_union);
+          AssertThrowMPI(ierr);
+        }
+      ierr = MPI_Group_free(&group_source);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Group_free(&group_dest);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Group_free(&group_union);
+      AssertThrowMPI(ierr);
     }
   else
     //process is active in the process grid
@@ -1792,8 +1798,14 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
 
   // gather the number of local rows and columns from all processes
   std::vector<int> proc_n_local_rows(n_mpi_processes), proc_n_local_columns(n_mpi_processes);
-  MPI_Allgather(&tmp.n_local_rows,1,MPI_INT,proc_n_local_rows.data(),1,MPI_INT,tmp.grid->mpi_communicator);
-  MPI_Allgather(&tmp.n_local_columns,1,MPI_INT,proc_n_local_columns.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+  int ierr = MPI_Allgather(&tmp.n_local_rows, 1, MPI_INT,
+                           proc_n_local_rows.data(), 1, MPI_INT,
+                           tmp.grid->mpi_communicator);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Allgather(&tmp.n_local_columns, 1, MPI_INT,
+                       proc_n_local_columns.data(), 1, MPI_INT,
+                       tmp.grid->mpi_communicator);
+  AssertThrowMPI(ierr);
 
   const unsigned int my_rank(Utilities::MPI::this_mpi_process(tmp.grid->mpi_communicator));
 
@@ -1839,7 +1851,8 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
 
   // before writing the state and property to file wait for
   // all processes to finish writing the matrix content to the file
-  MPI_Barrier(tmp.grid->mpi_communicator);
+  ierr = MPI_Barrier(tmp.grid->mpi_communicator);
+  AssertThrowMPI(ierr);
 
   // only root process will write state and property to the file
   if (tmp.grid->this_mpi_process==0)
@@ -2139,8 +2152,14 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
   // gather the number of local rows and columns from all processes
   std::vector<int> proc_n_local_rows(n_mpi_processes), proc_n_local_columns(n_mpi_processes);
-  MPI_Allgather(&tmp.n_local_rows,1,MPI_INT,proc_n_local_rows.data(),1,MPI_INT,tmp.grid->mpi_communicator);
-  MPI_Allgather(&tmp.n_local_columns,1,MPI_INT,proc_n_local_columns.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+  int ierr = MPI_Allgather(&tmp.n_local_rows, 1, MPI_INT,
+                           proc_n_local_rows.data(), 1, MPI_INT,
+                           tmp.grid->mpi_communicator);
+  AssertThrowMPI(ierr);
+  ierr = MPI_Allgather(&tmp.n_local_columns, 1, MPI_INT,
+                       proc_n_local_columns.data(), 1, MPI_INT,
+                       tmp.grid->mpi_communicator);
+  AssertThrowMPI(ierr);
 
   const unsigned int my_rank(Utilities::MPI::this_mpi_process(tmp.grid->mpi_communicator));
 
