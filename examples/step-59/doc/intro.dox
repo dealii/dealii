@@ -51,7 +51,7 @@ one used for the step-39 tutorial program. The discretization of the Laplacian
 is given by the following weak form
 @f{align*}
 &\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
-&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, \left<[\![u_h]\!]\right>_{F}\right) + \left<\left<[\![v_h]\!], \sigma \left<[\![u_h]\!]\right>_{F}\Big) \\
+&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, [\![u_h]\!]\right>_{F} + \left<[\![v_h]\!], \sigma [\![u_h]\!]\right>_{F}\Big) \\
 &= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},
 @f}
 where $[\![v]\!] = v^- \mathbf{n}^- + v^+ \mathbf{n}^+ = \mathbf n^{-}
