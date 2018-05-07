@@ -41,9 +41,9 @@ inconvenience this causes.
 <ol>
 
  <li>
-  New: Every function in the GridGenerator namespace now attaches a default manifold to the 
+  New: Every function in the GridGenerator namespace now attaches a default manifold to the
   curved parts of the boundary of the domain, and sets reasonable defaults for manifold indicators in the
-  domain, independently on the boundary indicators. 
+  domain, independently on the boundary indicators.
   <br>
   (Luca Heltai, Daniel Arndt, Jean-Paul Pelteret, David Wells, 2018/04/17)
  </li>
@@ -59,7 +59,7 @@ inconvenience this causes.
 
  <li>
   New: The Manifold class now requires the implementation of a Manifold::clone() method in
-  all derived classes. 
+  all derived classes.
   <br>
   (Luca Heltai, 2018/04/08)
  </li>
@@ -96,8 +96,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: TableIndices uses std::size_t for index access, 
-  LAPACKFullMatrix::size_type is types::blas_int and 
+  Changed: TableIndices uses std::size_t for index access,
+  LAPACKFullMatrix::size_type is types::blas_int and
   FullMatrix::size_type is std::size_t.
   <br>
   (Daniel Arndt, 2018/02/02)
@@ -128,8 +128,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: Change the logic of DoFTools::get_subdomain_association to have the 
-  degrees of freedom along a refinement edge be now all given to the processor 
+  Changed: Change the logic of DoFTools::get_subdomain_association to have the
+  degrees of freedom along a refinement edge be now all given to the processor
   with the smallest subdomain_id.
   <br>
   (Alexander Grayver, 2017/12/11)
@@ -137,7 +137,7 @@ inconvenience this causes.
 
  <li>
   Changed: The parameters contained in struct SolverQMRS::AdditionalData have
-  been changed in order to meet the rewritten algorithm. See the class documentation 
+  been changed in order to meet the rewritten algorithm. See the class documentation
   for more details.
   <br>
   (Ingo Kligge, 2017/12/06)
@@ -177,8 +177,8 @@ inconvenience this causes.
   the other hand, if you are using a Vector<std::complex<double>>, for
   example, then you need to pass a Function<dim,std::complex<double>> --
   which of course makes sense because the Neumann boundary values of a
-  complex-valued solution should also be complex-valued.  
-  <br> 
+  complex-valued solution should also be complex-valued.
+  <br>
   (Wolfgang Bangerth, 2017/11/17)
  </li>
 
@@ -282,7 +282,7 @@ inconvenience this causes.
 
  <li>
   Changed: Specialization of the ProductType class are now implemented through
-  specialization of the class internal::ProductTypeImpl . This was done in order 
+  specialization of the class internal::ProductTypeImpl . This was done in order
   to ensure that product operations performed with qualified number types do not
   result in the intended specializations being overlooked by the compiler.
   <br>
@@ -371,7 +371,7 @@ inconvenience this causes.
 
  <li>
   Changed: The types::boundary_id and types::material_id types have been changed
-  from unsigned char to unsigned int. 
+  from unsigned char to unsigned int.
   <br>
   (Jean-Paul Pelteret, 2017/08/07)
  </li>
@@ -476,7 +476,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The deprecated function SparsityTools::reorder_Cuthill_McKee() 
+  Changed: The deprecated function SparsityTools::reorder_Cuthill_McKee()
   acting on a SparsityPattern object has been removed.
   Use the one acting on a DynamicSparsityPattern instead.
   <br>
@@ -493,7 +493,7 @@ inconvenience this causes.
 
  <li>
   Changed: The deprecated function Utilities::System::job_supports_mpi()
-  has been removed. Use Utilities::MPI::job_supports_mpi() instead. 
+  has been removed. Use Utilities::MPI::job_supports_mpi() instead.
   <br>
   (Daniel Arndt, 2017/05/14)
  </li>
@@ -590,7 +590,7 @@ inconvenience this causes.
   Changed: The deprecated function FEValuesBase::get_normal_vectors()
   that returned a vector of Point objects has been removed. Its
   replacement, FEValuesBase::get_all_normal_vectors() has now itself
-  been deprecated, and we have created a new function 
+  been deprecated, and we have created a new function
   FEValuesBase::get_normal_vectors() that returns a vector of
   Tensor<1,dim> objects. The net effect is that the function with the
   old name has simply gotten a new return type.
@@ -699,6 +699,14 @@ inconvenience this causes.
 <ol>
 
  <li>
+  New: The tutorial step-59 shows a matrix-free solver for the Poisson
+  equation discretized with the symmetric interior penalty discontinous
+  Galerkin method.
+  <br>
+  (Katharina Kormann, Martin Kronbichler, 2018/05/04)
+ </li>
+
+ <li>
   New: The MatrixFree framework has been reworked to also support face integrals
   in DG. The new function MatrixFree::loop() takes three function pointers for
   workers on cells, interior faces and boundary faces. The loop can perform the
@@ -710,11 +718,11 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Triangulation now uses std::unique_ptr to store Manifolds, and duplicates the Manifolds when 
+  New: Triangulation now uses std::unique_ptr to store Manifolds, and duplicates the Manifolds when
   Triangulation::set_manifold() is called. This allows the construction of the Manifold objects
   to be independent of the Triangulation. In particular, it will be possible to associate
-  to the Triangulation reasonable default Manifold descriptors, that will be copied 
-  around together with the Triangulation itself. 
+  to the Triangulation reasonable default Manifold descriptors, that will be copied
+  around together with the Triangulation itself.
   <br>
   (Luca Heltai, 2018/04/06)
  </li>
@@ -763,7 +771,7 @@ inconvenience this causes.
 
  <li>
   New: The new namespace Rol contains an adaptor class that provides
-  the implementation of the ROL::Vector interface. 
+  the implementation of the ROL::Vector interface.
   The Trilinos package, Rapid Optimization Library (ROL), can solve unconstrained
   and constrained optimization problems, and optimization problems under
   uncertainty.
@@ -779,27 +787,27 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The function distribute_mg_dofs has been written for a parallel::shared::Triangulation. This allows for geometric multigrid computations on an adaptively refined mesh using a shared triangulation with the possibility of a user defined partitioning of the active and level cells. 
+  New: The function distribute_mg_dofs has been written for a parallel::shared::Triangulation. This allows for geometric multigrid computations on an adaptively refined mesh using a shared triangulation with the possibility of a user defined partitioning of the active and level cells.
   <br>
   (Conrad Clevenger, 2017/10/10)
  </li>
 
  <li>
-  New: Added support for the KINSOL solver of the SUNDIALS 
-  library. KINSOL is a solver for nonlinear algebraic systems. 
-  It includes a Newton-Krylov solver as well as Picard and 
-  fixed point solvers, both of which can be accelerated with 
-  Anderson acceleration. 
+  New: Added support for the KINSOL solver of the SUNDIALS
+  library. KINSOL is a solver for nonlinear algebraic systems.
+  It includes a Newton-Krylov solver as well as Picard and
+  fixed point solvers, both of which can be accelerated with
+  Anderson acceleration.
   <br>
   (Luca Heltai, 2017/09/28)
  </li>
 
  <li>
-  New: Added support for the ARKode solver of the SUNDIALS 
-  library. ARKode is a solver library that provides 
-  adaptive-step time integration of the initial value problem 
-  for systems of stiff, nonstiff, and multi-rate systems of 
-  ordinary differential equations (ODEs) given in linearly 
+  New: Added support for the ARKode solver of the SUNDIALS
+  library. ARKode is a solver library that provides
+  adaptive-step time integration of the initial value problem
+  for systems of stiff, nonstiff, and multi-rate systems of
+  ordinary differential equations (ODEs) given in linearly
   implicit form.
   <br>
   (Luca Heltai, 2017/09/27)
@@ -807,7 +815,7 @@ inconvenience this causes.
 
  <li>
   New: There is now support for the storage of Particles and their
-  properties in the new namespace Particles.  
+  properties in the new namespace Particles.
   <br>
   (Rene Gassmoeller, 2017/09/22)
  </li>
@@ -816,21 +824,21 @@ inconvenience this causes.
   New: A new ParameterAcceptor class has been added to the library.
   The class is intended to be used as a base class for any class
   that wants to handle parameters using the ParameterHandler class.
-  If you derive all your classes from ParameterAcceptor, and declare 
+  If you derive all your classes from ParameterAcceptor, and declare
   your parameters either with parse/declare_parameters methods or
   via the ParameterAcceptor::add_parameter() method, then the declaring
-  and parsing of your parameter files will be automatically managed 
+  and parsing of your parameter files will be automatically managed
   by the ParameterAcceptor::initialize() function.
   <br>
   (Luca Heltai, 2017/09/20)
  </li>
 
  <li>
-  New: Added support for the Open Asset Import Library (Assimp) 
-  (http://assimp.sourceforge.net/). This library can be used 
-  to read about 40 different 3D graphics formats, used in 3D 
+  New: Added support for the Open Asset Import Library (Assimp)
+  (http://assimp.sourceforge.net/). This library can be used
+  to read about 40 different 3D graphics formats, used in 3D
   modelers (such as Blender, Maya, etc.). Some of these formats
-  contain mesh information, that in turn can be read 
+  contain mesh information, that in turn can be read
   into deal.II Triangulation<2,3> objects.
   <br>
   (Luca Heltai, 2017/09/16)
@@ -838,8 +846,8 @@ inconvenience this causes.
 
  <li>
   New: A new GridTools::Cache class
-  allows caching of some expensive data of the 
-  Triangulation class, computed generally using 
+  allows caching of some expensive data of the
+  Triangulation class, computed generally using
   functions in GridTools.
   <br>
   (Luca Heltai, 2017/09/14)
@@ -869,7 +877,7 @@ inconvenience this causes.
  <li>
   New: A new KDTreeDistance class has been added that interfaces
   the nanoflann library (https://github.com/jlblancoc/nanoflann).
-  This class can be used to extract nearest neighbour information 
+  This class can be used to extract nearest neighbour information
   on collection of points, query for the closest points to a target
   point or all points contained within a given distance.
   <br>
@@ -905,14 +913,14 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The new namespace Patterns::Tools contains 
+  New: The new namespace Patterns::Tools contains
   utilities that can be used to convert from complicated types
   to strings and vice versa. These tools have been put to use
   in the method ParameterHandler::add_parameter() that allows
-  users to perform in one single call the operations 
-  ParameterHandler::declare_parameter(), 
+  users to perform in one single call the operations
+  ParameterHandler::declare_parameter(),
   ParameterHandler::get() and to convert the string to a valid
-  value stored in the variable that is given as a parameter to 
+  value stored in the variable that is given as a parameter to
   ParameterHandler::add_parameter().
   <br>
   (Luca Heltai, 2017/07/20)
@@ -958,8 +966,8 @@ inconvenience this causes.
 <ol>
 
  <li>
-  New: Gmsh::create_triangulation_from_boundary_curve is a new method that constructs a grid from an 
-  OpenCASCADE TopoDS_Edge object. It offers the reverse functionality of the method 
+  New: Gmsh::create_triangulation_from_boundary_curve is a new method that constructs a grid from an
+  OpenCASCADE TopoDS_Edge object. It offers the reverse functionality of the method
   OpenCASCADE::create_curves_from_triangulation_boundary().
   <br>
   (Luca Heltai, 2018/05/03)
@@ -967,10 +975,10 @@ inconvenience this causes.
 
  <li>
   New: NonMatching::create_coupling_sparsity_pattern and NonMatching::create_coupling_mass_matrix now have an
-  overloaded version that takes an additional GridTools::Cache, instead of 
+  overloaded version that takes an additional GridTools::Cache, instead of
   building it inside the functions. In the process, NonMatching::create_coupling_sparsity_pattern
-  gained also an additional ConstraintMatrix argument to reflect the same argument list of 
-  its companion function NonMatching::create_coupling_mass_matrix. 
+  gained also an additional ConstraintMatrix argument to reflect the same argument list of
+  its companion function NonMatching::create_coupling_mass_matrix.
   <br>
   (Luca Heltai, 2018/05/02)
  </li>
@@ -1042,8 +1050,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter now take an optional Mapping 
-  argument, that allows one to compute minimal and maximal cell diameters of deformed grids. 
+  New: GridTools::minimal_cell_diameter and GridTools::maximal_cell_diameter now take an optional Mapping
+  argument, that allows one to compute minimal and maximal cell diameters of deformed grids.
   <br>
   (Luca Heltai, 2018/04/23)
  </li>
@@ -1100,22 +1108,22 @@ inconvenience this causes.
  <li>
   New: Introduced Triangulation::reset_manifold(), as a substitute for Triangulation::set_manifold()
   with only one argument. The set_manifold() method with one argument only was used to reset the manifold
-  object. This method is now deprecated, in favor of the new, more explicative, method. 
-  An additional Triangulation::reset_all_manifolds() method has been added to remove all manifold 
+  object. This method is now deprecated, in favor of the new, more explicative, method.
+  An additional Triangulation::reset_all_manifolds() method has been added to remove all manifold
   objects from the triangulation.
   <br>
   (Luca Heltai, 2018/04/14)
  </li>
 
  <li>
-  New: GridTools::map_boundary_to_manifold_ids() allows you to set manifold ids on the 
-  boundary according to a given map of boundary to manifold ids. 
+  New: GridTools::map_boundary_to_manifold_ids() allows you to set manifold ids on the
+  boundary according to a given map of boundary to manifold ids.
   <br>
   (Luca Heltai, 2018/04/13)
  </li>
 
  <li>
-  Fixed: Ensure that numbers::NumberTraits and its corresponding operations are 
+  Fixed: Ensure that numbers::NumberTraits and its corresponding operations are
   well defined for all supported auto-differentiable numbers.
   <br>
   (Jean-Paul Pelteret, 2018/04/12)
@@ -1156,7 +1164,7 @@ inconvenience this causes.
 
  <li>
   Fixed: Some compile-times errors would previously appear for some arithmetic functions
-  when using Sacado::Fad::DFad types (e.g. Physics::Elasticity::Kinematics::F_iso() ). 
+  when using Sacado::Fad::DFad types (e.g. Physics::Elasticity::Kinematics::F_iso() ).
   By defining the ProductType Sacado expression templates, this issue is now avoided.
   <br>
   (Jean-Paul Pelteret, 2018/04/12)
@@ -1179,7 +1187,7 @@ inconvenience this causes.
 
  <li>
   New: Patterns::Tools::to_string() and Patterns::Tools::to_value() simplify the conversion to and from
-  strings of arbitrarily complex types. 
+  strings of arbitrarily complex types.
   <br>
   (Luca Heltai, 2018/04/06)
  </li>
@@ -1329,7 +1337,7 @@ inconvenience this causes.
 
  <li>
   New: JSON files which are written out by the
-  parameter handler can be read in again with the 
+  parameter handler can be read in again with the
   function ParameterHandler::parse_input_from_json().
   <br>
   (Menno Fraters, 2018/03/12)
@@ -1350,10 +1358,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Copying a Trilinos::MPI::Vector to a local deal.II Vector using 
-  operator=() resulted in only a partial copy of data to the local vector. In 
-  addition, the copied  elements  were offset incorrectly on each process. 
-  Similar held for copying a  Trilinos::MPI::BlockVector to a local deal.II 
+  Fixed: Copying a Trilinos::MPI::Vector to a local deal.II Vector using
+  operator=() resulted in only a partial copy of data to the local vector. In
+  addition, the copied  elements  were offset incorrectly on each process.
+  Similar held for copying a  Trilinos::MPI::BlockVector to a local deal.II
   BlockVector. This has been fixed and now works as expected.
   <br>
   (Jean-Paul Pelteret, 2018/03/07)
@@ -1368,20 +1376,20 @@ inconvenience this causes.
 
  <li>
   New: The ParameterAcceptorProxy class allows you to wrap a class that provides a static member
-  declare_parameters and a member parse_parameters into a ParameterAcceptor subclass. 
+  declare_parameters and a member parse_parameters into a ParameterAcceptor subclass.
   <br>
   (Luca Heltai, 2018/03/06)
  </li>
 
  <li>
-  New: NonMatching::create_coupling_sparsity_pattern and NonMatching::create_coupling_mass_matrix functions 
+  New: NonMatching::create_coupling_sparsity_pattern and NonMatching::create_coupling_mass_matrix functions
   to handle L2 projections between arbitrary non-aligned grids.
   <br>
   (Luca Heltai, 2018/03/05)
  </li>
 
  <li>
-  Fixed: GridTools::distort_random works with 
+  Fixed: GridTools::distort_random works with
   parallel::shared::Triangulation objects.
   <br>
   (Daniel Arndt, 2018/03/05)
@@ -1423,8 +1431,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The GridOut::write_mesh_per_processor_as_vtu function now 
-  only includes processor info in the .vtu filename and writes a .pvtu file 
+  Changed: The GridOut::write_mesh_per_processor_as_vtu function now
+  only includes processor info in the .vtu filename and writes a .pvtu file
   when using a <code>parallel::Triangulation</code>.
   <br>
   (Conrad Clevenger, 2018/02/19)
@@ -1513,16 +1521,16 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added Utilities::MPI::gather wrapper and tests to gather objects from all to one MPI process. 
+  New: Added Utilities::MPI::gather wrapper and tests to gather objects from all to one MPI process.
   <br>
   (Benjamin Brands, 2018/01/25)
  </li>
 
  <li>
-  Improved: The implementation of the SolverQMRS iteration has been renewed to 
-  perform much faster and to be adaptable to left and right side preconditioning 
-  of the system matrix. 
-  <br> 
+  Improved: The implementation of the SolverQMRS iteration has been renewed to
+  perform much faster and to be adaptable to left and right side preconditioning
+  of the system matrix.
+  <br>
   (Ingo Kligge, 2018/01/23)
  </li>
 
@@ -1553,7 +1561,7 @@ inconvenience this causes.
 
  <li>
   New: Enhanced Raviart-Thomas finite element FE_RT_Bubbles,
-  allows for local elimination of a vector variable in 
+  allows for local elimination of a vector variable in
   multipoint flux mixed finite element methods and similar.
   <br>
   (Eldar Khattatov, 2018/01/11)
@@ -1621,10 +1629,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added QSimplex, QTrianglePolar, QDuffy, and QSplit classes to perform quadratures 
+  New: Added QSimplex, QTrianglePolar, QDuffy, and QSplit classes to perform quadratures
   on reference simplices, on their affine transformations, and on hyper cubes
   split by a given point.
-  <br> 
+  <br>
   (Luca Heltai, 2017/12/21)
  </li>
 
@@ -1700,7 +1708,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: DoFTools::extract_hanging_node_dofs works for 
+  Improved: DoFTools::extract_hanging_node_dofs works for
   parallel::shared::Triangualtion and parallel::distributed::Triangulation
   and reports locally relevant DoFs.
   <br>
@@ -1708,8 +1716,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Now opencascade also works for spacedim == 2. 
-  <br> 
+  New: Now opencascade also works for spacedim == 2.
+  <br>
   (Luca Heltai, 2017/12/08)
  </li>
 
@@ -1723,9 +1731,9 @@ inconvenience this causes.
 
  <li>
   New: Created a new method OpenCASCADE::Utilities::create_curves_from_triangulation_boundary
-  that smoothly interpolates the boundary of two dimensional triangulations into a vector of 
-  OpenCASCADE TopoDS_Edge closed curves, representing the connected components of the boundary. 
-  <br> 
+  that smoothly interpolates the boundary of two dimensional triangulations into a vector of
+  OpenCASCADE TopoDS_Edge closed curves, representing the connected components of the boundary.
+  <br>
   (Dirk Peschka, Luca Heltai, 2017/12/05)
  </li>
 
@@ -1733,7 +1741,7 @@ inconvenience this causes.
   Fixed: SparsityPattern::print_svg(...) has the right size for the
   white rectangle so there is a small margin between the first and last
   row/column of the printed matrix.
-  <br> 
+  <br>
   (Christoph Goering, 2017/12/05)
  </li>
 
@@ -1745,8 +1753,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: GridGenerator::extract_boundary_mesh now correctly extracts also Manifold information. 
-  <br> 
+  New: GridGenerator::extract_boundary_mesh now correctly extracts also Manifold information.
+  <br>
   (Luca Heltai, Dirk Peschka, 2017/12/04)
  </li>
 
@@ -1796,8 +1804,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added random_value<T>() and random_point<dim>() in tests.h, to simplify and unify our way to generate random numbers and points. 
-  <br> 
+  New: Added random_value<T>() and random_point<dim>() in tests.h, to simplify and unify our way to generate random numbers and points.
+  <br>
   (Luca Heltai, 2017/11/21)
  </li>
 
@@ -1808,7 +1816,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Added convert_generalized_support_point_values_to_dof_values into 
+  Fixed: Added convert_generalized_support_point_values_to_dof_values into
   FE_FaceQ and FE_TraceQ. This is needed by VectorTools::interpolate
   <br>
   (Praveen Chandrashekar, 2017/11/19)
@@ -1823,22 +1831,22 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Add Utilities::pack and Utilities::unpack, to serialize and unserialize arbitrary 
-  objects that support boost::serialization/deserialization. 
-  <br> 
+  New: Add Utilities::pack and Utilities::unpack, to serialize and unserialize arbitrary
+  objects that support boost::serialization/deserialization.
+  <br>
   (Luca Heltai, 2017/11/18)
  </li>
 
  <li>
-  New: Utilities::MPI::all_gather and Utilities::MPI::some_to_some functions have been 
-  added to perform general collective communications between processors. 
-  <br> 
+  New: Utilities::MPI::all_gather and Utilities::MPI::some_to_some functions have been
+  added to perform general collective communications between processors.
+  <br>
   (Giovanni Alzetta, Luca Heltai, 2017/11/18)
  </li>
 
  <li>
-  Fixed: The function GridRefinement::refine_and_coarsen_fixed_number 
-  no longer produces an EXC_BAD_ACCESS exception when either of the 
+  Fixed: The function GridRefinement::refine_and_coarsen_fixed_number
+  no longer produces an EXC_BAD_ACCESS exception when either of the
   arguments top_fraction or bottom_fraction are set to 1.0.
   <br>
   (Oliver Sutton, 2017/11/17)
@@ -1860,7 +1868,7 @@ inconvenience this causes.
 
  <li>
   New: Math operations for some automatically differentiable numbers have been
-  extended. We also import some math functions for these number types into the 
+  extended. We also import some math functions for these number types into the
   standard namespace. This gives full compatibility with the Tensor and
   SymmetricTensor classes, and facilitates the integration of these number types
   into existing code.
@@ -1958,7 +1966,7 @@ inconvenience this causes.
 
  <li>
   Fixed: The spherical manifold used to do a division
-  by zero inside of SphericalManifold::get_new_point() 
+  by zero inside of SphericalManifold::get_new_point()
   if the new point was exactly at the center of the
   manifold. This is fixed now.
   <br>
@@ -1998,9 +2006,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Created a new Patterns::Tuple class, that allows parsing arbitrary tuples 
-  of objects in parameter files. 
-  <br> 
+  New: Created a new Patterns::Tuple class, that allows parsing arbitrary tuples
+  of objects in parameter files.
+  <br>
   (Luca Heltai, 2017/10/26)
  </li>
 
@@ -2100,7 +2108,7 @@ inconvenience this causes.
 
  <li>
   Fixed: The transformation operation for rank-2 and rank-4 (non-symmetric) tensors
-  in the  Physics::Transformations was incorrectly implemented. 
+  in the  Physics::Transformations was incorrectly implemented.
   This has now been fixed.
   <br>
   (Jean-Paul Pelteret, 2017/10/17)
@@ -2147,14 +2155,14 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: One of the functions GridTools::find_active_cell_around_point() 
+  Fixed: One of the functions GridTools::find_active_cell_around_point()
   supports an additional `mapping` argument. This mapping was used
-  to actually transform points from the real to the reference space, 
-  but somewhere in the algorithm we look for the `closest_vertex` to 
-  the target point. Such search was done ignoring if the `mapping` 
+  to actually transform points from the real to the reference space,
+  but somewhere in the algorithm we look for the `closest_vertex` to
+  the target point. Such search was done ignoring if the `mapping`
   actually changes the location of the vertices. This is now fixed,
   and the internal function that looks for the closest vertex now
-  takes into account the `mapping` transformation. 
+  takes into account the `mapping` transformation.
   <br>
   (Luca Heltai, 2017/09/27)
  </li>
@@ -2183,10 +2191,10 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: The hp version of DoFTools::make_flux_sparsity_pattern() with masks for 
+  Fixed: The hp version of DoFTools::make_flux_sparsity_pattern() with masks for
   DoF couplings now works with non-primitive FE spaces, similarly to its non-hp version.
   The hp version of VectorTools::project_boundary_values() is modified to work properly with Hdiv
-  conforming finite elements. 
+  conforming finite elements.
   <br>
   (Eldar Khattatov, 2017/09/26)
  </li>
@@ -2213,7 +2221,7 @@ inconvenience this causes.
 
  <li>
   Changed: The new methods ArrayView::cbegin() and ArrayView::cend() return
-  const_iterators and are const themselves. ArrayView::begin() and 
+  const_iterators and are const themselves. ArrayView::begin() and
   ArrayView::end() return (non-const) iterators and are const themselves.
   <br>
   (Daniel Arndt, Julius Witte, 2017/09/24)
@@ -2227,17 +2235,17 @@ inconvenience this causes.
 
  <li>
   New: A GridTools::find_closest_vertex() has been added
-  that takes a map of index-vertex position and a target 
-  point, and returns the index of the closest point in 
-  the map. 
+  that takes a map of index-vertex position and a target
+  point, and returns the index of the closest point in
+  the map.
   <br>
   (Luca Heltai, 2017/09/19)
  </li>
 
  <li>
   New: A GridTools::extract_used_vertices() has been added
-  that returns a map of index-vertex position, using an 
-  optional Mapping<dim,spacedim> object to compute the 
+  that returns a map of index-vertex position, using an
+  optional Mapping<dim,spacedim> object to compute the
   vertex locations.
   <br>
   (Luca Heltai, 2017/09/18)
@@ -2292,9 +2300,9 @@ inconvenience this causes.
   constructor for FESystem to construct
   FESystem objects using syntax like
   @code
-    FESystem<dim, spacedim> fe_system1 ({FiniteElementType1^n1, 
+    FESystem<dim, spacedim> fe_system1 ({FiniteElementType1^n1,
                                          FiniteElementType2^n2});
-    FESystem<dim, spacedim> fe_system2 (FiniteElementType1^n3, 
+    FESystem<dim, spacedim> fe_system2 (FiniteElementType1^n3,
                                         FiniteElementType2^n4);
   @endcode
   <br>
@@ -2308,8 +2316,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The various overloads for Threads::new_thread() and 
-  Threads::new_task() taking from 0 to 9 parameters have been replaced 
+  Changed: The various overloads for Threads::new_thread() and
+  Threads::new_task() taking from 0 to 9 parameters have been replaced
   by two variadic template versions.
   <br>
   (Daniel Arndt, 2017/09/01)
@@ -2405,8 +2413,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: An additional non-member operator*() function, performing a single 
-  contraction between a symmetric and normal tensor of arbitrary rank, has been 
+  New: An additional non-member operator*() function, performing a single
+  contraction between a symmetric and normal tensor of arbitrary rank, has been
   added to the SymmetricTensor class.
   <br>
   (Matthias Maier, Jean-Paul Pelteret, 2017/08/17)
@@ -2458,14 +2466,14 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecated: constraint_and_return_value has been deprecated 
+  Deprecated: constraint_and_return_value has been deprecated
   in favor of std::enable_if.
   <br> (Daniel Arndt, 2017/08/14)
  </li>
 
  <li>
   New: A new version of GridTools::find_active_cell_around_point()
-  has been added that exploits local maps constructed 
+  has been added that exploits local maps constructed
   using standard GridTools utilities.
   <br>
   (Rene Gassmoeller, Luca Heltai, 2017/08/13)
@@ -2496,7 +2504,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Fixed: Creation of coverage information via 
+  Fixed: Creation of coverage information via
   compiling with 'DEAL_II_SETUP_COVERAGE=ON'
   and 'ctest -S ../tests/run_coverage.cmake' works again.
   <br>
@@ -2562,15 +2570,15 @@ inconvenience this causes.
 
  <li>
   New: Quadrature::is_tensor_product() returns if the corresponding quadrature
-  formula can be represented as a tensor product and the quadrature points are 
-  sorted lexicographically. The corresponding 1D objects can be queried using 
+  formula can be represented as a tensor product and the quadrature points are
+  sorted lexicographically. The corresponding 1D objects can be queried using
   Quadrature::get_tensor_basis().
   <br>
   (Daniel Arndt, 2017/07/26)
  </li>
 
  <li>
-  Fixed: DataOutBase::write_hdf5_parallel() can also be used in case deal.II 
+  Fixed: DataOutBase::write_hdf5_parallel() can also be used in case deal.II
   and HDF5 are not compiled with MPI support.
   <br>
   (Daniel Arndt, 2017/07/26)
@@ -2585,7 +2593,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Initialization of Chebyshev smoother: Make initial guess robust with 
+  Initialization of Chebyshev smoother: Make initial guess robust with
   respect to number of processors by operating on the global index.
   <br>
   (Niklas Fehn, 2017/07/25)
@@ -2661,8 +2669,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: MGConstrainedDoFs object now stores information for periodicity 
-  constraints which is used during the multigrid transfer by 
+  New: MGConstrainedDoFs object now stores information for periodicity
+  constraints which is used during the multigrid transfer by
   MGTransferMatrixFree and MGTransferPrebuilt.
   <br>
   (Conrad Clevenger, Martin Kronbichler, 2017/07/08)
@@ -2700,7 +2708,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: The determinant of a LAPACKMatrix can now be computed via a 
+  New: The determinant of a LAPACKMatrix can now be computed via a
   call to LAPACKMatrix::determinant().
   <br>
   (Jean-Paul Pelteret, 2017/07/02)
@@ -2715,7 +2723,7 @@ inconvenience this causes.
 
  <li>
   Fixed: FullMatrix::determinant() is now implemented for square matrices
-  of size greater than 3. In this case, it is computed through the 
+  of size greater than 3. In this case, it is computed through the
   LU decomposition of the matrix using LAPACK.
   <br>
   (Andreas Kergassner, Jean-Paul Pelteret, 2017/07/02)
@@ -2730,8 +2738,8 @@ inconvenience this causes.
 
  <li>
   New: The Timer class now has new functions Timer::get_total_data(),
-  Timer::print_total_data, Timer::last_wall_time, Timer::cpu_time and 
-  Timer::last_cpu_time() to access information about the total run as 
+  Timer::print_total_data, Timer::last_wall_time, Timer::cpu_time and
+  Timer::last_cpu_time() to access information about the total run as
   well as the last lap.
   <br>
   (Daniel Arndt, 2017/06/23)
@@ -2747,16 +2755,16 @@ inconvenience this causes.
 
  <li>
   New: Patterns::Map now accepts a new optional parameter,
-  that allows to specify also the separator between 
+  that allows to specify also the separator between
   key-value pairs.
   <br>
   (Luca Heltai, 2017/06/14)
  </li>
 
  <li>
-  New: Utilities::split_string_list() now has a 
-  version that allows to pass a string instead of a 
-  character. With this it is possible to split on 
+  New: Utilities::split_string_list() now has a
+  version that allows to pass a string instead of a
+  character. With this it is possible to split on
   double chars, for example: "alpha ;; beta ;; gamma".
   <br>
   (Luca Heltai, 2017/06/14)
@@ -2765,14 +2773,14 @@ inconvenience this causes.
  <li>
   Fixed: The passing of additional settings to
   TrilinosWrappers::SolverBase from derived solvers
-  was never completed. This has now been corrected. 
+  was never completed. This has now been corrected.
   <br>
   (Julian Andrej, Jean-Paul Pelteret, 2017/06/14)
  </li>
 
  <li>
-  Fixed: Patterns derived from PatternBase now return 
-  std::unique_ptr<PatternBase> in their clone() and 
+  Fixed: Patterns derived from PatternBase now return
+  std::unique_ptr<PatternBase> in their clone() and
   create() functions.
   <br>
   (Luca Heltai, 2017/06/12)
@@ -2808,9 +2816,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  Initialization of Chebyshev smoother: project vector onto space of vectors 
+  Initialization of Chebyshev smoother: project vector onto space of vectors
   with zero mean which is necessary in some cases where the matrix is singular.
-  Rename variable is_initialized -> eigenvalues_are_initialized 
+  Rename variable is_initialized -> eigenvalues_are_initialized
   in order to improve code readability.
   <br>
   (Niklas Fehn, 2017/06/07)
@@ -2827,7 +2835,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Changed: The ParameterHandler::print_parameters() function is now 
+  Changed: The ParameterHandler::print_parameters() function is now
   @p const, as one would expect it to be.
   <br>
   (Wolfgang Bangerth, 2017/06/07)
@@ -2906,9 +2914,9 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: Added a GridTools::regularize_corner_cells function that 
-  detects if the boundary cells of a mesh at corner positions 
-  (with dim adjacent faces on the boundary) need to be split into 
+  New: Added a GridTools::regularize_corner_cells function that
+  detects if the boundary cells of a mesh at corner positions
+  (with dim adjacent faces on the boundary) need to be split into
   cells with smaller angles.
   <br> (Luca Heltai, Martin Kronbichler, 2017/05/18)
  </li>
@@ -2960,8 +2968,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: TriaAccessor::enclosing_ball() computes and return a pair of Point 
-  and double corresponding to the center and the radius of a reasonably small 
+  New: TriaAccessor::enclosing_ball() computes and return a pair of Point
+  and double corresponding to the center and the radius of a reasonably small
   enclosing ball of the TriaAccessor object.
   <br>
   (Vishal Boddu, Denis Davydov 2017/04/26)
@@ -3103,8 +3111,8 @@ inconvenience this causes.
  </li>
 
  <li>
-  New: DoFTools::extract_dofs_with_support_contained_within() returns a set of 
-  degrees of freedom whose support is entirely contained within the cells for 
+  New: DoFTools::extract_dofs_with_support_contained_within() returns a set of
+  degrees of freedom whose support is entirely contained within the cells for
   which the predicate returns true.
   <br>
   (Denis Davydov, 2017/03/24)
@@ -3112,12 +3120,12 @@ inconvenience this causes.
 
  <li>
   New: GridTools::compute_bounding_box() computes a bounding box of a subdomain
-  whose active cells conform to a given predicate. 
+  whose active cells conform to a given predicate.
   GridTools::compute_active_cell_layer_within_distance() computes a collection
-  of active cells that are within a given distance from  
+  of active cells that are within a given distance from
   predicate subdomain.
   GridTools::compute_ghost_cell_layer_within_distance() computes a collection
-  of active cells that are within a given distance from 
+  of active cells that are within a given distance from
   locally owned active cells.
   <br>
   (Vishal Boddu, Denis Davydov 2017/03/23)
