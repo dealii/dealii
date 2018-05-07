@@ -338,6 +338,8 @@ DEAL_II_NAMESPACE_OPEN
  * fill the section name with a human readable version of the class name
  * itself.
  *
+ * See the tutorial program step-60 for an example on how to use this class.
+ *
  * @author Luca Heltai, 2017.
  */
 class ParameterAcceptor : public Subscriptor
@@ -567,6 +569,8 @@ protected:
  * ParameterAcceptor one, allowing you to use it as a replacement of the
  * ParsedFunction class, with automatic declaration and parsing of parameter
  * files.
+ *
+ * See the tutorial program step-60 for an example on how to use this class.
  *
  * @author Luca Heltai, 2018
  */
