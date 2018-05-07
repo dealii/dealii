@@ -100,11 +100,13 @@ namespace Gmsh
 
     if (base_name != prm.output_base_name)
       {
-        for (const auto &filename: {iges_file_name,geo_file_name,msh_file_name,log_file_name,warnings_file_name})
-        {
-          const auto ret_value = std::remove(filename.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+filename));
-        }
+        const std::array<const std::string *, 5> filenames
+        {{&iges_file_name, &geo_file_name, &msh_file_name, &log_file_name, &warnings_file_name}};
+        for (const std::string *filename : filenames)
+          {
+            const auto ret_value = std::remove(filename->c_str());
+            AssertThrow(ret_value == 0, ExcMessage("Failed to remove " + *filename));
+          }
         const auto ret_value = std::remove(dir_template);
         AssertThrow(ret_value == 0,
                     ExcMessage("Failed to remove "+std::string(dir_template)));
