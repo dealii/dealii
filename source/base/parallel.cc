@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 
+#define dealii_parallel_cc
 #include <deal.II/base/parallel.h>
 
 
