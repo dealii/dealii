@@ -49,10 +49,10 @@ For this tutorial program, we exemplify the matrix-free DG framework for the
 interior penalty discretization of the Laplacian, i.e., the same scheme as the
 one used for the step-39 tutorial program. The discretization of the Laplacian
 is given by the following weak form
-@f{eqnarray*}
-&&\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
-&&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, \left<[\![u_h]\!]\right>_{F}\right) + \left<\left<[\![v_h]\!], \sigma \left<[\![u_h]\!]\right>_{F}\Big) \\
-&&= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},
+@f{align*}
+&\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
+&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, \left<[\![u_h]\!]\right>_{F}\right) + \left<\left<[\![v_h]\!], \sigma \left<[\![u_h]\!]\right>_{F}\Big) \\
+&= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},
 @f}
 where $[\![v]\!] = v^- \mathbf{n}^- + v^+ \mathbf{n}^+ = \mathbf n^{-}
 \left(v^- - v^+\right)$ denotes the directed jump of the quantity $v$ from the
@@ -145,7 +145,7 @@ of the case of the nodal element FE_DGQ with node points on the element
 surface: If we are interested in the shape function values on a face, only
 $(k+ 1)^{d-1}$ degrees of freedom contribute to them in a non-trivial way (in
 a more technical way of speaking, only $(k+1)^{d-1}$ shape functions have a
-nonzero support on the face and return
+nonzero support on the face and return true for
 FiniteElement::has_support_on_face()). When compared to the $(k+1)^d$ degrees
 of freedom of a cell, this is one power less.
 
