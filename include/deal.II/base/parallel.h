@@ -751,6 +751,7 @@ namespace parallel
 }
 
 
+#ifndef dealii_parallel_cc
 namespace internal
 {
   namespace VectorImplementation
@@ -783,6 +784,7 @@ namespace internal
   }
 
 } // end of namespace internal
+#endif // deal_ii_parallel_cc
 
 
 /* --------------------------- inline functions ------------------------- */
