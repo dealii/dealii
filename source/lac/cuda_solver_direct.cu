@@ -127,38 +127,6 @@ namespace CUDAWrappers
 
 
 
-    void cusolverSpcsrlsvluHost(cusolverSpHandle_t cusolver_sp_handle,
-                                const unsigned int n_rows, const unsigned int nnz,
-                                cusparseMatDescr_t descr, const float *val_host,
-                                const int *row_ptr_host, const int *column_index_host,
-                                const float *b_host, float *x_host)
-    {
-      int singularity = 0;
-      cusolverStatus_t cusolver_error_code = cusolverSpScsrlsvluHost(
-                                               cusolver_sp_handle, n_rows, nnz, descr, val_host, row_ptr_host,
-                                               column_index_host, b_host, 0., 1, x_host, &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
-    }
-
-
-
-    void cusolverSpcsrlsvluHost(cusolverSpHandle_t cusolver_sp_handle,
-                                const unsigned int n_rows, unsigned int nnz,
-                                cusparseMatDescr_t descr, const double *val_host,
-                                const int *row_ptr_host, const int *column_index_host,
-                                const double *b_host, double *x_host)
-    {
-      int singularity = 0;
-      cusolverStatus_t cusolver_error_code = cusolverSpDcsrlsvluHost(
-                                               cusolver_sp_handle, n_rows, nnz, descr, val_host, row_ptr_host,
-                                               column_index_host, b_host, 0., 1, x_host, &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
-    }
-
-
-
     void cholesky_factorization(cusolverSpHandle_t cusolver_sp_handle,
                                 const SparseMatrix<float> &matrix,
                                 const float *b, float *x)
@@ -255,38 +223,6 @@ namespace CUDAWrappers
       Utilities::CUDA::free(pivot_dev);
       Utilities::CUDA::free(info_dev);
     }
-
-
-
-    template <typename Number>
-    void lu_factorization(cusolverSpHandle_t cusolver_sp_handle,
-                          const SparseMatrix<Number> &matrix,
-                          const Number *b_dev, Number *x_dev)
-    {
-      // cuSOLVER does not support LU factorization of sparse matrix on the device,
-      // so we need to move everything to the host first and then back to the host.
-      const unsigned int nnz = matrix.n_nonzero_elements();
-      const unsigned int n_rows = matrix.m();
-      std::vector<Number> val_host(nnz);
-      std::vector<int> column_index_host(nnz);
-      std::vector<int> row_ptr_host(n_rows + 1);
-      auto cusparse_matrix = matrix.get_cusparse_matrix();
-      Utilities::CUDA::copy_to_host(std::get<0>(cusparse_matrix), val_host);
-      Utilities::CUDA::copy_to_host(std::get<1>(cusparse_matrix), column_index_host);
-      Utilities::CUDA::copy_to_host(std::get<2>(cusparse_matrix), row_ptr_host);
-      std::vector<Number> b_host(n_rows);
-      Utilities::CUDA::copy_to_host(b_dev, b_host);
-      std::vector<Number> x_host(n_rows);
-      Utilities::CUDA::copy_to_host(x_dev, x_host);
-
-      internal::cusolverSpcsrlsvluHost(
-        cusolver_sp_handle, n_rows, nnz, std::get<3>(cusparse_matrix), val_host.data(),
-        row_ptr_host.data(), column_index_host.data(), b_host.data(),
-        x_host.data());
-
-      // Move the solution back to the device
-      Utilities::CUDA::copy_to_dev(x_host, x_dev);
-    }
   }
 
 
@@ -331,9 +267,6 @@ namespace CUDAWrappers
     else if (additional_data.solver_type == "LU_dense")
       internal::lu_factorization(cuda_handle.cusparse_handle,
                                  cuda_handle.cusolver_dn_handle, A,
-                                 b.get_values(), x.get_values());
-    else if (additional_data.solver_type == "LU_host")
-      internal::lu_factorization(cuda_handle.cusolver_sp_handle, A,
                                  b.get_values(), x.get_values());
     else
       AssertThrow(false, ExcMessage("The provided solver name " +

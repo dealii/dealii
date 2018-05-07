@@ -3,6 +3,4 @@ DEAL::Starting value 0.00000
 DEAL::Convergence step 0 value 0.00000
 DEAL::Starting value 0.00000
 DEAL::Convergence step 0 value 0.00000
-DEAL:cg::Starting value 0.000
-DEAL::Convergence step 0 value 0.00000
-DEAL:cg::Starting value 0.000
+DEAL::OK
