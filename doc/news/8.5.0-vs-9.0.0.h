@@ -699,6 +699,14 @@ inconvenience this causes.
 <ol>
 
  <li>
+  New: The tutorial step-59 shows a matrix-free solver for the Poisson
+  equation discretized with the symmetric interior penalty discontinous
+  Galerkin method.
+  <br>
+  (Katharina Kormann, Martin Kronbichler, 2018/05/04)
+ </li>
+
+ <li>
   New: The MatrixFree framework has been reworked to also support face integrals
   in DG. The new function MatrixFree::loop() takes three function pointers for
   workers on cells, interior faces and boundary faces. The loop can perform the

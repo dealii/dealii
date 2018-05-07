@@ -1,0 +1,291 @@
+<br>
+
+<i>
+This program was contributed by Katharina Kormann and Martin
+Kronbichler.
+
+This work was partly supported by the German Research Foundation (DFG) through
+the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
+within the priority program "Software for Exascale Computing" (SPPEXA). </i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+Matrix-free operator evaluation enables very efficient implementations of
+discretization with high-order polynomial bases due to a method called sum
+factorization. This concept has been introduced in the step-37 and step-48
+tutorial programs. In this tutorial program, we extend those concepts to
+discontinuous Galerkin (DG) schemes that include face integrals, a class of
+methods where high orders are particularly widespread.
+
+The underlying idea of the matrix-free evaluation is the same as for
+continuous elements: The matrix-vector product that appears in an iterative
+solver or multigrid smoother is not implemented by a classical sparse matrix
+kernel, but instead applied implicitly by the evaluation of the underlying
+integrals on the fly. For tensor product shape functions that are integrated
+with a tensor product quadrature rule, this evaluation is particularly
+efficient by using the sum-factorization technique, which decomposes the
+initially $(k+1)^{2d}$ operations for interpolation involving $(k+1)^d$ vector
+entries with associated shape functions at degree $k$ in $d$ dimensions to
+$(k+1)^d$ quadrature points into $d$ one-dimensional operations of cost
+$(k+1)^{d+1}$ each. In 3D, this reduces the order of complexity by two powers
+in $k$. When measured as the complexity per degree of freedom, the complexity
+is $\mathcal O(k)$ in the polynomial degree. Due to the presence of face
+integrals in DG, and due to the fact that operations on quadrature points
+involve more memory transfer, which both scale as $\mathcal O(1)$, the
+observed complexity is often constant for moderate $k\leq 10$. This means that
+a high order method can be evaluated with the same throughput in terms of
+degrees of freedom per second as a low-order method.
+
+More information on the algorithms are available in the preprint
+<br>
+<a href="https://arxiv.org/abs/1711.03590">Fast matrix-free evaluation of
+discontinuous Galerkin finite element operators</a> by Martin Kronbichler and
+Katharina Kormann, arXiv:1711.03590.
+
+<h3>The symmetric interior penalty formulation for the Laplacian</h3>
+
+For this tutorial program, we exemplify the matrix-free DG framework for the
+interior penalty discretization of the Laplacian, i.e., the same scheme as the
+one used for the step-39 tutorial program. The discretization of the Laplacian
+is given by the following weak form
+@f{align*}
+&\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
+&\sum_{F\in\text{faces}}\Big(-\left<[\![v_h]\!], \{\!\{\nabla u_h\}\!\}\right>_{F} - \left<\{\!\{\nabla v_h\}\!\}, [\![u_h]\!]\right>_{F} + \left<[\![v_h]\!], \sigma [\![u_h]\!]\right>_{F}\Big) \\
+&= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},
+@f}
+where $[\![v]\!] = v^- \mathbf{n}^- + v^+ \mathbf{n}^+ = \mathbf n^{-}
+\left(v^- - v^+\right)$ denotes the directed jump of the quantity $v$ from the
+two associated cells $K^-$ and $K^+$, and $\{\!\{v\}\!\}=\frac{v^- + v^+}{2}$
+is the average from both sides.
+
+The terms in the equation represent the cell integral after integration by
+parts, the primal consistency term that arises at the element interfaces due
+to integration by parts and insertion of an average flux, the adjoint
+consistency term that is added for restoring symmetry of the underlying
+matrix, and a penalty term with factor $\sigma$, whose magnitude is equal the
+length of the cells in direction normal to face multiplied by $k(k+1)$, see
+step-39. The penalty term is chosen such that an inverse estimate holds and
+the final weak form is coercive, i.e., positive definite in the discrete
+setting. The adjoint consistency term and the penalty term involve the jump
+$[\![u_h]\!]$ at the element interfaces, which disappears for the analytic
+solution $u$. Thus, these terms are consistent with the original PDE, ensuring
+that the method can retain optimal orders of convergence.
+
+In the implementation below, we implement the weak form above by moving the
+normal vector $\mathbf{n}^-$ from the jump terms to the derivatives to form a
+<i>normal</i> derivative of the form $\mathbf{n}^-\cdot \nabla u_h$. This
+makes the implementation on quadrature points slightly more efficient because
+we only need to work with scalar terms rather than tensors, and is
+mathematically equivalent.
+
+For boundary conditions, we use the so-called mirror principle that defines
+<i>artificial</i> exterior values $u^+$ by extrapolation from the interior
+solution $u^-$ combined with the given boundary data, setting $u^+ = -u^- + 2
+g_\text{D}$ and $\mathbf{n}^-\cdot \nabla u^+ = \mathbf{n}^-\cdot \nabla u^-$
+on Dirichlet boundaries and $u^+=u^-$ and $\mathbf{n}^-\cdot \nabla u^+ =
+-\mathbf{n}^-\cdot \nabla u^- + 2 g_\text{N}$ on Neumann boundaries, for given
+Dirichlet values $g_\text{D}$ and Neumann values $g_\text{N}$. These
+expressions are then inserted in the above weak form. Contributions involving
+the known quantities $g_\text{D}$ and $g_\text{N}$ are eventually moved to the
+right hand side, whereas the unknown value $u^-$ is retained on the left hand
+side and contributes to the matrix terms similarly as interior faces. Upon
+these manipulations, the same weak form as in step-39 is obtained.
+
+<h3>Face integration support in MatrixFree and FEFaceEvaluation</h3>
+
+The matrix-free framework of deal.II provides the necessary infrastructure to
+implement the action of the discretized equation above. As opposed to the
+MatrixFree::cell_loop() that we used in step-37 and step-48, we now build a
+code in terms of MatrixFree::loop() that takes three function pointers, one
+for the cell integrals, one for the inner face integrals, and one for the
+boundary face integrals (in analogy to the design of MeshWorker used in the
+step-39 tutorial program). In each of these three functions, we then implement
+the respective terms on the quadrature points. For interpolation between the
+vector entries and the values and gradients on quadrature points, we use the
+class FEEvaluation for cell contributions and FEFaceEvaluation for face
+contributions. The basic usage of these functions has been discussed
+extensively in the step-37 tutorial program.
+
+In MatrixFree::loop(), all interior faces are visited exactly once, so one
+must make sure to compute the contributions from both the test functions
+$v_h^-$ and $v_h^+$. Given the fact that the test functions on both sides are
+indeed independent, the weak form above effectively means that we submit the
+same contribution to both an FEFaceEvaluation object called `phi_inner` and
+`phi_outer` for testing with the normal derivative of the test function, and
+values with opposite sign for testing with the values of the test function,
+because the latter involves opposite signs due to the jump term. For faces
+between cells of different refinement level, the integration is done from the
+refined side, and FEFaceEvaluation automatically performs interpolation to a
+subface on the coarse side. Thus, a hanging node never appears explicitly in a
+user implementation of a weak form.
+
+The fact that each face is visited exactly once also applies to those faces at
+subdomain boundaries between different processors when parallelized with MPI,
+where one cell belongs to one processor and one to the other. The setup in
+MatrixFree::reinit() splits the faces between the two sides, and eventually
+only reports the faces actually handled locally in
+MatrixFree::n_inner_face_batches() and MatrixFree::n_boundary_face_batches(),
+respectively. Note that, in analogy to the cell integrals discussed in
+step-37, deal.II applies vectorization over several faces to use SIMD, working
+on something we call a <i>batch of faces</i> with a single instruction. The
+face batches are independent from the cell batches, even though the time at
+which face integrals are processed is kept close to the time when the cell
+integrals of the respective cells are processed, in order to increase the data
+locality.
+
+Another thing that is new in this program is the fact that we no longer split
+the vector access like FEEvaluation::read_dof_values() or
+FEEvaluation::distribute_local_to_global() from the evaluation and integration
+steps, but call combined functions FEEvaluation::gather_evaluate() and
+FEEvaluation::integrate_scatter(), respectively. This is useful for face
+integrals because, depending on what gets evaluated on the faces, not all
+vector entries of a cell must be touched in the first place. Think for example
+of the case of the nodal element FE_DGQ with node points on the element
+surface: If we are interested in the shape function values on a face, only
+$(k+ 1)^{d-1}$ degrees of freedom contribute to them in a non-trivial way (in
+a more technical way of speaking, only $(k+1)^{d-1}$ shape functions have a
+nonzero support on the face and return true for
+FiniteElement::has_support_on_face()). When compared to the $(k+1)^d$ degrees
+of freedom of a cell, this is one power less.
+
+Now of course we are not interested in only the function values, but also the
+derivatives on the cell. Fortunately, there is an element in deal.II that
+extends this property of reduced access also for derivatives on faces, the
+FE_DGQHermite element.
+
+<h3>The FE_DGQHermite element</h3>
+
+The element FE_DGQHermite belongs to the family of FE_DGQ elements, i.e., its
+shape functions are a tensor product of 1D polynomials and the element is
+fully discontinuous. As opposed to the nodal character in the usual FE_DGQ
+element, the FE_DGQHermite element is a mixture of nodal contributions and
+derivative contributions based on a Hermite-like concept. The underlying
+polynomial class is Polynomials::HermiteLikeInterpolation and can be
+summarized as follows: For cubic polynomials, we use two polynomials to
+represent the function value and first derivative at the left end of the unit
+interval, $x=0$, and two polynomials to represent the function value and first
+derivative and the right end of the unit interval, $x=1$. At the opposite
+ends, both the value and first derivative of the shape functions are zero,
+ensuring that only two out of the four basis functions contribute to values
+and derivative on the respective end. However, we deviate from the classical
+Hermite interpolation in not strictly assigning one degree of freedom for the
+value and one for the first derivative, but rather allow the first derivative
+to be a linear combination of the first and the second shape function. This is
+done to improve the conditioning of the interpolation. Also, when going to
+degrees beyond three, we add node points in the element interior in a
+Lagrange-like fashion, combined with double zeros in the points $x=0$ and
+$x=1$. The position of these extra nodes is determined by the zeros of some
+Jacobi polynomials as explained in the description of the class
+Polynomials::HermiteLikeInterpolation.
+
+Using this element, we only need to access $2(k+1)^{d-1}$ degrees of freedom
+for computing both values and derivatives on a face. The check whether the
+Hermite property is fulfilled is done transparently inside
+FEFaceEvaluation::gather_evaluate() and FEFaceEvaluation::integrate_scatter()
+that check the type of the basis and reduce the access to data if
+possible. Obviously, this would not be possible if we had separated
+FEFaceEvaluation::read_dof_values() from FEFaceEvaluation::evaluate(), because
+the amount of entries we need to read depends on the type of the derivative
+(only values, first derivative, etc.) and thus must be given to
+`read_dof_values()`.
+
+This optimization is not only useful for computing the face integrals, but
+also for the MPI ghost layer exchange: In a naive exchange, we would need to
+send all degrees of freedom of a cell to another processor if the other
+processor is responsible for computing the face's contribution. Since we know
+that only some of the degrees of freedom in the evaluation with
+FEFaceEvaluation are touched, it is natural to only exchange the relevant
+ones. The MatrixFree::loop() function has support for a selected data exchange
+when combined with LinearAlgebra::distributed::Vector. To make this happen, we
+need to tell the loop what kind of evaluation on faces we are going to do,
+using an argument of type MatrixFree::DataAccessOnFaces, as can be seen in the
+implementation of `LaplaceOperator::vmult()` below. The way data is exchanged
+in that case is as follows: The ghost layer data in the vector still pretends
+to represent all degrees of freedom, such that FEFaceEvaluation can continue
+to read the values as if the cell were a locally owned one. The data exchange
+routines take care of the task for packing and unpacking the data into this
+format. While this sounds pretty complicated, we will show in the results
+section below that this really pays off by comparing the performance to a
+baseline code that does not specify the data access on faces.
+
+<h3>An approximate block-Jacobi smoother using the fast diagonalization method</h3>
+
+In the tradition of the step-37 program, we again solve a Poisson problem with
+a geometric multigrid preconditioner inside a conjugate gradient
+solver. Instead of computing the diagonal and use the basic
+PreconditionChebyshev as a smoother, we choose a different strategy in this
+tutorial program. We implement a block-Jacobi preconditioner, where a block
+refers to all degrees of freedom on a cell. Rather than building the full cell
+matrix and applying its LU factorization (or inverse) in the preconditioner
+&mdash; an operation that would be heavily memory bandwidth bound and thus
+pretty slow &mdash; we approximate the inverse of the block by a special
+technique called fast diagonalization method.
+
+The idea of the method is to take use of the structure of the cell matrix. In
+case of the Laplacian with constant coefficients discretized on a Cartesian
+mesh, the cell matrix $L$ can be written as
+@f{align*}{
+L &= A_1 \otimes M_0 + M_1 \otimes A_0
+@f}
+in 2D and
+@f{align*}{
+L &= A_2 \otimes M_1 \otimes M_0 + M_2 \otimes A_1 \otimes M_0 + M_2 \otimes M_1 \otimes A_0
+@f}
+in 3D. The matrices $A_0$ and $A_1$ denote the 1D Laplace matrix (including
+the cell and face term associated to the current cell values $u^-_h$ and
+$v^-_h$) and $M_0$ and $M_1$ are the mass matrices. Note that this simple
+tensor product structure is lost once there are non-constant coefficients on
+the cell or the geometry is not constant any more. We mention that a similar
+setup could also be used to replace the computed integrals with this final
+tensor product form of the matrices, which would cut the operations for the
+operator evaluation into less than half. However, given the fact that this
+only holds for Cartesian cells and constant coefficients, which is a pretty
+narrow case, we refrain from pursuing this idea.
+
+Interestingly, the exact inverse of the matrix $L$ can be found through tensor
+products due to a method introduced by <a
+href="http://dl.acm.org/citation.cfm?id=2716130">R. E. Lynch, J. R. Rice,
+D. H. Thomas, Direct solution of partial difference equations by tensor
+product methods, Numerische Mathematik 6, 185-199</a> from 1964,
+@f{align*}{
+L^{-1} &= S_1 \otimes S_0 (\Lambda_1 \otimes I + I \otimes \Lambda_0)^{-1}
+S_1^\mathrm T \otimes S_0^\mathrm T,
+@f}
+where $S_d$ is the matrix of eigenvectors to the generalized eigenvalue problem
+in the given tensor direction $d$:
+@f{align*}{
+A_d s  &= \lambda M_d s, \quad d = 0, \ldots,\mathrm{dim-1},
+@f}
+and $\Lambda_d$ is the diagonal matrix representing the generalized
+eigenvalues $\lambda$. Note that the vectors $s$ are such that they
+simultaneously diagonalize $A_d$ and $M_d$, i.e. $S_d^{\mathrm T} A_d S_d =
+\Lambda_d$ and $S_d^{\mathrm T} M_d S_d = I$.
+
+The deal.II library implements a class using this concept, called
+TensorProductMatrixSymmetricSum.
+
+For the sake of this program, we stick with constant coefficients and
+Cartesian meshes, even though an approximate version based on tensor products
+would still be possible for a more general mesh, and the operator evaluation
+itself is of course generic. Also, we do not bother with adaptive meshes where
+the multigrid algorithm would need to get access to flux matrices over the
+edges of different refinement, as explained in step-39. One thing we do,
+however, is to still wrap our block-Jacobi preconditioner inside
+PreconditionChebyshev. That class relieves us from finding an appropriate
+relaxation parameter (which would be around 0.7 in 2D and 0.5 in 3D for the
+block-Jacobi smoother), and often increases smoothing efficiency a bit over
+plain Jacobi smoothing in that it enables lower the time to solution when
+setting the degree of the Chebyshev polynomial to one or two.
+
+Note that the block-Jacobi smoother has an additional benefit: The fast
+diagonalization method can also be interpreted as a change from the
+Hermite-like polynomials underlying FE_DGQHermite to a basis where the cell
+Laplacian is diagonal. Thus, it cancels the effect of the basis, and we get
+the same iteration counts irrespective of whether we use FE_DGQHermite or
+FE_DGQ. This is in contrast to using the PreconditionChebyshev class with only
+the diagonal (a point-Jacobi scheme), where FE_DGQ and FE_DGQHermite do indeed
+behave differently and FE_DGQ needs 2-5 less iterations than FE_DGQHermite,
+despite the modification made to the Hermite-like shape functions to ensure a
+good conditioning.
+
