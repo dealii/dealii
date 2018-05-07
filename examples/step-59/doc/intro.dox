@@ -145,7 +145,7 @@ of the case of the nodal element FE_DGQ with node points on the element
 surface: If we are interested in the shape function values on a face, only
 $(k+ 1)^{d-1}$ degrees of freedom contribute to them in a non-trivial way (in
 a more technical way of speaking, only $(k+1)^{d-1}$ shape functions have a
-nonzero support on the face and return
+nonzero support on the face and return true for
 FiniteElement::has_support_on_face()). When compared to the $(k+1)^d$ degrees
 of freedom of a cell, this is one power less.
 
