@@ -129,6 +129,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
     UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX17_SAVED
       "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
       DEAL_II_HAVE_CXX17_ATTRIBUTES
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR
       )
 
     #
@@ -160,10 +161,26 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
       "
       DEAL_II_HAVE_CXX17_ATTRIBUTES)
 
+    #
+    # Test that the c++17 if constexpr is supported.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      int main()
+      {
+        constexpr bool flag = false;
+        if constexpr(flag)
+          return 1;
+        return 0;
+      }
+      "
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
+
     RESET_CMAKE_REQUIRED()
   ENDIF()
 
-  IF( DEAL_II_HAVE_CXX17_ATTRIBUTES )
+  IF( DEAL_II_HAVE_CXX17_ATTRIBUTES AND
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
     SET(DEAL_II_HAVE_CXX17 TRUE)
   ELSE()
     IF(NOT _user_provided_cxx_version_flag)
