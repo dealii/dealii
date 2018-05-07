@@ -208,8 +208,6 @@ namespace Step60
   {
   public:
 
-    // @sect3{Parameters}
-    //
     // The `Parameters` class is derived from ParameterAcceptor. This allows us
     // to use the ParameterAcceptor::add_parameter() method in its constructor.
     //
@@ -623,7 +621,8 @@ namespace Step60
 
   }
 
-
+  // @sect3{Set up}
+  //
   // The function `DistributedLagrangeProblem::setup_grids_and_dofs()` is used
   // to set up the finite element spaces. Notice how `std_cxx14::make_unique` is
   // used to create objects wrapped inside `std::unique_ptr` objects.
@@ -932,6 +931,8 @@ namespace Step60
     coupling_matrix.reinit(coupling_sparsity);
   }
 
+  // @sect3{Assembly}
+  //
   // The following function creates the matrices: as noted before computing the
   // stiffness matrix and the rhs is a standard procedure.
   template<int dim, int spacedim>
@@ -969,6 +970,8 @@ namespace Step60
     }
   }
 
+  // @sect3{Solve}
+  //
   // All parts have been assembled: we solve the system
   // using the Schur complement method
   template<int dim, int spacedim>

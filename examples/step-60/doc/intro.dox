@@ -41,7 +41,7 @@ The same is true, with a less regular range space (namely $H^{1/2}(\Gamma)$),
 when the dimension of $\Gamma$ is one less with respect to $\Omega$, and
 $\Gamma$ does not have a boundary. In this second case, the operator $\gamma$ is
 also known as the *trace* operator, and it is well defined for Lipschitz
-co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$ (read on <a
+co-dimension one curves and surfaces $\Gamma$ embedded in $\Omega$ (read  <a
 href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
 for further details on the trace operator).
 
@@ -52,8 +52,8 @@ and three dimensions.
 
 In this tutorial program we're not interested in further details on $\gamma$: we
 take the extension $\gamma$ for granted, assuming that the dimension of the
-embedded domain (`dim`) is always smaller by one or equal w.r.t. the dimension
-of the embedding domain $\Omega$ (`spacedim`).
+embedded domain (`dim`) is always smaller by one or equal with respect to the
+dimension of the embedding domain $\Omega$ (`spacedim`).
 
 We are going to solve the following differential problem: given a sufficiently
 regular function $g$ on $\Gamma$, find the solution $u$ to
@@ -218,7 +218,7 @@ information on two non-matching grids.
 In particular, the integral that appears in the computation of a single entry of
 $C$, is computed on $\Gamma$. As usual in finite elements we split this
 integral into contributions from all cells of the triangulation used to
-discretize $\Gamma$, we tranform the integral on $K$ to an integral on the
+discretize $\Gamma$, we transform the integral on $K$ to an integral on the
 reference element $\hat K$, where $F_{K}$ is the mapping from $\hat K$ to $K$,
 and compute the integral on $\hat K$ using a quadrature formula:
 
@@ -242,7 +242,7 @@ taken (as shown in the picture below):
 (\hat x_i)$, where $x_i$ is one of the quadrature points used for the integral
 on $K \subseteq \Gamma$.
 
-- Find the cell of $\Omega$ in which $y_i$ lies, say it's $T$.
+- Find the cell of $\Omega$ in which $y_i$ lies. We shall call this element $T$.
 
 - To evaluate the basis function use the inverse of the mapping $G_T$ that
 transforms the reference element $\hat T$ into the element $T$: $v_j(y_i) = \hat
@@ -252,33 +252,33 @@ v_j \circ G^{-1}_{T} (y_i)$.
   src="https://www.dealii.org/images/steps/developer/step-60.C_interpolation.png"
   alt=""> </p>
 
-The three steps above can be computed using by calling, in turn:
+The three steps above can be computed by calling, in turn,
 
-- GridTools::find_active_cell_around_point, followed by
+- GridTools::find_active_cell_around_point(), followed by
 
-- Mapping::tranform_real_to_unit_cell
+- Mapping::transform_real_to_unit_cell(). We then
 
 - construct a custom Quadrature formula, containing the point in the reference
- cell
+ cell and then
 
-- construct an FEValues object, with the given quadrature formula, and initialized
- with the cell obtained in the first step.
+- construct an FEValues object, with the given quadrature formula, and
+ initialized with the cell obtained in the first step.
 
-This is what the deal.II function VectorTools::point_value does when evaluating a
-finite element field (not just a single shape function) at an arbitrary point; but
-this is would be inefficient in this case.
+This is what the deal.II function VectorTools::point_value() does when
+evaluating a finite element field (not just a single shape function) at an
+arbitrary point; but this would be inefficient in this case.
 
-A better solution is to use a convenient wrapper to perform the first three steps
-on a collection of points: GridTools::compute_point_locations. If one is
+A better solution is to use a convenient wrapper to perform the first three
+steps on a collection of points: GridTools::compute_point_locations(). If one is
 actually interested in computing the full coupling matrix, then it is possible
-to call the method NonMatching::create_coupling_mass_matrix, that performs the
+to call the method NonMatching::create_coupling_mass_matrix(), that performs the
 above steps in an efficient way, reusing all possible data structures, and
-gathering expensive steps together. This is the function we'll be using later
-in this tutorial. 
+gathering expensive steps together. This is the function we'll be using later in
+this tutorial.
 
 We solve the final saddle point problem by an iterative solver, applied to the
-Schur complement $S$ (whose construction is described, for example, in step-20), and
-we construct $S$ using LinearOperator classes.
+Schur complement $S$ (whose construction is described, for example, in step-20),
+and we construct $S$ using LinearOperator classes.
 
 
 <h3>The testcase</h3>
@@ -307,7 +307,7 @@ reference interval $[0,1]$ to a curve in $\Omega$.
 
 If the curve is closed, then the results will be similar to running the same
 problem on a grid whose boundary is $\Gamma$. The program will happily run also
-with a non closed $\Gamma$, although in those cases, the mathematical
+with a non-closed $\Gamma$, although in those cases the mathematical
 formulation of the problem is more difficult, since $\Gamma$ will have a
 boundary by itself that has co-dimension two with respect to the domain
 $\Omega$.
