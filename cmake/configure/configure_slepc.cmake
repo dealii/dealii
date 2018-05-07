@@ -44,14 +44,6 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
         "The SLEPc library must have the same version as the PETSc library.\n"
         )
 
-      UNSET(SLEPC_INCLUDE_DIR_ARCH CACHE)
-      UNSET(SLEPC_INCLUDE_DIR_COMMON CACHE)
-      UNSET(SLEPC_LIBRARY CACHE)
-      SET(SLEPC_DIR "" CACHE PATH
-        "An optional hint to a SLEPc directory"
-        )
-      MARK_AS_ADVANCED(CLEAR SLEPC_DIR)
-
       SET(${var} FALSE)
     ENDIF()
   ENDIF()
