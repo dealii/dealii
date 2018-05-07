@@ -1,10 +1,14 @@
 <br>
 
 <i>This program was contributed by Luca Heltai and Giovanni Alzetta, SISSA, Trieste.
+</i>
+
+@dealiiTutorialDOI{10.5281/zenodo.12432816,https://zenodo.org/badge/DOI/10.5281/zenodo.12432816.svg}
+
 
 <h1>Introduction</h1>
 
-<h3>Distributed Lagrange multipliers</h3>
+<h3>Non-matching grid constraints through distributed Lagrange multipliers</h3>
 
 
 In this tutorial we consider the case of two domains, $\Omega$ in
