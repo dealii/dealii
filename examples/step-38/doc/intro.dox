@@ -30,7 +30,7 @@ variable, while here we actually have to investigate what it means to take
 derivatives of a function only defined on a (possibly curved) surface.
 
 In order to define the above operator, we start by introducing some notations.
-Let $\mathbf x_S:\hat S \rightarrow S$ be a parametrization of
+Let $\mathbf x_S:\hat S \rightarrow S$ be a parameterization of
 a surface $S$ from a reference element $\hat S \subset \mathbb R^2$,
 i.e. each point $\hat{\mathbf x}\in\hat S$ induces a point ${\mathbf
   x}_S(\hat{\mathbf x}) \in S$. Then let
