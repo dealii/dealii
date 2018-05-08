@@ -651,15 +651,28 @@ namespace internal
         }
       else
         {
-          std::vector<dealii::Vector<typename VectorType::value_type> > tmp(patch_values_system.size());
-          for (unsigned int i = 0; i < patch_values_system.size(); i++)
-            tmp[i].reinit(patch_values_system[i].size());
+          // OK, so we know that the data type stored by the user-provided
+          // vector is not simply a double. In that case, we need to
+          // ask the FEValuesBase object to extract function values for
+          // us from the evaluation points in the provided data
+          // type, and then copy them by hand into the output location.
+          const unsigned int n_components = fe_patch_values.get_fe().n_components();
+          const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
+
+          std::vector<dealii::Vector<typename VectorType::value_type> > tmp(n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            tmp[i].reinit(n_components);
 
           fe_patch_values.get_function_values (*vector, tmp);
 
-          for (unsigned int i = 0; i < patch_values_system.size(); i++)
-            for (unsigned int j=0; j<tmp[i].size(); ++j)
-              patch_values_system[i](j) = get_component (tmp[i](j), extract_component);
+          AssertDimension (patch_values_system.size(), n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            {
+              AssertDimension (patch_values_system[i].size(), n_components);
+
+              for (unsigned int j=0; j<n_components; ++j)
+                patch_values_system[i](j) = get_component (tmp[i](j), extract_component);
+            }
         }
     }
 
@@ -724,17 +737,30 @@ namespace internal
         }
       else
         {
+          // OK, so we know that the data type stored by the user-provided
+          // vector is not simply a double. In that case, we need to
+          // ask the FEValuesBase object to extract function values for
+          // us from the evaluation points in the provided data
+          // type, and then copy them by hand into the output location.
+          const unsigned int n_components = fe_patch_values.get_fe().n_components();
+          const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
+
           std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension,
               typename VectorType::value_type> > >
-              tmp(patch_gradients_system.size());
-          for (unsigned int i = 0; i < tmp.size(); i++)
-            tmp[i].resize(patch_gradients_system[i].size());
+              tmp(n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            tmp[i].resize(n_components);
 
           fe_patch_values.get_function_gradients (*vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
-            for (unsigned int j = 0; j < tmp[i].size(); j++)
-              patch_gradients_system[i][j] = get_component (tmp[i][j], extract_component);
+          AssertDimension (patch_gradients_system.size(), n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            {
+              AssertDimension (patch_gradients_system[i].size(), n_components);
+
+              for (unsigned int j = 0; j < n_components; j++)
+                patch_gradients_system[i][j] = get_component (tmp[i][j], extract_component);
+            }
         }
     }
 
@@ -800,17 +826,30 @@ namespace internal
         }
       else
         {
+          // OK, so we know that the data type stored by the user-provided
+          // vector is not simply a double. In that case, we need to
+          // ask the FEValuesBase object to extract function values for
+          // us from the evaluation points in the provided data
+          // type, and then copy them by hand into the output location.
+          const unsigned int n_components = fe_patch_values.get_fe().n_components();
+          const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
+
           std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension,
               typename VectorType::value_type> > >
-              tmp(patch_hessians_system.size());
-          for (unsigned int i = 0; i < tmp.size(); i++)
-            tmp[i].resize(patch_hessians_system[i].size());
+              tmp(n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            tmp[i].resize(n_components);
 
           fe_patch_values.get_function_hessians (*vector, tmp);
 
-          for (unsigned int i = 0; i < tmp.size(); i++)
-            for (unsigned int j = 0; j < tmp[i].size(); j++)
-              patch_hessians_system[i][j] = get_component (tmp[i][j], extract_component);
+          AssertDimension (patch_hessians_system.size(), n_eval_points);
+          for (unsigned int i = 0; i < n_eval_points; i++)
+            {
+              AssertDimension (patch_hessians_system[i].size(), n_components);
+
+              for (unsigned int j = 0; j < n_components; j++)
+                patch_hessians_system[i][j] = get_component (tmp[i][j], extract_component);
+            }
         }
     }
 
