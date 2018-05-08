@@ -140,7 +140,7 @@ namespace Step23
     Vector<double>       old_solution_u, old_solution_v;
     Vector<double>       system_rhs;
 
-    double               time_step
+    double               time_step;
     double               time;
     unsigned int         timestep_number;
     const double         theta;
