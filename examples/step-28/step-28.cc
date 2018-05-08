@@ -1153,7 +1153,7 @@ namespace Step28
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtu (output);
   }
 

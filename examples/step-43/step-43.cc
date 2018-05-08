@@ -1843,7 +1843,7 @@ namespace Step43
 
     std::string filename = "solution-" +
                            Utilities::int_to_string (timestep_number, 5) + ".vtu";
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtu (output);
   }
 

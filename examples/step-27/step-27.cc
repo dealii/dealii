@@ -474,7 +474,7 @@ namespace Step27
       const std::string filename = "solution-" +
                                    Utilities::int_to_string (cycle, 2) +
                                    ".vtk";
-      std::ofstream output (filename.c_str());
+      std::ofstream output (filename);
       data_out.write_vtk (output);
     }
 

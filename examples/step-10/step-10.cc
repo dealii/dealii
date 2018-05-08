@@ -140,7 +140,7 @@ namespace Step10
                                    + "_mapping_q_"
                                    + Utilities::to_string(degree)
                                    + ".dat";
-            std::ofstream gnuplot_file (filename.c_str());
+            std::ofstream gnuplot_file (filename);
 
             // Then write out the triangulation to this file. The last
             // argument of the function is a pointer to a mapping object. This

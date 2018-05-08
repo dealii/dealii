@@ -1333,7 +1333,7 @@ namespace Step18
 
     // With the so-completed filename, let us open a file and write the data
     // we have generated into it:
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtu (output);
 
     // The record files must be written only once and not by each processor,
@@ -1353,7 +1353,7 @@ namespace Step18
         visit_master_filename = ("solution-" +
                                  Utilities::int_to_string(timestep_no,4) +
                                  ".visit");
-        std::ofstream visit_master (visit_master_filename.c_str());
+        std::ofstream visit_master (visit_master_filename);
         DataOutBase::write_visit_record (visit_master, filenames);
 
         // Similarly, we write the paraview .pvtu:
@@ -1361,7 +1361,7 @@ namespace Step18
         pvtu_master_filename = ("solution-" +
                                 Utilities::int_to_string(timestep_no,4) +
                                 ".pvtu");
-        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        std::ofstream pvtu_master (pvtu_master_filename);
         data_out.write_pvtu_record (pvtu_master, filenames);
 
         // Finally, we write the paraview record, that references all .pvtu files and

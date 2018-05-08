@@ -478,7 +478,7 @@ namespace Step42
       nx(0),
       ny(0)
     {
-      std::ifstream f(name.c_str());
+      std::ifstream f(name);
       AssertThrow (f, ExcMessage (std::string("Can't read from file <") +
                                   name + ">!"));
 
@@ -2055,7 +2055,7 @@ namespace Step42
       (output_dir + filename_base + "-"
        + Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
 
-    std::ofstream output_vtu((filename + ".vtu").c_str());
+    std::ofstream output_vtu((filename + ".vtu"));
     data_out.write_vtu(output_vtu);
     pcout << output_dir + filename_base << ".pvtu" << std::endl;
 
@@ -2068,10 +2068,10 @@ namespace Step42
                               Utilities::int_to_string(i, 4) +
                               ".vtu");
 
-        std::ofstream pvtu_master_output((output_dir + filename_base + ".pvtu").c_str());
+        std::ofstream pvtu_master_output((output_dir + filename_base + ".pvtu"));
         data_out.write_pvtu_record(pvtu_master_output, filenames);
 
-        std::ofstream visit_master_output((output_dir + filename_base + ".visit").c_str());
+        std::ofstream visit_master_output((output_dir + filename_base + ".visit"));
         DataOutBase::write_visit_record(visit_master_output, filenames);
       }
 

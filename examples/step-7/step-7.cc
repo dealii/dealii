@@ -1081,7 +1081,7 @@ namespace Step7
     // appropriate for VTK output, open a file, and add the solution vector to
     // the object that will do the actual output:
     vtk_filename += ".vtk";
-    std::ofstream output (vtk_filename.c_str());
+    std::ofstream output (vtk_filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -1198,7 +1198,7 @@ namespace Step7
       }
 
     error_filename += ".tex";
-    std::ofstream error_table_file(error_filename.c_str());
+    std::ofstream error_table_file(error_filename);
 
     convergence_table.write_tex(error_table_file);
 
@@ -1283,7 +1283,7 @@ namespace Step7
           }
         conv_filename += ".tex";
 
-        std::ofstream table_file(conv_filename.c_str());
+        std::ofstream table_file(conv_filename);
         convergence_table.write_tex(table_file);
       }
   }

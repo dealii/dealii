@@ -1002,7 +1002,7 @@ namespace Step34
 
     const std::string
     filename = Utilities::int_to_string(dim) + "d_external.vtk";
-    std::ofstream file(filename.c_str());
+    std::ofstream file(filename);
 
     data_out.write_vtk(file);
   }
@@ -1030,7 +1030,7 @@ namespace Step34
                              "d_boundary_solution_" +
                              Utilities::int_to_string(cycle) +
                              ".vtk" );
-    std::ofstream file(filename.c_str());
+    std::ofstream file(filename);
 
     dataout.write_vtk(file);
 

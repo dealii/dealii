@@ -773,7 +773,7 @@ namespace Step55
                                   "." +
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4));
-    std::ofstream output ((filename + ".vtu").c_str());
+    std::ofstream output ((filename + ".vtu"));
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
@@ -788,9 +788,9 @@ namespace Step55
                                Utilities::int_to_string (i, 4) +
                                ".vtu");
 
-        std::ofstream master_output (("solution-" +
-                                      Utilities::int_to_string (cycle, 2) +
-                                      ".pvtu").c_str());
+        std::ofstream master_output ("solution-" +
+                                     Utilities::int_to_string (cycle, 2) +
+                                     ".pvtu");
         data_out.write_pvtu_record (master_output, filenames);
       }
   }
