@@ -72,9 +72,9 @@ void test (unsigned int variant)
 
   deallog.push(Utilities::int_to_string(variant,1));
 
-  SolverControl control(1000, variant==1?1e-4:1e-13);
+  SolverControl control(1000, variant==1?1e-4:1e-15);
   typename SolverGMRES<Vector<number> >::AdditionalData data;
-  data.max_n_tmp_vectors = 80;
+  data.max_n_tmp_vectors = 100;
 
   SolverGMRES<Vector<number> > solver(control, data);
   solver.connect_eigenvalues_slot(
@@ -113,7 +113,7 @@ void test (unsigned int variant)
 int main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision(2);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   deallog.push("double");
