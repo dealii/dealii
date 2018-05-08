@@ -763,7 +763,7 @@ namespace GridGenerator
    * boundary where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise
    * all indicators are set to 0.
    *
-   * All manifold ids are set to zero, and a  SphericalManifold is attached
+   * All manifold ids are set to zero, and a SphericalManifold is attached
    * to the triangulation.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
@@ -795,6 +795,9 @@ namespace GridGenerator
    * indicators are set to 0. In 3d indicator 2 is at the face x=0, 3 at y=0,
    * 4 at z=0.
    *
+   * All manifold ids are set to zero, and a SphericalManifold is attached
+   * to the triangulation.
+   *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
@@ -818,6 +821,9 @@ namespace GridGenerator
    * @note Although this function is declared as a template, it does not make
    * sense in 1D and 2D. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
+   *
+   * All manifold ids are set to zero, and a CylindricalManifold is attached
+   * to the triangulation.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
@@ -856,8 +862,6 @@ namespace GridGenerator
   void torus (Triangulation<dim,spacedim> &tria,
               const double R,
               const double r);
-
-
 
   /**
    * This class produces a square in the <i>xy</i>-plane with a cylindrical
