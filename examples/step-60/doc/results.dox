@@ -7,14 +7,14 @@ will get an exception that no such file can be found:
 
 @code
 ----------------------------------------------------
-Exception on processing: 
+Exception on processing:
 
 --------------------------------------------------------
 An error occurred in line <74> of file <../source/base/parameter_acceptor.cc> in function
     static void dealii::ParameterAcceptor::initialize(const std::string &, const std::string &, const ParameterHandler::OutputStyle, dealii::ParameterHandler &)
-The violated condition was: 
+The violated condition was:
     false
-Additional information: 
+Additional information:
     You specified <parameters.prm> as input parameter file, but it does not exist. We created it for you.
 --------------------------------------------------------
 
@@ -48,12 +48,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = R=.3, Cx=.4, Cy=.4                 # default: 
+    set Function constants  = R=.3, Cx=.4, Cy=.4                 # default:
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -64,7 +64,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -89,12 +89,12 @@ subsection Distributed Lagrange<1,2>
     # that describes the function, rather than having to use its numeric value
     # everywhere the constant appears. These values can be defined using this
     # parameter, in the form `var1=value1, var2=value2, ...'.
-    # 
+    #
     # A typical example would be to set this runtime parameter to
     # `pi=3.1415926536' and then use `pi' in the expression of the actual
     # formula. (That said, for convenience this class actually defines both
     # `pi' and `Pi' by default, but you get the idea.)
-    set Function constants  = 
+    set Function constants  =
 
     # The formula that denotes the function you want to evaluate for
     # particular values of the independent variables. This expression may
@@ -105,7 +105,7 @@ subsection Distributed Lagrange<1,2>
     # true, and to the third argument otherwise. For a full overview of
     # possible expressions accepted see the documentation of the muparser
     # library at http://muparser.beltoforion.de/.
-    # 
+    #
     # If the function you are describing represents a vector-valued function
     # with multiple components, then separate the expressions for individual
     # components by a semicolon.
@@ -141,7 +141,7 @@ If you now run the program, you will get a file called `used_parameters.prm`,
 containing a shorter version of the above parameters (without comments and
 documentation), documenting all parameters that were used to run your program:
 @code
-# Parameter file generated with 
+# Parameter file generated with
 # DEAL_II_PACKAGE_VERSION = 9.0.0
 subsection Distributed Lagrange<1,2>
   set Coupling quadrature order                    = 3
@@ -160,7 +160,7 @@ subsection Distributed Lagrange<1,2>
     set Variable names      = x,y,t
   end
   subsection Embedded value
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 1
     set Variable names      = x,y,t
   end
@@ -297,7 +297,7 @@ subsection Distributed Lagrange<1,2>
     set Variable names      = x,y,t
   end
   subsection Embedded value
-    set Function constants  = 
+    set Function constants  =
     set Function expression = x-.5
     set Variable names      = x,y,t
   end
@@ -320,9 +320,9 @@ though the meshes are not aligned, we obtain a pretty good result.
 Replacing $x-.5$ with $2(x-.5)^2-2(y-.5)^2$, i.e., modifying the parameter file
 such that we have
 @code
-  ... 
+  ...
   subsection Embedded value
-    set Function constants  = 
+    set Function constants  =
     set Function expression = 2*(x-.5)^2-2*(y-.5)^2
     set Variable names      = x,y,t
   end
