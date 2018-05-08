@@ -54,11 +54,14 @@ namespace Gmsh
                                            const AdditionalParameters &prm)
   {
     std::string base_name = prm.output_base_name;
-    FILE *tmp_file = nullptr;
+    char dir_template[] = "ctfbc-XXXXXX";
     if (base_name == "")
       {
-        tmp_file = std::tmpfile();
-        AssertThrow(tmp_file != nullptr, ExcMessage("Creating temporary file failed!"));
+        const char *temp = mkdtemp(dir_template);
+        AssertThrow(temp != nullptr,
+                    ExcMessage("Creating temporary directory failed!"));
+        base_name = temp;
+        base_name += "tmp";
       }
 
     const std::string iges_file_name     = base_name+".iges";
@@ -76,15 +79,13 @@ namespace Gmsh
             << "Plane Surface (3) = {2};" << std::endl
             << "Characteristic Length { 1 } = " << prm.characteristic_length << ";" << std::endl
             << "Mesh.RecombineAll = 1;" << std::endl
-            << "Mesh.SubdivisionAlgorithm=1;" << std::endl;
-
+            << "Mesh.SubdivisionAlgorithm = 1;" << std::endl;
     geofile.close();
 
     std::stringstream command;
-    command << DEAL_II_GMSH_EXECUTABLE_PATH << " -2 "
-            << geo_file_name << " 1> "
-            << log_file_name << " 2> "
-            << warnings_file_name;
+    command << DEAL_II_GMSH_EXECUTABLE_PATH << " -2 " << geo_file_name
+            << " 1> " << log_file_name
+            << " 2> " << warnings_file_name;
 
     const auto ret_value = std::system(command.str().c_str());
     AssertThrow(ret_value == 0,
@@ -99,30 +100,16 @@ namespace Gmsh
 
     if (base_name != prm.output_base_name)
       {
-        // clean up if the filenames are temporary ones
-        AssertThrow(tmp_file != nullptr, ExcInternalError());
-        const int ret = std::fclose(tmp_file);
-        AssertThrow(ret == 0, ExcInternalError());
-        {
-          const auto ret_value = std::remove(iges_file_name.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+iges_file_name));
-        }
-        {
-          const auto ret_value = std::remove(geo_file_name.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+geo_file_name));
-        }
-        {
-          const auto ret_value = std::remove(msh_file_name.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+msh_file_name));
-        }
-        {
-          const auto ret_value = std::remove(log_file_name.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+log_file_name));
-        }
-        {
-          const auto ret_value = std::remove(warnings_file_name.c_str());
-          AssertThrow(ret_value == 0, ExcMessage("Failed to remove "+warnings_file_name));
-        }
+        const std::array<const std::string *, 5> filenames
+        {{&iges_file_name, &geo_file_name, &msh_file_name, &log_file_name, &warnings_file_name}};
+        for (const std::string *filename : filenames)
+          {
+            const auto ret_value = std::remove(filename->c_str());
+            AssertThrow(ret_value == 0, ExcMessage("Failed to remove " + *filename));
+          }
+        const auto ret_value = std::remove(dir_template);
+        AssertThrow(ret_value == 0,
+                    ExcMessage("Failed to remove "+std::string(dir_template)));
       }
   }
 #endif
