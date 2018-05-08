@@ -30,7 +30,7 @@
 // executable can be run with different parameter settings, it can become
 // difficult to handle hundreds of parameters simultaneously while maintaining
 // compatibility between different programs. This is where the class
-// Parame terAcceptor proves useful.
+// ParameterAcceptor proves useful.
 //
 // This class is used to define a public interface for classes that want to use
 // a single global ParameterHandler to handle parameters. The class provides a
@@ -70,12 +70,12 @@
 // organized following a Directed Acyclic Graph (DAG). A DAG is a directed graph
 // with topological ordering: each node structurally represents an object, and
 // is connected to child nodes by one (or more) oriented edges, from the parent
-// to the child. The most significative example of this structure is the
+// to the child. The most significant example of this structure is the
 // Triangulation and its Triangulation::cell_iterator structure. From a
 // Triangulation (the main node), we can access each cell (children nodes of the
 // triangulation). From the cells themselves we can access over all vertices of
 // the cell. In this simple example, the DAG structure can be represented as
-// thre node types (the triangulation, the cell iterator, and the vertex)
+// three node types (the triangulation, the cell iterator, and the vertex)
 // connected by oriented edges from the triangulation to the cell iterators, and
 // from the cell iterator to the vertices. This has several advantages, but it
 // intrinsically creates “asymmetries”, making certain operations fast and their
@@ -97,7 +97,7 @@
 // somewhere. GridTools::Cache does exactly this, giving you access to
 // previously computed objects, or computing them on the fly (and then storing
 // them inside the class for later use), and making sure that whenever the
-// Triangulation is updated, also the relevant data strucutres are recomputed.
+// Triangulation is updated, also the relevant data structures are recomputed.
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/fe/fe.h>
@@ -411,7 +411,7 @@ namespace Step60
     Vector<double>            embedded_rhs;
     Vector<double>            embedded_value;
 
-    // The TimerOuput class is used to provide some statistics on
+    // The TimerOutput class is used to provide some statistics on
     // the performance of our program.
     TimerOutput monitor;
   };
@@ -425,7 +425,7 @@ namespace Step60
   // Parameter files can be organized into section/subsection/etc.:
   // this has the advantage that defined objects share parameters when
   // sharing the same section/subsection/etc. ParameterAcceptor allows
-  // to specify the section name using unix conventions on paths.
+  // to specify the section name using Unix conventions on paths.
   // If the section name starts with a slash ("/"), then the section is
   // interpreted as an *absolute path*, ParameterAcceptor enters a subsection
   // for each directory in the path, using the last name it encountered as
@@ -694,7 +694,7 @@ namespace Step60
     // according to the type of FiniteElement you choose. MappingFEField
     // implements the pure iso-parametric concept, and can be used, for example,
     // to implement iso-geometric analysis codes in deal.II, by combining it
-    // with the FEBernstein finite element class. In this example, we'll use the
+    // with the FE_Bernstein finite element class. In this example, we'll use the
     // two interchangeably, by taking into account the fact that one
     // configuration will be a `displacement`, while the other will be an
     // absolute `deformation` field.
@@ -746,7 +746,7 @@ namespace Step60
     // but also allow a local refinement depending on the position of $\Gamma$,
     // according to the value of `parameters.delta_refinement`, that we use to
     // decide how many rounds of local refinement we should do on $\Omega$,
-    // corresponding to the the position of $\Gamma$.
+    // corresponding to the position of $\Gamma$.
     //
     // With the mapping in place, it is now possible to query what is the
     // location of all support points associated with the `embedded_dh`, by
@@ -769,14 +769,14 @@ namespace Step60
     // support point, to get a chance at refining the embedding grid where it is
     // necessary, i.e., where the embedded grid is. This can be done manually,
     // by looping over each support point, and then calling the method
-    // Mapping::tranform_real_to_unit_cell for each cell of the embedding space,
+    // Mapping::transform_real_to_unit_cell for each cell of the embedding space,
     // until we find one that returns points in the unit reference cell, or it
     // can be done in a more intelligent way.
     //
     // The GridTools::find_active_cell_around_point is a possible option that
     // performs the above task in a cheaper way, by first identifying the
     // closest vertex of the embedding Triangulation to the target point, and
-    // then by calling Mapping::tranform_real_to_unit_cell only for those cells
+    // then by calling Mapping::transform_real_to_unit_cell only for those cells
     // that share the found vertex.
     //
     // In fact, there are algorithms in the GridTools namespace that exploit a
@@ -906,7 +906,7 @@ namespace Step60
   // Creating the coupling sparsity pattern is a complex operation,
   // but it can be easily done using the
   // NonMatching::create_coupling_sparsity_pattern, which requires the
-  // two DoFHandlers, the quadrature points for the coupling,
+  // two DoFHandler objects, the quadrature points for the coupling,
   // a DynamicSparsityPattern (which then needs to be copied into the
   // sparsity one, as usual), the component mask for the embedding and
   // embedded Triangulation (which we leave empty) and the mappings

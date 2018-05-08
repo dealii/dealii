@@ -50,7 +50,7 @@ href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
 for further details on the trace operator).
 
 The co-dimension two case is a little more complicated, and in general it is not
-possible to construct a continous trace operator, not even from $H^1(\Omega)$ to
+possible to construct a continuous trace operator, not even from $H^1(\Omega)$ to
 $L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one respectively in two
 and three dimensions.
 
@@ -132,8 +132,8 @@ non aligned meshes is complex by itself: to illustrate how is done we study a
 simple problem.
 
 The technique we describe here is presented in the literature using one of many names:
-the **immersed finite element method**, the **fictitious boundary method**, the
-**distributed Lagrange multiplier method**, and others. The main principle is
+the <b>immersed finite element method</b>, the <b>fictitious boundary method</b>, the
+<b>distributed Lagrange multiplier method</b>, and others. The main principle is
 that the discretization of the two grids and of the two finite element spaces
 are kept completely independent. This technique is particularly efficient for
 the simulation of fluid-structure interaction problems, where the configuration
@@ -299,7 +299,7 @@ example, something you read from file, or a closed sphere that you later deform
 to something more interesting.
 
 In the default scenario, $\Gamma$ has co-dimension one, and this tutorial
-program implements the Fictitious Boundary Method. As it turns out, the same
+program implements the Fictitious %Boundary Method. As it turns out, the same
 techniques are used in the Variational Immersed Finite Element Method, and
 the coupling operator $C$ defined above is the same in almost all of these
 non-matching methods.
@@ -323,7 +323,7 @@ $\Omega$.
   International Journal of Multiphase Flow 25 (5). Pergamon: 755–94.
 
 - Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
-  Hyper-Elastic Formulation of the Immersed Boundary Method.” Computer Methods
+  Hyper-Elastic Formulation of the Immersed %Boundary Method.” Computer Methods
   in Applied Mechanics and Engineering 197 (25–28).
 
 - Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
