@@ -84,6 +84,9 @@ namespace NonMatching
    * An exception is thrown if you use an immersed
    * parallel::distributed::Triangulation<dim1,spacedim>.
    *
+   * See the tutorial program step-60 for an example on how to use this
+   * function.
+   *
    * @author Luca Heltai, 2018
    */
   template<int dim0, int dim1, int spacedim, typename Sparsity>
@@ -156,6 +159,9 @@ namespace NonMatching
    * triangulation is of type parallel::shared::Triangulation<dim1,spacedim>.
    * An exception is thrown if you use an immersed
    * parallel::distributed::Triangulation<dim1,spacedim>.
+   *
+   * See the tutorial program step-60 for an example on how to use this
+   * function.
    *
    * @author Luca Heltai, 2018
    */
