@@ -50,7 +50,7 @@ href="https://en.wikipedia.org/wiki/Trace_operator">this wikipedia article</a>
 for further details on the trace operator).
 
 The co-dimension two case is a little more complicated, and in general it is not
-possible to construct a continous trace operator, not even from $H^1(\Omega)$ to
+possible to construct a continuous trace operator, not even from $H^1(\Omega)$ to
 $L^2(\Gamma)$, when the dimension of $\Gamma$ is zero or one respectively in two
 and three dimensions.
 
