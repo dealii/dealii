@@ -73,7 +73,7 @@ void test(Utilities::CUDA::Handle &cuda_handle)
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
 
-  for (auto solver_type: {"Cholesky", "LU_dense", "LU_host"})
+  for (auto solver_type: {"Cholesky", "LU_dense"})
     {
       // Solve on the device
       CUDAWrappers::SolverDirect<double>::AdditionalData data(solver_type);
