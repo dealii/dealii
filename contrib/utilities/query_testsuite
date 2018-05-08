@@ -30,7 +30,7 @@ print_help() {
   echo "compatible with markdown"
   echo ""
   echo "Options:"
-  echo "  -r (--regex)  : only show results for hosts/commits matching the specified regex"
+  echo "  -r (--regex)   : only show results for hosts/commits matching the specified regex"
   echo "  -l (--links)   : include hyperlinks"
   echo "  -h (--help)    : print this help message"
 }
