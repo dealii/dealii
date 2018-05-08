@@ -966,7 +966,9 @@ namespace Step60
                                                ComponentMask(), ComponentMask(),
                                                *embedded_mapping);
 
-      VectorTools::interpolate(*embedded_dh, embedded_value_function, embedded_value);
+      VectorTools::interpolate(*embedded_mapping,
+                               *embedded_dh, embedded_value_function,
+                               embedded_value);
     }
   }
 
