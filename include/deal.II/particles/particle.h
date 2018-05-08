@@ -148,7 +148,7 @@ namespace Particles
      * by @p property_pool.
      */
     Particle (const void *&begin_data,
-              PropertyPool &property_pool);
+              PropertyPool *const = nullptr);
 
     /**
      * Move constructor for Particle, creates a particle from an existing

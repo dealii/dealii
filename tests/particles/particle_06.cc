@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-// Like particle_02, but tests particle serialization and deserialization.
+// Like particle_04, but also attach properties.
 
 #include "../tests.h"
 #include <deal.II/particles/particle.h>
@@ -26,6 +26,9 @@ template <int dim, int spacedim>
 void test ()
 {
   {
+    const unsigned int n_properties_per_particle = 3;
+    Particles::PropertyPool pool(n_properties_per_particle);
+
     Point<spacedim> position;
 
     position(0) = 0.3;
@@ -43,12 +46,18 @@ void test ()
 
     const types::particle_index index(7);
 
+    std::vector<double> properties = {0.15,0.45,0.75};
+
     Particles::Particle<dim,spacedim> particle(position,reference_position,index);
+    particle.set_property_pool(pool);
+    particle.set_properties(ArrayView<double>(&properties[0],properties.size()));
 
     deallog << "Particle location: " << particle.get_location() << std::endl
             << "Particle reference location: " << particle.get_reference_location() << std::endl
-            << "Particle index: " << particle.get_id() << std::endl;
-    Assert (!particle.has_properties(), ExcInternalError());
+            << "Particle index: " << particle.get_id() << std::endl
+            << "Particle properties: " << std::vector<double>(particle.get_properties().begin(),
+                                                              particle.get_properties().end())
+            << std::endl;
 
     std::vector<char> data(particle.serialized_size_in_bytes());
     void *write_pointer = static_cast<void *> (&data.front());
@@ -56,12 +65,14 @@ void test ()
     particle.write_data(write_pointer);
 
     const void *read_pointer = static_cast<const void *> (&data.front());
-    const Particles::Particle<dim,spacedim> new_particle(read_pointer);
+    const Particles::Particle<dim,spacedim> new_particle(read_pointer, &pool);
 
     deallog << "Copy particle location: " << new_particle.get_location() << std::endl
             << "Copy particle reference location: " << new_particle.get_reference_location() << std::endl
-            << "Copy particle index: " << new_particle.get_id() << std::endl;
-    Assert (!new_particle.has_properties(), ExcInternalError());
+            << "Copy particle index: " << new_particle.get_id() << std::endl
+            << "Copy particle properties: " << std::vector<double>(new_particle.get_properties().begin(),
+                new_particle.get_properties().end())
+            << std::endl;
   }
 
   deallog << "OK" << std::endl;
