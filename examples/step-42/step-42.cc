@@ -2187,8 +2187,8 @@ namespace Step42
 
         solve_newton();
 
-        output_results((std::string("solution-") +
-                        Utilities::int_to_string(current_refinement_cycle, 2)).c_str());
+        output_results(std::string("solution-") +
+                       Utilities::int_to_string(current_refinement_cycle, 2));
 
         computing_timer.print_summary();
         computing_timer.reset();
