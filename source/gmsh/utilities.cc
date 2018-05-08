@@ -100,6 +100,12 @@ namespace Gmsh
 
     if (base_name != prm.output_base_name)
       {
+        // declaring the list without a type, i.e.,
+        //
+        //     auto filenames = {{iges_file_name, geo_file_name, ...}})
+        //
+        // causes internal compiler errors with GCC's concepts implementation,
+        // so give it an explicit type:
         const std::array<const std::string *, 5> filenames
         {{&iges_file_name, &geo_file_name, &msh_file_name, &log_file_name, &warnings_file_name}};
         for (const std::string *filename : filenames)
