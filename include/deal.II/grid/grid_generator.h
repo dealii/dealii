@@ -952,6 +952,9 @@ namespace GridGenerator
    * will currently have to set boundary indicators again by hand in the
    * output triangulation.
    *
+   * @note Unlike most GridGenerator functions, this function does not attach
+   * any manifolds to @p result, nor does it set any manifold ids.
+   *
    * @note For a related operation on refined meshes when both meshes are
    * derived from the same coarse mesh, see
    * GridGenerator::create_union_triangulation().
@@ -987,6 +990,10 @@ namespace GridGenerator
    * from meshes for simpler geometries, then this is not the function for
    * you. Instead, consider GridGenerator::merge_triangulations().
    *
+   * @note This function assumes that both @p triangulation_1 and @p
+   * triangulation_2 have the same manifold descriptions. The output
+   * Triangulation @p has the same manifold ids as these two triangulations.
+   *
    * @pre Both of the source conditions need to be available entirely locally.
    * In other words, they can not be objects of type
    * parallel::distributed::Triangulation.
@@ -1019,6 +1026,9 @@ namespace GridGenerator
    * cells as are in @p input_triangulation, with the exception of the cells
    * listed in @p cells_to_remove.
    *
+   * @note Unlike most GridGenerator functions, this function does not attach
+   * any manifolds to @p result, nor does it set any manifold ids.
+   *
    * @pre Because we cannot create triangulations de novo that contain
    * adaptively refined cells, the input triangulation needs to have all of
    * its cells on the same level. Oftentimes, this will in fact be the
@@ -1044,6 +1054,10 @@ namespace GridGenerator
    *
    * @note The 2d input triangulation @p input must be a coarse mesh that has
    * no refined cells.
+   *
+   * @note Since @p input and @p output have different spatial dimensions no
+   * manifold objects are copied (nor are any manifold ids set) by this
+   * function.
    */
   void
   extrude_triangulation (const Triangulation<2, 2> &input,
@@ -1062,6 +1076,10 @@ namespace GridGenerator
    *
    * @note The 2d input triangulation @p input must be a coarse mesh that has
    * no refined cells.
+   *
+   * @note Since @p input and @p output have different spatial dimensions no
+   * manifold objects are copied (nor are any manifold ids set) by this
+   * function.
    *
    * @author Weixiong Zheng, 2018
    */
@@ -1094,6 +1112,10 @@ namespace GridGenerator
    * This function will fail if the input Triangulation is of type
    * parallel::distributed::Triangulation, as well as when the input
    * Triangulation contains hanging nodes.
+   *
+   * @note Since @p input and @p output have different spatial dimensions no
+   * manifold objects are copied by this function: you must attach new
+   * manifold objects to @p out_tria.
    *
    * @author Luca Heltai, 2014
    */
@@ -1195,6 +1217,10 @@ namespace GridGenerator
    * faces to their corresponding surface mesh cells, for example to
    * accommodate different geometry descriptions in the case of curved
    * boundaries (but this is not currently implemented).
+   *
+   * @note Since @p volume_mesh and @p surface_mesh have different spatial
+   * dimensions no manifold objects are copied by this function: you must
+   * attach new manifold objects to @p surface_mesh.
    */
   template <template <int,int> class MeshType, int dim, int spacedim>
 #ifndef _MSC_VER
