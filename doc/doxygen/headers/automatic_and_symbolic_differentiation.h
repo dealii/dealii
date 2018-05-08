@@ -14,47 +14,389 @@
 // ---------------------------------------------------------------------
 
 /**
- * @defgroup auto_symb_diff Automatic and symbolic differentiation
+ * @defgroup auto_symb_diff Automatic differentiation
  *
  * @brief A module dedicated to the implementation of functions and classes that relate
- * to automatic and symbolic differentiation.
+ * to automatic differentiation.
  *
- * @todo Hyper-summarize the following list of topics:
- * - Automatic differentiation
- * - Symbolic differentiation
+ * Below we provide a very brief introduction as to what automatic differentiation is,
+ * what variations of this computational / numerical scheme exist, and how it is integrated
+ * within deal.II's framework.
  *
  * @section auto_diff_1 Automatic differentiation
  *
- * @todo Write a short introduction into AD. As a temporary entry, the following links
- * may be enlightening:
- * - <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Wikipedia article</a>
- * - <a href="https://projects.coin-or.org/ADOL-C/browser/stable/2.6/ADOL-C/doc/adolc-manual.pdf?format=raw#page=1>Adol-C manual</a>
+ * Automatic differentiation (commonly also referred to as called algorithmic differentiation),
+ * is a that can be used to "automatically" compute the first, and perhaps higher-order,
+ * derivatives of function(s) with respect to one or more input variables.
+ * Although this comes at a certain computational cost, the benefits to using such a tool may be
+ * significant. When used correctly the derivatives of often complicated functions can be computed
+ * to a very high accuracy. Although the exact accuracy achievable by these frameworks largely
+ * depends their underlying mathematical formulation, some implementations compute with a precision
+ * on the order of machine accuracy. Note that this is different to classical numerical differentiation,
+ * which has an accuracy that depends on both the perturbation size as well as the chosen
+ * finite-difference scheme (and is measurably larger than well-formulated automatic differentiation
+ * approaches).
  *
- * @todo Hyper-summarize the following list of topics:
- * - Forward and reverse mode AD
- * - Taped and tapeless AD; expression templates
+ * Three practical examples of auto-differentiation use within a finite-element context
+ * would then be
+ * - the quick prototyping of a new nonlinear formulation without the need to hand-compute
+ *   the linearization itself,
+ * - automatic linearization of finite-element residuals additively formed within complex
+ *   multiphysics frameworks, and
+ * - verification of user-implementations of linearizations for both cell-based calculations
+ *   (e.g. a residual) and those based at a continuum point (e.g. tangents for nonlinear
+ *   constitutive laws).
+ *
+ * There are quite a number of implementations for auto-differentiable numbers. They primarily
+ * fall into two broad categories, namely <em>source code transformation</em> and
+ * <em>operator overloading</em>.
+ * The first method generates new, compilable code based on some input function that, when executed,
+ * returns the derivatives of the input function. The second exploits the capability of <tt>C++</tt>
+ * operator definitions to be overloaded for custom class types. Therefore  a class that represents
+ * such an auto-differentiable number can, following each mathematical operation performed on or
+ * with it, in principle evaluate and keep track of its value as well as that of its directional
+ * derivative(s).
+ * As the libraries exclusively implementing the <em>source code transformation</em> approach
+ * collectively describe highly specialized tools that are to be used as function preprocessors, they
+ * have no direct support within deal.II itself. The latter, however, represent specialized number
+ * types that can be supported through the use of template  metaprogramming in the appropriate context.
+ * Given the examples presented above, this means that the FEValues class (and friends), as well as
+ * the Tensor and SymmetricTensor classes should support calculations performed with these specialized
+ * numbers.
+ * (In theory an entire program could be made differentiable. This could be useful in, for example,
+ * the sentitivity analysis of solutions with respect to input parameters. However, to date this has
+ * not been been tested.)
+ *
+ * Implementations of specialized frameworks based on <em>operator overloading</em> typically fall into
+ * one of three categories. In each, some customized data classes representing the floating point value
+ * of an evaluated function and its derivative(s) by
+ * -# exploiting <em>dual</em> / <em>complex-step</em> / <em>hyper-dual</em> formulations (occasionally
+ *    called <em>tapeless</em> methods),
+ * -# those utilizing <em>taping</em> strategies, and
+ * -# those using compile-time optimization through <em>expression templates</em>.
+ *
+ * To provide some tentative insight into how these various implementations might look like in practice, we
+ * offer the following generic summary of these approaches:
+ * -# The first two <em>tapeless</em> approaches listed above use some variation of a truncated Taylor
+ *    series, along with a particular choice of definition for the perturbation parameter, to compute
+ *    function derivatives using a finite-difference based approach. The "dual" number constitutes the
+ *    accumulated directional derivatives computed simultaneously as the function values is evaluated; in the
+ *    complex-step approach, the imaginary value effectively serves this purpose. The choice of the perturbation
+ *    parameter determines the numerical qualities of the scheme, such as the influence of the truncation of
+ *    the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative, while
+ *    the for the complex-step method these existent higher-order terms are neglected. It can be shown that
+ *    both of these methods are not subject to subtractive cancellation errors and that, within their
+ *    finite-difference scheme, they are not numerically sensitive to the internal step-size chosen for the
+ *    numerical perturbation. The dual number approach thus produces exact first derivatives, while the
+ *    complex-step approach does not. The standard implementation of the dual numbers, however, cannot yield
+ *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with the
+ *    outcome that both first and second derivatives can be computed exactly.
+ * -# With <em>taped</em> approaches, a specified subregion of code is selected as one for which all
+ *    operations executed with active (marked) input variables are tracked and recorded in a data structure
+ *    referred to as a tape. At the end of the taped region, the recorded function(s) may be revaluated
+ *    by "replaying" the tape with a different set of input variables instead of recomputing the function
+ *    directly. Assuming that the taped region represents a smooth function, arbitrarily high-order
+ *    derivatives of the function then can be by referring to the code path computed and stored on the tape.
+ *    (This could perhaps be achieve, for example, through evaluation of the function around the point
+ *    of interest.) There exist strategies to deal with situations where the taped function is not
+ *    smooth at the evaluated point, or if it is not analytic. Furthermore, one might need to consider the
+ *    case of branched functions, where the tape is no longer sequential, but rather forks off on a different
+ *    evaluation path to that due to the original recorded inputs.
+ * -# Methods based on <a href="https://en.wikipedia.org/wiki/Expression_templates">expression templates</a>
+ *    leverage the computational graph
+ *    (in this case, a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph (DAG)</a>),
+ *    constructed from the abstract syntax tree (AST), that resolves the function output from its input values.
+ *    The outermost leaves on the represent the independent variables or constants, and are transformed by unary
+ *    operators and connected by binary operators (in a the most simple case). Therefore the operations performed on
+ *    the two inputs is known at compile time, and with that the associated derivative operation can also be defined
+ *    at the same time. The compiled output type returned by this operator need not be generic, but can rather be
+ *    specialized based on the specific inputs (possibly carrying a differential history) given to that specific
+ *    operator on the vertex of the DAG. In this way, a compile-time optimized set of instructions can be generated
+ *    for the very specialized individual operations used to evaluate each intermediate result of the dependent
+ *    function.
+ *
+ * Each of these methods, of course, has its advantages and disadvantages, and one may be more appropriate
+ * than another for a given problem that is to be solved. As the aforemetioned implementational details
+ * (and others not discussed) may be hidden from the user, it may still be important to understand the
+ * implications, run-time cost,  and potential limitations, of using any one of these "black-box"
+ * auto-differentiable numbers.
+ *
+ * Resources used to furnish the details supplied here include:
+ *
+ * @code{.bib}
+ * @InProceedings{Fike2011a,
+ *   author    = {Fike, Jeffrey A and Alonso, Juan J},
+ *   title     = {The Development of Hyper-Dual Numbers for Exact Second-Derivative Calculations},
+ *   booktitle = {49th {AIAA} Aerospace Sciences Meeting including the New Horizons Forum and Aerospace Exposition},
+ *   year      = {2011},
+ *   volume    = {886},
+ *   pages     = {124},
+ *   month     = {jan},
+ *   publisher = {American Institute of Aeronautics and Astronautics},
+ *   doi       = {10.2514/6.2011-886},
+ * }
+ * @endcode
+ *
+ * @code{.bib}
+ * @Manual{Walther2009a,
+ *   title     = {Getting Started with ADOL-C},
+ *   author    = {Walther, Andrea and Griewank, Andreas},
+ *   year      = {2009},
+ *   booktitle = {Combinatorial scientific computing},
+ *   doi       = {10.1.1.210.4834},
+ *   pages     = {181--202}
+ * }
+ * @endcode
+ *
+ * ### Explotation of the chain-rule
+ *
+ * In the most practical sense, any of the above categories exploit the chain-rule to compute the total
+ * derivative of a composite function. To perform this action, they typically use one of two mechanisms to
+ * compute derivatives, specifically
+ * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentation, or
+ * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentation.
+ * As a point of interest, the <em>optimal Jacobian accumulation</em>, which performs a minimal set of
+ * computations, lies somewhere between these two limiting cases. Its computation for a general composite
+ * function remains an open problem in graph theory.
+ *
+ * With the aid of the diagram below (it and some of the listed details courtesy of this
+ * <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Wikipedia article</a>),
+ *
+ * <div class="twocolumn" style="width: 80%">
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/ForwardAccumulationAutomaticDifferentiation.png"
+ *            alt="Forward mode automatic differentiation"
+ *            width="400">
+ *     </div>
+ *     <div class="text" align="center">
+ *       Forward mode automatic differentiation
+ *     </div>
+ *   </div>
+ *   <div class="parent">
+ *     <div class="img" align="center">
+ *       <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/ReverseaccumulationAD.png"
+ *            alt="Reverse mode automatic differentiation"
+ *            width="400">
+ *     </div>
+ *     <div class="text" align="center">
+ *       Reverse mode automatic differentiation
+ *     </div>
+ *   </div>
+ * </div>
+ *
+ * representing the calculation of the function
+ * \f[
+ *   f (\mathbf{x})
+ *     = x_{1} \times x_{2} + \sin (x_{1})
+ *   \quad ,
+ * \f]
+ * we will briefly describe what forward- and reverse- auto-differentiation are.
+ * Note that in the diagram, along the edges of the graph in text are the directional
+ * derivative of function \f$ w \f$ with respect to the i-th variable, represented by
+ * the notation \f$ \dot{w} = \dfrac{d w}{d x_{i}} \f$.
+ * Consider first that any composite function \f$ f(x) \f$, here represented as having two
+ * independent variables, can be dissected into a composition of its elementary functions
+ * \f[
+ *   f (\mathbf{x})
+ *   = f_{0} \circ f_{1} \circ f_{2} \circ \ldots \circ f_{n} (\mathbf{x})
+ *   \quad .
+ * \f]
+ * As was previously mentioned, if each of the primitive operations \f$ f_{n} \f$ is smooth and
+ * differentiable, then the chain can be universally employed to compute the total derivative of \f$ f \f$,
+ * namely \f$ \dfrac{d f(x)}{d \mathbf{x}} \f$. How exactly the chain-rule is applied is what
+ * distinguishes the "forward" from the "reverse" mode, but ultimately both compute the total
+ * derivative
+ * \f[
+ *   \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
+ *   = \dfrac{d f_{0}}{d f_{1}} \dfrac{d f_{1}}{d f_{2}} \dfrac{d f_{2}}{d f_{3}} \ldots \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}}
+ *   \quad .
+ * \f]
+ *
+ * In forward-mode, the chain-rule is computed naturally from the "inside out". The independent
+ * variables are therefore fixed, and each sub-function \f$ f_{n} \f$ is computed recursively
+ * and its result returned as inputs to the parent function. Encapsulating and fixing the order
+ * of operations using parentheses, this means that we compute
+ * \f[
+ *   \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
+ *   = \dfrac{d f_{0}}{d f_{1}} \left( \dfrac{d f_{1}}{d f_{2}} \left(\dfrac{d f_{2}}{d f_{3}} \left(\ldots \left( \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}} \right)\right)\right)\right)
+ *   \quad .
+ * \f]
+ *
+ * In reverse-mode, the chain-rule is computed somewhat unnaturally from the "outside in". The
+ * values of the dependent variables first get computed and fixed, and then the preceeding
+ * differential operations are evaluated and multiplied in succession with the previous results
+ * from left to right. Again, if we encapsulate and fix the order of operations using parentheses,
+ * this implies that the reverse calculation is performed by
+ * \f[
+ * \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
+ *   = \left( \left( \left( \left( \left( \dfrac{d f_{0}}{d f_{1}} \right) \dfrac{d f_{1}}{d f_{2}} \right) \dfrac{d f_{2}}{d f_{3}} \right) \ldots \right) \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}} \right)
+ *   \quad .
+ * \f]
+ *
+ * The specific computations used to render the function value and its directional derivatives
+ * are tabulated in the <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">source article</a>.
+ * For a second illustrative example, we refer the interested reader to
+ * <a href="http://www.columbia.edu/~ahd2125/post/2015/12/5/">this article</a>.
+ *
+ * The computational complexity of a forward-sweep is proportional to that of the input function.
+ * Overall, the efficiency of each mode is determined by the number of independent (input) variables
+ * and dependent (output) variables. If the outputs greatly exceed the inputs in number, then
+ * forward-mode can be shown to be more efficient than reverse-mode. The converse is true when the
+ * number of input variables greatly exceeds that of the output variables. This point may be used to
+ * help inform which number type is most suitable for which set of operations are to be performed
+ * using automatic differentiation.
  *
  * @subsection auto_diff_1_1 Supported automatic differentiation libraries
  *
  * We currently have validated implementations for the following number types
  * and combinations:
  *
- *  - Taped Adol-C (n-differentiable, in theory, but internal drivers for up to second-order
- *    derivatives have been implemented)
- *  - Tapeless Adol-C (once differentiable)
- *  - Tapeless forward-mode Sacado with dynamic memory allocation (once differentiable)
- *  - Tapeless nested forward-mode Sacado (twice differentiable)
- *  - Tapeless reverse-mode Sacado (once differentiable)
- *  - Tapeless nested reverse and forward-mode Sacado (twice differentiable)
+ *  - Taped ADOL-C (n-differentiable, in theory, but internal drivers for up to second-order
+ *    derivatives will be implemented)
+ *  - Tapeless ADOL-C (once differentiable)
+ *  - Forward-mode Sacado with dynamic memory allocation using expression templates (once differentiable)
+ *  - Nested forward-mode Sacado using expression templates (twice differentiable)
+ *  - Reverse-mode Sacado (once differentiable)
+ *  - Nested reverse and dynamically-allocated forward-mode Sacado (twice differentiable)
+ *
+ * Note that in the above, "dynamic memory allocation" refers to the fact that the number of
+ * independent variables need not be specified at compile time.
+ *
+ * The <a href="https://projects.coin-or.org/ADOL-C/browser/trunk/ADOL-C/doc/adolc-manual.pdf?format=raw">ADOL-C user manual</a>
+ *
+ * @code{.bib}
+ * @Manual{Walther2009a,
+ *   title     = {Getting Started with ADOL-C},
+ *   author    = {Walther, Andrea and Griewank, Andreas},
+ *   year      = {2009},
+ *   booktitle = {Combinatorial scientific computing},
+ *   doi       = {10.1.1.210.4834},
+ *   pages     = {181--202},
+ *   url       = {https://projects.coin-or.org/ADOL-C/browser/trunk/ADOL-C/doc/adolc-manual.pdf}
+ * }
+ * @endcode
+ *
+ * provides the principle insights into their taped and tapeless implementations, and how ADOL-C
+ * can be incorporated into a user code.
+ * Some further useful resources for understanding the implementation of ADOL-C, and possibilities
+ * for how it may be used within a numerical code, include
+ *
+ * @code{.bib}
+ * @Article{Griewank1996a,
+ *   author    = {Griewank, Andreas and Juedes, David and Utke, Jean},
+ *   title     = {Algorithm 755: {ADOL-C}: a package for the automatic differentiation of algorithms written in {C/C++}},
+ *   journal   = {ACM Transactions on Mathematical Software (TOMS)},
+ *   year      = {1996},
+ *   volume    = {22},
+ *   number    = {2},
+ *   pages     = {131--167},
+ *   doi       = {10.1145/229473.229474},
+ *   publisher = {ACM}
+ * }
+ * @endcode
+ * @code{.bib}
+ * @InCollection{Bischof2008a,
+ *   author =    {Bischof, Christian and Guertler, Niels and Kowarz, Andreas and Walther, Andrea},
+ *   title =     {Parallel reverse mode automatic differentiation for OpenMP programs with ADOL-C},
+ *   booktitle = {Advances in Automatic Differentiation},
+ *   publisher = {Springer},
+ *   year =      {2008},
+ *   pages =     {163--173}
+ * }
+ * @endcode
+ * @code{.bib}
+ * @InBook{Kulshreshtha2012a,
+ *   chapter   = {Computing Derivatives in a Meshless Simulation Using Permutations in {ADOL}-C},
+ *   pages     = {321--331},
+ *   title     = {Recent Advances in Algorithmic Differentiation},
+ *   publisher = {Springer Berlin Heidelberg},
+ *   year      = {2012},
+ *   author    = {Kshitij Kulshreshtha and Jan Marburger},
+ *   editor    = {Forth S. and Hovland P. and Phipps E. and Utke J. and Walther A.},
+ *   series    = {Lecture Notes in Computational Science and Engineering},
+ *   doi       = {10.1007/978-3-642-30023-3_29},
+ * }
+ * @endcode
+ * @code{.bib}
+ * @InProceedings{Kulshreshtha2013a,
+ *   author    = {Kulshreshtha, Kshitij and Koniaeva, Alina},
+ *   title     = {Vectorizing the forward mode of ADOL-C on a GPU using CUDA},
+ *   booktitle = {13th European AD Workshop},
+ *   year      = {2013},
+ *   month     = jun
+ * }
+ * @endcode
+ *
+ * Similarly, a selection of useful resources for understanding the implementation of Sacado
+ * number types (in particular, how expression templating is employed and exploited) include
+ *
+ * @code{.bib}
+ * @InCollection{Bartlett2006a,
+ *   author        = {Bartlett, R. A. and Gay, D. M. and Phipps, E. T.},
+ *   title         = {Automatic Differentiation of C++ Codes for Large-Scale Scientific Computing},
+ *   booktitle     = {International Conference on Computational Science {\textendash} {ICCS} 2006},
+ *   publisher     = {Springer Berlin Heidelberg},
+ *   year          = {2006},
+ *   editor        = {Alexandrov, V.N. and van Albada, G.D. and Sloot, P.M.A. amd Dongarra, J.},
+ *   pages         = {525--532},
+ *   doi           = {10.1007/11758549_73},
+ *   organization  = {Springer}
+ * }
+ * @endcode
+ * @code{.bib}
+ * @InBook{Gay2012a,
+ *   chapter   = {Using expression graphs in optimization algorithms},
+ *   pages     = {247--262},
+ *   title     = {Mixed Integer Nonlinear Programming},
+ *   publisher = {Springer New York},
+ *   year      = {2012},
+ *   author    = {Gay, D. M.},
+ *   editor    = {Lee, J. and Leyffer, S.},
+ *   isbn      = {978-1-4614-1927-3},
+ *   doi       = {10.1007/978-1-4614-1927-3_8}
+ * }
+ * @endcode
+ * @code{.bib}
+ * @InBook{Phipps2012a,
+ *   chapter     = {Efficient Expression Templates for Operator Overloading-based Automatic Differentiation},
+ *   pages       = {309--319},
+ *   title       = {Recent Advances in Algorithmic Differentiation},
+ *   publisher   = {Springer},
+ *   year        = {2012},
+ *   author      = {Eric Phipps and Roger Pawlowski},
+ *   editor      = {Forth S. and Hovland P. and Phipps E. and Utke J. and Walther A.},
+ *   series      = {Lecture Notes in Computational Science and Engineering},
+ *   volume      = {73},
+ *   date        = {2012-05-15},
+ *   doi         = {10.1007/978-3-642-30023-3_28},
+ *   eprint      = {1205.3506v1},
+ *   eprintclass = {cs.MS},
+ *   eprinttype  = {arXiv}
+ * }
+ * @endcode
+ *
+ * The implementation of both forward- and reverse-mode Sacado numbers is quite intricate.
+ * As of Trilinos 12.12, the implementation of math operations involves a lot of preprocessor
+ * directives and macro programming. Accordingly, the code may be hard to follow and there
+ * exists no meaningful companion documentation for these classes.
+ * So, a useful resource for understanding the principle implementation of these numbers
+ * can be found at
+ * <a href="https://trilinos.org/docs/dev/packages/sacado/doc/html/classSacado_1_1Fad_1_1SimpleFad.html">this link for the Sacado::Fad::SimpleFad class</a>
+ * that outlines a reference (although reportedly inefficient) implementation of a
+ * forward-mode auto-differentiable number that does not use expression templates.
+ * (Although not explicitly stated, it would appear that the Sacado::Fad::SimpleFad class
+ * is implemented in the spirit of dual numbers.)
  *
  * @subsection auto_diff_1_2 How automatic differentiation is integrated into deal.II
  *
  * Since the interface to each automatic differentiation library is so vastly different,
- * a uniform internal interface to each number has been established. This allows the
- * driver classes (that provide the core functionality, and are introduced in the next
- * section) a consistent mechanism to interact with different auto-differentiation
- * libraries. Specifically, they need to be able to correctly initialize and finalize data
- * that is to be interpreted as the dependent and independent variables of a formula.
+ * a uniform internal interface to each number will been established in the near future.
+ * The goal will be to allow some driver classes (that provide the core functionality,
+ * and will later be introduced in the next section) a consistent mechanism to interact with
+ * different auto-differentiation libraries. Specifically, they need to be able to correctly
+ * initialize and finalize data that is to be interpreted as the dependent and independent
+ * variables of a formula.
  *
  * A summary of the files that implement the interface to the supported auto-differentiable
  * numbers is as follows:
@@ -96,6 +438,18 @@
  *
  * @subsubsection auto_diff_1_3 User interface to the automatic differentiation libraries
  *
- * @todo Summarize driver classes 
+ * As of the current release, there is no formal, unified interface to the automatic
+ * differentation libraries that we support. It is therefore necessary for users to
+ * manage the initialization and derivative computations themselves.
+ *
+ * The most up-to-date examples of how this is done using ADOL-C can be found in
+ * - their <a href="https://projects.coin-or.org/ADOL-C/browser/trunk/ADOL-C/doc/adolc-manual.pdf?format=raw">user manual</a>,
+ * - their <a href="https://gitlab.com/adol-c/adol-c/tree/master/ADOL-C/examples">development repository</a>, and
+ * - our <a href="https://github.com/dealii/dealii/tree/master/tests/adolc">test-suite</a>,
+ *
+ * while for Sacado, illustrative examples can be found in
+ * - their <a href="https://github.com/trilinos/Trilinos/tree/master/packages/sacado/example">development repository</a>,
+ * - a <a href="https://github.com/dealii/code-gallery/tree/master/Quasi_static_Finite_strain_Compressible_Elasticity">code-gallery example</a>, and
+ * - our <a href="https://github.com/dealii/dealii/tree/master/tests/sacado">test-suite</a>.
  *
  */
