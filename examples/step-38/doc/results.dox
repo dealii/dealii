@@ -111,15 +111,13 @@ above, this would look as follows:
 template <int spacedim>
 void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
 {
-  static SphericalManifold<dim,spacedim> surface_description;
-  triangulation.set_manifold (0, surface_description);
+  triangulation.set_manifold (0, SphericalManifold<dim,spacedim>());
 
   {
-    SphericalManifold<spacedim> boundary_description;
     Triangulation<spacedim> volume_mesh;
     GridGenerator::half_hyper_ball(volume_mesh);
 
-    volume_mesh.set_manifold (0, boundary_description);
+    volume_mesh.set_manifold (0, SphericalManifold<spacedim>);
     volume_mesh.refine_global (4);
 
     std::set<types::boundary_id> boundary_ids;
@@ -136,8 +134,8 @@ void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
   }
 
   std::cout << "Surface mesh has " << triangulation.n_active_cells()
-	    << " cells."
-	    << std::endl;
+            << " cells."
+            << std::endl;
 
   ...
 @endcode
