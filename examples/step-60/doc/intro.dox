@@ -299,7 +299,7 @@ example, something you read from file, or a closed sphere that you later deform
 to something more interesting.
 
 In the default scenario, $\Gamma$ has co-dimension one, and this tutorial
-program implements the Fictitious Boundary Method. As it turns out, the same
+program implements the Fictitious %Boundary Method. As it turns out, the same
 techniques are used in the Variational Immersed Finite Element Method, and
 the coupling operator $C$ defined above is the same in almost all of these
 non-matching methods.
@@ -323,7 +323,7 @@ $\Omega$.
   International Journal of Multiphase Flow 25 (5). Pergamon: 755–94.
 
 - Boffi, D., L. Gastaldi, L. Heltai, and C.S. Peskin. 2008. “On the
-  Hyper-Elastic Formulation of the Immersed Boundary Method.” Computer Methods
+  Hyper-Elastic Formulation of the Immersed %Boundary Method.” Computer Methods
   in Applied Mechanics and Engineering 197 (25–28).
 
 - Heltai, L., and F. Costanzo. 2012. “Variational Implementation of Immersed
