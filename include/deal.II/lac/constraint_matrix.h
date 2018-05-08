@@ -1785,8 +1785,8 @@ void ConstraintMatrix::distribute_local_to_global (
           const ConstraintLine &position =
             lines[lines_cache[calculate_line_index(*local_indices_begin)]];
           for (size_type j=0; j<position.entries.size(); ++j)
-            internal::ElementAccess<VectorType>::add(*local_vector_begin *
-                                                     position.entries[j].second, position.entries[j].first,
+            internal::ElementAccess<VectorType>::add((*local_vector_begin) * position.entries[j].second,
+                                                     position.entries[j].first,
                                                      global_vector);
         }
     }
