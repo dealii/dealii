@@ -491,9 +491,6 @@ namespace GridGenerator
    * The following pictures are generated with:
    * @code
    * Triangulation<2,3>   triangulation;
-   *
-   * static SphericalManifold<2,3> surface_description;
-   *
    * GridGenerator::hyper_sphere(triangulation);
    * triangulation.refine_global(3);
    * @endcode
