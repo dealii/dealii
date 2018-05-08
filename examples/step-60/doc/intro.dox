@@ -132,8 +132,8 @@ non aligned meshes is complex by itself: to illustrate how is done we study a
 simple problem.
 
 The technique we describe here is presented in the literature using one of many names:
-the **immersed finite element method**, the **fictitious boundary method**, the
-**distributed Lagrange multiplier method**, and others. The main principle is
+the <b>immersed finite element method</b>, the <b>fictitious boundary method</b>, the
+<b>distributed Lagrange multiplier method</b>, and others. The main principle is
 that the discretization of the two grids and of the two finite element spaces
 are kept completely independent. This technique is particularly efficient for
 the simulation of fluid-structure interaction problems, where the configuration
