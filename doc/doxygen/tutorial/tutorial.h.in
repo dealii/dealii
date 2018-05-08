@@ -431,6 +431,12 @@
  *       <td> Solving a Poisson problem discretized with an interior penalty DG
  *       method and a multilevel preconditioner in a matrix-free fashion using
  *       a massively parallel implementation.
+ *
+ *   <tr valign="top">
+ *       <td>step-60</td>
+ *       <td> Distributed Lagrange multipliers for the solution of
+ *       Poisson problems in complex domains with constraints defined
+ *       on non-matching grids.
  *       </td></tr>
  *
  * </table>
@@ -584,7 +590,8 @@
  *       step-35,
  *       step-36,
  *       step-42,
- *       step-44
+ *       step-44,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -594,7 +601,8 @@
  *     <td>
  *       step-10,
  *       step-11,
- *       step-32
+ *       step-32,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -696,6 +704,14 @@
  *       step-49,
  *       step-53,
  *       step-54
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Non matching algorithms
+ *     </td>
+ *     <td>
+ *       step-60
  *     </td>
  *   </tr>
  *
