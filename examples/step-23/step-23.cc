@@ -128,7 +128,7 @@ namespace Step23
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix constraints;
+    ConstraintMatrix     constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
@@ -140,9 +140,10 @@ namespace Step23
     Vector<double>       old_solution_u, old_solution_v;
     Vector<double>       system_rhs;
 
-    double time_step, time;
-    unsigned int timestep_number;
-    const double theta;
+    double               time_step
+    double               time;
+    unsigned int         timestep_number;
+    const double         theta;
   };
 
 
