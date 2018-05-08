@@ -835,14 +835,13 @@ namespace GridGenerator
    * Produce the volume or surface mesh of a torus. The axis of the torus is
    * the $y$-axis while the plane of the torus is the $x$-$z$ plane.
    *
-   * If @p dim is 3, the mesh will be the volume of the torus. By default,
-   * the boundary faces will have manifold id 0 and you should attach a
-   * TorusManifold to it. The cells will have manifold id 1 and you should
-   * attach a SphericalManifold to it.
+   * If @p dim is 3, the mesh will be the volume of the torus and this
+   * function attaches a TorusManifold to all boundary cells and faces (which
+   * are marked with a manifold id of 0).
    *
-   * If @p dim is 2, the mesh will describe the surface of the torus. All
-   * cells and faces will have manifold id 0 and you should attach a
-   * TorusManifold to it.
+   * If @p dim is 2, the mesh will describe the surface of the torus and this
+   * function attaches a TorusManifold to all cells and faces (which are
+   * marked with a manifold id of 0).
    *
    * @param tria The triangulation to be filled.
    *
