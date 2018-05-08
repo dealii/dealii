@@ -62,6 +62,7 @@ void test(std::ostream & /*out*/)
   parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
 
   GridGenerator::torus(tr, 1, 0.2);
+  tr.reset_all_manifolds();
   tr.refine_global();
 
   tr.begin_active()->set_refine_flag();
