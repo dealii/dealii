@@ -2759,7 +2759,7 @@ namespace internal
                             LinearAlgebra::distributed::Vector<Number> &vec) const
     {
       if (range_index == numbers::invalid_unsigned_int)
-        vec = 0;
+        vec = Number();
       else
         {
           const unsigned int mf_component = find_vector_in_mf(vec, false);
