@@ -263,7 +263,7 @@ DEAL:cg::Convergence step 108 value 7.65958e-13
 You may notice that, in terms of CPU time, assembling the coupling system is
 twice as expensive as assembling the standard Poisson system, even though the
 matrix is smaller. This is due to the non-matching nature of the discretization.
-Wether this is acceptable or not, depends on the applications.
+Whether this is acceptable or not, depends on the applications.
 
 If the problem was set in a three-dimensional setting, and the immersed mesh was
 time dependent, it would be much more expensive to recreate the mesh at each
@@ -273,7 +273,7 @@ grid, and embed the domain where you want to perform your computation using the
 technique presented here. This would require you to only have a surface
 representatio of your domain (a much cheaper and easier mesh to produce).
 
-To play around a little bit, we are going to complicate a little the ficticious
+To play around a little bit, we are going to complicate a little the fictitious
 domain as well as the boundary conditions we impose on it.
 
 <h2> Test case 2 and 3: </h2>
