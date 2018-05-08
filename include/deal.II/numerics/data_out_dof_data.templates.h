@@ -359,8 +359,8 @@ namespace internal
 
 
     template <int rank, int dim, typename NumberType>
-    Tensor<rank,dim> get_component (const Tensor<rank,dim,NumberType>         &value,
-                                    const ComponentExtractor extract_component)
+    Tensor<rank,dim> get_component (const Tensor<rank,dim,NumberType> &value,
+                                    const ComponentExtractor           extract_component)
     {
       Assert (extract_component == ComponentExtractor::real_part,
               ExcMessage ("You cannot extract anything other than the real "
@@ -469,7 +469,7 @@ namespace internal
        */
       virtual
       double
-      get_cell_data_value (const unsigned int cell_number,
+      get_cell_data_value (const unsigned int       cell_number,
                            const ComponentExtractor extract_component) const;
 
       /**
@@ -480,8 +480,8 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<double> &patch_values) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<double>                                                           &patch_values) const;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -492,8 +492,8 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<dealii::Vector<double> > &patch_values_system) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<dealii::Vector<double> >                                          &patch_values_system) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -503,8 +503,8 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<Tensor<1,DoFHandlerType::space_dimension> > &patch_gradients) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<Tensor<1,DoFHandlerType::space_dimension> >                       &patch_gradients) const;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -515,8 +515,8 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > >         &patch_gradients_system) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -526,8 +526,8 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<Tensor<2,DoFHandlerType::space_dimension> > &patch_hessians) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -538,8 +538,8 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-       const ComponentExtractor extract_component,
-       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const;
+       const ComponentExtractor                                                       extract_component,
+       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > >        &patch_hessians_system) const;
 
       /**
        * Return whether the data represented by (a derived class of) this object
@@ -618,7 +618,7 @@ namespace internal
     template <typename DoFHandlerType, typename VectorType>
     double
     DataEntry<DoFHandlerType,VectorType>::
-    get_cell_data_value (const unsigned int cell_number,
+    get_cell_data_value (const unsigned int       cell_number,
                          const ComponentExtractor extract_component) const
     {
       return get_component (get_vector_element(*vector, cell_number),
@@ -631,8 +631,8 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_values
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-     const ComponentExtractor extract_component,
-     std::vector<dealii::Vector<double> >                  &patch_values_system) const
+     const ComponentExtractor                                                       extract_component,
+     std::vector<dealii::Vector<double> >                                          &patch_values_system) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
@@ -669,8 +669,8 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_values
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-     const ComponentExtractor extract_component,
-     std::vector<double>                                   &patch_values) const
+     const ComponentExtractor                                                       extract_component,
+     std::vector<double>                                                           &patch_values) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
@@ -703,9 +703,9 @@ namespace internal
     template <typename DoFHandlerType, typename VectorType>
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_gradients
-    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>     &fe_patch_values,
-     const ComponentExtractor extract_component,
-     std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const
+    (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor                                                       extract_component,
+     std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > >         &patch_gradients_system) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
@@ -744,8 +744,8 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_gradients
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-     const ComponentExtractor extract_component,
-     std::vector<Tensor<1,DoFHandlerType::space_dimension> >           &patch_gradients) const
+     const ComponentExtractor                                                       extract_component,
+     std::vector<Tensor<1,DoFHandlerType::space_dimension> >                       &patch_gradients) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
@@ -780,8 +780,8 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_hessians
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-     const ComponentExtractor extract_component,
-     std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const
+     const ComponentExtractor                                                       extract_component,
+     std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension> > >         &patch_hessians_system) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
@@ -820,7 +820,7 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_hessians
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
-     const ComponentExtractor extract_component,
+     const ComponentExtractor                                                       extract_component,
      std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
