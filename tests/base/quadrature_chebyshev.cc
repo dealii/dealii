@@ -153,7 +153,7 @@ void check_GRC_right (double *exact_monomials)
           err = std::fabs(quadrature_int-exact_monomials[i]);
           deallog << "Quadrature order " << n << ", polynomial of degree " << i << ": ";
 
-          if (err < 1.e-15)
+          if (err < 2.e-15)
             deallog << "exact." << std::endl;
           else
             deallog << "error " << err << std::endl;
