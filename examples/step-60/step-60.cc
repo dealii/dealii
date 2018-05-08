@@ -906,7 +906,7 @@ namespace Step60
   // Creating the coupling sparsity pattern is a complex operation,
   // but it can be easily done using the
   // NonMatching::create_coupling_sparsity_pattern, which requires the
-  // two DoFHandler​s, the quadrature points for the coupling,
+  // two DoFHandler objects, the quadrature points for the coupling,
   // a DynamicSparsityPattern (which then needs to be copied into the
   // sparsity one, as usual), the component mask for the embedding and
   // embedded Triangulation (which we leave empty) and the mappings
