@@ -720,6 +720,7 @@ namespace GridGenerator
     tria.create_triangulation_compatibility (vertices, cells, SubCellData());
 
     tria.set_all_manifold_ids(0);
+    tria.set_manifold(0, TorusManifold<2>(R, r));
   }
 
   template <>
@@ -747,6 +748,7 @@ namespace GridGenerator
     // set manifolds as documented
     tria.set_all_manifold_ids(1);
     tria.set_all_manifold_ids_on_boundary(0);
+    tria.set_manifold(0, TorusManifold<3>(R, r));
   }
 
 

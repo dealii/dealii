@@ -35,15 +35,12 @@ void test<3,3> ()
   Triangulation<dim, spacedim> triangulation;
 
   GridGenerator::torus(triangulation, 1.0, 0.4);
-
-  static const SphericalManifold<3> desc_sphere;
-  static const TorusManifold<3> desc_torus(1.0, 0.4);
-  triangulation.set_manifold (0, desc_torus);
-  triangulation.set_manifold (1, desc_sphere);
+  triangulation.set_manifold (1, SphericalManifold<3>());
 
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement ();
 
+  const TorusManifold<3> desc_torus(1.0, 0.4);
   unsigned int c = 0;
   for (Triangulation<dim, spacedim>::active_vertex_iterator v = triangulation.begin_active_vertex();
        v != triangulation.end_vertex();
