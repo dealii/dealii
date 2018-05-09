@@ -653,7 +653,7 @@ namespace internal
         {
           std::vector<dealii::Vector<typename VectorType::value_type> > tmp(patch_values_system.size());
           for (unsigned int i = 0; i < patch_values_system.size(); i++)
-            tmp[i].reinit(patch_values_system[i]);
+            tmp[i].reinit(patch_values_system[i].size());
 
           fe_patch_values.get_function_values (*vector, tmp);
 
