@@ -3300,7 +3300,7 @@ namespace internal
               sendbuffers[idx] = it->second.pack_data ();
               const int ierr = MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
                                          MPI_BYTE, it->first,
-                                         1100101, tria.get_communicator(), &requests[idx]);
+                                         10101, tria.get_communicator(), &requests[idx]);
               AssertThrowMPI(ierr);
             }
 
@@ -3315,7 +3315,7 @@ namespace internal
 
               MPI_Status status;
               int len;
-              int ierr = MPI_Probe(MPI_ANY_SOURCE, 1100101, tria.get_communicator(), &status);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 10101, tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
@@ -3351,7 +3351,7 @@ namespace internal
               reply_buffers[idx] = cell_data_transfer_buffer.pack_data();
               ierr = MPI_Isend(&(reply_buffers[idx])[0], reply_buffers[idx].size(),
                                MPI_BYTE, status.MPI_SOURCE,
-                               1100102, tria.get_communicator(), &reply_requests[idx]);
+                               10102, tria.get_communicator(), &reply_requests[idx]);
               AssertThrowMPI(ierr);
             }
 
@@ -3363,7 +3363,7 @@ namespace internal
 
               MPI_Status status;
               int len;
-              int ierr = MPI_Probe(MPI_ANY_SOURCE, 1100102, tria.get_communicator(), &status);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 10102, tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
