@@ -537,16 +537,16 @@ general approach to this would go like this:
       for (unsigned int j=0; j<dim; j++)
       {
         history_field[i][j].reinit(history_dof_handler.n_dofs());
-	local_history_values_at_qpoints[i][j].reinit(quadrature.size());
-	local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
+        local_history_values_at_qpoints[i][j].reinit(quadrature.size());
+        local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
       }
 
     FullMatrix<double> qpoint_to_dof_matrix (history_fe.dofs_per_cell,
                                              quadrature.size());
     FETools::compute_projection_from_quadrature_points_matrix
               (history_fe,
-	       quadrature, quadrature,
-	       qpoint_to_dof_matrix);
+               quadrature, quadrature,
+               qpoint_to_dof_matrix);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
@@ -556,21 +556,19 @@ general approach to this would go like this:
       {
 
         PointHistory<dim> *local_quadrature_points_history
-	       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+          = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-        Assert (local_quadrature_points_history >=
-                    &quadrature_point_history.front(),
-		    ExcInternalError());
-        Assert (local_quadrature_points_history <
-                    &quadrature_point_history.back(),
-		    ExcInternalError());
+        Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+                ExcInternalError());
+        Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+                ExcInternalError());
 
         for (unsigned int i=0; i<dim; i++)
           for (unsigned int j=0; j<dim; j++)
           {
             for (unsigned int q=0; q<quadrature.size(); ++q)
               local_history_values_at_qpoints[i][j](q)
-                       = local_quadrature_points_history[q].old_stress[i][j];
+                = local_quadrature_points_history[q].old_stress[i][j];
 
             qpoint_to_dof_matrix.vmult (local_history_fe_values[i][j],
                                         local_history_values_at_qpoints[i][j]);
@@ -593,8 +591,8 @@ general approach to this would go like this:
                                              history_fe.dofs_per_cell);
     FETools::compute_interpolation_to_quadrature_points_matrix
               (history_fe,
-	       quadrature,
-	       dof_to_qpoint_matrix);
+               quadrature,
+               dof_to_qpoint_matrix);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
@@ -603,27 +601,25 @@ general approach to this would go like this:
     for (; cell != endc; ++cell, ++dg_cell)
     {
       PointHistory<dim> *local_quadrature_points_history
-	     = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-      Assert (local_quadrature_points_history >=
-                  &quadrature_point_history.front(),
-		  ExcInternalError());
-      Assert (local_quadrature_points_history <
-                  &quadrature_point_history.back(),
-		  ExcInternalError());
+      Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+              ExcInternalError());
+      Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+              ExcInternalError());
 
       for (unsigned int i=0; i<dim; i++)
         for (unsigned int j=0; j<dim; j++)
         {
           dg_cell->get_dof_values (history_field[i][j],
-	                           local_history_fe_values[i][j]);
+                                   local_history_fe_values[i][j]);
 
           dof_to_qpoint_matrix.vmult (local_history_values_at_qpoints[i][j],
                                       local_history_fe_values[i][j]);
 
           for (unsigned int q=0; q<quadrature.size(); ++q)
             local_quadrature_points_history[q].old_stress[i][j]
-                       = local_history_values_at_qpoints[i][j](q);
+              = local_history_values_at_qpoints[i][j](q);
       }
   @endcode
 
