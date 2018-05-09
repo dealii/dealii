@@ -62,6 +62,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wswitch")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsuggest-override")
 
 #
 # Disable Wplacement-new that will trigger a lot of warnings
