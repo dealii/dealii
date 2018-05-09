@@ -35,10 +35,7 @@ int main ()
 
   initlog();
 
-  TorusManifold<dim> boundary (1.5, .5);
   Triangulation<dim, spacedim> tria;
-  tria.set_manifold (0, boundary);
-
   GridGenerator::torus (tria, 1.5, .5);
   tria.refine_global(2);
 
@@ -47,4 +44,3 @@ int main ()
 
   return 0;
 }
-
