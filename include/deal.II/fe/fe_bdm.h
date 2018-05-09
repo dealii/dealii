@@ -51,6 +51,8 @@ DEAL_II_NAMESPACE_OPEN
  * <i>P<sub>p</sub></i>, interior degrees of freedom. These are the vector
  * function values in the first <i>p(p-1)/2</i> of the <i>p<sup>2</sup></i>
  * Gauss points in the cell.
+ *
+ * @ingroup fe
  */
 template <int dim>
 class FE_BDM
