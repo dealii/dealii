@@ -49,7 +49,7 @@ compute_index (const unsigned int i) const
 {
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
-  return {index_map[i]};
+  return {{index_map[i]}};
 }
 
 
@@ -70,12 +70,14 @@ compute_index (const unsigned int i) const
   unsigned int k=0;
   for (unsigned int iy=0; iy<n_1d; ++iy)
     if (n < k+n_1d-iy)
-      return {n-k, iy};
+      {
+        return {{n-k, iy}};
+      }
     else
       k+=n_1d-iy;
 
   Assert (false, ExcInternalError());
-  return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
+  return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
 
@@ -100,12 +102,14 @@ compute_index (const unsigned int i) const
   for (unsigned int iz=0; iz<n_1d; ++iz)
     for (unsigned int iy=0; iy<n_1d-iz; ++iy)
       if (n < k+n_1d-iy-iz)
-        return {n-k, iy, iz};
+        {
+          return {{n-k, iy, iz}};
+        }
       else
         k += n_1d-iy-iz;
 
   Assert (false, ExcInternalError());
-  return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
+  return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
 
