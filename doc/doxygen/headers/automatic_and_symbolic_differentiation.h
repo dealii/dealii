@@ -25,13 +25,14 @@
  *
  * @section auto_diff_1 Automatic differentiation
  *
- * Automatic differentiation (commonly also referred to as called algorithmic differentiation),
- * is a that can be used to "automatically" compute the first, and perhaps higher-order,
+ * <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation </a>
+ * (commonly also referred to as algorithmic differentiation),
+ * is a numerical method that can be used to "automatically" compute the first, and perhaps higher-order,
  * derivatives of function(s) with respect to one or more input variables.
  * Although this comes at a certain computational cost, the benefits to using such a tool may be
  * significant. When used correctly the derivatives of often complicated functions can be computed
  * to a very high accuracy. Although the exact accuracy achievable by these frameworks largely
- * depends their underlying mathematical formulation, some implementations compute with a precision
+ * depends on their underlying mathematical formulation, some implementations compute with a precision
  * on the order of machine accuracy. Note that this is different to classical numerical differentiation,
  * which has an accuracy that depends on both the perturbation size as well as the chosen
  * finite-difference scheme (and is measurably larger than well-formulated automatic differentiation
@@ -77,27 +78,30 @@
  *
  * To provide some tentative insight into how these various implementations might look like in practice, we
  * offer the following generic summary of these approaches:
- * -# The first two <em>tapeless</em> approaches listed above use some variation of a truncated Taylor
- *    series, along with a particular choice of definition for the perturbation parameter, to compute
- *    function derivatives using a finite-difference based approach. The "dual" number constitutes the
- *    accumulated directional derivatives computed simultaneously as the function values is evaluated; in the
- *    complex-step approach, the imaginary value effectively serves this purpose. The choice of the perturbation
- *    parameter determines the numerical qualities of the scheme, such as the influence of the truncation of
- *    the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative, while
- *    the for the complex-step method these existent higher-order terms are neglected. It can be shown that
+ * -# The first two <em>tapeless</em> approaches listed above (dual numbers and complex-step method) use some
+ *    variation of a truncated Taylor series, along with a particular choice of definition for the perturbation
+ *    parameter, to compute function derivatives using a finite-difference based approach. The "dual" number
+ *    constitutes the accumulated directional derivatives computed simultaneously as the function values is
+ *    evaluated; in the complex-step approach, the imaginary value effectively serves this purpose. The choice of
+ *    the perturbation parameter determines the numerical qualities of the scheme, such as the influence of the
+ *    truncation of the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative,
+ *    while for the complex-step method these existent higher-order terms are neglected. It can be shown that
  *    both of these methods are not subject to subtractive cancellation errors and that, within their
  *    finite-difference scheme, they are not numerically sensitive to the internal step-size chosen for the
  *    numerical perturbation. The dual number approach thus produces exact first derivatives, while the
- *    complex-step approach does not. The standard implementation of the dual numbers, however, cannot yield
- *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with the
- *    outcome that both first and second derivatives can be computed exactly.
+ *    complex-step approximation does not. The standard implementation of the dual numbers, however, cannot yield
+ *    exact values for second derivatives. Hyper-dual numbers take a different view of this idea, with numbers
+ *    begin represented in a form similar to quaternions (i.e. carrying additional non-real components) and the
+ *    derivatives being computed from a high-order truncation of the Taylor series all four components. The outcome
+ *    that, with the appropriate implementation, both first and second derivatives can be computed exactly.
  * -# With <em>taped</em> approaches, a specified subregion of code is selected as one for which all
  *    operations executed with active (marked) input variables are tracked and recorded in a data structure
  *    referred to as a tape. At the end of the taped region, the recorded function(s) may be revaluated
  *    by "replaying" the tape with a different set of input variables instead of recomputing the function
  *    directly. Assuming that the taped region represents a smooth function, arbitrarily high-order
- *    derivatives of the function then can be by referring to the code path computed and stored on the tape.
- *    (This could perhaps be achieve, for example, through evaluation of the function around the point
+ *    derivatives of the function then can be computed by referring to the code path tracked and stored on
+ *    the tape.
+ *    (This could perhaps be achieved, for example, through evaluation of the function around the point
  *    of interest.) There exist strategies to deal with situations where the taped function is not
  *    smooth at the evaluated point, or if it is not analytic. Furthermore, one might need to consider the
  *    case of branched functions, where the tape is no longer sequential, but rather forks off on a different
@@ -106,9 +110,9 @@
  *    leverage the computational graph
  *    (in this case, a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph (DAG)</a>),
  *    constructed from the abstract syntax tree (AST), that resolves the function output from its input values.
- *    The outermost leaves on the represent the independent variables or constants, and are transformed by unary
- *    operators and connected by binary operators (in a the most simple case). Therefore the operations performed on
- *    the two inputs is known at compile time, and with that the associated derivative operation can also be defined
+ *    The outermost leaves on the tree represent the independent variables or constants, and are transformed by unary
+ *    operators and connected by binary operators (in the most simple case). Therefore, the operations performed on
+ *    the function inputs is known at compile time, and with that the associated derivative operation can also be defined
  *    at the same time. The compiled output type returned by this operator need not be generic, but can rather be
  *    specialized based on the specific inputs (possibly carrying a differential history) given to that specific
  *    operator on the vertex of the DAG. In this way, a compile-time optimized set of instructions can be generated
@@ -121,7 +125,7 @@
  * implications, run-time cost,  and potential limitations, of using any one of these "black-box"
  * auto-differentiable numbers.
  *
- * Resources used to furnish the details supplied here include:
+ * In addition to the supplied linked articles, resources used to furnish the details supplied here include:
  *
  * @code{.bib}
  * @InProceedings{Fike2011a,
@@ -155,6 +159,7 @@
  * compute derivatives, specifically
  * - <em>forward-mode</em> (or <em>forward accumulation</em>) auto-differentation, or
  * - <em>reverse-mode</em> (or <em>reverse accumulation</em>) auto-differentation.
+ *
  * As a point of interest, the <em>optimal Jacobian accumulation</em>, which performs a minimal set of
  * computations, lies somewhere between these two limiting cases. Its computation for a general composite
  * function remains an open problem in graph theory.
@@ -185,61 +190,62 @@
  *   </div>
  * </div>
  *
- * representing the calculation of the function
- * \f[
- *   f (\mathbf{x})
- *     = x_{1} \times x_{2} + \sin (x_{1})
- *   \quad ,
- * \f]
+ * representing the calculation of the function $f (\mathbf{x}) = x_{1} \times x_{2} + \sin (x_{1})$,
  * we will briefly describe what forward- and reverse- auto-differentiation are.
  * Note that in the diagram, along the edges of the graph in text are the directional
- * derivative of function \f$ w \f$ with respect to the i-th variable, represented by
- * the notation \f$ \dot{w} = \dfrac{d w}{d x_{i}} \f$.
- * Consider first that any composite function \f$ f(x) \f$, here represented as having two
+ * derivative of function $w$ with respect to the i-th variable, represented by
+ * the notation $\dot{w} = \dfrac{d w}{d x_{i}}$.
+ * The specific computations used to render the function value and its directional derivatives
+ * for this example are tabulated in the
+ * <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">source article</a>.
+ * For a second illustrative example, we refer the interested reader to
+ * <a href="http://www.columbia.edu/~ahd2125/post/2015/12/5/">this article</a>.
+ *
+ * Consider first that any composite function $f(x)$, here represented as having two
  * independent variables, can be dissected into a composition of its elementary functions
- * \f[
+ * @f[
  *   f (\mathbf{x})
  *   = f_{0} \circ f_{1} \circ f_{2} \circ \ldots \circ f_{n} (\mathbf{x})
  *   \quad .
- * \f]
- * As was previously mentioned, if each of the primitive operations \f$ f_{n} \f$ is smooth and
- * differentiable, then the chain can be universally employed to compute the total derivative of \f$ f \f$,
- * namely \f$ \dfrac{d f(x)}{d \mathbf{x}} \f$. How exactly the chain-rule is applied is what
+ * @f]
+ * As was previously mentioned, if each of the primitive operations $f_{n}$ is smooth and
+ * differentiable, then the chain can be universally employed to compute the total derivative of $f$,
+ * namely $\dfrac{d f(x)}{d \mathbf{x}}$. How exactly the chain-rule is applied is what
  * distinguishes the "forward" from the "reverse" mode, but ultimately both compute the total
  * derivative
- * \f[
+ * @f[
  *   \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
  *   = \dfrac{d f_{0}}{d f_{1}} \dfrac{d f_{1}}{d f_{2}} \dfrac{d f_{2}}{d f_{3}} \ldots \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}}
  *   \quad .
- * \f]
+ * @f]
  *
  * In forward-mode, the chain-rule is computed naturally from the "inside out". The independent
- * variables are therefore fixed, and each sub-function \f$ f_{n} \f$ is computed recursively
- * and its result returned as inputs to the parent function. Encapsulating and fixing the order
- * of operations using parentheses, this means that we compute
- * \f[
+ * variables are therefore fixed, and each sub-function $f'_{i} \vert_{f'_{i+1}}$ is computed
+ * recursively and its result returned as inputs to the parent function. Encapsulating and fixing
+ * the order of operations using parentheses, this means that we compute
+ * @f[
  *   \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
  *   = \dfrac{d f_{0}}{d f_{1}} \left( \dfrac{d f_{1}}{d f_{2}} \left(\dfrac{d f_{2}}{d f_{3}} \left(\ldots \left( \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}} \right)\right)\right)\right)
  *   \quad .
- * \f]
+ * @f]
+ * The computational complexity of a forward-sweep is proportional to that of the input function.
+ * However, for each directional derivative that is to be computed one sweep of the computational
+ * graph is required.
  *
  * In reverse-mode, the chain-rule is computed somewhat unnaturally from the "outside in". The
  * values of the dependent variables first get computed and fixed, and then the preceeding
  * differential operations are evaluated and multiplied in succession with the previous results
  * from left to right. Again, if we encapsulate and fix the order of operations using parentheses,
  * this implies that the reverse calculation is performed by
- * \f[
+ * @f[
  * \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
  *   = \left( \left( \left( \left( \left( \dfrac{d f_{0}}{d f_{1}} \right) \dfrac{d f_{1}}{d f_{2}} \right) \dfrac{d f_{2}}{d f_{3}} \right) \ldots \right) \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}} \right)
  *   \quad .
- * \f]
+ * @f]
+ * The intermediate values $\dfrac{d f_{i-1}}{d f_{i}}$ are known as <em>adjoints</em>, which must be
+ * computed and stored as the computational graph is traversed. However, for each dependent scalar function
+ * one sweep of the computational graph renders all directional derivatives at once.
  *
- * The specific computations used to render the function value and its directional derivatives
- * are tabulated in the <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">source article</a>.
- * For a second illustrative example, we refer the interested reader to
- * <a href="http://www.columbia.edu/~ahd2125/post/2015/12/5/">this article</a>.
- *
- * The computational complexity of a forward-sweep is proportional to that of the input function.
  * Overall, the efficiency of each mode is determined by the number of independent (input) variables
  * and dependent (output) variables. If the outputs greatly exceed the inputs in number, then
  * forward-mode can be shown to be more efficient than reverse-mode. The converse is true when the
@@ -391,10 +397,10 @@
  * @subsection auto_diff_1_2 How automatic differentiation is integrated into deal.II
  *
  * Since the interface to each automatic differentiation library is so vastly different,
- * a uniform internal interface to each number will been established in the near future.
+ * a uniform internal interface to each number will be established in the near future.
  * The goal will be to allow some driver classes (that provide the core functionality,
- * and will later be introduced in the next section) a consistent mechanism to interact with
- * different auto-differentiation libraries. Specifically, they need to be able to correctly
+ * and will later be introduced in the next section) to have a consistent mechanism to interact
+ * with different auto-differentiation libraries. Specifically, they need to be able to correctly
  * initialize and finalize data that is to be interpreted as the dependent and independent
  * variables of a formula.
  *
@@ -409,12 +415,12 @@
  *   provide a uniform interface to the classes through the NumberTraits and ADNumberTraits
  *   classes which are extensively used throughout of drivers. We also provide some mechanisms
  *   to easily query select properties of these numbers, i.e. some type traits.
- * - adolc_math.h: Extension of the Adol-C math operations that allow these numbers to be used
+ * - adolc_math.h: Extension of the ADOL-C math operations that allow these numbers to be used
  *   consistently throughout the library.
  * - adolc_number_types.h: Implementation of the internal classes that define how we
- *   use Adol-C numbers.
+ *   use ADOL-C numbers.
  * - adolc_product_types.h: Defines some product and scalar types that allow the use of
- *   Adol-C numbers in conjunction with the Tensor and SymmetricTensor classes.
+ *   ADOL-C numbers in conjunction with the Tensor and SymmetricTensor classes.
  * - sacado_math.h: Extension of the sacado math operations that allow these numbers to be used
  *   consistently throughout the library.
  * - sacado_number_types.h: Implementation of the internal classes that define how we
