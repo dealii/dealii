@@ -1590,7 +1590,7 @@ namespace MatrixFreeOperators
     const unsigned int local_size = inverse_diagonal_vector.local_size();
     for (unsigned int i=0; i<local_size; ++i)
       inverse_diagonal_vector.local_element(i)
-        =1./inverse_diagonal_vector.local_element(i);
+        = Number(1.)/inverse_diagonal_vector.local_element(i);
 
     inverse_diagonal_vector.update_ghost_values();
     diagonal_vector.update_ghost_values();
