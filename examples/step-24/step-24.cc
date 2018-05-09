@@ -459,7 +459,7 @@ namespace Step24
     const std::string filename =  "solution-" +
                                   Utilities::int_to_string (timestep_number, 3) +
                                   ".gnuplot";
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_gnuplot (output);
   }
 

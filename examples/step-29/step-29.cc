@@ -863,7 +863,7 @@ namespace Step29
     const std::string filename = output_file +
                                  data_out.default_suffix();
 
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
 
     // The solution vectors $v$ and $w$ are added to the DataOut object in the
     // usual way:

@@ -691,7 +691,7 @@ namespace Step45
         pvtu_master_filename = ("solution-" +
                                 Utilities::int_to_string (refinement_cycle, 2) +
                                 ".pvtu");
-        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        std::ofstream pvtu_master (pvtu_master_filename);
         data_out.write_pvtu_record (pvtu_master, filenames);
       }
   }

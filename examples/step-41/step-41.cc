@@ -601,9 +601,9 @@ namespace Step41
 
     data_out.build_patches ();
 
-    std::ofstream output_vtk ((std::string("output_") +
-                               Utilities::int_to_string (iteration, 3) +
-                               ".vtk").c_str ());
+    std::ofstream output_vtk (std::string("output_") +
+                              Utilities::int_to_string (iteration, 3) +
+                              ".vtk");
     data_out.write_vtk (output_vtk);
   }
 

@@ -1146,7 +1146,7 @@ namespace Step37
                                  + ".vtu");
 
         std::string master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream master_output (master_name.c_str());
+        std::ofstream master_output (master_name);
         data_out.write_pvtu_record (master_output, filenames);
       }
   }

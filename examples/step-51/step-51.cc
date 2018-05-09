@@ -1204,7 +1204,7 @@ namespace Step51
     filename += "-q" + Utilities::int_to_string(fe.degree,1);
     filename += "-" + Utilities::int_to_string(cycle,2);
     filename += ".vtk";
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
 
     DataOut<dim> data_out;
 
@@ -1235,7 +1235,7 @@ namespace Step51
     face_out += "-q" + Utilities::int_to_string(fe.degree,1);
     face_out += "-" + Utilities::int_to_string(cycle,2);
     face_out += ".vtk";
-    std::ofstream face_output (face_out.c_str());
+    std::ofstream face_output (face_out);
 
 // The <code>DataOutFaces</code> class works analogously to the <code>DataOut</code>
 // class when we have a <code>DoFHandler</code> that defines the solution on

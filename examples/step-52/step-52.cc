@@ -453,7 +453,7 @@ namespace Step52
     const std::string filename = "solution-" + method_name + "-" +
                                  Utilities::int_to_string (time_step, 3) +
                                  ".vtu";
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
     data_out.write_vtu(output);
   }
 

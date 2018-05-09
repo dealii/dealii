@@ -591,7 +591,7 @@ namespace Step47
         //std::endl; std::cout << F << std::endl;
 
         std::string filename = "vertices.dat";
-        std::ofstream output (filename.c_str());
+        std::ofstream output (filename);
         output << "#vertices of xfem subcells" << std::endl;
         output << v0(0) << "   " << v0(1) << std::endl;
         output << v1(0) << "   " << v1(1) << std::endl;
@@ -718,7 +718,7 @@ namespace Step47
         //std::cout << "Pos " << Pos << std::endl; std::cout << A <<
         //std::endl; std::cout << B << std::endl;
         std::string filename = "vertices.dat";
-        std::ofstream output (filename.c_str());
+        std::ofstream output (filename);
         output << "#vertices of xfem subcells" << std::endl;
         output << A(0) << "   " << A(1) << std::endl;
         output << B(0) << "   " << B(1) << std::endl;
@@ -987,7 +987,7 @@ namespace Step47
     filename += ('0' + cycle);
     filename += ".vtk";
 
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
 
     Postprocessor<dim> postprocessor;
     DataOut<dim,hp::DoFHandler<dim> > data_out;

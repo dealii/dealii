@@ -2305,7 +2305,7 @@ namespace Step33
     std::string filename = "solution-" +
                            Utilities::int_to_string (output_file_number, 3) +
                            ".vtk";
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtk (output);
 
     ++output_file_number;
@@ -2332,7 +2332,7 @@ namespace Step33
       GridIn<dim> grid_in;
       grid_in.attach_triangulation(triangulation);
 
-      std::ifstream input_file(parameters.mesh_filename.c_str());
+      std::ifstream input_file(parameters.mesh_filename);
       Assert (input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
 
       grid_in.read_ucd(input_file);

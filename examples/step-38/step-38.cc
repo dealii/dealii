@@ -496,7 +496,7 @@ namespace Step38
     std::string filename ("solution-");
     filename += static_cast<char>('0'+spacedim);
     filename += "d.vtk";
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtk (output);
   }
 

@@ -709,7 +709,7 @@ namespace Step35
 
     {
       std::string filename = "nsbench2.inp";
-      std::ifstream file (filename.c_str());
+      std::ifstream file (filename);
       Assert (file, ExcFileNotOpen (filename.c_str()));
       grid_in.read_ucd (file);
     }
@@ -1354,9 +1354,9 @@ namespace Step35
                               DataOut<dim>::type_dof_data,
                               component_interpretation);
     data_out.build_patches (deg + 1);
-    std::ofstream output (("solution-" +
-                           Utilities::int_to_string (step, 5) +
-                           ".vtk").c_str());
+    std::ofstream output ("solution-" +
+                          Utilities::int_to_string (step, 5) +
+                          ".vtk");
     data_out.write_vtk (output);
   }
 

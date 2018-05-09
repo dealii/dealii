@@ -597,7 +597,7 @@ namespace Step40
                                   "." +
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4));
-    std::ofstream output ((filename + ".vtu").c_str());
+    std::ofstream output ((filename + ".vtu"));
     data_out.write_vtu (output);
 
     // The last step is to write a "master record" that lists for the
@@ -619,9 +619,9 @@ namespace Step40
                                Utilities::int_to_string (i, 4) +
                                ".vtu");
 
-        std::ofstream master_output (("solution-" +
-                                      Utilities::int_to_string (cycle, 2) +
-                                      ".pvtu").c_str());
+        std::ofstream master_output ("solution-" +
+                                     Utilities::int_to_string (cycle, 2) +
+                                     ".pvtu");
         data_out.write_pvtu_record (master_output, filenames);
       }
   }

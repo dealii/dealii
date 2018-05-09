@@ -877,7 +877,7 @@ namespace Step50
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4) +
                                   ".vtu");
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -893,14 +893,14 @@ namespace Step50
         pvtu_master_filename = ("solution-" +
                                 Utilities::int_to_string (cycle, 5) +
                                 ".pvtu");
-        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        std::ofstream pvtu_master (pvtu_master_filename);
         data_out.write_pvtu_record (pvtu_master, filenames);
 
         const std::string
         visit_master_filename = ("solution-" +
                                  Utilities::int_to_string (cycle, 5) +
                                  ".visit");
-        std::ofstream visit_master (visit_master_filename.c_str());
+        std::ofstream visit_master (visit_master_filename);
         DataOutBase::write_visit_record (visit_master, filenames);
 
         std::cout << "   wrote " << pvtu_master_filename << std::endl;

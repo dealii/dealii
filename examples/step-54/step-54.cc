@@ -225,7 +225,7 @@ namespace Step54
     // mesh from an external VTK file, and convert it to a deal triangulation.
     std::ifstream in;
 
-    in.open(initial_mesh_filename.c_str());
+    in.open(initial_mesh_filename);
 
     GridIn<2,3> gi;
     gi.attach_triangulation(tria);
@@ -363,7 +363,7 @@ namespace Step54
     const std::string filename = ( output_filename + "_" +
                                    Utilities::int_to_string(cycle) +
                                    ".vtk" );
-    std::ofstream logfile(filename.c_str());
+    std::ofstream logfile(filename);
     GridOut grid_out;
     grid_out.write_vtk(tria, logfile);
   }

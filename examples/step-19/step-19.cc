@@ -372,7 +372,7 @@ namespace Step19
     DataOutReader<dim,spacedim> merged_data;
 
     {
-      std::ifstream input (input_file_names[0].c_str());
+      std::ifstream input (input_file_names[0]);
       AssertThrow (input, ExcIO());
 
       merged_data.read (input);
@@ -382,7 +382,7 @@ namespace Step19
     // object, and then merge that into the first object declared above:
     for (unsigned int i=1; i<input_file_names.size(); ++i)
       {
-        std::ifstream input (input_file_names[i].c_str());
+        std::ifstream input (input_file_names[i]);
         AssertThrow (input, ExcIO());
 
         DataOutReader<dim,spacedim> additional_data;
@@ -398,7 +398,7 @@ namespace Step19
     // the command line. Note that this ensures that if the library acquires
     // the ability to output in other output formats, this program will be
     // able to make use of this ability without having to be changed!
-    std::ofstream output_stream (output_file.c_str());
+    std::ofstream output_stream (output_file);
     AssertThrow (output_stream, ExcIO());
 
     const DataOutBase::OutputFormat format
@@ -436,7 +436,7 @@ namespace Step19
     AssertThrow (input_file_names.size() > 0,
                  ExcMessage ("No input files specified."));
 
-    std::ifstream input(input_file_names[0].c_str());
+    std::ifstream input(input_file_names[0]);
     AssertThrow (input, ExcIO());
 
     const std::pair<unsigned int, unsigned int>

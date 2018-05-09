@@ -1032,13 +1032,13 @@ namespace Step32
     ParameterHandler prm;
     BoussinesqFlowProblem<dim>::Parameters::declare_parameters (prm);
 
-    std::ifstream parameter_file (parameter_filename.c_str());
+    std::ifstream parameter_file (parameter_filename);
 
     if (!parameter_file)
       {
         parameter_file.close ();
 
-        std::ofstream parameter_out (parameter_filename.c_str());
+        std::ofstream parameter_out (parameter_filename);
         prm.print_parameters (parameter_out,
                               ParameterHandler::Text);
 
@@ -3404,7 +3404,7 @@ namespace Step32
                                   Utilities::int_to_string
                                   (triangulation.locally_owned_subdomain(), 4) +
                                   ".vtu");
-    std::ofstream output (filename.c_str());
+    std::ofstream output (filename);
     data_out.write_vtu (output);
 
 
@@ -3428,14 +3428,14 @@ namespace Step32
         pvtu_master_filename = ("solution-" +
                                 Utilities::int_to_string (out_index, 5) +
                                 ".pvtu");
-        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        std::ofstream pvtu_master (pvtu_master_filename);
         data_out.write_pvtu_record (pvtu_master, filenames);
 
         const std::string
         visit_master_filename = ("solution-" +
                                  Utilities::int_to_string (out_index, 5) +
                                  ".visit");
-        std::ofstream visit_master (visit_master_filename.c_str());
+        std::ofstream visit_master (visit_master_filename);
         DataOutBase::write_visit_record (visit_master, filenames);
       }
 

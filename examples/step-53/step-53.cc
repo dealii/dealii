@@ -453,7 +453,7 @@ namespace Step53
 
     // Having done this all, we can now output the mesh into a file of its own:
     const std::string filename = "mesh.vtu";
-    std::ofstream out (filename.c_str());
+    std::ofstream out (filename);
     GridOut grid_out;
     grid_out.write_vtu (triangulation, out);
   }

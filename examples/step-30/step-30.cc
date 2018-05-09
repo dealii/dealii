@@ -875,7 +875,7 @@ namespace Step30
 
     filename += refine_type + ".eps";
     std::cout << "Writing grid to <" << filename << ">..." << std::endl;
-    std::ofstream eps_output (filename.c_str());
+    std::ofstream eps_output (filename);
 
     GridOut grid_out;
     grid_out.write_eps (triangulation, eps_output);
@@ -886,7 +886,7 @@ namespace Step30
 
     filename += refine_type + ".gnuplot";
     std::cout << "Writing grid to <" << filename << ">..." << std::endl;
-    std::ofstream gnuplot_grid_output (filename.c_str());
+    std::ofstream gnuplot_grid_output (filename);
 
     grid_out.write_gnuplot (triangulation, gnuplot_grid_output);
 
@@ -897,7 +897,7 @@ namespace Step30
     filename += refine_type + ".gnuplot";
     std::cout << "Writing solution to <" << filename << ">..."
               << std::endl;
-    std::ofstream gnuplot_output (filename.c_str());
+    std::ofstream gnuplot_output (filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
