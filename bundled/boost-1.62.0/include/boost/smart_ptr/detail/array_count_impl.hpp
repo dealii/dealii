@@ -24,11 +24,11 @@ namespace boost {
                 : allocator(allocator_) {
             }
 
-            virtual void dispose() {
+            virtual void dispose() override {
                 allocator();
             }
 
-            virtual void destroy() {
+            virtual void destroy() override {
 #if !defined(BOOST_NO_CXX11_ALLOCATOR)
                 typedef typename std::allocator_traits<A>::
                     template rebind_alloc<Y> YA;
@@ -47,11 +47,11 @@ namespace boost {
 #endif                
             }
 
-            virtual void* get_deleter(const sp_typeinfo&) {
+            virtual void* get_deleter(const sp_typeinfo&) override {
                 return &reinterpret_cast<char&>(allocator);
             }
 
-            virtual void* get_untyped_deleter() {
+            virtual void* get_untyped_deleter() override {
                 return &reinterpret_cast<char&>(allocator);
             }
 

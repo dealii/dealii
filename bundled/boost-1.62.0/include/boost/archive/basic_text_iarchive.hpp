@@ -81,7 +81,7 @@ protected:
     basic_text_iarchive(unsigned int flags) : 
         detail::common_iarchive<Archive>(flags)
     {}
-    ~basic_text_iarchive(){}
+    ~basic_text_iarchive() override{}
 };
 
 } // namespace archive

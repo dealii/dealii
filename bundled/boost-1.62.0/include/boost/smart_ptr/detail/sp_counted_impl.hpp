@@ -70,7 +70,7 @@ public:
 #endif
     }
 
-    virtual void dispose() // nothrow
+    virtual void dispose() override // nothrow
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
         boost::sp_scalar_destructor_hook( px_, sizeof(X), this );
@@ -78,12 +78,12 @@ public:
         boost::checked_delete( px_ );
     }
 
-    virtual void * get_deleter( sp_typeinfo const & )
+    virtual void * get_deleter( sp_typeinfo const & ) override
     {
         return 0;
     }
 
-    virtual void * get_untyped_deleter()
+    virtual void * get_untyped_deleter() override
     {
         return 0;
     }
@@ -148,17 +148,17 @@ public:
     {
     }
 
-    virtual void dispose() // nothrow
+    virtual void dispose() override // nothrow
     {
         del( ptr );
     }
 
-    virtual void * get_deleter( sp_typeinfo const & ti )
+    virtual void * get_deleter( sp_typeinfo const & ti ) override
     {
         return ti == BOOST_SP_TYPEID(D)? &reinterpret_cast<char&>( del ): 0;
     }
 
-    virtual void * get_untyped_deleter()
+    virtual void * get_untyped_deleter() override
     {
         return &reinterpret_cast<char&>( del );
     }
@@ -217,12 +217,12 @@ public:
     {
     }
 
-    virtual void dispose() // nothrow
+    virtual void dispose() override // nothrow
     {
         d_( p_ );
     }
 
-    virtual void destroy() // nothrow
+    virtual void destroy() override // nothrow
     {
 #if !defined( BOOST_NO_CXX11_ALLOCATOR )
 
@@ -249,12 +249,12 @@ public:
         a2.deallocate( this, 1 );
     }
 
-    virtual void * get_deleter( sp_typeinfo const & ti )
+    virtual void * get_deleter( sp_typeinfo const & ti ) override
     {
         return ti == BOOST_SP_TYPEID( D )? &reinterpret_cast<char&>( d_ ): 0;
     }
 
-    virtual void * get_untyped_deleter()
+    virtual void * get_untyped_deleter() override
     {
         return &reinterpret_cast<char&>( d_ );
     }

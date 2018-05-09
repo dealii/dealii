@@ -49,14 +49,14 @@ class codecvt_null;
 template<>
 class codecvt_null<char> : public std::codecvt<char, char, std::mbstate_t>
 {
-    virtual bool do_always_noconv() const throw() {
+    virtual bool do_always_noconv() const throw() override {
         return true;
     }
 public:
     explicit codecvt_null(std::size_t no_locale_manage = 0) :
         std::codecvt<char, char, std::mbstate_t>(no_locale_manage)
     {}
-    virtual ~codecvt_null(){};
+    virtual ~codecvt_null() override{};
 };
 
 template<>
@@ -71,7 +71,7 @@ class BOOST_SYMBOL_VISIBLE codecvt_null<wchar_t> : public std::codecvt<wchar_t, 
         char * first2,
         char * last2,
         char * & next2
-    ) const;
+    ) const override;
     virtual BOOST_WARCHIVE_DECL std::codecvt_base::result
     do_in(
         std::mbstate_t & state,
@@ -81,18 +81,18 @@ class BOOST_SYMBOL_VISIBLE codecvt_null<wchar_t> : public std::codecvt<wchar_t, 
         wchar_t * first2,
         wchar_t * last2,
         wchar_t * & next2
-    ) const;
-    virtual int do_encoding( ) const throw( ){
+    ) const override;
+    virtual int do_encoding( ) const throw( ) override{
         return sizeof(wchar_t) / sizeof(char);
     }
-    virtual int do_max_length( ) const throw( ){
+    virtual int do_max_length( ) const throw( ) override{
         return do_encoding();
     }
 public:
     explicit codecvt_null(std::size_t no_locale_manage = 0) :
         std::codecvt<wchar_t, char, std::mbstate_t>(no_locale_manage)
     {}
-    virtual ~codecvt_null(){};
+    virtual ~codecvt_null() override{};
 };
 
 } // namespace archive
