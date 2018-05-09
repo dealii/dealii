@@ -371,8 +371,8 @@
         <dd>
             <p>
                 <a href="https://projects.coin-or.org/ADOL-C" target="_top">ADOL-C</a> is a package that facilitates the evaluation of first and higher derivatives of vector functions. In particular, it can be used for automatic differentiation. For using
-                <a href="https://projects.coin-or.org/ADOL-C/" target="_top">ADOL-C</a> with deal.II, version 2.6.4 or newer is required. To use a self compiled version, specify
-                <code>-DADOLC_DIR=/path/to/adolc</code> on the command line.
+                <a href="https://projects.coin-or.org/ADOL-C/" target="_top">ADOL-C</a> with deal.II, version 2.6.4 or newer is required. To use a self compiled version, pass
+                <code>-DADOLC_DIR=/path/to/adolc</code> to the deal.II CMake call.
             </p>
         </dd>
 
@@ -381,8 +381,8 @@
         <dd>
             <p>
                 <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a> is a library for computing large scale eigenvalue problems.
-                <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                <code>-DARPACK_DIR=/path/to/arpack</code> on the command line. For a detailed description on how to compile ARPACK and linking with deal.II, see
+                <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+                <code>-DARPACK_DIR=/path/to/arpack</code> to the deal.II CMake call. For a detailed description on how to compile ARPACK and linking with deal.II, see
                 <a href="external-libs/arpack.html" target="body">this page</a>.
             </p>
         </dd>
@@ -393,8 +393,8 @@
             <p>
                 <a href="http://www.assimp.org/" target="_top"></a> is a portable Open Source library to import various well-known 3D model formats in a uniform manner. A subset of these formats can be read from within deal.II to generate two-dimensional
                 meshes, possibly embedded in a three-dimensional space.
-                <a href="http://www.assimp.org/" target="_top">Assimp</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                <code>-DASSIMP_DIR=/path/to/assimp</code> on the command line.
+                <a href="http://www.assimp.org/" target="_top">Assimp</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+                <code>-DASSIMP_DIR=/path/to/assimp</code> to the deal.II CMake call.
             </p>
         </dd>
 
@@ -427,9 +427,15 @@
              <a href="http://gmsh.info/" target="_top">Gmsh</a></dt>
             <dd>
                 <p>
-                    <a href="http://gmsh.info/" target="_top"></a> is a 3D finite element mesh generator. The executable can be used to create meshes from within deal.II by specifying the relevant input data.
-                    <a href="http://gmsh.info/" target="_top">Gmsh</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                    <code>-DGMSH_DIR=/path/to/gmsh</code> on the command line.
+                    <a href="http://gmsh.info/" target="_top">Gmsh</a>
+                    is a 3D mesh generator. The executable can be used
+                    to create meshes from within deal.II by specifying
+                    the relevant input data. Gmsh should be readily
+                    packaged by most Linux distributions. To use a
+                    self compiled version,
+                    pass <code>-DGMSH_DIR=/path/to/gmsh</code> to the
+                    deal.II CMake call. Note that netgen, tetgen and
+                    blas support has to be enabled in Gmsh.
                 </p>
             </dd>
 
@@ -437,8 +443,8 @@
             <dd>
                 <p>
                     The <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a> provides a wide range of mathematical routines such as random number generators, special functions and least-squares fitting.
-                    <a href="http://www.gnu.org/software/gsl/">GSL</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                    <code>-DGSL_DIR=/path/to/gsl</code> on the command line.
+                    <a href="http://www.gnu.org/software/gsl/">GSL</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+                    <code>-DGSL_DIR=/path/to/gsl</code> to the deal.II CMake call.
                 </p>
             </dd>
 
@@ -446,8 +452,8 @@
             <dd>
                 <p>
                     The <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a> provides graphical output capabilities in <code>HDF5/XDMF</code> format.
-                    <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                    <code>-DHDF5_DIR=/path/to/hdf5</code> on the command line.
+                    <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+                    <code>-DHDF5_DIR=/path/to/hdf5</code> to the deal.II CMake call.
                 </p>
             </dd>
 
@@ -457,8 +463,8 @@
             <dd>
                 <p>
                     <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview" target="_top">METIS</a> is a library that provides various methods to partition graphs. <acronym>deal.II</acronym> uses it in programs like the step-17 tutorial to partition
-                    a mesh for parallel computing. To use a self compiled version, specify
-                    <code>-DMETIS_DIR=/path/to/metis</code> on the command line.
+                    a mesh for parallel computing. To use a self compiled version, pass
+                    <code>-DMETIS_DIR=/path/to/metis</code> to the deal.II CMake call.
                     <acronym>deal.II</acronym> supports METIS 5 and later.
                 </p>
 
@@ -485,8 +491,8 @@
                 <p>
                     <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> is a C++11 header-only library for building KD-Trees of datasets with different topologies. In particular, it can be used for operations such as finding the
                     vertex or cell closest to a given evaluation point that occur frequently in many applications using unstructured meshes. scale eigenvalue problems.
-                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-                    <code>-DNANOFLANN_DIR=/path/to/nanoflann</code> on the command line.
+                    <a href="https://github.com/jlblancoc/nanoflann" target="_top">nanoflann</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+                    <code>-DNANOFLANN_DIR=/path/to/nanoflann</code> to the deal.II CMake call.
                 </p>
             </dd>
 
@@ -494,7 +500,7 @@
             <dd>
                 <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> is a library that provides services for reading and writing mesh data (and many other things). <acronym>deal.II</acronym> can use it to read meshes via one
                 of the functions of the <code>GridIn</code> class.
-                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, pass
+                <a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
                 <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
                 </p>
             </dd>
@@ -529,7 +535,7 @@
                 <p>
                     <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> is a library that supports parallel linear algebra and many other things.
 
-                    <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> is already packaged by some Linux distributions and should be found automatically if present. (Don't forget to install a development version of the library). To use a
+                    <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> is already packaged by some Linux distributions and should be found automatically if present. To use a
                     self compiled version of PETSc, add <code>-DPETSC_DIR=/path/to/petsc
 	  -DPETSC_ARCH=architecture</code> to the argument list for
                     <code>cmake</code>. The values for these arguments must be the same as those specified when building PETSc.
@@ -574,9 +580,9 @@
             <dd>
                 <p>
                     <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> is a collection of solvers for nonlinear and differential/algebraic equations.
-                    <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version,
+                    <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> should be readily packaged by most Linux distributions. To use a self compiled version,
                     specify
-                    <code>-DSUNDIALS_DIR=/path/to/sundials</code> on the command line.
+                    <code>-DSUNDIALS_DIR=/path/to/sundials</code> to the deal.II CMake call.
                 </p>
             </dd>
 
@@ -629,8 +635,8 @@
     <dd>
         <p>
             <a href="http://zlib.net/" target="_top">zlib</a> is a software library used for lossless data-compression. It is used in deal.II whenever compressed data is to be written.
-            <a href="http://zlib.net/" target="_top">zlib</a> should be readily packaged by most Linux distributions. (Don't forget to install a development version of the library). To use a self compiled version, specify
-            <code>-DZLIB_DIR=/path/to/zlib</code> on the command line.
+            <a href="http://zlib.net/" target="_top">zlib</a> should be readily packaged by most Linux distributions. To use a self compiled version, pass
+            <code>-DZLIB_DIR=/path/to/zlib</code> to the deal.II CMake call.
         </p>
     </dd>
 
