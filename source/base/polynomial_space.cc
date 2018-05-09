@@ -43,24 +43,21 @@ PolynomialSpace<0>::compute_n_pols (const unsigned int)
 
 
 template <>
-void
+std::array<unsigned int,1>
 PolynomialSpace<1>::
-compute_index (const unsigned int i,
-               unsigned int      (&index)[1]) const
+compute_index (const unsigned int i) const
 {
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
-  const unsigned int n=index_map[i];
-  index[0] = n;
+  return {index_map[i]};
 }
 
 
 
 template <>
-void
+std::array<unsigned int,2>
 PolynomialSpace<2>::
-compute_index (const unsigned int i,
-               unsigned int      (&index)[2]) const
+compute_index (const unsigned int i) const
 {
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
@@ -73,22 +70,20 @@ compute_index (const unsigned int i,
   unsigned int k=0;
   for (unsigned int iy=0; iy<n_1d; ++iy)
     if (n < k+n_1d-iy)
-      {
-        index[0] = n-k;
-        index[1] = iy;
-        return;
-      }
+      return {n-k, iy};
     else
       k+=n_1d-iy;
+
+  Assert (false, ExcInternalError());
+  return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
 }
 
 
 
 template <>
-void
+std::array<unsigned int,3>
 PolynomialSpace<3>::
-compute_index (const unsigned int i,
-               unsigned int      (&index)[3]) const
+compute_index (const unsigned int i) const
 {
   Assert(i<index_map.size(),
          ExcIndexRange(i,0,index_map.size()));
@@ -105,14 +100,12 @@ compute_index (const unsigned int i,
   for (unsigned int iz=0; iz<n_1d; ++iz)
     for (unsigned int iy=0; iy<n_1d-iz; ++iy)
       if (n < k+n_1d-iy-iz)
-        {
-          index[0] = n-k;
-          index[1] = iy;
-          index[2] = iz;
-          return;
-        }
+        return {n-k, iy, iz};
       else
         k += n_1d-iy-iz;
+
+  Assert (false, ExcInternalError());
+  return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
 }
 
 
@@ -136,8 +129,7 @@ double
 PolynomialSpace<dim>::compute_value (const unsigned int i,
                                      const Point<dim>  &p) const
 {
-  unsigned int ix[dim];
-  compute_index(i,ix);
+  const auto ix = compute_index(i);
   // take the product of the
   // polynomials in the various space
   // directions
@@ -154,8 +146,7 @@ Tensor<1,dim>
 PolynomialSpace<dim>::compute_grad (const unsigned int i,
                                     const Point<dim>  &p) const
 {
-  unsigned int ix[dim];
-  compute_index(i,ix);
+  const auto ix = compute_index(i);
 
   Tensor<1,dim> result;
   for (unsigned int d=0; d<dim; ++d)
@@ -180,8 +171,7 @@ Tensor<2,dim>
 PolynomialSpace<dim>::compute_grad_grad (const unsigned int i,
                                          const Point<dim>  &p) const
 {
-  unsigned int ix[dim];
-  compute_index(i,ix);
+  const auto ix = compute_index(i);
 
   Tensor<2,dim> result;
   for (unsigned int d=0; d<dim; ++d)

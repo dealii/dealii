@@ -71,9 +71,11 @@ public:
   /**
    * For the <tt>n</tt>th polynomial $p_n(x,y,z)=x^i y^j z^k$ this function
    * gives the degrees i,j,k in the x,y,z directions.
+   *
+   * In 1d and 2d, obviously only i and i,j are returned.
    */
-  void directional_degrees(unsigned int n,
-                           unsigned int (&degrees)[dim]) const;
+  std::array<unsigned int,dim>
+  directional_degrees(unsigned int n) const;
 
 private:
 
@@ -100,11 +102,11 @@ PolynomialsP<dim>::degree() const
 
 
 template <int dim>
-inline void
-PolynomialsP<dim>::directional_degrees(unsigned int n,
-                                       unsigned int (&degrees)[dim]) const
+inline
+std::array<unsigned int,dim>
+PolynomialsP<dim>::directional_degrees(unsigned int n) const
 {
-  this->compute_index(n,degrees);
+  return this->compute_index(n);
 }
 
 DEAL_II_NAMESPACE_CLOSE
