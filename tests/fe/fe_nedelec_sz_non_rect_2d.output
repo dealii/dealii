@@ -1,0 +1,10 @@
+
+DEAL:cg::Starting value 0.747607
+DEAL:cg::Convergence step 4 value 6.71226e-19
+DEAL::p=0 L2_error: 0.864275
+DEAL:cg::Starting value 2.34680
+DEAL:cg::Convergence step 13 value 3.46263e-13
+DEAL::p=1 L2_error: 0.0650158
+DEAL:cg::Starting value 2.34814
+DEAL:cg::Convergence step 18 value 3.36532e-13
+DEAL::p=2 L2_error: 1.40992e-13

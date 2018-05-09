@@ -58,6 +58,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
@@ -4786,7 +4787,8 @@ namespace VectorTools
                && (fe.system_to_base_index (cell_idx).first == base_indices)
                && (lower_bound <= fe.system_to_base_index (cell_idx).second)
                && (fe.system_to_base_index (cell_idx).second <= upper_bound))
-              || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+              || (((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+                   || (dynamic_cast<const FE_NedelecSZ<dim>*> (&fe) != nullptr))
                   && (line * (degree + 1) <= face_idx)
                   && (face_idx <= (line + 1) * (degree + 1) - 1)))
             {
@@ -5004,7 +5006,8 @@ namespace VectorTools
               const unsigned int cell_idx = fe.face_to_cell_index (face_idx, face);
               if (((dynamic_cast<const FESystem<dim>*> (&fe) != nullptr)
                    && (fe.system_to_base_index (cell_idx).first == base_indices))
-                  || (dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr))
+                  || (dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+                  || (dynamic_cast<const FE_NedelecSZ<dim>*> (&fe) != nullptr))
                 {
                   associated_edge_dof_to_face_dof[associated_edge_dof_index] = face_idx;
                   ++associated_edge_dof_index;
@@ -5121,7 +5124,8 @@ namespace VectorTools
                        && (fe.system_to_base_index (cell_idx).first == base_indices)
                        && (lower_bound <= fe.system_to_base_index (cell_idx).second)
                        && (fe.system_to_base_index (cell_idx).second <= upper_bound))
-                      || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+                      || (((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+                           || (dynamic_cast<const FE_NedelecSZ<dim>*> (&fe) != nullptr))
                           && (line * (degree + 1) <= face_idx)
                           && (face_idx <= (line + 1) * (degree + 1) - 1)))
                     {
@@ -5158,7 +5162,8 @@ namespace VectorTools
               const unsigned int cell_idx = fe.face_to_cell_index (face_idx, face);
               if (((dynamic_cast<const FESystem<dim>*> (&fe) != nullptr)
                    && (fe.system_to_base_index (cell_idx).first == base_indices))
-                  || ((dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)))
+                  || (dynamic_cast<const FE_Nedelec<dim>*> (&fe) != nullptr)
+                  || (dynamic_cast<const FE_NedelecSZ<dim>*> (&fe) != nullptr))
                 {
                   associated_face_dof_to_face_dof[associated_face_dof_index] = face_idx;
                   ++associated_face_dof_index;
@@ -5356,7 +5361,8 @@ namespace VectorTools
                           // If the FE is a FESystem we cannot check this.
                           if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                             {
-                              AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
+                              AssertThrow ((dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr)
+                                           || (dynamic_cast<const FE_NedelecSZ<dim>*> (&cell->get_fe ()) != nullptr),
                                            typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
 
                             }
@@ -5452,7 +5458,8 @@ namespace VectorTools
                           // If the FE is a FESystem we cannot check this.
                           if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                             {
-                              AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
+                              AssertThrow ((dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr)
+                                           || (dynamic_cast<const FE_NedelecSZ<dim>*> (&cell->get_fe ()) != nullptr),
                                            typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                             }
 
