@@ -879,7 +879,7 @@ FE_NedelecSZ<dim>::get_data (
       Assert (false, ExcNotImplemented ());
     }
     }
-  return data;
+  return std::move(data);
 }
 
 template <int dim>
