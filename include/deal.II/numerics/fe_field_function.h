@@ -195,7 +195,7 @@ namespace Functions
      * information.
      */
     virtual void vector_value (const Point<dim> &p,
-                               Vector<typename VectorType::value_type>   &values) const;
+                               Vector<typename VectorType::value_type>   &values) const override;
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -215,7 +215,7 @@ namespace Functions
      * information.
      */
     virtual typename VectorType::value_type value (const Point< dim > &p,
-                                                   const unsigned int  component = 0)    const;
+                                                   const unsigned int  component = 0)    const override;
 
     /**
      * Set @p values to the point values of the specified component of the
@@ -234,7 +234,7 @@ namespace Functions
      */
     virtual void value_list (const std::vector<Point< dim > >     &points,
                              std::vector<typename VectorType::value_type > &values,
-                             const unsigned int  component = 0)    const;
+                             const unsigned int  component = 0)    const override;
 
 
     /**
@@ -253,7 +253,7 @@ namespace Functions
      * information.
      */
     virtual void vector_value_list (const std::vector<Point< dim > >     &points,
-                                    std::vector<Vector<typename VectorType::value_type> > &values) const;
+                                    std::vector<Vector<typename VectorType::value_type> > &values) const override;
 
     /**
      * Return the gradient of all components of the function at the given
@@ -272,7 +272,7 @@ namespace Functions
      */
     virtual void
     vector_gradient (const Point< dim > &p,
-                     std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients) const;
+                     std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients) const override;
 
     /**
      * Return the gradient of the specified component of the function at the
@@ -290,7 +290,7 @@ namespace Functions
      * information.
      */
     virtual Tensor<1,dim,typename VectorType::value_type> gradient(const Point< dim > &p,
-        const unsigned int component = 0)const;
+        const unsigned int component = 0)const override;
 
     /**
      * Return the gradient of all components of the function at all the given
@@ -308,7 +308,7 @@ namespace Functions
     virtual void
     vector_gradient_list (const std::vector< Point< dim > > &p,
                           std::vector<
-                          std::vector< Tensor< 1, dim,typename VectorType::value_type > > > &gradients) const;
+                          std::vector< Tensor< 1, dim,typename VectorType::value_type > > > &gradients) const override;
 
     /**
      * Return the gradient of the specified component of the function at all
@@ -326,7 +326,7 @@ namespace Functions
     virtual void
     gradient_list (const std::vector< Point< dim > > &p,
                    std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients,
-                   const unsigned int component=0) const;
+                   const unsigned int component=0) const override;
 
 
     /**
@@ -342,7 +342,7 @@ namespace Functions
      */
     virtual typename VectorType::value_type
     laplacian (const Point<dim>   &p,
-               const unsigned int  component = 0) const;
+               const unsigned int  component = 0) const override;
 
     /**
      * Compute the Laplacian of all components at point <tt>p</tt> and store
@@ -358,7 +358,7 @@ namespace Functions
      */
     virtual void
     vector_laplacian (const Point<dim>   &p,
-                      Vector<typename VectorType::value_type>     &values) const;
+                      Vector<typename VectorType::value_type>     &values) const override;
 
     /**
      * Compute the Laplacian of one component at a set of points.
@@ -374,7 +374,7 @@ namespace Functions
     virtual void
     laplacian_list (const std::vector<Point<dim> > &points,
                     std::vector<typename VectorType::value_type>            &values,
-                    const unsigned int              component = 0) const;
+                    const unsigned int              component = 0) const override;
 
     /**
      * Compute the Laplacians of all components at a set of points.
@@ -389,7 +389,7 @@ namespace Functions
      */
     virtual void
     vector_laplacian_list (const std::vector<Point<dim> > &points,
-                           std::vector<Vector<typename VectorType::value_type> >   &values) const;
+                           std::vector<Vector<typename VectorType::value_type> >   &values) const override;
 
     /**
      * Given a set of points located in the domain (or, in the case of

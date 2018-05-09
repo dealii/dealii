@@ -153,10 +153,10 @@ namespace Step57
   public:
     BoundaryValues() : Function<dim>(dim+1) {}
     virtual double value(const Point<dim> &p,
-                         const unsigned int component) const;
+                         const unsigned int component) const override;
 
     virtual void   vector_value(const Point <dim>    &p,
-                                Vector<double> &values) const;
+                                Vector<double> &values) const override;
   };
 
   template <int dim>

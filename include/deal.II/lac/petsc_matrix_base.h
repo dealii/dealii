@@ -306,7 +306,7 @@ namespace PETScWrappers
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~MatrixBase ();
+    virtual ~MatrixBase () override;
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not

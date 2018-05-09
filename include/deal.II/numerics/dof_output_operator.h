@@ -54,7 +54,7 @@ namespace Algorithms
     void initialize (const DoFHandler<dim, spacedim> &dof_handler);
 
     virtual OutputOperator<VectorType> &
-    operator << (const AnyData &vectors);
+    operator << (const AnyData &vectors) override;
 
   private:
     SmartPointer<const DoFHandler<dim, spacedim>,

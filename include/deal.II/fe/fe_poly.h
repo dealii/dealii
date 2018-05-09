@@ -86,7 +86,7 @@ public:
   // for documentation, see the FiniteElement base class
   virtual
   UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const override;
 
   /**
    * Return the numbering of the underlying polynomial space compared to
@@ -107,7 +107,7 @@ public:
    * the semantics of this function.
    */
   virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const;
+                              const Point<dim> &p) const override;
 
   /**
    * Return the value of the <tt>component</tt>th vector component of the
@@ -121,7 +121,7 @@ public:
    */
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim> &p,
-                                        const unsigned int component) const;
+                                        const unsigned int component) const override;
 
   /**
    * Return the gradient of the <tt>i</tt>th shape function at the point
@@ -129,7 +129,7 @@ public:
    * the semantics of this function.
    */
   virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const;
+                                    const Point<dim>   &p) const override;
 
   /**
    * Return the gradient of the <tt>component</tt>th vector component of the
@@ -143,7 +143,7 @@ public:
    */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim> &p,
-                                              const unsigned int component) const;
+                                              const unsigned int component) const override;
 
   /**
    * Return the tensor of second derivatives of the <tt>i</tt>th shape
@@ -151,7 +151,7 @@ public:
    * class for more information about the semantics of this function.
    */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const;
+                                         const Point<dim> &p) const override;
 
   /**
    * Return the second derivative of the <tt>component</tt>th vector component
@@ -165,7 +165,7 @@ public:
    */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim> &p,
-                                                   const unsigned int component) const;
+                                                   const unsigned int component) const override;
 
   /**
    * Return the tensor of third derivatives of the <tt>i</tt>th shape function
@@ -173,7 +173,7 @@ public:
    * for more information about the semantics of this function.
    */
   virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+                                              const Point<dim>   &p) const override;
 
   /**
    * Return the third derivative of the <tt>component</tt>th vector component
@@ -187,7 +187,7 @@ public:
    */
   virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
                                                         const Point<dim>   &p,
-                                                        const unsigned int component) const;
+                                                        const unsigned int component) const override;
 
   /**
    * Return the tensor of fourth derivatives of the <tt>i</tt>th shape
@@ -195,7 +195,7 @@ public:
    * class for more information about the semantics of this function.
    */
   virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+                                              const Point<dim>   &p) const override;
 
   /**
    * Return the fourth derivative of the <tt>component</tt>th vector component
@@ -209,7 +209,7 @@ public:
    */
   virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
                                                         const Point<dim>   &p,
-                                                        const unsigned int component) const;
+                                                        const unsigned int component) const override;
 
 protected:
   /*
@@ -223,7 +223,7 @@ protected:
   get_data(const UpdateFlags                                                    update_flags,
            const Mapping<dim,spacedim>                                         &/*mapping*/,
            const Quadrature<dim>                                               &quadrature,
-           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override
   {
     // generate a new data object and
     // initialize some fields
@@ -334,7 +334,7 @@ protected:
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                   const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   virtual
   void
@@ -345,7 +345,7 @@ protected:
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   virtual
   void
@@ -357,7 +357,7 @@ protected:
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                           const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   /**
    * Fields of cell-independent data.

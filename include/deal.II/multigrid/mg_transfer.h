@@ -554,7 +554,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferPrebuilt () = default;
+  virtual ~MGTransferPrebuilt () override = default;
 
   /**
    * Initialize the constraints to be used in build_matrices().
@@ -594,7 +594,7 @@ public:
    */
   virtual void prolongate (const unsigned int to_level,
                            VectorType         &dst,
-                           const VectorType   &src) const;
+                           const VectorType   &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -613,7 +613,7 @@ public:
    */
   virtual void restrict_and_add (const unsigned int from_level,
                                  VectorType         &dst,
-                                 const VectorType   &src) const;
+                                 const VectorType   &src) const override;
 
   /**
    * Finite element does not provide prolongation matrices.

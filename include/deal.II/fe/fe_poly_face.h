@@ -72,7 +72,7 @@ public:
   // for documentation, see the FiniteElement base class
   virtual
   UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const override;
 
 protected:
   /*
@@ -86,7 +86,7 @@ protected:
   get_data (const UpdateFlags                                                    /*update_flags*/,
             const Mapping<dim,spacedim>                                         &/*mapping*/,
             const Quadrature<dim>                                               &/*quadrature*/,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const override
   {
     return std_cxx14::make_unique<InternalData>();
   }
@@ -95,7 +95,7 @@ protected:
   get_face_data(const UpdateFlags                                                    update_flags,
                 const Mapping<dim,spacedim>                                         &/*mapping*/,
                 const Quadrature<dim-1>                                             &quadrature,
-                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &/*output_data*/) const override
   {
     // generate a new data object and
     // initialize some fields
@@ -144,7 +144,7 @@ protected:
   get_subface_data(const UpdateFlags                                                    update_flags,
                    const Mapping<dim,spacedim>                                         &mapping,
                    const Quadrature<dim-1>                                             &quadrature,
-                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override
   {
     return get_face_data(update_flags, mapping,
                          QProjector<dim - 1>::project_to_all_children(quadrature),
@@ -160,7 +160,7 @@ protected:
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                   const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   virtual
   void
@@ -171,7 +171,7 @@ protected:
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   virtual
   void
@@ -183,7 +183,7 @@ protected:
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
                           const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   /**
    * Fields of cell-independent data.

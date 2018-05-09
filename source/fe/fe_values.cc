@@ -2364,7 +2364,7 @@ public:
    * we have to have a conversion operator.
    */
   virtual
-  operator typename Triangulation<dim,spacedim>::cell_iterator () const;
+  operator typename Triangulation<dim,spacedim>::cell_iterator () const override;
 
   /**
    * Return the number of degrees of freedom the DoF handler object has to
@@ -2372,7 +2372,7 @@ public:
    */
   virtual
   types::global_dof_index
-  n_dofs_for_dof_handler () const;
+  n_dofs_for_dof_handler () const override;
 
 #include "fe_values.decl.2.inst"
 
@@ -2383,7 +2383,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<IndexSet::value_type> &out) const;
+                               Vector<IndexSet::value_type> &out) const override;
 
 private:
   /**
@@ -2429,7 +2429,7 @@ public:
    * from and to the same time.
    */
   virtual
-  operator typename Triangulation<dim,spacedim>::cell_iterator () const;
+  operator typename Triangulation<dim,spacedim>::cell_iterator () const override;
 
   /**
    * Implement the respective function of the base class. Since this is not
@@ -2437,7 +2437,7 @@ public:
    */
   virtual
   types::global_dof_index
-  n_dofs_for_dof_handler () const;
+  n_dofs_for_dof_handler () const override;
 
 #include "fe_values.decl.2.inst"
 
@@ -2448,7 +2448,7 @@ public:
   virtual
   void
   get_interpolated_dof_values (const IndexSet &in,
-                               Vector<IndexSet::value_type> &out) const;
+                               Vector<IndexSet::value_type> &out) const override;
 
 private:
   /**

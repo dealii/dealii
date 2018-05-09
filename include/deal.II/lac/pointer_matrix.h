@@ -68,7 +68,7 @@ public:
    * of any derived class is called whenever a pointer-to-base-class object is
    * destroyed.
    */
-  virtual ~PointerMatrixBase () = default;
+  virtual ~PointerMatrixBase () override = default;
 
   /**
    * Reset the object to its original state.
@@ -153,7 +153,7 @@ public:
                 const char *name);
 
   // Use doc from base class
-  virtual void clear();
+  virtual void clear() override;
 
   /**
    * Return whether the object is empty.
@@ -171,25 +171,25 @@ public:
    * Matrix-vector product.
    */
   virtual void vmult (VectorType       &dst,
-                      const VectorType &src) const;
+                      const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product.
    */
   virtual void Tvmult (VectorType       &dst,
-                       const VectorType &src) const;
+                       const VectorType &src) const override;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void vmult_add (VectorType       &dst,
-                          const VectorType &src) const;
+                          const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VectorType       &dst,
-                           const VectorType &src) const;
+                           const VectorType &src) const override;
 
 private:
   /**
@@ -260,7 +260,7 @@ public:
                    const char               *name);
 
   // Use doc from base class
-  virtual void clear();
+  virtual void clear() override;
 
   /**
    * Return whether the object is empty.
@@ -283,25 +283,25 @@ public:
    * Matrix-vector product.
    */
   virtual void vmult (VectorType       &dst,
-                      const VectorType &src) const;
+                      const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product.
    */
   virtual void Tvmult (VectorType       &dst,
-                       const VectorType &src) const;
+                       const VectorType &src) const override;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void vmult_add (VectorType       &dst,
-                          const VectorType &src) const;
+                          const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
   virtual void Tvmult_add (VectorType       &dst,
-                           const VectorType &src) const;
+                           const VectorType &src) const override;
 
 private:
   /**

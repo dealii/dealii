@@ -160,11 +160,11 @@ namespace Step50
     Coefficient () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+                             const unsigned int              component = 0) const override;
   };
 
 

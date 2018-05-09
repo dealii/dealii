@@ -65,7 +65,7 @@ namespace Functions
      * calls svalue() with it, and returns the result.
      */
     virtual double value (const Point<dim> &point,
-                          const unsigned int component = 0) const;
+                          const unsigned int component = 0) const override;
 
     /**
      * Return the gradient with respect to the Cartesian coordinates at point @p p.
@@ -75,7 +75,7 @@ namespace Functions
      * coordinates.
      */
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
+                                    const unsigned int  component = 0) const override;
 
     /**
      * Return the Hessian with respect to the Cartesian coordinates at point @p p.
@@ -85,7 +85,7 @@ namespace Functions
      * Cartesian coordinates.
      */
     virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                            const unsigned int component=0) const;
+                                            const unsigned int component=0) const override;
 
     std::size_t memory_consumption () const;
 

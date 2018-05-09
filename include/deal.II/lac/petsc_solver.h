@@ -310,7 +310,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -361,7 +361,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -411,7 +411,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -461,7 +461,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -528,7 +528,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -579,7 +579,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
   /**
@@ -628,7 +628,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -678,7 +678,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -734,7 +734,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -784,7 +784,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -835,7 +835,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -890,7 +890,7 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
   };
 
   /**
@@ -952,7 +952,7 @@ namespace PETScWrappers
      */
     const AdditionalData additional_data;
 
-    virtual void set_solver_type (KSP &ksp) const;
+    virtual void set_solver_type (KSP &ksp) const override;
 
   private:
     /**

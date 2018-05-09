@@ -77,53 +77,53 @@ public:
 
   virtual
   UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const override;
 
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
-  virtual std::unique_ptr<FiniteElement<dim,dim> > clone() const;
+  virtual std::unique_ptr<FiniteElement<dim,dim> > clone() const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
   virtual double shape_value (const unsigned int i,
-                              const Point<dim>  &p) const;
+                              const Point<dim>  &p) const override;
 
   /**
   * Not implemented.
   */
   virtual double shape_value_component (const unsigned int i,
                                         const Point<dim>  &p,
-                                        const unsigned int component) const;
+                                        const unsigned int component) const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
   virtual Tensor<1,dim> shape_grad (const unsigned int i,
-                                    const Point<dim>  &p) const;
+                                    const Point<dim>  &p) const override;
 
   /**
   * Not implemented.
   */
   virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
                                               const Point<dim>  &p,
-                                              const unsigned int component) const;
+                                              const unsigned int component) const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
   virtual Tensor<2,dim> shape_grad_grad (const unsigned int i,
-                                         const Point<dim>  &p) const;
+                                         const Point<dim>  &p) const override;
 
   /**
   * Not implemented.
   */
   virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
                                                    const Point<dim>  &p,
-                                                   const unsigned int component) const;
+                                                   const unsigned int component) const override;
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed only
@@ -151,7 +151,7 @@ protected:
   get_data (const UpdateFlags                                                             update_flags,
             const Mapping<dim,dim>                                                       &mapping,
             const Quadrature<dim>                                                        &quadrature,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &output_data) const;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &output_data) const override;
 
   /**
   * Compute information about the shape functions on the cell denoted by the
@@ -166,7 +166,7 @@ protected:
                   const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
                   const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
                   const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
 
   /**
   * Compute information about the shape functions on the cell and face denoted
@@ -181,7 +181,7 @@ protected:
                        const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
                        const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
 
   /**
   * Not implemented.
@@ -195,7 +195,7 @@ protected:
                           const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
                           const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
                           const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
 
   /**
   * Derived Internal data which is used to store cell-independent data.

@@ -361,7 +361,7 @@ namespace parallel
       /**
        * Destructor.
        */
-      virtual ~Triangulation ();
+      virtual ~Triangulation () override;
 
       /**
        * Reset this triangulation into a virgin state by deleting all data.
@@ -369,7 +369,7 @@ namespace parallel
        * Note that this operation is only allowed if no subscriptions to this
        * object exist any more, such as DoFHandler objects using it.
        */
-      virtual void clear ();
+      virtual void clear () override;
 
       /**
        * Implementation of the same function as in the base class.
@@ -380,7 +380,7 @@ namespace parallel
        * parallel::distributed::Triangulation but only if the serial
        * Triangulation has never been refined.
        */
-      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria);
+      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
        * Create a triangulation as documented in the base class.
@@ -393,7 +393,7 @@ namespace parallel
        */
       virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
                                          const std::vector<CellData<dim> > &cells,
-                                         const SubCellData                 &subcelldata);
+                                         const SubCellData                 &subcelldata) override;
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -424,7 +424,7 @@ namespace parallel
        * function is connected to the signal it will be used to balance the
        * calculated weights, otherwise the number of cells is balanced.
        */
-      virtual void execute_coarsening_and_refinement ();
+      virtual void execute_coarsening_and_refinement () override;
 
       /**
        * Override the implementation of prepare_coarsening_and_refinement from
@@ -432,7 +432,7 @@ namespace parallel
        * and the level difference over vertices over the periodic boundary
        * must be not more than 2:1.
        */
-      virtual bool prepare_coarsening_and_refinement ();
+      virtual bool prepare_coarsening_and_refinement () override;
 
       /**
        * Manually repartition the active cells between processors. Normally
@@ -548,12 +548,12 @@ namespace parallel
        * mesh, i.e., the union of locally owned cells on all processors.
        */
       virtual
-      bool has_hanging_nodes() const;
+      bool has_hanging_nodes() const override;
 
       /**
        * Return the local memory consumption in bytes.
        */
-      virtual std::size_t memory_consumption () const;
+      virtual std::size_t memory_consumption () const override;
 
       /**
        * Return the local memory consumption contained in the p4est data
@@ -799,7 +799,7 @@ namespace parallel
        */
       virtual void
       add_periodicity
-      (const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator> > &);
+      (const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator> > &) override;
 
 
     private:
@@ -808,7 +808,7 @@ namespace parallel
        * Override the function to update the number cache so we can fill data
        * like @p level_ghost_owners.
        */
-      virtual void update_number_cache ();
+      virtual void update_number_cache () override;
 
       /**
        * store the Settings.
@@ -970,7 +970,7 @@ namespace parallel
        * are adjacent to each vertex.
        */
       virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-      compute_vertices_with_ghost_neighbors () const;
+      compute_vertices_with_ghost_neighbors () const override;
 
       /**
        * This method returns a bit vector of length tria.n_vertices()
@@ -1022,7 +1022,7 @@ namespace parallel
       /**
        * Destructor.
        */
-      virtual ~Triangulation ();
+      virtual ~Triangulation () override;
 
       /**
        * Return a permutation vector for the order the coarse cells are
@@ -1116,21 +1116,21 @@ namespace parallel
        * Like above, this method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-      compute_vertices_with_ghost_neighbors () const;
+      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      compute_vertices_with_ghost_neighbors () const override;
 
       /**
        * Like above, this method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       compute_level_vertices_with_ghost_neighbors (const unsigned int level) const;
 
       /**
        * Like above, this method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
-      std::vector<bool>
+      virtual std::vector<bool>
       mark_locally_active_vertices_on_level(const unsigned int level) const;
 
     };

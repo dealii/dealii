@@ -348,7 +348,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared virtual to make
    * class hierarchies derived from this class possible.
    */
-  virtual ~Manifold () = default;
+  virtual ~Manifold () override = default;
 
   /**
    * Return a copy of this manifold.

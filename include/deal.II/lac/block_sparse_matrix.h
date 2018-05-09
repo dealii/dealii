@@ -106,7 +106,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~BlockSparseMatrix ();
+  virtual ~BlockSparseMatrix () override;
 
 
 

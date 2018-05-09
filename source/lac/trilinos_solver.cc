@@ -294,10 +294,10 @@ namespace TrilinosWrappers
                                   const double               &reduction,
                                   const Epetra_LinearProblem &linear_problem);
 
-        virtual ~TrilinosReductionControl() = default;
+        virtual ~TrilinosReductionControl() override = default;
 
         virtual bool
-        ResidualVectorRequired () const
+        ResidualVectorRequired () const override
         {
           return status_test_collection->ResidualVectorRequired();
         }
@@ -306,7 +306,7 @@ namespace TrilinosWrappers
         CheckStatus (int                 CurrentIter,
                      Epetra_MultiVector *CurrentResVector,
                      double              CurrentResNormEst,
-                     bool                SolutionUpdated)
+                     bool                SolutionUpdated) override
         {
           // Note: CurrentResNormEst is set to -1.0 if no estimate of the
           // residual value is available
@@ -324,14 +324,14 @@ namespace TrilinosWrappers
         }
 
         virtual AztecOO_StatusType
-        GetStatus () const
+        GetStatus () const override
         {
           return status_test_collection->GetStatus();
         }
 
         virtual std::ostream &
         Print (std::ostream &stream,
-               int           indent = 0) const
+               int           indent = 0) const override
         {
           return status_test_collection->Print(stream,indent);
         }

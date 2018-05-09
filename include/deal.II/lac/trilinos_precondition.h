@@ -104,7 +104,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    ~PreconditionBase () = default;
+    ~PreconditionBase () override = default;
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
@@ -1505,7 +1505,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    ~PreconditionAMG();
+    ~PreconditionAMG() override;
 
 
     /**
@@ -1770,7 +1770,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    ~PreconditionAMGMueLu();
+    ~PreconditionAMGMueLu() override;
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1876,34 +1876,34 @@ namespace TrilinosWrappers
      * Apply the preconditioner, i.e., dst = src.
      */
     void vmult (MPI::Vector       &dst,
-                const MPI::Vector &src) const;
+                const MPI::Vector &src) const override;
 
     /**
      * Apply the transport conditioner, i.e., dst = src.
      */
     void Tvmult (MPI::Vector       &dst,
-                 const MPI::Vector &src) const;
+                 const MPI::Vector &src) const override;
 
     /**
      * Apply the preconditioner on deal.II data structures instead of the ones
      * provided in the Trilinos wrapper class, i.e., dst = src.
      */
     void vmult (dealii::Vector<double>       &dst,
-                const dealii::Vector<double> &src) const;
+                const dealii::Vector<double> &src) const override;
 
     /**
      * Apply the transpose preconditioner on deal.II data structures instead
      * of the ones provided in the Trilinos wrapper class, i.e. dst = src.
      */
     void Tvmult (dealii::Vector<double>       &dst,
-                 const dealii::Vector<double> &src) const;
+                 const dealii::Vector<double> &src) const override;
 
     /**
      * Apply the preconditioner on deal.II parallel data structures instead of
      * the ones provided in the Trilinos wrapper class, i.e., dst = src.
      */
     void vmult (LinearAlgebra::distributed::Vector<double>       &dst,
-                const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
+                const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
@@ -1911,7 +1911,7 @@ namespace TrilinosWrappers
      * src.
      */
     void Tvmult (LinearAlgebra::distributed::Vector<double>       &dst,
-                 const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
+                 const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
   };
 
 

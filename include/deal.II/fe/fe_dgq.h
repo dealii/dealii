@@ -118,7 +118,7 @@ public:
    * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -131,7 +131,7 @@ public:
    */
   virtual void
   get_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
-                            FullMatrix<double>           &matrix) const;
+                            FullMatrix<double>           &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -146,7 +146,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+                                 FullMatrix<double>       &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -162,7 +162,7 @@ public:
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
                                     const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+                                    FullMatrix<double>       &matrix) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. Overrides the
@@ -183,7 +183,7 @@ public:
    */
   virtual const FullMatrix<double> &
   get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * Embedding matrix between grids. Overrides the respective method in
@@ -208,7 +208,7 @@ public:
    */
   virtual const FullMatrix<double> &
   get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
    * @name Functions to support hp
@@ -235,7 +235,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -246,7 +246,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -257,7 +257,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -267,7 +267,7 @@ public:
    * of the element), as it has no hanging nodes (being a discontinuous
    * element).
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -280,7 +280,7 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * @}
@@ -291,14 +291,14 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -310,7 +310,7 @@ public:
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -320,11 +320,11 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t memory_consumption () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
 protected:
   /**
@@ -416,7 +416,7 @@ public:
    * returns <tt>FE_DGQArbitraryNodes<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -428,10 +428,10 @@ public:
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 };
 
 
@@ -462,7 +462,7 @@ public:
    * mode) is set to true and all other elements are set to false.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
@@ -470,11 +470,11 @@ public:
    * <tt>degree</tt> replaced by the values given by the template parameter
    * and the argument passed to the constructor, respectively.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 };
 
 
@@ -512,11 +512,11 @@ public:
    * <tt>degree</tt> replaced by the values given by the template parameter
    * and the argument passed to the constructor, respectively.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 };
 
 

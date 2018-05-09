@@ -104,7 +104,7 @@ public:
   /**
    * Destructor.
    */
-  ~SparseDirectUMFPACK ();
+  ~SparseDirectUMFPACK () override;
 
   /**
    * @name Setting up a sparse factorization

@@ -186,7 +186,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferSelect () = default;
+  virtual ~MGTransferSelect () override = default;
 
 //TODO: rewrite docs; make sure defaulted args are actually allowed
   /**
@@ -235,11 +235,11 @@ public:
 
   virtual void prolongate (const unsigned int    to_level,
                            Vector<number>       &dst,
-                           const Vector<number> &src) const;
+                           const Vector<number> &src) const override;
 
   virtual void restrict_and_add (const unsigned int    from_level,
                                  Vector<number>       &dst,
-                                 const Vector<number> &src) const;
+                                 const Vector<number> &src) const override;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the

@@ -565,12 +565,12 @@ namespace Step18
     virtual
     void
     vector_value (const Point<dim> &p,
-                  Vector<double>   &values) const;
+                  Vector<double>   &values) const override;
 
     virtual
     void
     vector_value_list (const std::vector<Point<dim> > &points,
-                       std::vector<Vector<double> >   &value_list) const;
+                       std::vector<Vector<double> >   &value_list) const override;
   };
 
 
@@ -653,12 +653,12 @@ namespace Step18
     virtual
     void
     vector_value (const Point<dim> &p,
-                  Vector<double>   &values) const;
+                  Vector<double>   &values) const override;
 
     virtual
     void
     vector_value_list (const std::vector<Point<dim> > &points,
-                       std::vector<Vector<double> >   &value_list) const;
+                       std::vector<Vector<double> >   &value_list) const override;
 
   private:
     const double velocity;

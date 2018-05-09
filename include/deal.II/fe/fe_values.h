@@ -1864,7 +1864,7 @@ public:
   /**
    * Destructor.
    */
-  ~FEValuesBase ();
+  ~FEValuesBase () override;
 
 
   /// @name ShapeAccess Access to shape function values. These fields are filled by the finite element.

@@ -165,7 +165,7 @@ namespace Utilities
        */
       virtual void reinit(const IndexSet &vector_space_vector_index_set,
                           const IndexSet &read_write_vector_index_set,
-                          const MPI_Comm &communicator);
+                          const MPI_Comm &communicator) override;
 
       /**
        * Set the locally owned indices. Used in the constructor.
@@ -356,7 +356,7 @@ namespace Utilities
       /**
        * Return the MPI communicator underlying the partitioner object.
        */
-      virtual const MPI_Comm &get_mpi_communicator() const;
+      virtual const MPI_Comm &get_mpi_communicator() const override;
 
       /**
        * Return whether ghost indices have been explicitly added as a @p

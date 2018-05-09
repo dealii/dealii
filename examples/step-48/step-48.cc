@@ -250,7 +250,7 @@ namespace Step48
     ExactSolution (const unsigned int n_components = 1,
                    const double time = 0.) : Function<dim>(n_components, time) {}
     virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+                          const unsigned int component = 0) const override;
   };
 
   template <int dim>

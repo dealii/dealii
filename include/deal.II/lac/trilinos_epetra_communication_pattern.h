@@ -55,14 +55,14 @@ namespace LinearAlgebra
       /**
        * Reinitialize the object.
        */
-      void reinit(const IndexSet &vector_space_vector_index_set,
-                  const IndexSet &read_write_vector_index_set,
-                  const MPI_Comm &communicator);
+      virtual void reinit(const IndexSet &vector_space_vector_index_set,
+                          const IndexSet &read_write_vector_index_set,
+                          const MPI_Comm &communicator) override;
 
       /**
        * Return the underlying MPI communicator.
        */
-      const MPI_Comm &get_mpi_communicator() const;
+      virtual const MPI_Comm &get_mpi_communicator() const override;
 
       /**
        * Return the underlying Epetra_Import object.

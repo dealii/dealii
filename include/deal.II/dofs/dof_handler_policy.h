@@ -124,23 +124,23 @@ namespace internal
         // documentation is inherited
         virtual
         NumberCache
-        distribute_dofs () const;
+        distribute_dofs () const override;
 
         // documentation is inherited
         virtual
         std::vector<NumberCache>
-        distribute_mg_dofs () const;
+        distribute_mg_dofs () const override;
 
         // documentation is inherited
         virtual
         NumberCache
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const override;
 
         // documentation is inherited
         virtual
         NumberCache
         renumber_mg_dofs (const unsigned int                          level,
-                          const std::vector<types::global_dof_index> &new_numbers) const;
+                          const std::vector<types::global_dof_index> &new_numbers) const override;
 
       protected:
         /**
@@ -176,14 +176,14 @@ namespace internal
          */
         virtual
         NumberCache
-        distribute_dofs () const;
+        distribute_dofs () const override;
 
         /**
          * This function is not yet implemented.
          */
         virtual
         std::vector<NumberCache>
-        distribute_mg_dofs () const;
+        distribute_mg_dofs () const override;
 
         /**
          * Renumber degrees of freedom as specified by the first argument.
@@ -196,13 +196,13 @@ namespace internal
          */
         virtual
         NumberCache
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const override;
 
         // documentation is inherited
         virtual
         NumberCache
         renumber_mg_dofs (const unsigned int                          level,
-                          const std::vector<types::global_dof_index> &new_numbers) const;
+                          const std::vector<types::global_dof_index> &new_numbers) const override;
 
       private:
         /**
@@ -230,23 +230,23 @@ namespace internal
         // documentation is inherited
         virtual
         NumberCache
-        distribute_dofs () const;
+        distribute_dofs () const override;
 
         // documentation is inherited
         virtual
         std::vector<NumberCache>
-        distribute_mg_dofs () const;
+        distribute_mg_dofs () const override;
 
         // documentation is inherited
         virtual
         NumberCache
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const override;
 
         // documentation is inherited
         virtual
         NumberCache
         renumber_mg_dofs (const unsigned int                          level,
-                          const std::vector<types::global_dof_index> &new_numbers) const;
+                          const std::vector<types::global_dof_index> &new_numbers) const override;
 
       private:
         /**

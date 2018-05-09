@@ -506,7 +506,7 @@ namespace TrilinosWrappers
       /**
        * Destructor.
        */
-      ~Vector () = default;
+      ~Vector () override = default;
 
       /**
        * Release all memory and return to a state just like after having called

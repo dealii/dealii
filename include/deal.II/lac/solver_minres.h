@@ -94,7 +94,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverMinRes () = default;
+  virtual ~SolverMinRes () override = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.

@@ -283,11 +283,11 @@ namespace Step42
 
       virtual
       double value (const Point<dim> &p,
-                    const unsigned int component = 0) const;
+                    const unsigned int component = 0) const override;
 
       virtual
       void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const;
+                         Vector<double> &values) const override;
     };
 
     template <int dim>
@@ -323,11 +323,11 @@ namespace Step42
       BoundaryValues ();
 
       virtual double value (const Point<dim> &p,
-                            const unsigned int component = 0) const;
+                            const unsigned int component = 0) const override;
 
       virtual
       void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const;
+                         Vector<double> &values) const override;
     };
 
 
@@ -375,11 +375,11 @@ namespace Step42
 
       virtual
       double value (const Point<dim> &p,
-                    const unsigned int component = 0) const;
+                    const unsigned int component = 0) const override;
 
       virtual
       void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const;
+                         Vector<double> &values) const override;
 
     private:
       const double z_surface;
@@ -563,11 +563,11 @@ namespace Step42
 
       virtual
       double value (const Point<dim> &p,
-                    const unsigned int component = 0) const;
+                    const unsigned int component = 0) const override;
 
       virtual
       void vector_value (const Point<dim> &p,
-                         Vector<double> &values) const;
+                         Vector<double> &values) const override;
 
     private:
       const BitmapFile<dim> input_obstacle;

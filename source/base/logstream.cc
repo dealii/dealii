@@ -169,12 +169,12 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       return newline_written_;
     }
   private:
-    int_type overflow(int_type ch)
+    int_type overflow(int_type ch) override
     {
       newline_written_ = true;
       return ch;
     }
-    int sync()
+    int sync() override
     {
       flushed_ = true;
       return 0;

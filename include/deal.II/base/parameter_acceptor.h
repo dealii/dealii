@@ -356,7 +356,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ParameterAcceptor();
+  virtual ~ParameterAcceptor() override;
 
   /**
    * Call declare_all_parameters(), read the parameters from `filename` (only
@@ -590,13 +590,13 @@ public:
    * Overloads the ParameterAcceptor::declare_parameters function, by calling
    * @p SourceClass::declare_parameters with @p prm as an argument.
    */
-  virtual void declare_parameters(ParameterHandler &prm);
+  virtual void declare_parameters(ParameterHandler &prm) override;
 
   /**
    * Overloads the ParameterAcceptor::parse_parameters function, by calling
    * @p SourceClass::parse_parameters with @p prm as an argument.
    */
-  virtual void parse_parameters(ParameterHandler &prm);
+  virtual void parse_parameters(ParameterHandler &prm) override;
 };
 
 

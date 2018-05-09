@@ -123,11 +123,11 @@ public:
    * returns <tt>FE_Q_iso_q1<dim>(equivalent_degree)</tt>, with @p dim and @p
    * equivalent_degree replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -139,7 +139,7 @@ public:
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * @name Functions to support hp
@@ -157,7 +157,7 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
   //@}
 };
 

@@ -1364,7 +1364,7 @@ namespace Threads
         task_descriptor (task_descriptor)
       {}
 
-      virtual tbb::task *execute ()
+      virtual tbb::task *execute () override
       {
         // call the function object and put the return value into the
         // proper place

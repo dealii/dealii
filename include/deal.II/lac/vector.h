@@ -225,7 +225,7 @@ public:
    * Destructor, deallocates memory. Made virtual to allow for derived classes
    * to behave properly.
    */
-  virtual ~Vector () = default;
+  virtual ~Vector () override = default;
 
   /**
    * This function does nothing but exists for compatibility with the parallel

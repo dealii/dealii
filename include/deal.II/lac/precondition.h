@@ -1803,11 +1803,11 @@ namespace internal
                           internal::VectorImplementation::minimum_parallel_grain_size);
       }
 
-      ~VectorUpdatesRange() = default;
+      ~VectorUpdatesRange() override = default;
 
       virtual void
       apply_to_subrange (const std::size_t begin,
-                         const std::size_t end) const
+                         const std::size_t end) const override
       {
         updater.apply_to_subrange(begin, end);
       }

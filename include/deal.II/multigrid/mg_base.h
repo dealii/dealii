@@ -50,7 +50,7 @@ public:
   /*
    * Virtual destructor.
    */
-  virtual ~MGMatrixBase() = default;
+  virtual ~MGMatrixBase() override = default;
 
   /**
    * Matrix-vector-multiplication on a certain level.
@@ -106,7 +106,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~MGCoarseGridBase () = default;
+  virtual ~MGCoarseGridBase () override = default;
 
   /**
    * Solution operator.
@@ -171,7 +171,7 @@ public:
   /**
    * Destructor. Does nothing here, but needs to be declared virtual anyway.
    */
-  virtual ~MGTransferBase() = default;
+  virtual ~MGTransferBase() override = default;
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -237,7 +237,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~MGSmootherBase() = default;
+  virtual ~MGSmootherBase() override = default;
 
   /**
    * Release matrices.

@@ -256,13 +256,13 @@ public:
    * returns <tt>FE_Q_DG0<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   // documentation inherited from the base class
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -275,7 +275,7 @@ public:
    */
   virtual void
   get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                            FullMatrix<double>       &matrix) const;
+                            FullMatrix<double>       &matrix) const override;
 
 
   /**
@@ -283,7 +283,7 @@ public:
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, there
@@ -292,11 +292,11 @@ public:
    * the discontinuous part.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
 private:
 

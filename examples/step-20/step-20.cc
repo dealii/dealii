@@ -128,7 +128,7 @@ namespace Step20
     RightHandSide () : Function<dim>(1) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -140,7 +140,7 @@ namespace Step20
     PressureBoundaryValues () : Function<dim>(1) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -151,7 +151,7 @@ namespace Step20
     ExactSolution () : Function<dim>(dim+1) {}
 
     virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+                               Vector<double>   &value) const override;
   };
 
 
@@ -229,7 +229,7 @@ namespace Step20
     KInverse () : TensorFunction<2,dim>() {}
 
     virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<Tensor<2,dim> >    &values) const;
+                             std::vector<Tensor<2,dim> >    &values) const override;
   };
 
 

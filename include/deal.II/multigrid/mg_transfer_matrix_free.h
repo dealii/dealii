@@ -70,7 +70,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferMatrixFree () = default;
+  virtual ~MGTransferMatrixFree () override = default;
 
   /**
    * Initialize the constraints to be used in build().
@@ -103,7 +103,7 @@ public:
    */
   virtual void prolongate (const unsigned int                           to_level,
                            LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const;
+                           const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -125,7 +125,7 @@ public:
    */
   virtual void restrict_and_add (const unsigned int from_level,
                                  LinearAlgebra::distributed::Vector<Number>       &dst,
-                                 const LinearAlgebra::distributed::Vector<Number> &src) const;
+                                 const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
    * Restrict fine-mesh field @p src to each multigrid level in @p mg_dof and
@@ -289,7 +289,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockMatrixFree () = default;
+  virtual ~MGTransferBlockMatrixFree () override = default;
 
   /**
    * Initialize the constraints to be used in build().
@@ -332,7 +332,7 @@ public:
    */
   virtual void prolongate (const unsigned int                                    to_level,
                            LinearAlgebra::distributed::BlockVector<Number>       &dst,
-                           const LinearAlgebra::distributed::BlockVector<Number> &src) const;
+                           const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -354,7 +354,7 @@ public:
    */
   virtual void restrict_and_add (const unsigned int from_level,
                                  LinearAlgebra::distributed::BlockVector<Number>       &dst,
-                                 const LinearAlgebra::distributed::BlockVector<Number> &src) const;
+                                 const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
    * Transfer from a block-vector on the global grid to block-vectors defined

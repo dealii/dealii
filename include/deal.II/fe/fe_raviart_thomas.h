@@ -115,12 +115,12 @@ public:
    * returns <tt>FE_RaviartThomas<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   // documentation inherited from the base class
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
-  clone() const;
+  clone() const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
@@ -130,22 +130,22 @@ public:
    * always @p true.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   // documentation inherited from the base class
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * Return a list of constant modes of the element. This method is currently
    * not correctly implemented because it returns ones for all components.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t memory_consumption () const override;
 
 private:
   /**
@@ -255,37 +255,37 @@ public:
    * returns <tt>FE_RaviartThomasNodal<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   // documentation inherited from the base class
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
-  clone() const;
+  clone() const override;
 
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source,
-                                              FullMatrix<double>       &matrix) const;
+                                              FullMatrix<double>       &matrix) const override;
 
   virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source,
                                                  const unsigned int        subface,
-                                                 FullMatrix<double>       &matrix) const;
-  virtual bool hp_constraints_are_implemented () const;
+                                                 FullMatrix<double>       &matrix) const override;
+  virtual bool hp_constraints_are_implemented () const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_line_dof_identities (const FiniteElement<dim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
+  hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const override;
 
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim> &fe_other) const override;
 
 private:
   /**
@@ -312,7 +312,7 @@ private:
    * always @p true.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from

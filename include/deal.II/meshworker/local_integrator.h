@@ -66,7 +66,7 @@ namespace MeshWorker
     /**
      * The empty virtual destructor.
      */
-    virtual ~LocalIntegrator() = default;
+    virtual ~LocalIntegrator() override = default;
 
     /**
      * Virtual function for integrating on cells. Throws exception

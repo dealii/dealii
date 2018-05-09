@@ -133,10 +133,10 @@ namespace Step31
       TemperatureInitialValues () : Function<dim>(1) {}
 
       virtual double value (const Point<dim>   &p,
-                            const unsigned int  component = 0) const;
+                            const unsigned int  component = 0) const override;
 
       virtual void vector_value (const Point<dim> &p,
-                                 Vector<double>   &value) const;
+                                 Vector<double>   &value) const override;
     };
 
 
@@ -166,10 +166,10 @@ namespace Step31
       TemperatureRightHandSide () : Function<dim>(1) {}
 
       virtual double value (const Point<dim>   &p,
-                            const unsigned int  component = 0) const;
+                            const unsigned int  component = 0) const override;
 
       virtual void vector_value (const Point<dim> &p,
-                                 Vector<double>   &value) const;
+                                 Vector<double>   &value) const override;
     };
 
 

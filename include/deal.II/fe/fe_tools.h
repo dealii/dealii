@@ -98,7 +98,7 @@ namespace FETools
     /**
      * Virtual destructor doing nothing but making the compiler happy.
      */
-    virtual ~FEFactoryBase() = default;
+    virtual ~FEFactoryBase() override = default;
   };
 
   /**
@@ -120,14 +120,14 @@ namespace FETools
      * Create a FiniteElement and return a pointer to it.
      */
     virtual std::unique_ptr<FiniteElement<FE::dimension,FE::space_dimension> >
-    get (const unsigned int degree) const;
+    get (const unsigned int degree) const override;
 
     /**
      * Create a FiniteElement from a quadrature formula (currently only
      * implemented for FE_Q) and return a pointer to it.
      */
     virtual std::unique_ptr<FiniteElement<FE::dimension,FE::space_dimension> >
-    get (const Quadrature<1> &quad) const;
+    get (const Quadrature<1> &quad) const override;
   };
 
   /**

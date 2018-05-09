@@ -137,7 +137,7 @@ public:
   RightHandSide () : Function<dim>() {}
 
   virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+                        const unsigned int  component = 0) const override;
 };
 
 
@@ -149,7 +149,7 @@ public:
   BoundaryValues () : Function<dim>() {}
 
   virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+                        const unsigned int  component = 0) const override;
 };
 
 
@@ -183,7 +183,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
   for (unsigned int i=0; i<dim; ++i)
     return_value += 4.0 * std::pow(p(i), 4.0);
 
-  return return_value;
+  return 1.;//return_value;
 }
 
 

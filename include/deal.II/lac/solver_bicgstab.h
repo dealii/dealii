@@ -173,7 +173,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverBicgstab ();
+  virtual ~SolverBicgstab () override;
 
   /**
    * Solve primal problem only.

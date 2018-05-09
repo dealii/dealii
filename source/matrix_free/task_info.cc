@@ -110,7 +110,7 @@ namespace internal
           is_blocked (is_blocked)
         {}
 
-        tbb::task *execute ()
+        tbb::task *execute () override
         {
           work();
 
@@ -143,7 +143,7 @@ namespace internal
           is_blocked (is_blocked_in)
         {}
 
-        tbb::task *execute ()
+        tbb::task *execute () override
         {
           tbb::empty_task *root = new( tbb::task::allocate_root() )tbb::empty_task;
           const unsigned int evens = task_info.partition_evens[partition];
@@ -267,7 +267,7 @@ namespace internal
           is_blocked (is_blocked_in)
         {}
 
-        tbb::task *execute ()
+        tbb::task *execute () override
         {
           const unsigned int n_chunks = (task_info.cell_partition_data[partition+1]-
                                          task_info.cell_partition_data[partition]+
@@ -302,7 +302,7 @@ namespace internal
         do_compress(do_compress)
       {}
 
-      tbb::task *execute ()
+      tbb::task *execute () override
       {
         if (do_compress == false)
           worker.vector_update_ghosts_finish();
