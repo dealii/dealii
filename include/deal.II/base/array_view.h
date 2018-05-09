@@ -66,6 +66,9 @@ DEAL_II_NAMESPACE_OPEN
  * therefore changes the std::vector object itself -- consequently, the
  * std::vector::operator[] is non-@p const.
  *
+ * @note This class is similar to std::span, but the latter is only
+ *  available in C++20.
+ *
  * @ingroup data
  * @author Wolfgang Bangerth, 2015, David Wells, 2017
  */
