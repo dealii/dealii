@@ -66,7 +66,7 @@
  * numbers.
  * (In theory an entire program could be made differentiable. This could be useful in, for example,
  * the sentitivity analysis of solutions with respect to input parameters. However, to date this has
- * not been been tested.)
+ * not been tested.)
  *
  * Implementations of specialized frameworks based on <em>operator overloading</em> typically fall into
  * one of three categories. In each, some customized data classes representing the floating point value
@@ -81,7 +81,7 @@
  * -# The first two <em>tapeless</em> approaches listed above (dual numbers and complex-step method) use some
  *    variation of a truncated Taylor series, along with a particular choice of definition for the perturbation
  *    parameter, to compute function derivatives using a finite-difference based approach. The "dual" number
- *    constitutes the accumulated directional derivatives computed simultaneously as the function values is
+ *    constitutes the accumulated directional derivatives computed simultaneously as the function values are
  *    evaluated; in the complex-step approach, the imaginary value effectively serves this purpose. The choice of
  *    the perturbation parameter determines the numerical qualities of the scheme, such as the influence of the
  *    truncation of the Taylor scheme; dual numbers do not contain any higher-order terms in their first derivative,
@@ -152,7 +152,7 @@
  * }
  * @endcode
  *
- * ### Explotation of the chain-rule
+ * ### Exploitation of the chain-rule
  *
  * In the most practical sense, any of the above categories exploit the chain-rule to compute the total
  * derivative of a composite function. To perform this action, they typically use one of two mechanisms to
@@ -191,9 +191,9 @@
  * </div>
  *
  * representing the calculation of the function $f (\mathbf{x}) = x_{1} \times x_{2} + \sin (x_{1})$,
- * we will briefly describe what forward- and reverse- auto-differentiation are.
+ * we will briefly describe what forward and reverse auto-differentiation are.
  * Note that in the diagram, along the edges of the graph in text are the directional
- * derivative of function $w$ with respect to the i-th variable, represented by
+ * derivative of function $w$ with respect to the $i$-th variable, represented by
  * the notation $\dot{w} = \dfrac{d w}{d x_{i}}$.
  * The specific computations used to render the function value and its directional derivatives
  * for this example are tabulated in the
@@ -210,9 +210,8 @@
  * @f]
  * As was previously mentioned, if each of the primitive operations $f_{n}$ is smooth and
  * differentiable, then the chain can be universally employed to compute the total derivative of $f$,
- * namely $\dfrac{d f(x)}{d \mathbf{x}}$. How exactly the chain-rule is applied is what
- * distinguishes the "forward" from the "reverse" mode, but ultimately both compute the total
- * derivative
+ * namely $\dfrac{d f(x)}{d \mathbf{x}}$. What distinguishes the "forward" from the "reverse" mode
+ * is how the chain-rule is evaluated, but ultimately both compute the total derivative
  * @f[
  *   \dfrac{d f (\mathbf{x})}{d \mathbf{x}}
  *   = \dfrac{d f_{0}}{d f_{1}} \dfrac{d f_{1}}{d f_{2}} \dfrac{d f_{2}}{d f_{3}} \ldots \dfrac{d f_{n} (\mathbf{x})}{d \mathbf{x}}
@@ -251,7 +250,9 @@
  * forward-mode can be shown to be more efficient than reverse-mode. The converse is true when the
  * number of input variables greatly exceeds that of the output variables. This point may be used to
  * help inform which number type is most suitable for which set of operations are to be performed
- * using automatic differentiation.
+ * using automatic differentiation. For example, in many applications for which second derivatives
+ * are to be computed it is appropriate to combine both reverse- and forward-modes. The former would
+ * then typically be used to calculate the first derivatives, and the latter the second derivatives.
  *
  * @subsection auto_diff_1_1 Supported automatic differentiation libraries
  *
@@ -286,7 +287,7 @@
  * provides the principle insights into their taped and tapeless implementations, and how ADOL-C
  * can be incorporated into a user code.
  * Some further useful resources for understanding the implementation of ADOL-C, and possibilities
- * for how it may be used within a numerical code, include
+ * for how it may be used within a numerical code, include:
  *
  * @code{.bib}
  * @Article{Griewank1996a,
@@ -335,7 +336,7 @@
  * @endcode
  *
  * Similarly, a selection of useful resources for understanding the implementation of Sacado
- * number types (in particular, how expression templating is employed and exploited) include
+ * number types (in particular, how expression templating is employed and exploited) include:
  *
  * @code{.bib}
  * @InCollection{Bartlett2006a,
