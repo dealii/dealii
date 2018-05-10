@@ -66,7 +66,7 @@ namespace Algorithms
     out.write (out_filename);
     out.clear ();
     return *this;
-  };
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
