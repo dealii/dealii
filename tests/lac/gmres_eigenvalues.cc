@@ -36,28 +36,25 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
 template <typename number>
 void test (unsigned int variant)
 {
-  const unsigned int n = variant % 2 == 0 ? 64 : 16;
+  const unsigned int n = variant < 3 ? 64 : 20;
   Vector<number> rhs(n), sol(n);
   rhs = 1.;
 
   LAPACKFullMatrix<number> matrix(n, n);
 
-  // put diagonal entries of different strengths. these are very challenging
-  // for GMRES and will usually take a lot of iterations until the Krylov
-  // subspace is complete enough
   if (variant == 0)
     for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1);
+      matrix(i,i) = std::sqrt(i+1);
   else if (variant == 1)
     for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i+1) * (i+1) * (i+1) * (i+1) * 1.001;
+      matrix(i,i) = 1.001 * (3 + i%5);
   else if (variant == 2)
     for (unsigned int i=0; i<n; ++i)
-      matrix(i,i) = (i%2?1.:-1.)*(i+1);
+      matrix(i,i) = (i%2?1.:-1.) * std::sqrt(i+1);
   else if (variant == 3)
     for (unsigned int i=0; i<n; ++i)
       {
-        matrix(i,i) = (i+1);
+        matrix(i,i) = (i%2?1.:-1.) * std::sqrt(i+1);
         if (i<n-1)
           matrix(i,i+1) = 1.5+i;
         if (i<n-2)
@@ -72,19 +69,20 @@ void test (unsigned int variant)
 
   deallog.push(Utilities::int_to_string(variant,1));
 
-  SolverControl control(1000, variant==1?1e-4:1e-15);
-  typename SolverGMRES<Vector<number> >::AdditionalData data;
-  data.max_n_tmp_vectors = 100;
+  // always do exactly 5 (variant 1 which should have 5 eigenvalues) or 20
+  // iterations -> set a tolerance that is too tight otherwise
+  IterationNumberControl control(variant == 1 ? 5 : 20, 1e-40);
 
-  SolverGMRES<Vector<number> > solver(control, data);
+  SolverGMRES<Vector<number> > solver(control);
   solver.connect_eigenvalues_slot(
     std::bind(output_eigenvalues<std::complex<double>>,
               std::placeholders::_1,"Eigenvalue estimate: "));
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 
-  if (variant == 0)
+  if (variant < 2)
     {
-      SolverCG<Vector<number> > solver_cg(control);
+      IterationNumberControl cg_control(variant == 1 ? 6 : 21, 1e-40);
+      SolverCG<Vector<number> > solver_cg(cg_control);
       solver_cg.connect_eigenvalues_slot(
         std::bind(output_eigenvalues<double>,
                   std::placeholders::_1,"Eigenvalue estimate: "));
@@ -123,4 +121,3 @@ int main()
   test<double>(3);
   deallog.pop();
 }
-
