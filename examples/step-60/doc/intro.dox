@@ -62,10 +62,10 @@ dimension of the embedding domain $\Omega$ (`spacedim`).
 We are going to solve the following differential problem: given a sufficiently
 regular function $g$ on $\Gamma$, find the solution $u$ to
 
-@f{eqnarray*}
-- \Delta u + \gamma^T \lambda &=& 0 & \text{ in } \Omega\\
-\gamma u &=& g &  \text{ in } \Gamma \\
-u & = & 0 & \text{ on } \partial\Omega.
+@f{eqnarray*}{
+- \Delta u + \gamma^T \lambda &=& 0  \text{ in } \Omega\\
+\gamma u &=& g  \text{ in } \Gamma \\
+u & = & 0 \text{ on } \partial\Omega.
 @f}
 
 This is a constrained problem, where we are looking for a harmonic function $u$
@@ -97,9 +97,9 @@ Q(\Gamma)$, integrating by parts when possible, and exploiting the boundary
 conditions on $\partial\Omega$, we obtain the following variational problem:
 
 Given a sufficiently regular function $g$ on $\Gamma$, find the solution $u$ to
-@f{eqnarray*}
-(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& 0 & \forall v \in V(\Omega) \\
-(\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} &  \forall q \in Q(\Gamma),
+@f{eqnarray*}{
+(\nabla u, \nabla v)_{\Omega} + (\lambda, \gamma v)_{\Gamma} &=& 0 \qquad \forall v \in V(\Omega) \\
+(\gamma u, q)_{\Gamma} &=& (g,q)_{\Gamma} \qquad \forall q \in Q(\Gamma),
 @f}
 
 where $(\cdot, \cdot)_{\Omega}$ and $(\cdot, \cdot)_{\Gamma}$ represent,
@@ -207,10 +207,10 @@ G
 
 where
 
-@f{eqnarray*}
-K_{ij} &:=& (\nabla v_j, \nabla v_i)_\Omega   & i,j=1,\dots,n \\
-C_{\alpha j} &:=& (v_j, q_\alpha)_\Gamma  &j=1,\dots,n, \alpha = 1,\dots, m \\\\
-G_{\alpha} &:=& (g, q_\alpha)_\Gamma & \alpha = 1,\dots, m.
+@f{eqnarray*}{
+K_{ij} &:=& (\nabla v_j, \nabla v_i)_\Omega   \qquad i,j=1,\dots,n \\
+C_{\alpha j} &:=& (v_j, q_\alpha)_\Gamma  \qquad j=1,\dots,n, \alpha = 1,\dots, m \\\\
+G_{\alpha} &:=& (g, q_\alpha)_\Gamma \qquad \alpha = 1,\dots, m.
 @f}
 
 While the matrix $K$ is the standard stiffness matrix for the Poisson problem on
@@ -242,9 +242,9 @@ of the matrix $C$.
 To evaluate $(v_j \circ F_{K}) (\hat x_i)$ the following steps needs to be
 taken (as shown in the picture below):
 
-- For a given cell $K$ in $\Gamma$ compute the real point $y_i \coloneqq F_{K}
-(\hat x_i)$, where $x_i$ is one of the quadrature points used for the integral
-on $K \subseteq \Gamma$.
+- For a given cell $K$ in $\Gamma$ compute the real point $y_i := F_{K} (\hat
+x_i)$, where $x_i$ is one of the quadrature points used for the integral on $K
+\subseteq \Gamma$.
 
 - Find the cell of $\Omega$ in which $y_i$ lies. We shall call this element $T$.
 
