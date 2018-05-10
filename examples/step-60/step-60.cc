@@ -436,6 +436,7 @@ namespace Step60
   // organized as follows:
   //
   // @code
+  // # Example parameter file
   // subsection first
   //   subsection second
   //     subsection third
@@ -457,6 +458,7 @@ namespace Step60
   // absolute one (e.g. `ParameterAcceptor("/first/second/third/My Other Class")`),
   // obtaining:
   // @code
+  // # Example parameter file
   // subsection first
   //   subsection second
   //     subsection third
@@ -479,6 +481,7 @@ namespace Step60
   // resulting parameter file will look like:
   //
   // @code
+  // # Example parameter file
   // subsection first
   //   subsection second
   //     subsection third
