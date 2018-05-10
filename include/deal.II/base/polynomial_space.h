@@ -213,12 +213,14 @@ protected:
 
   /**
    * Compute numbers in x, y and z direction. Given an index <tt>n</tt> in the
-   * d-dimensional polynomial space, compute the indices i,j,k such that
+   * d-dimensional polynomial space, return the indices i,j,k such that
    * <i>p<sub>n</sub>(x,y,z) =
    * p<sub>i</sub>(x)p<sub>j</sub>(y)p<sub>k</sub>(z)</i>.
+   *
+   * In 1d and 2d, obviously only i and i,j are returned.
    */
-  void compute_index (const unsigned int n,
-                      unsigned int      (&index)[dim>0?dim:1]) const;
+  std::array<unsigned int,dim>
+  compute_index (const unsigned int n) const;
 
 private:
   /**
@@ -246,14 +248,11 @@ private:
 /* -------------- declaration of explicit specializations --- */
 
 template <>
-void PolynomialSpace<1>::compute_index(const unsigned int n,
-                                       unsigned int      (&index)[1]) const;
+std::array<unsigned int,1> PolynomialSpace<1>::compute_index(const unsigned int n) const;
 template <>
-void PolynomialSpace<2>::compute_index(const unsigned int n,
-                                       unsigned int      (&index)[2]) const;
+std::array<unsigned int,2> PolynomialSpace<2>::compute_index(const unsigned int n) const;
 template <>
-void PolynomialSpace<3>::compute_index(const unsigned int n,
-                                       unsigned int      (&index)[3]) const;
+std::array<unsigned int,3> PolynomialSpace<3>::compute_index(const unsigned int n) const;
 
 
 
@@ -304,10 +303,9 @@ template <class StreamType>
 void
 PolynomialSpace<dim>::output_indices(StreamType &out) const
 {
-  unsigned int ix[dim];
   for (unsigned int i=0; i<n_pols; ++i)
     {
-      compute_index(i,ix);
+      const std::array<unsigned int,dim> ix = compute_index(i);
       out << i << "\t";
       for (unsigned int d=0; d<dim; ++d)
         out << ix[d] << " ";
@@ -321,8 +319,7 @@ Tensor<order,dim>
 PolynomialSpace<dim>::compute_derivative (const unsigned int i,
                                           const Point<dim> &p) const
 {
-  unsigned int indices[dim];
-  compute_index (i, indices);
+  const std::array<unsigned int,dim> indices = compute_index (i);
 
   double v [dim][order+1];
   {

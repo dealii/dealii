@@ -415,8 +415,9 @@ FE_DGPMonomial<2>::has_support_on_face (const unsigned int shape_index,
     support_on_face=true;
   else
     {
-      unsigned int degrees[2];
-      this->poly_space.directional_degrees(shape_index, degrees);
+      const std::array<unsigned int,2> degrees
+        = this->poly_space.directional_degrees(shape_index);
+
       if ((face_index==0 && degrees[1]==0) ||
           (face_index==3 && degrees[0]==0))
         support_on_face=true;
@@ -436,8 +437,9 @@ FE_DGPMonomial<3>::has_support_on_face (const unsigned int shape_index,
     support_on_face=true;
   else
     {
-      unsigned int degrees[3];
-      this->poly_space.directional_degrees(shape_index, degrees);
+      const std::array<unsigned int,3> degrees
+        = this->poly_space.directional_degrees(shape_index);
+
       if ((face_index==0 && degrees[1]==0) ||
           (face_index==2 && degrees[2]==0) ||
           (face_index==5 && degrees[0]==0))
