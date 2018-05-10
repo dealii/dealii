@@ -54,6 +54,8 @@ do {
             print " * \n";
         }
         $state = $code_fragment_mode;
+        # Make sure we distinguish from the other code style
+        print " * <div class=inlineddealii>\n";
     }
     # We shall skip something...
     elsif (($state != $skip_mode) && m!^\s*//\s*\@cond SKIP!)
@@ -128,7 +130,7 @@ do {
     }
     elsif ($state == $code_fragment_mode)
     {
-        # This is the end of a @code - @endcode block, so back to
+        # If this is the end of a @code - @endcode block, go back to
         # comment_mode:
         if (m!^\s*//\s*\@endcode!)
         {
@@ -140,7 +142,12 @@ do {
 
         # finally print this line
         print " * $_\n";
-    }
+
+        if (m!^ *\s*\@endcode!)
+        {
+            print " * </div>\n";
+        }
+   }
  } while (<>);
 
 if ($state == $program_mode) {
