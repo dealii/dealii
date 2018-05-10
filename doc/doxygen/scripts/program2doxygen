@@ -138,10 +138,10 @@ do {
         }
         # in code fragment mode: only skip leading whitespace and
         # comment // signs
-        s!\s*//\s(.*)\n!$1!;
+        s!^\s*//(.*)\n!$1!;
 
         # finally print this line
-        print " * $_\n";
+        print " *$_\n";
 
         if (m!^ *\s*\@endcode!)
         {
