@@ -720,7 +720,7 @@ private:
    * degree of freedom in the hierarchic numbering would have.
    *
    * This function is analogous to the
-   * FETools::hierarchical_to_lexicographic_numbering() function. However, in
+   * FETools::hierarchic_to_lexicographic_numbering() function. However, in
    * contrast to the fe_q_hierarchical numbering defined above, the
    * lexicographic numbering originates from the tensor products of
    * consecutive numbered dofs (like for LagrangeEquidistant).
