@@ -16,7 +16,7 @@
     <p>
       <acronym>deal.II</acronym> uses very few
       <a href="http://www.opengroup.org/austin/">POSIX</a> specific system
-      features and is otherwise fairly ISO (1998) C++ Standard compliant.
+      features and is otherwise fairly ISO (2011) C++ Standard compliant.
 
       Consequently, there is a good chance that <acronym>deal.II</acronym>
       will run on a reasonably well behaved system besides the ones listed
@@ -95,16 +95,16 @@ include/deal.II/base/config.h.in
           Almost all <a href="http://www.opengroup.org/austin/">POSIX</a>
           specific code is well guarded with fall-back code in case the
           specific POSIX function is not available. There is (currently)
-          one exception, though: Certain routines in
+          one exception, though: Routines that measure elapsed CPU time in
           <code>source/base/timer.cc</code> have implementations for POSIX
-          and Windows and throw a compile time error on other platforms.
+          and Windows and will not work correctly on other platforms.
         <li>
           Have a look at
 <pre>
-cmake/checks/check_for_compiler_bugs.cmake
-cmake/checks/check_for_compiler_features.cmake
-cmake/checks/check_for_cxx_features.cmake
-cmake/checks/check_for_system_features.cmake
+cmake/checks/check_01_cxx_features.cmake
+cmake/checks/check_02_compiler_features.cmake
+cmake/checks/check_02_system_features.cmake
+cmake/checks/check_03_compiler_bugs.cmake
 include/deal.II/base/config.h.in
 </pre>
           to see how platform and compiler specific checks are done.
