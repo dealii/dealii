@@ -209,16 +209,23 @@ this is like imposing a constant Dirichlet boundary condition on $\Gamma$, seen
 as boundary of the portion of $\Omega$ inside $\Gamma$. Similarly on $\partial
 \Omega$ we have zero Dirichlet boundary conditions.
 
-<TABLE WIDTH="60%" ALIGN="center">
-  <tr>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.1_no_grid.png" alt="">
-    </td>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.1_grid.png" alt="">
-    </td>
-  </tr>
-</table>
+
+<div class="twocolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_no_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.1_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+</div>
 
 The output of the program will look like the following:
 
@@ -329,16 +336,22 @@ such that we have
 @endcode
 produces the saddle on the right.
 
-<TABLE WIDTH="60%" ALIGN="center">
-  <tr>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.3_grid.png" alt="">
-    </td>
-    <td ALIGN="center">
-      <img src="https://www.dealii.org/images/steps/developer/step-60.4_grid.png" alt="">
-    </td>
-  </tr>
-</table>
+<div class="twocolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.3_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-60.4_grid.png"
+           alt = ""
+           width="500">
+    </div>
+  </div>
+</div>
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
