@@ -985,11 +985,11 @@ void FE_NedelecSZ<dim>::fill_edge_values(const typename Triangulation<dim,dim>::
             {
               std::transform (edge_sigma_values[m].begin(), edge_sigma_values[m].end(),
                               edge_sigma_values[m].begin(),
-                              std::bind1st (std::multiplies<double> (), static_cast<double>(edge_sign[m])));
+              [&](const double edge_sigma_value) {return edge_sign[m]*edge_sigma_value;});
 
               std::transform (edge_sigma_grads[m].begin(), edge_sigma_grads[m].end(),
                               edge_sigma_grads[m].begin(),
-                              std::bind1st (std::multiplies<double> (), static_cast<double>(edge_sign[m])));
+              [&](const double edge_sigma_grad) {return edge_sign[m]*edge_sigma_grad;});
             }
 
           // If we want to generate shape gradients then we need second derivatives of the 1d polynomials,
@@ -1131,10 +1131,10 @@ void FE_NedelecSZ<dim>::fill_edge_values(const typename Triangulation<dim,dim>::
             {
               std::transform (edge_sigma_values[m].begin(), edge_sigma_values[m].end(),
                               edge_sigma_values[m].begin(),
-                              std::bind1st (std::multiplies<double> (), static_cast<double>(edge_sign[m])));
+              [&](const double edge_sigma_value) {return edge_sign[m]*edge_sigma_value;});
               std::transform (edge_sigma_grads[m].begin(), edge_sigma_grads[m].end(),
                               edge_sigma_grads[m].begin(),
-                              std::bind1st (std::multiplies<double> (), static_cast<double>(edge_sign[m])));
+              [&](const double edge_sigma_grad) {return edge_sign[m]*edge_sigma_grad;});
             }
 
           // Now calculate the edge-based shape functions:
