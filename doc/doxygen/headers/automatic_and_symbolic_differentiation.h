@@ -209,7 +209,7 @@
  *   \quad .
  * @f]
  * As was previously mentioned, if each of the primitive operations $f_{n}$ is smooth and
- * differentiable, then the chain can be universally employed to compute the total derivative of $f$,
+ * differentiable, then the chain-rule can be universally employed to compute the total derivative of $f$,
  * namely $\dfrac{d f(x)}{d \mathbf{x}}$. What distinguishes the "forward" from the "reverse" mode
  * is how the chain-rule is evaluated, but ultimately both compute the total derivative
  * @f[
@@ -422,7 +422,7 @@
  *   use ADOL-C numbers.
  * - adolc_product_types.h: Defines some product and scalar types that allow the use of
  *   ADOL-C numbers in conjunction with the Tensor and SymmetricTensor classes.
- * - sacado_math.h: Extension of the sacado math operations that allow these numbers to be used
+ * - sacado_math.h: Extension of the Sacado math operations that allow these numbers to be used
  *   consistently throughout the library.
  * - sacado_number_types.h: Implementation of the internal classes that define how we
  *   use the supported Sacado numbers.
