@@ -130,41 +130,72 @@ of the disaster our forced compression wreaks on the cylinder (colors in the
 images encode the norm of the stress in the material):
 
 
-<table width="100%">
-  <tr width="100%">
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0002.0000.png" alt="">
-       Time = 2
-    </td>
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0002.0000.png"
+           alt="Time = 2"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 2
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0005.0000.png"
+           alt="Time = 5"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 5
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0007.0000.png"
+           alt="Time = 7"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 7
+    </div>
+  </div>
+</div>
 
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0005.0000.png" alt="">
-       Time = 5
-    </td>
 
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0007.0000.png" alt="">
-       Time = 7
-    </td>
-  </tr>
-
-  <tr width="100%">
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0008.0000.png" alt="">
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0008.0000.png"
+           alt="Time = 8"
+           width="400">
+    </div>
+    <div class="text" align="center">
       Time = 8
-    </td>
-
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0009.0000.png" alt="">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0009.0000.png"
+           alt="Time = 9"
+           width="400">
+    </div>
+    <div class="text" align="center">
       Time = 9
-    </td>
-
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0010.0000.png" alt="">
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.sequential-0010.0000.png"
+           alt="Time = 10"
+           width="400">
+    </div>
+    <div class="text" align="center">
       Time = 10
-    </td>
-  </tr>
-</table>
+    </div>
+  </div>
+</div>
 
 
 As is clearly visible, as we keep compressing the cylinder, it starts
@@ -250,58 +281,99 @@ Here are first the mesh on which we compute as well as the partitioning
 for the 16 processors:
 
 
-<table width="100%">
-  <tr width="100%">
-    <td width="49%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-000mesh.png" alt="">
-    </td>
-
-    <td width="49%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.p.png" alt="">
-    </td>
-  </tr>
-</table>
+<div class="twocolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-000mesh.png"
+           alt="Discretization"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Discretization
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.p.png"
+           alt="Parallel partitioning"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Parallel partitioning
+    </div>
+  </div>
+</div>
 
 
 Finally, here is the same output as we have shown before for the much smaller
 sequential case:
 
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.s.png"
+           alt="Time = 2"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 2
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0005.s.png"
+           alt="Time = 5"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 5
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0007.s.png"
+           alt="Time = 7"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 7
+    </div>
+  </div>
+</div>
 
-<table width="100%">
-  <tr width="100%">
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0002.s.png" alt="">
-       Time = 2
-    </td>
 
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0005.s.png" alt="">
-       Time = 5
-    </td>
-
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0007.s.png" alt="">
-       Time = 7
-    </td>
-  </tr>
-
-  <tr width="100%">
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0008.s.png" alt="">
-       Time = 8
-    </td>
-
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0009.s.png" alt="">
-       Time = 9
-    </td>
-
-    <td width="33%">
-      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0010.s.png" alt="">
-       Time = 10
-    </td>
-  </tr>
-</table>
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0008.s.png"
+           alt="Time = 8"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 8
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0009.s.png"
+           alt="Time = 9"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 9
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      <img src="https://www.dealii.org/images/steps/developer/step-18.parallel-0010.s.png"
+           alt="Time = 10"
+           width="400">
+    </div>
+    <div class="text" align="center">
+      Time = 10
+    </div>
+  </div>
+</div>
 
 
 As before, we observe that at high axial compression the cylinder begins
@@ -465,16 +537,16 @@ general approach to this would go like this:
       for (unsigned int j=0; j<dim; j++)
       {
         history_field[i][j].reinit(history_dof_handler.n_dofs());
-	local_history_values_at_qpoints[i][j].reinit(quadrature.size());
-	local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
+        local_history_values_at_qpoints[i][j].reinit(quadrature.size());
+        local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
       }
 
     FullMatrix<double> qpoint_to_dof_matrix (history_fe.dofs_per_cell,
                                              quadrature.size());
     FETools::compute_projection_from_quadrature_points_matrix
               (history_fe,
-	       quadrature, quadrature,
-	       qpoint_to_dof_matrix);
+               quadrature, quadrature,
+               qpoint_to_dof_matrix);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
@@ -484,21 +556,19 @@ general approach to this would go like this:
       {
 
         PointHistory<dim> *local_quadrature_points_history
-	       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+          = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-        Assert (local_quadrature_points_history >=
-                    &quadrature_point_history.front(),
-		    ExcInternalError());
-        Assert (local_quadrature_points_history <
-                    &quadrature_point_history.back(),
-		    ExcInternalError());
+        Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+                ExcInternalError());
+        Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+                ExcInternalError());
 
         for (unsigned int i=0; i<dim; i++)
           for (unsigned int j=0; j<dim; j++)
           {
             for (unsigned int q=0; q<quadrature.size(); ++q)
               local_history_values_at_qpoints[i][j](q)
-                       = local_quadrature_points_history[q].old_stress[i][j];
+                = local_quadrature_points_history[q].old_stress[i][j];
 
             qpoint_to_dof_matrix.vmult (local_history_fe_values[i][j],
                                         local_history_values_at_qpoints[i][j]);
@@ -521,8 +591,8 @@ general approach to this would go like this:
                                              history_fe.dofs_per_cell);
     FETools::compute_interpolation_to_quadrature_points_matrix
               (history_fe,
-	       quadrature,
-	       dof_to_qpoint_matrix);
+               quadrature,
+               dof_to_qpoint_matrix);
 
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
@@ -531,27 +601,25 @@ general approach to this would go like this:
     for (; cell != endc; ++cell, ++dg_cell)
     {
       PointHistory<dim> *local_quadrature_points_history
-	     = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-      Assert (local_quadrature_points_history >=
-                  &quadrature_point_history.front(),
-		  ExcInternalError());
-      Assert (local_quadrature_points_history <
-                  &quadrature_point_history.back(),
-		  ExcInternalError());
+      Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+              ExcInternalError());
+      Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+              ExcInternalError());
 
       for (unsigned int i=0; i<dim; i++)
         for (unsigned int j=0; j<dim; j++)
         {
           dg_cell->get_dof_values (history_field[i][j],
-	                           local_history_fe_values[i][j]);
+                                   local_history_fe_values[i][j]);
 
           dof_to_qpoint_matrix.vmult (local_history_values_at_qpoints[i][j],
                                       local_history_fe_values[i][j]);
 
           for (unsigned int q=0; q<quadrature.size(); ++q)
             local_quadrature_points_history[q].old_stress[i][j]
-                       = local_history_values_at_qpoints[i][j](q);
+              = local_history_values_at_qpoints[i][j](q);
       }
   @endcode
 
