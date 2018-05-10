@@ -55,7 +55,7 @@ do {
         }
         $state = $code_fragment_mode;
         # Make sure we distinguish from the other code style
-        print " * <div class=inlineddealii>\n";
+        print " * <div class=CodeFragmentInTutorialComment>\n";
     }
     # We shall skip something...
     elsif (($state != $skip_mode) && m!^\s*//\s*\@cond SKIP!)

@@ -84,8 +84,8 @@ div.image img[src="fe_enriched_h-refinement.png"] {
 
 
 /*
- * environment for custom codes
+ * environment for code fragments in tutorial comments
  */
-.inlineddealii {
-    background-color: #FF33F0;
+.CodeFragmentInTutorialComment {
+    /* background-color: #FF33F0; */
 }
