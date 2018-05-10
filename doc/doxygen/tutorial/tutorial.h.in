@@ -781,7 +781,8 @@
  *       step-43,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -812,7 +813,10 @@
  *   <tr valign="top">
  *     <td> Linear operators
  *     </td>
- *     <td>step-44</td>
+ *     <td>
+ *       step-44,
+ *       step-60
+ *     </td>
  *   </tr>
  *
  * </table>
