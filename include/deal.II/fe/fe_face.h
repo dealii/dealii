@@ -64,14 +64,14 @@ public:
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_FaceQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -83,7 +83,7 @@ public:
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -95,7 +95,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+                                 FullMatrix<double>       &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -108,14 +108,14 @@ public:
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
                                     const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+                                    FullMatrix<double>       &matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   /**
    * @name Functions to support hp
@@ -141,7 +141,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -151,7 +151,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -161,13 +161,13 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const;
+  hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -180,7 +180,7 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
   /**
    * @}
    */
@@ -190,7 +190,7 @@ public:
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
 private:
   /**
@@ -224,19 +224,19 @@ public:
 
   virtual
   std::unique_ptr<FiniteElement<1,spacedim>>
-                                          clone() const;
+                                          clone() const override;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_FaceQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   // for documentation, see the FiniteElement base class
   virtual
   UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -248,7 +248,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<1,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+                                 FullMatrix<double>       &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -261,20 +261,20 @@ public:
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<1,spacedim> &source,
                                     const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+                                    FullMatrix<double>       &matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool hp_constraints_are_implemented () const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -295,7 +295,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+  hp_vertex_dof_identities (const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -305,7 +305,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+  hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -315,7 +315,7 @@ public:
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+  hp_quad_dof_identities (const FiniteElement<1, spacedim> &fe_other) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -328,14 +328,14 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<1,spacedim> &fe_other) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
 protected:
   /*
@@ -349,7 +349,7 @@ protected:
   get_data (const UpdateFlags                                                  /*update_flags*/,
             const Mapping<1,spacedim>                                         &/*mapping*/,
             const Quadrature<1>                                               &/*quadrature*/,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const override
   {
     return std_cxx14::make_unique<typename FiniteElement<1, spacedim>::InternalDataBase>();
   }
@@ -358,7 +358,7 @@ protected:
   get_face_data(const UpdateFlags update_flags,
                 const Mapping<1,spacedim> &/*mapping*/,
                 const Quadrature<0> &quadrature,
-                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const override
   {
     // generate a new data object and initialize some fields
     auto data = std_cxx14::make_unique<typename FiniteElement<1,spacedim>::InternalDataBase>();
@@ -381,7 +381,7 @@ protected:
   get_subface_data(const UpdateFlags                                                  update_flags,
                    const Mapping<1,spacedim>                                         &mapping,
                    const Quadrature<0>                                               &quadrature,
-                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const override
   {
     return get_face_data(update_flags, mapping, quadrature, output_data);
   }
@@ -395,7 +395,7 @@ protected:
                   const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
                   const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                   const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const override;
 
   virtual
   void
@@ -406,7 +406,7 @@ protected:
                        const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
                        const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                        const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const override;
 
   virtual
   void
@@ -418,7 +418,7 @@ protected:
                           const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
                           const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                           const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const override;
 
 private:
   /**
@@ -468,14 +468,14 @@ public:
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_FaceP<dim>(degree)</tt> , with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -487,7 +487,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+                                 FullMatrix<double>       &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -500,20 +500,20 @@ public:
   virtual void
   get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
                                     const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+                                    FullMatrix<double>       &matrix) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -526,7 +526,7 @@ public:
    */
   virtual
   FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -535,7 +535,7 @@ public:
    * polynomials).
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  get_constant_modes () const override;
 
 private:
   /**
@@ -562,7 +562,7 @@ public:
   /**
    * Return the name of the element
    */
-  std::string get_name() const;
+  std::string get_name() const override;
 };
 
 

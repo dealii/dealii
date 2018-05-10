@@ -863,7 +863,7 @@ public:
    * safer as we have virtual functions.  It actually does nothing
    * spectacular.
    */
-  virtual ~ParameterHandler () = default;
+  virtual ~ParameterHandler () override = default;
 
   /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>

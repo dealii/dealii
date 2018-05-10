@@ -54,11 +54,11 @@ namespace mu
 
     Parser();
 
-    virtual void InitCharSets();
-    virtual void InitFun();
-    virtual void InitConst();
-    virtual void InitOprt();
-    virtual void OnDetectVar(string_type *pExpr, int &nStart, int &nEnd);
+    virtual void InitCharSets() override;
+    virtual void InitFun() override;
+    virtual void InitConst() override;
+    virtual void InitOprt() override;
+    virtual void OnDetectVar(string_type *pExpr, int &nStart, int &nEnd) override;
 
     value_type Diff(value_type *a_Var, 
                     value_type a_fPos, 

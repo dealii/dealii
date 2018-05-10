@@ -539,15 +539,15 @@ namespace Step33
       void
       evaluate_vector_field
       (const DataPostprocessorInputs::Vector<dim> &inputs,
-       std::vector<Vector<double> >               &computed_quantities) const;
+       std::vector<Vector<double> >               &computed_quantities) const override;
 
-      virtual std::vector<std::string> get_names () const;
+      virtual std::vector<std::string> get_names () const override;
 
       virtual
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      get_data_component_interpretation () const;
+      get_data_component_interpretation () const override;
 
-      virtual UpdateFlags get_needed_update_flags () const;
+      virtual UpdateFlags get_needed_update_flags () const override;
 
     private:
       const bool do_schlieren_plot;

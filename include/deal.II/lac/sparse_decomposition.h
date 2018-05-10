@@ -128,13 +128,13 @@ public:
    * Destruction. Mark the destructor pure to ensure that this class isn't
    * used directly, but only its derived classes.
    */
-  virtual ~SparseLUDecomposition () = 0;
+  virtual ~SparseLUDecomposition () override = 0;
 
   /**
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear();
+  virtual void clear() override;
 
   /**
    * Parameters for SparseDecomposition.

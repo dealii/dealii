@@ -115,7 +115,7 @@ public:
   /**
    * Destructor.
    */
-  ~BlockSparsityPatternBase ();
+  ~BlockSparsityPatternBase () override;
 
   /**
    * Resize the matrix, by setting the number of block rows and columns. This

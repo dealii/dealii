@@ -128,7 +128,7 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~RungeKutta() = default;
+    virtual ~RungeKutta() override = default;
 
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
@@ -151,7 +151,7 @@ namespace TimeStepping
      std::vector<std::function<VectorType (const double, const double, const VectorType &)> > &J_inverse,
      double                                                                                   t,
      double                                                                                   delta_t,
-     VectorType                                                                               &y);
+     VectorType                                                                               &y) override;
 
     /**
      * Purely virtual function. This function is used to advance from time @p
@@ -220,7 +220,7 @@ namespace TimeStepping
     /**
      * Initialize the explicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method);
+    void initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -238,7 +238,7 @@ namespace TimeStepping
      const std::function<VectorType (const double, const double, const VectorType &)>  &id_minus_tau_J_inverse,
      double                                                                      t,
      double                                                                      delta_t,
-     VectorType                                                                  &y);
+     VectorType                                                                  &y) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. This
@@ -269,7 +269,7 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const;
+    const Status &get_status() const override;
 
   private:
     /**
@@ -319,7 +319,7 @@ namespace TimeStepping
     /**
      * Initialize the implicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method);
+    void initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -337,7 +337,7 @@ namespace TimeStepping
      const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
      double                                                                           t,
      double                                                                           delta_t,
-     VectorType                                                                       &y);
+     VectorType                                                                       &y) override;
 
     /**
      * Set the maximum number of iterations and the tolerance used by the
@@ -367,7 +367,7 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const;
+    const Status &get_status() const override;
 
   private:
     /**
@@ -456,7 +456,7 @@ namespace TimeStepping
     /**
      * Destructor.
      */
-    ~EmbeddedExplicitRungeKutta()
+    ~EmbeddedExplicitRungeKutta() override
     {
       free_memory();
     }
@@ -469,7 +469,7 @@ namespace TimeStepping
     /**
      * Initialize the embedded explicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method);
+    void initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -487,7 +487,7 @@ namespace TimeStepping
      const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
      double                                                                     t,
      double                                                                     delta_t,
-     VectorType &y);
+     VectorType &y) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. This
@@ -530,7 +530,7 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const;
+    const Status &get_status() const override;
 
   private:
     /**

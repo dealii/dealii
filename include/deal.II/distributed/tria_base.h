@@ -56,7 +56,7 @@ namespace parallel
     /**
      * Destructor.
      */
-    virtual ~Triangulation ();
+    virtual ~Triangulation () override;
 
     /**
      * Return MPI communicator used by this triangulation.
@@ -66,7 +66,7 @@ namespace parallel
     /**
      * Implementation of the same function as in the base class.
      */
-    virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria);
+    virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria) override;
 
     /**
      * Return the number of active cells owned by each of the MPI processes
@@ -103,12 +103,12 @@ namespace parallel
      * by each processor. This equals the overall number of active cells in
      * the triangulation.
      */
-    virtual types::global_dof_index n_global_active_cells () const;
+    virtual types::global_dof_index n_global_active_cells () const override;
 
     /**
      * Return the local memory consumption in bytes.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t memory_consumption () const override;
 
 
     /**
@@ -118,7 +118,7 @@ namespace parallel
      * the domain that are not very refined, but if other processors store
      * cells in more deeply refined parts of the domain.
      */
-    virtual unsigned int n_global_levels () const;
+    virtual unsigned int n_global_levels () const override;
 
     /**
      * Return the subdomain id of those cells that are owned by the current
@@ -126,7 +126,7 @@ namespace parallel
      * subdomain id are either owned by another processor or have children
      * that only exist on other processors.
      */
-    types::subdomain_id locally_owned_subdomain () const;
+    types::subdomain_id locally_owned_subdomain () const override;
 
     /**
      * Return a set of MPI ranks of the processors that have at least one

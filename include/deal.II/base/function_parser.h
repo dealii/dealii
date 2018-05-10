@@ -212,7 +212,7 @@ public:
    * Destructor. Explicitly delete the FunctionParser objects (there is one
    * for each component of the function).
    */
-  ~FunctionParser();
+  ~FunctionParser() override;
 
   /**
    * Type for the constant map. Used by the initialize() method.
@@ -291,7 +291,7 @@ public:
    * component.
    */
   virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+                        const unsigned int  component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at the given point @p
@@ -300,7 +300,7 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void vector_value (const Point<dim>   &p,
-                             Vector<double>     &values) const;
+                             Vector<double>     &values) const override;
 
   /**
    * @addtogroup Exceptions

@@ -576,11 +576,11 @@ public:
    * returns <tt>FE_Q<dim>(degree)</tt>, with @p dim and @p degree replaced by
    * appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -592,7 +592,7 @@ public:
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 };
 
 

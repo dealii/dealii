@@ -109,7 +109,7 @@ namespace Step14
       PointValueEvaluation (const Point<dim>   &evaluation_point);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double>  &solution) const;
+                                const Vector<double>  &solution) const override;
 
       DeclException1 (ExcEvaluationPointNotFound,
                       Point<dim>,
@@ -324,7 +324,7 @@ namespace Step14
       GridOutput (const std::string &output_name_base);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double>  &solution) const;
+                                const Vector<double>  &solution) const override;
     private:
       const std::string output_name_base;
     };
@@ -426,19 +426,19 @@ namespace Step14
               const Quadrature<dim-1>  &face_quadrature,
               const Function<dim>      &boundary_values);
       virtual
-      ~Solver ();
+      ~Solver () override;
 
       virtual
       void
-      solve_problem ();
+      solve_problem () override;
 
       virtual
       void
-      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const override;
 
       virtual
       unsigned int
-      n_dofs () const;
+      n_dofs () const override;
 
     protected:
       const SmartPointer<const FiniteElement<dim> >  fe;
@@ -763,11 +763,11 @@ namespace Step14
                     const Function<dim>      &boundary_values);
 
       virtual
-      void output_solution () const;
+      void output_solution () const override;
 
     protected:
       const SmartPointer<const Function<dim> > rhs_function;
-      virtual void assemble_rhs (Vector<double> &rhs) const;
+      virtual void assemble_rhs (Vector<double> &rhs) const override;
     };
 
 
@@ -862,7 +862,7 @@ namespace Step14
                         const Function<dim>      &rhs_function,
                         const Function<dim>      &boundary_values);
 
-      virtual void refine_grid ();
+      virtual void refine_grid () override;
     };
 
 
@@ -904,7 +904,7 @@ namespace Step14
                        const Function<dim>      &rhs_function,
                        const Function<dim>      &boundary_values);
 
-      virtual void refine_grid ();
+      virtual void refine_grid () override;
     };
 
 
@@ -968,7 +968,7 @@ namespace Step14
                                const Function<dim>      &boundary_values,
                                const Function<dim>      &weighting_function);
 
-      virtual void refine_grid ();
+      virtual void refine_grid () override;
 
     private:
       const SmartPointer<const Function<dim> > weighting_function;
@@ -1133,14 +1133,14 @@ namespace Step14
     struct SetUp : public SetUpBase<dim>
     {
       virtual
-      const Function<dim>   &get_boundary_values () const;
+      const Function<dim>   &get_boundary_values () const override;
 
       virtual
-      const Function<dim>   &get_right_hand_side () const;
+      const Function<dim>   &get_right_hand_side () const override;
 
 
       virtual
-      void create_coarse_grid (Triangulation<dim> &coarse_grid) const;
+      void create_coarse_grid (Triangulation<dim> &coarse_grid) const override;
 
     private:
       static const typename Traits::BoundaryValues boundary_values;
@@ -1514,7 +1514,7 @@ namespace Step14
       virtual
       void
       assemble_rhs (const DoFHandler<dim> &dof_handler,
-                    Vector<double>        &rhs) const;
+                    Vector<double>        &rhs) const override;
 
       DeclException1 (ExcEvaluationPointNotFound,
                       Point<dim>,
@@ -1746,7 +1746,7 @@ namespace Step14
 
     protected:
       const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
-      virtual void assemble_rhs (Vector<double> &rhs) const;
+      virtual void assemble_rhs (Vector<double> &rhs) const override;
 
       static const Functions::ZeroFunction<dim> boundary_values;
     };
@@ -1806,21 +1806,21 @@ namespace Step14
 
       virtual
       void
-      solve_problem ();
+      solve_problem () override;
 
       virtual
       void
-      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const override;
 
       virtual
       unsigned int
-      n_dofs () const;
+      n_dofs () const override;
 
-      virtual void refine_grid ();
+      virtual void refine_grid () override;
 
       virtual
       void
-      output_solution () const;
+      output_solution () const override;
 
     private:
       // In the private section, we have two functions that are used to call

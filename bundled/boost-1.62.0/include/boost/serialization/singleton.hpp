@@ -101,7 +101,7 @@ class singleton_wrapper : public T
 {
 public:
     static bool m_is_destroyed;
-    ~singleton_wrapper(){
+    ~singleton_wrapper() {
         m_is_destroyed = true;
     }
 };

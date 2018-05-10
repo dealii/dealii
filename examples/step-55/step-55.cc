@@ -201,7 +201,7 @@ namespace Step55
     RightHandSide () : Function<dim>(dim+1) {}
 
     virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+                               Vector<double>   &value) const override;
 
   };
 
@@ -229,7 +229,7 @@ namespace Step55
     ExactSolution () : Function<dim>(dim+1) {}
 
     virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+                               Vector<double>   &value) const override;
   };
 
   template <int dim>

@@ -470,7 +470,7 @@ namespace internal
       virtual
       double
       get_cell_data_value (const unsigned int       cell_number,
-                           const ComponentExtractor extract_component) const;
+                           const ComponentExtractor extract_component) const override;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -481,7 +481,7 @@ namespace internal
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<double>                                                           &patch_values) const;
+       std::vector<double>                                                           &patch_values) const override;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -493,7 +493,7 @@ namespace internal
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<dealii::Vector<double> >                                          &patch_values_system) const;
+       std::vector<dealii::Vector<double> >                                          &patch_values_system) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -504,7 +504,7 @@ namespace internal
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<Tensor<1,DoFHandlerType::space_dimension> >                       &patch_gradients) const;
+       std::vector<Tensor<1,DoFHandlerType::space_dimension> >                       &patch_gradients) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -516,7 +516,7 @@ namespace internal
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > >         &patch_gradients_system) const;
+       std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > >         &patch_gradients_system) const override;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -527,7 +527,7 @@ namespace internal
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const;
+       std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const override;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -539,24 +539,24 @@ namespace internal
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
        const ComponentExtractor                                                       extract_component,
-       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > >        &patch_hessians_system) const;
+       std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > >        &patch_hessians_system) const override;
 
       /**
        * Return whether the data represented by (a derived class of) this object
        * represents a complex-valued (as opposed to real-valued) information.
        */
-      virtual bool is_complex_valued () const;
+      virtual bool is_complex_valued () const override;
 
       /**
        * Clear all references to the vectors.
        */
-      virtual void clear ();
+      virtual void clear () override;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      virtual std::size_t memory_consumption () const;
+      virtual std::size_t memory_consumption () const override;
 
     private:
       /**

@@ -76,7 +76,7 @@ public:
    * Destructor. If this class still owns a file to which temporary data was
    * stored, then it is deleted.
    */
-  virtual ~SwappableVector ();
+  virtual ~SwappableVector () override;
 
   /**
    * Copy operator. Do mostly the same as the copy constructor does; if

@@ -134,7 +134,7 @@ public:
   /**
    * Destructor
    */
-  ~ScaLAPACKMatrix() = default;
+  ~ScaLAPACKMatrix() override = default;
 
   /**
    * Initialize the rectangular matrix with @p n_rows and @p n_cols

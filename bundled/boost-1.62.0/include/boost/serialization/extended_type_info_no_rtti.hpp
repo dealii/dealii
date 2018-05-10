@@ -57,12 +57,12 @@ class BOOST_SYMBOL_VISIBLE extended_type_info_no_rtti_0 :
 {
 protected:
     BOOST_SERIALIZATION_DECL extended_type_info_no_rtti_0(const char * key);
-    BOOST_SERIALIZATION_DECL ~extended_type_info_no_rtti_0();
+    BOOST_SERIALIZATION_DECL ~extended_type_info_no_rtti_0() override;
 public:
     virtual BOOST_SERIALIZATION_DECL bool
-    is_less_than(const boost::serialization::extended_type_info &rhs) const ;
+    is_less_than(const boost::serialization::extended_type_info &rhs) const override ;
     virtual BOOST_SERIALIZATION_DECL bool
-    is_equal(const boost::serialization::extended_type_info &rhs) const ;
+    is_equal(const boost::serialization::extended_type_info &rhs) const override ;
 };
 
 } // no_rtti_system
@@ -103,7 +103,7 @@ public:
     {
         key_register();
     }
-    ~extended_type_info_no_rtti(){
+    ~extended_type_info_no_rtti() override{
         key_unregister();
     }
     const extended_type_info *
@@ -121,10 +121,10 @@ public:
     const char * get_key() const{
         return action<guid_defined< T >::value >::invoke();
     }
-    virtual const char * get_debug_info() const{
+    virtual const char * get_debug_info() const override{
         return action<guid_defined< T >::value >::invoke();
     }
-    virtual void * construct(unsigned int count, ...) const{
+    virtual void * construct(unsigned int count, ...) const override{
         // count up the arguments
         std::va_list ap;
         va_start(ap, count);
@@ -145,7 +145,7 @@ public:
             return NULL;
         }
     }
-    virtual void destroy(void const * const p) const{
+    virtual void destroy(void const * const p) const override{
         boost::serialization::access::destroy(
             static_cast<T const *>(p)
         );

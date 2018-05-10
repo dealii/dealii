@@ -200,7 +200,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlock ();
+  virtual ~MGTransferBlock () override;
 
   /**
    * Initialize additional #factors and #memory if the restriction of the
@@ -222,11 +222,11 @@ public:
 
   virtual void prolongate (const unsigned int    to_level,
                            BlockVector<number>       &dst,
-                           const BlockVector<number> &src) const;
+                           const BlockVector<number> &src) const override;
 
   virtual void restrict_and_add (const unsigned int    from_level,
                                  BlockVector<number>       &dst,
-                                 const BlockVector<number> &src) const;
+                                 const BlockVector<number> &src) const override;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the
@@ -327,7 +327,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockSelect () = default;
+  virtual ~MGTransferBlockSelect () override = default;
 
   /**
    * Actually build the prolongation matrices for grouped blocks.
@@ -353,11 +353,11 @@ public:
 
   virtual void prolongate (const unsigned int    to_level,
                            Vector<number>       &dst,
-                           const Vector<number> &src) const;
+                           const Vector<number> &src) const override;
 
   virtual void restrict_and_add (const unsigned int    from_level,
                                  Vector<number>       &dst,
-                                 const Vector<number> &src) const;
+                                 const Vector<number> &src) const override;
 
   /**
    * Transfer a single block from a vector on the global grid to a multilevel

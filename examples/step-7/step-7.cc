@@ -191,10 +191,10 @@ namespace Step7
     Solution () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
+                                    const unsigned int  component = 0) const override;
   };
 
 
@@ -290,7 +290,7 @@ namespace Step7
     RightHandSide () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 

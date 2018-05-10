@@ -96,13 +96,13 @@ namespace Step39
   {
   public:
     void cell(MeshWorker::DoFInfo<dim> &dinfo,
-              typename MeshWorker::IntegrationInfo<dim> &info) const;
+              typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                  typename MeshWorker::IntegrationInfo<dim> &info) const;
+                  typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
               MeshWorker::DoFInfo<dim> &dinfo2,
               typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
@@ -158,12 +158,12 @@ namespace Step39
   class RHSIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
-    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
               MeshWorker::DoFInfo<dim> &dinfo2,
               typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
@@ -207,12 +207,12 @@ namespace Step39
   class Estimator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
-    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
               MeshWorker::DoFInfo<dim> &dinfo2,
               typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
 
@@ -303,12 +303,12 @@ namespace Step39
   class ErrorIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
-    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const override;
     void face(MeshWorker::DoFInfo<dim> &dinfo1,
               MeshWorker::DoFInfo<dim> &dinfo2,
               typename MeshWorker::IntegrationInfo<dim> &info1,
-              typename MeshWorker::IntegrationInfo<dim> &info2) const;
+              typename MeshWorker::IntegrationInfo<dim> &info2) const override;
   };
 
   // Here we have the integration on cells. There is currently no good

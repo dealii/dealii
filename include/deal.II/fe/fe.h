@@ -768,7 +768,7 @@ public:
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~FiniteElement () = default;
+  virtual ~FiniteElement () override = default;
 
   /**
    * Creates information for creating a FESystem with this class as

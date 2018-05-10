@@ -351,7 +351,7 @@ namespace WorkStream
         /**
          * Create an item and return a pointer to it.
          */
-        virtual void *operator () (void *)
+        virtual void *operator () (void *) override
         {
           // find first unused item. we know that there must be one
           // because we have set the maximal number of tokens in flight
@@ -493,7 +493,7 @@ namespace WorkStream
         /**
          * Work on an item.
          */
-        void *operator () (void *item)
+        void *operator () (void *item) override
         {
           // first unpack the current item
           typedef
@@ -637,7 +637,7 @@ namespace WorkStream
         /**
          * Work on a single item.
          */
-        void *operator () (void *item)
+        void *operator () (void *item) override
         {
           // first unpack the current item
           typedef

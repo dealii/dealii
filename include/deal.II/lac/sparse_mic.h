@@ -61,13 +61,13 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SparseMIC();
+  virtual ~SparseMIC() override;
 
   /**
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear();
+  virtual void clear() override;
 
   /**
    * Make the @p AdditionalData type in the base class accessible to this
@@ -125,7 +125,7 @@ public:
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t memory_consumption () const override;
 
   /**
    * @addtogroup Exceptions

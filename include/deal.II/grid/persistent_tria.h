@@ -133,7 +133,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~PersistentTriangulation () = default;
+  virtual ~PersistentTriangulation () override = default;
 
   /**
    * Overloaded version of the same function in the base class which stores
@@ -141,7 +141,7 @@ public:
    * triangulation and after that calls the respective function of the base
    * class.
    */
-  virtual void execute_coarsening_and_refinement ();
+  virtual void execute_coarsening_and_refinement () override;
 
   /**
    * Restore the grid according to the saved data. For this, the coarse grid
@@ -182,7 +182,7 @@ public:
    * The coarse grid must persist until the end of this object, since it will
    * be used upon reconstruction of the grid.
    */
-  virtual void copy_triangulation (const Triangulation<dim, spacedim> &tria);
+  virtual void copy_triangulation (const Triangulation<dim, spacedim> &tria) override;
 
   /**
    * Throw an error, since this function is not useful in the context of this
@@ -190,7 +190,7 @@ public:
    */
   virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
                                      const std::vector<CellData<dim> > &cells,
-                                     const SubCellData                 &subcelldata);
+                                     const SubCellData                 &subcelldata) override;
 
   /**
    * An overload of the respective function of the base class.
@@ -201,7 +201,7 @@ public:
   virtual void create_triangulation_compatibility (
     const std::vector<Point<spacedim> >    &vertices,
     const std::vector<CellData<dim> > &cells,
-    const SubCellData                 &subcelldata);
+    const SubCellData                 &subcelldata) override;
 
   /**
    * Write all refine and coarsen flags to the ostream @p out.
@@ -224,7 +224,7 @@ public:
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t memory_consumption () const override;
 
   /**
    * Exception.

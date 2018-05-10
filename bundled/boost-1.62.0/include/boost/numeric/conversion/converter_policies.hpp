@@ -136,7 +136,7 @@ class bad_numeric_cast : public std::bad_cast
 {
   public:
 
-    virtual const char * what() const throw()
+    virtual const char * what() const throw() override
       {  return "bad numeric conversion: overflow"; }
 };
 
@@ -144,14 +144,14 @@ class negative_overflow : public bad_numeric_cast
 {
   public:
 
-    virtual const char * what() const throw()
+    virtual const char * what() const throw() override
       {  return "bad numeric conversion: negative overflow"; }
 };
 class positive_overflow : public bad_numeric_cast
 {
   public:
 
-    virtual const char * what() const throw()
+    virtual const char * what() const throw() override
       { return "bad numeric conversion: positive overflow"; }
 };
 

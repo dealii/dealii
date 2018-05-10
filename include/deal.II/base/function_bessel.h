@@ -38,15 +38,15 @@ namespace Functions
     Bessel1(const unsigned int order,
             const double wave_number,
             const Point<dim> center = Point<dim>());
-    virtual double value (const Point<dim> &points, const unsigned int component) const;
+    virtual double value (const Point<dim> &points, const unsigned int component) const override;
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+                             const unsigned int              component = 0) const override;
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
+                                    const unsigned int  component = 0) const override;
     virtual void gradient_list (const std::vector<Point<dim> > &points,
                                 std::vector<Tensor<1,dim> >    &gradients,
-                                const unsigned int              component = 0) const;
+                                const unsigned int              component = 0) const override;
   private:
     unsigned int order;
     double wave_number;

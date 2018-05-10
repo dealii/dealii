@@ -25,7 +25,7 @@ namespace boost {
     class no_slots_error: public std::exception
     {
     public:
-      virtual const char* what() const throw() {return "boost::signals2::no_slots_error";}
+      virtual const char* what() const throw() override {return "boost::signals2::no_slots_error";}
     };
 
     template<typename T>

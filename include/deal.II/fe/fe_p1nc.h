@@ -261,18 +261,18 @@ public:
    */
   FE_P1NC();
 
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
-  virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const;
+  virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const override;
 
   virtual
   std::unique_ptr<FiniteElement<2,2>>
-                                   clone() const;
+                                   clone() const override;
 
   /**
    * Destructor.
    */
-  virtual ~FE_P1NC () = default;
+  virtual ~FE_P1NC () override = default;
 
 
 
@@ -302,21 +302,21 @@ private:
   get_data (const UpdateFlags update_flags,
             const Mapping<2,2> &,
             const Quadrature<2> &quadrature,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   virtual
   std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
   get_face_data (const UpdateFlags update_flags,
                  const Mapping<2,2> &,
                  const Quadrature<1> &quadrature,
-                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   virtual
   std::unique_ptr<FiniteElement<2,2>::InternalDataBase>
   get_subface_data (const UpdateFlags update_flags,
                     const Mapping<2,2> &,
                     const Quadrature<1> &quadrature,
-                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   /**
    * Compute the data on the current cell.
@@ -329,7 +329,7 @@ private:
                   const Mapping<2,2>::InternalDataBase              &mapping_internal,
                   const internal::FEValuesImplementation::MappingRelatedData<2,2> &mapping_data,
                   const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                  internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+                  internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   /**
    * Compute the data on the face of the current cell.
@@ -342,7 +342,7 @@ private:
                        const Mapping<2,2>::InternalDataBase                      &mapping_internal,
                        const dealii::internal::FEValuesImplementation::MappingRelatedData<2,2> &mapping_data,
                        const InternalDataBase                                    &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   /**
    * Compute the data on the subface of the current cell.
@@ -356,7 +356,7 @@ private:
                           const Mapping<2,2>::InternalDataBase                      &mapping_internal,
                           const dealii::internal::FEValuesImplementation::MappingRelatedData<2,2> &mapping_data,
                           const InternalDataBase                                    &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const override;
 
   /**
    * Create the constraints matrix for hanging edges.

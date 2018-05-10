@@ -168,7 +168,7 @@ namespace LinearAlgebra
     /**
      * Destructor.
      */
-    ~ReadWriteVector () = default;
+    ~ReadWriteVector () override = default;
 
     /**
      * Set the global size of the vector to @p size. The stored elements have

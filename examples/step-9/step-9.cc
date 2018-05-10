@@ -197,10 +197,10 @@ namespace Step9
   public:
     AdvectionField () : TensorFunction<1,dim> () {}
 
-    virtual Tensor<1,dim> value (const Point<dim> &p) const;
+    virtual Tensor<1,dim> value (const Point<dim> &p) const override;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<Tensor<1,dim> >    &values) const;
+                             std::vector<Tensor<1,dim> >    &values) const override;
 
     // In previous examples, we have used assertions that throw exceptions in
     // several places. However, we have never seen how such exceptions are
@@ -290,11 +290,11 @@ namespace Step9
     RightHandSide () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+                             const unsigned int              component = 0) const override;
 
   private:
     static const Point<dim> center_point;
@@ -361,11 +361,11 @@ namespace Step9
     BoundaryValues () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+                             const unsigned int              component = 0) const override;
   };
 
 

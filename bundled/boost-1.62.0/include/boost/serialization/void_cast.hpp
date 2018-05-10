@@ -154,26 +154,26 @@ template <class Derived, class Base>
 class BOOST_SYMBOL_VISIBLE void_caster_primitive :
     public void_caster
 {
-    virtual void const * downcast(void const * const t) const {
+    virtual void const * downcast(void const * const t) const override {
         const Derived * d = 
             boost::serialization::smart_cast<const Derived *, const Base *>(
                 static_cast<const Base *>(t)
             );
         return d;
     }
-    virtual void const * upcast(void const * const t) const {
+    virtual void const * upcast(void const * const t) const override {
         const Base * b = 
             boost::serialization::smart_cast<const Base *, const Derived *>(
                 static_cast<const Derived *>(t)
             );
         return b;
     }
-    virtual bool has_virtual_base() const {
+    virtual bool has_virtual_base() const override {
         return false;
     }
 public:
     void_caster_primitive();
-    virtual ~void_caster_primitive();
+    virtual ~void_caster_primitive() override;
 };
 
 template <class Derived, class Base>
@@ -202,18 +202,18 @@ template <class Derived, class Base>
 class BOOST_SYMBOL_VISIBLE void_caster_virtual_base :
     public void_caster
 {
-    virtual bool has_virtual_base() const {
+    virtual bool has_virtual_base() const override {
         return true;
     }
 public:
-    virtual void const * downcast(void const * const t) const {
+    virtual void const * downcast(void const * const t) const override {
         const Derived * d = 
             dynamic_cast<const Derived *>(
                 static_cast<const Base *>(t)
             );
         return d;
     }
-    virtual void const * upcast(void const * const t) const {
+    virtual void const * upcast(void const * const t) const override {
         const Base * b = 
             dynamic_cast<const Base *>(
                 static_cast<const Derived *>(t)
@@ -221,7 +221,7 @@ public:
         return b;
     }
     void_caster_virtual_base();
-    virtual ~void_caster_virtual_base();
+    virtual ~void_caster_virtual_base() override;
 };
 
 #ifdef BOOST_MSVC

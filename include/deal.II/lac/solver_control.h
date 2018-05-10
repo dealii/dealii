@@ -99,9 +99,9 @@ public:
       : last_step (last_step), last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () noexcept = default;
+    virtual ~NoConvergence () noexcept override = default;
 
-    virtual void print_info (std::ostream &out) const
+    virtual void print_info (std::ostream &out) const override
     {
       out << "Iterative method reported convergence failure in step "
           << last_step << ". The residual in the last step was " << last_residual
@@ -155,7 +155,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~SolverControl() = default;
+  virtual ~SolverControl() override = default;
 
   /**
    * Interface to parameter file.
@@ -429,7 +429,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ReductionControl() = default;
+  virtual ~ReductionControl() override = default;
 
   /**
    * Interface to parameter file.
@@ -447,7 +447,7 @@ public:
    * value</tt> upon the first iteration.
    */
   virtual State check (const unsigned int step,
-                       const double   check_value);
+                       const double   check_value) override;
 
   /**
    * Reduction factor.
@@ -513,7 +513,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~IterationNumberControl() = default;
+  virtual ~IterationNumberControl() override = default;
 
   /**
    * Decide about success or failure of an iteration. This function bases
@@ -521,7 +521,7 @@ public:
    * the check value reached exactly zero.
    */
   virtual State check (const unsigned int step,
-                       const double   check_value);
+                       const double   check_value) override;
 };
 
 
@@ -569,14 +569,14 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ConsecutiveControl() = default;
+  virtual ~ConsecutiveControl() override = default;
 
   /**
    * Decide about success or failure of an iteration, see the class description
    * above.
    */
   virtual State check (const unsigned int step,
-                       const double   check_value);
+                       const double   check_value) override;
 
 protected:
   /**

@@ -45,17 +45,17 @@ namespace
   {
   public:
     generic_error_category(){}
-    const char *   name() const BOOST_SYSTEM_NOEXCEPT;
-    std::string    message( int ev ) const;
+    const char *   name() const BOOST_SYSTEM_NOEXCEPT override;
+    std::string    message( int ev ) const override;
   };
 
   class system_error_category : public error_category
   {
   public:
     system_error_category(){}
-    const char *        name() const BOOST_SYSTEM_NOEXCEPT;
-    std::string         message( int ev ) const;
-    error_condition     default_error_condition( int ev ) const BOOST_SYSTEM_NOEXCEPT;
+    const char *        name() const BOOST_SYSTEM_NOEXCEPT override;
+    std::string         message( int ev ) const override;
+    error_condition     default_error_condition( int ev ) const BOOST_SYSTEM_NOEXCEPT override;
   };
 
   //  generic_error_category implementation  ---------------------------------//

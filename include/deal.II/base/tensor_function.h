@@ -75,7 +75,7 @@ public:
    * usually not used by their true type, but rather through pointers to this
    * base class.
    */
-  virtual ~TensorFunction () = default;
+  virtual ~TensorFunction () override = default;
 
   /**
    * Return the value of the function at the given point.
@@ -127,17 +127,17 @@ public:
   ConstantTensorFunction (const dealii::Tensor<rank, dim, Number> &value,
                           const Number initial_time = 0.0);
 
-  virtual ~ConstantTensorFunction () = default;
+  virtual ~ConstantTensorFunction () override = default;
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim> &p) const;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim> &p) const override;
 
   virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type> &values) const;
+                           std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type> &values) const override;
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type gradient (const Point<dim> &p) const;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type gradient (const Point<dim> &p) const override;
 
   virtual void gradient_list (const std::vector<Point<dim> > &points,
-                              std::vector<typename dealii::TensorFunction<rank, dim, Number>::gradient_type> &gradients) const;
+                              std::vector<typename dealii::TensorFunction<rank, dim, Number>::gradient_type> &gradients) const override;
 
 private:
   const dealii::Tensor<rank, dim, Number> _value;

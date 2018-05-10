@@ -94,7 +94,7 @@ protected:
     }
     BOOST_WARCHIVE_DECL 
     text_wiarchive_impl(std::wistream & is, unsigned int flags);
-    ~text_wiarchive_impl(){};
+    ~text_wiarchive_impl() override{};
 };
 
 } // namespace archive
@@ -120,7 +120,7 @@ public:
     text_wiarchive(std::wistream & is, unsigned int flags = 0) :
         text_wiarchive_impl<text_wiarchive>(is, flags)
     {}
-    ~text_wiarchive(){}
+    ~text_wiarchive() override{}
 };
 
 } // namespace archive

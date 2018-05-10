@@ -136,7 +136,7 @@ namespace PETScWrappers
       /**
        * Destructor. Clears memory
        */
-      ~BlockVector () = default;
+      ~BlockVector () override = default;
 
       /**
        * Copy operator: fill all components of the vector that are locally

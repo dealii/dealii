@@ -63,7 +63,7 @@ public:
    */
   void operator() (const unsigned int level,
                    VectorType         &dst,
-                   const VectorType   &src) const;
+                   const VectorType   &src) const override;
 
 private:
   /**
@@ -202,7 +202,7 @@ public:
    */
   virtual void operator() (const unsigned int level,
                            VectorType         &dst,
-                           const VectorType   &src) const;
+                           const VectorType   &src) const override;
 
 private:
   /**
@@ -260,7 +260,7 @@ public:
 
   void operator() (const unsigned int level,
                    VectorType         &dst,
-                   const VectorType   &src) const;
+                   const VectorType   &src) const override;
 
 private:
   /**

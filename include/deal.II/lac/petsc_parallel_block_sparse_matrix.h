@@ -106,7 +106,7 @@ namespace PETScWrappers
       /**
        * Destructor.
        */
-      ~BlockSparseMatrix () = default;
+      ~BlockSparseMatrix () override = default;
 
       /**
        * Pseudo copy operator only copying empty objects. The sizes of the

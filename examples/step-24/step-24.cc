@@ -145,7 +145,7 @@ namespace Step24
     {}
 
     virtual double value (const Point<dim> &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
   private:
     struct Source

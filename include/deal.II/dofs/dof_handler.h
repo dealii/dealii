@@ -352,7 +352,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~DoFHandler ();
+  virtual ~DoFHandler () override;
 
   /**
    * Copy operator. DoFHandler objects are large and expensive.

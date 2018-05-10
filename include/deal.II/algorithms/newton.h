@@ -94,9 +94,9 @@ namespace Algorithms
      * are not used by Newton, but will be handed down to the objects
      * #residual and #inverse_derivative.
      */
-    virtual void operator() (AnyData &out, const AnyData &in);
+    virtual void operator() (AnyData &out, const AnyData &in) override;
 
-    virtual void notify(const Event &);
+    virtual void notify(const Event &) override;
 
     /**
      * Set the maximal residual reduction allowed without triggering

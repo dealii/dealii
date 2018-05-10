@@ -143,7 +143,7 @@ namespace Step21
     PressureRightHandSide () : Function<dim>(1) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -168,7 +168,7 @@ namespace Step21
     PressureBoundaryValues () : Function<dim>(1) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -195,7 +195,7 @@ namespace Step21
     SaturationBoundaryValues () : Function<dim>(1) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -233,10 +233,10 @@ namespace Step21
     InitialValues () : Function<dim>(dim+2) {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
 
     virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+                               Vector<double>   &value) const override;
 
   };
 
@@ -362,7 +362,7 @@ namespace Step21
       {}
 
       virtual void value_list (const std::vector<Point<dim> > &points,
-                               std::vector<Tensor<2,dim> >    &values) const;
+                               std::vector<Tensor<2,dim> >    &values) const override;
 
     private:
       static std::vector<Point<dim> > centers;

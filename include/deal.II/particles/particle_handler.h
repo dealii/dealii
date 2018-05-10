@@ -82,7 +82,7 @@ namespace Particles
     /**
      * Destructor.
      */
-    ~ParticleHandler();
+    ~ParticleHandler() override;
 
     /**
      * Initialize the particle handler. This function does not clear the

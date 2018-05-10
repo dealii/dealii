@@ -116,7 +116,7 @@ template<class Archive, class T>
 class iserializer : public basic_iserializer
 {
 private:
-    virtual void destroy(/*const*/ void *address) const {
+    virtual void destroy(/*const*/ void *address) const override {
         boost::serialization::access::destroy(static_cast<T *>(address));
     }
 protected:
@@ -134,25 +134,25 @@ public:
         basic_iarchive & ar,
         void *x, 
         const unsigned int file_version
-    ) const BOOST_USED;
-    virtual bool class_info() const {
+    ) const override BOOST_USED;
+    virtual bool class_info() const override {
         return boost::serialization::implementation_level< T >::value 
             >= boost::serialization::object_class_info;
     }
-    virtual bool tracking(const unsigned int /* flags */) const {
+    virtual bool tracking(const unsigned int /* flags */) const override {
         return boost::serialization::tracking_level< T >::value 
                 == boost::serialization::track_always
             || ( boost::serialization::tracking_level< T >::value 
                 == boost::serialization::track_selectively
                 && serialized_as_pointer());
     }
-    virtual version_type version() const {
+    virtual version_type version() const override {
         return version_type(::boost::serialization::version< T >::value);
     }
-    virtual bool is_polymorphic() const {
+    virtual bool is_polymorphic() const override {
         return boost::is_polymorphic< T >::value;
     }
-    virtual ~iserializer(){};
+    virtual ~iserializer() override{};
 };
 
 #ifdef BOOST_MSVC
@@ -287,13 +287,13 @@ class pointer_iserializer :
     public basic_pointer_iserializer
 {
 private:
-    virtual void * heap_allocation() const {
+    virtual void * heap_allocation() const override {
         detail::heap_allocation<T> h;
         T * t = h.get();
         h.release();
         return t;
     }
-    virtual const basic_iserializer & get_basic_serializer() const {
+    virtual const basic_iserializer & get_basic_serializer() const override {
         return boost::serialization::singleton<
             iserializer<Archive, T>
         >::get_const_instance();
@@ -302,11 +302,11 @@ private:
         basic_iarchive & ar, 
         void * x,
         const unsigned int file_version
-    ) const BOOST_USED;
+    ) const override BOOST_USED;
 protected:
     // this should alway be a singleton so make the constructor protected
     pointer_iserializer();
-    ~pointer_iserializer();
+    ~pointer_iserializer() override;
 };
 
 #ifdef BOOST_MSVC

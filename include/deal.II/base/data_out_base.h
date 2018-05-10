@@ -2936,7 +2936,7 @@ protected:
    * read() function.
    */
   virtual const std::vector<dealii::DataOutBase::Patch<dim,spacedim> > &
-  get_patches () const;
+  get_patches () const override;
 
   /**
    * Abstract virtual function through which the names of data sets are
@@ -2944,7 +2944,7 @@ protected:
    *
    * Return the names of the variables as read the last time we read a file.
    */
-  virtual std::vector<std::string> get_dataset_names () const;
+  virtual std::vector<std::string> get_dataset_names () const override;
 
   /**
    * This functions returns information about how the individual components of
@@ -2966,7 +2966,7 @@ protected:
    */
   virtual
   std::vector<std::tuple<unsigned int, unsigned int, std::string> >
-  get_vector_data_ranges () const;
+  get_vector_data_ranges () const override;
 
 private:
   /**

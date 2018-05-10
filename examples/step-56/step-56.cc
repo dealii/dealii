@@ -102,9 +102,9 @@ namespace Step56
   public:
     Solution () : Function<dim>(dim+1) {}
     virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+                          const unsigned int component = 0) const override;
     virtual Tensor<1,dim> gradient (const Point<dim> &p,
-                                    const unsigned int component = 0) const;
+                                    const unsigned int component = 0) const override;
   };
 
   template <>
@@ -233,7 +233,7 @@ namespace Step56
     RightHandSide () : Function<dim>(dim+1) {}
 
     virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+                          const unsigned int component = 0) const override;
   };
 
   template <>

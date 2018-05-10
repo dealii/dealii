@@ -166,7 +166,7 @@ namespace Step23
     InitialValuesU () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -177,7 +177,7 @@ namespace Step23
     InitialValuesV () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -213,7 +213,7 @@ namespace Step23
     RightHandSide () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -238,7 +238,7 @@ namespace Step23
     BoundaryValuesU () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 
@@ -251,7 +251,7 @@ namespace Step23
     BoundaryValuesV () : Function<dim>() {}
 
     virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+                          const unsigned int  component = 0) const override;
   };
 
 

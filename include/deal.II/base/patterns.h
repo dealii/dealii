@@ -206,21 +206,21 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an integer and its value is
      * within the specified range.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -298,21 +298,21 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a number and its value is within
      * the specified range.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Creates a new object on the heap using @p new if the given
@@ -368,27 +368,27 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -461,20 +461,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -487,7 +487,7 @@ namespace Patterns
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const override;
 
     /**
      * @addtogroup Exceptions
@@ -578,20 +578,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -604,7 +604,7 @@ namespace Patterns
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const override;
 
     /**
      * Return a reference to the key pattern.
@@ -785,20 +785,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a list of strings
      * each of which matches the patterns given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -811,7 +811,7 @@ namespace Patterns
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const override;
 
     /**
      * Return a reference to the i-th pattern in the tuple.
@@ -863,21 +863,21 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -890,7 +890,7 @@ namespace Patterns
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t memory_consumption () const override;
 
     /**
      * @addtogroup Exceptions
@@ -934,14 +934,14 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -973,20 +973,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Anything]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches
@@ -1046,20 +1046,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * file type flag
@@ -1105,20 +1105,20 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const;
+    virtual bool match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const;
+    virtual std::string description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const override;
 
     /**
      * Create a new object if the start of description matches

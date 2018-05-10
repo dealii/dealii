@@ -111,7 +111,7 @@ public:
   /**
    * Destructor
    */
-  ~SolverSelector();
+  ~SolverSelector() override;
 
   /**
    * Solver procedure. Calls the @p solve function of the @p solver whose @p

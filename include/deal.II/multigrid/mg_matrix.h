@@ -74,12 +74,12 @@ namespace mg
      */
     const LinearOperator<VectorType> &operator[] (unsigned int level) const;
 
-    virtual void vmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
-    virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
-    virtual void Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
-    virtual void Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
-    virtual unsigned int get_minlevel() const;
-    virtual unsigned int get_maxlevel() const;
+    virtual void vmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual unsigned int get_minlevel() const override;
+    virtual unsigned int get_maxlevel() const override;
 
     /**
      * Memory used by this object.

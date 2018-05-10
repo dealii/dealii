@@ -84,7 +84,7 @@ public:
     BOOST_IOSTREAMS_STREAMBUF_TYPEDEFS(Tr)
 public:
     stream_buffer() { }
-    ~stream_buffer()
+    ~stream_buffer() override
     { 
         try { 
             if (this->is_open() && this->auto_close()) 

@@ -81,7 +81,7 @@ namespace GridTools
     /**
      * Destructor.
      */
-    ~Cache();
+    ~Cache() override;
 
     /**
      * Make sure that the objects marked for update are recomputed during

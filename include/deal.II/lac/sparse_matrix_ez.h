@@ -323,7 +323,7 @@ public:
   /**
    * Destructor. Free all memory.
    */
-  ~SparseMatrixEZ () = default;
+  ~SparseMatrixEZ () override = default;
 
   /**
    * Pseudo operator only copying empty objects.

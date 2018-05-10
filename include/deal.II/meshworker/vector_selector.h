@@ -199,7 +199,7 @@ namespace MeshWorker
     /**
      * Virtual, but empty destructor.
      */
-    virtual ~VectorDataBase() = default;
+    virtual ~VectorDataBase() override = default;
 
     /**
      * The only function added to VectorSelector is an abstract virtual
@@ -319,7 +319,7 @@ namespace MeshWorker
       const unsigned int component,
       const unsigned int n_comp,
       const unsigned int start,
-      const unsigned int size) const;
+      const unsigned int size) const override;
 
     virtual void mg_fill(
       std::vector<std::vector<std::vector<typename VectorType::value_type> > > &values,
@@ -331,7 +331,7 @@ namespace MeshWorker
       const unsigned int component,
       const unsigned int n_comp,
       const unsigned int start,
-      const unsigned int size) const;
+      const unsigned int size) const override;
 
     /**
      * The memory used by this object.

@@ -63,7 +63,7 @@ public:
   /**
    * Default destructor.
    */
-  ~CellDataStorage() = default;
+  ~CellDataStorage() override = default;
 
   /**
    * Initialize data on the @p cell to store @p number_of_data_points_per_cell of objects of type @p T .

@@ -177,7 +177,7 @@ namespace PETScWrappers
      * Return a reference to the MPI communicator object in use with this
      * matrix.
      */
-    const MPI_Comm &get_mpi_communicator () const;
+    const MPI_Comm &get_mpi_communicator () const override;
 
     /**
      * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>

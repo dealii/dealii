@@ -102,13 +102,13 @@ public:
    * returns <tt>FE_Q_Bubbles<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string get_name () const override;
 
   // documentation inherited from the base class
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &nodal_values) const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -121,15 +121,15 @@ public:
    */
   virtual void
   get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                            FullMatrix<double>       &matrix) const;
+                            FullMatrix<double>       &matrix) const override;
 
   virtual const FullMatrix<double> &
   get_prolongation_matrix  (const unsigned int child,
-                            const RefinementCase<dim> &refinement_case) const;
+                            const RefinementCase<dim> &refinement_case) const override;
 
   virtual const FullMatrix<double> &
   get_restriction_matrix  (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case) const;
+                           const RefinementCase<dim> &refinement_case) const override;
 
   /**
    * Check for non-zero values on a face.
@@ -140,11 +140,11 @@ public:
    * Implementation of the interface in FiniteElement
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+                                    const unsigned int face_index) const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  clone() const override;
 
 private:
 

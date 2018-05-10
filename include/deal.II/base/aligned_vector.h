@@ -376,7 +376,7 @@ namespace internal
      * the constructor on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const
+                                    const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -439,7 +439,7 @@ namespace internal
      * the constructor on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const
+                                    const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -522,7 +522,7 @@ namespace internal
      * This sets elements on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const
+                                    const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual
@@ -600,7 +600,7 @@ namespace internal
      * This initializes elements on a subrange given by two integers.
      */
     virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const
+                                    const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual

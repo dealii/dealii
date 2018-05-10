@@ -182,7 +182,7 @@ public:
    * Nonetheless, since derived classes want to call the destructor of a base
    * class, this destructor is implemented (despite it being pure virtual).
    */
-  virtual ~Function () = 0;
+  virtual ~Function () override = 0;
 
   /**
    * Assignment operator. This is here only so that you can have objects of
@@ -397,30 +397,30 @@ namespace Functions
     ConstantFunction (const RangeNumberType *begin_ptr, const unsigned int n_components);
 
     virtual RangeNumberType value (const Point<dim>   &p,
-                                   const unsigned int  component = 0) const;
+                                   const unsigned int  component = 0) const override;
 
     virtual void vector_value (const Point<dim> &p,
-                               Vector<RangeNumberType>   &return_value) const;
+                               Vector<RangeNumberType>   &return_value) const override;
 
     virtual void value_list (const std::vector<Point<dim> > &points,
                              std::vector<RangeNumberType>            &return_values,
-                             const unsigned int              component = 0) const;
+                             const unsigned int              component = 0) const override;
 
     virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<RangeNumberType> >   &return_values) const;
+                                    std::vector<Vector<RangeNumberType> >   &return_values) const override;
 
     virtual Tensor<1,dim, RangeNumberType> gradient (const Point<dim> &p,
-                                                     const unsigned int component = 0) const;
+                                                     const unsigned int component = 0) const override;
 
     virtual void vector_gradient (const Point<dim>            &p,
-                                  std::vector<Tensor<1,dim, RangeNumberType> > &gradients) const;
+                                  std::vector<Tensor<1,dim, RangeNumberType> > &gradients) const override;
 
     virtual void gradient_list (const std::vector<Point<dim> > &points,
                                 std::vector<Tensor<1,dim, RangeNumberType> >    &gradients,
-                                const unsigned int              component = 0) const;
+                                const unsigned int              component = 0) const override;
 
     virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
-                                       std::vector<std::vector<Tensor<1,dim, RangeNumberType> > > &gradients) const;
+                                       std::vector<std::vector<Tensor<1,dim, RangeNumberType> > > &gradients) const override;
 
     std::size_t memory_consumption () const;
 
@@ -540,7 +540,7 @@ public:
    * Return the value of the function at the given point for all components.
    */
   virtual void vector_value (const Point<dim> &p,
-                             Vector<RangeNumberType>   &return_value) const;
+                             Vector<RangeNumberType>   &return_value) const override;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
@@ -549,7 +549,7 @@ public:
    * array.
    */
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<RangeNumberType> >   &values) const;
+                                  std::vector<Vector<RangeNumberType> >   &values) const override;
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
@@ -662,7 +662,7 @@ public:
    * the function given to the constructor produces for this point.
    */
   virtual RangeNumberType value (const Point<dim>   &p,
-                                 const unsigned int  component = 0) const;
+                                 const unsigned int  component = 0) const override;
 
 private:
   /**
@@ -731,7 +731,7 @@ public:
    * the function given to the constructor produces for this point.
    */
   virtual RangeNumberType value (const Point<dim>   &p,
-                                 const unsigned int  component = 0) const;
+                                 const unsigned int  component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at a given point.
@@ -739,7 +739,7 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void vector_value (const Point<dim>   &p,
-                             Vector<RangeNumberType>     &values) const;
+                             Vector<RangeNumberType>     &values) const override;
 
 private:
   /**
@@ -818,13 +818,13 @@ public:
    * This destructor is defined as virtual so as to coincide with all other
    * aspects of class.
    */
-  virtual ~VectorFunctionFromTensorFunction() = default;
+  virtual ~VectorFunctionFromTensorFunction() override = default;
 
   /**
    * Return a single component of a vector-valued function at a given point.
    */
   virtual RangeNumberType value (const Point<dim> &p,
-                                 const unsigned int component = 0) const;
+                                 const unsigned int component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at a given point.
@@ -832,7 +832,7 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
   virtual void vector_value (const Point<dim> &p,
-                             Vector<RangeNumberType>   &values) const;
+                             Vector<RangeNumberType>   &values) const override;
 
   /**
    * Return all components of a vector-valued function at a list of points.
@@ -842,7 +842,7 @@ public:
    * function
    */
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<RangeNumberType> >   &value_list) const;
+                                  std::vector<Vector<RangeNumberType> >   &value_list) const override;
 
 private:
   /**

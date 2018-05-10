@@ -672,7 +672,7 @@ public:
   /**
    * Destructor. At present, this does nothing.
    */
-  virtual ~TimeStepBase () = default;
+  virtual ~TimeStepBase () override = default;
 
   /**
    * Reconstruct all the data that is needed for this time level to work. This
@@ -1326,7 +1326,7 @@ public:
    * Destructor. At present, this does not more than releasing the lock on the
    * coarse grid triangulation given to the constructor.
    */
-  virtual ~TimeStepBase_Tria ();
+  virtual ~TimeStepBase_Tria () override;
 
   /**
    * Reconstruct all the data that is needed for this time level to work. This
@@ -1348,7 +1348,7 @@ public:
    * likely is the case), preferably at the beginning so that your function
    * can take effect of the triangulation already existing.
    */
-  virtual void wake_up (const unsigned int wakeup_level);
+  virtual void wake_up (const unsigned int wakeup_level) override;
 
   /**
    * This is the opposite function to @p wake_up. It is used to delete data or
@@ -1363,7 +1363,7 @@ public:
    * this function from your overloaded version, preferably at the end so that
    * your function can use the triangulation as long as you need it.
    */
-  virtual void sleep (const unsigned int);
+  virtual void sleep (const unsigned int) override;
 
   /**
    * Do the refinement according to the flags passed to the constructor of
@@ -1411,7 +1411,7 @@ public:
    * amount memory used by the derived class, and add the result of this
    * function to your result.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t memory_consumption () const override;
 
   /**
    * Exception
