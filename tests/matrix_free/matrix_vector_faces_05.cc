@@ -43,5 +43,5 @@ void test ()
   constraints.close();
 
   // test with threads enabled as well
-  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, true);
+  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, false);
 }
