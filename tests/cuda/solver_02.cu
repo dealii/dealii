@@ -55,10 +55,8 @@ void test(Utilities::CUDA::Handle &cuda_handle)
 
   // Generate a random solution and then compute the rhs
   dealii::Vector<double> sol_ref(size);
-  std::default_random_engine generator;
-  std::normal_distribution<> distribution(10., 2.);
   for (auto &val : sol_ref)
-    val = distribution(generator);
+    val = random_value(5.,15.);
 
   dealii::Vector<double> rhs(size);
   matrix.vmult(rhs, sol_ref);
@@ -72,8 +70,9 @@ void test(Utilities::CUDA::Handle &cuda_handle)
   rhs_dev.import(rhs_host, VectorOperation::insert);
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
+  const std::array<std::string,3> solver_names {"Cholesky", "LU_dense", "LU_host"};
 
-  for (auto solver_type: {"Cholesky", "LU_dense", "LU_host"})
+  for (auto solver_type: solver_names)
     {
       // Solve on the device
       CUDAWrappers::SolverDirect<double>::AdditionalData data(solver_type);
@@ -91,7 +90,7 @@ void test(Utilities::CUDA::Handle &cuda_handle)
       for (unsigned int i = 0; i < size; ++i)
         AssertThrow(std::abs(solution_host[i] - sol_ref[i]) < 1e-12,
                     ExcInternalError());
-      std::cout<<solver_type<<std::endl;
+      deallog << solver_type << std::endl;
     }
 }
 
