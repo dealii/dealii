@@ -249,6 +249,14 @@ public:
      * hanging nodes, there are quite many colors (50 or more in 3D), which
      * might degrade parallel performance (bad cache behavior, many
      * synchronization points).
+     *
+     * @note Threading support is currently experimental for the case inner
+     * face integrals are performed and it is recommended to use MPI
+     * parallelism if possible. While the scheme has been verified to work
+     * with the `partition_partition` option in case of usual DG elements, no
+     * comprehensive tests have been performed for systems of more general
+     * elements, like combinations of continuous and discontinuous elements
+     * that add face integrals to all terms.
      */
     TasksParallelScheme tasks_parallel_scheme;
 
