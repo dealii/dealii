@@ -231,8 +231,8 @@ namespace python
      * Generate a hyper-ball intersected with the positive orthant relate to @p
      * center, which contains three elements in 2d and four in 3d. The boundary
      * indicators for the final triangulations are 0 for the curved boundary
-     * and 1 for the cut plane. The appropriate boundary class is
-     * HyperBallBoundary.
+     * and 1 for the cut plane. The appropriate manifold class is
+     * SphericalManifold.
      */
     void generate_quarter_hyper_ball(PointWrapper &center,
                                      const double  radius = 1.);
@@ -241,8 +241,8 @@ namespace python
      * Generate a half hyper-ball around @p center, which contains four elements
      * in 2d and 6 in 3d. The cut plane is perpendicular to the x-axis. The
      * boundary indicators for the final triangulation are 0 for the curved
-     * boundary and 1 for the cut plane. The appropriate boundary class is
-     * HalfHyperBallBoundary, or HyperBallBoundary.
+     * boundary and 1 for the cut plane. The appropriate manifold class is
+     * SphericalManifold.
      */
     void generate_half_hyper_ball(PointWrapper &center,
                                   const double  radius = 1.);

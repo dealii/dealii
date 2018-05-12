@@ -225,9 +225,9 @@ namespace python
   const char generate_quarter_hyper_ball_docstring [] =
     "Generate a hyper-ball intersected with the positive orthant relate to  \n"
     "center, which contains three elements in 2d and four in 3d. The        \n"
-    "boundary indicators for the final triangulations are 0 for the curved  \n" 
-    "boundary and 1 for the cut plane. The appropriate boundary class is    \n"
-    "HyperBallBoundary.                                                     \n"
+    "boundary indicators for the final triangulations are 0 for the curved  \n"
+    "boundary and 1 for the cut plane. The appropriate Manifold class is    \n"
+    "SphericalManifold.                                                     \n"
     ;
 
 
@@ -236,8 +236,8 @@ namespace python
     "Generate a half hyper-ball around center, which contains four          \n"
     "elements in 2d and 6 in 3d. The cut plane is perpendicular to the      \n"
     "x-axis. The boundary indicators for the final triangulation are 0 for  \n"
-    "the curved boundary and 1 for the cut plane. The appropriate boundary  \n"
-    "class is HalfHyperBallBoundary, or HyperBallBoundary.                  \n"
+    "the curved boundary and 1 for the cut plane. The appropriate manifold  \n"
+    "class is SphericalManifold.                                            \n"
     ;
 
 

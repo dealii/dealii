@@ -32,8 +32,6 @@ void test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
   tria.refine_global(4-dim);
   tria.begin_active()->set_refine_flag();
   tria.last()->set_refine_flag();

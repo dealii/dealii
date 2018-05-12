@@ -42,8 +42,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class Boundary;
-template <int dim, int spacedim> class StraightBoundary;
 template <int dim, int spacedim> class Manifold;
 
 namespace GridTools
@@ -1278,16 +1276,6 @@ private:
 
 public:
   /**
-   * Default manifold object. This is used for those objects for which no
-   * boundary description has been explicitly set using set_manifold().
-   *
-   * @deprecated This member variable has been deprecated in favor of creating
-   * an independent FlatManifold.
-   */
-  DEAL_II_DEPRECATED
-  static const StraightBoundary<dim,spacedim> straight_boundary;
-
-  /**
    * Declare some symbolic names for mesh smoothing algorithms. The meaning of
    * these flags is documented in the Triangulation class.
    */
@@ -1706,68 +1694,6 @@ public:
   virtual const MeshSmoothing &get_mesh_smoothing() const;
 
   /**
-   * If @p dim==spacedim, assign a boundary object to a certain part of the
-   * boundary of a the triangulation. If a face with boundary number @p number
-   * is refined, this object is used to find the location of new vertices on
-   * the boundary (see the results section of step-49 for a more in-depth
-   * discussion of this, with examples).  It is also used for non-linear
-   * (i.e.: non-Q1) transformations of cells to the unit cell in shape
-   * function calculations.
-   *
-   * If @p dim!=spacedim the boundary object is in fact the exact manifold
-   * that the triangulation is approximating (for example a circle
-   * approximated by a polygon triangulation). As above, the refinement is
-   * made in such a way that the new points are located on the exact manifold.
-   *
-   * Numbers of boundary objects correspond to material numbers of faces at
-   * the boundary, for instance the material id in a UCD input file. They are
-   * not necessarily consecutive but must be in the range
-   * 0-(types::boundary_id-1).  Material IDs on boundaries are also called
-   * boundary indicators and are accessed with accessor functions of that
-   * name.
-   *
-   * The @p boundary_object is not copied and MUST persist until the
-   * triangulation is destroyed. This is also true for triangulations
-   * generated from this one by @p copy_triangulation.
-   *
-   * It is possible to remove or replace the boundary object during the
-   * lifetime of a non-empty triangulation. Usually, this is done before the
-   * first refinement and is dangerous afterwards. Removal of a boundary
-   * object is done by <tt>set_boundary(number)</tt>, i.e. the function of
-   * same name but only one argument. This operation then replaces the
-   * boundary object given before by a straight boundary approximation.
-   *
-   * @ingroup boundary
-   *
-   * @deprecated This method has been deprecated. Use
-   * Triangulation::set_manifold() instead.
-   *
-   * @see
-   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   */
-  DEAL_II_DEPRECATED
-  void set_boundary (const types::manifold_id   number,
-                     const Boundary<dim,spacedim> &boundary_object);
-
-
-  /**
-   * Reset those parts of the boundary with the given number to use a straight
-   * boundary approximation. This is the default state of a triangulation, and
-   * undoes assignment of a different boundary object by the function of same
-   * name and two arguments.
-   *
-   * @ingroup boundary
-   *
-   * @deprecated This method has been deprecated. Use
-   * Triangulation::reset_manifold() instead.
-   *
-   * @see
-   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   */
-  DEAL_II_DEPRECATED
-  void set_boundary (const types::manifold_id number);
-
-  /**
    * Assign a manifold object to a certain part of the triangulation. If
    * an object with manifold number @p number is refined, this object is used
    * to find the location of new vertices (see the results section of step-49
@@ -1869,22 +1795,6 @@ public:
    */
   void set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
                                          const types::manifold_id number);
-
-
-  /**
-   * Return a constant reference to a boundary object used for this
-   * triangulation.  Number is the same as in @p set_boundary
-   *
-   * @ingroup boundary
-   *
-   * @deprecated This method has been deprecated. Use
-   * Triangulation::get_manifold() instead.
-   *
-   * @see
-   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   */
-  DEAL_II_DEPRECATED
-  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
 
   /**
    * Return a constant reference to a Manifold object used for this

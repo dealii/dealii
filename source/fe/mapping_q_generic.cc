@@ -27,7 +27,6 @@
 #include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_tools.h>
@@ -3612,11 +3611,9 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
     }
   else
     // otherwise call the more complicated functions and ask for inner points
-    // from the boundary description
+    // from the manifold description
     {
       std::vector<Point<spacedim> > tmp_points;
-      // loop over each of the lines, and if it is at the boundary, then first
-      // get the boundary description and second compute the points on it
       for (unsigned int line_no=0; line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
         {
           const typename Triangulation<dim,spacedim>::line_iterator
@@ -3633,34 +3630,20 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
               cell->get_manifold() :
               line->get_manifold() );
 
-          if (const Boundary<dim,spacedim> *boundary
-              = dynamic_cast<const Boundary<dim,spacedim> *>(&manifold))
+          const std::array<Point<spacedim>, 2> vertices
+          {
             {
-              tmp_points.resize(this->polynomial_degree-1);
-              boundary->get_intermediate_points_on_line(line, tmp_points);
-              if (dim != 3 || cell->line_orientation(line_no))
-                a.insert (a.end(), tmp_points.begin(), tmp_points.end());
-              else
-                a.insert (a.end(), tmp_points.rbegin(), tmp_points.rend());
+              cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 0)),
+              cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 1))
             }
-          else
-            {
-              const std::array<Point<spacedim>, 2> vertices
-              {
-                {
-                  cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 0)),
-                  cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 1))
-                }
-              };
+          };
 
-              const std::size_t n_rows = support_point_weights_perimeter_to_interior[0].size(0);
-              a.resize(a.size() + n_rows);
-              auto a_view = make_array_view(a.end() - n_rows, a.end());
-              manifold.get_new_points(make_array_view(vertices.begin(),
-                                                      vertices.end()),
-                                      support_point_weights_perimeter_to_interior[0],
-                                      a_view);
-            }
+          const std::size_t n_rows = support_point_weights_perimeter_to_interior[0].size(0);
+          a.resize(a.size() + n_rows);
+          auto a_view = make_array_view(a.end() - n_rows, a.end());
+          manifold.get_new_points(make_array_view(vertices.begin(), vertices.end()),
+                                  support_point_weights_perimeter_to_interior[0],
+                                  a_view);
         }
     }
 }
@@ -3683,12 +3666,10 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
     {
       const Triangulation<3>::face_iterator face = cell->face(face_no);
 
-      // select the correct mappings for the present face
+#ifdef DEBUG
       const bool face_orientation = cell->face_orientation(face_no),
                  face_flip        = cell->face_flip       (face_no),
                  face_rotation    = cell->face_rotation   (face_no);
-
-#ifdef DEBUG
       const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face,
                          lines_per_face    = GeometryInfo<3>::lines_per_face;
 
@@ -3708,54 +3689,29 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                                            face_no, i, face_orientation, face_flip, face_rotation)),
                ExcInternalError());
 #endif
+      // extract the points surrounding a quad from the points
+      // already computed. First get the 4 vertices and then the points on
+      // the four lines
+      boost::container::small_vector<Point<3>, 200>
+      tmp_points(GeometryInfo<2>::vertices_per_cell
+                 + GeometryInfo<2>::lines_per_cell*(polynomial_degree-1));
+      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+        tmp_points[v] = a[GeometryInfo<3>::face_to_cell_vertices(face_no,v)];
+      if (polynomial_degree > 1)
+        for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
+          for (unsigned int i=0; i<polynomial_degree-1; ++i)
+            tmp_points[4+line*(polynomial_degree-1)+i] =
+              a[GeometryInfo<3>::vertices_per_cell +
+                (polynomial_degree-1)*
+                GeometryInfo<3>::face_to_cell_lines(face_no,line) + i];
 
-      // On a quad, we have to check whether the manifold should determine the
-      // point distribution from all surrounding points (new manifold code) or
-      // the old-style Boundary code should simply return the intermediate
-      // points. The second check is to find out whether the Boundary object
-      // is actually a StraightBoundary (the default flat manifold assigned to
-      // the triangulation if no manifold is assigned).
-      const Boundary<3,3> *boundary =
-        dynamic_cast<const Boundary<3,3> *>(&face->get_manifold());
-      if (boundary != nullptr &&
-          std::string(typeid(*boundary).name()).find("StraightBoundary") ==
-          std::string::npos)
-        {
-          // ask the boundary/manifold object to return intermediate points on it
-          tmp_points.resize((polynomial_degree-1)*(polynomial_degree-1));
-          boundary->get_intermediate_points_on_quad(face, tmp_points);
-          for (unsigned int i=0; i<tmp_points.size(); ++i)
-            a.push_back(tmp_points[fe_q->adjust_quad_dof_index_for_face_orientation(i,
-                                   face_orientation,
-                                   face_flip,
-                                   face_rotation)]);
-        }
-      else
-        {
-          // extract the points surrounding a quad from the points
-          // already computed. First get the 4 vertices and then the points on
-          // the four lines
-          boost::container::small_vector<Point<3>, 200>
-          tmp_points(GeometryInfo<2>::vertices_per_cell
-                     + GeometryInfo<2>::lines_per_cell*(polynomial_degree-1));
-          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-            tmp_points[v] = a[GeometryInfo<3>::face_to_cell_vertices(face_no,v)];
-          if (polynomial_degree > 1)
-            for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
-              for (unsigned int i=0; i<polynomial_degree-1; ++i)
-                tmp_points[4+line*(polynomial_degree-1)+i] =
-                  a[GeometryInfo<3>::vertices_per_cell +
-                    (polynomial_degree-1)*
-                    GeometryInfo<3>::face_to_cell_lines(face_no,line) + i];
-
-          const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
-          a.resize(a.size() + n_rows);
-          auto a_view = make_array_view(a.end() - n_rows, a.end());
-          face->get_manifold().get_new_points (make_array_view(tmp_points.begin(),
-                                                               tmp_points.end()),
-                                               support_point_weights_perimeter_to_interior[1],
-                                               a_view);
-        }
+      const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
+      a.resize(a.size() + n_rows);
+      auto a_view = make_array_view(a.end() - n_rows, a.end());
+      face->get_manifold().get_new_points (make_array_view(tmp_points.begin(),
+                                                           tmp_points.end()),
+                                           support_point_weights_perimeter_to_interior[1],
+                                           a_view);
     }
 }
 
@@ -3767,38 +3723,28 @@ MappingQGeneric<2,3>::
 add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
                         std::vector<Point<3> >                  &a) const
 {
-  if (const Boundary<2,3> *boundary =
-        dynamic_cast<const Boundary<2,3> *>(&cell->get_manifold()))
-    {
-      std::vector<Point<3> > points((polynomial_degree-1)*(polynomial_degree-1));
-      boundary->get_intermediate_points_on_quad(cell, points);
-      a.insert(a.end(), points.begin(), points.end());
-    }
-  else
-    {
-      std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
-      for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
-        vertices[i] = cell->vertex(i);
+  std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
+  for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+    vertices[i] = cell->vertex(i);
 
-      Table<2,double> weights(Utilities::fixed_power<2>(polynomial_degree-1),
-                              GeometryInfo<2>::vertices_per_cell);
-      for (unsigned int q=0, q2=0; q2<polynomial_degree-1; ++q2)
-        for (unsigned int q1=0; q1<polynomial_degree-1; ++q1, ++q)
-          {
-            Point<2> point(line_support_points.point(q1+1)[0],
-                           line_support_points.point(q2+1)[0]);
-            for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
-              weights(q,i) = GeometryInfo<2>::d_linear_shape_function(point, i);
-          }
-      // TODO: use all surrounding points once Boundary path is removed
-      const std::size_t n_rows = weights.size(0);
-      a.resize(a.size() + n_rows);
-      auto a_view = make_array_view(a.end() - n_rows, a.end());
-      cell->get_manifold().get_new_points(make_array_view(vertices.begin(),
-                                                          vertices.end()),
-                                          weights,
-                                          a_view);
-    }
+  Table<2,double> weights(Utilities::fixed_power<2>(polynomial_degree-1),
+                          GeometryInfo<2>::vertices_per_cell);
+  for (unsigned int q=0, q2=0; q2<polynomial_degree-1; ++q2)
+    for (unsigned int q1=0; q1<polynomial_degree-1; ++q1, ++q)
+      {
+        Point<2> point(line_support_points.point(q1+1)[0],
+                       line_support_points.point(q2+1)[0]);
+        for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+          weights(q,i) = GeometryInfo<2>::d_linear_shape_function(point, i);
+      }
+
+  const std::size_t n_rows = weights.size(0);
+  a.resize(a.size() + n_rows);
+  auto a_view = make_array_view(a.end() - n_rows, a.end());
+  cell->get_manifold().get_new_points(make_array_view(vertices.begin(),
+                                                      vertices.end()),
+                                      weights,
+                                      a_view);
 }
 
 
