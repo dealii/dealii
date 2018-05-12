@@ -101,7 +101,7 @@
  *       <td>step-3</td>
  *       <td> Actually solve Laplace's
  *       problem. Object-orientation. Assembling matrices and
- *       vectors. %Boundary values.
+ *       vectors. Boundary values.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -303,7 +303,7 @@
  *
  *   <tr valign="top">
  *       <td>step-34</td>
- *       <td> %Boundary element methods (BEM) of low order: Exterior irrotational
+ *       <td> Boundary element methods (BEM) of low order: Exterior irrotational
  *       flow. The ParsedFunction class.
  *       </td></tr>
  *
@@ -667,7 +667,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> %Boundary element methods, curved manifolds
+ *     <td> Boundary element methods, curved manifolds
  *     </td>
  *     <td>
  *       step-32,

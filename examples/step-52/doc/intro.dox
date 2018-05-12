@@ -216,7 +216,7 @@ where
   {\cal S}_{i}(t)  &=& (\psi_i,S(x,t))_\Omega.
 @f}
 See also step-24 and step-26 to understand how we arrive here.
-%Boundary terms are not necessary due to the chosen boundary conditions for
+Boundary terms are not necessary due to the chosen boundary conditions for
 the current problem. To use the Runge-Kutta methods, we recast this
 as follows:
 @f{eqnarray*}

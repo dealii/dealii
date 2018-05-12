@@ -125,7 +125,7 @@ problems and that you may want to investigate before trying to morph step-31
 into something that can solve whatever you want to solve.
 
 
-<h3>%Boundary and initial conditions</h3>
+<h3>Boundary and initial conditions</h3>
 
 Since the Boussinesq equations are derived under the assumption that inertia
 of the fluid's motion does not play a role, the flow field is at each time

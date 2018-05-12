@@ -572,7 +572,7 @@ namespace MatrixCreator
  * others.
  *
  *
- * <h3>%Boundary conditions</h3>
+ * <h3>Boundary conditions</h3>
  *
  * The apply_boundary_values() function inserts boundary conditions into a
  * system of equations.  To actually do this you have to specify a list of

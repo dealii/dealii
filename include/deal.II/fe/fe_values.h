@@ -3277,7 +3277,7 @@ public:
                     const Quadrature<dim-1>&           quadrature);
 
   /**
-   * %Boundary form of the transformation of the cell at the <tt>i</tt>th
+   * Boundary form of the transformation of the cell at the <tt>i</tt>th
    * quadrature point.  See
    * @ref GlossBoundaryForm.
    *

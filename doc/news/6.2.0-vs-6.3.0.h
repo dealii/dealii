@@ -201,7 +201,7 @@ inconvenience this causes.
    and Cataldo Manigrasso, SISSA, Trieste, Italy). It
    explains in detail how to use the
    library for the solution of problems defined on codimension
-   one manifolds, such as, for example, %Boundary Element Methods.
+   one manifolds, such as, for example, Boundary Element Methods.
    <br>
    (Luca Heltai, 2009/09/23)
    </p>
