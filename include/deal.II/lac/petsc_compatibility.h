@@ -37,15 +37,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace PETScWrappers
 {
   /**
-   * a compatibility typedef for older versions of PETSc.
-   *
-   * @deprecated The name of this type changed in PETSc 3.2: deal.II does not
-   * support versions of PETSc older than this so this typedef will be removed
-   * in a future release.
-   */
-  typedef PetscBool PetscBooleanType DEAL_II_DEPRECATED;
-
-  /**
    * Set an option in the global PETSc database. This function just wraps
    * PetscOptionsSetValue with a version check (the signature of this function
    * changed in PETSc 3.7.0).

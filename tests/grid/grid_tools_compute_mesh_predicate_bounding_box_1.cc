@@ -29,7 +29,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/distributed/grid_tools.h>
 #include <deal.II/distributed/grid_refinement.h>
 
 // predicate: test if the cell is locally owned
