@@ -150,6 +150,13 @@ namespace SparsityPatternIterators
     size_type index () const;
 
     /**
+     * Return global index in sparsity pattern.
+     * This function can only be called for entries for which is_valid_entry()
+     * is true.
+     */
+    size_type global_index () const;
+
+    /**
      * Column number of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
@@ -1138,6 +1145,7 @@ namespace SparsityPatternIterators
   {}
 
 
+
   inline
   Accessor::
   Accessor (const SparsityPattern *sparsity_pattern)
@@ -1145,6 +1153,7 @@ namespace SparsityPatternIterators
     sparsity_pattern(sparsity_pattern),
     index_within_sparsity(sparsity_pattern->rowstart[sparsity_pattern->rows])
   {}
+
 
 
   inline
@@ -1156,6 +1165,7 @@ namespace SparsityPatternIterators
             sparsity_pattern->colnums[index_within_sparsity]
             != SparsityPattern::invalid_entry);
   }
+
 
 
   inline
@@ -1172,6 +1182,7 @@ namespace SparsityPatternIterators
   }
 
 
+
   inline
   size_type
   Accessor::column() const
@@ -1180,6 +1191,7 @@ namespace SparsityPatternIterators
 
     return (sparsity_pattern->colnums[index_within_sparsity]);
   }
+
 
 
   inline
@@ -1191,6 +1203,16 @@ namespace SparsityPatternIterators
     return index_within_sparsity - sparsity_pattern->rowstart[row()];
   }
 
+
+
+  inline
+  size_type
+  Accessor::global_index() const
+  {
+    Assert (is_valid_entry() == true, ExcInvalidIterator());
+
+    return index_within_sparsity;
+  }
 
 
 
@@ -1290,12 +1312,14 @@ namespace SparsityPatternIterators
   }
 
 
+
   inline
   bool
   Iterator::operator < (const Iterator &other) const
   {
     return accessor < other.accessor;
   }
+
 
 
   inline
@@ -1317,6 +1341,7 @@ SparsityPattern::begin () const
 {
   return iterator(this, rowstart[0]);
 }
+
 
 
 inline
@@ -1358,6 +1383,7 @@ SparsityPattern::n_rows () const
 }
 
 
+
 inline
 SparsityPattern::size_type
 SparsityPattern::n_cols () const
@@ -1366,12 +1392,14 @@ SparsityPattern::n_cols () const
 }
 
 
+
 inline
 bool
 SparsityPattern::is_compressed () const
 {
   return compressed;
 }
+
 
 
 inline
@@ -1403,6 +1431,7 @@ SparsityPattern::column_number (const size_type row,
 
   return colnums[rowstart[row]+index];
 }
+
 
 
 inline
