@@ -3926,9 +3926,7 @@ namespace internal
       for (LineList::const_iterator line=line_list.begin();
            line!=line_list.end(); ++line)
         if (eps_flags_base.color_lines_level && (line->level > 0))
-          // lines colored according to
-          // refinement level,
-          // contributed by J�rg
+          // lines colored according to refinement level, contributed by Jörg
           // R. Weimar
           out << line->level
               << " l "
