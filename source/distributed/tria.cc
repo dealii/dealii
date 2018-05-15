@@ -3239,10 +3239,10 @@ namespace parallel
 #endif
 
       // add new pair with offset and pack_callback
-      cell_attached_data.pack_callbacks.push_back(
-        std::make_pair(cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
-                       pack_callback)
-      );
+      cell_attached_data.pack_callbacks.push_back({ cell_attached_data.cumulative_fixed_data_size
+                                                    + sizeof(CellStatus),
+                                                    pack_callback
+                                                  } );
 
       // increase counters
       ++cell_attached_data.n_attached_datas;
