@@ -45,6 +45,7 @@ void do_reinit (SparsityPattern &sp)
 }
 
 
+
 void do_reinit (ChunkSparsityPattern &sp)
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5, chunk_size);
@@ -77,6 +78,7 @@ void build_sparsity (SP &sparsity_pattern)
 }
 
 
+
 template <typename SP>
 void row_length ()
 {
@@ -88,6 +90,21 @@ void row_length ()
 
   deallog << "OK" << std::endl;
 }
+
+
+
+template <typename SP>
+void global_index ()
+{
+  SP sparsity_pattern;
+  build_sparsity (sparsity_pattern);
+
+  for (auto it = sparsity_pattern.begin(); it != sparsity_pattern.end(); ++it)
+    deallog << it->row() << " " << it->column() << " " << it->global_index() << std::endl;
+
+  deallog << "OK" << std::endl;
+}
+
 
 
 template <typename SP>
@@ -113,6 +130,7 @@ void print ()
 
   deallog << "OK" << std::endl;
 }
+
 
 
 template <typename SP>
@@ -166,7 +184,6 @@ void copy_with_offdiagonals_1<DynamicSparsityPattern> ()
 
 
 
-
 template <typename SP>
 void copy_with_offdiagonals_2 ()
 {
@@ -189,6 +206,7 @@ void copy_with_offdiagonals_2 ()
 }
 
 
+
 template <>
 void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
 {
@@ -206,7 +224,6 @@ void copy_with_offdiagonals_2<DynamicSparsityPattern> ()
   // function
   deallog << "OK" << std::endl;
 }
-
 
 
 
@@ -228,7 +245,6 @@ do_copy_from (const std::list<std::set<unsigned int,std::greater<unsigned int> >
                  sparsity.begin(), sparsity.end(),
                  chunk_size);
 }
-
 
 
 
@@ -262,13 +278,13 @@ do_copy_from (const FullMatrix<double> &sparsity,
 }
 
 
+
 void
 do_copy_from (const FullMatrix<double> &sparsity,
               ChunkSparsityPattern &sp4)
 {
   sp4.copy_from (sparsity, chunk_size);
 }
-
 
 
 
@@ -438,6 +454,7 @@ void matrix_position ()
 }
 
 
+
 template <>
 void matrix_position<ChunkSparsityPattern> ()
 {
@@ -446,14 +463,13 @@ void matrix_position<ChunkSparsityPattern> ()
 }
 
 
+
 template <>
 void matrix_position<DynamicSparsityPattern> ()
 {
   // this class doesn't have that function
   deallog << "OK" << std::endl;
 }
-
-
 
 
 
@@ -498,7 +514,6 @@ void block_read_write<DynamicSparsityPattern> ()
   // pattern
   deallog << "OK" << std::endl;
 }
-
 
 
 
