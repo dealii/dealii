@@ -121,8 +121,9 @@ public:
    * components and suffix.
    * @param open_mode The mode handed over to the @p fopen function.
    */
-  std::string find (const std::string &filename,
-                    const char *open_mode = "r");
+  std::string
+  find (const std::string &filename,
+        const char *open_mode = "r");
 
   /**
    * Find a file in the class specified by the constructor and return its
@@ -142,32 +143,37 @@ public:
    * @param suffix The suffix to be used for opening.
    * @param open_mode The mode handed over to the @p fopen function.
    */
-  std::string find (const std::string &filename,
-                    const std::string &suffix,
-                    const char *open_mode = "r");
+  std::string
+  find (const std::string &filename,
+        const std::string &suffix,
+        const char *open_mode = "r");
 
   /**
    * Show the paths and suffixes used for this object.
    */
   template <class StreamType>
-  void show(StreamType &stream) const;
+  void
+  show(StreamType &stream) const;
 
   /**
    * Add a new class.
    */
-  static void add_class (const std::string &cls);
+  static void
+  add_class (const std::string &cls);
 
   /**
    * Add a path to the current class. See PathSearch::Position for possible
    * position arguments.
    */
-  void add_path (const std::string &path, Position pos = back);
+  void
+  add_path (const std::string &path, Position pos = back);
 
   /**
    * Add a path to the current class. See PathSearch::Position for possible
    * position arguments.
    */
-  void add_suffix (const std::string &suffix, Position pos = back);
+  void
+  add_suffix (const std::string &suffix, Position pos = back);
 
   /**
    * This class was not registered in the path search mechanism.
@@ -197,19 +203,22 @@ private:
   /**
    * Initialize the static list objects for further use.
    */
-  static void initialize_classes();
+  static void
+  initialize_classes();
 
   /**
    * Get path list for a certain class. Used to set up #my_path_list in
    * constructor.
    */
-  static std::vector<std::string> &get_path_list(const std::string &cls);
+  static std::vector<std::string> &
+  get_path_list(const std::string &cls);
 
   /**
    * Get suffix list for a certain class. Used to set up #my_suffix_list in
    * constructor.
    */
-  static std::vector<std::string> &get_suffix_list(const std::string &cls);
+  static std::vector<std::string> &
+  get_suffix_list(const std::string &cls);
 
   /**
    * The file class handled by this object.

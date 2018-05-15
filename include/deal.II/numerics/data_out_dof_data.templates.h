@@ -319,8 +319,9 @@ namespace internal
      * for the real part is the only valid choice for the second argument.
      */
     template <typename NumberType>
-    double get_component (const NumberType         value,
-                          const ComponentExtractor extract_component)
+    double
+    get_component (const NumberType         value,
+                   const ComponentExtractor extract_component)
     {
       (void)extract_component;
       static_assert (numbers::NumberTraits<NumberType>::is_complex == false,
@@ -338,8 +339,9 @@ namespace internal
      * when the given value is a complex number
      */
     template <typename NumberType>
-    double get_component (const std::complex<NumberType> &value,
-                          const ComponentExtractor        extract_component)
+    double
+    get_component (const std::complex<NumberType> &value,
+                   const ComponentExtractor        extract_component)
     {
       switch (extract_component)
         {
@@ -359,8 +361,9 @@ namespace internal
 
 
     template <int rank, int dim, typename NumberType>
-    Tensor<rank,dim> get_component (const Tensor<rank,dim,NumberType> &value,
-                                    const ComponentExtractor           extract_component)
+    Tensor<rank,dim>
+    get_component (const Tensor<rank,dim,NumberType> &value,
+                   const ComponentExtractor           extract_component)
     {
       Assert (extract_component == ComponentExtractor::real_part,
               ExcMessage ("You cannot extract anything other than the real "
@@ -545,18 +548,21 @@ namespace internal
        * Return whether the data represented by (a derived class of) this object
        * represents a complex-valued (as opposed to real-valued) information.
        */
-      virtual bool is_complex_valued () const override;
+      virtual bool
+      is_complex_valued () const override;
 
       /**
        * Clear all references to the vectors.
        */
-      virtual void clear () override;
+      virtual void
+      clear () override;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      virtual std::size_t memory_consumption () const override;
+      virtual std::size_t
+      memory_consumption () const override;
 
     private:
       /**
@@ -1154,7 +1160,8 @@ add_data_vector_internal
 
 template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
-void DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear_data_vectors ()
+void
+DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear_data_vectors ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());

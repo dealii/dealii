@@ -75,7 +75,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -124,7 +125,8 @@ public:
   /**
    * Return the radius of the cylinder.
    */
-  double get_radius () const;
+  double
+  get_radius () const;
 
   /**
    * Exception. Thrown by the @p get_radius if the @p
@@ -158,13 +160,15 @@ private:
    * Refer to the general documentation of @p get_intermediate_points_on_line
    * in the documentation of the base class.
    */
-  void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
-                                               std::vector<Point<spacedim> > &points) const;
+  void
+  get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
+                                          std::vector<Point<spacedim> > &points) const;
 
   /**
    * Given a number for the axis, return a vector that denotes this direction.
    */
-  static Point<spacedim> get_axis_vector (const unsigned int axis);
+  static Point<spacedim>
+  get_axis_vector (const unsigned int axis);
 };
 
 
@@ -224,13 +228,15 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,dim> >
+  clone() const override;
 
   /**
    * Return the radius of the (truncated) cone at given point <tt>x</tt> on
    * the axis.
    */
-  double get_radius (const Point<dim> x) const;
+  double
+  get_radius (const Point<dim> x) const;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -364,7 +370,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -476,8 +483,9 @@ private:
    * Refer to the general documentation of @p get_intermediate_points_on_line
    * in the documentation of the base class.
    */
-  void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
-                                               std::vector<Point<spacedim> > &points) const;
+  void
+  get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
+                                          std::vector<Point<spacedim> > &points) const;
 };
 
 
@@ -511,7 +519,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,dim> >
+  clone() const override;
 
   /**
    * Check if on the line <tt>x==0</tt>, otherwise pass to the base class.
@@ -586,7 +595,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,dim> >
+  clone() const override;
 };
 
 
@@ -625,7 +635,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,dim> >
+  clone() const override;
 
   /**
    * Construct a new point on a line.
@@ -701,7 +712,8 @@ public:
   /**
    * Clone this Boundary object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
 //Boundary Refinement Functions
   /**
@@ -719,14 +731,16 @@ public:
   /**
    * Construct a new points on a line.
    */
-  virtual void   get_intermediate_points_on_line (
+  virtual void
+  get_intermediate_points_on_line (
     const typename Triangulation< dim, spacedim >::line_iterator   &line,
     std::vector< Point< spacedim > >         &points) const override;
 
   /**
    * Construct a new points on a quad.
    */
-  virtual void  get_intermediate_points_on_quad (
+  virtual void
+  get_intermediate_points_on_quad (
     const typename Triangulation< dim, spacedim >::quad_iterator &quad,
     std::vector< Point< spacedim > >         &points ) const override;
 
@@ -734,7 +748,8 @@ public:
    * Get the normal from cartesian coordinates. This normal does not have unit
    * length.
    */
-  virtual void get_normals_at_vertices (
+  virtual void
+  get_normals_at_vertices (
     const typename Triangulation< dim, spacedim >::face_iterator &face,
     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const override;
 
@@ -746,31 +761,36 @@ private:
    * <tt>correct_angle = Pi - angle</tt>, etc.
    */
 
-  double           get_correct_angle(const double angle,const double x,const double y) const;
+  double
+  get_correct_angle(const double angle,const double x,const double y) const;
 
   /**
    * Get the cartesian coordinates of the Torus, i.e., from
    * <tt>(theta,phi)</tt> to <tt>(x,y,z)</tt>.
    */
-  Point<spacedim>  get_real_coord(const Point<dim> &surfP) const;
+  Point<spacedim>
+  get_real_coord(const Point<dim> &surfP) const;
 
   /**
    * Get the surface coordinates of the Torus, i.e., from <tt>(x,y,z)</tt> to
    * <tt>(theta,phi)</tt>.
    */
-  Point<dim>       get_surf_coord(const Point<spacedim> &p) const;
+  Point<dim>
+  get_surf_coord(const Point<spacedim> &p) const;
 
   /**
    * Get the normal from surface coordinates. This normal does not have unit
    * length.
    */
-  Point<spacedim>  get_surf_norm_from_sp(const Point<dim> &surfP)      const;
+  Point<spacedim>
+  get_surf_norm_from_sp(const Point<dim> &surfP)      const;
 
   /**
    * Get the normal from cartesian coordinates. This normal does not have unit
    * length.
    */
-  Point<spacedim>  get_surf_norm(const Point<spacedim> &p) const;
+  Point<spacedim>
+  get_surf_norm(const Point<spacedim> &p) const;
 
   /**
    * Inner and outer radii of the shell.

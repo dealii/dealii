@@ -164,8 +164,9 @@ public:
    *
    * Additionally, a relaxation parameter for derived classes may be provided.
    */
-  void initialize (const MatrixType &A,
-                   const AdditionalData parameters);
+  void
+  initialize (const MatrixType &A,
+              const AdditionalData parameters);
 protected:
   /**
    * Initialize matrix and block size for permuted preconditioning.
@@ -178,10 +179,11 @@ protected:
    *
    * Additionally, a relaxation parameter for derived classes may be provided.
    */
-  void initialize (const MatrixType &A,
-                   const std::vector<size_type> &permutation,
-                   const std::vector<size_type> &inverse_permutation,
-                   const AdditionalData parameters);
+  void
+  initialize (const MatrixType &A,
+              const std::vector<size_type> &permutation,
+              const std::vector<size_type> &inverse_permutation,
+              const AdditionalData parameters);
 
   /**
    * Set either the permutation of rows or the permutation of blocks,
@@ -206,32 +208,37 @@ protected:
    * @note It is safe to call set_permutation() before initialize(), while the
    * other order is only admissible for block permutation.
    */
-  void set_permutation(const std::vector<size_type> &permutation,
-                       const std::vector<size_type> &inverse_permutation);
+  void
+  set_permutation(const std::vector<size_type> &permutation,
+                  const std::vector<size_type> &inverse_permutation);
 
   /**
    * Replacement of invert_diagblocks() for permuted preconditioning.
    */
-  void invert_permuted_diagblocks();
+  void
+  invert_permuted_diagblocks();
 public:
   /**
    * Deletes the inverse diagonal block matrices if existent, sets the
    * blocksize to 0, hence leaves the class in the state that it had directly
    * after calling the constructor.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Check whether the object is empty.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Read-only access to entries. This function is only possible if the
    * inverse diagonal blocks are stored.
    */
-  value_type el(size_type i,
-                size_type j) const;
+  value_type
+  el(size_type i,
+     size_type j) const;
 
   /**
    * Stores the inverse of the diagonal blocks in @p inverse. This costs some
@@ -248,7 +255,8 @@ public:
    * You may want to do this in case you use this matrix to precondition
    * another matrix.
    */
-  void invert_diagblocks();
+  void
+  invert_diagblocks();
 
   /**
    * Perform one block relaxation step in forward numbering.
@@ -262,10 +270,11 @@ public:
    * function.
    */
   template <typename number2>
-  void forward_step (Vector<number2>       &dst,
-                     const Vector<number2> &prev,
-                     const Vector<number2> &src,
-                     const bool             transpose_diagonal) const;
+  void
+  forward_step (Vector<number2>       &dst,
+                const Vector<number2> &prev,
+                const Vector<number2> &src,
+                const bool             transpose_diagonal) const;
 
   /**
    * Perform one block relaxation step in backward numbering.
@@ -279,22 +288,25 @@ public:
    * function.
    */
   template <typename number2>
-  void backward_step (Vector<number2>       &dst,
-                      const Vector<number2> &prev,
-                      const Vector<number2> &src,
-                      const bool             transpose_diagonal) const;
+  void
+  backward_step (Vector<number2>       &dst,
+                 const Vector<number2> &prev,
+                 const Vector<number2> &src,
+                 const bool             transpose_diagonal) const;
 
 
   /**
    * Return the size of the blocks.
    */
-  size_type block_size () const;
+  size_type
+  block_size () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * @addtogroup Exceptions
@@ -401,17 +413,20 @@ public:
       /**
        * Row number of the element represented by this object.
        */
-      size_type row() const;
+      size_type
+      row() const;
 
       /**
        * Column number of the element represented by this object.
        */
-      size_type column() const;
+      size_type
+      column() const;
 
       /**
        * Value of this matrix entry.
        */
-      inverse_type value() const;
+      inverse_type
+      value() const;
 
     protected:
       /**
@@ -455,32 +470,38 @@ public:
     /**
      * Prefix increment.
      */
-    const_iterator &operator++ ();
+    const_iterator &
+    operator++ ();
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor &
+    operator* () const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor *
+    operator-> () const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const const_iterator &) const;
+    bool
+    operator == (const const_iterator &) const;
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const const_iterator &) const;
+    bool
+    operator != (const const_iterator &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
      * smaller or if the row numbers are equal and the first index is smaller.
      */
-    bool operator < (const const_iterator &) const;
+    bool
+    operator < (const const_iterator &) const;
 
   private:
     /**
@@ -514,13 +535,15 @@ public:
    * matrices in each preconditioning step.
    */
   template <typename number2>
-  void vmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Same as @p vmult, since Jacobi is symmetric.
    */
   template <typename number2>
-  void Tvmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  Tvmult (Vector<number2> &, const Vector<number2> &) const;
   /**
    * Execute block Jacobi preconditioning, adding to @p dst.
    *
@@ -529,45 +552,53 @@ public:
    * matrices in each preconditioning step.
    */
   template <typename number2>
-  void vmult_add (Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult_add (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Same as @p vmult_add, since Jacobi is symmetric.
    */
   template <typename number2>
-  void Tvmult_add (Vector<number2> &, const Vector<number2> &) const;
+  void
+  Tvmult_add (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Perform one step of the Jacobi iteration.
    */
   template <typename number2>
-  void step (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  step (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
   /**
    * Perform one step of the Jacobi iteration.
    */
   template <typename number2>
-  void Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
   /**
    * Iterator starting at the first entry.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin () const;
 
   /**
    * Final iterator.
    */
-  const_iterator end () const;
+  const_iterator
+  end () const;
 
   /**
    * Iterator starting at the first entry of row @p r.
    */
-  const_iterator begin (const size_type r) const;
+  const_iterator
+  begin (const size_type r) const;
 
   /**
    * Final iterator of row @p r.
    */
-  const_iterator end (const size_type r) const;
+  const_iterator
+  end (const size_type r) const;
 
 
 private:
@@ -578,9 +609,10 @@ private:
    * destination vector.
    */
   template <typename number2>
-  void do_vmult (Vector<number2> &,
-                 const Vector<number2> &,
-                 bool adding) const;
+  void
+  do_vmult (Vector<number2> &,
+            const Vector<number2> &,
+            bool adding) const;
 
   friend class Accessor;
   friend class const_iterator;
@@ -668,7 +700,8 @@ public:
    * direct solver.
    */
   template <typename number2>
-  void vmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Execute block SOR preconditioning.
@@ -681,7 +714,8 @@ public:
    * @see vmult
    */
   template <typename number2>
-  void vmult_add (Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult_add (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Backward application of vmult().
@@ -692,7 +726,8 @@ public:
    * the transposed, if the diagonal blocks are symmetric.
    */
   template <typename number2>
-  void Tvmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  Tvmult (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Execute backward block SOR preconditioning.
@@ -705,19 +740,22 @@ public:
    * @see vmult
    */
   template <typename number2>
-  void Tvmult_add (Vector<number2> &, const Vector<number2> &) const;
+  void
+  Tvmult_add (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Perform one step of the SOR iteration.
    */
   template <typename number2>
-  void step (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  step (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
   /**
    * Perform one step of the transposed SOR iteration.
    */
   template <typename number2>
-  void Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
 protected:
   /**
@@ -735,10 +773,11 @@ protected:
    * The parameter @p adding does not have any function, yet.
    */
   template <typename number2>
-  void forward (Vector<number2> &,
-                const Vector<number2> &,
-                const bool transpose_diagonal,
-                const bool adding) const;
+  void
+  forward (Vector<number2> &,
+           const Vector<number2> &,
+           const bool transpose_diagonal,
+           const bool adding) const;
 
   /**
    * Implementation of the backward substitution loop called by Tvmult() and
@@ -750,10 +789,11 @@ protected:
    * The parameter @p adding does not have any function, yet.
    */
   template <typename number2>
-  void backward (Vector<number2> &,
-                 const Vector<number2> &,
-                 const bool transpose_diagonal,
-                 const bool adding) const;
+  void
+  backward (Vector<number2> &,
+            const Vector<number2> &,
+            const bool transpose_diagonal,
+            const bool adding) const;
 };
 
 
@@ -828,25 +868,29 @@ public:
    * matrices in each preconditioning step.
    */
   template <typename number2>
-  void vmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Same as vmult()
    */
   template <typename number2>
-  void Tvmult (Vector<number2> &, const Vector<number2> &) const;
+  void
+  Tvmult (Vector<number2> &, const Vector<number2> &) const;
 
   /**
    * Perform one step of the SOR iteration.
    */
   template <typename number2>
-  void step (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  step (Vector<number2> &dst, const Vector<number2> &rhs) const;
 
   /**
    * Perform one step of the transposed SOR iteration.
    */
   template <typename number2>
-  void Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
+  void
+  Tstep (Vector<number2> &dst, const Vector<number2> &rhs) const;
 };
 
 /*@}*/

@@ -549,8 +549,9 @@ namespace GraphColoring
    * coloring using graph connections represented by SparsityPattern.
    * For further details, refer to SparsityTools::color_sparsity_pattern.
    */
-  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
-                                       std::vector<unsigned int> &color_indices);
+  unsigned int
+  color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                          std::vector<unsigned int> &color_indices);
 
 } // End graph_coloring namespace
 

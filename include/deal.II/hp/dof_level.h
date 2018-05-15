@@ -259,15 +259,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
 
     private:
       /**
@@ -279,7 +281,8 @@ namespace internal
        * freedom each of the finite elements has that we store in this object.
        */
       template <int dim, int spacedim>
-      void compress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection);
+      void
+      compress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection);
 
       /**
        * Uncompress the arrays that store dof indices by using a variant of
@@ -290,7 +293,8 @@ namespace internal
        * freedom each of the finite elements has that we store in this object.
        */
       template <int dim, int spacedim>
-      void uncompress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection);
+      void
+      uncompress_data (const dealii::hp::FECollection<dim,spacedim> &fe_collection);
 
 
       /**
@@ -310,7 +314,8 @@ namespace internal
        * called) without having to care about any of the other data
        * fields.
        */
-      void normalize_active_fe_indices ();
+      void
+      normalize_active_fe_indices ();
 
 
       /**
@@ -327,7 +332,8 @@ namespace internal
 
 
     inline
-    bool DoFLevel::is_compressed_entry (const active_fe_index_type active_fe_index)
+    bool
+    DoFLevel::is_compressed_entry (const active_fe_index_type active_fe_index)
     {
       return ((signed_active_fe_index_type)active_fe_index < 0);
     }

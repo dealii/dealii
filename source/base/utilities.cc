@@ -609,7 +609,8 @@ namespace Utilities
   {
 #if defined(__linux__)
 
-    double get_cpu_load ()
+    double
+    get_cpu_load ()
     {
       std::ifstream cpuinfo;
       cpuinfo.open("/proc/loadavg");
@@ -624,7 +625,8 @@ namespace Utilities
 
 #else
 
-    double get_cpu_load ()
+    double
+    get_cpu_load ()
     {
       return 0.;
     }
@@ -651,7 +653,8 @@ namespace Utilities
     }
 
 
-    void get_memory_stats (MemoryStats &stats)
+    void
+    get_memory_stats (MemoryStats &stats)
     {
       stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
 
@@ -684,7 +687,8 @@ namespace Utilities
 
 
 
-    std::string get_hostname ()
+    std::string
+    get_hostname ()
     {
 #if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_GETHOSTNAME)
       const unsigned int N=1024;
@@ -698,7 +702,8 @@ namespace Utilities
 
 
 
-    std::string get_time ()
+    std::string
+    get_time ()
     {
       std::time_t  time1= std::time (nullptr);
       std::tm     *time = std::localtime(&time1);
@@ -713,7 +718,8 @@ namespace Utilities
 
 
 
-    std::string get_date ()
+    std::string
+    get_date ()
     {
       std::time_t  time1= std::time (nullptr);
       std::tm     *time = std::localtime(&time1);
@@ -728,7 +734,8 @@ namespace Utilities
 
 
 
-    void posix_memalign (void **memptr, size_t alignment, size_t size)
+    void
+    posix_memalign (void **memptr, size_t alignment, size_t size)
     {
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign (memptr, alignment, size);
@@ -746,7 +753,8 @@ namespace Utilities
 
 
 
-    bool job_supports_mpi ()
+    bool
+    job_supports_mpi ()
     {
       return Utilities::MPI::job_supports_mpi();
     }
@@ -816,7 +824,8 @@ namespace Utilities
 
 
 
-    void destroy_communicator (Epetra_Comm &communicator)
+    void
+    destroy_communicator (Epetra_Comm &communicator)
     {
       // save the communicator, reset the map, and delete the communicator if
       // this whole thing was created as an MPI communicator
@@ -835,13 +844,15 @@ namespace Utilities
 
 
 
-    unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator)
+    unsigned int
+    get_n_mpi_processes (const Epetra_Comm &mpi_communicator)
     {
       return mpi_communicator.NumProc();
     }
 
 
-    unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator)
+    unsigned int
+    get_this_mpi_process (const Epetra_Comm &mpi_communicator)
     {
       return (unsigned int)mpi_communicator.MyPID();
     }
@@ -879,15 +890,24 @@ namespace Utilities
 
 #endif
 
-  template std::string to_string<int> (int, unsigned int);
-  template std::string to_string<long int> (long int, unsigned int);
-  template std::string to_string<long long int> (long long int, unsigned int);
-  template std::string to_string<unsigned int> (unsigned int, unsigned int);
-  template std::string to_string<unsigned long int> (unsigned long int, unsigned int);
-  template std::string to_string<unsigned long long int> (unsigned long long int, unsigned int);
-  template std::string to_string<float> (float, unsigned int);
-  template std::string to_string<double> (double, unsigned int);
-  template std::string to_string<long double> (long double, unsigned int);
+  template std::string to_string<int>
+  (int, unsigned int);
+  template std::string to_string<long int>
+  (long int, unsigned int);
+  template std::string to_string<long long int>
+  (long long int, unsigned int);
+  template std::string to_string<unsigned int>
+  (unsigned int, unsigned int);
+  template std::string to_string<unsigned long int>
+  (unsigned long int, unsigned int);
+  template std::string to_string<unsigned long long int>
+  (unsigned long long int, unsigned int);
+  template std::string to_string<float>
+  (float, unsigned int);
+  template std::string to_string<double>
+  (double, unsigned int);
+  template std::string to_string<long double>
+  (long double, unsigned int);
 
 }
 

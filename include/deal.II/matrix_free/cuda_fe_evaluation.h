@@ -33,8 +33,9 @@ namespace CUDAWrappers
   namespace internal
   {
     template <int dim, int fe_degree, bool transpose, typename Number>
-    __device__ void resolve_hanging_nodes_shmem(Number *values, const unsigned
-                                                int constr)
+    __device__ void
+    resolve_hanging_nodes_shmem(Number *values, const unsigned
+                                int constr)
     {
       //TODO
     }
@@ -85,9 +86,10 @@ namespace CUDAWrappers
     /**
      * Constructor.
      */
-    __device__ FEEvaluation(int cell_id,
-                            const data_type *data,
-                            SharedData<dim,Number> *shdata);
+    __device__
+    FEEvaluation(int cell_id,
+                 const data_type *data,
+                 SharedData<dim,Number> *shdata);
 
     /**
      * For the vector @p src, read out the values on the degrees of freedom of
@@ -97,7 +99,8 @@ namespace CUDAWrappers
      * nodes, so once can see it as a similar function to
      * ConstraintMatrix::read_dof_valuess as well.
      */
-    __device__ void read_dof_values(const Number *src);
+    __device__ void
+    read_dof_values(const Number *src);
 
     /**
      * Take the value stored internally on dof values of the current cell and
@@ -105,7 +108,8 @@ namespace CUDAWrappers
      * during the write operation. The functionality is hence similar to the
      * function ConstraintMatrix::distribute_local_to_global.
      */
-    __device__  void distribute_local_to_global(Number *dst) const;
+    __device__  void
+    distribute_local_to_global(Number *dst) const;
 
     /**
      * Evaluate the function values and the gradients of the FE function given
@@ -114,8 +118,9 @@ namespace CUDAWrappers
      * computed. This function needs to be called before the functions
      * @p get_value() or @p get_gradient() give useful information.
      */
-    __device__ void evaluate(const bool evaluate_val,
-                             const bool evaluate_grad);
+    __device__ void
+    evaluate(const bool evaluate_val,
+             const bool evaluate_grad);
 
     /**
      * This function takes the values and/or gradients that are stored on
@@ -124,14 +129,16 @@ namespace CUDAWrappers
      * @p integrate_val and @p integrate_grad are used to enable/disable some
      * of the values or the gradients.
      */
-    __device__ void integrate(const bool integrate_val,
-                              const bool integrate_grad);
+    __device__ void
+    integrate(const bool integrate_val,
+              const bool integrate_grad);
 
     /**
      * Return the value of a finite element function at quadrature point
      * number @p q_point after a call to @p evalue(true,...).
      */
-    __device__ value_type get_value(const unsigned int q_point) const;
+    __device__ value_type
+    get_value(const unsigned int q_point) const;
 
     /**
      * Write a value to the field containing the values on quadrature points
@@ -139,27 +146,31 @@ namespace CUDAWrappers
      * get_value(), This specifies the value which is tested by all basis
      * function on the current cell and integrated over.
      */
-    __device__ void submit_value(const value_type &val_in,
-                                 const unsigned int q_point);
+    __device__ void
+    submit_value(const value_type &val_in,
+                 const unsigned int q_point);
 
     /**
      * Return the gradient of a finite element function at quadrature point
      * number @p q_point after a call to @p evaluate(...,true).
      */
-    __device__ gradient_type get_gradient(const unsigned int q_point) const;
+    __device__ gradient_type
+    get_gradient(const unsigned int q_point) const;
 
     /**
      * Write a contribution that is tested by the gradient to the field
      * containing the values on quadrature points with component @p q_point
      */
-    __device__ void submit_gradient(const gradient_type &grad_in,
-                                    const unsigned int q_point);
+    __device__ void
+    submit_gradient(const gradient_type &grad_in,
+                    const unsigned int q_point);
 
     /**
      * Apply the function @p func on every quadrature point.
      */
     template <typename functor>
-    __device__ void apply_quad_point_operations(const functor &func);
+    __device__ void
+    apply_quad_point_operations(const functor &func);
 
   private:
     unsigned int *local_to_global;

@@ -77,12 +77,14 @@ namespace Patterns
     /**
      * Make destructor of this and all derived classes virtual.
      */
-    virtual ~PatternBase () = default;
+    virtual
+    ~PatternBase () = default;
 
     /**
      * Return <tt>true</tt> if the given string matches the pattern.
      */
-    virtual bool match (const std::string &test_string) const = 0;
+    virtual bool
+    match (const std::string &test_string) const = 0;
 
     /**
      * List of possible description output formats.
@@ -112,7 +114,8 @@ namespace Patterns
     /**
      * Return a string describing the pattern.
      */
-    virtual std::string description (const OutputStyle style=Machine) const = 0;
+    virtual std::string
+    description (const OutputStyle style=Machine) const = 0;
 
     /**
      * Return a pointer to an exact copy of the object. This is necessary
@@ -123,7 +126,8 @@ namespace Patterns
      * Ownership of the objects returned by this function is passed to the
      * caller of this function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const = 0;
+    virtual std::unique_ptr<PatternBase>
+    clone () const = 0;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -140,13 +144,15 @@ namespace Patterns
      * On the other hand, if you know that your class deviates from this
      * assumption significantly, you can still overload this function.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t
+    memory_consumption () const;
   };
 
   /**
    * Return pointer to the correct derived class based on description.
    */
-  std::unique_ptr<PatternBase> pattern_factory (const std::string &description);
+  std::unique_ptr<PatternBase>
+  pattern_factory (const std::string &description);
 
   namespace internal
   {
@@ -155,7 +161,8 @@ namespace Patterns
      * will appear as intended. For example, characters like _ can not be
      * written as is in LateX and have to be escaped as \_.
      */
-    std::string escape(const std::string &input, const PatternBase::OutputStyle style);
+    std::string
+    escape(const std::string &input, const PatternBase::OutputStyle style);
 
   }
 
@@ -206,28 +213,32 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an integer and its value is
      * within the specified range.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Integer> create (const std::string &description);
+    static std::unique_ptr<Integer>
+    create (const std::string &description);
 
   private:
     /**
@@ -298,21 +309,24 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a number and its value is within
      * the specified range.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Creates a new object on the heap using @p new if the given
@@ -321,7 +335,8 @@ namespace Patterns
      * of the returned object is transferred to the caller of this function,
      * which should be freed using @p delete.
      */
-    static std::unique_ptr<Double> create(const std::string &description);
+    static std::unique_ptr<Double>
+    create(const std::string &description);
 
   private:
     /**
@@ -368,34 +383,39 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Selection> create (const std::string &description);
+    static std::unique_ptr<Selection>
+    create (const std::string &description);
 
   private:
     /**
@@ -445,12 +465,14 @@ namespace Patterns
     /**
      * Return the internally stored separator.
      */
-    const std::string &get_separator() const;
+    const std::string &
+    get_separator() const;
 
     /**
      * Return the internally stored base pattern.
      */
-    const PatternBase &get_base_pattern() const;
+    const PatternBase &
+    get_base_pattern() const;
 
     /**
      * Copy constructor.
@@ -461,33 +483,38 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<List> create (const std::string &description);
+    static std::unique_ptr<List>
+    create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * @addtogroup Exceptions
@@ -578,53 +605,62 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Map> create (const std::string &description);
+    static std::unique_ptr<Map>
+    create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Return a reference to the key pattern.
      */
-    const PatternBase &get_key_pattern() const;
+    const PatternBase &
+    get_key_pattern() const;
 
     /**
      * Return a reference to the value pattern.
      */
-    const PatternBase &get_value_pattern() const;
+    const PatternBase &
+    get_value_pattern() const;
 
     /**
      * Return the separator of the map entries.
      */
-    const std::string &get_separator() const;
+    const std::string &
+    get_separator() const;
 
     /**
      * Return the key-value separator.
      */
-    const std::string &get_key_value_separator() const;
+    const std::string &
+    get_key_value_separator() const;
 
     /**
      * @addtogroup Exceptions
@@ -785,43 +821,50 @@ namespace Patterns
      * Return <tt>true</tt> if the string is a list of strings
      * each of which matches the patterns given to the constructor.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Tuple> create (const std::string &description);
+    static std::unique_ptr<Tuple>
+    create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Return a reference to the i-th pattern in the tuple.
      */
-    const PatternBase &get_pattern(const unsigned int &i) const;
+    const PatternBase &
+    get_pattern(const unsigned int &i) const;
 
     /**
      * Return the separator of the tuple entries.
      */
-    const std::string &get_separator() const;
+    const std::string &
+    get_separator() const;
 
   private:
     /**
@@ -863,34 +906,39 @@ namespace Patterns
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<MultipleSelection> create (const std::string &description);
+    static std::unique_ptr<MultipleSelection>
+    create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * @addtogroup Exceptions
@@ -934,21 +982,24 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Bool> create(const std::string &description);
+    static std::unique_ptr<Bool>
+    create(const std::string &description);
 
   private:
     /**
@@ -973,27 +1024,31 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Anything]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<Anything> create(const std::string &description);
+    static std::unique_ptr<Anything>
+    create(const std::string &description);
 
   private:
     /**
@@ -1046,20 +1101,23 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * file type flag
@@ -1071,7 +1129,8 @@ namespace Patterns
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<FileName> create (const std::string &description);
+    static std::unique_ptr<FileName>
+    create (const std::string &description);
 
   private:
     /**
@@ -1105,27 +1164,31 @@ namespace Patterns
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
      */
-    virtual bool match (const std::string &test_string) const override;
+    virtual bool
+    match (const std::string &test_string) const override;
 
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
-    virtual std::string description (const OutputStyle style=Machine) const override;
+    virtual std::string
+    description (const OutputStyle style=Machine) const override;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual std::unique_ptr<PatternBase> clone () const override;
+    virtual std::unique_ptr<PatternBase>
+    clone () const override;
 
     /**
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static std::unique_ptr<DirectoryName> create(const std::string &description);
+    static std::unique_ptr<DirectoryName>
+    create(const std::string &description);
 
   private:
     /**
@@ -1237,7 +1300,8 @@ namespace Patterns
        * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
-      static std::unique_ptr<Patterns::PatternBase> to_pattern() = delete;
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern() = delete;
 
       /**
        * Return a string containing a textual version of the variable s. Use the
@@ -1248,9 +1312,10 @@ namespace Patterns
        * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
-      static std::string to_string(const T &s,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &p = Convert<T>::to_pattern()) = delete;
+      static std::string
+      to_string(const T &s,
+                const std::unique_ptr<Patterns::PatternBase>
+                &p = Convert<T>::to_pattern()) = delete;
 
       /**
        * Convert a string to a value, using the given pattern. Use the pattern
@@ -1260,9 +1325,10 @@ namespace Patterns
        * it is implemented and available in the specializations of the Convert
        * class template for particular kinds of template arguments @p T.
        */
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &p =
-                          Convert<T>::to_pattern()) = delete;
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &p =
+                 Convert<T>::to_pattern()) = delete;
     };
 
     /**
@@ -1286,7 +1352,8 @@ namespace Patterns
      * @author Luca Heltai, 2018
      */
     template<typename T>
-    std::string to_string(const T &t);
+    std::string
+    to_string(const T &t);
 
     /**
      * A utility function that simplifies the conversion from strings to arbitrary
@@ -1316,7 +1383,8 @@ namespace Patterns
      * @author Luca Heltai, 2018
      */
     template<typename T>
-    void to_value(const std::string &s, T &t);
+    void
+    to_value(const std::string &s, T &t);
 
     /**
      * @addtogroup Exceptions
@@ -1420,7 +1488,8 @@ namespace Patterns
     struct Convert<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         if (std::is_same<T,bool>::value)
           return std_cxx14::make_unique<Patterns::Bool>();
@@ -1436,9 +1505,10 @@ namespace Patterns
         return nullptr;
       }
 
-      static std::string to_string(const T &value,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &p = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &value,
+                const std::unique_ptr<Patterns::PatternBase>
+                &p = Convert<T>::to_pattern())
       {
         std::stringstream str;
         if (std::is_same<T, unsigned char>::value ||
@@ -1453,9 +1523,10 @@ namespace Patterns
         return str.str();
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &p =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &p =
+                 Convert<T>::to_pattern())
       {
         AssertThrow(p->match(s), ExcNoMatch(s, *p));
         T value;
@@ -1536,13 +1607,15 @@ namespace Patterns
     {
       // Helper function for list_rank
       template <class T>
-      constexpr int max_list_rank()
+      constexpr int
+      max_list_rank()
       {
         return RankInfo<T>::list_rank;
       }
 
       template <class T1, class T2, class... Types>
-      constexpr int max_list_rank()
+      constexpr int
+      max_list_rank()
       {
         return std_cxx14::max(RankInfo<T1>::list_rank,
                               max_list_rank<T2,Types...>());
@@ -1550,13 +1623,15 @@ namespace Patterns
 
       // Helper function for map_rank
       template <class T>
-      constexpr int max_map_rank()
+      constexpr int
+      max_map_rank()
       {
         return RankInfo<T>::map_rank;
       }
 
       template <class T1, class T2, class... Types>
-      constexpr int max_map_rank()
+      constexpr int
+      max_map_rank()
       {
         return std_cxx14::max(RankInfo<T1>::map_rank,
                               max_map_rank<T2,Types...>());
@@ -1624,7 +1699,8 @@ namespace Patterns
     template <class T>
     struct Convert<T, typename std::enable_if<is_list_compatible<T>::value>::type>
     {
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
@@ -1635,9 +1711,10 @@ namespace Patterns
                  internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p, ExcMessage("I need a List pattern to convert a "
@@ -1659,9 +1736,10 @@ namespace Patterns
         return s;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
 
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
@@ -1686,7 +1764,8 @@ namespace Patterns
     template <class T>
     struct Convert<T, typename std::enable_if<is_map_compatible<T>::value>::type>
     {
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
@@ -1701,9 +1780,10 @@ namespace Patterns
                  internal::default_map_separator[internal::RankInfo<T>::map_rank - 1]);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
         AssertThrow(p, ExcMessage("I need a Map pattern to convert a string to "
@@ -1729,9 +1809,10 @@ namespace Patterns
         return s;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
 
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
@@ -1764,7 +1845,8 @@ namespace Patterns
     struct Convert<Tensor<rank, dim, Number>>
     {
       typedef Tensor<rank, dim, Number> T;
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
@@ -1775,9 +1857,10 @@ namespace Patterns
                  internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
@@ -1799,9 +1882,10 @@ namespace Patterns
         return s;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
 
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
@@ -1829,22 +1913,25 @@ namespace Patterns
 
       typedef Point<dim, Number> T;
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         return Convert<Tensor<1, dim, Number>>::to_pattern();
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         return Convert<Tensor<1, dim, Number>>::to_string(
                  Tensor<1, dim, Number>(t), pattern);
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
         return T(Convert<Tensor<1, dim, Number>>::to_value(s, pattern));
       }
@@ -1856,7 +1943,8 @@ namespace Patterns
     {
       typedef std::complex<Number> T;
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::list_rank > 0,
                       "Cannot use this class for non List-compatible types.");
@@ -1867,9 +1955,10 @@ namespace Patterns
                  internal::default_list_separator[internal::RankInfo<T>::list_rank - 1]);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
@@ -1889,9 +1978,10 @@ namespace Patterns
       /**
        * Convert a string to a value, using the given pattern, or a default one.
        */
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
 
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
@@ -1916,22 +2006,25 @@ namespace Patterns
     {
       typedef std::string T;
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         return std_cxx14::make_unique<Patterns::Anything>();
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(t), ExcNoMatch(t, *pattern));
         return t;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
         return s;
@@ -1944,7 +2037,8 @@ namespace Patterns
     {
       typedef std::pair<Key,Value> T;
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non Map-compatible types.");
@@ -1958,9 +2052,10 @@ namespace Patterns
                  internal::default_map_separator[internal::RankInfo<T>::map_rank - 1]);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         std::unordered_map<Key, Value> m;
         m.insert(t);
@@ -1969,9 +2064,10 @@ namespace Patterns
         return s;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
         std::unordered_map<Key, Value> m;
         m = Convert<decltype(m)>::to_value(s, pattern);
@@ -1985,7 +2081,8 @@ namespace Patterns
     {
       typedef std::tuple<Args...> T;
 
-      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
       {
         static_assert(internal::RankInfo<T>::map_rank > 0,
                       "Cannot use this class for non tuple-compatible types.");
@@ -1994,9 +2091,10 @@ namespace Patterns
                  *Convert<Args>::to_pattern()...);
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
+      static std::string
+      to_string(const T &t,
+                const std::unique_ptr<Patterns::PatternBase>
+                &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
         AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a tuple "
@@ -2010,9 +2108,10 @@ namespace Patterns
         return str;
       }
 
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
+      static T
+      to_value(const std::string &s,
+               const std::unique_ptr<Patterns::PatternBase> &pattern =
+                 Convert<T>::to_pattern())
       {
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
@@ -2053,17 +2152,19 @@ namespace Patterns
 
       template<std::size_t... I>
       static
-      T to_value_internal_1(const std::vector<std::string> &s,
-                            const Patterns::Tuple &pattern,
-                            std_cxx14::index_sequence<I...>)
+      T
+      to_value_internal_1(const std::vector<std::string> &s,
+                          const Patterns::Tuple &pattern,
+                          std_cxx14::index_sequence<I...>)
       {
         return std::make_tuple(Convert<typename std::tuple_element<I,T>::type>::
                                to_value(s[I], pattern.get_pattern(I).clone())...);
       }
 
       static
-      T to_value_internal_2(const std::vector<std::string> &s,
-                            const Patterns::Tuple &pattern)
+      T
+      to_value_internal_2(const std::vector<std::string> &s,
+                          const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_value_internal_1(s, pattern,
                                                std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
@@ -2072,14 +2173,16 @@ namespace Patterns
 
     // Utility function with default Pattern
     template<typename T>
-    std::string to_string(const T &t)
+    std::string
+    to_string(const T &t)
     {
       return Convert<T>::to_string(t);
     }
 
     // Utility function with default Pattern
     template<typename T>
-    void to_value(const std::string &s, T &t)
+    void
+    to_value(const std::string &s, T &t)
     {
       t = Convert<T>::to_value(s);
     }

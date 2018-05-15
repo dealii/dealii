@@ -93,7 +93,8 @@ namespace internal
      * Evaluate the Gamma function $ \Gamma(n) = (n-1)! $.
      * @param n  point of evaluation (integer).
      */
-    long double gamma(const unsigned int n)
+    long double
+    gamma(const unsigned int n)
     {
       long double result = n - 1;
       for (int i=n-2; i>1; --i)
@@ -598,8 +599,9 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 
 
 template <>
-unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
-                                          const unsigned int n)
+unsigned int
+QGaussOneOverR<2>::quad_size(const Point<2> singularity,
+                             const unsigned int n)
 {
   double eps=1e-8;
   bool on_edge=false;
@@ -789,8 +791,9 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
 
 
 template <int dim>
-bool QSorted<dim>::compare_weights(const unsigned int a,
-                                   const unsigned int b) const
+bool
+QSorted<dim>::compare_weights(const unsigned int a,
+                              const unsigned int b) const
 {
   return (this->weights[a] < this->weights[b]);
 }

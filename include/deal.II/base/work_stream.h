@@ -351,7 +351,8 @@ namespace WorkStream
         /**
          * Create an item and return a pointer to it.
          */
-        virtual void *operator () (void *) override
+        virtual void *
+        operator () (void *) override
         {
           // find first unused item. we know that there must be one
           // because we have set the maximal number of tokens in flight
@@ -493,7 +494,8 @@ namespace WorkStream
         /**
          * Work on an item.
          */
-        void *operator () (void *item) override
+        void *
+        operator () (void *item) override
         {
           // first unpack the current item
           typedef
@@ -637,7 +639,8 @@ namespace WorkStream
         /**
          * Work on a single item.
          */
-        void *operator () (void *item) override
+        void *
+        operator () (void *item) override
         {
           // first unpack the current item
           typedef
@@ -778,7 +781,8 @@ namespace WorkStream
          * The function that calls the worker and the copier functions on a
          * range of items denoted by the two arguments.
          */
-        void operator() (const tbb::blocked_range<typename std::vector<Iterator>::const_iterator> &range)
+        void
+        operator() (const tbb::blocked_range<typename std::vector<Iterator>::const_iterator> &range)
         {
           // we need to find an unused scratch and corresponding copy
           // data object in the list that corresponds to the current

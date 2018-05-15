@@ -377,8 +377,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim, spacedim> &x_source_f
 template <int dim, int spacedim>
 const FullMatrix<double> &
 FE_DGQ<dim,spacedim>
-::get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case) const
+::
+get_prolongation_matrix (const unsigned int child,
+                         const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
@@ -443,8 +444,9 @@ FE_DGQ<dim,spacedim>
 template <int dim, int spacedim>
 const FullMatrix<double> &
 FE_DGQ<dim,spacedim>
-::get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case) const
+::
+get_restriction_matrix (const unsigned int child,
+                        const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));

@@ -80,7 +80,8 @@ namespace Threads
      * A kind of copy constructor. Initialize each thread local object by
      * copying the given object.
      */
-    explicit ThreadLocalStorage (const T &t);
+    explicit
+    ThreadLocalStorage (const T &t);
 
     /**
      * Copy constructor. Initialize each thread local object with the
@@ -101,13 +102,15 @@ namespace Threads
      * member function, then you need to declare the member variable
      * <code>mutable</code> to allow such access.
      */
-    T &get ();
+    T &
+    get ();
 
     /**
      * Same as above, except that @p exists is set to true if an element was
      * already present for the current thread; false otherwise.
      */
-    T &get (bool &exists);
+    T &
+    get (bool &exists);
 
     /**
      * Conversion operator that simply converts the thread-local object to the
@@ -129,7 +132,8 @@ namespace Threads
      *
      * @return The current object, after the changes have been made
      */
-    ThreadLocalStorage<T> &operator = (const T &t);
+    ThreadLocalStorage<T> &
+    operator = (const T &t);
 
     /**
      * Remove the thread-local objects stored for all threads that have
@@ -150,7 +154,8 @@ namespace Threads
      * initialization. This is necessary both in the multithreaded or non-
      * multithreaded case.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Return a reference to the internal Threading Building Blocks

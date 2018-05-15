@@ -76,8 +76,9 @@ namespace DoFTools
         *
         * Return true if @p lhs is considered less than @p rhs.
         */
-      bool operator() (const Point<dim, Number> &lhs,
-                       const Point<dim, Number> &rhs) const
+      bool
+      operator() (const Point<dim, Number> &lhs,
+                  const Point<dim, Number> &rhs) const
       {
         double downstream_size = 0;
         double weight = 1.;
@@ -305,10 +306,11 @@ namespace DoFTools
 
 
   template <typename DoFHandlerType, typename Number>
-  void distribute_cell_to_dof_vector (const DoFHandlerType &dof_handler,
-                                      const Vector<Number> &cell_data,
-                                      Vector<double>       &dof_data,
-                                      const unsigned int    component)
+  void
+  distribute_cell_to_dof_vector (const DoFHandlerType &dof_handler,
+                                 const Vector<Number> &cell_data,
+                                 Vector<double>       &dof_data,
+                                 const unsigned int    component)
   {
     const unsigned int dim = DoFHandlerType::dimension;
     const unsigned int spacedim = DoFHandlerType::space_dimension;
@@ -889,7 +891,8 @@ namespace DoFTools
     namespace
     {
       template <int spacedim>
-      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<1,spacedim> &dof_handler)
+      IndexSet
+      extract_hanging_node_dofs (const dealii::DoFHandler<1,spacedim> &dof_handler)
       {
         // there are no hanging nodes in 1d
         return IndexSet(dof_handler.n_dofs());
@@ -897,7 +900,8 @@ namespace DoFTools
 
 
       template <int spacedim>
-      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<2,spacedim> &dof_handler)
+      IndexSet
+      extract_hanging_node_dofs (const dealii::DoFHandler<2,spacedim> &dof_handler)
       {
         const unsigned int dim = 2;
 
@@ -935,7 +939,8 @@ namespace DoFTools
 
 
       template <int spacedim>
-      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<3,spacedim> &dof_handler)
+      IndexSet
+      extract_hanging_node_dofs (const dealii::DoFHandler<3,spacedim> &dof_handler)
       {
         const unsigned int dim = 3;
 
@@ -1313,7 +1318,8 @@ namespace DoFTools
       for (auto cell : dof_handler.active_cell_iterators())
         max_subdomain_id = std::max (max_subdomain_id, cell->subdomain_id());
       return max_subdomain_id + 1;
-    } ()
+    }
+    ()
     :
     Utilities::MPI::n_mpi_processes
     (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
@@ -1723,7 +1729,8 @@ namespace DoFTools
        * Return true if the given element is primitive.
        */
       template <int dim, int spacedim>
-      bool all_elements_are_primitive (const FiniteElement<dim,spacedim> &fe)
+      bool
+      all_elements_are_primitive (const FiniteElement<dim,spacedim> &fe)
       {
         return fe.is_primitive();
       }
@@ -1733,7 +1740,8 @@ namespace DoFTools
        * Return true if each element of the given element collection is primitive.
        */
       template <int dim, int spacedim>
-      bool all_elements_are_primitive (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
+      bool
+      all_elements_are_primitive (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
       {
         for (unsigned int i=0; i<fe_collection.size(); ++i)
           if (fe_collection[i].is_primitive() == false)
@@ -2253,11 +2261,12 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void make_cell_patches(SparsityPattern                &block_list,
-                         const DoFHandler<dim,spacedim> &dof_handler,
-                         const unsigned int             level,
-                         const std::vector<bool>        &selected_dofs,
-                         const types::global_dof_index  offset)
+  void
+  make_cell_patches(SparsityPattern                &block_list,
+                    const DoFHandler<dim,spacedim> &dof_handler,
+                    const unsigned int             level,
+                    const std::vector<bool>        &selected_dofs,
+                    const types::global_dof_index  offset)
   {
     typename DoFHandler<dim,spacedim>::level_cell_iterator cell;
     typename DoFHandler<dim,spacedim>::level_cell_iterator endc = dof_handler.end(level);
@@ -2295,10 +2304,11 @@ namespace DoFTools
 
 
   template <typename DoFHandlerType>
-  void make_single_patch(SparsityPattern      &block_list,
-                         const DoFHandlerType &dof_handler,
-                         const unsigned int    level,
-                         const bool            interior_only)
+  void
+  make_single_patch(SparsityPattern      &block_list,
+                    const DoFHandlerType &dof_handler,
+                    const unsigned int    level,
+                    const bool            interior_only)
   {
     const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_fe();
     block_list.reinit(1, dof_handler.n_dofs(level), dof_handler.n_dofs(level));
@@ -2338,11 +2348,12 @@ namespace DoFTools
 
 
   template <typename DoFHandlerType>
-  void make_child_patches (SparsityPattern      &block_list,
-                           const DoFHandlerType &dof_handler,
-                           const unsigned int    level,
-                           const bool            interior_dofs_only,
-                           const bool            boundary_dofs)
+  void
+  make_child_patches (SparsityPattern      &block_list,
+                      const DoFHandlerType &dof_handler,
+                      const unsigned int    level,
+                      const bool            interior_dofs_only,
+                      const bool            boundary_dofs)
   {
     Assert(level > 0 && level < dof_handler.get_triangulation().n_levels(),
            ExcIndexRange(level, 1, dof_handler.get_triangulation().n_levels()));

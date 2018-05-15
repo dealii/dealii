@@ -204,27 +204,31 @@ public:
    * In any case, you should not rely on this behavior, and you should only
    * call this reinit function if you really know what you are doing.
    */
-  virtual void reinit (const size_type N,
-                       const bool         omit_zeroing_entries=false) override;
+  virtual void
+  reinit (const size_type N,
+          const bool         omit_zeroing_entries=false) override;
 
   /**
    * This reinit function is equivalent to constructing a new object with the
    * given size, starting from the pointer ptr.
    */
-  void reinit(const size_type N, Number *ptr);
+  void
+  reinit(const size_type N, Number *ptr);
 
   /**
    * This reinit function is equivalent to constructing a new object with the
    * given size, starting from the pointer ptr. The same considerations made
    * for the constructor apply here.
    */
-  void reinit(const size_type N, const Number *ptr);
+  void
+  reinit(const size_type N, const Number *ptr);
 
   /**
    * This function is here to prevent memory corruption. It should never be
    * called, and will throw an exception if you try to do so.
    */
-  virtual void swap (Vector<Number> &v) override;
+  virtual void
+  swap (Vector<Number> &v) override;
 };
 
 
@@ -274,8 +278,9 @@ VectorView<Number>::~VectorView()
 
 template <typename Number>
 inline
-void VectorView<Number>::reinit(const size_type N,
-                                const bool omit_zeroing_entries)
+void
+VectorView<Number>::reinit(const size_type N,
+                           const bool omit_zeroing_entries)
 {
   this->vec_size = N;
   this->max_vec_size = N;
@@ -286,7 +291,8 @@ void VectorView<Number>::reinit(const size_type N,
 
 template <typename Number>
 inline
-void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
+void
+VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
@@ -298,7 +304,8 @@ void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 
 template <typename Number>
 inline
-void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
+void
+VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
@@ -310,7 +317,8 @@ void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 
 template <typename Number>
 inline
-void VectorView<Number>::swap(Vector<Number> &)
+void
+VectorView<Number>::swap(Vector<Number> &)
 {
   AssertThrow(false, ExcMessage("Can't swap a VectorView with a Vector!"));
 }

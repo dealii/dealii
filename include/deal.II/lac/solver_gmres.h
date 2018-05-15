@@ -74,7 +74,8 @@ namespace internal
        * Get vector number @p i. If this vector was unused before, an error
        * occurs.
        */
-      VectorType &operator[] (const unsigned int i) const;
+      VectorType &
+      operator[] (const unsigned int i) const;
 
       /**
        * Get vector number @p i. Allocate it if necessary.
@@ -82,14 +83,16 @@ namespace internal
        * If a vector must be allocated, @p temp is used to reinit it to the
        * proper dimensions.
        */
-      VectorType &operator() (const unsigned int i,
-                              const VectorType   &temp);
+      VectorType &
+      operator() (const unsigned int i,
+                  const VectorType   &temp);
 
       /**
        * Return size of data vector. It is used in the solver to store
        * the Arnoldi vectors.
        */
-      unsigned int size() const;
+      unsigned int
+      size() const;
 
 
     private:
@@ -365,15 +368,17 @@ protected:
   /**
    * Implementation of the computation of the norm of the residual.
    */
-  virtual double criterion();
+  virtual double
+  criterion();
 
   /**
    * Transformation of an upper Hessenberg matrix into tridiagonal structure
    * by givens rotation of the last column
    */
-  void givens_rotation (Vector<double> &h,  Vector<double> &b,
-                        Vector<double> &ci, Vector<double> &si,
-                        int col) const;
+  void
+  givens_rotation (Vector<double> &h,  Vector<double> &b,
+                   Vector<double> &ci, Vector<double> &si,
+                   int col) const;
 
   /**
    * Orthogonalize the vector @p vv against the @p dim (orthogonal) vectors
@@ -577,8 +582,9 @@ namespace internal
 
     // A comparator for better printing eigenvalues
     inline
-    bool complex_less_pred(const std::complex<double> &x,
-                           const std::complex<double> &y)
+    bool
+    complex_less_pred(const std::complex<double> &x,
+                      const std::complex<double> &y)
     {
       return x.real() < y.real() || (x.real() == y.real() && x.imag() < y.imag());
     }

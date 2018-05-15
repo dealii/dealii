@@ -66,8 +66,9 @@ namespace MatrixTools
   namespace
   {
     template <typename Iterator>
-    bool column_less_than(const typename Iterator::value_type p,
-                          const unsigned int column)
+    bool
+    column_less_than(const typename Iterator::value_type p,
+                     const unsigned int column)
     {
       return (p.column() < column);
     }

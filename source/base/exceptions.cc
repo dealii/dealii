@@ -44,21 +44,24 @@ namespace deal_II_exceptions
 
   std::string additional_assert_output;
 
-  void set_additional_assert_output (const char *const p)
+  void
+  set_additional_assert_output (const char *const p)
   {
     additional_assert_output = p;
   }
 
   bool show_stacktrace = true;
 
-  void suppress_stacktrace_in_exceptions ()
+  void
+  suppress_stacktrace_in_exceptions ()
   {
     show_stacktrace = false;
   }
 
   bool abort_on_exception = true;
 
-  void disable_abort_on_exception ()
+  void
+  disable_abort_on_exception ()
   {
     abort_on_exception = false;
   }
@@ -113,11 +116,12 @@ ExceptionBase::~ExceptionBase () noexcept
 
 
 
-void ExceptionBase::set_fields (const char *f,
-                                const int  l,
-                                const char *func,
-                                const char *c,
-                                const char *e)
+void
+ExceptionBase::set_fields (const char *f,
+                           const int  l,
+                           const char *func,
+                           const char *c,
+                           const char *e)
 {
   file = f;
   line = l;
@@ -135,7 +139,8 @@ void ExceptionBase::set_fields (const char *f,
 #endif
 }
 
-const char *ExceptionBase::what() const noexcept
+const char *
+ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
   if (what_str == "")
@@ -157,14 +162,16 @@ const char *ExceptionBase::what() const noexcept
 }
 
 
-const char *ExceptionBase::get_exc_name () const
+const char *
+ExceptionBase::get_exc_name () const
 {
   return exc;
 }
 
 
 
-void ExceptionBase::print_exc_data (std::ostream &out) const
+void
+ExceptionBase::print_exc_data (std::ostream &out) const
 {
   // print a header for the exception
   out << "An error occurred in line <" << line
@@ -196,14 +203,16 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
 
 
 
-void ExceptionBase::print_info (std::ostream &out) const
+void
+ExceptionBase::print_info (std::ostream &out) const
 {
   out << "    (none)" << std::endl;
 }
 
 
 
-void ExceptionBase::print_stack_trace (std::ostream &out) const
+void
+ExceptionBase::print_stack_trace (std::ostream &out) const
 {
   if (n_stacktrace_frames == 0)
     return;
@@ -293,7 +302,8 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 
 
 
-void ExceptionBase::generate_message () const
+void
+ExceptionBase::generate_message () const
 {
   // build up a c_string with the error message.
   // Guard this procedure with a try block, we shall not throw at this
@@ -342,7 +352,8 @@ namespace StandardExceptions
     error_code (error_code)
   {}
 
-  void ExcMPI::print_info (std::ostream &out) const
+  void
+  ExcMPI::print_info (std::ostream &out) const
   {
     char error_name[MPI_MAX_ERROR_STRING];
     error_name[0] = '\0';
@@ -393,7 +404,8 @@ namespace StandardExceptions
 namespace
 {
   [[noreturn]]
-  void internal_abort (const ExceptionBase &exc) noexcept
+  void
+  internal_abort (const ExceptionBase &exc) noexcept
   {
     // first print the error
     std::cerr << exc.what() << std::endl;
@@ -441,7 +453,8 @@ namespace deal_II_exceptions
 {
   namespace internals
   {
-    void do_issue_error_nothrow (const ExceptionBase &exc) noexcept
+    void
+    do_issue_error_nothrow (const ExceptionBase &exc) noexcept
     {
       if (dealii::deal_II_exceptions::abort_on_exception)
         internal_abort(exc);
@@ -457,7 +470,8 @@ namespace deal_II_exceptions
 
 
     [[noreturn]]
-    void abort (const ExceptionBase &exc)
+    void
+    abort (const ExceptionBase &exc)
     {
       if (dealii::deal_II_exceptions::abort_on_exception)
         internal_abort(exc);
@@ -471,7 +485,8 @@ namespace deal_II_exceptions
 
 
 #ifdef DEAL_II_WITH_CUDA
-    std::string get_cusparse_error_string(const cusparseStatus_t error_code)
+    std::string
+    get_cusparse_error_string(const cusparseStatus_t error_code)
     {
       switch (error_code)
         {
@@ -516,7 +531,8 @@ namespace deal_II_exceptions
 
 
 
-    std::string get_cusolver_error_string(cusolverStatus_t error_code)
+    std::string
+    get_cusolver_error_string(cusolverStatus_t error_code)
     {
       std::string message;
       switch (error_code)
@@ -577,7 +593,8 @@ DEAL_II_NAMESPACE_CLOSE
 #ifdef DEAL_II_HAVE_VERBOSE_TERMINATE
 namespace __gnu_cxx
 {
-  extern void __verbose_terminate_handler ();
+  extern void
+  __verbose_terminate_handler ();
 }
 
 namespace

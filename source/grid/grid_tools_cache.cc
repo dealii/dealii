@@ -47,7 +47,8 @@ namespace GridTools
 
 
   template<int dim, int spacedim>
-  void Cache<dim,spacedim>::mark_for_update(const CacheUpdateFlags &flags)
+  void
+  Cache<dim,spacedim>::mark_for_update(const CacheUpdateFlags &flags)
   {
     update_flags |= flags;
   }
@@ -99,7 +100,8 @@ namespace GridTools
 
 #ifdef DEAL_II_WITH_NANOFLANN
   template<int dim, int spacedim>
-  const KDTree<spacedim> &Cache<dim,spacedim>::get_vertex_kdtree() const
+  const KDTree<spacedim> &
+  Cache<dim,spacedim>::get_vertex_kdtree() const
   {
     if (update_flags & update_vertex_kdtree)
       {

@@ -122,7 +122,8 @@ namespace PETScWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverBase () = default;
+    virtual
+    ~SolverBase () = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -142,26 +143,30 @@ namespace PETScWrappers
      * Resets the contained preconditioner and solver object. See class
      * description for more details.
      */
-    virtual void reset();
+    virtual void
+    reset();
 
 
     /**
      * Sets a prefix name for the solver object. Useful when customizing the
      * PETSc KSP object with command-line options.
      */
-    void set_prefix(const std::string &prefix);
+    void
+    set_prefix(const std::string &prefix);
 
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
     /**
      * initialize the solver with the preconditioner. This function is
      * intended for use with SLEPc spectral transformation class.
      */
-    void initialize(const PreconditionerBase &preconditioner);
+    void
+    initialize(const PreconditionerBase &preconditioner);
 
   protected:
 
@@ -182,7 +187,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is requested by the derived class.
      */
-    virtual void set_solver_type (KSP &ksp) const = 0;
+    virtual void
+    set_solver_type (KSP &ksp) const = 0;
 
     /**
      * Solver prefix name to qualify options specific to the PETSc KSP object
@@ -200,11 +206,12 @@ namespace PETScWrappers
      * reached.
      */
     static
-    PetscErrorCode convergence_test (KSP                 ksp,
-                                     const PetscInt      iteration,
-                                     const PetscReal     residual_norm,
-                                     KSPConvergedReason *reason,
-                                     void               *solver_control);
+    PetscErrorCode
+    convergence_test (KSP                 ksp,
+                      const PetscInt      iteration,
+                      const PetscReal     residual_norm,
+                      KSPConvergedReason *reason,
+                      void               *solver_control);
 
     /**
      * A structure that contains the PETSc solver and preconditioner objects.
@@ -310,7 +317,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -361,7 +369,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -411,7 +420,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -461,7 +471,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -528,7 +539,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -579,7 +591,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
   /**
@@ -628,7 +641,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -678,7 +692,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -734,7 +749,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -784,7 +800,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -835,7 +852,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
 
@@ -890,7 +908,8 @@ namespace PETScWrappers
      * Function that takes a Krylov Subspace Solver context object, and sets
      * the type of solver that is appropriate for this class.
      */
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
   };
 
   /**
@@ -935,16 +954,18 @@ namespace PETScWrappers
     /**
      * The method to solve the linear system.
      */
-    void solve (const MatrixBase &A,
-                VectorBase       &x,
-                const VectorBase &b);
+    void
+    solve (const MatrixBase &A,
+           VectorBase       &x,
+           const VectorBase &b);
 
     /**
      * The method allows to take advantage if the system matrix is symmetric
      * by using LDL^T decomposition instead of more expensive LU. The argument
      * indicates whether the matrix is symmetric or not.
      */
-    void set_symmetric_mode (const bool flag);
+    void
+    set_symmetric_mode (const bool flag);
 
   protected:
     /**
@@ -952,7 +973,8 @@ namespace PETScWrappers
      */
     const AdditionalData additional_data;
 
-    virtual void set_solver_type (KSP &ksp) const override;
+    virtual void
+    set_solver_type (KSP &ksp) const override;
 
   private:
     /**
@@ -962,11 +984,12 @@ namespace PETScWrappers
      * reached.
      */
     static
-    PetscErrorCode convergence_test (KSP                ksp,
-                                     const PetscInt     iteration,
-                                     const PetscReal    residual_norm,
-                                     KSPConvergedReason *reason,
-                                     void               *solver_control);
+    PetscErrorCode
+    convergence_test (KSP                ksp,
+                      const PetscInt     iteration,
+                      const PetscReal    residual_norm,
+                      KSPConvergedReason *reason,
+                      void               *solver_control);
 
     /**
      * A structure that contains the PETSc solver and preconditioner objects.

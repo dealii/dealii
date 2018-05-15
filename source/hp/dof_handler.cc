@@ -858,7 +858,8 @@ namespace internal
          */
         template <int dim, int spacedim>
         static
-        void communicate_active_fe_indices (dealii::hp::DoFHandler<dim,spacedim> &dof_handler)
+        void
+        communicate_active_fe_indices (dealii::hp::DoFHandler<dim,spacedim> &dof_handler)
         {
           if (const parallel::shared::Triangulation<dim, spacedim> *tr =
                 dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
@@ -1097,7 +1098,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
+  types::global_dof_index
+  DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
     Assert(fe_collection.size() > 0, ExcNoFESelected());
 
@@ -1165,7 +1167,8 @@ namespace hp
 
 
   template <>
-  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs () const
+  types::global_dof_index
+  DoFHandler<2,3>::n_boundary_dofs () const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1175,7 +1178,8 @@ namespace hp
 
   template <>
   template <typename number>
-  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const std::map<types::boundary_id, const Function<3,number>*> &) const
+  types::global_dof_index
+  DoFHandler<2,3>::n_boundary_dofs (const std::map<types::boundary_id, const Function<3,number>*> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1184,7 +1188,8 @@ namespace hp
 
 
   template <>
-  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
+  types::global_dof_index
+  DoFHandler<2,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1218,7 +1223,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::set_active_fe_indices (const std::vector<unsigned int> &active_fe_indices)
+  void
+  DoFHandler<dim,spacedim>::set_active_fe_indices (const std::vector<unsigned int> &active_fe_indices)
   {
     Assert(active_fe_indices.size()==get_triangulation().n_active_cells(),
            ExcDimensionMismatch(active_fe_indices.size(), get_triangulation().n_active_cells()));
@@ -1238,7 +1244,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::get_active_fe_indices (std::vector<unsigned int> &active_fe_indices) const
+  void
+  DoFHandler<dim,spacedim>::get_active_fe_indices (std::vector<unsigned int> &active_fe_indices) const
   {
     active_fe_indices.resize(get_triangulation().n_active_cells());
 
@@ -1252,8 +1259,9 @@ namespace hp
   }
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::initialize(const Triangulation<dim,spacedim> &tria,
-                                            const hp::FECollection<dim,spacedim> &fe)
+  void
+  DoFHandler<dim,spacedim>::initialize(const Triangulation<dim,spacedim> &tria,
+                                       const hp::FECollection<dim,spacedim> &fe)
   {
     if (this->tria != &tria)
       {
@@ -1273,7 +1281,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::distribute_dofs (const hp::FECollection<dim,spacedim> &ff)
+  void
+  DoFHandler<dim,spacedim>::distribute_dofs (const hp::FECollection<dim,spacedim> &ff)
   {
     Assert(tria!=nullptr,
            ExcMessage("You need to set the Triangulation in the DoFHandler using initialize() or "
@@ -1378,7 +1387,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::setup_policy_and_listeners ()
+  void
+  DoFHandler<dim,spacedim>::setup_policy_and_listeners ()
   {
     // decide whether we need a sequential or a parallel shared/distributed policy
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
@@ -1404,7 +1414,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::clear ()
+  void
+  DoFHandler<dim,spacedim>::clear ()
   {
     // release memory
     clear_space ();
@@ -1413,7 +1424,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
+  void
+  DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
   {
     Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
 
@@ -1516,7 +1528,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::create_active_fe_table ()
+  void
+  DoFHandler<dim,spacedim>::create_active_fe_table ()
   {
     // Create sufficiently many hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
@@ -1551,7 +1564,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::pre_refinement_action ()
+  void
+  DoFHandler<dim,spacedim>::pre_refinement_action ()
   {
     create_active_fe_table ();
 
@@ -1690,7 +1704,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::clear_space ()
+  void
+  DoFHandler<dim,spacedim>::clear_space ()
   {
     levels.clear ();
     faces.reset ();

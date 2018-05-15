@@ -188,14 +188,15 @@ namespace internal
     template <typename number,
               typename InVector,
               typename OutVector>
-    void vmult_add_on_subrange (const ChunkSparsityPattern &cols,
-                                const unsigned int  begin_row,
-                                const unsigned int  end_row,
-                                const number       *values,
-                                const std::size_t  *rowstart,
-                                const size_type    *colnums,
-                                const InVector     &src,
-                                OutVector          &dst)
+    void
+    vmult_add_on_subrange (const ChunkSparsityPattern &cols,
+                           const unsigned int  begin_row,
+                           const unsigned int  end_row,
+                           const number       *values,
+                           const std::size_t  *rowstart,
+                           const size_type    *colnums,
+                           const InVector     &src,
+                           OutVector          &dst)
     {
       const size_type m = cols.n_rows();
       const size_type n = cols.n_cols();
@@ -375,9 +376,10 @@ namespace internal
   namespace ChunkSparseMatrixImplementation
   {
     template <typename T>
-    void zero_subrange (const unsigned int begin,
-                        const unsigned int end,
-                        T *dst)
+    void
+    zero_subrange (const unsigned int begin,
+                   const unsigned int end,
+                   T *dst)
     {
       std::memset (dst+begin,0,(end-begin)*sizeof(T));
     }
@@ -1472,7 +1474,8 @@ ChunkSparseMatrix<number>::SSOR (Vector<somenumber> &dst,
 
 
 template <typename number>
-void ChunkSparseMatrix<number>::print (std::ostream &out) const
+void
+ChunkSparseMatrix<number>::print (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1486,12 +1489,13 @@ void ChunkSparseMatrix<number>::print (std::ostream &out) const
 
 
 template <typename number>
-void ChunkSparseMatrix<number>::print_formatted (std::ostream &out,
-                                                 const unsigned int precision,
-                                                 const bool scientific,
-                                                 const unsigned int width_,
-                                                 const char *zero_string,
-                                                 const double denominator) const
+void
+ChunkSparseMatrix<number>::print_formatted (std::ostream &out,
+                                            const unsigned int precision,
+                                            const bool scientific,
+                                            const unsigned int width_,
+                                            const char *zero_string,
+                                            const double denominator) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1538,8 +1542,9 @@ void ChunkSparseMatrix<number>::print_formatted (std::ostream &out,
 
 
 template <typename number>
-void ChunkSparseMatrix<number>::print_pattern (std::ostream &out,
-                                               const double threshold) const
+void
+ChunkSparseMatrix<number>::print_pattern (std::ostream &out,
+                                          const double threshold) const
 {
   AssertThrow (out, ExcIO());
 

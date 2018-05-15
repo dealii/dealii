@@ -64,8 +64,9 @@ namespace Functions
      * This function converts the given point to spherical coordinates,
      * calls svalue() with it, and returns the result.
      */
-    virtual double value (const Point<dim> &point,
-                          const unsigned int component = 0) const override;
+    virtual double
+    value (const Point<dim> &point,
+           const unsigned int component = 0) const override;
 
     /**
      * Return the gradient with respect to the Cartesian coordinates at point @p p.
@@ -74,8 +75,9 @@ namespace Functions
      * calls sgradient() with it, and converts the result into Cartesian
      * coordinates.
      */
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
+    virtual Tensor<1,dim>
+    gradient (const Point<dim>   &p,
+              const unsigned int  component = 0) const override;
 
     /**
      * Return the Hessian with respect to the Cartesian coordinates at point @p p.
@@ -84,18 +86,21 @@ namespace Functions
      * calls sgradient and shessian() with it, and converts the result into
      * Cartesian coordinates.
      */
-    virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                            const unsigned int component=0) const override;
+    virtual SymmetricTensor<2,dim>
+    hessian (const Point<dim> &p,
+             const unsigned int component=0) const override;
 
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
   private:
     /**
      * Return the value at point @p sp. Here, @p sp is provided in spherical
      * coordinates.
      */
-    virtual double svalue(const std::array<double, dim> &sp,
-                          const unsigned int component) const;
+    virtual double
+    svalue(const std::array<double, dim> &sp,
+           const unsigned int component) const;
 
     /**
      * Return the gradient in spherical coordinates.
@@ -103,8 +108,9 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,r},\, f_{,\theta},\, f_{,\phi}\}$.
      */
-    virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
-                                              const unsigned int component) const;
+    virtual std::array<double, dim>
+    sgradient(const std::array<double, dim> &sp,
+              const unsigned int component) const;
 
     /**
      * Return the Hessian in spherical coordinates.
@@ -112,8 +118,9 @@ namespace Functions
      * The returned object should contain derivatives in the following order:
      * $\{ f_{,rr},\, f_{,\theta\theta},\, f_{,\phi\phi},\, f_{,r\theta},\, f_{,r\phi},\, f_{,\theta\phi}\}$.
      */
-    virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
-                                            const unsigned int component) const;
+    virtual std::array<double, 6>
+    shessian (const std::array<double, dim> &sp,
+              const unsigned int component) const;
 
     /**
      * A vector from the origin to the center of spherical coordinate system.

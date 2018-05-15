@@ -606,10 +606,11 @@ namespace FEValuesViews
     // ----------------------------- vector part ---------------------------
 
     template <int dim, int spacedim, typename Number>
-    void do_function_values (const ArrayView<Number> &dof_values,
-                             const Table<2,double>          &shape_values,
-                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &values)
+    void
+    do_function_values (const ArrayView<Number> &dof_values,
+                        const Table<2,double>          &shape_values,
+                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
+                        std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -2307,7 +2308,8 @@ public:
    * Destructor. Made virtual since we store only
    * pointers to the base class.
    */
-  virtual ~CellIteratorBase () = default;
+  virtual
+  ~CellIteratorBase () = default;
 
   /**
    * Conversion operator to an iterator for triangulations. This
@@ -3194,7 +3196,8 @@ namespace internal
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_values (
+void
+FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector   &fe_function,
   std::vector<typename InputVector::value_type> &values) const
 {
@@ -3218,7 +3221,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_values (
+void
+FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<typename InputVector::value_type> &values) const
@@ -3239,7 +3243,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_values (
+void
+FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector            &fe_function,
   std::vector<Vector<typename InputVector::value_type> > &values) const
 {
@@ -3265,7 +3270,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_values (
+void
+FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Vector<typename InputVector::value_type> > &values) const
@@ -3294,7 +3300,8 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_values (
+void
+FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<typename InputVector::value_type> > > values,
@@ -3349,7 +3356,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_gradients (
+void
+FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<1,spacedim,typename InputVector::value_type> > &gradients) const
@@ -3397,7 +3405,8 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_gradients (
+void
+FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<Tensor<1,spacedim,typename InputVector::value_type> > > > gradients,
@@ -3451,7 +3460,8 @@ get_function_hessians (const InputVector                &fe_function,
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_hessians (
+void
+FEValuesBase<dim,spacedim>::get_function_hessians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<2,spacedim,typename InputVector::value_type> > &hessians) const
@@ -3501,7 +3511,8 @@ get_function_hessians (const InputVector                         &fe_function,
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim, spacedim>::get_function_hessians (
+void
+FEValuesBase<dim, spacedim>::get_function_hessians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<Tensor<2,spacedim,typename InputVector::value_type> > > > hessians,
@@ -3529,7 +3540,8 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_laplacians (
+void
+FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector   &fe_function,
   std::vector<typename InputVector::value_type> &laplacians) const
 {
@@ -3552,7 +3564,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_laplacians (
+void
+FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<typename InputVector::value_type> &laplacians) const
@@ -3574,7 +3587,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_laplacians (
+void
+FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector            &fe_function,
   std::vector<Vector<typename InputVector::value_type> > &laplacians) const
 {
@@ -3597,7 +3611,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_laplacians (
+void
+FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Vector<typename InputVector::value_type> > &laplacians) const
@@ -3623,7 +3638,8 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_laplacians (
+void
+FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<std::vector<typename InputVector::value_type> > &laplacians,
@@ -3672,7 +3688,8 @@ get_function_third_derivatives (const InputVector                &fe_function,
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim,spacedim>::get_function_third_derivatives (
+void
+FEValuesBase<dim,spacedim>::get_function_third_derivatives (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<3,spacedim,typename InputVector::value_type> > &third_derivatives) const
@@ -3722,7 +3739,8 @@ get_function_third_derivatives (const InputVector                         &fe_fu
 
 template <int dim, int spacedim>
 template <class InputVector>
-void FEValuesBase<dim, spacedim>::get_function_third_derivatives (
+void
+FEValuesBase<dim, spacedim>::get_function_third_derivatives (
   const InputVector &fe_function,
   const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<Tensor<3,spacedim,typename InputVector::value_type> > > > third_derivatives,
@@ -4081,7 +4099,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
+void
+FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
   // no FE in this cell, so no assertion
   // necessary here
@@ -4128,7 +4147,8 @@ FEValues<dim,spacedim>::reinit
 
 
 template <int dim, int spacedim>
-void FEValues<dim,spacedim>::do_reinit ()
+void
+FEValues<dim,spacedim>::do_reinit ()
 {
   // first call the mapping and let it generate the data
   // specific to the mapping. also let it inspect the
@@ -4328,8 +4348,9 @@ FEFaceValues<dim,spacedim>::reinit
 
 
 template <int dim, int spacedim>
-void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                         const unsigned int              face_no)
+void
+FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                    const unsigned int              face_no)
 {
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
@@ -4347,7 +4368,8 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
 
 
 template <int dim, int spacedim>
-void FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
+void
+FEFaceValues<dim,spacedim>::do_reinit (const unsigned int face_no)
 {
   // first of all, set the present_face_index (if available)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;
@@ -4505,9 +4527,10 @@ void FESubfaceValues<dim,spacedim>::reinit
 
 
 template <int dim, int spacedim>
-void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                            const unsigned int         face_no,
-                                            const unsigned int         subface_no)
+void
+FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                       const unsigned int         face_no,
+                                       const unsigned int         subface_no)
 {
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
@@ -4527,8 +4550,9 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
 
 
 template <int dim, int spacedim>
-void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
-                                               const unsigned int subface_no)
+void
+FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
+                                          const unsigned int subface_no)
 {
   // first of all, set the present_face_index (if available)
   const typename Triangulation<dim,spacedim>::cell_iterator cell=*this->present_cell;

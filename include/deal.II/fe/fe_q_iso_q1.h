@@ -123,7 +123,8 @@ public:
    * returns <tt>FE_Q_iso_q1<dim>(equivalent_degree)</tt>, with @p dim and @p
    * equivalent_degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >

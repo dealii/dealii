@@ -114,7 +114,8 @@ namespace MeshWorker
    */
   template <class StreamType>
   inline
-  StreamType &operator << (StreamType &s, AssembleFlags u)
+  StreamType &
+  operator << (StreamType &s, AssembleFlags u)
   {
     s << " AssembleFlags";
     if (u & assemble_own_cells        ) s << "|own_cells"        ;

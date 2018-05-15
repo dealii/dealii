@@ -76,7 +76,8 @@ namespace LAPACKSupport
   /**
    * Function printing the name of a State.
    */
-  inline const char *state_name(State s)
+  inline const char *
+  state_name(State s)
   {
     switch (s)
       {
@@ -124,7 +125,8 @@ namespace LAPACKSupport
   /**
    * Function printing the name of a Property.
    */
-  inline const char *property_name(const Property s)
+  inline const char *
+  property_name(const Property s)
   {
     switch (s)
       {

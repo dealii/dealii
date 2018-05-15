@@ -113,29 +113,30 @@ namespace MeshWorker
    */
   template <class CellIteratorType,
             class ScratchData, class CopyData>
-  void mesh_loop(const CellIteratorType &begin,
-                 const typename identity<CellIteratorType>::type &end,
+  void
+  mesh_loop(const CellIteratorType &begin,
+            const typename identity<CellIteratorType>::type &end,
 
-                 const typename identity<std::function<void (const CellIteratorType &, ScratchData &, CopyData &)>>::type &cell_worker,
-                 const typename identity<std::function<void (const CopyData &)>>::type &copier,
+            const typename identity<std::function<void (const CellIteratorType &, ScratchData &, CopyData &)>>::type &cell_worker,
+            const typename identity<std::function<void (const CopyData &)>>::type &copier,
 
-                 const ScratchData &sample_scratch_data,
-                 const CopyData &sample_copy_data,
+            const ScratchData &sample_scratch_data,
+            const CopyData &sample_copy_data,
 
-                 const AssembleFlags flags = assemble_own_cells,
+            const AssembleFlags flags = assemble_own_cells,
 
-                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>>::type &boundary_worker=
-                   std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>(),
+            const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>>::type &boundary_worker=
+              std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>(),
 
-                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                                             const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                                             ScratchData &, CopyData &)>>::type &face_worker=
-                   std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                       const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                       ScratchData &, CopyData &)>(),
+            const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                                        const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                                        ScratchData &, CopyData &)>>::type &face_worker=
+              std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                  const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                  ScratchData &, CopyData &)>(),
 
-                 const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
-                 const unsigned int   chunk_size = 8)
+            const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
+            const unsigned int   chunk_size = 8)
   {
     Assert((!cell_worker) == !(flags & work_on_cells),
            ExcMessage("If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));

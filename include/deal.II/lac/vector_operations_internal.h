@@ -34,14 +34,16 @@ namespace internal
     typedef types::global_dof_index size_type;
 
     template <typename T>
-    bool is_non_negative (const T &t)
+    bool
+    is_non_negative (const T &t)
     {
       return t >= 0;
     }
 
 
     template <typename T>
-    bool is_non_negative (const std::complex<T> &)
+    bool
+    is_non_negative (const std::complex<T> &)
     {
       Assert (false,
               ExcMessage ("Complex numbers do not have an ordering."));
@@ -51,8 +53,9 @@ namespace internal
 
 
     template <typename T>
-    void print (const T    &t,
-                const char *format)
+    void
+    print (const T    &t,
+           const char *format)
     {
       if (format != nullptr)
         std::printf (format, t);
@@ -63,8 +66,9 @@ namespace internal
 
 
     template <typename T>
-    void print (const std::complex<T> &t,
-                const char            *format)
+    void
+    print (const std::complex<T> &t,
+           const char            *format)
     {
       if (format != nullptr)
         std::printf (format, t.real(), t.imag());
@@ -78,25 +82,28 @@ namespace internal
     // from std::complex to a
     // non-complex type
     template <typename T, typename U>
-    void copy (const T *begin,
-               const T *end,
-               U       *dest)
+    void
+    copy (const T *begin,
+          const T *end,
+          U       *dest)
     {
       std::copy (begin, end, dest);
     }
 
     template <typename T, typename U>
-    void copy (const std::complex<T> *begin,
-               const std::complex<T> *end,
-               std::complex<U>       *dest)
+    void
+    copy (const std::complex<T> *begin,
+          const std::complex<T> *end,
+          std::complex<U>       *dest)
     {
       std::copy (begin, end, dest);
     }
 
     template <typename T, typename U>
-    void copy (const std::complex<T> *,
-               const std::complex<T> *,
-               U *)
+    void
+    copy (const std::complex<T> *,
+          const std::complex<T> *,
+          U *)
     {
       Assert (false, ExcMessage ("Can't convert a vector of complex numbers "
                                  "into a vector of reals/doubles"));
@@ -142,7 +149,8 @@ namespace internal
         AssertIndexRange(vec_size, n_chunks*chunk_size+1);
       }
 
-      void operator() (const tbb::blocked_range<size_type> &range) const
+      void
+      operator() (const tbb::blocked_range<size_type> &range) const
       {
         const size_type r_begin = start + range.begin()*chunk_size;
         const size_type r_end = std::min(start + range.end()*chunk_size, end);
@@ -158,10 +166,11 @@ namespace internal
 #endif
 
     template <typename Functor>
-    void parallel_for(Functor &functor,
-                      size_type start,
-                      size_type end,
-                      std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+    void
+    parallel_for(Functor &functor,
+                 size_type start,
+                 size_type end,
+                 std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;
@@ -207,7 +216,8 @@ namespace internal
         Assert(dst != nullptr, ExcInternalError());
       }
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         Assert (end>=begin, ExcInternalError());
 
@@ -242,7 +252,8 @@ namespace internal
         Assert(dst!=nullptr, ExcInternalError());
       }
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         Assert (end>=begin, ExcInternalError());
 
@@ -277,7 +288,8 @@ namespace internal
         factor(factor)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -306,7 +318,8 @@ namespace internal
         factor(factor)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -337,7 +350,8 @@ namespace internal
         x(x)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -367,7 +381,8 @@ namespace internal
         v_val(v_val)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -395,7 +410,8 @@ namespace internal
         factor(factor)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -423,7 +439,8 @@ namespace internal
         v_val(v_val)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -454,7 +471,8 @@ namespace internal
         b(b)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -486,7 +504,8 @@ namespace internal
         x(x)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -520,7 +539,8 @@ namespace internal
         b(b)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -552,7 +572,8 @@ namespace internal
         v_val(v_val)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -581,7 +602,8 @@ namespace internal
         a(a)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -614,7 +636,8 @@ namespace internal
         b(b)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -651,7 +674,8 @@ namespace internal
         c(c)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -685,7 +709,8 @@ namespace internal
         b_val(b_val)
       {}
 
-      void operator() (const size_type begin, const size_type end) const
+      void
+      operator() (const size_type begin, const size_type end) const
       {
         if (parallel::internal::EnableOpenMPSimdFor<Number>::value)
           {
@@ -958,10 +983,11 @@ namespace internal
     const unsigned int vector_accumulation_recursion_threshold = 128;
 
     template <typename Operation, typename ResultType>
-    void accumulate_recursive (const Operation   &op,
-                               const size_type    first,
-                               const size_type    last,
-                               ResultType        &result)
+    void
+    accumulate_recursive (const Operation   &op,
+                          const size_type    first,
+                          const size_type    last,
+                          ResultType        &result)
     {
       const size_type vec_size = last - first;
       if (vec_size <= vector_accumulation_recursion_threshold * 32)
@@ -1258,14 +1284,16 @@ namespace internal
        * An operator used by TBB to work on a given @p range of chunks
        * [range.begin(), range.end()).
        */
-      void operator() (const tbb::blocked_range<size_type> &range) const
+      void
+      operator() (const tbb::blocked_range<size_type> &range) const
       {
         for (size_type i = range.begin(); i < range.end(); ++i)
           accumulate_recursive(op, start+i*chunk_size, std::min(start+(i+1)*chunk_size, end),
                                array_ptr[i]);
       }
 
-      ResultType do_sum() const
+      ResultType
+      do_sum() const
       {
         while (n_chunks > 1)
           {
@@ -1299,11 +1327,12 @@ namespace internal
      * parallel.
      */
     template <typename Operation, typename ResultType>
-    void parallel_reduce (const Operation   &op,
-                          const size_type    start,
-                          const size_type    end,
-                          ResultType        &result,
-                          std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
+    void
+    parallel_reduce (const Operation   &op,
+                     const size_type    start,
+                     const size_type    end,
+                     ResultType        &result,
+                     std::shared_ptr<parallel::internal::TBBPartitioner> &partitioner)
     {
 #ifdef DEAL_II_WITH_THREADS
       size_type vec_size = end-start;

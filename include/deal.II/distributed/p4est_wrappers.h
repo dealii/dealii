@@ -286,9 +286,10 @@ namespace internal
       size_t (&connectivity_memory_used) (types<2>::connectivity *p4est);
 
       template <int spacedim>
-      static void iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-                          dealii::internal::p4est::types<2>::ghost *parallel_ghost,
-                          void *user_data);
+      static void
+      iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
+              dealii::internal::p4est::types<2>::ghost *parallel_ghost,
+              void *user_data);
 
       static const unsigned int max_level = P4EST_MAXLEVEL;
     };

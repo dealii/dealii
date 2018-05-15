@@ -883,9 +883,10 @@ FE_NedelecSZ<dim>::get_data (
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::fill_edge_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                                         const Quadrature<dim>                                &quadrature,
-                                         const InternalData                                   &fe_data) const
+void
+FE_NedelecSZ<dim>::fill_edge_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                                    const Quadrature<dim>                                &quadrature,
+                                    const InternalData                                   &fe_data) const
 {
   // This function handles the cell-dependent construction of the EDGE-based shape functions.
   //
@@ -1218,9 +1219,10 @@ void FE_NedelecSZ<dim>::fill_edge_values(const typename Triangulation<dim,dim>::
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::fill_face_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                                         const Quadrature<dim>                                &quadrature,
-                                         const InternalData                                   &fe_data) const
+void
+FE_NedelecSZ<dim>::fill_face_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                                    const Quadrature<dim>                                &quadrature,
+                                    const InternalData                                   &fe_data) const
 {
   // This function handles the cell-dependent construction of the FACE-based shape functions.
   //
@@ -1488,7 +1490,8 @@ void FE_NedelecSZ<dim>::fill_face_values(const typename Triangulation<dim,dim>::
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::fill_fe_values(
+void
+FE_NedelecSZ<dim>::fill_fe_values(
   const typename Triangulation<dim,dim>::cell_iterator                         &cell,
   const CellSimilarity::Similarity                                              /*cell_similarity*/,
   const Quadrature<dim>                                                        &quadrature,
@@ -1590,7 +1593,8 @@ void FE_NedelecSZ<dim>::fill_fe_values(
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::fill_fe_face_values (
+void
+FE_NedelecSZ<dim>::fill_fe_face_values (
   const typename Triangulation<dim,dim>::cell_iterator                         &cell,
   const unsigned int                                                            face_no,
   const Quadrature<dim-1>                                                      &quadrature,
@@ -1703,7 +1707,8 @@ void FE_NedelecSZ<dim>::fill_fe_face_values (
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::fill_fe_subface_values(
+void
+FE_NedelecSZ<dim>::fill_fe_subface_values(
   const typename Triangulation<dim,dim>::cell_iterator                         &/*cell*/,
   const unsigned int                                                            /*face_no*/,
   const unsigned int                                                            /*sub_no*/,
@@ -1786,7 +1791,8 @@ FE_NedelecSZ<dim>::clone () const
 }
 
 template <int dim>
-std::vector<unsigned int> FE_NedelecSZ<dim>::get_dpo_vector (const unsigned int degree)
+std::vector<unsigned int>
+FE_NedelecSZ<dim>::get_dpo_vector (const unsigned int degree)
 {
   // internal function to return a vector of "dofs per object"
   // where the objects inside the vector refer to:
@@ -1806,7 +1812,8 @@ std::vector<unsigned int> FE_NedelecSZ<dim>::get_dpo_vector (const unsigned int 
 }
 
 template <int dim>
-unsigned int FE_NedelecSZ<dim>::compute_num_dofs (const unsigned int degree) const
+unsigned int
+FE_NedelecSZ<dim>::compute_num_dofs (const unsigned int degree) const
 {
   // Internal function to compute the number of DoFs
   // for a given dimension & polynomial order.
@@ -1827,7 +1834,8 @@ unsigned int FE_NedelecSZ<dim>::compute_num_dofs (const unsigned int degree) con
 }
 
 template <int dim>
-void FE_NedelecSZ<dim>::create_polynomials (const unsigned int degree)
+void
+FE_NedelecSZ<dim>::create_polynomials (const unsigned int degree)
 {
   // fill the 1d polynomials vector:
   IntegratedLegendrePolynomials = IntegratedLegendreSZ::generate_complete_basis (degree + 1);

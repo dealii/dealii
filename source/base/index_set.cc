@@ -523,7 +523,8 @@ IndexSet::block_read(std::istream &in)
 
 
 
-void IndexSet::fill_index_vector(std::vector<size_type> &indices) const
+void
+IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 {
   compress();
 

@@ -42,7 +42,8 @@ DataOutStack<dim,spacedim,DoFHandlerType>::DataVector::memory_consumption () con
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::new_parameter_value (const double p,
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::new_parameter_value (const double p,
     const double dp)
 {
   parameter      = p;
@@ -65,7 +66,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::new_parameter_value (const doubl
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::attach_dof_handler (const DoFHandlerType &dof)
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::attach_dof_handler (const DoFHandlerType &dof)
 {
   // Check consistency of redundant
   // template parameter
@@ -76,7 +78,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::attach_dof_handler (const DoFHan
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::string &name,
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::string &name,
     const VectorType   vector_type)
 {
   std::vector<std::string> names;
@@ -86,7 +89,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::vector<std::string> &names,
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::vector<std::string> &names,
     const VectorType    vector_type)
 {
   // make sure this function is
@@ -127,8 +131,9 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::declare_data_vector (const std::
 
 template <int dim, int spacedim, typename DoFHandlerType>
 template <typename number>
-void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
-    const std::string    &name)
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
+                                                            const std::string    &name)
 {
   const unsigned int n_components = dof_handler->get_fe(0).n_components ();
 
@@ -160,8 +165,9 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
 
 template <int dim, int spacedim, typename DoFHandlerType>
 template <typename number>
-void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
-    const std::vector<std::string> &names)
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
+                                                            const std::vector<std::string> &names)
 {
   Assert (dof_handler != nullptr,
           Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected ());
@@ -228,7 +234,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned int nnnn_subdivisions)
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned int nnnn_subdivisions)
 {
   // this is mostly copied from the
   // DataOut class
@@ -413,7 +420,8 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-void DataOutStack<dim,spacedim,DoFHandlerType>::finish_parameter_value ()
+void
+DataOutStack<dim,spacedim,DoFHandlerType>::finish_parameter_value ()
 {
   // release lock on dof handler
   dof_handler = nullptr;
@@ -453,7 +461,8 @@ DataOutStack<dim,spacedim,DoFHandlerType>::get_patches () const
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-std::vector<std::string> DataOutStack<dim,spacedim,DoFHandlerType>::get_dataset_names () const
+std::vector<std::string>
+DataOutStack<dim,spacedim,DoFHandlerType>::get_dataset_names () const
 {
   std::vector<std::string> names;
   for (typename std::vector<DataVector>::const_iterator dataset=dof_data.begin();

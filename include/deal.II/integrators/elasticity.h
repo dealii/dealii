@@ -45,7 +45,8 @@ namespace LocalIntegrators
      * \f[ \int_Z \varepsilon(u): \varepsilon(v)\,dx \f]
      */
     template <int dim>
-    inline void cell_matrix (
+    inline void
+    cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const double factor = 1.)
@@ -112,7 +113,8 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void nitsche_matrix (
+    inline void
+    nitsche_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       double penalty,
@@ -157,7 +159,8 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void nitsche_tangential_matrix (
+    inline void
+    nitsche_tangential_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       double penalty,
@@ -228,7 +231,8 @@ namespace LocalIntegrators
      * @date 2013
      */
     template <int dim, typename number>
-    void nitsche_residual (
+    void
+    nitsche_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -276,7 +280,8 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim, typename number>
-    inline void nitsche_tangential_residual (
+    inline void
+    nitsche_tangential_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -351,7 +356,8 @@ namespace LocalIntegrators
      * @date 2013
      */
     template <int dim, typename number>
-    void nitsche_residual_homogeneous (
+    void
+    nitsche_residual_homogeneous (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -393,7 +399,8 @@ namespace LocalIntegrators
      * The interior penalty flux for symmetric gradients.
      */
     template <int dim>
-    inline void ip_matrix (
+    inline void
+    ip_matrix (
       FullMatrix<double> &M11,
       FullMatrix<double> &M12,
       FullMatrix<double> &M21,

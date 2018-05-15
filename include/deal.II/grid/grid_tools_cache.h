@@ -93,45 +93,52 @@ namespace GridTools
      *
      * @param flags What to mark for update
      */
-    void mark_for_update(const CacheUpdateFlags &flags=update_all);
+    void
+    mark_for_update(const CacheUpdateFlags &flags=update_all);
 
 
     /**
      * Return the cached vertex_to_cell_map as computed by GridTools::vertex_to_cell_map().
      */
     const std::vector< std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
-    &get_vertex_to_cell_map() const;
+    &
+    get_vertex_to_cell_map() const;
 
     /**
      * Return the cached vertex_to_cell_centers_directions as computed by
      * GridTools::vertex_to_cell_centers_directions().
      */
     const std::vector<std::vector<Tensor<1,spacedim>>>
-    &get_vertex_to_cell_centers_directions() const;
+    &
+    get_vertex_to_cell_centers_directions() const;
 
     /**
      * Return the cached map of used vertices, as computed by
      * GridTools::extract_used_vertices().
      */
     const std::map<unsigned int, Point<spacedim> >
-    &get_used_vertices() const;
+    &
+    get_used_vertices() const;
 
     /**
      * Return a reference to the stored triangulation.
      */
-    const Triangulation<dim,spacedim> &get_triangulation() const;
+    const Triangulation<dim,spacedim> &
+    get_triangulation() const;
 
     /**
      * Return a reference to the stored mapping.
      */
-    const Mapping<dim,spacedim> &get_mapping() const;
+    const Mapping<dim,spacedim> &
+    get_mapping() const;
 
 #ifdef DEAL_II_WITH_NANOFLANN
     /**
      * Return the cached vertex_kdtree object, constructed with the vertices of
      * the stored triangulation.
      */
-    const KDTree<spacedim> &get_vertex_kdtree() const;
+    const KDTree<spacedim> &
+    get_vertex_kdtree() const;
 #endif
 
   private:

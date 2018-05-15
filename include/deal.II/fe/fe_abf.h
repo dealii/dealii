@@ -111,7 +111,8 @@ public:
    * returns <tt>FE_ABF<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
@@ -120,8 +121,9 @@ public:
    * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
    * always @p true.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   // documentation inherited from the base class
   virtual
@@ -129,7 +131,8 @@ public:
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
                                                           std::vector<double>                &nodal_values) const override;
 
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -161,7 +164,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points (const unsigned int rt_degree);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
@@ -169,7 +173,8 @@ private:
    * element, this restriction operator preserves the divergence of a function
    * weakly.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction ();
 
   /**
    * Fields of cell-independent data.

@@ -234,7 +234,8 @@ public:
     /**
      * Apply <code>A-sigma * B</code>
      */
-    void vmult (VectorType &dst, const VectorType &src) const
+    void
+    vmult (VectorType &dst, const VectorType &src) const
     {
       B.vmult(dst,src);
       dst *= (-sigma);
@@ -244,7 +245,8 @@ public:
     /**
      * Apply <code>A^T-sigma * B^T</code>
      */
-    void Tvmult (VectorType &dst, const VectorType &src) const
+    void
+    Tvmult (VectorType &dst, const VectorType &src) const
     {
       B.Tvmult(dst,src);
       dst *= (-sigma);
@@ -278,7 +280,8 @@ public:
   /**
    * Access to the object that controls convergence.
    */
-  SolverControl &control () const;
+  SolverControl &
+  control () const;
 
   /**
    * Constructor.
@@ -290,7 +293,8 @@ public:
   /**
    * Initialize internal variables.
    */
-  void reinit(const IndexSet &locally_owned_dofs );
+  void
+  reinit(const IndexSet &locally_owned_dofs );
 
   /**
    * Initialize internal variables when working with BlockVectors.
@@ -298,18 +302,21 @@ public:
    * whereas @p partitioning is used for calling the reinit of the deal.II
    * blockvectors used.
    */
-  void reinit(const IndexSet &locally_owned_dofs,
-              const std::vector<IndexSet> &partitioning);
+  void
+  reinit(const IndexSet &locally_owned_dofs,
+         const std::vector<IndexSet> &partitioning);
 
   /**
    * Initialize internal variables from the input @p distributed_vector.
    */
-  void reinit(const VectorType &distributed_vector);
+  void
+  reinit(const VectorType &distributed_vector);
 
   /**
    * Set initial vector for building Krylov space.
    */
-  void set_initial_vector(const VectorType &vec);
+  void
+  set_initial_vector(const VectorType &vec);
 
   /**
    * Set shift @p sigma for shift-and-invert spectral transformation.
@@ -319,7 +326,8 @@ public:
    * @note only relevant for <code>mode=3</code> (see the general documentation of this
    * class for a definition of what the different modes are).
    */
-  void set_shift(const std::complex<double> sigma);
+  void
+  set_shift(const std::complex<double> sigma);
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
@@ -356,7 +364,8 @@ public:
   /**
    * Return the memory consumption of this class in bytes.
    */
-  std::size_t memory_consumption() const;
+  std::size_t
+  memory_consumption() const;
 
 protected:
 
@@ -488,7 +497,8 @@ private:
    *
    * This function is called inside the reinit() functions
    */
-  void internal_reinit(const IndexSet &locally_owned_dofs);
+  void
+  internal_reinit(const IndexSet &locally_owned_dofs);
 
   /**
    * PArpackExcInfoPdnaupds.
@@ -621,7 +631,8 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
 
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::set_shift(const std::complex<double> sigma)
+void
+PArpackSolver<VectorType>::set_shift(const std::complex<double> sigma)
 {
   sigmar = sigma.real();
   sigmai = sigma.imag();
@@ -687,7 +698,8 @@ internal_reinit(const IndexSet &locally_owned_dofs)
 
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
+void
+PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
 {
   internal_reinit(locally_owned_dofs);
 
@@ -700,7 +712,8 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
 
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
+void
+PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
 {
   internal_reinit(distributed_vector.locally_owned_elements());
 
@@ -713,8 +726,9 @@ void PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
 
 
 template <typename VectorType>
-void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
-                                       const std::vector<IndexSet> &partitioning)
+void
+PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
+                                  const std::vector<IndexSet> &partitioning)
 {
   internal_reinit(locally_owned_dofs);
 
@@ -1059,7 +1073,8 @@ void PArpackSolver<VectorType>::solve
 
 
 template <typename VectorType>
-SolverControl &PArpackSolver<VectorType>::control () const
+SolverControl &
+PArpackSolver<VectorType>::control () const
 {
   return solver_control;
 }

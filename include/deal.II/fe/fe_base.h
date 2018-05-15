@@ -135,8 +135,9 @@ namespace FiniteElementDomination
    * <code>other_element_dominates</code>, then the returned value is
    * <code>neither_element_dominates</code>.
    */
-  inline Domination operator & (const Domination d1,
-                                const Domination d2);
+  inline Domination
+  operator & (const Domination d1,
+              const Domination d2);
 }
 
 
@@ -369,34 +370,40 @@ public:
   /**
    * Number of dofs per vertex.
    */
-  unsigned int n_dofs_per_vertex () const;
+  unsigned int
+  n_dofs_per_vertex () const;
 
   /**
    * Number of dofs per line. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_line () const;
+  unsigned int
+  n_dofs_per_line () const;
 
   /**
    * Number of dofs per quad. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_quad () const;
+  unsigned int
+  n_dofs_per_quad () const;
 
   /**
    * Number of dofs per hex. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_hex () const;
+  unsigned int
+  n_dofs_per_hex () const;
 
   /**
    * Number of dofs per face, accumulating degrees of freedom of all lower
    * dimensional objects.
    */
-  unsigned int n_dofs_per_face () const;
+  unsigned int
+  n_dofs_per_face () const;
 
   /**
    * Number of dofs per cell, accumulating degrees of freedom of all lower
    * dimensional objects.
    */
-  unsigned int n_dofs_per_cell () const;
+  unsigned int
+  n_dofs_per_cell () const;
 
   /**
    * Return the number of degrees per structdim-dimensional object. For
@@ -407,26 +414,30 @@ public:
    * associated with these objects.
    */
   template <int structdim>
-  unsigned int n_dofs_per_object () const;
+  unsigned int
+  n_dofs_per_object () const;
 
   /**
    * Number of components. See
    * @ref GlossComponent "the glossary"
    * for more information.
    */
-  unsigned int n_components () const;
+  unsigned int
+  n_components () const;
 
   /**
    * Number of blocks. See
    * @ref GlossBlock "the glossary"
    * for more information.
    */
-  unsigned int n_blocks () const;
+  unsigned int
+  n_blocks () const;
 
   /**
    * Detailed information on block sizes.
    */
-  const BlockIndices &block_indices() const;
+  const BlockIndices &
+  block_indices() const;
 
   /**
    * Maximal polynomial degree of a shape function in a single coordinate
@@ -434,7 +445,8 @@ public:
    *
    * This function can be used to determine the optimal quadrature rule.
    */
-  unsigned int tensor_degree () const;
+  unsigned int
+  tensor_degree () const;
 
   /**
    * Test whether a finite element space conforms to a certain Sobolev space.
@@ -442,12 +454,14 @@ public:
    * @note This function will return a true value even if the finite element
    * space has higher regularity than asked for.
    */
-  bool conforms (const Conformity) const;
+  bool
+  conforms (const Conformity) const;
 
   /**
    * Comparison operator.
    */
-  bool operator == (const FiniteElementData &) const;
+  bool
+  operator == (const FiniteElementData &) const;
 };
 
 
@@ -460,8 +474,9 @@ public:
 namespace FiniteElementDomination
 {
   inline
-  Domination operator & (const Domination d1,
-                         const Domination d2)
+  Domination
+  operator & (const Domination d1,
+              const Domination d2)
   {
     // go through the entire list of possibilities. note that if we were into
     // speed, obfuscation and cared enough, we could implement this operator

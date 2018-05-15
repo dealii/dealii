@@ -39,7 +39,8 @@ namespace internal
 
     template <int structdim, int spacedim, typename Number>
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor
-    ::QuadratureDescriptor()
+    ::
+    QuadratureDescriptor()
       :
       n_q_points (numbers::invalid_unsigned_int)
     {
@@ -50,8 +51,9 @@ namespace internal
     template <int structdim, int spacedim, typename Number>
     void
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor
-    ::initialize(const Quadrature<1> &quadrature_1d,
-                 const UpdateFlags    update_flags_inner_faces)
+    ::
+    initialize(const Quadrature<1> &quadrature_1d,
+               const UpdateFlags    update_flags_inner_faces)
     {
       Assert(structdim+1 <= spacedim ||
              update_flags_inner_faces == update_default,
@@ -103,7 +105,8 @@ namespace internal
     template <int structdim, int spacedim, typename Number>
     std::size_t
     MappingInfoStorage<structdim, spacedim, Number>::QuadratureDescriptor
-    ::memory_consumption() const
+    ::
+    memory_consumption() const
     {
       std::size_t memory =
         sizeof (this) +
@@ -289,7 +292,8 @@ namespace internal
     namespace
     {
       template <int dim>
-      double get_jacobian_size (const dealii::Triangulation<dim> &tria)
+      double
+      get_jacobian_size (const dealii::Triangulation<dim> &tria)
       {
         if (tria.n_cells() == 0)
           return 1;
@@ -317,7 +321,8 @@ namespace internal
       struct LocalData
       {
         LocalData (const double jac_size);
-        void resize (const unsigned int size);
+        void
+        resize (const unsigned int size);
 
         AlignedVector<Point<dim,VectorizedArray<Number> > > quadrature_points;
         AlignedVector<Tensor<2,dim,VectorizedArray<Number> > > general_jac;
@@ -356,13 +361,14 @@ namespace internal
        * Helper function called internally during the initialize function.
        */
       template <int dim, typename Number>
-      void evaluate_on_cell (const dealii::Triangulation<dim> &tria,
-                             const std::pair<unsigned int,unsigned int> *cells,
-                             const unsigned int         my_q,
-                             GeometryType              &cell_t_prev,
-                             GeometryType (&cell_t)[VectorizedArray<Number>::n_array_elements],
-                             dealii::FEValues<dim,dim> &fe_val,
-                             LocalData<dim,Number>     &cell_data)
+      void
+      evaluate_on_cell (const dealii::Triangulation<dim> &tria,
+                        const std::pair<unsigned int,unsigned int> *cells,
+                        const unsigned int         my_q,
+                        GeometryType              &cell_t_prev,
+                        GeometryType (&cell_t)[VectorizedArray<Number>::n_array_elements],
+                        dealii::FEValues<dim,dim> &fe_val,
+                        LocalData<dim,Number>     &cell_data)
       {
         const unsigned int n_q_points = fe_val.n_quadrature_points;
         const UpdateFlags update_flags = fe_val.get_update_flags();
@@ -1850,7 +1856,8 @@ namespace internal
 
 
     template <int dim, typename Number>
-    std::size_t MappingInfo<dim,Number>::memory_consumption() const
+    std::size_t
+    MappingInfo<dim,Number>::memory_consumption() const
     {
       std::size_t
       memory  = MemoryConsumption::memory_consumption (cell_data);
@@ -1865,8 +1872,9 @@ namespace internal
 
     template <int dim, typename Number>
     template <typename StreamType>
-    void MappingInfo<dim,Number>::print_memory_consumption(StreamType     &out,
-                                                           const SizeInfo &task_info) const
+    void
+    MappingInfo<dim,Number>::print_memory_consumption(StreamType     &out,
+                                                      const SizeInfo &task_info) const
     {
       out << "    Cell types:                      ";
       task_info.print_memory_statistics

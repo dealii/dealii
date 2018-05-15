@@ -150,7 +150,8 @@ namespace SLEPcWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverBase ();
+    virtual
+    ~SolverBase ();
 
     /**
      * Composite method that solves the eigensystem $Ax=\lambda x$. The
@@ -289,7 +290,8 @@ namespace SLEPcWrappers
     /**
      * Access to the object that controls convergence.
      */
-    SolverControl &control () const;
+    SolverControl &
+    control () const;
 
   protected:
 

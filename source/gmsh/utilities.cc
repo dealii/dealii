@@ -35,7 +35,8 @@ namespace Gmsh
 
 
 
-  void AdditionalParameters::add_parameters(ParameterHandler &prm)
+  void
+  AdditionalParameters::add_parameters(ParameterHandler &prm)
   {
     prm.add_parameter("Characteristic length", characteristic_length);
     prm.add_parameter("Intermediate file name base", output_base_name,

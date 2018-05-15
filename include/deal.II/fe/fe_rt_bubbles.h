@@ -100,7 +100,8 @@ public:
    * returns <tt>FE_RT_Bubbles<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual std::unique_ptr<FiniteElement<dim,dim> >
   clone () const override;
@@ -137,7 +138,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points (const unsigned int rt_degree);
 };
 
 

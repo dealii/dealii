@@ -115,13 +115,15 @@ namespace internal
         /**
          * Set up the lengths in the various members of this struct.
          */
-        void initialize(const Quadrature<1> &quadrature_1d,
-                        const UpdateFlags    update_flags_inner_faces = update_default);
+        void
+        initialize(const Quadrature<1> &quadrature_1d,
+                   const UpdateFlags    update_flags_inner_faces = update_default);
 
         /**
          * Returns the memory consumption in bytes.
          */
-        std::size_t memory_consumption() const;
+        std::size_t
+        memory_consumption() const;
 
         /**
          * Number of quadrature points applied on the given cell or face.
@@ -259,13 +261,15 @@ namespace internal
        * structures of this class to the given output stream.
        */
       template <typename StreamType>
-      void print_memory_consumption(StreamType     &out,
-                                    const SizeInfo &task_info) const;
+      void
+      print_memory_consumption(StreamType     &out,
+                               const SizeInfo &task_info) const;
 
       /**
        * Returns the memory consumption in bytes.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
     };
 
 
@@ -294,39 +298,44 @@ namespace internal
        * multigrid, etc.)  on a fixed Triangulation. In addition, a mapping
        * and several quadrature formulas are given.
        */
-      void initialize (const dealii::Triangulation<dim>                &tria,
-                       const std::vector<std::pair<unsigned int,unsigned int> >  &cells,
-                       const FaceInfo<VectorizedArray<Number>::n_array_elements> &faces,
-                       const std::vector<unsigned int>         &active_fe_index,
-                       const Mapping<dim>                      &mapping,
-                       const std::vector<dealii::hp::QCollection<1> >  &quad,
-                       const UpdateFlags                        update_flags_cells,
-                       const UpdateFlags                        update_flags_boundary_faces,
-                       const UpdateFlags                        update_flags_inner_faces,
-                       const UpdateFlags                        update_flags_faces_by_cells);
+      void
+      initialize (const dealii::Triangulation<dim>                &tria,
+                  const std::vector<std::pair<unsigned int,unsigned int> >  &cells,
+                  const FaceInfo<VectorizedArray<Number>::n_array_elements> &faces,
+                  const std::vector<unsigned int>         &active_fe_index,
+                  const Mapping<dim>                      &mapping,
+                  const std::vector<dealii::hp::QCollection<1> >  &quad,
+                  const UpdateFlags                        update_flags_cells,
+                  const UpdateFlags                        update_flags_boundary_faces,
+                  const UpdateFlags                        update_flags_inner_faces,
+                  const UpdateFlags                        update_flags_faces_by_cells);
 
       /**
        * Return the type of a given cell as detected during initialization.
        */
-      GeometryType get_cell_type (const unsigned int cell_chunk_no) const;
+      GeometryType
+      get_cell_type (const unsigned int cell_chunk_no) const;
 
       /**
        * Clear all data fields in this class.
        */
-      void clear ();
+      void
+      clear ();
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      std::size_t memory_consumption() const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Prints a detailed summary of memory consumption in the different
        * structures of this class to the given output stream.
        */
       template <typename StreamType>
-      void print_memory_consumption(StreamType     &out,
-                                    const TaskInfo &task_info) const;
+      void
+      print_memory_consumption(StreamType     &out,
+                               const TaskInfo &task_info) const;
 
       /**
        * Stores whether a cell is Cartesian (cell type 0), has constant
@@ -365,24 +374,26 @@ namespace internal
        * Computes the information in the given cells, called within
        * initialize.
        */
-      void initialize_cells (const dealii::Triangulation<dim>                &tria,
-                             const std::vector<std::pair<unsigned int,unsigned int> > &cells,
-                             const std::vector<unsigned int>         &active_fe_index,
-                             const Mapping<dim>                      &mapping,
-                             const std::vector<dealii::hp::QCollection<1> >  &quad,
-                             const UpdateFlags                        update_flags_cells);
+      void
+      initialize_cells (const dealii::Triangulation<dim>                &tria,
+                        const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+                        const std::vector<unsigned int>         &active_fe_index,
+                        const Mapping<dim>                      &mapping,
+                        const std::vector<dealii::hp::QCollection<1> >  &quad,
+                        const UpdateFlags                        update_flags_cells);
 
       /**
        * Computes the information in the given faces, called within
        * initialize.
        */
-      void initialize_faces (const dealii::Triangulation<dim>        &tria,
-                             const std::vector<std::pair<unsigned int,unsigned int> > &cells,
-                             const std::vector<FaceToCellTopology<VectorizedArray<Number>::n_array_elements> > &faces,
-                             const Mapping<dim>                      &mapping,
-                             const std::vector<dealii::hp::QCollection<1> >  &quad,
-                             const UpdateFlags                        update_flags_boundary_faces,
-                             const UpdateFlags                        update_flags_inner_faces);
+      void
+      initialize_faces (const dealii::Triangulation<dim>        &tria,
+                        const std::vector<std::pair<unsigned int,unsigned int> > &cells,
+                        const std::vector<FaceToCellTopology<VectorizedArray<Number>::n_array_elements> > &faces,
+                        const Mapping<dim>                      &mapping,
+                        const std::vector<dealii::hp::QCollection<1> >  &quad,
+                        const UpdateFlags                        update_flags_boundary_faces,
+                        const UpdateFlags                        update_flags_inner_faces);
 
       /**
        * Computes the information in the given faces, called within
@@ -457,19 +468,23 @@ namespace internal
     {
       FPArrayComparator (const Number scaling);
 
-      bool operator() (const std::vector<Number> &v1,
-                       const std::vector<Number> &v2) const;
+      bool
+      operator() (const std::vector<Number> &v1,
+                  const std::vector<Number> &v2) const;
 
-      bool operator ()(const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t1,
-                       const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t2) const;
-
-      template <int dim>
-      bool operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
-                       const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
+      bool
+      operator ()(const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t1,
+                  const Tensor<1,VectorizedArray<Number>::n_array_elements,Number> &t2) const;
 
       template <int dim>
-      bool operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
-                       const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
+      bool
+      operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                  const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
+
+      template <int dim>
+      bool
+      operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                  const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
 
       Number tolerance;
     };
@@ -482,7 +497,8 @@ namespace internal
     inline
     unsigned int
     MappingInfoStorage<structdim,spacedim,Number>
-    ::quad_index_from_n_q_points (const unsigned int n_q_points) const
+    ::
+    quad_index_from_n_q_points (const unsigned int n_q_points) const
     {
       for (unsigned int i=0; i<descriptor.size(); ++i)
         if (n_q_points == descriptor[i].n_q_points)

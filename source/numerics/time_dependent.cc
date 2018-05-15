@@ -126,7 +126,8 @@ TimeDependent::add_timestep (TimeStepBase *new_timestep)
 }
 
 
-void TimeDependent::delete_timestep (const unsigned int position)
+void
+TimeDependent::delete_timestep (const unsigned int position)
 {
   Assert (position<timesteps.size(),
           ExcInvalidPosition());
@@ -191,7 +192,8 @@ TimeDependent::postprocess ()
 
 
 
-void TimeDependent::start_sweep (const unsigned int s)
+void
+TimeDependent::start_sweep (const unsigned int s)
 {
   sweep_no = s;
 
@@ -214,7 +216,8 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep ()
+void
+TimeDependent::end_sweep ()
 {
   void (TimeDependent::*p) (const unsigned int, const unsigned int)
     = &TimeDependent::end_sweep;
@@ -225,8 +228,9 @@ void TimeDependent::end_sweep ()
 
 
 
-void TimeDependent::end_sweep (const unsigned int begin,
-                               const unsigned int end)
+void
+TimeDependent::end_sweep (const unsigned int begin,
+                          const unsigned int end)
 {
   for (unsigned int step=begin; step<end; ++step)
     timesteps[step]->end_sweep ();
@@ -486,7 +490,8 @@ TimeStepBase_Tria<dim>::sleep (const unsigned int sleep_level)
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::save_refine_flags ()
+void
+TimeStepBase_Tria<dim>::save_refine_flags ()
 {
   // for any of the non-initial grids
   // store the refinement flags
@@ -499,7 +504,8 @@ void TimeStepBase_Tria<dim>::save_refine_flags ()
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::restore_grid ()
+void
+TimeStepBase_Tria<dim>::restore_grid ()
 {
   Assert (tria == nullptr, ExcGridNotDeleted());
   Assert (refine_flags.size() == coarsen_flags.size(),
@@ -718,7 +724,8 @@ namespace
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
+void
+TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 {
   Vector<float> criteria;
   get_tria_refinement_criteria (criteria);
@@ -1114,7 +1121,8 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 
 
 template <int dim>
-void TimeStepBase_Tria<dim>::init_for_refinement ()
+void
+TimeStepBase_Tria<dim>::init_for_refinement ()
 {
   next_action = grid_refinement;
 }

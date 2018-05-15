@@ -86,15 +86,17 @@ namespace internal
       /**
        * Clear all data fields in this class.
        */
-      void clear ();
+      void
+      clear ();
 
       /**
        * Return the FE index for a given finite element degree. If not in hp
        * mode, this function always returns index 0. If an index is not found
        * in hp mode, it returns numbers::invalid_unsigned_int.
        */
-      unsigned int fe_index_from_degree (const unsigned int first_selected_component,
-                                         const unsigned int fe_degree) const;
+      unsigned int
+      fe_index_from_degree (const unsigned int first_selected_component,
+                            const unsigned int fe_degree) const;
 
       /**
        * This internal method takes the local indices on a cell and fills them
@@ -104,12 +106,13 @@ namespace internal
        * assigned the correct index after all the ghost indices have been
        * collected by the call to @p assign_ghosts.
        */
-      void read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
-                             const std::vector<unsigned int> &lexicographic_inv,
-                             const ConstraintMatrix          &constraints,
-                             const unsigned int               cell_number,
-                             ConstraintValues<double>        &constraint_values,
-                             bool                            &cell_at_boundary);
+      void
+      read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
+                        const std::vector<unsigned int> &lexicographic_inv,
+                        const ConstraintMatrix          &constraints,
+                        const unsigned int               cell_number,
+                        ConstraintValues<double>        &constraint_values,
+                        bool                            &cell_at_boundary);
 
       /**
        * This method assigns the correct indices to ghost indices from the
@@ -118,7 +121,8 @@ namespace internal
        * start at the end of the locally owned range. This way, we get direct
        * access to all vector entries.
        */
-      void assign_ghosts(const std::vector<unsigned int> &boundary_cells);
+      void
+      assign_ghosts(const std::vector<unsigned int> &boundary_cells);
 
       /**
        * This method reorders the way cells are gone through based on a given
@@ -126,10 +130,11 @@ namespace internal
        * together and interprets them as one cell only, as is needed for
        * vectorization.
        */
-      void reorder_cells (const TaskInfo                   &task_info,
-                          const std::vector<unsigned int>  &renumbering,
-                          const std::vector<unsigned int>  &constraint_pool_row_index,
-                          const std::vector<unsigned char> &irregular_cells);
+      void
+      reorder_cells (const TaskInfo                   &task_info,
+                     const std::vector<unsigned int>  &renumbering,
+                     const std::vector<unsigned int>  &constraint_pool_row_index,
+                     const std::vector<unsigned char> &irregular_cells);
 
       /**
        * Finds possible compression for the cell indices that we can apply for
@@ -166,7 +171,8 @@ namespace internal
        * more advanced features are not implemented, so there is only limited
        * value of this function.
        */
-      void compute_dof_renumbering (std::vector<types::global_dof_index> &renumbering);
+      void
+      compute_dof_renumbering (std::vector<types::global_dof_index> &renumbering);
 
       /**
        * Fills the array that defines how to zero selected ranges in the result
@@ -185,24 +191,27 @@ namespace internal
       /**
        * Return the memory consumption in bytes of this class.
        */
-      std::size_t memory_consumption() const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Prints a detailed summary of memory consumption in the different
        * structures of this class to the given output stream.
        */
       template <typename StreamType>
-      void print_memory_consumption(StreamType     &out,
-                                    const TaskInfo &size_info) const;
+      void
+      print_memory_consumption(StreamType     &out,
+                               const TaskInfo &size_info) const;
 
       /**
        * Prints a representation of the indices in the class to the given
        * output stream.
        */
       template <typename Number>
-      void print (const std::vector<Number>       &constraint_pool_data,
-                  const std::vector<unsigned int> &constraint_pool_row_index,
-                  std::ostream                    &out) const;
+      void
+      print (const std::vector<Number>       &constraint_pool_data,
+             const std::vector<unsigned int> &constraint_pool_row_index,
+             std::ostream                    &out) const;
 
       /**
        * Enum for various storage variants of the indices. This storage format

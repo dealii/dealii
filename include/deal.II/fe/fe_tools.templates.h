@@ -1243,9 +1243,10 @@ namespace
   // temporary
   template <int dim, int spacedim>
   inline
-  void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
-                      const FiniteElement<dim,spacedim> &fe2,
-                      FullMatrix<double> &interpolation_matrix)
+  void
+  gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
+                 const FiniteElement<dim,spacedim> &fe2,
+                 FullMatrix<double> &interpolation_matrix)
   {
     fe2.get_interpolation_matrix (fe1, interpolation_matrix);
   }
@@ -1254,9 +1255,10 @@ namespace
 
   template <int dim, typename number, int spacedim>
   inline
-  void gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
-                      const FiniteElement<dim,spacedim> &fe2,
-                      FullMatrix<number> &interpolation_matrix)
+  void
+  gim_forwarder (const FiniteElement<dim,spacedim> &fe1,
+                 const FiniteElement<dim,spacedim> &fe2,
+                 FullMatrix<number> &interpolation_matrix)
   {
     FullMatrix<double> tmp (interpolation_matrix.m(),
                             interpolation_matrix.n());
@@ -1275,8 +1277,9 @@ namespace
   // of the template argument
   template <int dim, int spacedim>
   inline
-  unsigned int match_dimension (const std::string &name,
-                                const unsigned int position)
+  unsigned int
+  match_dimension (const std::string &name,
+                   const unsigned int position)
   {
     if (position >= name.size())
       return 0;
@@ -1316,7 +1319,8 @@ namespace
 namespace FETools
 {
   template <int dim, int spacedim>
-  void compute_component_wise(
+  void
+  compute_component_wise(
     const FiniteElement<dim,spacedim> &element,
     std::vector<unsigned int> &renumbering,
     std::vector<std::vector<unsigned int> > &comp_start)
@@ -1358,7 +1362,8 @@ namespace FETools
 
 
   template <int dim, int spacedim>
-  void compute_block_renumbering (
+  void
+  compute_block_renumbering (
     const FiniteElement<dim,spacedim> &element,
     std::vector<types::global_dof_index> &renumbering,
     std::vector<types::global_dof_index> &block_data,
@@ -1406,9 +1411,10 @@ namespace FETools
 
 
   template <int dim, typename number, int spacedim>
-  void get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
-                                 const FiniteElement<dim,spacedim> &fe2,
-                                 FullMatrix<number> &interpolation_matrix)
+  void
+  get_interpolation_matrix (const FiniteElement<dim,spacedim> &fe1,
+                            const FiniteElement<dim,spacedim> &fe2,
+                            FullMatrix<number> &interpolation_matrix)
   {
     Assert (fe1.n_components() == fe2.n_components(),
             ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
@@ -1470,9 +1476,10 @@ namespace FETools
 
 
   template <int dim, typename number, int spacedim>
-  void get_back_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
-                                     const FiniteElement<dim,spacedim> &fe2,
-                                     FullMatrix<number> &interpolation_matrix)
+  void
+  get_back_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
+                                const FiniteElement<dim,spacedim> &fe2,
+                                FullMatrix<number> &interpolation_matrix)
   {
     Assert (fe1.n_components() == fe2.n_components(),
             ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
@@ -1496,9 +1503,10 @@ namespace FETools
 
 
   template <int dim, typename number, int spacedim>
-  void get_interpolation_difference_matrix (const FiniteElement<dim,spacedim> &fe1,
-                                            const FiniteElement<dim,spacedim> &fe2,
-                                            FullMatrix<number> &difference_matrix)
+  void
+  get_interpolation_difference_matrix (const FiniteElement<dim,spacedim> &fe1,
+                                       const FiniteElement<dim,spacedim> &fe2,
+                                       FullMatrix<number> &difference_matrix)
   {
     Assert (fe1.n_components() == fe2.n_components(),
             ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
@@ -1520,9 +1528,10 @@ namespace FETools
 
 
   template <int dim, typename number, int spacedim>
-  void get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
-                              const FiniteElement<dim,spacedim> &fe2,
-                              FullMatrix<number> &matrix)
+  void
+  get_projection_matrix (const FiniteElement<dim,spacedim> &fe1,
+                         const FiniteElement<dim,spacedim> &fe2,
+                         FullMatrix<number> &matrix)
   {
     Assert (fe1.n_components() == 1, ExcNotImplemented());
     Assert (fe1.n_components() == fe2.n_components(),
@@ -2511,7 +2520,8 @@ namespace FETools
 
 
       template <int dim,int spacedim>
-      std::unique_ptr<FiniteElement<dim,spacedim> >get_fe_by_name (std::string &name)
+      std::unique_ptr<FiniteElement<dim,spacedim> >
+      get_fe_by_name (std::string &name)
       {
         return get_fe_by_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
@@ -2809,7 +2819,8 @@ namespace FETools
 
 
   template <int dim, int spacedim>
-  void compute_projection_from_face_quadrature_points_matrix(
+  void
+  compute_projection_from_face_quadrature_points_matrix(
     const FiniteElement<dim, spacedim> &fe,
     const Quadrature<dim - 1> &lhs_quadrature,
     const Quadrature<dim - 1> &rhs_quadrature,
@@ -2874,7 +2885,8 @@ namespace FETools
     // FETools::convert_generalized_support_point_values_to_dof_values
 
     template <int dim, int spacedim, typename number>
-    static void convert_helper(
+    static void
+    convert_helper(
       const FiniteElement<dim, spacedim> &finite_element,
       const std::vector<Vector<number> > &support_point_values,
       std::vector<number>                &dof_values)
@@ -2906,7 +2918,8 @@ namespace FETools
 
 
     template <int dim, int spacedim, typename number>
-    static void convert_helper(
+    static void
+    convert_helper(
       const FiniteElement<dim, spacedim> &finite_element,
       const std::vector<Vector<std::complex<number> > > &support_point_values,
       std::vector<std::complex<number> >                &dof_values)
@@ -2960,7 +2973,8 @@ namespace FETools
 
 
     template <int dim, int spacedim>
-    static void convert_helper(
+    static void
+    convert_helper(
       const FiniteElement<dim, spacedim> &finite_element,
       const std::vector<Vector<double> > &support_point_values,
       std::vector<double>                &dof_values)
@@ -2974,7 +2988,8 @@ namespace FETools
 
 
   template <int dim, int  spacedim, typename number>
-  void convert_generalized_support_point_values_to_dof_values(
+  void
+  convert_generalized_support_point_values_to_dof_values(
     const FiniteElement<dim, spacedim> &finite_element,
     const std::vector<Vector<number> > &support_point_values,
     std::vector<number>                &dof_values)

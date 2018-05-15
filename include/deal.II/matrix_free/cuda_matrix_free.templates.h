@@ -50,7 +50,8 @@ namespace CUDAWrappers
      * matrix stored in a one-dimensional array.
      */
     template <typename Number>
-    void transpose(const unsigned int N, const unsigned M, const Number *src, Number *dst)
+    void
+    transpose(const unsigned int N, const unsigned M, const Number *src, Number *dst)
     {
       // src is N X M
       // dst is M X N
@@ -65,9 +66,10 @@ namespace CUDAWrappers
      * Same as above but the source and the destination are the same vector.
      */
     template <typename Number>
-    void transpose_in_place(std::vector<Number> &array_host,
-                            const unsigned int n,
-                            const unsigned int m)
+    void
+    transpose_in_place(std::vector<Number> &array_host,
+                       const unsigned int n,
+                       const unsigned int m)
     {
       // convert to structure-of-array
       std::vector<Number> old(array_host.size());
@@ -82,8 +84,9 @@ namespace CUDAWrappers
      * Allocate an array to the device and copy @p array_host to the device.
      */
     template <typename Number1, typename Number2>
-    void alloc_and_copy(Number1 **array_device, std::vector<Number2> &array_host,
-                        const unsigned int n)
+    void
+    alloc_and_copy(Number1 **array_device, std::vector<Number2> &array_host,
+                   const unsigned int n)
     {
       cudaError_t error_code = cudaMalloc(array_device, n*sizeof(Number1));
       AssertCuda(error_code);
@@ -110,14 +113,18 @@ namespace CUDAWrappers
                    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
                    const UpdateFlags             &update_flags);
 
-      void setup_color_arrays(const unsigned int n_colors);
+      void
+      setup_color_arrays(const unsigned int n_colors);
 
-      void setup_cell_arrays(const unsigned int color);
+      void
+      setup_cell_arrays(const unsigned int color);
 
       template <typename CellFilter>
-      void get_cell_data(const CellFilter &cell, const unsigned int cell_id);
+      void
+      get_cell_data(const CellFilter &cell, const unsigned int cell_id);
 
-      void alloc_and_copy_arrays(const unsigned int cell);
+      void
+      alloc_and_copy_arrays(const unsigned int cell);
 
     private:
       MatrixFree<dim, Number> *data;
@@ -168,7 +175,8 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number>
-    void ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
+    void
+    ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
     {
       data->n_cells.resize(n_colors);
       data->grid_dim.resize(n_colors);
@@ -191,7 +199,8 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number>
-    void ReinitHelper<dim,Number>::setup_cell_arrays(const unsigned int color)
+    void
+    ReinitHelper<dim,Number>::setup_cell_arrays(const unsigned int color)
     {
       const unsigned int n_cells = data->n_cells[color];
       const unsigned int cells_per_block = data->cells_per_block;
@@ -238,8 +247,9 @@ namespace CUDAWrappers
 
     template <int dim, typename Number>
     template <typename CellFilter>
-    void ReinitHelper<dim,Number>::get_cell_data(const CellFilter &cell,
-                                                 const unsigned int cell_id)
+    void
+    ReinitHelper<dim,Number>::get_cell_data(const CellFilter &cell,
+                                            const unsigned int cell_id)
     {
       cell->get_dof_indices(local_dof_indices);
 
@@ -279,7 +289,8 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number>
-    void ReinitHelper<dim, Number>::alloc_and_copy_arrays(const unsigned int color)
+    void
+    ReinitHelper<dim, Number>::alloc_and_copy_arrays(const unsigned int color)
     {
       const unsigned int n_cells = data->n_cells[color];
 
@@ -334,7 +345,8 @@ namespace CUDAWrappers
 
 
     template <int dim>
-    std::vector<types::global_dof_index> get_conflict_indices(
+    std::vector<types::global_dof_index>
+    get_conflict_indices(
       const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> &cell,
       const ConstraintMatrix &constraints)
     {
@@ -349,7 +361,8 @@ namespace CUDAWrappers
 
 
     template <typename Number>
-    __global__  void copy_constrained_dofs(
+    __global__  void
+    copy_constrained_dofs(
       const dealii::types::global_dof_index *constrained_dofs,
       const unsigned int                     n_constrained_dofs,
       const Number                          *src,
@@ -364,7 +377,8 @@ namespace CUDAWrappers
 
 
     template <typename Number>
-    __global__ void set_constrained_dofs(
+    __global__ void
+    set_constrained_dofs(
       const dealii::types::global_dof_index *constrained_dofs,
       const unsigned int                     n_constrained_dofs,
       Number                                 val,
@@ -379,10 +393,11 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number, typename functor>
-    __global__ void apply_kernel_shmem(const functor &func,
-                                       const typename MatrixFree<dim,Number>::Data gpu_data,
-                                       const Number *src,
-                                       Number *dst)
+    __global__ void
+    apply_kernel_shmem(const functor &func,
+                       const typename MatrixFree<dim,Number>::Data gpu_data,
+                       const Number *src,
+                       Number *dst)
     {
       const unsigned int cells_per_block = cells_per_block_shmem(
                                              dim, functor::n_dofs_1d-1);
@@ -419,11 +434,12 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  void MatrixFree<dim,Number>::reinit(const Mapping<dim>     &mapping,
-                                      const DoFHandler<dim>  &dof_handler,
-                                      const ConstraintMatrix &constraints,
-                                      const Quadrature<1>    &quad,
-                                      const AdditionalData    additional_data)
+  void
+  MatrixFree<dim,Number>::reinit(const Mapping<dim>     &mapping,
+                                 const DoFHandler<dim>  &dof_handler,
+                                 const ConstraintMatrix &constraints,
+                                 const Quadrature<1>    &quad,
+                                 const AdditionalData    additional_data)
   {
     if (typeid(Number) == typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
@@ -577,7 +593,8 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  void MatrixFree<dim, Number>::free()
+  void
+  MatrixFree<dim, Number>::free()
   {
     for (unsigned int i=0; i < q_points.size(); ++i)
       {
@@ -647,8 +664,9 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  void MatrixFree<dim,Number>::copy_constrained_values(const CUDAVector<Number> &src,
-                                                       CUDAVector<Number>       &dst) const
+  void
+  MatrixFree<dim,Number>::copy_constrained_values(const CUDAVector<Number> &src,
+                                                  CUDAVector<Number>       &dst) const
   {
     internal::copy_constrained_dofs<Number> <<<constraint_grid_dim,constraint_block_dim>>> (
       constrained_dofs, n_constrained_dofs, src.get_values(), dst.get_values());
@@ -657,8 +675,9 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  void MatrixFree<dim,Number>::set_constrained_values(Number          val,
-                                                      CUDAVector<Number> &dst) const
+  void
+  MatrixFree<dim,Number>::set_constrained_values(Number          val,
+                                                 CUDAVector<Number> &dst) const
   {
     internal::set_constrained_dofs<Number> <<<constraint_grid_dim, constraint_block_dim>>>(
       constrained_dofs, n_constrained_dofs, val, dst.get_values());
@@ -667,7 +686,8 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  unsigned int MatrixFree<dim,Number>::get_padding_length() const
+  unsigned int
+  MatrixFree<dim,Number>::get_padding_length() const
   {
     return padding_length;
   }
@@ -676,9 +696,10 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   template <typename functor>
-  void MatrixFree<dim,Number>::cell_loop(const functor &func,
-                                         const CUDAVector<Number> &src,
-                                         CUDAVector<Number> &dst) const
+  void
+  MatrixFree<dim,Number>::cell_loop(const functor &func,
+                                    const CUDAVector<Number> &src,
+                                    CUDAVector<Number> &dst) const
   {
     for (unsigned int i=0; i < n_colors; ++i)
       internal::apply_kernel_shmem<dim, Number, functor> <<<grid_dim[i],block_dim[i]>>> (
@@ -688,7 +709,8 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  std::size_t MatrixFree<dim, Number>::memory_consumption() const
+  std::size_t
+  MatrixFree<dim, Number>::memory_consumption() const
   {
     // First compute the size of n_cells, row_starts, kernel launch parameters,
     // and constrained_dofs

@@ -84,7 +84,8 @@ public:
   /**
    * Destructor, asserting that the counter is zero.
    */
-  virtual ~Subscriptor();
+  virtual
+  ~Subscriptor();
 
   /**
    * Assignment operator.
@@ -92,20 +93,23 @@ public:
    * This has to be handled with care, too, because the counter has to remain
    * the same. It therefore does nothing more than returning <tt>*this</tt>.
    */
-  Subscriptor &operator = (const Subscriptor &);
+  Subscriptor &
+  operator = (const Subscriptor &);
 
   /**
    * Move assignment operator.
    *
    * Asserts that the counter for the moved object is zero.
    */
-  Subscriptor &operator = (Subscriptor &&) noexcept;
+  Subscriptor &
+  operator = (Subscriptor &&) noexcept;
 
   /**
    * Subscribes a user of the object. The subscriber may be identified by text
    * supplied as <tt>identifier</tt>.
    */
-  void subscribe (const char *identifier = nullptr) const;
+  void
+  subscribe (const char *identifier = nullptr) const;
 
   /**
    * Unsubscribes a user from the object.
@@ -113,19 +117,22 @@ public:
    * @note The <tt>identifier</tt> must be the <b>same pointer</b> as the one
    * supplied to subscribe(), not just the same text.
    */
-  void unsubscribe (const char *identifier = nullptr) const;
+  void
+  unsubscribe (const char *identifier = nullptr) const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
    * use this class for reference counted lifetime determination where the
    * last one to unsubscribe also deletes the object.
    */
-  unsigned int n_subscriptions () const;
+  unsigned int
+  n_subscriptions () const;
 
   /**
    * List the subscribers to @p deallog.
    */
-  void list_subscribers () const;
+  void
+  list_subscribers () const;
 
   /**
    * @addtogroup Exceptions
@@ -169,7 +176,8 @@ public:
    * there is no reason to write the subscribers out in the first place.
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
 private:
   /**
@@ -229,7 +237,8 @@ private:
    * then, rather than aborting, this function prints an error message to the
    * standard error stream and returns.
    */
-  void check_no_subscribers () const noexcept;
+  void
+  check_no_subscribers () const noexcept;
 };
 
 //---------------------------------------------------------------------------

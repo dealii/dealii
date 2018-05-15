@@ -89,21 +89,24 @@ namespace Particles
      * internal data structures, it just sets the connections to the
      * MPI communicator and the triangulation.
      */
-    void initialize(const parallel::distributed::Triangulation<dim,spacedim> &tria,
-                    const Mapping<dim,spacedim> &mapping,
-                    const unsigned int n_properties = 0);
+    void
+    initialize(const parallel::distributed::Triangulation<dim,spacedim> &tria,
+               const Mapping<dim,spacedim> &mapping,
+               const unsigned int n_properties = 0);
 
     /**
      * Clear all particle related data.
      */
-    void clear();
+    void
+    clear();
 
     /**
      * Only clear particle data, but keep cache information about number
      * of particles. This is useful during reorganization of particle data
      * between processes.
      */
-    void clear_particles();
+    void
+    clear_particles();
 
     /**
      * Update all internally cached numbers. Note that all functions that
@@ -113,47 +116,56 @@ namespace Particles
      * (e.g. insert_particle). This is done because the update is
      * expensive compared to single operations.
      */
-    void update_cached_numbers();
+    void
+    update_cached_numbers();
 
     /**
      * Return an iterator to the first particle.
      */
-    particle_iterator begin() const;
+    particle_iterator
+    begin() const;
 
     /**
      * Return an iterator to the first particle.
      */
-    particle_iterator begin();
+    particle_iterator
+    begin();
 
     /**
      * Return an iterator past the end of the particles.
      */
-    particle_iterator end() const;
+    particle_iterator
+    end() const;
 
     /**
      * Return an iterator past the end of the particles.
      */
-    particle_iterator end();
+    particle_iterator
+    end();
 
     /**
      * Return an iterator to the first ghost particle.
      */
-    particle_iterator begin_ghost() const;
+    particle_iterator
+    begin_ghost() const;
 
     /**
      * Return an iterator to the first ghost particle.
      */
-    particle_iterator begin_ghost();
+    particle_iterator
+    begin_ghost();
 
     /**
      * Return an iterator past the end of the ghost particles.
      */
-    particle_iterator end_ghost() const;
+    particle_iterator
+    end_ghost() const;
 
     /**
      * Return an iterator past the end of the ghost particles.
      */
-    particle_iterator end_ghost();
+    particle_iterator
+    end_ghost();
 
     /**
      * Return a pair of particle iterators that mark the begin and end of
@@ -250,7 +262,8 @@ namespace Particles
      *
      * @return Total number of particles in simulation.
      */
-    types::particle_index n_global_particles() const;
+    types::particle_index
+    n_global_particles() const;
 
     /**
      * Return the maximum number of particles per cell the last
@@ -258,25 +271,29 @@ namespace Particles
      *
      * @return Maximum number of particles in one cell in simulation.
      */
-    types::particle_index n_global_max_particles_per_cell() const;
+    types::particle_index
+    n_global_max_particles_per_cell() const;
 
     /**
      * Return the number of particles in the local part of the
      * triangulation.
      */
-    types::particle_index n_locally_owned_particles() const;
+    types::particle_index
+    n_locally_owned_particles() const;
 
     /**
      * Return the next free particle index in the global set
      * of particles the last
      * time the update_cached_numbers() function was called.
      */
-    types::particle_index get_next_free_particle_index() const;
+    types::particle_index
+    get_next_free_particle_index() const;
 
     /**
      * Return the number of properties each particle has.
      */
-    unsigned int n_properties_per_particle() const;
+    unsigned int
+    n_properties_per_particle() const;
 
     /**
      * Return a reference to the property pool that owns all particle
@@ -330,7 +347,8 @@ namespace Particles
      * Serialize the contents of this class.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void
+    serialize (Archive &ar, const unsigned int version);
 
   private:
     /**
@@ -484,7 +502,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void ParticleHandler<dim,spacedim>::serialize (Archive &ar, const unsigned int)
+  void
+  ParticleHandler<dim,spacedim>::serialize (Archive &ar, const unsigned int)
   {
     // Note that we do not serialize the particle data itself. Instead we
     // use the serialization functionality of the triangulation class, because

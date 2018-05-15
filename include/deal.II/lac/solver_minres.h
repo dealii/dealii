@@ -94,7 +94,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverMinRes () override = default;
+  virtual
+  ~SolverMinRes () override = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -121,17 +122,19 @@ protected:
   /**
    * Implementation of the computation of the norm of the residual.
    */
-  virtual double criterion();
+  virtual double
+  criterion();
 
   /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
    * for graphical output of the convergence history.
    */
-  virtual void print_vectors(const unsigned int step,
-                             const VectorType   &x,
-                             const VectorType   &r,
-                             const VectorType   &d) const;
+  virtual void
+  print_vectors(const unsigned int step,
+                const VectorType   &x,
+                const VectorType   &r,
+                const VectorType   &d) const;
 
   /**
    * Within the iteration loop, the square of the residual vector is stored in

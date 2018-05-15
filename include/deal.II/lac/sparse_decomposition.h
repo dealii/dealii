@@ -128,13 +128,15 @@ public:
    * Destruction. Mark the destructor pure to ensure that this class isn't
    * used directly, but only its derived classes.
    */
-  virtual ~SparseLUDecomposition () override = 0;
+  virtual
+  ~SparseLUDecomposition () override = 0;
 
   /**
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Parameters for SparseDecomposition.
@@ -209,28 +211,32 @@ public:
    * (using the <code>vmult</code> function of derived classes).
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData parameters);
+  void
+  initialize (const SparseMatrix<somenumber> &matrix,
+              const AdditionalData parameters);
 
   /**
    * Return whether the object is empty. It calls the inherited
    * SparseMatrix::empty() function.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the dimension of the codomain (or range) space. It calls the
    * inherited SparseMatrix::m() function. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. It calls the  inherited
    * SparseMatrix::n() function. Note that the matrix is of dimension $m
    * \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
   /**
    * Adding Matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i> with
@@ -240,8 +246,9 @@ public:
    *
    */
   template <class OutVector, class InVector>
-  void vmult_add (OutVector &dst,
-                  const InVector &src) const;
+  void
+  vmult_add (OutVector &dst,
+             const InVector &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
@@ -251,14 +258,16 @@ public:
    * Source and destination must not be the same vector.
    */
   template <class OutVector, class InVector>
-  void Tvmult_add (OutVector &dst,
-                   const InVector &src) const;
+  void
+  Tvmult_add (OutVector &dst,
+              const InVector &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t
+  memory_consumption () const;
 
   /**
    * @addtogroup Exceptions
@@ -279,7 +288,8 @@ protected:
    * pattern remains unchanged.
    */
   template <typename somenumber>
-  void copy_from (const SparseMatrix<somenumber> &matrix);
+  void
+  copy_from (const SparseMatrix<somenumber> &matrix);
 
   /**
    * Performs the strengthening loop. For each row calculates the sum of
@@ -287,7 +297,8 @@ protected:
    * (through get_strengthen_diagonal()) sf and multiplies the diagonal entry
    * with <code>sf+1</code>.
    */
-  virtual void strengthen_diagonal_impl ();
+  virtual void
+  strengthen_diagonal_impl ();
 
   /**
    * In the decomposition phase, computes a strengthening factor for the
@@ -298,7 +309,8 @@ protected:
    * <code>strengthen_diagonal</code>'s value. This variable is set to
    * a nonzero value in several of the derived classes.
    */
-  virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
+  virtual number
+  get_strengthen_diagonal(const number rowsum, const size_type row) const;
 
   /**
    * The default strengthening value, returned by get_strengthen_diagonal().
@@ -315,7 +327,8 @@ protected:
   /**
    * Fills the #prebuilt_lower_bound array.
    */
-  void prebuild_lower_bound ();
+  void
+  prebuild_lower_bound ();
 
 private:
 

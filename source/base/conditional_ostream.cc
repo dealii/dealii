@@ -26,13 +26,15 @@ ConditionalOStream::ConditionalOStream(std::ostream &stream,
 {}
 
 
-void ConditionalOStream::set_condition(bool flag)
+void
+ConditionalOStream::set_condition(bool flag)
 {
   active_flag = flag;
 }
 
 
-bool ConditionalOStream::is_active() const
+bool
+ConditionalOStream::is_active() const
 {
   return active_flag;
 }

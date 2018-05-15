@@ -41,7 +41,8 @@ namespace LinearAlgebra
     /**
      * Destructor.
      */
-    virtual ~CommunicationPatternBase() = default;
+    virtual
+    ~CommunicationPatternBase() = default;
 
     /**
      * Reinitialize the communication pattern. The first argument @p
@@ -50,14 +51,16 @@ namespace LinearAlgebra
      * read_write_vector_index_set is the index set associated to a
      * ReadWriteVector object.
      */
-    virtual void reinit(const IndexSet &vector_space_vector_index_set,
-                        const IndexSet &read_write_vector_index_set,
-                        const MPI_Comm &communicator) = 0;
+    virtual void
+    reinit(const IndexSet &vector_space_vector_index_set,
+           const IndexSet &read_write_vector_index_set,
+           const MPI_Comm &communicator) = 0;
 
     /**
      * Return a constant reference to the underlying mpi communicator.
      */
-    virtual const MPI_Comm &get_mpi_communicator() const = 0;
+    virtual const MPI_Comm &
+    get_mpi_communicator() const = 0;
   };
 
 } // end of namespace LinearAlgebra

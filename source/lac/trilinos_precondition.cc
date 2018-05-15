@@ -53,7 +53,8 @@ namespace TrilinosWrappers
 
 
 
-  void PreconditionBase::clear ()
+  void
+  PreconditionBase::clear ()
   {
     preconditioner.reset();
 #ifdef DEAL_II_WITH_MPI

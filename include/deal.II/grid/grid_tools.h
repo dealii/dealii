@@ -120,7 +120,8 @@ namespace GridTools
    * this function will not catch this.
    */
   template <int dim, int spacedim>
-  double diameter (const Triangulation<dim, spacedim> &tria);
+  double
+  diameter (const Triangulation<dim, spacedim> &tria);
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the
@@ -149,8 +150,9 @@ namespace GridTools
    * triangulation, as discussed above.
    */
   template <int dim, int spacedim>
-  double volume (const Triangulation<dim,spacedim> &tria,
-                 const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
+  double
+  volume (const Triangulation<dim,spacedim> &tria,
+          const Mapping<dim,spacedim> &mapping = (StaticMappingQ1<dim,spacedim>::mapping));
 
   /**
    * Return an approximation of the diameter of the smallest active cell of a
@@ -192,8 +194,9 @@ namespace GridTools
    * up by naming its vertices from the list.
    */
   template <int dim>
-  double cell_measure (const std::vector<Point<dim> > &all_vertices,
-                       const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
+  double
+  cell_measure (const std::vector<Point<dim> > &all_vertices,
+                const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
   /**
    * A version of the last function that can accept input for nonzero
@@ -201,7 +204,8 @@ namespace GridTools
    * and calling it will just raise an exception.
    */
   template <int dim, typename T>
-  double cell_measure (const T &, ...);
+  double
+  cell_measure (const T &, ...);
 
   /**
    * Compute the smallest box containing the entire triangulation.
@@ -217,7 +221,8 @@ namespace GridTools
    * but different from the bounding boxes computed on other processors.
    */
   template <int dim, int spacedim>
-  BoundingBox<spacedim> compute_bounding_box(const Triangulation<dim, spacedim> &triangulation);
+  BoundingBox<spacedim>
+  compute_bounding_box(const Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Return the point on the geometrical object @p object closest to the given
@@ -266,9 +271,10 @@ namespace GridTools
    * Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void delete_unused_vertices (std::vector<Point<spacedim> >    &vertices,
-                               std::vector<CellData<dim> > &cells,
-                               SubCellData                 &subcelldata);
+  void
+  delete_unused_vertices (std::vector<Point<spacedim> >    &vertices,
+                          std::vector<CellData<dim> > &cells,
+                          SubCellData                 &subcelldata);
 
   /**
    * Remove vertices that are duplicated, due to the input of a structured
@@ -286,11 +292,12 @@ namespace GridTools
    * direction is less than @p tol.
    */
   template <int dim, int spacedim>
-  void delete_duplicated_vertices (std::vector<Point<spacedim> >    &all_vertices,
-                                   std::vector<CellData<dim> > &cells,
-                                   SubCellData                 &subcelldata,
-                                   std::vector<unsigned int>   &considered_vertices,
-                                   const double                 tol=1e-12);
+  void
+  delete_duplicated_vertices (std::vector<Point<spacedim> >    &all_vertices,
+                              std::vector<CellData<dim> > &cells,
+                              SubCellData                 &subcelldata,
+                              std::vector<unsigned int>   &considered_vertices,
+                              const double                 tol=1e-12);
 
   /*@}*/
   /**
@@ -322,8 +329,9 @@ namespace GridTools
    * step-38. It is also used in step-49 and step-53.
    */
   template <int dim, typename Transformation, int spacedim>
-  void transform (const Transformation        &transformation,
-                  Triangulation<dim,spacedim> &triangulation);
+  void
+  transform (const Transformation        &transformation,
+             Triangulation<dim,spacedim> &triangulation);
 
   /**
    * Shift each vertex of the triangulation by the given shift vector. This
@@ -331,8 +339,9 @@ namespace GridTools
    * triangulation stated there hold for this function as well.
    */
   template <int dim, int spacedim>
-  void shift (const Tensor<1,spacedim>    &shift_vector,
-              Triangulation<dim,spacedim> &triangulation);
+  void
+  shift (const Tensor<1,spacedim>    &shift_vector,
+         Triangulation<dim,spacedim> &triangulation);
 
 
   /**
@@ -342,8 +351,9 @@ namespace GridTools
    * the transform() function above, so the requirements on the triangulation
    * stated there hold for this function as well.
    */
-  void rotate (const double      angle,
-               Triangulation<2> &triangulation);
+  void
+  rotate (const double      angle,
+          Triangulation<2> &triangulation);
 
   /**
    * Rotate all vertices of the given @p triangulation in counter-clockwise
@@ -422,10 +432,11 @@ namespace GridTools
    * @note This function is not currently implemented for the 1d case.
    */
   template <int dim>
-  void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
-                          Triangulation<dim> &tria,
-                          const Function<dim,double> *coefficient = nullptr,
-                          const bool solve_for_absolute_positions = false);
+  void
+  laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+                     Triangulation<dim> &tria,
+                     const Function<dim,double> *coefficient = nullptr,
+                     const bool solve_for_absolute_positions = false);
 
   /**
    * Return a std::map with all vertices of faces located in the boundary
@@ -444,8 +455,9 @@ namespace GridTools
    * the triangulation stated there hold for this function as well.
    */
   template <int dim, int spacedim>
-  void scale (const double        scaling_factor,
-              Triangulation<dim, spacedim> &triangulation);
+  void
+  scale (const double        scaling_factor,
+         Triangulation<dim, spacedim> &triangulation);
 
   /**
    * Distort the given triangulation by randomly moving around all the
@@ -458,9 +470,10 @@ namespace GridTools
    * boundary vertices are not moved.
    */
   template <int dim, int spacedim>
-  void distort_random (const double factor,
-                       Triangulation<dim, spacedim> &triangulation,
-                       const bool   keep_boundary=true);
+  void
+  distort_random (const double factor,
+                  Triangulation<dim, spacedim> &triangulation,
+                  const bool   keep_boundary=true);
 
   /**
    * Remove hanging nodes from a grid. If the @p isotropic parameter is set
@@ -792,7 +805,8 @@ namespace GridTools
    * @author Luca Heltai, 2017.
    */
   template <int dim, int spacedim>
-  std::map<unsigned int,Point<spacedim>> extract_used_vertices (
+  std::map<unsigned int,Point<spacedim>>
+                                      extract_used_vertices (
                                         const Triangulation<dim,spacedim> &container,
                                         const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
 
@@ -2328,8 +2342,9 @@ namespace GridTools
    * @author Luca Heltai, 2015
    */
   template <int dim, int spacedim>
-  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    const bool reset_boundary_ids=false);
+  void
+  copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                               const bool reset_boundary_ids=false);
 
   /**
    * Map the given boundary ids to the given manifold ids on faces and
@@ -2355,10 +2370,11 @@ namespace GridTools
    * @author Luca Heltai, 2018
    */
   template <int dim, int spacedim>
-  void map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
-                                    const std::vector<types::manifold_id> &dst_manifold_ids,
-                                    Triangulation<dim, spacedim> &tria,
-                                    const std::vector<types::boundary_id> &reset_boundary_ids = {});
+  void
+  map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
+                               const std::vector<types::manifold_id> &dst_manifold_ids,
+                               Triangulation<dim, spacedim> &tria,
+                               const std::vector<types::boundary_id> &reset_boundary_ids = {});
 
   /**
    * Copy material ids to manifold ids. The default manifold_id for new
@@ -2392,8 +2408,9 @@ namespace GridTools
    * @author Luca Heltai, 2015
    */
   template <int dim, int spacedim>
-  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    const bool compute_face_ids=false);
+  void
+  copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                               const bool compute_face_ids=false);
 
 
   /*@}*/
@@ -2532,16 +2549,18 @@ namespace GridTools
      * equal to the size as @p cell_ids .
      */
     template <class Archive>
-    void save (Archive &ar,
-               const unsigned int version) const;
+    void
+    save (Archive &ar,
+          const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization. Throw away the previous content.
      */
     template <class Archive>
-    void load (Archive &ar,
-               const unsigned int version);
+    void
+    load (Archive &ar,
+          const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
   };
@@ -2617,15 +2636,17 @@ namespace GridTools
 namespace GridTools
 {
   template <int dim, typename T>
-  double cell_measure (const T &, ...)
+  double
+  cell_measure (const T &, ...)
   {
     Assert(false, ExcNotImplemented());
     return std::numeric_limits<double>::quiet_NaN();
   }
 
   template <int dim, typename Predicate, int spacedim>
-  void transform (const Predicate    &predicate,
-                  Triangulation<dim, spacedim> &triangulation)
+  void
+  transform (const Predicate    &predicate,
+             Triangulation<dim, spacedim> &triangulation)
   {
     std::vector<bool> treated_vertices (triangulation.n_vertices(),
                                         false);
@@ -3004,7 +3025,8 @@ namespace GridTools
     // inside the project_to_object function below.
     template <int structdim>
     inline
-    bool weights_are_ok (const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &v)
+    bool
+    weights_are_ok (const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &v)
     {
       // clang has trouble figuring out structdim here, so define it
       // again:

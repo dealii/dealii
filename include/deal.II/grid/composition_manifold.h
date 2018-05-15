@@ -79,7 +79,8 @@ public:
   /**
    * Make a clone of this Manifold.
    */
-  virtual std::unique_ptr<Manifold<dim, spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim, spacedim> >
+  clone() const override;
 
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim

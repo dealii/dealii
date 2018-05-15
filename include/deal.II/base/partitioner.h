@@ -163,14 +163,16 @@ namespace Utilities
        * read_write_vector_index_set is the index set associated to a
        * ReadWriteVector object.
        */
-      virtual void reinit(const IndexSet &vector_space_vector_index_set,
-                          const IndexSet &read_write_vector_index_set,
-                          const MPI_Comm &communicator) override;
+      virtual void
+      reinit(const IndexSet &vector_space_vector_index_set,
+             const IndexSet &read_write_vector_index_set,
+             const MPI_Comm &communicator) override;
 
       /**
        * Set the locally owned indices. Used in the constructor.
        */
-      void set_owned_indices (const IndexSet &locally_owned_indices);
+      void
+      set_owned_indices (const IndexSet &locally_owned_indices);
 
       /**
        * Set the ghost indices after the constructor has been
@@ -182,19 +184,22 @@ namespace Utilities
        * set but only a tighter subset should be communicated according to
        * @p ghost_indices.
        */
-      void set_ghost_indices (const IndexSet &ghost_indices,
-                              const IndexSet &larger_ghost_index_set = IndexSet());
+      void
+      set_ghost_indices (const IndexSet &ghost_indices,
+                         const IndexSet &larger_ghost_index_set = IndexSet());
 
       /**
        * Return the global size.
        */
-      types::global_dof_index size() const;
+      types::global_dof_index
+      size() const;
 
       /**
        * Return the local size, i.e. local_range().second minus
        * local_range().first.
        */
-      unsigned int local_size() const;
+      unsigned int
+      local_size() const;
 
       /**
        * Return an IndexSet representation of the local range. This class
@@ -202,7 +207,8 @@ namespace Utilities
        * consists of one single range of data, and is equivalent to the result
        * of local_range().
        */
-      const IndexSet &locally_owned_range() const;
+      const IndexSet &
+      locally_owned_range() const;
 
       /**
        * Return the local range. The returned pair consists of the index of
@@ -216,7 +222,8 @@ namespace Utilities
        * Return true if the given global index is in the local range of this
        * processor.
        */
-      bool in_local_range (const types::global_dof_index global_index) const;
+      bool
+      in_local_range (const types::global_dof_index global_index) const;
 
       /**
        * Return the local index corresponding to the given global index. If
@@ -245,18 +252,21 @@ namespace Utilities
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
        */
-      bool is_ghost_entry (const types::global_dof_index global_index) const;
+      bool
+      is_ghost_entry (const types::global_dof_index global_index) const;
 
       /**
        * Return an IndexSet representation of all ghost indices.
        */
-      const IndexSet &ghost_indices() const;
+      const IndexSet &
+      ghost_indices() const;
 
       /**
        * Return the number of ghost indices. Same as
        * ghost_indices().n_elements(), but cached for simpler access.
        */
-      unsigned int n_ghost_indices() const;
+      unsigned int
+      n_ghost_indices() const;
 
       /**
        * In case the partitioner was built to define ghost indices as a subset
@@ -295,7 +305,8 @@ namespace Utilities
        * Number of import indices, i.e., indices that are ghosts on other
        * processors and we will receive data from.
        */
-      unsigned int n_import_indices() const;
+      unsigned int
+      n_import_indices() const;
 
       /**
        * Return a list of processors (first entry) and the number of degrees
@@ -318,7 +329,8 @@ namespace Utilities
        * not compatible, only these processors will return @p false, whereas
        * the other processors will return @p true.
        */
-      bool is_compatible (const Partitioner &part) const;
+      bool
+      is_compatible (const Partitioner &part) const;
 
       /**
        * Check whether the given partitioner is compatible with the
@@ -333,37 +345,43 @@ namespace Utilities
        * only in a context where all processors call it the same number of
        * times.
        */
-      bool is_globally_compatible (const Partitioner &part) const;
+      bool
+      is_globally_compatible (const Partitioner &part) const;
 
       /**
        * Return the MPI ID of the calling processor. Cached to have simple
        * access.
        */
-      unsigned int this_mpi_process () const;
+      unsigned int
+      this_mpi_process () const;
 
       /**
        * Return the total number of MPI processor participating in the given
        * partitioner. Cached to have simple access.
        */
-      unsigned int n_mpi_processes () const;
+      unsigned int
+      n_mpi_processes () const;
 
       /**
        * Return the MPI communicator underlying the partitioner object.
        */
       DEAL_II_DEPRECATED
-      const MPI_Comm &get_communicator() const;
+      const MPI_Comm &
+      get_communicator() const;
 
       /**
        * Return the MPI communicator underlying the partitioner object.
        */
-      virtual const MPI_Comm &get_mpi_communicator() const override;
+      virtual const MPI_Comm &
+      get_mpi_communicator() const override;
 
       /**
        * Return whether ghost indices have been explicitly added as a @p
        * ghost_indices argument. Only true if a reinit call or constructor
        * provided that argument.
        */
-      bool ghost_indices_initialized() const;
+      bool
+      ghost_indices_initialized() const;
 
 #ifdef DEAL_II_WITH_MPI
       /**
@@ -520,7 +538,8 @@ namespace Utilities
       /**
        * Compute the memory consumption of this structure.
        */
-      std::size_t memory_consumption() const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Exception
@@ -653,7 +672,8 @@ namespace Utilities
 #ifndef DOXYGEN
 
     inline
-    types::global_dof_index Partitioner::size() const
+    types::global_dof_index
+    Partitioner::size() const
     {
       return global_size;
     }
@@ -661,7 +681,8 @@ namespace Utilities
 
 
     inline
-    const IndexSet &Partitioner::locally_owned_range() const
+    const IndexSet &
+    Partitioner::locally_owned_range() const
     {
       return locally_owned_range_data;
     }
@@ -746,7 +767,8 @@ namespace Utilities
 
 
     inline
-    const IndexSet  &Partitioner::ghost_indices() const
+    const IndexSet  &
+    Partitioner::ghost_indices() const
     {
       return ghost_indices_data;
     }

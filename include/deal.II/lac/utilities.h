@@ -63,8 +63,9 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template<typename NumberType>
-    std::array<NumberType,3> givens_rotation(const NumberType &x,
-                                             const NumberType &y);
+    std::array<NumberType,3>
+    givens_rotation(const NumberType &x,
+                    const NumberType &y);
 
     /**
      * Return the elements of a hyperbolic rotation matrix.
@@ -95,8 +96,9 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template<typename NumberType>
-    std::array<NumberType,3> hyperbolic_rotation(const NumberType &x,
-                                                 const NumberType &y);
+    std::array<NumberType,3>
+    hyperbolic_rotation(const NumberType &x,
+                        const NumberType &y);
 
     /**
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
@@ -133,11 +135,12 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    double lanczos_largest_eigenvalue(const OperatorType &H,
-                                      const VectorType &v0,
-                                      const unsigned int k,
-                                      VectorMemory<VectorType> &vector_memory,
-                                      std::vector<double> *eigenvalues = nullptr);
+    double
+    lanczos_largest_eigenvalue(const OperatorType &H,
+                               const VectorType &v0,
+                               const unsigned int k,
+                               VectorMemory<VectorType> &vector_memory,
+                               std::vector<double> *eigenvalues = nullptr);
 
     /**
      * Apply Chebyshev polynomial of the operator @p H to @p x. For a
@@ -189,12 +192,13 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    void chebyshev_filter(VectorType &x,
-                          const OperatorType &H,
-                          const unsigned int n,
-                          const std::pair<double,double> unwanted_spectrum,
-                          const double tau,
-                          VectorMemory<VectorType> &vector_memory);
+    void
+    chebyshev_filter(VectorType &x,
+                     const OperatorType &H,
+                     const unsigned int n,
+                     const std::pair<double,double> unwanted_spectrum,
+                     const double tau,
+                     VectorMemory<VectorType> &vector_memory);
 
   }
 
@@ -211,8 +215,9 @@ namespace Utilities
   {
 
     template<typename NumberType>
-    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &/*f*/,
-                                                               const std::complex<NumberType> &/*g*/)
+    std::array<std::complex<NumberType>,3>
+    hyperbolic_rotation(const std::complex<NumberType> &/*f*/,
+                        const std::complex<NumberType> &/*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
       std::array<NumberType,3> res;
@@ -222,8 +227,9 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<NumberType,3> hyperbolic_rotation(const NumberType &f,
-                                                 const NumberType &g)
+    std::array<NumberType,3>
+    hyperbolic_rotation(const NumberType &f,
+                        const NumberType &g)
     {
       Assert (f != 0, ExcDivideByZero());
       const NumberType tau = g/f;
@@ -244,8 +250,9 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &/*f*/,
-                                                           const std::complex<NumberType> &/*g*/)
+    std::array<std::complex<NumberType>,3>
+    givens_rotation(const std::complex<NumberType> &/*f*/,
+                    const std::complex<NumberType> &/*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
       std::array<NumberType,3> res;
@@ -255,8 +262,9 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<NumberType,3> givens_rotation(const NumberType &f,
-                                             const NumberType &g)
+    std::array<NumberType,3>
+    givens_rotation(const NumberType &f,
+                    const NumberType &g)
     {
       std::array<NumberType,3> res;
       // naive calculation for "r" may overflow or underflow:
@@ -307,11 +315,12 @@ namespace Utilities
 
 
     template <typename OperatorType, typename VectorType>
-    double lanczos_largest_eigenvalue(const OperatorType &H,
-                                      const VectorType &v0_,
-                                      const unsigned int k,
-                                      VectorMemory<VectorType> &vector_memory,
-                                      std::vector<double> *eigenvalues)
+    double
+    lanczos_largest_eigenvalue(const OperatorType &H,
+                               const VectorType &v0_,
+                               const unsigned int k,
+                               VectorMemory<VectorType> &vector_memory,
+                               std::vector<double> *eigenvalues)
     {
       // Do k-step Lanczos:
 
@@ -397,12 +406,13 @@ namespace Utilities
 
 
     template <typename OperatorType, typename VectorType>
-    void chebyshev_filter(VectorType &x,
-                          const OperatorType &op,
-                          const unsigned int degree,
-                          const std::pair<double,double> unwanted_spectrum,
-                          const double a_L,
-                          VectorMemory<VectorType> &vector_memory)
+    void
+    chebyshev_filter(VectorType &x,
+                     const OperatorType &op,
+                     const unsigned int degree,
+                     const std::pair<double,double> unwanted_spectrum,
+                     const double a_L,
+                     VectorMemory<VectorType> &vector_memory)
     {
       const double a = unwanted_spectrum.first;
       const double b = unwanted_spectrum.second;

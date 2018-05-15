@@ -255,14 +255,16 @@ public:
    *   = accessor;
    * @endcode
    */
-  explicit TriaRawIterator (const Accessor &a);
+  explicit
+  TriaRawIterator (const Accessor &a);
 
   /**
    * Constructor. Assumes that the other accessor type is convertible to the
    * current one.
    */
   template <typename OtherAccessor>
-  explicit TriaRawIterator (const OtherAccessor &a);
+  explicit
+  TriaRawIterator (const OtherAccessor &a);
 
   /**
    * Proper constructor, initialized with the triangulation, the level and
@@ -324,12 +326,14 @@ public:
    *
    * You must not dereference invalid or past the end iterators.
    */
-  const Accessor &operator * () const;
+  const Accessor &
+  operator * () const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor &operator * ();
+  Accessor &
+  operator * ();
 
   /**
    * Dereferencing operator, returns a reference of the cell pointed to. Usage
@@ -337,12 +341,14 @@ public:
    *
    * There is a @p const and a non-@p const version.
    */
-  const Accessor *operator -> () const;
+  const Accessor *
+  operator -> () const;
 
   /**
    * Dereferencing operator, non-@p const version.
    */
-  Accessor *operator -> ();
+  Accessor *
+  operator -> ();
 
 
   /**
@@ -354,24 +360,28 @@ public:
    * only intended for limited purposes inside the library and it makes
    * debugging much harder.
    */
-  const Accessor &access_any () const;
+  const Accessor &
+  access_any () const;
 
   /*@}*/
 
   /**
    * Assignment operator.
    */
-  TriaRawIterator &operator = (const TriaRawIterator &);
+  TriaRawIterator &
+  operator = (const TriaRawIterator &);
 
   /**
    * Compare for equality.
    */
-  bool operator == (const TriaRawIterator &) const;
+  bool
+  operator == (const TriaRawIterator &) const;
 
   /**
    * Compare for inequality.
    */
-  bool operator != (const TriaRawIterator &) const;
+  bool
+  operator != (const TriaRawIterator &) const;
 
   /**
    * Ordering relation for iterators.
@@ -398,13 +408,15 @@ public:
    * parallel::distributed::Triangulation because we rely on index(), which is
    * likely not the same.
    */
-  bool operator < (const TriaRawIterator &) const;
+  bool
+  operator < (const TriaRawIterator &) const;
 
   /**
    * Another comparison operator, implementing with the same ordering as
    * #operator<.
    */
-  bool operator > (const TriaRawIterator &) const;
+  bool
+  operator > (const TriaRawIterator &) const;
 
   /**@name Advancement of iterators*/
   /*@{*/
@@ -413,7 +425,8 @@ public:
    * the iterator to the next element and returns a reference to
    * <tt>*this</tt>.
    */
-  TriaRawIterator &operator ++ ();
+  TriaRawIterator &
+  operator ++ ();
 
   /**
    * Postfix <tt>++</tt> operator: <tt>iterator++</tt>. This operator advances
@@ -426,13 +439,15 @@ public:
    * of for loops (<tt>for (; iterator!=end; ++iterator)</tt>) since there you
    * normally never need the returned value.
    */
-  TriaRawIterator operator ++ (int);
+  TriaRawIterator
+  operator ++ (int);
 
   /**
    * Prefix @p -- operator: @p --iterator. This operator moves the iterator to
    * the previous element and returns a reference to <tt>*this</tt>.
    */
-  TriaRawIterator &operator -- ();
+  TriaRawIterator &
+  operator -- ();
 
   /**
    * Postfix @p -- operator: @p iterator--. This operator moves the iterator
@@ -442,27 +457,31 @@ public:
    * The same applies as for the postfix operator++: If possible, avoid it by
    * using the prefix operator form to avoid the use of a temporary variable.
    */
-  TriaRawIterator operator -- (int);
+  TriaRawIterator
+  operator -- (int);
   /*@}*/
 
   /**
    * Return the state of the iterator.
    */
-  IteratorState::IteratorStates state () const;
+  IteratorState::IteratorStates
+  state () const;
 
   /**
    * Print the iterator to a stream <code>out</code>. The format is
    * <tt>level.index</tt>.
    */
   template <class StreamType>
-  void print (StreamType &out) const;
+  void
+  print (StreamType &out) const;
 
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Mark the class as bidirectional iterator and declare some typedefs which
@@ -584,7 +603,8 @@ public:
    * the type Accessor.
    */
   template <typename OtherAccessor>
-  explicit TriaIterator (const OtherAccessor &a);
+  explicit
+  TriaIterator (const OtherAccessor &a);
 
   /**
    * This is a conversion operator (constructor) which takes another iterator
@@ -658,7 +678,8 @@ public:
    * iterator to the next used element and returns a reference to
    * <tt>*this</tt>.
    */
-  TriaIterator<Accessor> &operator ++ ();
+  TriaIterator<Accessor> &
+  operator ++ ();
 
   /**
    * Postfix <tt>++</tt> operator: <tt>i++</tt>. This operator advances the
@@ -669,18 +690,21 @@ public:
    * especially in the head of for loops (<tt>for (; i!=end; ++i)</tt>) since
    * there you normally never need the returned value.
    */
-  TriaIterator<Accessor> operator ++ (int);
+  TriaIterator<Accessor>
+  operator ++ (int);
 
   /**
    * Prefix @p -- operator: @p --i. This operator advances the iterator to the
    * previous used element and returns a reference to <tt>*this</tt>.
    */
-  TriaIterator<Accessor> &operator -- ();
+  TriaIterator<Accessor> &
+  operator -- ();
 
   /**
    * Postfix @p -- operator: @p i--.
    */
-  TriaIterator<Accessor> operator -- (int);
+  TriaIterator<Accessor>
+  operator -- (int);
   /*@}*/
 
   /**
@@ -836,7 +860,8 @@ public:
    * iterator to the next active element and returns a reference to
    * <tt>*this</tt>.
    */
-  TriaActiveIterator<Accessor> &operator ++ ();
+  TriaActiveIterator<Accessor> &
+  operator ++ ();
 
   /**@name Advancement of iterators*/
   /*@{*/
@@ -849,18 +874,21 @@ public:
    * especially in the head of for loops (<tt>for (; i!=end; ++i)</tt>) since
    * there you normally never need the returned value.
    */
-  TriaActiveIterator<Accessor> operator ++ (int);
+  TriaActiveIterator<Accessor>
+  operator ++ (int);
 
   /**
    * Prefix @p -- operator: @p --i. This operator advances the iterator to the
    * previous active element and returns a reference to <tt>*this</tt>.
    */
-  TriaActiveIterator<Accessor> &operator -- ();
+  TriaActiveIterator<Accessor> &
+  operator -- ();
 
   /**
    * Postfix @p -- operator: @p i--.
    */
-  TriaActiveIterator<Accessor> operator -- (int);
+  TriaActiveIterator<Accessor>
+  operator -- (int);
   /*@}*/
 
   /**
@@ -1194,8 +1222,9 @@ TriaActiveIterator<Accessor>::TriaActiveIterator (const TriaRawIterator<OtherAcc
  */
 template <typename Accessor>
 inline
-std::ostream &operator << (std::ostream                        &out,
-                           const TriaRawIterator<Accessor> &i)
+std::ostream &
+operator << (std::ostream                        &out,
+             const TriaRawIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1212,8 +1241,9 @@ std::ostream &operator << (std::ostream                        &out,
  */
 template <typename Accessor>
 inline
-std::ostream &operator << (std::ostream                     &out,
-                           const TriaIterator<Accessor> &i)
+std::ostream &
+operator << (std::ostream                     &out,
+             const TriaIterator<Accessor> &i)
 {
   i.print(out);
   return out;
@@ -1230,8 +1260,9 @@ std::ostream &operator << (std::ostream                     &out,
  */
 template <typename Accessor>
 inline
-std::ostream &operator << (std::ostream                           &out,
-                           const TriaActiveIterator<Accessor> &i)
+std::ostream &
+operator << (std::ostream                           &out,
+             const TriaActiveIterator<Accessor> &i)
 {
   i.print(out);
   return out;

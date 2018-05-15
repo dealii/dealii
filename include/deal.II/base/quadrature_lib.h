@@ -373,8 +373,9 @@ private:
    * of the singular quadrature rule, considering whether the point is inside
    * the cell, on an edge of the cell, or on a corner of the cell.
    */
-  static unsigned int quad_size(const Point<dim> singularity,
-                                const unsigned int n);
+  static unsigned int
+  quad_size(const Point<dim> singularity,
+            const unsigned int n);
 };
 
 
@@ -404,8 +405,9 @@ private:
    * @p a and @p b are indices into the weights array and the result will
    * be determined by comparing the weights.
    */
-  bool compare_weights(const unsigned int a,
-                       const unsigned int b) const;
+  bool
+  compare_weights(const unsigned int a,
+                  const unsigned int b) const;
 };
 
 /**
@@ -806,21 +808,34 @@ public:
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> QGauss<1>::QGauss (const unsigned int n);
-template <> QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
+template <>
+QGauss<1>::QGauss (const unsigned int n);
+template <>
+QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
 
-template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int);
-template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int);
+template <> std::vector<double>
+QGaussLog<1>::get_quadrature_points(const unsigned int);
+template <> std::vector<double>
+QGaussLog<1>::get_quadrature_weights(const unsigned int);
 
-template <> QMidpoint<1>::QMidpoint ();
-template <> QTrapez<1>::QTrapez ();
-template <> QSimpson<1>::QSimpson ();
-template <> QMilne<1>::QMilne ();
-template <> QWeddle<1>::QWeddle ();
-template <> QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
-template <> QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha, const bool flag);
-template <> QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index, const bool flag);
-template <> QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity);
+template <>
+QMidpoint<1>::QMidpoint ();
+template <>
+QTrapez<1>::QTrapez ();
+template <>
+QSimpson<1>::QSimpson ();
+template <>
+QMilne<1>::QMilne ();
+template <>
+QWeddle<1>::QWeddle ();
+template <>
+QGaussLog<1>::QGaussLog (const unsigned int n, const bool revert);
+template <>
+QGaussLogR<1>::QGaussLogR (const unsigned int n, const Point<1> x0, const double alpha, const bool flag);
+template <>
+QGaussOneOverR<2>::QGaussOneOverR (const unsigned int n, const unsigned int index, const bool flag);
+template <>
+QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity);
 
 
 

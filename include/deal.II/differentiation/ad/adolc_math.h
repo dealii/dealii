@@ -97,7 +97,8 @@ namespace std
   {
     return 1.0 - std::erf(x);
   } \
-  inline adtl::adouble erfc(const adtl::adouble &x)
+  inline adtl::adouble
+  erfc(const adtl::adouble &x)
   {
     return 1.0 - std::erf(x);
   }

@@ -381,7 +381,8 @@ SparseDirectUMFPACK::clear ()
 
 
 template <class Matrix>
-void SparseDirectUMFPACK::factorize (const Matrix &)
+void
+SparseDirectUMFPACK::factorize (const Matrix &)
 {
   AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }

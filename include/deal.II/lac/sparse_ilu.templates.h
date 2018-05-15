@@ -31,8 +31,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 template <typename somenumber>
-void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
-                                    const AdditionalData &data)
+void
+SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
+                               const AdditionalData &data)
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 
@@ -134,8 +135,9 @@ label_200:
 
 template <typename number>
 template <typename somenumber>
-void SparseILU<number>::vmult (Vector<somenumber>       &dst,
-                               const Vector<somenumber> &src) const
+void
+SparseILU<number>::vmult (Vector<somenumber>       &dst,
+                          const Vector<somenumber> &src) const
 {
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
@@ -208,8 +210,9 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 
 template <typename number>
 template <typename somenumber>
-void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
-                                const Vector<somenumber> &src) const
+void
+SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
+                           const Vector<somenumber> &src) const
 {
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));

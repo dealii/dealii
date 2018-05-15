@@ -282,9 +282,10 @@ ParameterHandler::get_current_full_path (const std::string &name) const
 
 
 
-void ParameterHandler::parse_input (std::istream &input,
-                                    const std::string &filename,
-                                    const std::string &last_line)
+void
+ParameterHandler::parse_input (std::istream &input,
+                               const std::string &filename,
+                               const std::string &last_line)
 {
   AssertThrow (input, ExcIO());
 
@@ -422,8 +423,9 @@ void ParameterHandler::parse_input (std::istream &input,
 
 
 
-void ParameterHandler::parse_input (const std::string &filename,
-                                    const std::string &last_line)
+void
+ParameterHandler::parse_input (const std::string &filename,
+                               const std::string &last_line)
 {
   PathSearch search("PARAMETERS");
 
@@ -528,7 +530,8 @@ namespace
 
 
 
-void ParameterHandler::parse_input_from_xml (std::istream &in)
+void
+ParameterHandler::parse_input_from_xml (std::istream &in)
 {
   AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
@@ -580,7 +583,8 @@ void ParameterHandler::parse_input_from_xml (std::istream &in)
 }
 
 
-void ParameterHandler::parse_input_from_json (std::istream &in)
+void
+ParameterHandler::parse_input_from_json (std::istream &in)
 {
   AssertThrow(in, ExcIO());
 
@@ -596,7 +600,8 @@ void ParameterHandler::parse_input_from_json (std::istream &in)
 
 
 
-void ParameterHandler::clear ()
+void
+ParameterHandler::clear ()
 {
   entries = std_cxx14::make_unique<boost::property_tree::ptree> ();
 }
@@ -641,8 +646,9 @@ ParameterHandler::declare_entry (const std::string           &entry,
 
 
 
-void ParameterHandler::add_action(const std::string &entry,
-                                  const std::function<void (const std::string &)> &action)
+void
+ParameterHandler::add_action(const std::string &entry,
+                             const std::function<void (const std::string &)> &action)
 {
   actions.push_back (action);
 
@@ -736,7 +742,8 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
 
 
 
-void ParameterHandler::enter_subsection (const std::string &subsection)
+void
+ParameterHandler::enter_subsection (const std::string &subsection)
 {
   // if necessary create subsection
   if (!entries->get_child_optional (get_current_full_path(subsection)))
@@ -749,7 +756,8 @@ void ParameterHandler::enter_subsection (const std::string &subsection)
 
 
 
-void ParameterHandler::leave_subsection ()
+void
+ParameterHandler::leave_subsection ()
 {
   // assert there is a subsection that
   // we may leave
@@ -778,7 +786,8 @@ ParameterHandler::get (const std::string &entry_string) const
 
 
 
-long int ParameterHandler::get_integer (const std::string &entry_string) const
+long int
+ParameterHandler::get_integer (const std::string &entry_string) const
 {
   try
     {
@@ -798,7 +807,8 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
 
 
 
-double ParameterHandler::get_double (const std::string &entry_string) const
+double
+ParameterHandler::get_double (const std::string &entry_string) const
 {
   try
     {
@@ -818,7 +828,8 @@ double ParameterHandler::get_double (const std::string &entry_string) const
 
 
 
-bool ParameterHandler::get_bool (const std::string &entry_string) const
+bool
+ParameterHandler::get_bool (const std::string &entry_string) const
 {
   const std::string s = get(entry_string);
 
@@ -2186,7 +2197,8 @@ MultipleParameterLoop::parse_input (std::istream &input,
 
 
 
-void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
+void
+MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
 {
   for (unsigned int run_no=0; run_no<n_branches; ++run_no)
     {
@@ -2199,7 +2211,8 @@ void MultipleParameterLoop::loop (MultipleParameterLoop::UserClass &uc)
 
 
 
-void MultipleParameterLoop::init_branches ()
+void
+MultipleParameterLoop::init_branches ()
 {
   multiple_choices.clear ();
   init_branches_current_section ();
@@ -2238,7 +2251,8 @@ void MultipleParameterLoop::init_branches ()
 
 
 
-void MultipleParameterLoop::init_branches_current_section ()
+void
+MultipleParameterLoop::init_branches_current_section ()
 {
   const boost::property_tree::ptree &current_section
     = entries->get_child (get_current_path());
@@ -2278,7 +2292,8 @@ void MultipleParameterLoop::init_branches_current_section ()
 
 
 
-void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
+void
+MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 {
   unsigned int possibilities = 1;
 
@@ -2348,7 +2363,8 @@ MultipleParameterLoop::Entry::Entry (const std::vector<std::string> &ssp,
 
 
 
-void MultipleParameterLoop::Entry::split_different_values ()
+void
+MultipleParameterLoop::Entry::split_different_values ()
 {
   // split string into three parts:
   // part before the opening "{",

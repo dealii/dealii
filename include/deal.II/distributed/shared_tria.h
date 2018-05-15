@@ -241,7 +241,8 @@ namespace parallel
       /**
        * Destructor.
        */
-      virtual ~Triangulation () override = default;
+      virtual
+      ~Triangulation () override = default;
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
@@ -251,7 +252,8 @@ namespace parallel
        * addition of calling dealii::GridTools::partition_triangulation() at
        * the end.
        */
-      virtual void execute_coarsening_and_refinement () override;
+      virtual void
+      execute_coarsening_and_refinement () override;
 
       /**
        * Create a triangulation.
@@ -259,9 +261,10 @@ namespace parallel
        * This function also partitions triangulation based on the MPI
        * communicator provided to the constructor.
        */
-      virtual void create_triangulation (const std::vector< Point< spacedim > > &vertices,
-                                         const std::vector< CellData< dim > > &cells,
-                                         const SubCellData &subcelldata) override;
+      virtual void
+      create_triangulation (const std::vector< Point< spacedim > > &vertices,
+                            const std::vector< CellData< dim > > &cells,
+                            const SubCellData &subcelldata) override;
 
       /**
        * Copy @p other_tria to this triangulation.
@@ -273,7 +276,8 @@ namespace parallel
        * since it only stores those cells that it owns, one layer of ghost cells around
        * the ones it locally owns, and a number of artificial cells.
        */
-      virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria) override;
+      virtual void
+      copy_triangulation (const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
        * Read the data of this object from a stream for the purpose of
@@ -284,7 +288,8 @@ namespace parallel
        * provided to the constructor.
        */
       template <class Archive>
-      void load (Archive &ar, const unsigned int version);
+      void
+      load (Archive &ar, const unsigned int version);
 
       /**
        * Return a vector of length Triangulation::n_active_cells() where each
@@ -294,7 +299,8 @@ namespace parallel
        * artificial cells that do not store who the owner of the cell is in
        * their subdomain_id field.
        */
-      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+      const std::vector<types::subdomain_id> &
+      get_true_subdomain_ids_of_cells() const;
 
       /**
        * Return a vector of length Triangulation::n_cells(level) where each
@@ -304,13 +310,15 @@ namespace parallel
        * artificial cells that do not store who the owner of the cell is in
        * their level_subdomain_id field.
        */
-      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+      const std::vector<types::subdomain_id> &
+      get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
        * Return allow_artificial_cells , namely true if artificial cells are
        * allowed.
        */
-      bool with_artificial_cells() const;
+      bool
+      with_artificial_cells() const;
 
     protected:
 
@@ -318,7 +326,8 @@ namespace parallel
        * Override the function to update the number cache so we can fill data
        * like @p level_ghost_owners.
        */
-      virtual void update_number_cache () override;
+      virtual void
+      update_number_cache () override;
 
     private:
 
@@ -336,7 +345,8 @@ namespace parallel
        * This function calls GridTools::partition_triangulation () and if
        * requested in the constructor of the class marks artificial cells.
        */
-      void partition();
+      void
+      partition();
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
@@ -403,17 +413,20 @@ namespace parallel
       /**
        * A dummy function to return empty vector.
        */
-      const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
+      const std::vector<types::subdomain_id> &
+      get_true_subdomain_ids_of_cells() const;
 
       /**
        * A dummy function to return empty vector.
        */
-      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+      const std::vector<types::subdomain_id> &
+      get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
 
       /**
        * A dummy function which always returns true.
        */
-      bool with_artificial_cells() const;
+      bool
+      with_artificial_cells() const;
 
     private:
       /**

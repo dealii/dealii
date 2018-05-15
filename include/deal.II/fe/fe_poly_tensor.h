@@ -162,13 +162,15 @@ public:
    * valued, there is no such scalar value and the function therefore throws
    * an exception.
    */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const override;
+  virtual double
+  shape_value (const unsigned int i,
+               const Point<dim> &p) const override;
 
   // documentation inherited from the base class
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim> &p,
-                                        const unsigned int component) const override;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim> &p,
+                         const unsigned int component) const override;
 
   /**
    * Compute the gradient of (scalar) shape function @p i at the given
@@ -176,13 +178,15 @@ public:
    * vector valued, there is no such scalar value and the function therefore
    * throws an exception.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const override;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int  i,
+              const Point<dim>   &p) const override;
 
   // documentation inherited from the base class
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
-                                              const unsigned int component) const override;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim> &p,
+                        const unsigned int component) const override;
 
   /**
    * Compute the Hessian of (scalar) shape function @p i at the given
@@ -190,13 +194,15 @@ public:
    * vector valued, there is no such scalar value and the function therefore
    * throws an exception.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int  i,
+                   const Point<dim> &p) const override;
 
   // documentation inherited from the base class
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim> &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad_component (const unsigned int i,
+                             const Point<dim> &p,
+                             const unsigned int component) const override;
 
 protected:
   /**

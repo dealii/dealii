@@ -82,23 +82,27 @@ public:
   /**
    * Print the list of the indices to <tt>out</tt>.
    */
-  void output_indices(std::ostream &out) const;
+  void
+  output_indices(std::ostream &out) const;
 
   /**
    * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==n()</tt>.  Stores a copy of <tt>renumber</tt>.
    */
-  void set_numbering(const std::vector<unsigned int> &renumber);
+  void
+  set_numbering(const std::vector<unsigned int> &renumber);
 
   /**
    * Give read access to the renumber vector.
    */
-  const std::vector<unsigned int> &get_numbering() const;
+  const std::vector<unsigned int> &
+  get_numbering() const;
 
   /**
    * Give read access to the inverse renumber vector.
    */
-  const std::vector<unsigned int> &get_numbering_inverse() const;
+  const std::vector<unsigned int> &
+  get_numbering_inverse() const;
 
   /**
    * Compute the value and the first and second derivatives of each tensor
@@ -112,12 +116,13 @@ public:
    * compute_grad() or compute_grad_grad() functions, see below, in a loop
    * over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<double>         &values,
-                std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads,
-                std::vector<Tensor<3,dim> > &third_derivatives,
-                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim>            &unit_point,
+           std::vector<double>         &values,
+           std::vector<Tensor<1,dim> > &grads,
+           std::vector<Tensor<2,dim> > &grad_grads,
+           std::vector<Tensor<3,dim> > &third_derivatives,
+           std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -131,8 +136,9 @@ public:
    * <tt>values.size()==</tt>n() to get the point values of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  double compute_value (const unsigned int i,
-                        const Point<dim> &p) const;
+  double
+  compute_value (const unsigned int i,
+                 const Point<dim> &p) const;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
@@ -149,8 +155,9 @@ public:
    * @tparam order The derivative order.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order,dim>
+  compute_derivative (const unsigned int i,
+                      const Point<dim> &p) const;
 
   /**
    * Compute the grad of the <tt>i</tt>th tensor product polynomial at
@@ -164,8 +171,9 @@ public:
    * <tt>grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<1,dim> compute_grad (const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1,dim>
+  compute_grad (const unsigned int i,
+                const Point<dim> &p) const;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -179,14 +187,16 @@ public:
    * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<2,dim> compute_grad_grad (const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2,dim>
+  compute_grad_grad (const unsigned int i,
+                     const Point<dim> &p) const;
 
   /**
    * Return the number of tensor product polynomials. For <i>n</i> 1d
    * polynomials this is <i>n<sup>dim</sup></i>.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
 
 protected:
@@ -217,8 +227,9 @@ protected:
    * <i>i</i>.
    */
   // fix to avoid compiler warnings about zero length arrays
-  void compute_index (const unsigned int i,
-                      unsigned int       (&indices)[(dim>0?dim:1)]) const;
+  void
+  compute_index (const unsigned int i,
+                 unsigned int       (&indices)[(dim>0?dim:1)]) const;
 };
 
 
@@ -281,12 +292,13 @@ public:
    * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
    * in a loop over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<double>         &values,
-                std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads,
-                std::vector<Tensor<3,dim> > &third_derivatives,
-                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim>            &unit_point,
+           std::vector<double>         &values,
+           std::vector<Tensor<1,dim> > &grads,
+           std::vector<Tensor<2,dim> > &grad_grads,
+           std::vector<Tensor<3,dim> > &third_derivatives,
+           std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -300,8 +312,9 @@ public:
    * with <tt>values.size()==n_tensor_pols</tt> to get the point values of all
    * tensor polynomials all at once and in a much more efficient way.
    */
-  double compute_value (const unsigned int i,
-                        const Point<dim> &p) const;
+  double
+  compute_value (const unsigned int i,
+                 const Point<dim> &p) const;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
@@ -318,8 +331,9 @@ public:
    * @tparam order The derivative order.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order,dim>
+  compute_derivative (const unsigned int i,
+                      const Point<dim> &p) const;
 
   /**
    * Compute the grad of the <tt>i</tt>th tensor product polynomial at
@@ -333,8 +347,9 @@ public:
    * with <tt>grads.size()==n_tensor_pols</tt> to get the point value of all
    * tensor polynomials all at once and in a much more efficient way.
    */
-  Tensor<1,dim> compute_grad (const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1,dim>
+  compute_grad (const unsigned int i,
+                const Point<dim> &p) const;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -348,14 +363,16 @@ public:
    * with <tt>grad_grads.size()==n_tensor_pols</tt> to get the point value of
    * all tensor polynomials all at once and in a much more efficient way.
    */
-  Tensor<2,dim> compute_grad_grad (const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2,dim>
+  compute_grad_grad (const unsigned int i,
+                     const Point<dim> &p) const;
 
   /**
    * Return the number of tensor product polynomials. It is the product of
    * the number of polynomials in each coordinate direction.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
 private:
   /**
@@ -375,8 +392,9 @@ private:
    * dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
    */
-  void compute_index (const unsigned int i,
-                      unsigned int       (&indices)[dim]) const;
+  void
+  compute_index (const unsigned int i,
+                 unsigned int       (&indices)[dim]) const;
 
   /**
    * Given the input to the constructor, compute <tt>n_tensor_pols</tt>.

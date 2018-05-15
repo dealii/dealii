@@ -66,28 +66,32 @@ namespace MeshWorker
     /**
      * The empty virtual destructor.
      */
-    virtual ~LocalIntegrator() override = default;
+    virtual
+    ~LocalIntegrator() override = default;
 
     /**
      * Virtual function for integrating on cells. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void cell(DoFInfo<dim, spacedim, number> &dinfo,
-                      IntegrationInfo<dim, spacedim> &info) const;
+    virtual void
+    cell(DoFInfo<dim, spacedim, number> &dinfo,
+         IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on boundary faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void boundary(DoFInfo<dim, spacedim, number> &dinfo,
-                          IntegrationInfo<dim, spacedim> &info) const;
+    virtual void
+    boundary(DoFInfo<dim, spacedim, number> &dinfo,
+             IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on interior faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void face(DoFInfo<dim, spacedim, number> &dinfo1,
-                      DoFInfo<dim, spacedim, number> &dinfo2,
-                      IntegrationInfo<dim, spacedim> &info1,
-                      IntegrationInfo<dim, spacedim> &info2) const;
+    virtual void
+    face(DoFInfo<dim, spacedim, number> &dinfo1,
+         DoFInfo<dim, spacedim, number> &dinfo2,
+         IntegrationInfo<dim, spacedim> &info1,
+         IntegrationInfo<dim, spacedim> &info2) const;
 
     /**
      * The flag indicating whether the cell integrator cell() is to be used in

@@ -73,7 +73,8 @@ namespace internal
           task_info (task_info)
         {}
 
-        void operator() () const
+        void
+        operator() () const
         {
           MFWorkerInterface *used_worker = worker != nullptr ? worker : *worker_pointer;
           Assert(used_worker != nullptr, ExcInternalError());
@@ -110,7 +111,8 @@ namespace internal
           is_blocked (is_blocked)
         {}
 
-        tbb::task *execute () override
+        tbb::task *
+        execute () override
         {
           work();
 
@@ -143,7 +145,8 @@ namespace internal
           is_blocked (is_blocked_in)
         {}
 
-        tbb::task *execute () override
+        tbb::task *
+        execute () override
         {
           tbb::empty_task *root = new ( tbb::task::allocate_root() )tbb::empty_task;
           const unsigned int evens = task_info.partition_evens[partition];
@@ -230,7 +233,8 @@ namespace internal
           partition (partition_in)
         {}
 
-        void operator()(const tbb::blocked_range<unsigned int> &r) const
+        void
+        operator()(const tbb::blocked_range<unsigned int> &r) const
         {
           const unsigned int start_index = task_info.cell_partition_data[partition]
                                            + task_info.block_size * r.begin();
@@ -267,7 +271,8 @@ namespace internal
           is_blocked (is_blocked_in)
         {}
 
-        tbb::task *execute () override
+        tbb::task *
+        execute () override
         {
           const unsigned int n_chunks = (task_info.cell_partition_data[partition+1]-
                                          task_info.cell_partition_data[partition]+
@@ -302,7 +307,8 @@ namespace internal
         do_compress(do_compress)
       {}
 
-      tbb::task *execute () override
+      tbb::task *
+      execute () override
       {
         if (do_compress == false)
           worker.vector_update_ghosts_finish();
@@ -568,7 +574,8 @@ namespace internal
 
 
 
-    void TaskInfo::clear ()
+    void
+    TaskInfo::clear ()
     {
       n_active_cells = 0;
       n_ghost_cells = 0;
@@ -596,8 +603,9 @@ namespace internal
 
 
     template <typename StreamType>
-    void TaskInfo::print_memory_statistics (StreamType &out,
-                                            const std::size_t data_length) const
+    void
+    TaskInfo::print_memory_statistics (StreamType &out,
+                                       const std::size_t data_length) const
     {
       Utilities::MPI::MinMaxAvg memory_c
         = Utilities::MPI::min_max_avg (1e-6*data_length, communicator);
@@ -698,13 +706,14 @@ namespace internal
 
     void
     TaskInfo
-    ::create_blocks_serial (const std::vector<unsigned int> &boundary_cells,
-                            const std::vector<unsigned int> &cells_close_to_boundary,
-                            const unsigned int               dofs_per_cell,
-                            const std::vector<unsigned int> &cell_vectorization_categories,
-                            const bool cell_vectorization_categories_strict,
-                            std::vector<unsigned int>       &renumbering,
-                            std::vector<unsigned char>      &incompletely_filled_vectorization)
+    ::
+    create_blocks_serial (const std::vector<unsigned int> &boundary_cells,
+                          const std::vector<unsigned int> &cells_close_to_boundary,
+                          const unsigned int               dofs_per_cell,
+                          const std::vector<unsigned int> &cell_vectorization_categories,
+                          const bool cell_vectorization_categories_strict,
+                          std::vector<unsigned int>       &renumbering,
+                          std::vector<unsigned char>      &incompletely_filled_vectorization)
     {
       const unsigned int n_macro_cells =
         (n_active_cells + vectorization_length - 1) / vectorization_length;
@@ -883,9 +892,10 @@ namespace internal
 
     void
     TaskInfo
-    ::initial_setup_blocks_tasks(const std::vector<unsigned int> &boundary_cells,
-                                 std::vector<unsigned int>       &renumbering,
-                                 std::vector<unsigned char>      &incompletely_filled_vectorization)
+    ::
+    initial_setup_blocks_tasks(const std::vector<unsigned int> &boundary_cells,
+                               std::vector<unsigned int>       &renumbering,
+                               std::vector<unsigned char>      &incompletely_filled_vectorization)
     {
       const unsigned int n_macro_cells =
         (n_active_cells + vectorization_length - 1) / vectorization_length;

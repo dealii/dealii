@@ -162,7 +162,8 @@ public:
    * equal if they have the same size and the same starting pointer.
    * This version always compares with the const value_type.
    */
-  bool operator == (const ArrayView<const value_type> &other_view) const;
+  bool
+  operator == (const ArrayView<const value_type> &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -177,7 +178,8 @@ public:
    * equal if they have the same size and the same starting pointer.
    * This version always compares with the const value_type.
    */
-  bool operator != (const ArrayView<const value_type> &other_view) const;
+  bool
+  operator != (const ArrayView<const value_type> &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -191,33 +193,39 @@ public:
    * Return the size (in elements) of the view of memory this object
    * represents.
    */
-  std::size_t size() const;
+  std::size_t
+  size() const;
 
   /**
    * Return a pointer to the underlying array serving as element storage.
    * In case the container is empty a nullptr is returned.
    */
-  value_type *data() const noexcept;
+  value_type *
+  data() const noexcept;
 
   /**
    * Return an iterator pointing to the beginning of the array view.
    */
-  iterator begin() const;
+  iterator
+  begin() const;
 
   /**
    * Return an iterator pointing to one past the end of the array view.
    */
-  iterator end() const;
+  iterator
+  end() const;
 
   /**
    * Return a constant iterator pointing to the beginning of the array view.
    */
-  const_iterator cbegin() const;
+  const_iterator
+  cbegin() const;
 
   /**
    * Return a constant iterator pointing to one past the end of the array view.
    */
-  const_iterator cend() const;
+  const_iterator
+  cend() const;
 
   /**
    * Return a reference to the $i$th element of the range represented by the
@@ -228,7 +236,8 @@ public:
    * memory location depending on whether the template type of the class is @p
    * const or not.
    */
-  value_type &operator[] (const std::size_t i) const;
+  value_type &
+  operator[] (const std::size_t i) const;
 
 private:
   /**
@@ -438,7 +447,8 @@ namespace internal
      * range in memory.
      */
     template <class Iterator>
-    bool is_contiguous(const Iterator &first, const Iterator &last)
+    bool
+    is_contiguous(const Iterator &first, const Iterator &last)
     {
       const auto n = std::distance(first, last);
       for (typename std::decay<decltype(n)>::type i = 0; i < n; ++i)
@@ -460,8 +470,9 @@ namespace internal
      */
     template <class T>
     constexpr
-    bool is_contiguous(T *,
-                       T *)
+    bool
+    is_contiguous(T *,
+                  T *)
     {
       return true;
     }

@@ -81,22 +81,26 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~FunctionTime() = default;
+  virtual
+  ~FunctionTime() = default;
 
   /**
    * Return the value of the time variable.
    */
-  Number get_time () const;
+  Number
+  get_time () const;
 
   /**
    * Set the time to <tt>new_time</tt>, overwriting the old value.
    */
-  virtual void set_time (const Number new_time);
+  virtual void
+  set_time (const Number new_time);
 
   /**
    * Advance the time by the given time step <tt>delta_t</tt>.
    */
-  virtual void advance_time (const Number delta_t);
+  virtual void
+  advance_time (const Number delta_t);
 
 private:
   /**

@@ -133,7 +133,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~PersistentTriangulation () override = default;
+  virtual
+  ~PersistentTriangulation () override = default;
 
   /**
    * Overloaded version of the same function in the base class which stores
@@ -141,7 +142,8 @@ public:
    * triangulation and after that calls the respective function of the base
    * class.
    */
-  virtual void execute_coarsening_and_refinement () override;
+  virtual void
+  execute_coarsening_and_refinement () override;
 
   /**
    * Restore the grid according to the saved data. For this, the coarse grid
@@ -155,7 +157,8 @@ public:
    * Repeatedly calls the <tt>restore(unsigned int)</tt> function in a loop
    * over all refinement steps.
    */
-  void restore ();
+  void
+  restore ();
 
   /**
    * Differential restore. Performs the @p step_noth local refinement and
@@ -165,13 +168,15 @@ public:
    * it were if restore would have been called from
    * <tt>step=0...step_no-1</tt> before.
    */
-  void restore (const unsigned int step_no);
+  void
+  restore (const unsigned int step_no);
 
   /**
    * Return the number of refinement and coarsening steps. This is given by
    * the size of the @p refine_flags vector.
    */
-  unsigned int n_refinement_steps () const;
+  unsigned int
+  n_refinement_steps () const;
 
   /**
    * Overload this function to use @p tria as a new coarse grid. The present
@@ -182,15 +187,17 @@ public:
    * The coarse grid must persist until the end of this object, since it will
    * be used upon reconstruction of the grid.
    */
-  virtual void copy_triangulation (const Triangulation<dim, spacedim> &tria) override;
+  virtual void
+  copy_triangulation (const Triangulation<dim, spacedim> &tria) override;
 
   /**
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
-  virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
-                                     const std::vector<CellData<dim> > &cells,
-                                     const SubCellData                 &subcelldata) override;
+  virtual void
+  create_triangulation (const std::vector<Point<spacedim> >    &vertices,
+                        const std::vector<CellData<dim> > &cells,
+                        const SubCellData                 &subcelldata) override;
 
   /**
    * An overload of the respective function of the base class.
@@ -198,7 +205,8 @@ public:
    * Throw an error, since this function is not useful in the context of this
    * class.
    */
-  virtual void create_triangulation_compatibility (
+  virtual void
+  create_triangulation_compatibility (
     const std::vector<Point<spacedim> >    &vertices,
     const std::vector<CellData<dim> > &cells,
     const SubCellData                 &subcelldata) override;
@@ -206,25 +214,29 @@ public:
   /**
    * Write all refine and coarsen flags to the ostream @p out.
    */
-  virtual void write_flags(std::ostream &out) const;
+  virtual void
+  write_flags(std::ostream &out) const;
 
   /**
    * Reads all refine and coarsen flags that previously were written by
    * <tt>write_flags(...)</tt>. This is especially useful for rebuilding the
    * triangulation after the end or breakdown of a program and its restart.
    */
-  virtual void read_flags(std::istream &in);
+  virtual void
+  read_flags(std::istream &in);
 
   /**
    * Clear all flags. Retains the same coarse grid.
    */
-  virtual void clear_flags();
+  virtual void
+  clear_flags();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   /**
    * Exception.

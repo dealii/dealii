@@ -45,15 +45,16 @@ namespace
   template <int dim, int n_components, typename Number>
   struct Default
   {
-    static inline void evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                 Number *values_dofs_actual,
-                                 Number *values_quad,
-                                 Number *gradients_quad,
-                                 Number *hessians_quad,
-                                 Number *scratch_data,
-                                 const bool               evaluate_values,
-                                 const bool               evaluate_gradients,
-                                 const bool               evaluate_hessians)
+    static inline void
+    evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+              Number *values_dofs_actual,
+              Number *values_quad,
+              Number *gradients_quad,
+              Number *hessians_quad,
+              Number *scratch_data,
+              const bool               evaluate_values,
+              const bool               evaluate_gradients,
+              const bool               evaluate_hessians)
     {
       internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                dim, -1, 0, n_components, Number>
@@ -62,13 +63,14 @@ namespace
                           evaluate_values, evaluate_gradients, evaluate_hessians);
     }
 
-    static inline void integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                  Number *values_dofs_actual,
-                                  Number *values_quad,
-                                  Number *gradients_quad,
-                                  Number *scratch_data,
-                                  const bool               integrate_values,
-                                  const bool               integrate_gradients)
+    static inline void
+    integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+               Number *values_dofs_actual,
+               Number *values_quad,
+               Number *gradients_quad,
+               Number *scratch_data,
+               const bool               integrate_values,
+               const bool               integrate_gradients)
     {
       internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
                dim, -1, 0, n_components, Number>
@@ -107,7 +109,8 @@ namespace
   template<int degree, int n_q_points_1d, int dim, int n_components, typename Number>
   struct Factory<dim, n_components, Number, 0, degree, n_q_points_1d>
   {
-    static inline void evaluate (
+    static inline void
+    evaluate (
       const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
       Number *values_dofs_actual,
       Number *values_quad,
@@ -130,7 +133,8 @@ namespace
          scratch_data, evaluate_values, evaluate_gradients, evaluate_hessians);
     }
 
-    static inline void integrate (
+    static inline void
+    integrate (
       const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
       Number *values_dofs_actual,
       Number *values_quad,
@@ -158,15 +162,16 @@ namespace
   template<int degree, int n_q_points_1d, int dim, int n_components, typename Number>
   struct Factory<dim, n_components, Number, 1, degree, n_q_points_1d, typename std::enable_if<(n_q_points_1d<degree+3)>::type>
   {
-    static inline void evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                 Number *values_dofs_actual,
-                                 Number *values_quad,
-                                 Number *gradients_quad,
-                                 Number *hessians_quad,
-                                 Number *scratch_data,
-                                 const bool               evaluate_values,
-                                 const bool               evaluate_gradients,
-                                 const bool               evaluate_hessians)
+    static inline void
+    evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+              Number *values_dofs_actual,
+              Number *values_quad,
+              Number *gradients_quad,
+              Number *hessians_quad,
+              Number *scratch_data,
+              const bool               evaluate_values,
+              const bool               evaluate_gradients,
+              const bool               evaluate_hessians)
   {
     const int runtime_n_q_points_1d = shape_info.n_q_points_1d;
     if (runtime_n_q_points_1d == n_q_points_1d)
@@ -194,13 +199,14 @@ namespace
           evaluate_values, evaluate_gradients, evaluate_hessians);
   }
 
-  static inline void integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                Number *values_dofs_actual,
-                                Number *values_quad,
-                                Number *gradients_quad,
-                                Number *scratch_data,
-                                const bool               integrate_values,
-                                const bool               integrate_gradients)
+  static inline void
+  integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+             Number *values_dofs_actual,
+             Number *values_quad,
+             Number *gradients_quad,
+             Number *scratch_data,
+             const bool               integrate_values,
+             const bool               integrate_gradients)
   {
     const int runtime_n_q_points_1d = shape_info.n_q_points_1d;
     if (runtime_n_q_points_1d == n_q_points_1d)
@@ -235,15 +241,16 @@ namespace
    * for the 'evaluate' function.
    */
   template<int dim, int n_components, typename Number>
-  void symmetric_selector_evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                    Number *values_dofs_actual,
-                                    Number *values_quad,
-                                    Number *gradients_quad,
-                                    Number *hessians_quad,
-                                    Number *scratch_data,
-                                    const bool               evaluate_values,
-                                    const bool               evaluate_gradients,
-                                    const bool               evaluate_hessians)
+  void
+  symmetric_selector_evaluate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                               Number *values_dofs_actual,
+                               Number *values_quad,
+                               Number *gradients_quad,
+                               Number *hessians_quad,
+                               Number *scratch_data,
+                               const bool               evaluate_values,
+                               const bool               evaluate_gradients,
+                               const bool               evaluate_hessians)
   {
     Assert(shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric,
            ExcInternalError());
@@ -259,13 +266,14 @@ namespace
    * for the 'integrate' function.
    */
   template<int dim, int n_components, typename Number>
-  void symmetric_selector_integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                                     Number *values_dofs_actual,
-                                     Number *values_quad,
-                                     Number *gradients_quad,
-                                     Number *scratch_data,
-                                     const bool               integrate_values,
-                                     const bool               integrate_gradients)
+  void
+  symmetric_selector_integrate (const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+                                Number *values_dofs_actual,
+                                Number *values_quad,
+                                Number *gradients_quad,
+                                Number *scratch_data,
+                                const bool               integrate_values,
+                                const bool               integrate_gradients)
   {
     Assert(shape_info.element_type <= internal::MatrixFreeFunctions::tensor_symmetric,
            ExcInternalError());
@@ -297,15 +305,16 @@ struct SelectEvaluator
    * internal::FEEvaluationImplTransformToCollocation::evaluate() with appropriate
    * template parameters.
    */
-  static void evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                       Number *values_dofs_actual,
-                       Number *values_quad,
-                       Number *gradients_quad,
-                       Number *hessians_quad,
-                       Number *scratch_data,
-                       const bool               evaluate_values,
-                       const bool               evaluate_gradients,
-                       const bool               evaluate_hessians);
+  static void
+  evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+           Number *values_dofs_actual,
+           Number *values_quad,
+           Number *gradients_quad,
+           Number *hessians_quad,
+           Number *scratch_data,
+           const bool               evaluate_values,
+           const bool               evaluate_gradients,
+           const bool               evaluate_hessians);
 
   /**
    * Chooses an appropriate evaluation strategy for the integrate function, i.e.
@@ -314,13 +323,14 @@ struct SelectEvaluator
    * internal::FEEvaluationImplTransformToCollocation::integrate() with appropriate
    * template parameters.
    */
-  static void integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                        Number *values_dofs_actual,
-                        Number *values_quad,
-                        Number *gradients_quad,
-                        Number *scratch_data,
-                        const bool               integrate_values,
-                        const bool               integrate_gradients);
+  static void
+  integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+            Number *values_dofs_actual,
+            Number *values_quad,
+            Number *gradients_quad,
+            Number *scratch_data,
+            const bool               integrate_values,
+            const bool               integrate_gradients);
 };
 
 /**
@@ -344,15 +354,16 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
    * internal::FEEvaluationImplTransformToCollocation::evaluate() with appropriate
    * template parameters.
    */
-  static void evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                       Number *values_dofs_actual,
-                       Number *values_quad,
-                       Number *gradients_quad,
-                       Number *hessians_quad,
-                       Number *scratch_data,
-                       const bool               evaluate_values,
-                       const bool               evaluate_gradients,
-                       const bool               evaluate_hessians);
+  static void
+  evaluate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+           Number *values_dofs_actual,
+           Number *values_quad,
+           Number *gradients_quad,
+           Number *hessians_quad,
+           Number *scratch_data,
+           const bool               evaluate_values,
+           const bool               evaluate_gradients,
+           const bool               evaluate_hessians);
 
   /**
    * Based on the run time parameters stored in @p shape_info this function
@@ -362,13 +373,14 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
    * internal::FEEvaluationImplTransformToCollocation::integrate() with appropriate
    * template parameters.
    */
-  static void integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                        Number *values_dofs_actual,
-                        Number *values_quad,
-                        Number *gradients_quad,
-                        Number *scratch_data,
-                        const bool               integrate_values,
-                        const bool               integrate_gradients);
+  static void
+  integrate(const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+            Number *values_dofs_actual,
+            Number *values_quad,
+            Number *gradients_quad,
+            Number *scratch_data,
+            const bool               integrate_values,
+            const bool               integrate_gradients);
 };
 
 //----------------------Implementation for SelectEvaluator---------------------

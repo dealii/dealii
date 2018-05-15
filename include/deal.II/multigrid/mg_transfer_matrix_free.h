@@ -70,22 +70,26 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferMatrixFree () override = default;
+  virtual
+  ~MGTransferMatrixFree () override = default;
 
   /**
    * Initialize the constraints to be used in build().
    */
-  void initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
+  void
+  initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Actually build the information for the prolongation for each level.
    */
-  void build (const DoFHandler<dim,dim> &mg_dof);
+  void
+  build (const DoFHandler<dim,dim> &mg_dof);
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -101,9 +105,10 @@ public:
    * @param dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
-  virtual void prolongate (const unsigned int                           to_level,
-                           LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  virtual void
+  prolongate (const unsigned int                           to_level,
+              LinearAlgebra::distributed::Vector<Number>       &dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -123,9 +128,10 @@ public:
    * @param dst has as many elements as there are degrees of freedom on the
    * coarser level.
    */
-  virtual void restrict_and_add (const unsigned int from_level,
-                                 LinearAlgebra::distributed::Vector<Number>       &dst,
-                                 const LinearAlgebra::distributed::Vector<Number> &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int from_level,
+                    LinearAlgebra::distributed::Vector<Number>       &dst,
+                    const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
    * Restrict fine-mesh field @p src to each multigrid level in @p mg_dof and
@@ -135,9 +141,10 @@ public:
    * resized to locally relevant vectors on each level.
    */
   template<typename Number2, int spacedim>
-  void interpolate_to_mg(const DoFHandler< dim, spacedim > &mg_dof,
-                         MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-                         const LinearAlgebra::distributed::Vector<Number2> &src) const;
+  void
+  interpolate_to_mg(const DoFHandler< dim, spacedim > &mg_dof,
+                    MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
+                    const LinearAlgebra::distributed::Vector<Number2> &src) const;
 
   /**
    * Finite element does not provide prolongation matrices.
@@ -147,7 +154,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
 
@@ -235,17 +243,19 @@ private:
    * Perform the prolongation operation.
    */
   template <int degree>
-  void do_prolongate_add(const unsigned int                           to_level,
-                         LinearAlgebra::distributed::Vector<Number>       &dst,
-                         const LinearAlgebra::distributed::Vector<Number> &src) const;
+  void
+  do_prolongate_add(const unsigned int                           to_level,
+                    LinearAlgebra::distributed::Vector<Number>       &dst,
+                    const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
    * Performs the restriction operation.
    */
   template <int degree>
-  void do_restrict_add(const unsigned int                           from_level,
-                       LinearAlgebra::distributed::Vector<Number>       &dst,
-                       const LinearAlgebra::distributed::Vector<Number> &src) const;
+  void
+  do_restrict_add(const unsigned int                           from_level,
+                  LinearAlgebra::distributed::Vector<Number>       &dst,
+                  const LinearAlgebra::distributed::Vector<Number> &src) const;
 };
 
 
@@ -289,32 +299,38 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockMatrixFree () override = default;
+  virtual
+  ~MGTransferBlockMatrixFree () override = default;
 
   /**
    * Initialize the constraints to be used in build().
    */
-  void initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
+  void
+  initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
    */
-  void initialize_constraints (const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
+  void
+  initialize_constraints (const std::vector<MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Actually build the information for the prolongation for each level.
    */
-  void build (const DoFHandler<dim,dim> &mg_dof);
+  void
+  build (const DoFHandler<dim,dim> &mg_dof);
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
    */
-  void build (const std::vector<const DoFHandler<dim,dim>*> &mg_dof);
+  void
+  build (const std::vector<const DoFHandler<dim,dim>*> &mg_dof);
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -330,9 +346,10 @@ public:
    * @param dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
-  virtual void prolongate (const unsigned int                                    to_level,
-                           LinearAlgebra::distributed::BlockVector<Number>       &dst,
-                           const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+  virtual void
+  prolongate (const unsigned int                                    to_level,
+              LinearAlgebra::distributed::BlockVector<Number>       &dst,
+              const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -352,9 +369,10 @@ public:
    * @param dst has as many elements as there are degrees of freedom on the
    * coarser level.
    */
-  virtual void restrict_and_add (const unsigned int from_level,
-                                 LinearAlgebra::distributed::BlockVector<Number>       &dst,
-                                 const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int from_level,
+                    LinearAlgebra::distributed::BlockVector<Number>       &dst,
+                    const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
    * Transfer from a block-vector on the global grid to block-vectors defined
@@ -402,7 +420,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * This class can both be used with a single DoFHandler

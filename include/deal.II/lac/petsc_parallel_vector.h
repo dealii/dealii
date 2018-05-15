@@ -184,9 +184,10 @@ namespace PETScWrappers
        * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one
        * of length zero.
        */
-      explicit Vector (const MPI_Comm  &communicator,
-                       const size_type  n,
-                       const size_type  local_size);
+      explicit
+      Vector (const MPI_Comm  &communicator,
+              const size_type  n,
+              const size_type  local_size);
 
 
       /**
@@ -200,9 +201,10 @@ namespace PETScWrappers
        * different parts of the vector shall communicate
        */
       template <typename Number>
-      explicit Vector (const MPI_Comm               &communicator,
-                       const dealii::Vector<Number> &v,
-                       const size_type               local_size);
+      explicit
+      Vector (const MPI_Comm               &communicator,
+              const dealii::Vector<Number> &v,
+              const size_type               local_size);
 
 
       /**
@@ -218,9 +220,10 @@ namespace PETScWrappers
        * is deprecated: use PETScWrappers::MPI::Vector instead.
        */
       DEAL_II_DEPRECATED
-      explicit Vector (const MPI_Comm     &communicator,
-                       const VectorBase   &v,
-                       const size_type     local_size);
+      explicit
+      Vector (const MPI_Comm     &communicator,
+              const VectorBase   &v,
+              const size_type     local_size);
 
       /**
        * Construct a new parallel ghosted PETSc vector from IndexSets.
@@ -260,20 +263,23 @@ namespace PETScWrappers
        * not reordered by component (use a PETScWrappers::BlockVector
        * otherwise).
        */
-      explicit Vector (const IndexSet &local,
-                       const MPI_Comm &communicator);
+      explicit
+      Vector (const IndexSet &local,
+              const MPI_Comm &communicator);
 
       /**
        * Release all memory and return to a state just like after having
        * called the default constructor.
        */
-      virtual void clear () override;
+      virtual void
+      clear () override;
 
       /**
        * Copy the given vector. Resize the present vector if necessary. Also
        * take over the MPI communicator of @p v.
        */
-      Vector &operator= (const Vector &v);
+      Vector &
+      operator= (const Vector &v);
 
       /**
        * Set all components of the vector to the given number @p s. Simply
@@ -281,7 +287,8 @@ namespace PETScWrappers
        * function to make the example given in the discussion about making the
        * constructor explicit work.
        */
-      Vector &operator= (const PetscScalar s);
+      Vector &
+      operator= (const PetscScalar s);
 
       /**
        * Copy the values of a deal.II vector (as opposed to those of the PETSc
@@ -293,7 +300,8 @@ namespace PETScWrappers
        * can't get from the source vector.
        */
       template <typename number>
-      Vector &operator= (const dealii::Vector<number> &v);
+      Vector &
+      operator= (const dealii::Vector<number> &v);
 
       /**
        * Change the dimension of the vector to @p N. It is unspecified how
@@ -311,10 +319,11 @@ namespace PETScWrappers
        * If @p omit_zeroing_entries is false, the vector is filled by zeros.
        * Otherwise, the elements are left an unspecified state.
        */
-      void reinit (const MPI_Comm  &communicator,
-                   const size_type  N,
-                   const size_type  local_size,
-                   const bool       omit_zeroing_entries = false);
+      void
+      reinit (const MPI_Comm  &communicator,
+              const size_type  N,
+              const size_type  local_size,
+              const bool       omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector @p v, and also take over
@@ -325,8 +334,9 @@ namespace PETScWrappers
        * as calling <tt>reinit(v.size(), v.local_size(),
        * omit_zeroing_entries)</tt>.
        */
-      void reinit (const Vector &v,
-                   const bool    omit_zeroing_entries = false);
+      void
+      reinit (const Vector &v,
+              const bool    omit_zeroing_entries = false);
 
       /**
        * Reinit as a vector with ghost elements. See the constructor with
@@ -335,9 +345,10 @@ namespace PETScWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void reinit (const IndexSet &local,
-                   const IndexSet &ghost,
-                   const MPI_Comm &communicator);
+      void
+      reinit (const IndexSet &local,
+              const IndexSet &ghost,
+              const MPI_Comm &communicator);
 
       /**
        * Reinit as a vector without ghost elements. See constructor with same
@@ -346,14 +357,16 @@ namespace PETScWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void reinit (const IndexSet &local,
-                   const MPI_Comm &communicator);
+      void
+      reinit (const IndexSet &local,
+              const MPI_Comm &communicator);
 
       /**
        * Return a reference to the MPI communicator object in use with this
        * vector.
        */
-      const MPI_Comm &get_mpi_communicator () const override;
+      const MPI_Comm &
+      get_mpi_communicator () const override;
 
       /**
        * Print to a stream. @p precision denotes the desired precision with
@@ -366,10 +379,11 @@ namespace PETScWrappers
        * that the right thing happens for parallel vectors that are
        * distributed across processors.
        */
-      void print (std::ostream       &out,
-                  const unsigned int  precision  = 3,
-                  const bool          scientific = true,
-                  const bool          across     = true) const;
+      void
+      print (std::ostream       &out,
+             const unsigned int  precision  = 3,
+             const bool          scientific = true,
+             const bool          across     = true) const;
 
       /**
        * @copydoc PETScWrappers::VectorBase::all_zero()
@@ -377,7 +391,8 @@ namespace PETScWrappers
        * @note This function overloads the one in the base class to make this
        * a collective operation.
        */
-      bool all_zero () const;
+      bool
+      all_zero () const;
 
     protected:
       /**
@@ -386,8 +401,9 @@ namespace PETScWrappers
        * local_size denotes how many of these elements shall be stored
        * locally.
        */
-      virtual void create_vector (const size_type n,
-                                  const size_type local_size);
+      virtual void
+      create_vector (const size_type n,
+                     const size_type local_size);
 
 
 
@@ -396,9 +412,10 @@ namespace PETScWrappers
        * with the specified ghost indices. Note that you need to call
        * update_ghost_values() before accessing those.
        */
-      virtual void create_vector (const size_type n,
-                                  const size_type local_size,
-                                  const IndexSet &ghostnodes);
+      virtual void
+      create_vector (const size_type n,
+                     const size_type local_size,
+                     const IndexSet &ghostnodes);
 
 
     private:
@@ -421,7 +438,8 @@ namespace PETScWrappers
      * @author Wolfgang Bangerth, 2004
      */
     inline
-    void swap (Vector &u, Vector &v)
+    void
+    swap (Vector &u, Vector &v)
     {
       u.swap (v);
     }
@@ -525,18 +543,20 @@ namespace internal
     public:
       template <typename Matrix>
       static
-      void reinit_range_vector (const Matrix &matrix,
-                                PETScWrappers::MPI::Vector &v,
-                                bool /*omit_zeroing_entries*/)
+      void
+      reinit_range_vector (const Matrix &matrix,
+                           PETScWrappers::MPI::Vector &v,
+                           bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_range_indices(), matrix.get_mpi_communicator());
       }
 
       template <typename Matrix>
       static
-      void reinit_domain_vector(const Matrix &matrix,
-                                PETScWrappers::MPI::Vector &v,
-                                bool /*omit_zeroing_entries*/)
+      void
+      reinit_domain_vector(const Matrix &matrix,
+                           PETScWrappers::MPI::Vector &v,
+                           bool /*omit_zeroing_entries*/)
       {
         v.reinit(matrix.locally_owned_domain_indices(), matrix.get_mpi_communicator());
       }

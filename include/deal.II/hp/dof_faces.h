@@ -190,15 +190,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
 
@@ -249,15 +251,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
     /**
@@ -280,15 +284,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
     /**
@@ -316,36 +322,41 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
 
     // --------------------- inline and template functions ------------------
     template <class Archive>
-    void DoFIndicesOnFaces<1>::serialize(Archive &,
-                                         const unsigned int)
+    void
+    DoFIndicesOnFaces<1>::serialize(Archive &,
+                                    const unsigned int)
     {}
 
 
     template <class Archive>
-    void DoFIndicesOnFaces<2>::serialize(Archive &ar,
-                                         const unsigned int)
+    void
+    DoFIndicesOnFaces<2>::serialize(Archive &ar,
+                                    const unsigned int)
     {
       ar &lines;
     }
 
 
     template <class Archive>
-    void DoFIndicesOnFaces<3>::serialize(Archive &ar,
-                                         const unsigned int)
+    void
+    DoFIndicesOnFaces<3>::serialize(Archive &ar,
+                                    const unsigned int)
     {
       ar &lines &quads;
     }
@@ -615,8 +626,9 @@ namespace internal
 
     template <int structdim>
     template <class Archive>
-    void DoFIndicesOnFacesOrEdges<structdim>::serialize(Archive &ar,
-                                                        const unsigned int)
+    void
+    DoFIndicesOnFacesOrEdges<structdim>::serialize(Archive &ar,
+                                                   const unsigned int)
     {
       ar &dofs;
       ar &dof_offsets;

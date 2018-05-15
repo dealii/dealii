@@ -211,7 +211,8 @@ namespace internal
       /**
        * Destructor made virtual.
        */
-      virtual ~DataEntryBase () = default;
+      virtual
+      ~DataEntryBase () = default;
 
       /**
        * Assuming that the stored vector is a cell vector, extract the given
@@ -295,18 +296,21 @@ namespace internal
        * Return whether the data represented by (a derived class of) this object
        * represents a complex-valued (as opposed to real-valued) information.
        */
-      virtual bool is_complex_valued () const = 0;
+      virtual bool
+      is_complex_valued () const = 0;
 
       /**
        * Clear all references to the vectors.
        */
-      virtual void clear () = 0;
+      virtual void
+      clear () = 0;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      virtual std::size_t memory_consumption () const = 0;
+      virtual std::size_t
+      memory_consumption () const = 0;
 
       /**
        * Pointer to the DoFHandler object that the vector is based on.
@@ -372,14 +376,16 @@ namespace internal
       ParallelDataBase (const ParallelDataBase &data);
 
       template <typename DoFHandlerType>
-      void reinit_all_fe_values(std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
-                                const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                                const unsigned int face = numbers::invalid_unsigned_int);
+      void
+      reinit_all_fe_values(std::vector<std::shared_ptr<DataEntryBase<DoFHandlerType> > > &dof_data,
+                           const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                           const unsigned int face = numbers::invalid_unsigned_int);
 
       const FEValuesBase<dim,spacedim> &
       get_present_fe_values(const unsigned int dataset) const;
 
-      void resize_system_vectors(const unsigned int n_components);
+      void
+      resize_system_vectors(const unsigned int n_components);
 
       const unsigned int n_datasets;
       const unsigned int n_subdivisions;
@@ -590,7 +596,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~DataOut_DoFData () override;
+  virtual
+  ~DataOut_DoFData () override;
 
   /**
    * Designate a dof handler to be used to extract geometry data and the
@@ -600,7 +607,8 @@ public:
    * This call is optional: If you add data vectors with specified DoFHandler
    * object, then that contains all information needed to generate the output.
    */
-  void attach_dof_handler (const DoFHandlerType &);
+  void
+  attach_dof_handler (const DoFHandlerType &);
 
   /**
    * Designate a triangulation to be used to extract geometry data and the
@@ -611,8 +619,9 @@ public:
    * This call is useful when you only output cell vectors and no DoFHandler
    * at all, in which case it provides the geometry.
    */
-  void attach_triangulation (const Triangulation<DoFHandlerType::dimension,
-                             DoFHandlerType::space_dimension> &);
+  void
+  attach_triangulation (const Triangulation<DoFHandlerType::dimension,
+                        DoFHandlerType::space_dimension> &);
 
   /**
    * Add a data vector together with its name.
@@ -680,11 +689,12 @@ public:
    * for a use of this).
    */
   template <class VectorType>
-  void add_data_vector (const VectorType               &data,
-                        const std::vector<std::string> &names,
-                        const DataVectorType           type = type_automatic,
-                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
-                        = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
+  void
+  add_data_vector (const VectorType               &data,
+                   const std::vector<std::string> &names,
+                   const DataVectorType           type = type_automatic,
+                   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+                   = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
   /**
    * This function is an abbreviation to the above one (see there for a
@@ -703,11 +713,12 @@ public:
    * FEValuesBase::get_function_values() function.
    */
   template <class VectorType>
-  void add_data_vector (const VectorType     &data,
-                        const std::string    &name,
-                        const DataVectorType type = type_automatic,
-                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
-                        = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
+  void
+  add_data_vector (const VectorType     &data,
+                   const std::string    &name,
+                   const DataVectorType type = type_automatic,
+                   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+                   = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
   /**
    * This function is an extension of the above one (see there for a
@@ -724,11 +735,12 @@ public:
    * methods above is skipped.
    */
   template <class VectorType>
-  void add_data_vector (const DoFHandlerType           &dof_handler,
-                        const VectorType               &data,
-                        const std::vector<std::string> &names,
-                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
-                        = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
+  void
+  add_data_vector (const DoFHandlerType           &dof_handler,
+                   const VectorType               &data,
+                   const std::vector<std::string> &names,
+                   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+                   = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
 
   /**
@@ -736,11 +748,12 @@ public:
    * @p dof_handler given and a single data name.
    */
   template <class VectorType>
-  void add_data_vector (const DoFHandlerType          &dof_handler,
-                        const VectorType  &data,
-                        const std::string &name,
-                        const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
-                        = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
+  void
+  add_data_vector (const DoFHandlerType          &dof_handler,
+                   const VectorType  &data,
+                   const std::string &name,
+                   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation
+                   = std::vector<DataComponentInterpretation::DataComponentInterpretation>());
 
   /**
    * This function is an alternative to the above ones, allowing the output of
@@ -771,8 +784,9 @@ public:
    * variable as objects are destroyed in reverse order of declaration.
    */
   template <class VectorType>
-  void add_data_vector (const VectorType                             &data,
-                        const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
+  void
+  add_data_vector (const VectorType                             &data,
+                   const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
 
   /**
    * Same function as above, but with a DoFHandler object that does not need
@@ -781,9 +795,10 @@ public:
    * vector, not other solution vectors or DoFHandlers.
    */
   template <class VectorType>
-  void add_data_vector (const DoFHandlerType                         &dof_handler,
-                        const VectorType                             &data,
-                        const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
+  void
+  add_data_vector (const DoFHandlerType                         &dof_handler,
+                   const VectorType                             &data,
+                   const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor);
 
   /**
    * Release the pointers to the data vectors. This allows output of a new set
@@ -791,7 +806,8 @@ public:
    * DataOut object can be used in an algebraic context. Note that besides the
    * data vectors also the patches already computed are deleted.
    */
-  void clear_data_vectors ();
+  void
+  clear_data_vectors ();
 
   /**
    * Release pointers to all input data elements, i.e. pointers to data
@@ -803,7 +819,8 @@ public:
    * object and vectors must not be deleted before the output thread is
    * finished.
    */
-  void clear_input_data_references ();
+  void
+  clear_input_data_references ();
 
   /**
    * This function can be used to merge the patches that were created using
@@ -829,8 +846,9 @@ public:
    * set up any patches.
    */
   template <typename DoFHandlerType2>
-  void merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> &source,
-                      const Point<patch_space_dim> &shift = Point<patch_space_dim>());
+  void
+  merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> &source,
+                 const Point<patch_space_dim> &shift = Point<patch_space_dim>());
 
   /**
    * Release the pointers to the data vectors and the DoF handler. You have to
@@ -838,13 +856,15 @@ public:
    * pointer to the dof handler is cleared as well, along with all other data.
    * In effect, this function resets everything to a virgin state.
    */
-  virtual void clear ();
+  virtual void
+  clear ();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 protected:
   /**
@@ -884,14 +904,16 @@ protected:
    * they shall write to a file.
    */
   virtual
-  const std::vector<Patch> &get_patches () const override;
+  const std::vector<Patch> &
+  get_patches () const override;
 
   /**
    * Virtual function through which the names of data sets are obtained by the
    * output functions of the base class.
    */
   virtual
-  std::vector<std::string> get_dataset_names () const override;
+  std::vector<std::string>
+  get_dataset_names () const override;
 
   /**
    * Extracts the finite elements stored in the dof_data object, including a

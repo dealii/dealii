@@ -624,7 +624,8 @@ namespace PETScWrappers
   namespace internal
   {
     template <typename T>
-    bool is_non_negative (const T &t)
+    bool
+    is_non_negative (const T &t)
     {
       return t >= 0;
     }
@@ -632,7 +633,8 @@ namespace PETScWrappers
 
 
     template <typename T>
-    bool is_non_negative (const std::complex<T> &)
+    bool
+    is_non_negative (const std::complex<T> &)
     {
       Assert (false,
               ExcMessage ("You can't ask a complex value "

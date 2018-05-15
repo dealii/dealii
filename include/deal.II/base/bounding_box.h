@@ -110,7 +110,8 @@ public:
   /**
    * Return the boundary_points
    */
-  const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &get_boundary_points () const;
+  const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &
+                                                              get_boundary_points () const;
 
   /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
@@ -118,30 +119,35 @@ public:
    *
    * Return an enumerator of type NeighborType.
    */
-  NeighborType get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const;
+  NeighborType
+  get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const;
 
   /**
    * Enlarge the current object so that it contains @p other_bbox .
    * If the current object already contains @p other_bbox then it is not changed
    * by this function.
    */
-  void merge_with(const BoundingBox<spacedim,Number> &other_bbox);
+  void
+  merge_with(const BoundingBox<spacedim,Number> &other_bbox);
 
   /**
    * Return true if the point is inside the Bounding Box, false otherwise.
    */
-  bool point_inside (const Point<spacedim, Number> &p) const;
+  bool
+  point_inside (const Point<spacedim, Number> &p) const;
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
    */
-  double volume() const;
+  double
+  volume() const;
 
   /**
    * Boost serialization function
    */
   template<class Archive>
-  void serialize(Archive &ar, const unsigned int version );
+  void
+  serialize(Archive &ar, const unsigned int version );
 
 private:
   std::pair<Point<spacedim,Number>,Point<spacedim,Number>> boundary_points;
@@ -167,7 +173,8 @@ BoundingBox<spacedim, Number>::BoundingBox (const std::pair<Point<spacedim,Numbe
 
 template <int spacedim, typename Number>
 template<class Archive>
-void BoundingBox<spacedim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
+void
+BoundingBox<spacedim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
 {
   ar &boundary_points;
 }

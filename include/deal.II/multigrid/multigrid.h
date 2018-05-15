@@ -190,14 +190,16 @@ public:
   /**
    * Reinit this class according to #minlevel and #maxlevel.
    */
-  void reinit (const unsigned int minlevel,
-               const unsigned int maxlevel);
+  void
+  reinit (const unsigned int minlevel,
+          const unsigned int maxlevel);
 
   /**
    * Execute one multigrid cycle. The type of cycle is selected by the
    * constructor argument cycle. See the enum Cycle for available types.
    */
-  void cycle ();
+  void
+  cycle ();
 
   /**
    * Execute one step of the V-cycle algorithm.  This function assumes, that
@@ -209,7 +211,8 @@ public:
    *
    * The actual work for this function is done in level_v_step().
    */
-  void vcycle ();
+  void
+  vcycle ();
 
   /**
    * Set additional matrices to correct residual computation at refinement
@@ -223,8 +226,9 @@ public:
    * <tt>edge_in</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_matrices (const MGMatrixBase<VectorType> &edge_out,
-                          const MGMatrixBase<VectorType> &edge_in);
+  void
+  set_edge_matrices (const MGMatrixBase<VectorType> &edge_out,
+                     const MGMatrixBase<VectorType> &edge_in);
 
   /**
    * Set additional matrices to correct residual computation at refinement
@@ -238,25 +242,29 @@ public:
    * <tt>edge_up</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_flux_matrices (const MGMatrixBase<VectorType> &edge_down,
-                               const MGMatrixBase<VectorType> &edge_up);
+  void
+  set_edge_flux_matrices (const MGMatrixBase<VectorType> &edge_down,
+                          const MGMatrixBase<VectorType> &edge_up);
 
   /**
    * Return the finest level for multigrid.
    */
-  unsigned int get_maxlevel() const;
+  unsigned int
+  get_maxlevel() const;
 
   /**
    * Return the coarsest level for multigrid.
    */
-  unsigned int get_minlevel() const;
+  unsigned int
+  get_minlevel() const;
 
   /**
    * Set the highest level for which the multilevel method is performed. By
    * default, this is the finest level of the Triangulation. Accepted are
    * values not smaller than the current #minlevel.
    */
-  void set_maxlevel (const unsigned int);
+  void
+  set_maxlevel (const unsigned int);
 
   /**
    * Set the coarsest level for which the multilevel method is performed. By
@@ -273,13 +281,15 @@ public:
    * @note If #minlevel is set to a nonzero value, do not forget to adjust
    * your coarse grid solver!
    */
-  void set_minlevel (const unsigned int level,
-                     bool relative = false);
+  void
+  set_minlevel (const unsigned int level,
+                bool relative = false);
 
   /**
    * Chance #cycle_type used in cycle().
    */
-  void set_cycle(Cycle);
+  void
+  set_cycle(Cycle);
 
   /**
    * @deprecated Debug output will go away. Use signals instead.
@@ -288,7 +298,8 @@ public:
    * during the multigrid cycles.
    */
   DEAL_II_DEPRECATED
-  void set_debug (const unsigned int);
+  void
+  set_debug (const unsigned int);
 
   /**
    * Connect a function to mg::Signals::coarse_solve.
@@ -333,7 +344,8 @@ private:
    * but will then call itself recursively for <tt>level-1</tt>, unless we are
    * on #minlevel where the coarse grid solver solves the problem exactly.
    */
-  void level_v_step (const unsigned int level);
+  void
+  level_v_step (const unsigned int level);
 
   /**
    * The actual W-cycle or F-cycle multigrid method. <tt>level</tt> is the
@@ -342,7 +354,8 @@ private:
    * <tt>level-1</tt>, unless we are on #minlevel where the coarse grid solver
    * solves the problem exactly.
    */
-  void level_step (const unsigned int level, Cycle cycle);
+  void
+  level_step (const unsigned int level, Cycle cycle);
 
   /**
    * Cycle type performed by the method cycle().
@@ -485,7 +498,8 @@ public:
   /**
    * Dummy function needed by other classes.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
@@ -494,16 +508,18 @@ public:
    * This is the operator used by LAC iterative solvers.
    */
   template <class OtherVectorType>
-  void vmult (OtherVectorType       &dst,
-              const OtherVectorType &src) const;
+  void
+  vmult (OtherVectorType       &dst,
+         const OtherVectorType &src) const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
   template <class OtherVectorType>
-  void vmult_add (OtherVectorType       &dst,
-                  const OtherVectorType &src) const;
+  void
+  vmult_add (OtherVectorType       &dst,
+             const OtherVectorType &src) const;
 
   /**
    * Transposed preconditioning operator.
@@ -511,8 +527,9 @@ public:
    * Not implemented, but the definition may be needed.
    */
   template <class OtherVectorType>
-  void Tvmult (OtherVectorType       &dst,
-               const OtherVectorType &src) const;
+  void
+  Tvmult (OtherVectorType       &dst,
+          const OtherVectorType &src) const;
 
   /**
    * Transposed preconditioning operator.
@@ -520,8 +537,9 @@ public:
    * Not implemented, but the definition may be needed.
    */
   template <class OtherVectorType>
-  void Tvmult_add (OtherVectorType       &dst,
-                   const OtherVectorType &src) const;
+  void
+  Tvmult_add (OtherVectorType       &dst,
+              const OtherVectorType &src) const;
 
   /**
    * Return the partitioning of the range space of this preconditioner, i.e.,
@@ -529,7 +547,8 @@ public:
    * By default, the respective information for the first DoFHandler object
    * are returned.
    */
-  IndexSet locally_owned_range_indices(const unsigned int block=0) const;
+  IndexSet
+  locally_owned_range_indices(const unsigned int block=0) const;
 
   /**
    * Return the partitioning of the domain space of this preconditioner, i.e.,
@@ -537,12 +556,14 @@ public:
    * By default, the respective information for the first DoFHandler object
    * are returned.
    */
-  IndexSet locally_owned_domain_indices(const unsigned int block=0) const;
+  IndexSet
+  locally_owned_domain_indices(const unsigned int block=0) const;
 
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  MPI_Comm get_mpi_communicator() const;
+  MPI_Comm
+  get_mpi_communicator() const;
 
   /**
    * Connect a function to mg::Signals::transfer_to_mg.
@@ -818,9 +839,10 @@ namespace internal
 
 template <int dim, typename VectorType, class TRANSFER>
 PreconditionMG<dim, VectorType, TRANSFER>
-::PreconditionMG(const DoFHandler<dim>  &dof_handler,
-                 Multigrid<VectorType>  &mg,
-                 const TRANSFER         &transfer)
+::
+PreconditionMG(const DoFHandler<dim>  &dof_handler,
+               Multigrid<VectorType>  &mg,
+               const TRANSFER         &transfer)
   :
   dof_handler_vector(1,&dof_handler),
   dof_handler_vector_raw(1,&dof_handler),
@@ -831,9 +853,10 @@ PreconditionMG<dim, VectorType, TRANSFER>
 
 template <int dim, typename VectorType, class TRANSFER>
 PreconditionMG<dim, VectorType, TRANSFER>
-::PreconditionMG(const std::vector<const DoFHandler<dim>*>  &dof_handler,
-                 Multigrid<VectorType>  &mg,
-                 const TRANSFER         &transfer)
+::
+PreconditionMG(const std::vector<const DoFHandler<dim>*>  &dof_handler,
+               Multigrid<VectorType>  &mg,
+               const TRANSFER         &transfer)
   :
   dof_handler_vector(dof_handler.size()),
   dof_handler_vector_raw(dof_handler.size()),

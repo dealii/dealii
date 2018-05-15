@@ -110,14 +110,16 @@ namespace internal
        * function in zero evaluates to one.
        */
       template <int dim>
-      void reinit (const Quadrature<1> &quad,
-                   const FiniteElement<dim> &fe_dim,
-                   const unsigned int base_element = 0);
+      void
+      reinit (const Quadrature<1> &quad,
+              const FiniteElement<dim> &fe_dim,
+              const unsigned int base_element = 0);
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Encodes the type of element detected at construction. FEEvaluation
@@ -341,7 +343,8 @@ namespace internal
        * Check whether we have symmetries in the shape values. In that case,
        * also fill the shape_???_eo fields.
        */
-      bool check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
+      bool
+      check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
 
       /**
        * Check whether symmetric 1D basis functions are such that the shape
@@ -349,7 +352,8 @@ namespace internal
        * with the quadrature points. This allows for specialized algorithms
        * that save some operations in the evaluation.
        */
-      bool check_1d_shapes_collocation();
+      bool
+      check_1d_shapes_collocation();
     };
 
 

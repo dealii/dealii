@@ -490,11 +490,12 @@ namespace PETScWrappers
 
   namespace internals
   {
-    void perform_mmult (const MatrixBase &inputleft,
-                        const MatrixBase &inputright,
-                        MatrixBase       &result,
-                        const VectorBase &V,
-                        const bool        transpose_left)
+    void
+    perform_mmult (const MatrixBase &inputleft,
+                   const MatrixBase &inputright,
+                   MatrixBase       &result,
+                   const VectorBase &V,
+                   const bool        transpose_left)
     {
       const bool use_vector = (V.size() == inputright.m() ? true : false);
       if (transpose_left == false)
@@ -597,7 +598,8 @@ namespace PETScWrappers
     return matrix;
   }
 
-  Mat &MatrixBase::petsc_matrix ()
+  Mat &
+  MatrixBase::petsc_matrix ()
   {
     return matrix;
   }

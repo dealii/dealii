@@ -320,10 +320,11 @@ namespace GridRefinement
    * helper function for the actual strategies.
    */
   template <int dim, typename Number, int spacedim>
-  void refine (Triangulation<dim,spacedim> &tria,
-               const Vector<Number>        &criteria,
-               const double                threshold,
-               const unsigned int          max_to_mark = numbers::invalid_unsigned_int);
+  void
+  refine (Triangulation<dim,spacedim> &tria,
+          const Vector<Number>        &criteria,
+          const double                threshold,
+          const unsigned int          max_to_mark = numbers::invalid_unsigned_int);
 
   /**
    * Mark all mesh cells for which the value in @p criteria is less than @p
@@ -340,9 +341,10 @@ namespace GridRefinement
    * helper function for the actual strategies.
    */
   template <int dim, typename Number, int spacedim>
-  void coarsen (Triangulation<dim,spacedim> &tria,
-                const Vector<Number>        &criteria,
-                const double                threshold);
+  void
+  coarsen (Triangulation<dim,spacedim> &tria,
+           const Vector<Number>        &criteria,
+           const double                threshold);
 
   /**
    * An exception thrown if the vector with cell criteria contains negative

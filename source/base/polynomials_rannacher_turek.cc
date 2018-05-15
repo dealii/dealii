@@ -29,8 +29,9 @@ PolynomialsRannacherTurek<dim>::PolynomialsRannacherTurek()
 
 
 template <int dim>
-double PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
-                                                     const Point<dim> &p) const
+double
+PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
+                                              const Point<dim> &p) const
 {
   Assert(dim == 2, ExcNotImplemented());
   if (i == 0)
@@ -57,7 +58,8 @@ double PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
 
 
 template <int dim>
-Tensor<1, dim> PolynomialsRannacherTurek<dim>::compute_grad(
+Tensor<1, dim>
+PolynomialsRannacherTurek<dim>::compute_grad(
   const unsigned int i,
   const Point<dim> &p) const
 {
@@ -134,7 +136,8 @@ const
 
 
 template <int dim>
-void PolynomialsRannacherTurek<dim>::compute(
+void
+PolynomialsRannacherTurek<dim>::compute(
   const Point<dim> &unit_point,
   std::vector<double> &values,
   std::vector<Tensor<1, dim> > &grads,

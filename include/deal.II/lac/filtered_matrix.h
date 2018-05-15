@@ -218,23 +218,27 @@ public:
     /**
      * Row number of the element represented by this object.
      */
-    size_type row() const;
+    size_type
+    row() const;
 
     /**
      * Column number of the element represented by this object.
      */
-    size_type column() const;
+    size_type
+    column() const;
 
     /**
      * Value of the right hand side for this row.
      */
-    double value() const;
+    double
+    value() const;
 
   private:
     /**
      * Advance to next entry
      */
-    void advance ();
+    void
+    advance ();
 
     /**
      * The matrix accessed.
@@ -267,43 +271,51 @@ public:
     /**
      * Prefix increment.
      */
-    const_iterator &operator++ ();
+    const_iterator &
+    operator++ ();
 
     /**
      * Postfix increment.
      */
-    const_iterator &operator++ (int);
+    const_iterator &
+    operator++ (int);
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor &
+    operator* () const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor *
+    operator-> () const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const const_iterator &) const;
+    bool
+    operator == (const const_iterator &) const;
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const const_iterator &) const;
+    bool
+    operator != (const const_iterator &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
      * smaller or if the row numbers are equal and the first index is smaller.
      */
-    bool operator < (const const_iterator &) const;
+    bool
+    operator < (const const_iterator &) const;
 
     /**
      * Comparison operator. Compares just the other way around than the
      * operator above.
      */
-    bool operator > (const const_iterator &) const;
+    bool
+    operator > (const const_iterator &) const;
 
   private:
     /**
@@ -349,7 +361,8 @@ public:
   /**
    * Copy operator. Take over matrix and constraints from the other object.
    */
-  FilteredMatrix &operator = (const FilteredMatrix &fm);
+  FilteredMatrix &
+  operator = (const FilteredMatrix &fm);
 
   /**
    * Set the matrix to be used further on. You will probably also want to call
@@ -361,13 +374,15 @@ public:
    * #expect_constrained_source.
    */
   template <typename MatrixType>
-  void initialize (const MatrixType &m,
-                   const bool        expect_constrained_source = false);
+  void
+  initialize (const MatrixType &m,
+              const bool        expect_constrained_source = false);
 
   /**
    * Delete all constraints and the matrix pointer.
    */
-  void clear ();
+  void
+  clear ();
 //@}
   /**
    * @name Managing constraints
@@ -377,7 +392,8 @@ public:
    * Add the constraint that the value with index <tt>i</tt> should have the
    * value <tt>v</tt>.
    */
-  void add_constraint (const size_type i, const double v);
+  void
+  add_constraint (const size_type i, const double v);
 
   /**
    * Add a list of constraints to the ones already managed by this object. The
@@ -395,12 +411,14 @@ public:
    * that has already been constrained previously.
    */
   template <class ConstraintList>
-  void add_constraints (const ConstraintList &new_constraints);
+  void
+  add_constraints (const ConstraintList &new_constraints);
 
   /**
    * Delete the list of constraints presently in use.
    */
-  void clear_constraints ();
+  void
+  clear_constraints ();
 //@}
   /**
    * Vector operations
@@ -414,28 +432,32 @@ public:
    * method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
   DEAL_II_DEPRECATED
-  void apply_constraints (VectorType &v,
-                          const bool matrix_is_symmetric) const;
+  void
+  apply_constraints (VectorType &v,
+                     const bool matrix_is_symmetric) const;
   /**
    * Apply the constraints to a right hand side vector. This needs to be done
    * before starting to solve with the filtered matrix.
    */
-  void apply_constraints (VectorType &v) const;
+  void
+  apply_constraints (VectorType &v) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
    * multiplication with the stored matrix and post_filter() in that order.
    */
-  void vmult (VectorType       &dst,
-              const VectorType &src) const;
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const;
 
   /**
    * Matrix-vector multiplication: this operation performs pre_filter(),
    * transposed multiplication with the stored matrix and post_filter() in
    * that order.
    */
-  void Tvmult (VectorType       &dst,
-               const VectorType &src) const;
+  void
+  Tvmult (VectorType       &dst,
+          const VectorType &src) const;
 
   /**
    * Adding matrix-vector multiplication.
@@ -444,8 +466,9 @@ public:
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
    * We expect that in most cases this is the required behavior.
    */
-  void vmult_add (VectorType       &dst,
-                  const VectorType &src) const;
+  void
+  vmult_add (VectorType       &dst,
+             const VectorType &src) const;
 
   /**
    * Adding transpose matrix-vector multiplication:
@@ -454,8 +477,9 @@ public:
    * entries set to zero, independent of the previous value of <tt>dst</tt>.
    * We expect that in most cases this is the required behavior.
    */
-  void Tvmult_add (VectorType       &dst,
-                   const VectorType &src) const;
+  void
+  Tvmult_add (VectorType       &dst,
+              const VectorType &src) const;
 //@}
 
   /**
@@ -465,11 +489,13 @@ public:
   /**
    * Iterator to the first constraint.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin () const;
   /**
    * Final iterator.
    */
-  const_iterator end () const;
+  const_iterator
+  end () const;
 //@}
 
   /**
@@ -477,7 +503,8 @@ public:
    * object. Since we are not the owner of the matrix referenced, its memory
    * consumption is not included.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**
@@ -509,8 +536,9 @@ private:
     /**
      * Function comparing the pairs @p i1 and @p i2 for their keys.
      */
-    bool operator () (const IndexValuePair &i1,
-                      const IndexValuePair &i2) const;
+    bool
+    operator () (const IndexValuePair &i1,
+                 const IndexValuePair &i2) const;
   };
 
   /**
@@ -528,15 +556,17 @@ private:
    * Do the pre-filtering step, i.e. zero out those components that belong to
    * constrained degrees of freedom.
    */
-  void pre_filter (VectorType &v) const;
+  void
+  pre_filter (VectorType &v) const;
 
   /**
    * Do the postfiltering step, i.e. set constrained degrees of freedom to the
    * value of the input vector, as the matrix contains only ones on the
    * diagonal for these degrees of freedom.
    */
-  void post_filter (const VectorType &in,
-                    VectorType       &out) const;
+  void
+  post_filter (const VectorType &in,
+               VectorType       &out) const;
 
   friend class Accessor;
   /**

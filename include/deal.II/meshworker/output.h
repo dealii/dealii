@@ -71,14 +71,16 @@ namespace MeshWorker
        * of the points. Nevertheless, it is up to the user to set these values
        * to whatever is desired.
        */
-      void initialize (const unsigned int n_points,
-                       const unsigned int n_vectors);
+      void
+      initialize (const unsigned int n_points,
+                  const unsigned int n_vectors);
 
       /**
        * Set the stream #os to which data is written. If no stream is selected
        * with this function, data goes to @p deallog.
        */
-      void initialize_stream (std::ostream &stream);
+      void
+      initialize_stream (std::ostream &stream);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -88,20 +90,23 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <int dim>
-      void initialize_info(DoFInfo<dim> &info, bool face);
+      void
+      initialize_info(DoFInfo<dim> &info, bool face);
 
       /**
        * Write the patch to the output stream.
        */
       template <int dim>
-      void assemble(const DoFInfo<dim> &info);
+      void
+      assemble(const DoFInfo<dim> &info);
 
       /**
        * @warning Not implemented yet
        */
       template <int dim>
-      void assemble(const DoFInfo<dim> &info1,
-                    const DoFInfo<dim> &info2);
+      void
+      assemble(const DoFInfo<dim> &info1,
+               const DoFInfo<dim> &info2);
 
     private:
       /**
@@ -109,14 +114,16 @@ namespace MeshWorker
        * has been called, or to @p deallog if no pointer has been set.
        */
       template <typename T>
-      void write(const T &t) const;
+      void
+      write(const T &t) const;
 
       /**
        * Write an end-of-line marker either to the stream #os, if
        * initialize_stream has been called, or to @p deallog if no pointer has
        * been set.
        */
-      void write_endl () const;
+      void
+      write_endl () const;
 
       /**
        * The number of output components in each point.

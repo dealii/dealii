@@ -60,7 +60,8 @@ namespace Gmsh
     /**
      * Call prm.add_parameter for each member of the AdditionalParameters class.
      */
-    void add_parameters(ParameterHandler &prm);
+    void
+    add_parameters(ParameterHandler &prm);
 
     /**
      * The characteristic length used for the definition of the Gmsh grid.

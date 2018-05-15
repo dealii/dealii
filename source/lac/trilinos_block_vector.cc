@@ -172,10 +172,11 @@ namespace TrilinosWrappers
 
 
 
-    void BlockVector::print (std::ostream       &out,
-                             const unsigned int  precision,
-                             const bool          scientific,
-                             const bool          across) const
+    void
+    BlockVector::print (std::ostream       &out,
+                        const unsigned int  precision,
+                        const bool          scientific,
+                        const bool          across) const
     {
       for (size_type i=0; i<this->n_blocks(); ++i)
         {

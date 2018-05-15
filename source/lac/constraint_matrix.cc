@@ -98,17 +98,19 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 
 
 
-const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
+const ConstraintMatrix::LineRange
+ConstraintMatrix::get_lines() const
 {
   return boost::make_iterator_range(lines.begin(), lines.end());
 }
 
 
 
-bool ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
-                                                 const IndexSet &locally_active_dofs,
-                                                 const MPI_Comm mpi_communicator,
-                                                 const bool verbose) const
+bool
+ConstraintMatrix::is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                                            const IndexSet &locally_active_dofs,
+                                            const MPI_Comm mpi_communicator,
+                                            const bool verbose) const
 {
   ConstraintLine empty;
   empty.inhomogeneity = 0.0;
@@ -287,7 +289,8 @@ void ConstraintMatrix::add_selected_constraints
 
 
 
-void ConstraintMatrix::close ()
+void
+ConstraintMatrix::close ()
 {
   if (sorted == true)
     return;
@@ -718,7 +721,8 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 
 
 
-void ConstraintMatrix::shift (const size_type offset)
+void
+ConstraintMatrix::shift (const size_type offset)
 {
   if (local_lines.size() == 0)
     lines_cache.insert (lines_cache.begin(), offset,
@@ -753,7 +757,8 @@ void ConstraintMatrix::shift (const size_type offset)
 
 
 
-void ConstraintMatrix::clear ()
+void
+ConstraintMatrix::clear ()
 {
   {
     std::vector<ConstraintLine> tmp;
@@ -770,7 +775,8 @@ void ConstraintMatrix::clear ()
 
 
 
-void ConstraintMatrix::reinit (const IndexSet &local_constraints)
+void
+ConstraintMatrix::reinit (const IndexSet &local_constraints)
 {
   local_lines = local_constraints;
 
@@ -784,7 +790,8 @@ void ConstraintMatrix::reinit (const IndexSet &local_constraints)
 
 
 
-void ConstraintMatrix::condense (SparsityPattern &sparsity) const
+void
+ConstraintMatrix::condense (SparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
@@ -868,7 +875,8 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
+void
+ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -958,7 +966,8 @@ void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
+void
+ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
@@ -1070,7 +1079,8 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
 
 
-void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
+void
+ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(),
@@ -1183,7 +1193,8 @@ void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
 
 
 
-bool ConstraintMatrix::is_identity_constrained (const size_type index) const
+bool
+ConstraintMatrix::is_identity_constrained (const size_type index) const
 {
   if (is_constrained(index) == false)
     return false;
@@ -1198,8 +1209,9 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
 }
 
 
-bool ConstraintMatrix::are_identity_constrained (const size_type index1,
-                                                 const size_type index2) const
+bool
+ConstraintMatrix::are_identity_constrained (const size_type index1,
+                                            const size_type index2) const
 {
   if (is_constrained(index1) == true)
     {
@@ -1245,7 +1257,8 @@ ConstraintMatrix::max_constraint_indirections () const
 
 
 
-bool ConstraintMatrix::has_inhomogeneities () const
+bool
+ConstraintMatrix::has_inhomogeneities () const
 {
   for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
        i!=lines.end(); ++i)
@@ -1256,7 +1269,8 @@ bool ConstraintMatrix::has_inhomogeneities () const
 }
 
 
-void ConstraintMatrix::print (std::ostream &out) const
+void
+ConstraintMatrix::print (std::ostream &out) const
 {
   for (size_type i=0; i!=lines.size(); ++i)
     {

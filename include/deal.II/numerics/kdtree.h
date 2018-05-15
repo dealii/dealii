@@ -123,22 +123,25 @@ public:
     /**
      * Return number of points in the data set (required by nanoflann).
      */
-    size_t kdtree_get_point_count() const;
+    size_t
+    kdtree_get_point_count() const;
 
 
     /**
      * Return the L2 distance between points
      */
-    coord_t kdtree_distance (const coord_t *p1,
-                             const size_t idx_p2,
-                             const size_t size) const;
+    coord_t
+    kdtree_distance (const coord_t *p1,
+                     const size_t idx_p2,
+                     const size_t size) const;
 
 
     /**
      * Return the d-th component of the idx-th point in the class.
      */
-    coord_t kdtree_get_pt (const size_t idx,
-                           const int d) const;
+    coord_t
+    kdtree_get_pt (const size_t idx,
+                   const int d) const;
 
 
     /**
@@ -149,7 +152,8 @@ public:
      * expected dimensionality (e.g. 2 or 3 for point clouds).
      */
     template <class BBOX>
-    bool kdtree_get_bbox (BBOX &) const;
+    bool
+    kdtree_get_bbox (BBOX &) const;
   };
 
 
@@ -180,19 +184,22 @@ public:
    *
    * @param[in] pts A collection of points
    */
-  void set_points (const std::vector<Point<dim> > &pts);
+  void
+  set_points (const std::vector<Point<dim> > &pts);
 
 
   /**
    * A const accessor to the @p i'th one among the underlying points.
    */
-  const Point<dim> &operator[] (const unsigned int i) const;
+  const Point<dim> &
+  operator[] (const unsigned int i) const;
 
 
   /**
    * The number of points currently stored by this class.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
 
   /**
@@ -249,7 +256,8 @@ private:
 
 template <int dim>
 inline
-unsigned int KDTree<dim>::size() const
+unsigned int
+KDTree<dim>::size() const
 {
   if (adaptor)
     return adaptor->points.size();

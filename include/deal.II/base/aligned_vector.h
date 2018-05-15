@@ -127,7 +127,8 @@ public:
    * @note This method can only be invoked for classes @p T that define a
    * default constructor, @p T(). Otherwise, compilation will fail.
    */
-  void resize_fast (const size_type size);
+  void
+  resize_fast (const size_type size);
 
   /**
    * Change the size of the vector. It keeps old elements previously
@@ -141,7 +142,8 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void resize (const size_type size_in);
+  void
+  resize (const size_type size_in);
 
   /**
    * Change the size of the vector. It keeps old elements previously
@@ -158,8 +160,9 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void resize (const size_type size_in,
-               const T        &init);
+  void
+  resize (const size_type size_in,
+          const T        &init);
 
   /**
    * Reserve memory space for @p size elements. If the argument @p size is set
@@ -169,38 +172,44 @@ public:
    * data), this function doubles the amount of memory occupied when the given
    * size is larger than the previously allocated size.
    */
-  void reserve (const size_type size_alloc);
+  void
+  reserve (const size_type size_alloc);
 
   /**
    * Releases all previously allocated memory and leaves the vector in a state
    * equivalent to the state after the default constructor has been called.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Inserts an element at the end of the vector, increasing the vector size
    * by one. Note that the allocated size will double whenever the previous
    * space is not enough to hold the new element.
    */
-  void push_back (const T in_data);
+  void
+  push_back (const T in_data);
 
   /**
    * Return the last element of the vector (read and write access).
    */
-  reference back ();
+  reference
+  back ();
 
   /**
    * Return the last element of the vector (read-only access).
    */
-  const_reference back () const;
+  const_reference
+  back () const;
 
   /**
    * Inserts several elements at the end of the vector given by a range of
    * elements.
    */
   template <typename ForwardIterator>
-  void insert_back (ForwardIterator begin,
-                    ForwardIterator end);
+  void
+  insert_back (ForwardIterator begin,
+               ForwardIterator end);
 
   /**
    * Fills the vector with size() copies of a default constructed object.
@@ -211,7 +220,8 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void fill ();
+  void
+  fill ();
 
   /**
    * Fills the vector with size() copies of the given input.
@@ -221,28 +231,33 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
-  void fill (const T &element);
+  void
+  fill (const T &element);
 
   /**
    * Swaps the given vector with the calling vector.
    */
-  void swap (AlignedVector<T> &vec);
+  void
+  swap (AlignedVector<T> &vec);
 
   /**
    * Return whether the vector is empty, i.e., its size is zero.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the size of the vector.
    */
-  size_type size () const;
+  size_type
+  size () const;
 
   /**
    * Return the capacity of the vector, i.e., the size this vector can hold
    * without reallocation. Note that capacity() >= size().
    */
-  size_type capacity () const;
+  size_type
+  capacity () const;
 
   /**
    * Read-write access to entry @p index in the vector.
@@ -253,48 +268,56 @@ public:
   /**
    * Read-only access to entry @p index in the vector.
    */
-  const_reference operator [] (const size_type index) const;
+  const_reference
+  operator [] (const size_type index) const;
 
   /**
    * Return a read and write pointer to the beginning of the data array.
    */
-  iterator begin ();
+  iterator
+  begin ();
 
   /**
    * Return a read and write pointer to the end of the data array.
    */
-  iterator end ();
+  iterator
+  end ();
 
   /**
    * Return a read-only pointer to the beginning of the data array.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin () const;
 
   /**
    * Return a read-only pointer to the end of the data array.
    */
-  const_iterator end () const;
+  const_iterator
+  end () const;
 
   /**
    * Return the memory consumption of the allocated memory in this class. If
    * the underlying type @p T allocates memory by itself, this memory is not
    * counted.
    */
-  size_type memory_consumption () const;
+  size_type
+  memory_consumption () const;
 
   /**
    * Write the data of this object to a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void save (Archive &ar, const unsigned int version) const;
+  void
+  save (Archive &ar, const unsigned int version) const;
 
   /**
    * Read the data of this object from a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void load (Archive &ar, const unsigned int version);
+  void
+  load (Archive &ar, const unsigned int version);
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -375,8 +398,9 @@ namespace internal
      * This method moves elements from the source to the destination given in
      * the constructor on a subrange given by two integers.
      */
-    virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const override
+    virtual void
+    apply_to_subrange (const std::size_t begin,
+                       const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -438,8 +462,9 @@ namespace internal
      * This method moves elements from the source to the destination given in
      * the constructor on a subrange given by two integers.
      */
-    virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const override
+    virtual void
+    apply_to_subrange (const std::size_t begin,
+                       const std::size_t end) const override
     {
       if (end == begin)
         return;
@@ -521,8 +546,9 @@ namespace internal
     /**
      * This sets elements on a subrange given by two integers.
      */
-    virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const override
+    virtual void
+    apply_to_subrange (const std::size_t begin,
+                       const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual
@@ -541,18 +567,20 @@ namespace internal
     bool trivial_element;
 
     // copy assignment operation
-    void copy_construct_or_assign(const std::size_t begin,
-                                  const std::size_t end,
-                                  std::integral_constant<bool, false>) const
+    void
+    copy_construct_or_assign(const std::size_t begin,
+                             const std::size_t end,
+                             std::integral_constant<bool, false>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         destination_[i] = element_;
     }
 
     // copy constructor (memory initialization)
-    void copy_construct_or_assign(const std::size_t begin,
-                                  const std::size_t end,
-                                  std::integral_constant<bool, true>) const
+    void
+    copy_construct_or_assign(const std::size_t begin,
+                             const std::size_t end,
+                             std::integral_constant<bool, true>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         new (&destination_[i]) T(element_);
@@ -599,8 +627,9 @@ namespace internal
     /**
      * This initializes elements on a subrange given by two integers.
      */
-    virtual void apply_to_subrange (const std::size_t begin,
-                                    const std::size_t end) const override
+    virtual void
+    apply_to_subrange (const std::size_t begin,
+                       const std::size_t end) const override
     {
       // for classes with trivial assignment of zero can use memset. cast
       // element to (void*) to silence compiler warning for virtual
@@ -617,18 +646,20 @@ namespace internal
     mutable T *destination_;
 
     // copy assignment operation
-    void default_construct_or_assign(const std::size_t begin,
-                                     const std::size_t end,
-                                     std::integral_constant<bool, false>) const
+    void
+    default_construct_or_assign(const std::size_t begin,
+                                const std::size_t end,
+                                std::integral_constant<bool, false>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         destination_[i] = std::move(T());
     }
 
     // copy constructor (memory initialization)
-    void default_construct_or_assign(const std::size_t begin,
-                                     const std::size_t end,
-                                     std::integral_constant<bool, true>) const
+    void
+    default_construct_or_assign(const std::size_t begin,
+                                const std::size_t end,
+                                std::integral_constant<bool, true>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         new (&destination_[i]) T;
@@ -1115,8 +1146,9 @@ AlignedVector<T>::memory_consumption () const
  * @relatesalso AlignedVector
  */
 template < class T >
-bool operator == (const AlignedVector<T> &lhs,
-                  const AlignedVector<T> &rhs)
+bool
+operator == (const AlignedVector<T> &lhs,
+             const AlignedVector<T> &rhs)
 {
   if (lhs.size() != rhs.size())
     return false;
@@ -1136,8 +1168,9 @@ bool operator == (const AlignedVector<T> &lhs,
  * @relatesalso AlignedVector
  */
 template < class T >
-bool operator != (const AlignedVector<T> &lhs,
-                  const AlignedVector<T> &rhs)
+bool
+operator != (const AlignedVector<T> &lhs,
+             const AlignedVector<T> &rhs)
 {
   return !(operator==(lhs, rhs));
 }

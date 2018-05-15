@@ -51,7 +51,8 @@ namespace OpenCASCADE
      * TopoDS_Shape. This function will fail when the given shape is
      * not of topological dimension one.
      */
-    Handle_Adaptor3d_HCurve curve_adaptor(const TopoDS_Shape &shape)
+    Handle_Adaptor3d_HCurve
+    curve_adaptor(const TopoDS_Shape &shape)
     {
       Assert( (shape.ShapeType() == TopAbs_WIRE) ||
               (shape.ShapeType() == TopAbs_EDGE),
@@ -68,7 +69,8 @@ namespace OpenCASCADE
 
 
 // Helper internal functions.
-    double shape_length(const TopoDS_Shape &sh)
+    double
+    shape_length(const TopoDS_Shape &sh)
     {
       Handle_Adaptor3d_HCurve adapt = curve_adaptor(sh);
       return GCPnts_AbscissaPoint::Length(adapt->GetCurve());

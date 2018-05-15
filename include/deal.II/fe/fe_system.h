@@ -497,7 +497,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FESystem () override = default;
+  virtual
+  ~FESystem () override = default;
 
   /**
    * Return a string that uniquely identifies a finite element. This element
@@ -507,7 +508,8 @@ public:
    * the multiplicities of the basis elements. If a multiplicity is equal to
    * one, then the superscript is omitted.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -540,8 +542,9 @@ public:
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
    * the shape of the cell in real space.
    */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const override;
+  virtual double
+  shape_value (const unsigned int i,
+               const Point<dim> &p) const override;
 
   /**
    * Return the value of the @p componentth vector component of the @p ith
@@ -551,9 +554,10 @@ public:
    * Since this element is vector valued in general, it relays the computation
    * of these values to the base elements.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim> &p,
-                                        const unsigned int component) const override;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim> &p,
+                         const unsigned int component) const override;
 
   /**
    * Return the gradient of the @p ith shape function at the point @p p. @p p
@@ -569,8 +573,9 @@ public:
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
    * the shape of the cell in real space.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const override;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int  i,
+              const Point<dim>   &p) const override;
 
   /**
    * Return the gradient of the @p componentth vector component of the @p ith
@@ -580,9 +585,10 @@ public:
    * Since this element is vector valued in general, it relays the computation
    * of these values to the base elements.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
-                                              const unsigned int component) const override;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim> &p,
+                        const unsigned int component) const override;
 
   /**
    * Return the tensor of second derivatives of the @p ith shape function at
@@ -598,8 +604,9 @@ public:
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
    * the shape of the cell in real space.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int  i,
+                   const Point<dim> &p) const override;
 
   /**
    * Return the second derivatives of the @p componentth vector component of
@@ -629,8 +636,9 @@ public:
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
    * the shape of the cell in real space.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const override;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const override;
 
   /**
    * Return the third derivatives of the @p componentth vector component of
@@ -640,9 +648,10 @@ public:
    * Since this element is vector valued in general, it relays the computation
    * of these values to the base elements.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const override;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const override;
 
   /**
    * Return the tensor of fourth derivatives of the @p ith shape function at
@@ -658,8 +667,9 @@ public:
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
    * the shape of the cell in real space.
    */
-  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const override;
+  virtual Tensor<4,dim>
+  shape_4th_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const override;
 
   /**
    * Return the fourth derivatives of the @p componentth vector component of
@@ -669,9 +679,10 @@ public:
    * Since this element is vector valued in general, it relays the computation
    * of these values to the base elements.
    */
-  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const override;
+  virtual Tensor<4,dim>
+  shape_4th_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -701,8 +712,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. Overrides the
@@ -801,11 +813,12 @@ public:
    * dofs_per_cell.
    */
   virtual
-  unsigned int face_to_cell_index (const unsigned int face_dof_index,
-                                   const unsigned int face,
-                                   const bool face_orientation = true,
-                                   const bool face_flip        = false,
-                                   const bool face_rotation    = false) const override;
+  unsigned int
+  face_to_cell_index (const unsigned int face_dof_index,
+                      const unsigned int face,
+                      const bool face_orientation = true,
+                      const bool face_flip        = false,
+                      const bool face_rotation    = false) const override;
 
   /**
    * Implementation of the respective function in the base class.
@@ -843,7 +856,8 @@ public:
    * This function returns @p true if and only if all its base elements return
    * @p true for this function.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -955,7 +969,8 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
 protected:
 
@@ -1025,16 +1040,17 @@ protected:
    * <tt>face_no!=invalid_face_no</tt> and <tt>sub_no!=invalid_face_no</tt>.
    */
   template <int dim_1>
-  void compute_fill (const Mapping<dim,spacedim>                      &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                                face_no,
-                     const unsigned int                                sub_no,
-                     const Quadrature<dim_1>                          &quadrature,
-                     const CellSimilarity::Similarity                   cell_similarity,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-                     const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
-                     const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &mapping_data,
-                     internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+  void
+  compute_fill (const Mapping<dim,spacedim>                      &mapping,
+                const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const unsigned int                                face_no,
+                const unsigned int                                sub_no,
+                const Quadrature<dim_1>                          &quadrature,
+                const CellSimilarity::Similarity                   cell_similarity,
+                const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
+                const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
+                const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &mapping_data,
+                internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
 private:
 
@@ -1073,13 +1089,15 @@ private:
    * several of them. It sets up the index table for the system as well as @p
    * restriction and @p prolongation matrices.
    */
-  void initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                   const std::vector<unsigned int> &multiplicities);
+  void
+  initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+              const std::vector<unsigned int> &multiplicities);
 
   /**
    * Used by @p initialize.
    */
-  void build_interface_constraints ();
+  void
+  build_interface_constraints ();
 
   /**
    * A function that computes the hp_vertex_dof_identities(),
@@ -1115,8 +1133,9 @@ private:
      * Give write-access to the pointer to a @p InternalData of the @p
      * base_noth base element.
      */
-    void set_fe_data(const unsigned int                        base_no,
-                     std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>);
+    void
+    set_fe_data(const unsigned int                        base_no,
+                std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>);
 
     /**
      * Give read-access to the pointer to a @p InternalData of the @p

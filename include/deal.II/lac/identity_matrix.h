@@ -89,27 +89,31 @@ public:
   /**
    * Resize the matrix to be of size #n by #n.
    */
-  void reinit (const size_type n);
+  void
+  reinit (const size_type n);
 
   /**
    * Number of rows of this matrix. For the present matrix, the number of rows
    * and columns are equal, of course.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Number of columns of this matrix. For the present matrix, the number of
    * rows and columns are equal, of course.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
   /**
    * Matrix-vector multiplication. For the present case, this of course
    * amounts to simply copying the input vector to the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void vmult (OutVectorType      &out,
-              const InVectorType &in) const;
+  void
+  vmult (OutVectorType      &out,
+         const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with addition to the output vector. For the
@@ -117,8 +121,9 @@ public:
    * the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void vmult_add (OutVectorType      &out,
-                  const InVectorType &in) const;
+  void
+  vmult_add (OutVectorType      &out,
+             const InVectorType &in) const;
 
   /**
    * Matrix-vector multiplication with the transpose matrix. For the present
@@ -126,8 +131,9 @@ public:
    * output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void Tvmult (OutVectorType      &out,
-               const InVectorType &in) const;
+  void
+  Tvmult (OutVectorType      &out,
+          const InVectorType &in) const;
 
 
   /**
@@ -136,8 +142,9 @@ public:
    * adding the input vector to the output vector.
    */
   template <typename OutVectorType, typename InVectorType>
-  void Tvmult_add (OutVectorType      &out,
-                   const InVectorType &in) const;
+  void
+  Tvmult_add (OutVectorType      &out,
+              const InVectorType &in) const;
 private:
 
   /**

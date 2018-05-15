@@ -40,16 +40,19 @@ public:
   AnyData() = default;
 
   /// Number of stored data objects.
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
   /// Add a new data object
   template <typename type>
-  void add(type entry, const std::string &name);
+  void
+  add(type entry, const std::string &name);
 
   /**
    * @brief Merge the data of another AnyData to the end of this object.
    */
-  void merge(const AnyData &other);
+  void
+  merge(const AnyData &other);
 
   /**
    * @brief Access to stored data object by name.
@@ -60,7 +63,8 @@ public:
    * use try_read() instead.
    */
   template <typename type>
-  type entry (const std::string &name);
+  type
+  entry (const std::string &name);
 
   /**
    * @brief Read-only access to stored data object by name.
@@ -71,7 +75,8 @@ public:
    * use try_read() instead.
    */
   template <typename type>
-  const type entry (const std::string &name) const;
+  const type
+  entry (const std::string &name) const;
 
   /**
    * @brief Dedicated read only access by name.
@@ -85,7 +90,8 @@ public:
    * Use read_ptr() instead!
    */
   template <typename type>
-  const type read (const std::string &name) const;
+  const type
+  read (const std::string &name) const;
 
   /**
    * @brief Dedicated read only access by name for pointer data.
@@ -97,14 +103,16 @@ public:
    * become mutable by accident.
    */
   template <typename type>
-  const type *read_ptr (const std::string &name) const;
+  const type *
+  read_ptr (const std::string &name) const;
 
   /**
    * Perform the same action as read_ptr(), but do not throw an exception if
    * the pointer does not exist. Return a null pointer instead.
    */
   template <typename type>
-  const type *try_read_ptr (const std::string &name) const;
+  const type *
+  try_read_ptr (const std::string &name) const;
 
   /**
    * @brief Dedicated read only access by name without exceptions.
@@ -114,36 +122,44 @@ public:
    * cannot be converted to the return type, a null pointer is returned.
    */
   template <typename type>
-  const type *try_read (const std::string &name) const;
+  const type *
+  try_read (const std::string &name) const;
 
   /**
    * Access to stored data object by index.
    */
   template <typename type>
-  type entry (const unsigned int i);
+  type
+  entry (const unsigned int i);
 
   /// Read-only access to stored data object by index.
   template <typename type>
-  const type entry (const unsigned int i) const;
+  const type
+  entry (const unsigned int i) const;
 
   /// Dedicated read only access.
   template <typename type>
-  const type read (const unsigned int i) const;
+  const type
+  read (const unsigned int i) const;
 
   /// Dedicated read only access to pointer object.
   template <typename type>
-  const type *read_ptr (const unsigned int i) const;
+  const type *
+  read_ptr (const unsigned int i) const;
 
   /// Dedicated read only access to pointer object without exception.
   template <typename type>
-  const type *try_read_ptr (const unsigned int i) const;
+  const type *
+  try_read_ptr (const unsigned int i) const;
 
   /// Dedicated read only access without exception.
   template <typename type>
-  const type *try_read (const unsigned int i) const;
+  const type *
+  try_read (const unsigned int i) const;
 
   /// Name of object at index.
-  const std::string &name(const unsigned int i) const;
+  const std::string &
+  name(const unsigned int i) const;
 
   /**
    * @brief Find index of a named object
@@ -151,7 +167,8 @@ public:
    * Try to find the object and return its index in the list. Throw an
    * exception if the object has not been found.
    */
-  unsigned int find(const std::string &name) const;
+  unsigned int
+  find(const std::string &name) const;
 
   /**
    * @brief Try to find index of a named object
@@ -159,15 +176,18 @@ public:
    * Try to find the object and return its index in the list. returns
    * numbers::invalid_unsigned_int if the name was not found.
    */
-  unsigned int try_find(const std::string &name) const;
+  unsigned int
+  try_find(const std::string &name) const;
 
   /// Find out if object is of a certain type
   template <typename type>
-  bool is_type(const unsigned int i) const;
+  bool
+  is_type(const unsigned int i) const;
 
   /// List the contents to a stream
   template <class StreamType>
-  void list (StreamType &os) const;
+  void
+  list (StreamType &os) const;
 
   /// An entry with this name does not exist in the AnyData object.
   DeclException1(ExcNameNotFound, std::string,
@@ -446,7 +466,8 @@ AnyData::merge(const AnyData &other)
 
 template <class StreamType>
 inline
-void AnyData::list(StreamType &os) const
+void
+AnyData::list(StreamType &os) const
 {
   for (unsigned int i=0; i<names.size(); ++i)
     {

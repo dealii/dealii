@@ -297,7 +297,8 @@ ConeBoundary<dim>::ConeBoundary (const double radius_0,
 
 
 template<int dim>
-std::unique_ptr<Manifold<dim,dim> > ConeBoundary<dim>::clone() const
+std::unique_ptr<Manifold<dim,dim> >
+ConeBoundary<dim>::clone() const
 {
   return std_cxx14::make_unique<ConeBoundary<dim> >(radius_0,radius_1,x_0,x_1);
 }
@@ -305,7 +306,8 @@ std::unique_ptr<Manifold<dim,dim> > ConeBoundary<dim>::clone() const
 
 
 template <int dim>
-double ConeBoundary<dim>::get_radius (Point<dim> x) const
+double
+ConeBoundary<dim>::get_radius (Point<dim> x) const
 {
   for (unsigned int i = 0; i < dim; ++i)
     if ((x_1 (i) - x_0 (i)) != 0)
@@ -849,7 +851,8 @@ HalfHyperBallBoundary<dim>::HalfHyperBallBoundary (const Point<dim> center,
 
 
 template<int dim>
-std::unique_ptr<Manifold<dim,dim> > HalfHyperBallBoundary<dim>::clone() const
+std::unique_ptr<Manifold<dim,dim> >
+HalfHyperBallBoundary<dim>::clone() const
 {
   return std_cxx14::make_unique<HalfHyperBallBoundary<dim> >(this->get_center(),
                                                              this->get_radius());

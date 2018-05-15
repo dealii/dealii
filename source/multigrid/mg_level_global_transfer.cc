@@ -152,15 +152,16 @@ MGLevelGlobalTransfer<VectorType>::memory_consumption () const
 namespace
 {
   template <int dim, int spacedim, typename Number>
-  void fill_internal(const DoFHandler<dim,spacedim> &mg_dof,
-                     SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> > > mg_constrained_dofs,
-                     const MPI_Comm mpi_communicator,
-                     const bool transfer_solution_vectors,
-                     std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices,
-                     std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices_global_mine,
-                     std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices_level_mine,
-                     LinearAlgebra::distributed::Vector<Number> &ghosted_global_vector,
-                     MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &ghosted_level_vector)
+  void
+  fill_internal(const DoFHandler<dim,spacedim> &mg_dof,
+                SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> > > mg_constrained_dofs,
+                const MPI_Comm mpi_communicator,
+                const bool transfer_solution_vectors,
+                std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices,
+                std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices_global_mine,
+                std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &copy_indices_level_mine,
+                LinearAlgebra::distributed::Vector<Number> &ghosted_global_vector,
+                MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &ghosted_level_vector)
   {
     // first go to the usual routine...
     std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > >

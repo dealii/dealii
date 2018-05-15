@@ -2103,7 +2103,8 @@ namespace DoFTools
     // set_periodicity_constraints with the help of user supplied matrix
     // and first_vector_components.
     template <int dim, int spacedim>
-    FullMatrix<double> compute_transformation(
+    FullMatrix<double>
+    compute_transformation(
       const FiniteElement<dim, spacedim> &fe,
       const FullMatrix<double>           &matrix,
       const std::vector<unsigned int>    &first_vector_components)
@@ -2555,7 +2556,8 @@ namespace DoFTools
        * multhithreading is available.
        */
       template <int dim, int spacedim>
-      void compute_intergrid_weights_3 (
+      void
+      compute_intergrid_weights_3 (
         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
         const Assembler::Scratch &,
         Assembler::CopyData<dim,spacedim>                                     &copy_data,
@@ -2648,12 +2650,13 @@ namespace DoFTools
        * multhithreading is available.
        */
       template <int dim,int spacedim>
-      void copy_intergrid_weights_3(const Assembler::CopyData<dim,spacedim>                &copy_data,
-                                    const unsigned int                                      coarse_component,
-                                    const FiniteElement<dim,spacedim>                      &coarse_fe,
-                                    const std::vector<types::global_dof_index>             &weight_mapping,
-                                    const bool                                              is_called_in_parallel,
-                                    std::vector<std::map<types::global_dof_index, float> > &weights)
+      void
+      copy_intergrid_weights_3(const Assembler::CopyData<dim,spacedim>                &copy_data,
+                               const unsigned int                                      coarse_component,
+                               const FiniteElement<dim,spacedim>                      &coarse_fe,
+                               const std::vector<types::global_dof_index>             &weight_mapping,
+                               const bool                                              is_called_in_parallel,
+                               std::vector<std::map<types::global_dof_index, float> > &weights)
       {
         unsigned int pos = 0;
         for (unsigned int local_dof=0; local_dof<copy_data.dofs_per_cell; ++local_dof)

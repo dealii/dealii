@@ -112,13 +112,15 @@ public:
   /**
    * Return a human readable string representation of this CellId.
    */
-  std::string to_string() const;
+  std::string
+  to_string() const;
 
   /**
    * Return a compact and fast binary representation of this CellId.
    */
   template <int dim>
-  binary_type to_binary() const;
+  binary_type
+  to_binary() const;
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
@@ -130,25 +132,29 @@ public:
   /**
    * Compare two CellId objects for equality.
    */
-  bool operator== (const CellId &other) const;
+  bool
+  operator== (const CellId &other) const;
 
   /**
    * Compare two CellIds for inequality.
    */
-  bool operator!= (const CellId &other) const;
+  bool
+  operator!= (const CellId &other) const;
 
   /**
    * Compare two CellIds with regard to an ordering. The details of this
    * ordering are unspecified except that the operation provides a
    * total ordering among all cells.
    */
-  bool operator<(const CellId &other) const;
+  bool
+  operator<(const CellId &other) const;
 
   /**
    * Boost serialization function
    */
   template<class Archive>
-  void serialize(Archive &ar, const unsigned int version );
+  void
+  serialize(Archive &ar, const unsigned int version );
 
 private:
   /**
@@ -178,8 +184,10 @@ private:
   std::array<std::uint8_t,30> child_indices;
 #endif
 
-  friend std::istream &operator>> (std::istream &is, CellId &cid);
-  friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
+  friend std::istream &
+  operator>> (std::istream &is, CellId &cid);
+  friend std::ostream &
+  operator<< (std::ostream &os, const CellId &cid);
 };
 
 
@@ -189,8 +197,9 @@ private:
  * Write a CellId object into a stream.
  */
 inline
-std::ostream &operator<< (std::ostream &os,
-                          const CellId &cid)
+std::ostream &
+operator<< (std::ostream &os,
+            const CellId &cid)
 {
   os << cid.coarse_cell_id << '_' << cid.n_child_indices << ':';
   for (unsigned int i=0; i<cid.n_child_indices; ++i)
@@ -208,7 +217,8 @@ std::ostream &operator<< (std::ostream &os,
  * Serialization function
  */
 template<class Archive>
-void CellId::serialize(Archive &ar, const unsigned int /*version*/)
+void
+CellId::serialize(Archive &ar, const unsigned int /*version*/)
 {
   ar &coarse_cell_id;
   ar &n_child_indices;
@@ -219,8 +229,9 @@ void CellId::serialize(Archive &ar, const unsigned int /*version*/)
  * Read a CellId object from a stream.
  */
 inline
-std::istream &operator>> (std::istream &is,
-                          CellId &cid)
+std::istream &
+operator>> (std::istream &is,
+            CellId &cid)
 {
   unsigned int cellid;
   is >> cellid;
@@ -274,7 +285,8 @@ CellId::operator!= (const CellId &other) const
 
 
 inline
-bool CellId::operator<(const CellId &other) const
+bool
+CellId::operator<(const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return this->coarse_cell_id < other.coarse_cell_id;

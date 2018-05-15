@@ -102,7 +102,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverRichardson () override = default;
+  virtual
+  ~SolverRichardson () override = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -127,17 +128,19 @@ public:
   /**
    * Set the damping-coefficient. Default is 1., i.e. no damping.
    */
-  void set_omega (const double om=1.);
+  void
+  set_omega (const double om=1.);
 
   /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
    * for graphical output of the convergence history.
    */
-  virtual void print_vectors (const unsigned int step,
-                              const VectorType &x,
-                              const VectorType &r,
-                              const VectorType &d) const;
+  virtual void
+  print_vectors (const unsigned int step,
+                 const VectorType &x,
+                 const VectorType &r,
+                 const VectorType &d) const;
 
 protected:
   /**
@@ -146,8 +149,9 @@ protected:
    * implementation of this function uses either the actual
    * residual, @p r, or the preconditioned residual, @p d.
    */
-  virtual typename VectorType::value_type criterion(const VectorType &r,
-                                                    const VectorType &d) const;
+  virtual typename VectorType::value_type
+  criterion(const VectorType &r,
+            const VectorType &d) const;
 
   /**
    * Control parameters.

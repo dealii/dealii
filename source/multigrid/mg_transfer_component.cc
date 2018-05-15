@@ -251,7 +251,8 @@ MGTransferSelect<number>::do_copy_to_mg (
 
 
 template <int dim, int spacedim>
-void MGTransferComponentBase::build_matrices (
+void
+MGTransferComponentBase::build_matrices (
   const DoFHandler<dim,spacedim> &,
   const DoFHandler<dim,spacedim> &mg_dof)
 {
@@ -544,7 +545,8 @@ void MGTransferComponentBase::build_matrices (
 
 template <typename number>
 template <int dim, int spacedim>
-void MGTransferSelect<number>::build_matrices (
+void
+MGTransferSelect<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
   const DoFHandler<dim,spacedim> &mg_dof,
   unsigned int select,

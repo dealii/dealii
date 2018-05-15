@@ -66,7 +66,8 @@ namespace Functions
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  void FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_value (const Point<dim> &p,
+  void
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::vector_value (const Point<dim> &p,
       Vector<typename VectorType::value_type>   &values) const
   {
     Assert (values.size() == this->n_components,

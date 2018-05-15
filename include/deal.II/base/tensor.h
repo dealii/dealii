@@ -139,7 +139,8 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV Tensor ();
+  DEAL_II_CUDA_HOST_DEV
+  Tensor ();
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -189,7 +190,8 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV operator Number &();
+  DEAL_II_CUDA_HOST_DEV
+  operator Number &();
 
   /**
    * Return a reference to the encapsulated Number object. Since rank-0
@@ -199,7 +201,8 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV operator const Number &() const;
+  DEAL_II_CUDA_HOST_DEV
+  operator const Number &() const;
 
   /**
    * Assignment from tensors with different underlying scalar type. This
@@ -207,7 +210,8 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  Tensor &operator = (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &
+  operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
 #ifdef __INTEL_COMPILER
   /**
@@ -216,7 +220,8 @@ public:
    * copy constructor for Sacado::Rad::ADvar types automatically.
    * See https://github.com/dealii/dealii/pull/5865.
    */
-  Tensor &operator = (const Tensor<0,dim,Number> &rhs);
+  Tensor &
+  operator = (const Tensor<0,dim,Number> &rhs);
 #endif
 
   /**
@@ -224,31 +229,36 @@ public:
    * that the @p OtherNumber type is convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor &operator = (const OtherNumber &d);
+  Tensor &
+  operator = (const OtherNumber &d);
 
   /**
    * Test for equality of two tensors.
    */
   template <typename OtherNumber>
-  bool operator == (const Tensor<0,dim,OtherNumber> &rhs) const;
+  bool
+  operator == (const Tensor<0,dim,OtherNumber> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
   template <typename OtherNumber>
-  bool operator != (const Tensor<0,dim,OtherNumber> &rhs) const;
+  bool
+  operator != (const Tensor<0,dim,OtherNumber> &rhs) const;
 
   /**
    * Add another scalar
    */
   template <typename OtherNumber>
-  Tensor &operator += (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &
+  operator += (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Subtract another scalar.
    */
   template <typename OtherNumber>
-  Tensor &operator -= (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &
+  operator -= (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Multiply the scalar with a <tt>factor</tt>.
@@ -256,18 +266,21 @@ public:
    * @see CUDAWrappers
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Tensor &operator *= (const OtherNumber &factor);
+  DEAL_II_CUDA_HOST_DEV Tensor &
+  operator *= (const OtherNumber &factor);
 
   /**
    * Divide the scalar by <tt>factor</tt>.
    */
   template <typename OtherNumber>
-  Tensor &operator /= (const OtherNumber &factor);
+  Tensor &
+  operator /= (const OtherNumber &factor);
 
   /**
    * Tensor with inverted entries.
    */
-  Tensor  operator - () const;
+  Tensor
+  operator - () const;
 
   /**
    * Reset all values to zero.
@@ -281,14 +294,16 @@ public:
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    */
-  real_type norm () const;
+  real_type
+  norm () const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -296,14 +311,16 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV real_type norm_square () const;
+  DEAL_II_CUDA_HOST_DEV real_type
+  norm_square () const;
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
   /**
    * Internal type declaration that is used to specialize the return type of
@@ -321,8 +338,9 @@ private:
    * Internal helper function for unroll.
    */
   template <typename OtherNumber>
-  void unroll_recursion(Vector<OtherNumber> &result,
-                        unsigned int        &start_index) const;
+  void
+  unroll_recursion(Vector<OtherNumber> &result,
+                   unsigned int        &start_index) const;
 
   /**
    * Allow an arbitrary Tensor to access the underlying values.
@@ -420,12 +438,14 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV Tensor ();
+  DEAL_II_CUDA_HOST_DEV
+  Tensor ();
 
   /**
    * Constructor, where the data is copied from a C-style array.
    */
-  explicit Tensor (const array_type &initializer);
+  explicit
+  Tensor (const array_type &initializer);
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -452,24 +472,28 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV value_type &operator [] (const unsigned int i);
+  DEAL_II_CUDA_HOST_DEV value_type &
+  operator [] (const unsigned int i);
 
   /**
    * Read-only access operator.
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV const value_type &operator[](const unsigned int i) const;
+  DEAL_II_CUDA_HOST_DEV const value_type &
+  operator[](const unsigned int i) const;
 
   /**
    * Read access using TableIndices <tt>indices</tt>
    */
-  const Number &operator [] (const TableIndices<rank_> &indices) const;
+  const Number &
+  operator [] (const TableIndices<rank_> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
    */
-  Number &operator [] (const TableIndices<rank_> &indices);
+  Number &
+  operator [] (const TableIndices<rank_> &indices);
 
   /**
    * Return a pointer to the first element of the underlying storage.
@@ -501,7 +525,8 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  Tensor &operator = (const Tensor<rank_,dim,OtherNumber> &rhs);
+  Tensor &
+  operator = (const Tensor<rank_,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -509,31 +534,36 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  Tensor &operator = (const Number &d);
+  Tensor &
+  operator = (const Number &d);
 
   /**
    * Test for equality of two tensors.
    */
   template <typename OtherNumber>
-  bool operator == (const Tensor<rank_,dim,OtherNumber> &) const;
+  bool
+  operator == (const Tensor<rank_,dim,OtherNumber> &) const;
 
   /**
    * Test for inequality of two tensors.
    */
   template <typename OtherNumber>
-  bool operator != (const Tensor<rank_,dim,OtherNumber> &) const;
+  bool
+  operator != (const Tensor<rank_,dim,OtherNumber> &) const;
 
   /**
    * Add another tensor.
    */
   template <typename OtherNumber>
-  Tensor &operator += (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor &
+  operator += (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
   template <typename OtherNumber>
-  Tensor &operator -= (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor &
+  operator -= (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
@@ -542,18 +572,21 @@ public:
    * @see CUDAWrappers
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Tensor &operator *= (const OtherNumber &factor);
+  DEAL_II_CUDA_HOST_DEV Tensor &
+  operator *= (const OtherNumber &factor);
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
    */
   template <typename OtherNumber>
-  Tensor &operator /= (const OtherNumber &factor);
+  Tensor &
+  operator /= (const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
    */
-  Tensor  operator - () const;
+  Tensor
+  operator - () const;
 
   /**
    * Reset all values to zero.
@@ -567,7 +600,8 @@ public:
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Return the Frobenius-norm of a tensor, i.e. the square root of the sum of
@@ -575,7 +609,8 @@ public:
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    */
 
-  typename numbers::NumberTraits<Number>::real_type norm() const;
+  typename numbers::NumberTraits<Number>::real_type
+  norm() const;
 
   /**
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
@@ -583,7 +618,8 @@ public:
    *
    * @see CUDAWrappers
    */
-  DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type norm_square() const;
+  DEAL_II_CUDA_HOST_DEV typename numbers::NumberTraits<Number>::real_type
+  norm_square() const;
 
   /**
    * Fill a vector with all tensor elements.
@@ -593,7 +629,8 @@ public:
    * fastest.
    */
   template <typename OtherNumber>
-  void unroll (Vector<OtherNumber> &result) const;
+  void
+  unroll (Vector<OtherNumber> &result) const;
 
   /**
    * Return an unrolled index in the range [0,dim^rank-1] for the element of
@@ -608,20 +645,23 @@ public:
    * [0,dim^rank-1], return which set of indices it would correspond to.
    */
   static
-  TableIndices<rank_> unrolled_to_component_indices(const unsigned int i);
+  TableIndices<rank_>
+  unrolled_to_component_indices(const unsigned int i);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption ();
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
   /**
    * Internal type declaration that is used to specialize the return type of
@@ -641,8 +681,9 @@ private:
    * Internal helper function for unroll.
    */
   template <typename OtherNumber>
-  void unroll_recursion(Vector<OtherNumber> &result,
-                        unsigned int        &start_index) const;
+  void
+  unroll_recursion(Vector<OtherNumber> &result,
+                   unsigned int        &start_index) const;
 
   /**
    * Allow an arbitrary Tensor to access the underlying values.
@@ -672,12 +713,14 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,T> >
   {
-    static const Tensor<rank,dim,T> &value (const Tensor<rank,dim,T> &t)
+    static const Tensor<rank,dim,T> &
+    value (const Tensor<rank,dim,T> &t)
     {
       return t;
     }
 
-    static Tensor<rank,dim,T> value (const T &t)
+    static Tensor<rank,dim,T>
+    value (const T &t)
     {
       Tensor<rank,dim,T> tmp;
       tmp=t;
@@ -688,19 +731,22 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,VectorizedArray<T> > >
   {
-    static const Tensor<rank,dim,VectorizedArray<T> > &value (const Tensor<rank,dim,VectorizedArray<T> > &t)
+    static const Tensor<rank,dim,VectorizedArray<T> > &
+    value (const Tensor<rank,dim,VectorizedArray<T> > &t)
     {
       return t;
     }
 
-    static Tensor<rank,dim,VectorizedArray<T> > value (const T &t)
+    static Tensor<rank,dim,VectorizedArray<T> >
+    value (const T &t)
     {
       Tensor<rank,dim,VectorizedArray<T> > tmp;
       tmp=internal::NumberType<VectorizedArray<T> >::value(t);
       return tmp;
     }
 
-    static Tensor<rank,dim,VectorizedArray<T> > value (const VectorizedArray<T> &t)
+    static Tensor<rank,dim,VectorizedArray<T> >
+    value (const VectorizedArray<T> &t)
     {
       Tensor<rank,dim,VectorizedArray<T> > tmp;
       tmp=t;
@@ -715,7 +761,8 @@ namespace internal
 
 template <int dim,typename Number>
 inline
-DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::Tensor ()
+DEAL_II_CUDA_HOST_DEV
+Tensor<0,dim,Number>::Tensor ()
 // Some auto-differentiable numbers need explicit
 // zero initialization.
   : value(internal::NumberType<Number>::value(0.0))
@@ -786,7 +833,8 @@ Tensor<0,dim,Number>::end_raw() const
 
 template <int dim, typename Number>
 inline
-DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator Number &()
+DEAL_II_CUDA_HOST_DEV
+Tensor<0,dim,Number>::operator Number &()
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -798,7 +846,8 @@ DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator Number &()
 
 template <int dim, typename Number>
 inline
-DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator const Number &() const
+DEAL_II_CUDA_HOST_DEV
+Tensor<0,dim,Number>::operator const Number &() const
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -811,7 +860,8 @@ DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator const Number &() const
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
 {
   value = internal::NumberType<Number>::value(p);
   return *this;
@@ -821,7 +871,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Other
 #ifdef __INTEL_COMPILER
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
 {
   value = p.value;
   return *this;
@@ -832,7 +883,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Numbe
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const OtherNumber &d)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator = (const OtherNumber &d)
 {
   value = internal::NumberType<Number>::value(d);
   return *this;
@@ -842,7 +894,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const OtherNumber &d)
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-bool Tensor<0,dim,Number>::operator == (const Tensor<0,dim,OtherNumber> &p) const
+bool
+Tensor<0,dim,Number>::operator == (const Tensor<0,dim,OtherNumber> &p) const
 {
 #ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
   Assert(!(std::is_same<Number,adouble>::value || std::is_same<OtherNumber,adouble>::value),
@@ -857,7 +910,8 @@ bool Tensor<0,dim,Number>::operator == (const Tensor<0,dim,OtherNumber> &p) cons
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-bool Tensor<0,dim,Number>::operator != (const Tensor<0,dim,OtherNumber> &p) const
+bool
+Tensor<0,dim,Number>::operator != (const Tensor<0,dim,OtherNumber> &p) const
 {
   return !((*this) == p);
 }
@@ -866,7 +920,8 @@ bool Tensor<0,dim,Number>::operator != (const Tensor<0,dim,OtherNumber> &p) cons
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator += (const Tensor<0,dim,OtherNumber> &p)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator += (const Tensor<0,dim,OtherNumber> &p)
 {
   value += p.value;
   return *this;
@@ -876,7 +931,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator += (const Tensor<0,dim,Othe
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,OtherNumber> &p)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,OtherNumber> &p)
 {
   value -= p.value;
   return *this;
@@ -886,7 +942,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,Othe
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator *= (const OtherNumber &s)
+DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator *= (const OtherNumber &s)
 {
   value *= s;
   return *this;
@@ -896,7 +953,8 @@ DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator *= (c
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
-Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator /= (const OtherNumber &s)
+Tensor<0,dim,Number> &
+Tensor<0,dim,Number>::operator /= (const OtherNumber &s)
 {
   value /= s;
   return *this;
@@ -905,7 +963,8 @@ Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator /= (const OtherNumber &s)
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> Tensor<0,dim,Number>::operator - () const
+Tensor<0,dim,Number>
+Tensor<0,dim,Number>::operator - () const
 {
   return -value;
 }
@@ -924,7 +983,8 @@ Tensor<0,dim,Number>::norm () const
 template <int dim, typename Number>
 inline
 typename Tensor<0,dim,Number>::real_type
-DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::norm_square () const
+DEAL_II_CUDA_HOST_DEV
+Tensor<0,dim,Number>::norm_square () const
 {
   // We cannot use Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
@@ -949,7 +1009,8 @@ Tensor<0, dim, Number>::unroll_recursion (Vector<OtherNumber> &result,
 
 template <int dim, typename Number>
 inline
-void Tensor<0,dim,Number>::clear ()
+void
+Tensor<0,dim,Number>::clear ()
 {
   // Some auto-differentiable numbers need explicit
   // zero initialization.
@@ -960,7 +1021,8 @@ void Tensor<0,dim,Number>::clear ()
 template <int dim, typename Number>
 template <class Archive>
 inline
-void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
+void
+Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
   ar &value;
 }
@@ -971,7 +1033,8 @@ void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 
 template <int rank_, int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE
-DEAL_II_CUDA_HOST_DEV Tensor<rank_,dim,Number>::Tensor ()
+DEAL_II_CUDA_HOST_DEV
+Tensor<rank_,dim,Number>::Tensor ()
 {
   // All members of the c-style array values are already default initialized
   // and thus all values are already set to zero recursively.
@@ -1188,7 +1251,8 @@ Tensor<rank_,dim,Number>::operator == (const Tensor<rank_,dim,OtherNumber> &p) c
 template <>
 template <>
 inline
-bool Tensor<1,0,double>::operator == (const Tensor<1,0,double> &) const
+bool
+Tensor<1,0,double>::operator == (const Tensor<1,0,double> &) const
 {
   return true;
 }
@@ -1353,7 +1417,8 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 
 template <int rank_, int dim, typename Number>
 inline
-void Tensor<rank_,dim,Number>::clear ()
+void
+Tensor<rank_,dim,Number>::clear ()
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = internal::NumberType<Number>::value(0.0);
@@ -1395,7 +1460,8 @@ Tensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
  */
 template <int rank_, int dim, typename Number>
 inline
-std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
+std::ostream &
+operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
     {
@@ -1416,7 +1482,8 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
  */
 template <int dim, typename Number>
 inline
-std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
+std::ostream &
+operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 {
   out << static_cast<const Number &>(p);
   return out;
@@ -1998,7 +2065,8 @@ cross_product_3d (const Tensor<1,dim,Number> &src1,
  */
 template <int dim, typename Number>
 inline
-Number determinant (const Tensor<2,dim,Number> &t)
+Number
+determinant (const Tensor<2,dim,Number> &t)
 {
   // Compute the determinant using the Laplace expansion of the
   // determinant. We expand along the last row.
@@ -2026,7 +2094,8 @@ Number determinant (const Tensor<2,dim,Number> &t)
  */
 template <typename Number>
 inline
-Number determinant (const Tensor<2,1,Number> &t)
+Number
+determinant (const Tensor<2,1,Number> &t)
 {
   return t[0][0];
 }
@@ -2041,7 +2110,8 @@ Number determinant (const Tensor<2,1,Number> &t)
  */
 template <int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE
-Number trace (const Tensor<2,dim,Number> &d)
+Number
+trace (const Tensor<2,dim,Number> &d)
 {
   Number t=d[0][0];
   for (unsigned int i=1; i<dim; ++i)

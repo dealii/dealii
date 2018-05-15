@@ -53,7 +53,8 @@ public:
    * separated by <tt>|</tt>, so that you can use it for the definition of
    * parameter files (see ParameterHandler for details).
    */
-  static std::string get_quadrature_names();
+  static std::string
+  get_quadrature_names();
 
   /**
    * @addtogroup Exceptions

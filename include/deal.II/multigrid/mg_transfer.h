@@ -48,7 +48,8 @@ namespace internal
     typedef ::dealii::SparseMatrix<typename VectorType::value_type> Matrix;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const SparsityPatternType &sp, const DoFHandlerType &)
+    static void
+    reinit(Matrix &matrix, Sparsity &sparsity, int level, const SparsityPatternType &sp, const DoFHandlerType &)
     {
       sparsity.copy_from (sp);
       (void)level;
@@ -64,7 +65,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
+    static void
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
       const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *dist_tria =
         dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
@@ -87,7 +89,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
+    static void
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
       const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *dist_tria =
         dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
@@ -110,7 +113,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
+    static void
+    reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
       const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *dist_tria =
         dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
@@ -134,7 +138,8 @@ namespace internal
     typedef ::dealii::SparseMatrix<Number> Matrix;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
-    static void reinit(Matrix &, Sparsity &, int, const SparsityPatternType &, const DoFHandlerType &)
+    static void
+    reinit(Matrix &, Sparsity &, int, const SparsityPatternType &, const DoFHandlerType &)
     {
       AssertThrow(false, ExcNotImplemented(
                     "ERROR: MGTransferPrebuilt with LinearAlgebra::distributed::Vector currently "
@@ -169,7 +174,8 @@ public:
   /**
    * Reset the object to the state it had right after the default constructor.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
@@ -228,12 +234,14 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Print the copy index fields for debugging purposes.
    */
-  void print_indices(std::ostream &os) const;
+  void
+  print_indices(std::ostream &os) const;
 
 protected:
 
@@ -241,7 +249,8 @@ protected:
    * Internal function to @p fill copy_indices*. Called by derived classes.
    */
   template <int dim, int spacedim>
-  void fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Sizes of the multi-level vectors.
@@ -319,7 +328,8 @@ public:
   /**
    * Reset the object to the state it had right after the default constructor.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
@@ -378,12 +388,14 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Print the copy index fields for debugging purposes.
    */
-  void print_indices(std::ostream &os) const;
+  void
+  print_indices(std::ostream &os) const;
 
 protected:
 
@@ -402,7 +414,8 @@ protected:
    * Internal function to @p fill copy_indices*. Called by derived classes.
    */
   template <int dim, int spacedim>
-  void fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Sizes of the multi-level vectors.
@@ -554,12 +567,14 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferPrebuilt () override = default;
+  virtual
+  ~MGTransferPrebuilt () override = default;
 
   /**
    * Initialize the constraints to be used in build_matrices().
    */
-  void initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
+  void
+  initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Initialize the constraints to be used in build_matrices().
@@ -567,19 +582,22 @@ public:
    * @deprecated @p constraints is unused.
    */
   DEAL_II_DEPRECATED
-  void initialize_constraints (const ConstraintMatrix &constraints,
-                               const MGConstrainedDoFs &mg_constrained_dofs);
+  void
+  initialize_constraints (const ConstraintMatrix &constraints,
+                          const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Actually build the prolongation matrices for each level.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -592,9 +610,10 @@ public:
    * @arg dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
-  virtual void prolongate (const unsigned int to_level,
-                           VectorType         &dst,
-                           const VectorType   &src) const override;
+  virtual void
+  prolongate (const unsigned int to_level,
+              VectorType         &dst,
+              const VectorType   &src) const override;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -611,9 +630,10 @@ public:
    * @arg dst has as many elements as there are degrees of freedom on the
    * coarser level.
    */
-  virtual void restrict_and_add (const unsigned int from_level,
-                                 VectorType         &dst,
-                                 const VectorType   &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int from_level,
+                    VectorType         &dst,
+                    const VectorType   &src) const override;
 
   /**
    * Finite element does not provide prolongation matrices.
@@ -628,12 +648,14 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Print all the matrices for debugging purposes.
    */
-  void print_matrices(std::ostream &os) const;
+  void
+  print_matrices(std::ostream &os) const;
 
 private:
 

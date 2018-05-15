@@ -83,7 +83,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 protected:
   /**
@@ -94,8 +95,9 @@ protected:
    * to certain blocks.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &dof,
+                  const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Flag of selected blocks.
@@ -200,14 +202,16 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlock () override;
+  virtual
+  ~MGTransferBlock () override;
 
   /**
    * Initialize additional #factors and #memory if the restriction of the
    * blocks is to be weighted differently.
    */
-  void initialize (const std::vector<number> &factors,
-                   VectorMemory<Vector<number> > &memory);
+  void
+  initialize (const std::vector<number> &factors,
+              VectorMemory<Vector<number> > &memory);
 
   /**
    * Build the prolongation matrices for each level.
@@ -216,17 +220,20 @@ public:
    * MGTransferBlockBase.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof,
-                       const std::vector<bool> &selected);
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &dof,
+                  const DoFHandler<dim,spacedim> &mg_dof,
+                  const std::vector<bool> &selected);
 
-  virtual void prolongate (const unsigned int    to_level,
-                           BlockVector<number>       &dst,
-                           const BlockVector<number> &src) const override;
+  virtual void
+  prolongate (const unsigned int    to_level,
+              BlockVector<number>       &dst,
+              const BlockVector<number> &src) const override;
 
-  virtual void restrict_and_add (const unsigned int    from_level,
-                                 BlockVector<number>       &dst,
-                                 const BlockVector<number> &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int    from_level,
+                    BlockVector<number>       &dst,
+                    const BlockVector<number> &src) const override;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the
@@ -327,7 +334,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockSelect () override = default;
+  virtual
+  ~MGTransferBlockSelect () override = default;
 
   /**
    * Actually build the prolongation matrices for grouped blocks.
@@ -342,22 +350,26 @@ public:
    * should be built.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof,
-                       unsigned int selected);
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &dof,
+                  const DoFHandler<dim,spacedim> &mg_dof,
+                  unsigned int selected);
 
   /**
    * Change selected block. Handle with care!
    */
-  void select (const unsigned int block);
+  void
+  select (const unsigned int block);
 
-  virtual void prolongate (const unsigned int    to_level,
-                           Vector<number>       &dst,
-                           const Vector<number> &src) const override;
+  virtual void
+  prolongate (const unsigned int    to_level,
+              Vector<number>       &dst,
+              const Vector<number> &src) const override;
 
-  virtual void restrict_and_add (const unsigned int    from_level,
-                                 Vector<number>       &dst,
-                                 const Vector<number> &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int    from_level,
+                    Vector<number>       &dst,
+                    const Vector<number> &src) const override;
 
   /**
    * Transfer a single block from a vector on the global grid to a multilevel
@@ -433,7 +445,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**

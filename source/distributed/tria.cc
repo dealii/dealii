@@ -934,7 +934,8 @@ namespace
                       typename internal::p4est::types<dim>::topidx  coarse_cell_index,
                       typename internal::p4est::types<dim>::quadrant *children[]);
 
-    bool pointers_are_at_end () const;
+    bool
+    pointers_are_at_end () const;
 
   private:
     std::vector<typename internal::p4est::types<dim>::quadrant> refine_list;
@@ -943,9 +944,10 @@ namespace
     std::vector<typename internal::p4est::types<dim>::quadrant> coarsen_list;
     typename std::vector<typename internal::p4est::types<dim>::quadrant>::const_iterator current_coarsen_pointer;
 
-    void build_lists (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                      const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                      const types::subdomain_id myid);
+    void
+    build_lists (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                 const typename internal::p4est::types<dim>::quadrant &p4est_cell,
+                 const types::subdomain_id myid);
   };
 
 
@@ -1216,7 +1218,8 @@ namespace
      * order that p4est will encounter the cells, and they do not contain
      * ghost cells or artificial cells.
      */
-    explicit PartitionWeights (const std::vector<unsigned int> &cell_weights);
+    explicit
+    PartitionWeights (const std::vector<unsigned int> &cell_weights);
 
     /**
      * A callback function that we pass to the p4est data structures when a
@@ -1405,7 +1408,8 @@ namespace parallel
           std::vector<unsigned int * > first_vertex_indices;
           std::vector<dealii::Point<spacedim>* > first_vertices;
 
-          unsigned int bytes_for_buffer () const
+          unsigned int
+          bytes_for_buffer () const
           {
             return sizeof(unsigned int) +
                    tree_index.size() * sizeof(unsigned int) +
@@ -1415,7 +1419,8 @@ namespace parallel
                    vertices.size() * sizeof(dealii::Point<spacedim>);
           }
 
-          void pack_data (std::vector<char> &buffer) const
+          void
+          pack_data (std::vector<char> &buffer) const
           {
             buffer.resize(bytes_for_buffer());
 
@@ -1451,7 +1456,8 @@ namespace parallel
 
           }
 
-          void unpack_data (const std::vector<char> &buffer)
+          void
+          unpack_data (const std::vector<char> &buffer)
           {
             const char *ptr = buffer.data();
             unsigned int cells;

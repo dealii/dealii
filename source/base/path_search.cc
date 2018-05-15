@@ -27,7 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 
 std::map<std::string, std::vector<std::string> > PathSearch::path_lists;
 std::map<std::string, std::vector<std::string> > PathSearch::suffix_lists;
-std::string PathSearch::empty("");
+std::string
+PathSearch::empty("");
 
 void
 PathSearch::initialize_classes()

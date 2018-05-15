@@ -137,15 +137,17 @@ namespace internal
          * Return the size of objects of this kind.
          */
         static
-        std::size_t memory_consumption ();
+        std::size_t
+        memory_consumption ();
 
         /**
          * Read or write the data of this object to or from a stream for the
          * purpose of serialization
          */
         template <class Archive>
-        void serialize(Archive &ar,
-                       const unsigned int version);
+        void
+        serialize(Archive &ar,
+                  const unsigned int version);
       };
 
       /**
@@ -180,8 +182,9 @@ namespace internal
        * In 2D e.g. refined lines have to be stored in pairs, whereas new
        * lines in the interior of refined cells can be stored as single lines.
        */
-      void reserve_space (const unsigned int new_objs_in_pairs,
-                          const unsigned int new_objs_single = 0);
+      void
+      reserve_space (const unsigned int new_objs_in_pairs,
+                     const unsigned int new_objs_single = 0);
 
       /**
        * Return an iterator to the next free slot for a single object. This
@@ -225,7 +228,8 @@ namespace internal
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * The orientation of the face number <code>face</code> of the cell with
@@ -241,65 +245,76 @@ namespace internal
        * with the base class function instead of the derived class. Still, we
        * do not want to make it virtual for efficiency reasons.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
 
       /**
        * Access to user pointers.
        */
-      void  *&user_pointer(const unsigned int i);
+      void  *&
+      user_pointer(const unsigned int i);
 
       /**
        * Read-only access to user pointers.
        */
-      const void *user_pointer(const unsigned int i) const;
+      const void *
+      user_pointer(const unsigned int i) const;
 
       /**
        * Access to user indices.
        */
-      unsigned int &user_index(const unsigned int i);
+      unsigned int &
+      user_index(const unsigned int i);
 
       /**
        * Read-only access to user pointers.
        */
-      unsigned int user_index(const unsigned int i) const;
+      unsigned int
+      user_index(const unsigned int i) const;
 
       /**
        * Reset user data to zero.
        */
-      void clear_user_data(const unsigned int i);
+      void
+      clear_user_data(const unsigned int i);
 
       /**
        * Clear all user pointers or indices and reset their type, such that
        * the next access may be either or.
        */
-      void clear_user_data();
+      void
+      clear_user_data();
 
       /**
        * Clear all user flags.
        */
-      void clear_user_flags();
+      void
+      clear_user_flags();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory (const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
 
       /**
        * Exception
@@ -363,7 +378,8 @@ namespace internal
          * serialization.
          */
         template <class Archive>
-        void serialize (Archive &ar, const unsigned int version);
+        void
+        serialize (Archive &ar, const unsigned int version);
       };
 
       /**
@@ -410,7 +426,8 @@ namespace internal
        * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
        * they point in opposite direction.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
 
       /**
@@ -453,33 +470,38 @@ namespace internal
        * <code>vector::reserve()</code>, but does really append the needed
        * elements.
        */
-      void reserve_space (const unsigned int new_objs);
+      void
+      reserve_space (const unsigned int new_objs);
 
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory (const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
 
@@ -499,7 +521,8 @@ namespace internal
        * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
        * they point in opposite direction.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
 
       /**
@@ -515,34 +538,39 @@ namespace internal
        * not only call <code>vector::reserve()</code>, but does really append
        * the needed elements.
        */
-      void reserve_space (const unsigned int new_quads_in_pairs,
-                          const unsigned int new_quads_single = 0);
+      void
+      reserve_space (const unsigned int new_quads_in_pairs,
+                     const unsigned int new_quads_single = 0);
 
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory (const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
     };
 
 //----------------------------------------------------------------------//
@@ -662,7 +690,8 @@ namespace internal
 
     template <typename G>
     inline
-    unsigned int TriaObjects<G>::user_index (const unsigned int i) const
+    unsigned int
+    TriaObjects<G>::user_index (const unsigned int i) const
     {
       Assert(user_data_type == data_unknown || user_data_type == data_index,
              ExcPointerIndexClash());
@@ -675,7 +704,8 @@ namespace internal
 
     template <typename G>
     inline
-    void TriaObjects<G>::clear_user_data ()
+    void
+    TriaObjects<G>::clear_user_data ()
     {
       user_data_type = data_unknown;
       for (unsigned int i=0; i<user_data.size(); ++i)
@@ -685,7 +715,8 @@ namespace internal
 
     template <typename G>
     inline
-    void TriaObjects<G>::clear_user_flags ()
+    void
+    TriaObjects<G>::clear_user_flags ()
     {
       user_flags.assign(user_flags.size(),false);
     }
@@ -705,8 +736,9 @@ namespace internal
 
     template <typename G>
     template <class Archive>
-    void TriaObjects<G>::serialize(Archive &ar,
-                                   const unsigned int)
+    void
+    TriaObjects<G>::serialize(Archive &ar,
+                              const unsigned int)
     {
       ar &cells &children;
       ar &refinement_cases;
@@ -720,8 +752,9 @@ namespace internal
 
 
     template <class Archive>
-    void TriaObjectsHex::serialize(Archive &ar,
-                                   const unsigned int version)
+    void
+    TriaObjectsHex::serialize(Archive &ar,
+                              const unsigned int version)
     {
       this->TriaObjects<TriaObject<3> >::serialize (ar, version);
 
@@ -730,8 +763,9 @@ namespace internal
 
 
     template <class Archive>
-    void TriaObjectsQuad3D::serialize(Archive &ar,
-                                      const unsigned int version)
+    void
+    TriaObjectsQuad3D::serialize(Archive &ar,
+                                 const unsigned int version)
     {
       this->TriaObjects<TriaObject<2> >::serialize (ar, version);
 

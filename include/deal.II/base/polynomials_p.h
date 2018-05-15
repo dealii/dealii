@@ -66,7 +66,8 @@ public:
    * Note, that this number is <tt>PolynomialSpace::degree()-1</tt>, compare
    * definition in PolynomialSpace.
    */
-  unsigned int degree() const;
+  unsigned int
+  degree() const;
 
   /**
    * For the <tt>n</tt>th polynomial $p_n(x,y,z)=x^i y^j z^k$ this function
@@ -82,7 +83,8 @@ private:
   /**
    * Fills the <tt>index_map</tt>.
    */
-  void create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
+  void
+  create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
 
   /**
    * Degree <tt>p</tt> of the polynomial space $P_p$, i.e. the number

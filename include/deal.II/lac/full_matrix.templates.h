@@ -207,9 +207,10 @@ FullMatrix<number>::vmult (Vector<number2> &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
-                                 const Vector<number2> &src,
-                                 const bool             adding) const
+void
+FullMatrix<number>::Tvmult (Vector<number2>       &dst,
+                            const Vector<number2> &src,
+                            const bool             adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -240,9 +241,10 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 
 template <typename number>
 template <typename number2, typename number3>
-number FullMatrix<number>::residual (Vector<number2> &dst,
-                                     const Vector<number2> &src,
-                                     const Vector<number3> &right) const
+number
+FullMatrix<number>::residual (Vector<number2> &dst,
+                              const Vector<number2> &src,
+                              const Vector<number3> &right) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -270,8 +272,9 @@ number FullMatrix<number>::residual (Vector<number2> &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::forward (Vector<number2>       &dst,
-                                  const Vector<number2> &src) const
+void
+FullMatrix<number>::forward (Vector<number2>       &dst,
+                             const Vector<number2> &src) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -294,8 +297,9 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::backward (Vector<number2>       &dst,
-                                   const Vector<number2> &src) const
+void
+FullMatrix<number>::backward (Vector<number2>       &dst,
+                              const Vector<number2> &src) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -315,11 +319,12 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::fill (const FullMatrix<number2> &src,
-                               const size_type dst_offset_i,
-                               const size_type dst_offset_j,
-                               const size_type src_offset_i,
-                               const size_type src_offset_j)
+void
+FullMatrix<number>::fill (const FullMatrix<number2> &src,
+                          const size_type dst_offset_i,
+                          const size_type dst_offset_j,
+                          const size_type src_offset_i,
+                          const size_type src_offset_j)
 {
   AssertIndexRange (dst_offset_i, m());
   AssertIndexRange (dst_offset_j, n());
@@ -341,9 +346,10 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
-                                           const std::vector<size_type> &p_rows,
-                                           const std::vector<size_type> &p_cols)
+void
+FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
+                                      const std::vector<size_type> &p_rows,
+                                      const std::vector<size_type> &p_cols)
 {
   Assert (p_rows.size() == this->n_rows(),
           ExcDimensionMismatch (p_rows.size(), this->n_rows()));
@@ -358,9 +364,10 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 
 
 template <typename number>
-void FullMatrix<number>::add_row (const size_type i,
-                                  const number s,
-                                  const size_type j)
+void
+FullMatrix<number>::add_row (const size_type i,
+                             const number s,
+                             const size_type j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -370,11 +377,12 @@ void FullMatrix<number>::add_row (const size_type i,
 
 
 template <typename number>
-void FullMatrix<number>::add_row (const size_type i,
-                                  const number s,
-                                  const size_type j,
-                                  const number t,
-                                  const size_type k)
+void
+FullMatrix<number>::add_row (const size_type i,
+                             const number s,
+                             const size_type j,
+                             const number t,
+                             const size_type k)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -385,8 +393,9 @@ void FullMatrix<number>::add_row (const size_type i,
 
 
 template <typename number>
-void FullMatrix<number>::add_col (const size_type i, const number s,
-                                  const size_type j)
+void
+FullMatrix<number>::add_col (const size_type i, const number s,
+                             const size_type j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -396,9 +405,10 @@ void FullMatrix<number>::add_col (const size_type i, const number s,
 
 
 template <typename number>
-void FullMatrix<number>::add_col (const size_type i, const number s,
-                                  const size_type j, const number t,
-                                  const size_type k)
+void
+FullMatrix<number>::add_col (const size_type i, const number s,
+                             const size_type j, const number t,
+                             const size_type k)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -409,8 +419,9 @@ void FullMatrix<number>::add_col (const size_type i, const number s,
 
 
 template <typename number>
-void FullMatrix<number>::swap_row (const size_type i,
-                                   const size_type j)
+void
+FullMatrix<number>::swap_row (const size_type i,
+                              const size_type j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -421,8 +432,9 @@ void FullMatrix<number>::swap_row (const size_type i,
 
 
 template <typename number>
-void FullMatrix<number>::swap_col (const size_type i,
-                                   const size_type j)
+void
+FullMatrix<number>::swap_col (const size_type i,
+                              const size_type j)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -433,7 +445,8 @@ void FullMatrix<number>::swap_col (const size_type i,
 
 
 template <typename number>
-void FullMatrix<number>::diagadd (const number src)
+void
+FullMatrix<number>::diagadd (const number src)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (m() == n(), ExcDimensionMismatch(m(),n()));
@@ -445,8 +458,9 @@ void FullMatrix<number>::diagadd (const number src)
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::equ (const number               a,
-                              const FullMatrix<number2> &A)
+void
+FullMatrix<number>::equ (const number               a,
+                         const FullMatrix<number2> &A)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
@@ -510,9 +524,10 @@ FullMatrix<number>::equ (const number               a,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
-                                const FullMatrix<number2> &src,
-                                const bool                 adding) const
+void
+FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
+                           const FullMatrix<number2> &src,
+                           const bool                 adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (n() == src.m(), ExcDimensionMismatch(n(), src.m()));
@@ -582,9 +597,10 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
-                                 const FullMatrix<number2> &src,
-                                 const bool                 adding) const
+void
+FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
+                            const FullMatrix<number2> &src,
+                            const bool                 adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
@@ -676,9 +692,10 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
-                                 const FullMatrix<number2> &src,
-                                 const bool                 adding) const
+void
+FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
+                            const FullMatrix<number2> &src,
+                            const bool                 adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
@@ -766,9 +783,10 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
-                                  const FullMatrix<number2> &src,
-                                  const bool                 adding) const
+void
+FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
+                             const FullMatrix<number2> &src,
+                             const bool                 adding) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   Assert (m() == src.n(), ExcDimensionMismatch(m(), src.n()));
@@ -1086,12 +1104,13 @@ FullMatrix<number>::add (const number               a,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::add (const FullMatrix<number2> &src,
-                              const number factor,
-                              const size_type dst_offset_i,
-                              const size_type dst_offset_j,
-                              const size_type src_offset_i,
-                              const size_type src_offset_j)
+void
+FullMatrix<number>::add (const FullMatrix<number2> &src,
+                         const number factor,
+                         const size_type dst_offset_i,
+                         const size_type dst_offset_j,
+                         const size_type src_offset_i,
+                         const size_type src_offset_j)
 {
   AssertIndexRange (dst_offset_i, m());
   AssertIndexRange (dst_offset_j, n());
@@ -1112,12 +1131,13 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
 
 template <typename number>
 template <typename number2>
-void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
-                               const number factor,
-                               const size_type dst_offset_i,
-                               const size_type dst_offset_j,
-                               const size_type src_offset_i,
-                               const size_type src_offset_j)
+void
+FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
+                          const number factor,
+                          const size_type dst_offset_i,
+                          const size_type dst_offset_j,
+                          const size_type src_offset_i,
+                          const size_type src_offset_j)
 {
   AssertIndexRange (dst_offset_i, m());
   AssertIndexRange (dst_offset_j, n());
@@ -1174,7 +1194,8 @@ namespace internal
     template <typename number, typename = void>
     struct Determinant
     {
-      static number value (const FullMatrix<number> &)
+      static number
+      value (const FullMatrix<number> &)
       {
         AssertThrow(false, ExcNotImplemented());
         return 0.0;
@@ -1191,7 +1212,8 @@ namespace internal
       >::type>
     {
 #ifdef DEAL_II_WITH_LAPACK
-      static number value (const FullMatrix<number> &A)
+      static number
+      value (const FullMatrix<number> &A)
       {
         using s_type = typename LAPACKFullMatrix<number>::size_type;
         AssertIndexRange (A.m()-1, std::numeric_limits<s_type>::max());
@@ -1203,7 +1225,8 @@ namespace internal
         return lp_A.determinant();
       }
 #else
-      static number value (const FullMatrix<number> &)
+      static number
+      value (const FullMatrix<number> &)
       {
         AssertThrow(false, ExcNeedsLAPACK());
         return 0.0;

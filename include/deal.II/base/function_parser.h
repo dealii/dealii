@@ -258,10 +258,11 @@ public:
    * method in this case is dim+1. The value of this parameter defaults to
    * false, i.e. do not consider time.
    */
-  void initialize (const std::string              &vars,
-                   const std::vector<std::string> &expressions,
-                   const ConstMap                 &constants,
-                   const bool time_dependent = false);
+  void
+  initialize (const std::string              &vars,
+              const std::vector<std::string> &expressions,
+              const ConstMap                 &constants,
+              const bool time_dependent = false);
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than
@@ -270,10 +271,11 @@ public:
    * this method is called and the number of components successfully parsed
    * does not match the number of components of the base function.
    */
-  void initialize (const std::string &vars,
-                   const std::string &expression,
-                   const ConstMap    &constants,
-                   const bool time_dependent = false);
+  void
+  initialize (const std::string &vars,
+              const std::string &expression,
+              const ConstMap    &constants,
+              const bool time_dependent = false);
 
   /**
    * A function that returns default names for variables, to be used in the
@@ -290,8 +292,9 @@ public:
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
    */
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const override;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at the given point @p
@@ -299,8 +302,9 @@ public:
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    */
-  virtual void vector_value (const Point<dim>   &p,
-                             Vector<double>     &values) const override;
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const override;
 
   /**
    * @addtogroup Exceptions
@@ -364,7 +368,8 @@ private:
    * already been called by testing whether 'fp.get().size()==0' (not
    * initialized) or >0 (already initialized).
    */
-  void init_muparser() const;
+  void
+  init_muparser() const;
 #endif
 
   /**

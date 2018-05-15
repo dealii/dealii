@@ -64,7 +64,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer()
 
 
 template <int dim, typename VectorType, typename DoFHandlerType>
-void SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
+void
+SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
 {
   indices_on_cell.clear();
   dof_values_on_cell.clear();
@@ -76,7 +77,8 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
 
 
 template <int dim, typename VectorType, typename DoFHandlerType>
-void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
+void
+SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
   Assert(prepared_for!=coarsening_and_refinement,
@@ -183,13 +185,15 @@ namespace internal
    * implemented.
    */
   template <typename DoFHandlerType>
-  void extract_interpolation_matrices (const DoFHandlerType &,
-                                       dealii::Table<2,FullMatrix<double> > &)
+  void
+  extract_interpolation_matrices (const DoFHandlerType &,
+                                  dealii::Table<2,FullMatrix<double> > &)
   {}
 
   template <int dim, int spacedim>
-  void extract_interpolation_matrices (const dealii::hp::DoFHandler<dim,spacedim> &dof,
-                                       dealii::Table<2,FullMatrix<double> > &matrices)
+  void
+  extract_interpolation_matrices (const dealii::hp::DoFHandler<dim,spacedim> &dof,
+                                  dealii::Table<2,FullMatrix<double> > &matrices)
   {
     const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
     matrices.reinit (fe.size(), fe.size());
@@ -219,13 +223,15 @@ namespace internal
 
 
   template <int dim, int spacedim>
-  void restriction_additive (const FiniteElement<dim,spacedim> &,
-                             std::vector<std::vector<bool> > &)
+  void
+  restriction_additive (const FiniteElement<dim,spacedim> &,
+                        std::vector<std::vector<bool> > &)
   {}
 
   template <int dim, int spacedim>
-  void restriction_additive (const dealii::hp::FECollection<dim,spacedim> &fe,
-                             std::vector<std::vector<bool> > &restriction_is_additive)
+  void
+  restriction_additive (const dealii::hp::FECollection<dim,spacedim> &fe,
+                        std::vector<std::vector<bool> > &restriction_is_additive)
   {
     restriction_is_additive.resize (fe.size());
     for (unsigned int f=0; f<fe.size(); ++f)

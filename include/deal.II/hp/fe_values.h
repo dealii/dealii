@@ -99,7 +99,8 @@ namespace internal
       /**
        * Get the underlying update flags.
        */
-      UpdateFlags get_update_flags() const;
+      UpdateFlags
+      get_update_flags() const;
 
       /**
        * Return a reference to the @p FEValues object selected by the last
@@ -107,7 +108,8 @@ namespace internal
        * you called the @p reinit function of the <tt>hp::FE*Values</tt> class
        * the last time.
        */
-      const FEValuesType &get_present_fe_values () const;
+      const FEValuesType &
+      get_present_fe_values () const;
 
     protected:
 

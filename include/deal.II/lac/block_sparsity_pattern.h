@@ -130,15 +130,17 @@ public:
    * SparsityPattern class here but rather let the user call whatever function
    * she desires.
    */
-  void reinit (const size_type n_block_rows,
-               const size_type n_block_columns);
+  void
+  reinit (const size_type n_block_rows,
+          const size_type n_block_columns);
 
   /**
    * Copy operator. For this the same holds as for the copy constructor: it is
    * declared, defined and fine to be called, but the latter only for empty
    * objects.
    */
-  BlockSparsityPatternBase &operator = (const BlockSparsityPatternBase &);
+  BlockSparsityPatternBase &
+  operator = (const BlockSparsityPatternBase &);
 
   /**
    * This function collects the sizes of the sub-objects and stores them in
@@ -146,7 +148,8 @@ public:
    * matrix to indices into the subobjects. You *must* call this function each
    * time after you have changed the size of the sub-objects.
    */
-  void collect_sizes ();
+  void
+  collect_sizes ();
 
   /**
    * Access the block with the given coordinates.
@@ -182,17 +185,20 @@ public:
    * This function compresses the sparsity structures that this object
    * represents. It simply calls @p compress for all sub-objects.
    */
-  void compress ();
+  void
+  compress ();
 
   /**
    * Return the number of blocks in a column.
    */
-  size_type n_block_rows () const;
+  size_type
+  n_block_rows () const;
 
   /**
    * Return the number of blocks in a row.
    */
-  size_type n_block_cols () const;
+  size_type
+  n_block_cols () const;
 
   /**
    * Return whether the object is empty. It is empty if no memory is
@@ -200,14 +206,16 @@ public:
    * function is just the concatenation of the respective call to all sub-
    * matrices.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the maximum number of entries per row. It returns the maximal
    * number of entries per row accumulated over all blocks in a row, and the
    * maximum over all rows.
    */
-  size_type max_entries_per_row () const;
+  size_type
+  max_entries_per_row () const;
 
   /**
    * Add a nonzero entry to the matrix. This function may only be called for
@@ -218,7 +226,8 @@ public:
    * This function simply finds out to which block <tt>(i,j)</tt> belongs and
    * then relays to that block.
    */
-  void add (const size_type i, const size_type j);
+  void
+  add (const size_type i, const size_type j);
 
   /**
    * Add several nonzero entries to the specified matrix row.  This function
@@ -231,34 +240,39 @@ public:
    * blocks.
    */
   template <typename ForwardIterator>
-  void add_entries (const size_type  row,
-                    ForwardIterator  begin,
-                    ForwardIterator  end,
-                    const bool       indices_are_sorted = false);
+  void
+  add_entries (const size_type  row,
+               ForwardIterator  begin,
+               ForwardIterator  end,
+               const bool       indices_are_sorted = false);
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
    * image space. It is the sum of rows of the (block-)rows of sub-matrices.
    */
-  size_type n_rows () const;
+  size_type
+  n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space. It is the sum of columns of the (block-)columns of sub-
    * matrices.
    */
-  size_type n_cols () const;
+  size_type
+  n_cols () const;
 
   /**
    * Check if a value at a certain position may be non-zero.
    */
-  bool exists (const size_type i, const size_type j) const;
+  bool
+  exists (const size_type i, const size_type j) const;
 
   /**
    * Number of entries in a specific row, added up over all the blocks that
    * form this row.
    */
-  unsigned int row_length (const size_type row) const;
+  unsigned int
+  row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
@@ -271,14 +285,16 @@ public:
    * In the present context, it is the sum of the values as returned by the
    * sub-objects.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements () const;
 
   /**
    * Print the sparsity of the matrix. The output consists of one line per row
    * of the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.
    */
-  void print (std::ostream &out) const;
+  void
+  print (std::ostream &out) const;
 
   /**
    * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
@@ -287,7 +303,8 @@ public:
    * sparsity patterns, see
    * @ref SparsityPattern.
    */
-  void print_gnuplot (std::ostream &out) const;
+  void
+  print_gnuplot (std::ostream &out) const;
 
   /**
    * @addtogroup Exceptions
@@ -395,8 +412,9 @@ public:
   /**
    * Forwarding to BlockSparsityPatternBase::reinit().
    */
-  void reinit (const size_type n_block_rows,
-               const size_type n_block_columns);
+  void
+  reinit (const size_type n_block_rows,
+          const size_type n_block_columns);
 
   /**
    * Initialize the pattern with two BlockIndices for the block structures of
@@ -410,29 +428,33 @@ public:
    * For the diagonal blocks, the inner SparsityPattern is initialized with
    * optimized diagonals, while this is not done for the off-diagonal blocks.
    */
-  void reinit (const BlockIndices &row_indices,
-               const BlockIndices &col_indices,
-               const std::vector<std::vector<unsigned int> > &row_lengths);
+  void
+  reinit (const BlockIndices &row_indices,
+          const BlockIndices &col_indices,
+          const std::vector<std::vector<unsigned int> > &row_lengths);
 
 
   /**
    * Return whether the structure is compressed or not, i.e. whether all sub-
    * matrices are compressed.
    */
-  bool is_compressed () const;
+  bool
+  is_compressed () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Copy data from an object of type BlockDynamicSparsityPattern, i.e. resize
    * this object to the size of the given argument, and copy over the contents
    * of each of the subobjects. Previous content of this object is lost.
    */
-  void copy_from (const BlockDynamicSparsityPattern &dsp);
+  void
+  copy_from (const BlockDynamicSparsityPattern &dsp);
 };
 
 
@@ -533,28 +555,32 @@ public:
    * in the two arguments. The block at position (<i>i,j</i>) will have the
    * dimensions <tt>row_block_sizes[i]</tt> times <tt>col_block_sizes[j]</tt>.
    */
-  void reinit (const std::vector<size_type> &row_block_sizes,
-               const std::vector<size_type> &col_block_sizes);
+  void
+  reinit (const std::vector<size_type> &row_block_sizes,
+          const std::vector<size_type> &col_block_sizes);
 
   /**
    * Resize the pattern with symmetric blocks determined by the size() of each
    * IndexSet. See the constructor taking a vector of IndexSets for details.
    */
-  void reinit(const std::vector<IndexSet> &partitioning);
+  void
+  reinit(const std::vector<IndexSet> &partitioning);
 
   /**
    * Resize the matrix to a tensor product of matrices with dimensions defined
    * by the arguments. The two BlockIndices objects must be initialized and
    * the sparsity pattern will have the same block structure afterwards.
    */
-  void reinit (const BlockIndices &row_indices, const BlockIndices &col_indices);
+  void
+  reinit (const BlockIndices &row_indices, const BlockIndices &col_indices);
 
   /**
    * Access to column number field. Return the column number of the @p index
    * th entry in row @p row.
    */
-  size_type column_number (const size_type row,
-                           const unsigned int index) const;
+  size_type
+  column_number (const size_type row,
+                 const unsigned int index) const;
 
   /**
    * Allow the use of the reinit functions of the base class as well.
@@ -671,8 +697,9 @@ namespace TrilinosWrappers
      * have the dimensions <tt>row_block_sizes[i]</tt> times
      * <tt>col_block_sizes[j]</tt>.
      */
-    void reinit (const std::vector<size_type> &row_block_sizes,
-                 const std::vector<size_type> &col_block_sizes);
+    void
+    reinit (const std::vector<size_type> &row_block_sizes,
+            const std::vector<size_type> &col_block_sizes);
 
     /**
      * Resize the matrix to a square tensor product of matrices with parallel
@@ -682,23 +709,26 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet arguments instead.
      */
     DEAL_II_DEPRECATED
-    void reinit (const std::vector<Epetra_Map> &parallel_partitioning);
+    void
+    reinit (const std::vector<Epetra_Map> &parallel_partitioning);
 
     /**
      * Resize the matrix to a square tensor product of matrices. See the
      * constructor that takes a vector of IndexSets for details.
      */
-    void reinit (const std::vector<IndexSet> &parallel_partitioning,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD);
+    void
+    reinit (const std::vector<IndexSet> &parallel_partitioning,
+            const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
     /**
      * Resize the matrix to a rectangular block matrices. This method allows
      * rows and columns to be different, both in the outer block structure and
      * within the blocks.
      */
-    void reinit (const std::vector<IndexSet> &row_parallel_partitioning,
-                 const std::vector<IndexSet> &column_parallel_partitioning,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD);
+    void
+    reinit (const std::vector<IndexSet> &row_parallel_partitioning,
+            const std::vector<IndexSet> &column_parallel_partitioning,
+            const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
     /**
      * Resize the matrix to a rectangular block matrices that furthermore
@@ -708,10 +738,11 @@ namespace TrilinosWrappers
      * method TrilinosWrappers::SparsityPattern::reinit method with three
      * index set arguments for more details.
      */
-    void reinit (const std::vector<IndexSet> &row_parallel_partitioning,
-                 const std::vector<IndexSet> &column_parallel_partitioning,
-                 const std::vector<IndexSet> &writeable_rows,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD);
+    void
+    reinit (const std::vector<IndexSet> &row_parallel_partitioning,
+            const std::vector<IndexSet> &column_parallel_partitioning,
+            const std::vector<IndexSet> &writeable_rows,
+            const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
     /**
      * Allow the use of the reinit functions of the base class as well.

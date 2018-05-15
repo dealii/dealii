@@ -99,9 +99,11 @@ public:
       : last_step (last_step), last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () noexcept override = default;
+    virtual
+    ~NoConvergence () noexcept override = default;
 
-    virtual void print_info (std::ostream &out) const override
+    virtual void
+    print_info (std::ostream &out) const override
     {
       out << "Iterative method reported convergence failure in step "
           << last_step << ". The residual in the last step was " << last_residual
@@ -155,17 +157,20 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~SolverControl() override = default;
+  virtual
+  ~SolverControl() override = default;
 
   /**
    * Interface to parameter file.
    */
-  static void declare_parameters (ParameterHandler &param);
+  static void
+  declare_parameters (ParameterHandler &param);
 
   /**
    * Read parameters from file.
    */
-  void parse_parameters (ParameterHandler &param);
+  void
+  parse_parameters (ParameterHandler &param);
 
   /**
    * Decide about success or failure of an iteration.  This function gets the
@@ -184,118 +189,139 @@ public:
    * Derived classes may overload this function, e.g. to log the convergence
    * indicators (@p check_value) or to do other computations.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value);
+  virtual State
+  check (const unsigned int step,
+         const double   check_value);
 
   /**
    * Return the result of the last check operation.
    */
-  State last_check() const;
+  State
+  last_check() const;
 
   /**
    * Return the initial convergence criterion.
    */
-  double initial_value() const;
+  double
+  initial_value() const;
 
   /**
    * Return the convergence value of last iteration step for which @p check
    * was called by the solver.
    */
-  double last_value() const;
+  double
+  last_value() const;
 
   /**
    * Number of last iteration step.
    */
-  unsigned int last_step() const;
+  unsigned int
+  last_step() const;
 
   /**
    * Maximum number of steps.
    */
-  unsigned int max_steps () const;
+  unsigned int
+  max_steps () const;
 
   /**
    * Change maximum number of steps.
    */
-  unsigned int set_max_steps (const unsigned int);
+  unsigned int
+  set_max_steps (const unsigned int);
 
   /**
    * Enables the failure check. Solving is stopped with @p ReturnState @p
    * failure if <tt>residual>failure_residual</tt> with
    * <tt>failure_residual:=rel_failure_residual*first_residual</tt>.
    */
-  void set_failure_criterion (const double rel_failure_residual);
+  void
+  set_failure_criterion (const double rel_failure_residual);
 
   /**
    * Disables failure check and resets @p relative_failure_residual and @p
    * failure_residual to zero.
    */
-  void clear_failure_criterion ();
+  void
+  clear_failure_criterion ();
 
   /**
    * Tolerance.
    */
-  double tolerance () const;
+  double
+  tolerance () const;
 
   /**
    * Change tolerance.
    */
-  double set_tolerance (const double);
+  double
+  set_tolerance (const double);
 
   /**
    * Enables writing residuals of each step into a vector for later analysis.
    */
-  void enable_history_data();
+  void
+  enable_history_data();
 
   /**
    * Provide read access to the collected residual data.
    */
-  const std::vector<double> &get_history_data() const;
+  const std::vector<double> &
+  get_history_data() const;
 
   /**
    * Average error reduction over all steps.
    *
    * Requires enable_history_data()
    */
-  double average_reduction() const;
+  double
+  average_reduction() const;
   /**
    * Error reduction of the last step; for stationary iterations, this
    * approximates the norm of the iteration matrix.
    *
    * Requires enable_history_data()
    */
-  double final_reduction() const;
+  double
+  final_reduction() const;
 
   /**
    * Error reduction of any iteration step.
    *
    * Requires enable_history_data()
    */
-  double step_reduction(unsigned int step) const;
+  double
+  step_reduction(unsigned int step) const;
 
   /**
    * Log each iteration step. Use @p log_frequency for skipping steps.
    */
-  void log_history (const bool);
+  void
+  log_history (const bool);
 
   /**
    * Return the @p log_history flag.
    */
-  bool log_history () const;
+  bool
+  log_history () const;
 
   /**
    * Set logging frequency.
    */
-  unsigned int log_frequency (unsigned int);
+  unsigned int
+  log_frequency (unsigned int);
 
   /**
    * Log start and end step.
    */
-  void log_result (const bool);
+  void
+  log_result (const bool);
 
   /**
    * Return the @p log_result flag.
    */
-  bool log_result () const;
+  bool
+  log_result () const;
 
   /**
    * This exception is thrown if a function operating on the vector of history
@@ -423,41 +449,48 @@ public:
    * Assign a SolverControl object to ReductionControl. The result of the
    * assignment will emulate SolverControl by setting @p reduce to zero.
    */
-  ReductionControl &operator= (const SolverControl &c);
+  ReductionControl &
+  operator= (const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ReductionControl() override = default;
+  virtual
+  ~ReductionControl() override = default;
 
   /**
    * Interface to parameter file.
    */
-  static void declare_parameters (ParameterHandler &param);
+  static void
+  declare_parameters (ParameterHandler &param);
 
   /**
    * Read parameters from file.
    */
-  void parse_parameters (ParameterHandler &param);
+  void
+  parse_parameters (ParameterHandler &param);
 
   /**
    * Decide about success or failure of an iteration.  This function calls the
    * one in the base class, but sets the tolerance to <tt>reduction * initial
    * value</tt> upon the first iteration.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check (const unsigned int step,
+         const double   check_value) override;
 
   /**
    * Reduction factor.
    */
-  double reduction () const;
+  double
+  reduction () const;
 
   /**
    * Change reduction factor.
    */
-  double set_reduction (const double);
+  double
+  set_reduction (const double);
 
 protected:
   /**
@@ -507,21 +540,24 @@ public:
    * assignment will emulate SolverControl by setting the reduction target to
    * zero.
    */
-  IterationNumberControl &operator= (const SolverControl &c);
+  IterationNumberControl &
+  operator= (const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~IterationNumberControl() override = default;
+  virtual
+  ~IterationNumberControl() override = default;
 
   /**
    * Decide about success or failure of an iteration. This function bases
    * success solely on the fact if a given number of iterations was reached or
    * the check value reached exactly zero.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check (const unsigned int step,
+         const double   check_value) override;
 };
 
 
@@ -563,20 +599,23 @@ public:
    * assignment will emulate SolverControl by setting @p n_consecutive_iterations
    * to one.
    */
-  ConsecutiveControl &operator= (const SolverControl &c);
+  ConsecutiveControl &
+  operator= (const SolverControl &c);
 
   /**
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ConsecutiveControl() override = default;
+  virtual
+  ~ConsecutiveControl() override = default;
 
   /**
    * Decide about success or failure of an iteration, see the class description
    * above.
    */
-  virtual State check (const unsigned int step,
-                       const double   check_value) override;
+  virtual State
+  check (const unsigned int step,
+         const double   check_value) override;
 
 protected:
   /**

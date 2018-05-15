@@ -95,104 +95,123 @@ public:
    * Deletes the inverse diagonal block matrices if existent hence leaves the
    * class in the state that it had directly after calling the constructor.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Resize to this number of diagonal blocks with the given block size. If
    * <tt>compress</tt> is true, then only one block will be stored.
    */
-  void reinit(unsigned int nblocks, size_type blocksize, bool compress,
-              Inversion method = gauss_jordan);
+  void
+  reinit(unsigned int nblocks, size_type blocksize, bool compress,
+         Inversion method = gauss_jordan);
 
   /**
    * Tell the class that inverses are computed.
    */
-  void inverses_computed(bool are_they);
+  void
+  inverses_computed(bool are_they);
 
   /**
    * Does the matrix use only one diagonal block?
    */
-  bool same_diagonal () const;
+  bool
+  same_diagonal () const;
 
   /**
    * Check, whether diagonal blocks (not their inverses) should be stored.
    */
-  bool store_diagonals() const;
+  bool
+  store_diagonals() const;
 
   /**
    * Return true, if inverses are ready for use.
    */
-  bool inverses_ready () const;
+  bool
+  inverses_ready () const;
 
   /**
    * The number of blocks.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
   /**
    * Multiply with the inverse block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void
+  inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Multiply with the transposed inverse block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void
+  inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #gauss_jordan.
    */
-  FullMatrix<number> &inverse (size_type i);
+  FullMatrix<number> &
+  inverse (size_type i);
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  Householder<number> &inverse_householder (size_type i);
+  Householder<number> &
+  inverse_householder (size_type i);
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  LAPACKFullMatrix<number> &inverse_svd (size_type i);
+  LAPACKFullMatrix<number> &
+  inverse_svd (size_type i);
 
   /**
    * Access to the inverse diagonal blocks.
    */
-  const FullMatrix<number> &inverse (size_type i) const;
+  const FullMatrix<number> &
+  inverse (size_type i) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  const Householder<number> &inverse_householder (size_type i) const;
+  const Householder<number> &
+  inverse_householder (size_type i) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  const LAPACKFullMatrix<number> &inverse_svd (size_type i) const;
+  const LAPACKFullMatrix<number> &
+  inverse_svd (size_type i) const;
 
   /**
    * Access to the diagonal blocks.
    */
-  FullMatrix<number> &diagonal (size_type i);
+  FullMatrix<number> &
+  diagonal (size_type i);
 
   /**
    * Access to the diagonal blocks.
    */
-  const FullMatrix<number> &diagonal (size_type i) const;
+  const FullMatrix<number> &
+  diagonal (size_type i) const;
 
   /**
    * Print some statistics about the inverses to @p deallog. Output depends on
    * #Inversion. It is richest for svd, where we obtain statistics on extremal
    * singular values and condition numbers.
    */
-  void log_statistics () const;
+  void
+  log_statistics () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * You are trying to access a diagonal block (not its inverse), but you

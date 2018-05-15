@@ -70,7 +70,8 @@ public:
    * returns <tt>FE_BDM<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -105,7 +106,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int bdm_degree);
+  void
+  initialize_support_points (const unsigned int bdm_degree);
   /**
    * The values in the face support points of the polynomials needed as test
    * functions. The outer vector is indexed by quadrature points, the inner by

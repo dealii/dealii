@@ -110,12 +110,14 @@ namespace TrilinosWrappers
      * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Return the MPI communicator object in use with this matrix.
      */
-    MPI_Comm get_mpi_communicator () const;
+    MPI_Comm
+    get_mpi_communicator () const;
 
     /**
      * Sets an internal flag so that all operations performed by the matrix,
@@ -126,47 +128,54 @@ namespace TrilinosWrappers
      * @note Calling this function any even number of times in succession will
      * return the object to its original state.
      */
-    void transpose ();
+    void
+    transpose ();
 
     /**
      * Apply the preconditioner.
      */
-    virtual void vmult (MPI::Vector       &dst,
-                        const MPI::Vector &src) const;
+    virtual void
+    vmult (MPI::Vector       &dst,
+           const MPI::Vector &src) const;
 
     /**
      * Apply the transpose preconditioner.
      */
-    virtual void Tvmult (MPI::Vector       &dst,
-                         const MPI::Vector &src) const;
+    virtual void
+    Tvmult (MPI::Vector       &dst,
+            const MPI::Vector &src) const;
 
     /**
      * Apply the preconditioner on deal.II data structures instead of the ones
      * provided in the Trilinos wrapper class.
      */
-    virtual void vmult (dealii::Vector<double>       &dst,
-                        const dealii::Vector<double> &src) const;
+    virtual void
+    vmult (dealii::Vector<double>       &dst,
+           const dealii::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II data structures instead
      * of the ones provided in the Trilinos wrapper class.
      */
-    virtual void Tvmult (dealii::Vector<double>       &dst,
-                         const dealii::Vector<double> &src) const;
+    virtual void
+    Tvmult (dealii::Vector<double>       &dst,
+            const dealii::Vector<double> &src) const;
 
     /**
      * Apply the preconditioner on deal.II parallel data structures instead of
      * the ones provided in the Trilinos wrapper class.
      */
-    virtual void vmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
-                        const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
+    virtual void
+    vmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
+           const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class.
      */
-    virtual void Tvmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
-                         const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
+    virtual void
+    Tvmult (dealii::LinearAlgebra::distributed::Vector<double>       &dst,
+            const dealii::LinearAlgebra::distributed::Vector<double> &src) const;
 
     /**
      * @name Access to underlying Trilinos data
@@ -177,7 +186,8 @@ namespace TrilinosWrappers
      * Calling this function from an uninitialized object will cause an
      * exception.
      */
-    Epetra_Operator &trilinos_operator () const;
+    Epetra_Operator &
+    trilinos_operator () const;
     //@}
 
     /**
@@ -189,14 +199,16 @@ namespace TrilinosWrappers
      * Return the partitioning of the domain space of this matrix, i.e., the
      * partitioning of the vectors this matrix has to be multiplied with.
      */
-    IndexSet locally_owned_domain_indices() const;
+    IndexSet
+    locally_owned_domain_indices() const;
 
     /**
      * Return the partitioning of the range space of this matrix, i.e., the
      * partitioning of the vectors that are result from matrix-vector
      * products.
      */
-    IndexSet locally_owned_range_indices() const;
+    IndexSet
+    locally_owned_range_indices() const;
 
 //@}
 
@@ -309,8 +321,9 @@ namespace TrilinosWrappers
      * Take the sparse matrix the preconditioner object should be built of,
      * and additional flags (damping parameter, etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -405,8 +418,9 @@ namespace TrilinosWrappers
      * and additional flags (damping parameter, overlap in parallel
      * computations, etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -501,8 +515,9 @@ namespace TrilinosWrappers
      * and additional flags (damping parameter, overlap in parallel
      * computations etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -598,8 +613,9 @@ namespace TrilinosWrappers
      * Take the sparse matrix the preconditioner object should be built of,
      * and additional flags (damping parameter, etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -711,8 +727,9 @@ namespace TrilinosWrappers
      * and additional flags (damping parameter, overlap in parallel
      * computations, etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -824,8 +841,9 @@ namespace TrilinosWrappers
      * and additional flags (damping parameter, overlap in parallel
      * computations etc.) if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -934,8 +952,9 @@ namespace TrilinosWrappers
      * Initialize function. Takes the matrix the preconditioner should be
      * computed of, and additional flags if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -1046,8 +1065,9 @@ namespace TrilinosWrappers
      * Initialize function. Takes the matrix which is used to form the
      * preconditioner, and additional flags if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -1168,8 +1188,9 @@ namespace TrilinosWrappers
      * Initialize function. Takes the matrix which is used to form the
      * preconditioner, and additional flags if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -1218,8 +1239,9 @@ namespace TrilinosWrappers
      * Initialize function. Takes the matrix which is used to form the
      * preconditioner, and additional flags if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -1302,8 +1324,9 @@ namespace TrilinosWrappers
      * Initialize function. Takes the matrix which is used to form the
      * preconditioner, and additional flags if there are any.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
   };
 
 
@@ -1513,8 +1536,9 @@ namespace TrilinosWrappers
      * linear system with the given matrix. The function uses the matrix
      * format specified in TrilinosWrappers::SparseMatrix.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1534,8 +1558,9 @@ namespace TrilinosWrappers
      * products. The interface class Epetra_RowMatrix is very flexible to
      * enable this kind of implementation.
      */
-    void initialize (const Epetra_RowMatrix &matrix,
-                     const AdditionalData   &additional_data = AdditionalData());
+    void
+    initialize (const Epetra_RowMatrix &matrix,
+                const AdditionalData   &additional_data = AdditionalData());
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1549,8 +1574,9 @@ namespace TrilinosWrappers
      * guide</a>. In particular, users need to follow the ML instructions in
      * case a vector-valued problem ought to be solved.
      */
-    void initialize (const SparseMatrix           &matrix,
-                     const Teuchos::ParameterList &ml_parameters);
+    void
+    initialize (const SparseMatrix           &matrix,
+                const Teuchos::ParameterList &ml_parameters);
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1559,8 +1585,9 @@ namespace TrilinosWrappers
      * of type Epetra_RowMatrix which allows a user to pass quite general
      * objects to the ML preconditioner.
      */
-    void initialize (const Epetra_RowMatrix       &matrix,
-                     const Teuchos::ParameterList &ml_parameters);
+    void
+    initialize (const Epetra_RowMatrix       &matrix,
+                const Teuchos::ParameterList &ml_parameters);
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1569,10 +1596,11 @@ namespace TrilinosWrappers
      * can be considered rather inefficient.
      */
     template <typename number>
-    void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
-                     const AdditionalData                 &additional_data = AdditionalData(),
-                     const double                          drop_tolerance = 1e-13,
-                     const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
+    void
+    initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
+                const AdditionalData                 &additional_data = AdditionalData(),
+                const double                          drop_tolerance = 1e-13,
+                const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
 
     /**
      * This function can be used for a faster recalculation of the
@@ -1586,18 +1614,21 @@ namespace TrilinosWrappers
      * pattern is usually the most difficult thing to do when setting up the
      * AMG ML preconditioner.
      */
-    void reinit ();
+    void
+    reinit ();
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Prints an estimate of the memory consumption of this class.
      */
-    size_type memory_consumption () const;
+    size_type
+    memory_consumption () const;
 
   private:
     /**
@@ -1777,8 +1808,9 @@ namespace TrilinosWrappers
      * linear system with the given matrix. The function uses the matrix
      * format specified in TrilinosWrappers::SparseMatrix.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1786,8 +1818,9 @@ namespace TrilinosWrappers
      * function above, this function uses an object of type
      * Epetra_CrsMatrixCrs.
      */
-    void initialize (const Epetra_CrsMatrix &matrix,
-                     const AdditionalData   &additional_data = AdditionalData());
+    void
+    initialize (const Epetra_CrsMatrix &matrix,
+                const AdditionalData   &additional_data = AdditionalData());
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1800,16 +1833,18 @@ namespace TrilinosWrappers
      * href=http://trilinos.sandia.gov/packages/ml/mlguide5.pdf>ML user's
      * guide</a>. Not all ML options have a corresponding MueLu option.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     Teuchos::ParameterList &muelu_parameters);
+    void
+    initialize (const SparseMatrix   &matrix,
+                Teuchos::ParameterList &muelu_parameters);
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
      * linear system with the given matrix. As opposed to the other initialize
      * function above, this function uses an object of type Epetra_CrsMatrix.
      */
-    void initialize (const Epetra_CrsMatrix &matrix,
-                     Teuchos::ParameterList &muelu_parameters);
+    void
+    initialize (const Epetra_CrsMatrix &matrix,
+                Teuchos::ParameterList &muelu_parameters);
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a
@@ -1818,21 +1853,24 @@ namespace TrilinosWrappers
      * can be considered rather inefficient.
      */
     template <typename number>
-    void initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
-                     const AdditionalData                 &additional_data = AdditionalData(),
-                     const double                          drop_tolerance = 1e-13,
-                     const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
+    void
+    initialize (const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
+                const AdditionalData                 &additional_data = AdditionalData(),
+                const double                          drop_tolerance = 1e-13,
+                const ::dealii::SparsityPattern      *use_this_sparsity = nullptr);
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Prints an estimate of the memory consumption of this class.
      */
-    size_type memory_consumption () const;
+    size_type
+    memory_consumption () const;
 
   private:
     /**
@@ -1869,49 +1907,56 @@ namespace TrilinosWrappers
      * @note This function must be called when this preconditioner is to be
      * wrapped in a LinearOperator without an exemplar materix.
      */
-    void initialize (const SparseMatrix   &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const SparseMatrix   &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
     /**
      * Apply the preconditioner, i.e., dst = src.
      */
-    void vmult (MPI::Vector       &dst,
-                const MPI::Vector &src) const override;
+    void
+    vmult (MPI::Vector       &dst,
+           const MPI::Vector &src) const override;
 
     /**
      * Apply the transport conditioner, i.e., dst = src.
      */
-    void Tvmult (MPI::Vector       &dst,
-                 const MPI::Vector &src) const override;
+    void
+    Tvmult (MPI::Vector       &dst,
+            const MPI::Vector &src) const override;
 
     /**
      * Apply the preconditioner on deal.II data structures instead of the ones
      * provided in the Trilinos wrapper class, i.e., dst = src.
      */
-    void vmult (dealii::Vector<double>       &dst,
-                const dealii::Vector<double> &src) const override;
+    void
+    vmult (dealii::Vector<double>       &dst,
+           const dealii::Vector<double> &src) const override;
 
     /**
      * Apply the transpose preconditioner on deal.II data structures instead
      * of the ones provided in the Trilinos wrapper class, i.e. dst = src.
      */
-    void Tvmult (dealii::Vector<double>       &dst,
-                 const dealii::Vector<double> &src) const override;
+    void
+    Tvmult (dealii::Vector<double>       &dst,
+            const dealii::Vector<double> &src) const override;
 
     /**
      * Apply the preconditioner on deal.II parallel data structures instead of
      * the ones provided in the Trilinos wrapper class, i.e., dst = src.
      */
-    void vmult (LinearAlgebra::distributed::Vector<double>       &dst,
-                const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
+    void
+    vmult (LinearAlgebra::distributed::Vector<double>       &dst,
+           const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
 
     /**
      * Apply the transpose preconditioner on deal.II parallel data structures
      * instead of the ones provided in the Trilinos wrapper class, i.e., dst =
      * src.
      */
-    void Tvmult (LinearAlgebra::distributed::Vector<double>       &dst,
-                 const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
+    void
+    Tvmult (LinearAlgebra::distributed::Vector<double>       &dst,
+            const dealii::LinearAlgebra::distributed::Vector<double> &src) const override;
   };
 
 
@@ -1989,8 +2034,9 @@ namespace TrilinosWrappers
   // <code>const</code> in all deal.II calls) to non-constant value, as this
   // is the way Trilinos wants to have them.
   inline
-  void PreconditionBase::vmult (dealii::Vector<double>       &dst,
-                                const dealii::Vector<double> &src) const
+  void
+  PreconditionBase::vmult (dealii::Vector<double>       &dst,
+                           const dealii::Vector<double> &src) const
   {
     AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
@@ -2007,8 +2053,9 @@ namespace TrilinosWrappers
 
 
   inline
-  void PreconditionBase::Tvmult (dealii::Vector<double>       &dst,
-                                 const dealii::Vector<double> &src) const
+  void
+  PreconditionBase::Tvmult (dealii::Vector<double>       &dst,
+                            const dealii::Vector<double> &src) const
   {
     AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.size()),
                      preconditioner->OperatorDomainMap().NumMyElements());

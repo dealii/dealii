@@ -118,7 +118,8 @@ public:
    * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
@@ -267,7 +268,8 @@ public:
    * of the element), as it has no hanging nodes (being a discontinuous
    * element).
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -290,8 +292,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
@@ -320,7 +323,8 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -344,7 +348,8 @@ private:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
   /**
    * Compute renumbering for rotation of degrees of freedom.
@@ -362,8 +367,9 @@ private:
    * Since rotation around the y-axis is not used, it is not implemented
    * either.
    */
-  void rotate_indices (std::vector<unsigned int> &indices,
-                       const char                 direction) const;
+  void
+  rotate_indices (std::vector<unsigned int> &indices,
+                  const char                 direction) const;
 
   /*
    * Mutex for protecting initialization of restriction and embedding matrix.
@@ -416,7 +422,8 @@ public:
    * returns <tt>FE_DGQArbitraryNodes<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -470,7 +477,8 @@ public:
    * <tt>degree</tt> replaced by the values given by the template parameter
    * and the argument passed to the constructor, respectively.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -512,7 +520,8 @@ public:
    * <tt>degree</tt> replaced by the values given by the template parameter
    * and the argument passed to the constructor, respectively.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >

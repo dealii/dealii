@@ -61,7 +61,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void Triangulation<dim,spacedim>::partition()
+    void
+    Triangulation<dim,spacedim>::partition()
     {
 #ifdef DEBUG
       // Check that all meshes are the same (or at least have the same

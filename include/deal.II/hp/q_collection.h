@@ -58,7 +58,8 @@ namespace hp
      * push_back(), if desired, though it would probably be clearer to add all
      * mappings the same way.
      */
-    explicit QCollection (const Quadrature<dim> &quadrature);
+    explicit
+    QCollection (const Quadrature<dim> &quadrature);
 
     /**
      * Adds a new quadrature rule to the QCollection. In most cases, you will
@@ -84,7 +85,8 @@ namespace hp
      * is later destroyed by this object upon destruction of the entire
      * collection.
      */
-    void push_back (const Quadrature<dim> &new_quadrature);
+    void
+    push_back (const Quadrature<dim> &new_quadrature);
 
     /**
      * Return a reference to the quadrature rule specified by the argument.
@@ -98,7 +100,8 @@ namespace hp
     /**
      * Return the number of quadrature pointers stored in this object.
      */
-    unsigned int size () const;
+    unsigned int
+    size () const;
 
     /**
      * Return the maximum number of quadrature points over all the elements of
@@ -106,13 +109,15 @@ namespace hp
      * the maximum amount of memory that may be used when re-sizing later on
      * to a articular quadrature formula from within this collection.
      */
-    unsigned int max_n_quadrature_points () const;
+    unsigned int
+    max_n_quadrature_points () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     /**
      * Exception

@@ -1606,7 +1606,8 @@ namespace internal
   {
     namespace
     {
-      bool uses_both_endpoints(const Quadrature<1> &base_quadrature)
+      bool
+      uses_both_endpoints(const Quadrature<1> &base_quadrature)
       {
         bool at_left = false,
              at_right = false;

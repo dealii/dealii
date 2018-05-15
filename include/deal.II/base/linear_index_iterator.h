@@ -176,42 +176,50 @@ public:
   /**
    * Prefix increment.
    */
-  DerivedIterator &operator ++ ();
+  DerivedIterator &
+  operator ++ ();
 
   /**
    * Postfix increment.
    */
-  DerivedIterator operator ++ (int);
+  DerivedIterator
+  operator ++ (int);
 
   /**
    * Prefix decrement.
    */
-  DerivedIterator &operator -- ();
+  DerivedIterator &
+  operator -- ();
 
   /**
    * Postfix decrement.
    */
-  DerivedIterator operator -- (int);
+  DerivedIterator
+  operator -- (int);
 
   /**
    * Return an iterator that is @p n entries ahead of the current one.
    */
-  DerivedIterator operator + (const difference_type n) const;
+  DerivedIterator
+  operator + (const difference_type n) const;
 
   /**
    * Return an iterator that is @p n entries behind the current one.
    */
-  DerivedIterator operator - (const difference_type n) const;
+  DerivedIterator
+  operator - (const difference_type n) const;
 
   /**
    * Increment the iterator position by @p n.
    */
-  DerivedIterator &operator += (const difference_type n);
+  DerivedIterator &
+  operator += (const difference_type n);
 
   /**
    * Decrement the iterator position by @p n.
    */
-  DerivedIterator &operator -= (const difference_type n);
+  DerivedIterator &
+  operator -= (const difference_type n);
 
   /**
    * Return the distance between the current iterator and the argument. The
@@ -219,28 +227,33 @@ public:
    * current iterator to get the argument (for a positive return value), or
    * operator--() (for a negative return value).
    */
-  difference_type operator - (const DerivedIterator &p) const;
+  difference_type
+  operator - (const DerivedIterator &p) const;
 
   /**
    * Dereferencing operator.
    */
-  reference operator * () const;
+  reference
+  operator * () const;
 
   /**
    * Dereferencing operator.
    */
-  pointer operator -> () const;
+  pointer
+  operator -> () const;
 
   /**
    * Comparison operator. Returns <code>true</code> if both iterators point to
    * the same entry in the same container.
    */
-  bool operator == (const DerivedIterator &) const;
+  bool
+  operator == (const DerivedIterator &) const;
 
   /**
    * Inverse of operator==().
    */
-  bool operator != (const DerivedIterator &) const;
+  bool
+  operator != (const DerivedIterator &) const;
 
   /**
    * Comparison operator: uses the same ordering as operator<(), but also
@@ -249,7 +262,8 @@ public:
    * This function is only valid if both iterators point into the same
    * container.
    */
-  bool operator <= (const DerivedIterator &) const;
+  bool
+  operator <= (const DerivedIterator &) const;
 
   /**
    * Comparison operator: uses the same ordering as operator>(), but also
@@ -258,7 +272,8 @@ public:
    * This function is only valid if both iterators point into the same
    * container.
    */
-  bool operator >= (const DerivedIterator &) const;
+  bool
+  operator >= (const DerivedIterator &) const;
 
   /**
    * Comparison operator. Result is true if either the first row number is
@@ -267,13 +282,15 @@ public:
    * This function is only valid if both iterators point into the same
    * container.
    */
-  bool operator < (const DerivedIterator &) const;
+  bool
+  operator < (const DerivedIterator &) const;
 
   /**
    * Comparison operator. Works in the same way as operator<(), just the other
    * way round.
    */
-  bool operator > (const DerivedIterator &) const;
+  bool
+  operator > (const DerivedIterator &) const;
 
 protected:
   /**

@@ -60,7 +60,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 
 protected:
@@ -75,8 +76,9 @@ protected:
    * re-ordering and grouping of components.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof);
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &dof,
+                  const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Flag of selected components.
@@ -186,7 +188,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferSelect () override = default;
+  virtual
+  ~MGTransferSelect () override = default;
 
 //TODO: rewrite docs; make sure defaulted args are actually allowed
   /**
@@ -215,31 +218,35 @@ public:
    * @arg boundary_indices: holds the boundary indices on each level.
    */
   template <int dim, int spacedim>
-  void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const DoFHandler<dim,spacedim> &mg_dof,
-                       unsigned int selected,
-                       unsigned int mg_selected,
-                       const std::vector<unsigned int> &target_component
-                       = std::vector<unsigned int>(),
-                       const std::vector<unsigned int> &mg_target_component
-                       = std::vector<unsigned int>(),
-                       const std::vector<std::set<types::global_dof_index> > &boundary_indices
-                       = std::vector<std::set<types::global_dof_index> >()
-                      );
+  void
+  build_matrices (const DoFHandler<dim,spacedim> &dof,
+                  const DoFHandler<dim,spacedim> &mg_dof,
+                  unsigned int selected,
+                  unsigned int mg_selected,
+                  const std::vector<unsigned int> &target_component
+                  = std::vector<unsigned int>(),
+                  const std::vector<unsigned int> &mg_target_component
+                  = std::vector<unsigned int>(),
+                  const std::vector<std::set<types::global_dof_index> > &boundary_indices
+                  = std::vector<std::set<types::global_dof_index> >()
+                 );
 
   /**
    * Change selected component. Handle with care!
    */
-  void select (const unsigned int component,
-               const unsigned int mg_component = numbers::invalid_unsigned_int);
+  void
+  select (const unsigned int component,
+          const unsigned int mg_component = numbers::invalid_unsigned_int);
 
-  virtual void prolongate (const unsigned int    to_level,
-                           Vector<number>       &dst,
-                           const Vector<number> &src) const override;
+  virtual void
+  prolongate (const unsigned int    to_level,
+              Vector<number>       &dst,
+              const Vector<number> &src) const override;
 
-  virtual void restrict_and_add (const unsigned int    from_level,
-                                 Vector<number>       &dst,
-                                 const Vector<number> &src) const override;
+  virtual void
+  restrict_and_add (const unsigned int    from_level,
+                    Vector<number>       &dst,
+                    const Vector<number> &src) const override;
 
   /**
    * Transfer from a vector on the global grid to a multilevel vector for the
@@ -314,7 +321,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**

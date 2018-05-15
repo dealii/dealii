@@ -114,30 +114,34 @@ public:
    * return.
    */
   template <typename number2>
-  double least_squares (Vector<number2> &dst,
-                        const Vector<number2> &src) const;
+  double
+  least_squares (Vector<number2> &dst,
+                 const Vector<number2> &src) const;
 
   /**
    * This function does the same as the previous one, but for BlockVectors.
    */
   template <typename number2>
-  double least_squares (BlockVector<number2> &dst,
-                        const BlockVector<number2> &src) const;
+  double
+  least_squares (BlockVector<number2> &dst,
+                 const BlockVector<number2> &src) const;
 
   /**
    * A wrapper to least_squares(), implementing the standard MatrixType
    * interface.
    */
   template <class VectorType>
-  void vmult (VectorType &dst,
-              const VectorType &src) const;
+  void
+  vmult (VectorType &dst,
+         const VectorType &src) const;
 
   /**
    * A wrapper to least_squares() that implements multiplication with
    * the transpose matrix.
    */
   template <class VectorType>
-  void Tvmult (VectorType &dst, const VectorType &src) const;
+  void
+  Tvmult (VectorType &dst, const VectorType &src) const;
 
 
 private:

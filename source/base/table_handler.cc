@@ -31,7 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 // inline and template functions
 namespace internal
 {
-  double TableEntry::get_numeric_value () const
+  double
+  TableEntry::get_numeric_value () const
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
@@ -77,7 +78,8 @@ namespace internal
     return 0;
   }
 
-  void TableEntry::cache_string(bool scientific, unsigned int precision) const
+  void
+  TableEntry::cache_string(bool scientific, unsigned int precision) const
   {
     std::ostringstream ss;
 
@@ -95,7 +97,8 @@ namespace internal
       cached_value = "\"\"";
   }
 
-  const std::string &TableEntry::get_cached_string() const
+  const std::string &
+  TableEntry::get_cached_string() const
   {
     return cached_value;
   }
@@ -108,14 +111,16 @@ namespace internal
     struct GetDefaultValue : public boost::static_visitor<>
     {
       template <typename T>
-      void operator()( T &operand ) const
+      void
+      operator()( T &operand ) const
       {
         operand = T();
       }
     };
   }
 
-  TableEntry TableEntry::get_default_constructed_copy () const
+  TableEntry
+  TableEntry::get_default_constructed_copy () const
   {
     TableEntry new_entry = *this;
     boost::apply_visitor(Local::GetDefaultValue(), new_entry.value);
@@ -193,7 +198,8 @@ TableHandler::TableHandler()
 
 
 
-void TableHandler::declare_column (const std::string &key)
+void
+TableHandler::declare_column (const std::string &key)
 {
   // see if the column already exists; insert it if not
   Assert (columns.find(key) == columns.end(),
@@ -206,7 +212,8 @@ void TableHandler::declare_column (const std::string &key)
 
 
 
-void TableHandler::start_new_row ()
+void
+TableHandler::start_new_row ()
 {
   // figure out the longest current column
   unsigned int max_col_length = 0;
@@ -236,8 +243,9 @@ TableHandler::set_auto_fill_mode (const bool state)
 }
 
 
-void TableHandler::add_column_to_supercolumn (const std::string &key,
-                                              const std::string &superkey)
+void
+TableHandler::add_column_to_supercolumn (const std::string &key,
+                                         const std::string &superkey)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
 
@@ -282,7 +290,8 @@ void TableHandler::add_column_to_supercolumn (const std::string &key,
 
 
 
-void TableHandler::set_column_order (const std::vector<std::string> &new_order)
+void
+TableHandler::set_column_order (const std::vector<std::string> &new_order)
 {
   for (unsigned int j=0; j<new_order.size(); ++j)
     Assert(supercolumns.count(new_order[j]) || columns.count(new_order[j]),
@@ -292,8 +301,9 @@ void TableHandler::set_column_order (const std::vector<std::string> &new_order)
 }
 
 
-void TableHandler::set_tex_caption (const std::string &key,
-                                    const std::string &tex_caption)
+void
+TableHandler::set_tex_caption (const std::string &key,
+                               const std::string &tex_caption)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].tex_caption=tex_caption;
@@ -301,22 +311,25 @@ void TableHandler::set_tex_caption (const std::string &key,
 
 
 
-void TableHandler::set_tex_table_caption (const std::string &table_caption)
+void
+TableHandler::set_tex_table_caption (const std::string &table_caption)
 {
   tex_table_caption=table_caption;
 }
 
 
 
-void TableHandler::set_tex_table_label (const std::string &table_label)
+void
+TableHandler::set_tex_table_label (const std::string &table_label)
 {
   tex_table_label=table_label;
 }
 
 
 
-void TableHandler::set_tex_supercaption (const std::string &superkey,
-                                         const std::string &tex_supercaption)
+void
+TableHandler::set_tex_supercaption (const std::string &superkey,
+                                    const std::string &tex_supercaption)
 {
   Assert(supercolumns.count(superkey), ExcSuperColumnNotExistent(superkey));
   Assert(tex_supercaptions.count(superkey), ExcInternalError());
@@ -325,8 +338,9 @@ void TableHandler::set_tex_supercaption (const std::string &superkey,
 
 
 
-void TableHandler::set_tex_format (const std::string &key,
-                                   const std::string &tex_format)
+void
+TableHandler::set_tex_format (const std::string &key,
+                              const std::string &tex_format)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   Assert(tex_format=="l" || tex_format=="c" || tex_format=="r",
@@ -336,8 +350,9 @@ void TableHandler::set_tex_format (const std::string &key,
 
 
 
-void TableHandler::set_precision (const std::string &key,
-                                  const unsigned int precision)
+void
+TableHandler::set_precision (const std::string &key,
+                             const unsigned int precision)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   if (columns[key].precision!=precision)
@@ -348,8 +363,9 @@ void TableHandler::set_precision (const std::string &key,
 }
 
 
-void TableHandler::set_scientific (const std::string &key,
-                                   const bool scientific)
+void
+TableHandler::set_scientific (const std::string &key,
+                              const bool scientific)
 {
   Assert(columns.count(key), ExcColumnNotExistent(key));
   if (columns[key].scientific!=scientific)
@@ -360,8 +376,9 @@ void TableHandler::set_scientific (const std::string &key,
 }
 
 
-void TableHandler::write_text(std::ostream &out,
-                              const TextOutputFormat format) const
+void
+TableHandler::write_text(std::ostream &out,
+                         const TextOutputFormat format) const
 {
   AssertThrow (out, ExcIO());
   boost::io::ios_flags_saver restore_flags(out);
@@ -574,7 +591,8 @@ void TableHandler::write_text(std::ostream &out,
 }
 
 
-void TableHandler::write_tex (std::ostream &out, const bool with_header) const
+void
+TableHandler::write_tex (std::ostream &out, const bool with_header) const
 {
   //TODO[TH]: update code similar to
   //write_text() to use the cache
@@ -709,7 +727,8 @@ void TableHandler::write_tex (std::ostream &out, const bool with_header) const
 }
 
 
-void TableHandler::clear()
+void
+TableHandler::clear()
 {
 
   columns.clear();
@@ -723,7 +742,8 @@ void TableHandler::clear()
 }
 
 
-unsigned int TableHandler::n_rows() const
+unsigned int
+TableHandler::n_rows() const
 {
   if (columns.size() == 0)
     return 0;
@@ -742,7 +762,8 @@ unsigned int TableHandler::n_rows() const
 }
 
 
-void TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) const
+void
+TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) const
 {
   sel_columns.clear();
 
@@ -773,7 +794,8 @@ void TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) c
 }
 
 
-void TableHandler::clear_current_row ()
+void
+TableHandler::clear_current_row ()
 {
   // Figure out what is the currect (max) length of the columns
   // so that we "shave" one off.

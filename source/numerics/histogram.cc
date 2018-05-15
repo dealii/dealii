@@ -23,8 +23,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
-bool Histogram::logarithmic_less (const number n1,
-                                  const number n2)
+bool
+Histogram::logarithmic_less (const number n1,
+                             const number n2)
 {
   return (((n1<n2) && (n1>0)) ||
           ((n1<n2) && (n2<=0)) ||
@@ -51,10 +52,11 @@ Histogram::Interval::memory_consumption () const
 
 
 template <typename number>
-void Histogram::evaluate (const std::vector<Vector<number> > &values,
-                          const std::vector<double>          &y_values_,
-                          const unsigned int                  n_intervals,
-                          const IntervalSpacing               interval_spacing)
+void
+Histogram::evaluate (const std::vector<Vector<number> > &values,
+                     const std::vector<double>          &y_values_,
+                     const unsigned int                  n_intervals,
+                     const IntervalSpacing               interval_spacing)
 {
   Assert (values.size() > 0,
           ExcMessage("Your input data needs to contain at least one input vector."));
@@ -203,9 +205,10 @@ void Histogram::evaluate (const std::vector<Vector<number> > &values,
 
 
 template <typename number>
-void Histogram::evaluate (const Vector<number>    &values,
-                          const unsigned int       n_intervals,
-                          const IntervalSpacing    interval_spacing)
+void
+Histogram::evaluate (const Vector<number>    &values,
+                     const unsigned int       n_intervals,
+                     const IntervalSpacing    interval_spacing)
 {
   std::vector<Vector<number> > values_list (1,
                                             values);
@@ -214,7 +217,8 @@ void Histogram::evaluate (const Vector<number>    &values,
 
 
 
-void Histogram::write_gnuplot (std::ostream &out) const
+void
+Histogram::write_gnuplot (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
   Assert (!intervals.empty(),
@@ -288,7 +292,8 @@ void Histogram::write_gnuplot (std::ostream &out) const
 
 
 
-std::string Histogram::get_interval_spacing_names ()
+std::string
+Histogram::get_interval_spacing_names ()
 {
   return "linear|logarithmic";
 }
@@ -323,25 +328,29 @@ Histogram::memory_consumption () const
 
 // explicit instantiations for float
 template
-void Histogram::evaluate<float> (const std::vector<Vector<float> > &values,
-                                 const std::vector<double>                  &y_values,
-                                 const unsigned int                          n_intervals,
-                                 const IntervalSpacing                       interval_spacing);
+void Histogram::evaluate<float>
+(const std::vector<Vector<float> > &values,
+ const std::vector<double>                  &y_values,
+ const unsigned int                          n_intervals,
+ const IntervalSpacing                       interval_spacing);
 template
-void Histogram::evaluate<float> (const Vector<float>   &values,
-                                 const unsigned int     n_intervals,
-                                 const IntervalSpacing  interval_spacing);
+void Histogram::evaluate<float>
+(const Vector<float>   &values,
+ const unsigned int     n_intervals,
+ const IntervalSpacing  interval_spacing);
 
 
 // explicit instantiations for double
 template
-void Histogram::evaluate<double> (const std::vector<Vector<double> >  &values,
-                                  const std::vector<double>                    &y_values,
-                                  const unsigned int                            n_intervals,
-                                  const IntervalSpacing                         interval_spacing);
+void Histogram::evaluate<double>
+(const std::vector<Vector<double> >  &values,
+ const std::vector<double>                    &y_values,
+ const unsigned int                            n_intervals,
+ const IntervalSpacing                         interval_spacing);
 template
-void Histogram::evaluate<double> (const Vector<double>   &values,
-                                  const unsigned int      n_intervals,
-                                  const IntervalSpacing   interval_spacing);
+void Histogram::evaluate<double>
+(const Vector<double>   &values,
+ const unsigned int      n_intervals,
+ const IntervalSpacing   interval_spacing);
 
 DEAL_II_NAMESPACE_CLOSE

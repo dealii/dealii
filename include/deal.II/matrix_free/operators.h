@@ -203,13 +203,15 @@ namespace MatrixFreeOperators
     /**
      * Virtual destructor.
      */
-    virtual ~Base() override = default;
+    virtual
+    ~Base() override = default;
 
     /**
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
-    virtual void clear();
+    virtual void
+    clear();
 
     /**
      * Initialize operator on fine scale.
@@ -227,9 +229,10 @@ namespace MatrixFreeOperators
      * column selection vector is empty, it is taken the same as the row
      * selection, defining a diagonal block.
      */
-    void initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
-                     const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>(),
-                     const std::vector<unsigned int> &selected_column_blocks = std::vector<unsigned int>());
+    void
+    initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
+                const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>(),
+                const std::vector<unsigned int> &selected_column_blocks = std::vector<unsigned int>());
 
     /**
      * Initialize operator on a level @p level for a single FiniteElement.
@@ -244,10 +247,11 @@ namespace MatrixFreeOperators
      * columns is used as opposed to the non-level initialization function. If
      * empty, all components are selected.
      */
-    void initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
-                     const MGConstrainedDoFs &mg_constrained_dofs,
-                     const unsigned int level,
-                     const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
+    void
+    initialize (std::shared_ptr<const MatrixFree<dim,value_type> > data,
+                const MGConstrainedDoFs &mg_constrained_dofs,
+                const unsigned int level,
+                const std::vector<unsigned int> &selected_row_blocks = std::vector<unsigned int>());
 
     /**
      * Initialize operator on a level @p level for multiple FiniteElement
@@ -272,65 +276,76 @@ namespace MatrixFreeOperators
     /**
      * Return the dimension of the codomain (or range) space.
      */
-    size_type m () const;
+    size_type
+    m () const;
 
     /**
      * Return the dimension of the domain space.
      */
-    size_type n () const;
+    size_type
+    n () const;
 
     /**
      * vmult operator for interface.
      */
-    void vmult_interface_down(VectorType &dst,
-                              const VectorType &src) const;
+    void
+    vmult_interface_down(VectorType &dst,
+                         const VectorType &src) const;
 
     /**
      * vmult operator for interface.
      */
-    void vmult_interface_up(VectorType &dst,
-                            const VectorType &src) const;
+    void
+    vmult_interface_up(VectorType &dst,
+                       const VectorType &src) const;
 
     /**
      * Matrix-vector multiplication.
      */
-    void vmult (VectorType &dst,
-                const VectorType &src) const;
+    void
+    vmult (VectorType &dst,
+           const VectorType &src) const;
 
     /**
      * Transpose matrix-vector multiplication.
      */
-    void Tvmult (VectorType &dst,
-                 const VectorType &src) const;
+    void
+    Tvmult (VectorType &dst,
+            const VectorType &src) const;
 
     /**
      * Adding Matrix-vector multiplication.
      */
-    void vmult_add (VectorType &dst,
-                    const VectorType &src) const;
+    void
+    vmult_add (VectorType &dst,
+               const VectorType &src) const;
 
     /**
      * Adding transpose matrix-vector multiplication.
      */
-    void Tvmult_add (VectorType &dst,
-                     const VectorType &src) const;
+    void
+    Tvmult_add (VectorType &dst,
+                const VectorType &src) const;
 
     /**
      * Return the value of the matrix entry (row,col). In matrix-free context
      * this function is valid only for row==col when diagonal is initialized.
      */
-    value_type el (const unsigned int row,
-                   const unsigned int col) const;
+    value_type
+    el (const unsigned int row,
+        const unsigned int col) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this object.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t
+    memory_consumption () const;
 
     /**
      * A wrapper for initialize_dof_vector() of MatrixFree object.
      */
-    void initialize_dof_vector (VectorType &vec) const;
+    void
+    initialize_dof_vector (VectorType &vec) const;
 
     /**
      * Compute diagonal of this operator.
@@ -338,7 +353,8 @@ namespace MatrixFreeOperators
      * A derived class needs to implement this function and resize and fill
      * the protected member inverse_diagonal_entries and/or diagonal_entries accordingly.
      */
-    virtual void compute_diagonal () = 0;
+    virtual void
+    compute_diagonal () = 0;
 
     /**
      * Get read access to the MatrixFree object stored with this operator.
@@ -364,9 +380,10 @@ namespace MatrixFreeOperators
      * <tt>src</tt> vector by the inverse of the respective diagonal element and
      * multiplies the result with the relaxation factor <tt>omega</tt>.
      */
-    void precondition_Jacobi(VectorType &dst,
-                             const VectorType &src,
-                             const value_type omega) const;
+    void
+    precondition_Jacobi(VectorType &dst,
+                        const VectorType &src,
+                        const value_type omega) const;
 
   protected:
 
@@ -374,33 +391,38 @@ namespace MatrixFreeOperators
      * Perform necessary operations related to constraints before calling
      * apply_add() or Tapply_add() inside mult_add().
      */
-    void preprocess_constraints(VectorType &dst, const VectorType &src) const;
+    void
+    preprocess_constraints(VectorType &dst, const VectorType &src) const;
 
     /**
      * Perform necessary operations related to constraints after calling
      * apply_add() or Tapply_add() inside mult_add().
      */
-    void postprocess_constraints(VectorType &dst, const VectorType &src) const;
+    void
+    postprocess_constraints(VectorType &dst, const VectorType &src) const;
 
     /**
      * Set constrained entries (both from hanging nodes and edge constraints)
      * of @p dst to one.
      */
-    void set_constrained_entries_to_one (VectorType &dst) const;
+    void
+    set_constrained_entries_to_one (VectorType &dst) const;
 
     /**
      * Apply operator to @p src and add result in @p dst.
      */
-    virtual void apply_add(VectorType &dst,
-                           const VectorType &src) const = 0;
+    virtual void
+    apply_add(VectorType &dst,
+              const VectorType &src) const = 0;
 
     /**
      * Apply transpose operator to @p src and add result in @p dst.
      *
      * Default implementation is to call apply_add().
      */
-    virtual void Tapply_add(VectorType &dst,
-                            const VectorType &src) const;
+    virtual void
+    Tapply_add(VectorType &dst,
+               const VectorType &src) const;
 
     /**
      * MatrixFree object to be used with this operator.
@@ -454,9 +476,10 @@ namespace MatrixFreeOperators
      * Function which implements vmult_add (@p transpose = false) and
      * Tvmult_add (@p transpose = true).
      */
-    void mult_add (VectorType &dst,
-                   const VectorType &src,
-                   const bool transpose) const;
+    void
+    mult_add (VectorType &dst,
+              const VectorType &src,
+              const bool transpose) const;
 
     /**
      * Adjust the ghost range of the vectors to the storage requirements of
@@ -465,8 +488,9 @@ namespace MatrixFreeOperators
      * order to ensure that the cell loops will be able to access the ghost
      * indices with the correct local indices.
      */
-    void adjust_ghost_range_if_necessary(const VectorType &vec,
-                                         const bool        is_row) const;
+    void
+    adjust_ghost_range_if_necessary(const VectorType &vec,
+                                    const bool        is_row) const;
   };
 
 
@@ -529,32 +553,37 @@ namespace MatrixFreeOperators
     /**
      * Clear the pointer to the OperatorType object.
      */
-    void clear();
+    void
+    clear();
 
     /**
      * Initialize this class with an operator @p operator_in.
      */
-    void initialize (const OperatorType &operator_in);
+    void
+    initialize (const OperatorType &operator_in);
 
     /**
      * vmult operator, see class description for more info.
      */
     template <typename VectorType>
-    void vmult (VectorType &dst,
-                const VectorType &src) const;
+    void
+    vmult (VectorType &dst,
+           const VectorType &src) const;
 
     /**
      * Tvmult operator, see class description for more info.
      */
     template <typename VectorType>
-    void Tvmult (VectorType &dst,
-                 const VectorType &src) const;
+    void
+    Tvmult (VectorType &dst,
+            const VectorType &src) const;
 
     /**
      * A wrapper for initialize_dof_vector() of OperatorType object.
      */
     template <typename VectorType>
-    void initialize_dof_vector (VectorType &vec) const;
+    void
+    initialize_dof_vector (VectorType &vec) const;
 
 
   private:
@@ -603,17 +632,19 @@ namespace MatrixFreeOperators
      * passed as first argument. Passing more than one component in the
      * coefficient is allowed.
      */
-    void apply(const AlignedVector<VectorizedArray<Number> > &inverse_coefficient,
-               const unsigned int             n_actual_components,
-               const VectorizedArray<Number> *in_array,
-               VectorizedArray<Number>       *out_array) const;
+    void
+    apply(const AlignedVector<VectorizedArray<Number> > &inverse_coefficient,
+          const unsigned int             n_actual_components,
+          const VectorizedArray<Number> *in_array,
+          VectorizedArray<Number>       *out_array) const;
 
     /**
      * Fills the given array with the inverse of the JxW values, i.e., a mass
      * matrix with coefficient 1. Non-unit coefficients must be multiplied (in
      * inverse form) to this array.
      */
-    void fill_inverse_JxW_values(AlignedVector<VectorizedArray<Number> > &inverse_jxw) const;
+    void
+    fill_inverse_JxW_values(AlignedVector<VectorizedArray<Number> > &inverse_jxw) const;
 
   private:
     /**
@@ -660,7 +691,8 @@ namespace MatrixFreeOperators
     /**
      * For preconditioning, we store a lumped mass matrix at the diagonal entries.
      */
-    virtual void compute_diagonal () override;
+    virtual void
+    compute_diagonal () override;
 
   private:
     /**
@@ -668,16 +700,18 @@ namespace MatrixFreeOperators
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
-    virtual void apply_add (VectorType       &dst,
-                            const VectorType &src) const override;
+    virtual void
+    apply_add (VectorType       &dst,
+               const VectorType &src) const override;
 
     /**
      * For this operator, there is just a cell contribution.
      */
-    void local_apply_cell (const MatrixFree<dim,value_type>            &data,
-                           VectorType                                  &dst,
-                           const VectorType                            &src,
-                           const std::pair<unsigned int,unsigned int>  &cell_range) const;
+    void
+    local_apply_cell (const MatrixFree<dim,value_type>            &data,
+                      VectorType                                  &dst,
+                      const VectorType                            &src,
+                      const std::pair<unsigned int,unsigned int>  &cell_range) const;
   };
 
 
@@ -718,7 +752,8 @@ namespace MatrixFreeOperators
      * on element with hanging nodes but is still an acceptable approximation
      * to be used in preconditioners.
      */
-    virtual void compute_diagonal ();
+    virtual void
+    compute_diagonal ();
 
     /**
      * Set the heterogeneous scalar coefficient @p scalar_coefficient to be used at
@@ -763,9 +798,11 @@ namespace MatrixFreeOperators
      * of scope in user code and the clear() command or destructor of this class
      * will delete the table.
      */
-    void set_coefficient(const std::shared_ptr<Table<2, VectorizedArray<value_type> > > &scalar_coefficient );
+    void
+    set_coefficient(const std::shared_ptr<Table<2, VectorizedArray<value_type> > > &scalar_coefficient );
 
-    virtual void clear();
+    virtual void
+    clear();
 
     /**
      * Read/Write access to coefficients to be used in Laplace operator.
@@ -773,7 +810,8 @@ namespace MatrixFreeOperators
      * The function will throw an error if coefficients are not previously set
      * by set_coefficient() function.
      */
-    std::shared_ptr< Table<2, VectorizedArray<value_type> > > get_coefficient();
+    std::shared_ptr< Table<2, VectorizedArray<value_type> > >
+    get_coefficient();
 
   private:
     /**
@@ -781,30 +819,34 @@ namespace MatrixFreeOperators
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
-    virtual void apply_add (VectorType       &dst,
-                            const VectorType &src) const;
+    virtual void
+    apply_add (VectorType       &dst,
+               const VectorType &src) const;
 
     /**
      * Applies the Laplace operator on a cell.
      */
-    void local_apply_cell (const MatrixFree<dim,value_type>            &data,
-                           VectorType                                  &dst,
-                           const VectorType                            &src,
-                           const std::pair<unsigned int,unsigned int>  &cell_range) const;
+    void
+    local_apply_cell (const MatrixFree<dim,value_type>            &data,
+                      VectorType                                  &dst,
+                      const VectorType                            &src,
+                      const std::pair<unsigned int,unsigned int>  &cell_range) const;
 
     /**
      * Apply diagonal part of the Laplace operator on a cell.
      */
-    void local_diagonal_cell (const MatrixFree<dim,value_type>            &data,
-                              VectorType                                  &dst,
-                              const unsigned int &,
-                              const std::pair<unsigned int,unsigned int>  &cell_range) const;
+    void
+    local_diagonal_cell (const MatrixFree<dim,value_type>            &data,
+                         VectorType                                  &dst,
+                         const unsigned int &,
+                         const std::pair<unsigned int,unsigned int>  &cell_range) const;
 
     /**
      * Apply Laplace operator on a cell @p cell.
      */
-    void do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,value_type> &phi,
-                              const unsigned int cell) const;
+    void
+    do_operation_on_cell(FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,value_type> &phi,
+                         const unsigned int cell) const;
 
     /**
      * User-provided heterogeneity coefficient.
@@ -819,7 +861,8 @@ namespace MatrixFreeOperators
   template <int dim, int fe_degree, int n_components, typename Number>
   inline
   CellwiseInverseMassMatrix<dim,fe_degree,n_components,Number>
-  ::CellwiseInverseMassMatrix (const FEEvaluationBase<dim,n_components,Number> &fe_eval)
+  ::
+  CellwiseInverseMassMatrix (const FEEvaluationBase<dim,n_components,Number> &fe_eval)
     :
     fe_eval (fe_eval)
   {
@@ -849,7 +892,8 @@ namespace MatrixFreeOperators
   inline
   void
   CellwiseInverseMassMatrix<dim,fe_degree,n_components,Number>
-  ::fill_inverse_JxW_values(AlignedVector<VectorizedArray<Number> > &inverse_jxw) const
+  ::
+  fill_inverse_JxW_values(AlignedVector<VectorizedArray<Number> > &inverse_jxw) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     Assert(inverse_jxw.size() > 0 &&
@@ -878,10 +922,11 @@ namespace MatrixFreeOperators
   inline
   void
   CellwiseInverseMassMatrix<dim,fe_degree,n_components,Number>
-  ::apply(const AlignedVector<VectorizedArray<Number> > &inverse_coefficients,
-          const unsigned int             n_actual_components,
-          const VectorizedArray<Number> *in_array,
-          VectorizedArray<Number>       *out_array) const
+  ::
+  apply(const AlignedVector<VectorizedArray<Number> > &inverse_coefficients,
+        const unsigned int             n_actual_components,
+        const VectorizedArray<Number> *in_array,
+        VectorizedArray<Number>       *out_array) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     Assert(inverse_coefficients.size() > 0 &&

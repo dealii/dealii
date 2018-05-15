@@ -43,13 +43,15 @@ namespace internal
     namespace
     {
       template <typename Number>
-      Number get_first_array_element(const Number a)
+      Number
+      get_first_array_element(const Number a)
       {
         return a;
       }
 
       template <typename Number>
-      Number get_first_array_element(const VectorizedArray<Number> a)
+      Number
+      get_first_array_element(const VectorizedArray<Number> a)
       {
         return a[0];
       }

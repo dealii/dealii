@@ -176,8 +176,9 @@ public:
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<dimension> &mapping,
-                              const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches (const Mapping<dimension> &mapping,
+                 const unsigned int n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -197,7 +198,8 @@ public:
    *
    * For more general sets, overload this function in a derived class.
    */
-  virtual FaceDescriptor first_face ();
+  virtual FaceDescriptor
+  first_face ();
 
   /**
    * Return the next face after which we want output for. If there are no more
@@ -215,7 +217,8 @@ public:
    * is also used from the default implementation. Overloading only one of the
    * two functions should be done with care.
    */
-  virtual FaceDescriptor next_face (const FaceDescriptor &face);
+  virtual FaceDescriptor
+  next_face (const FaceDescriptor &face);
 
 private:
   /**
@@ -226,9 +229,10 @@ private:
   /**
    * Build one patch. This function is called in a WorkStream context.
    */
-  void build_one_patch (const FaceDescriptor *cell_and_face,
-                        internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
-                        DataOutBase::Patch<dimension-1,space_dimension> &patch);
+  void
+  build_one_patch (const FaceDescriptor *cell_and_face,
+                   internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
+                   DataOutBase::Patch<dimension-1,space_dimension> &patch);
 };
 
 

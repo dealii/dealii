@@ -656,8 +656,9 @@ namespace Physics
         template<>
         inline
         std::pair<unsigned int, unsigned int>
-        indices_from_component<1> (const unsigned int component_n,
-                                   const bool)
+        indices_from_component<1>
+        (const unsigned int component_n,
+         const bool)
         {
           Assert(component_n < 1, ExcIndexRange(component_n,0,1));
 
@@ -668,8 +669,9 @@ namespace Physics
         template<>
         inline
         std::pair<unsigned int, unsigned int>
-        indices_from_component<2> (const unsigned int component_n,
-                                   const bool         symmetric)
+        indices_from_component<2>
+        (const unsigned int component_n,
+         const bool         symmetric)
         {
           if (symmetric == true)
             {
@@ -694,8 +696,9 @@ namespace Physics
         template<>
         inline
         std::pair<unsigned int, unsigned int>
-        indices_from_component<3> (const unsigned int component_n,
-                                   const bool         symmetric)
+        indices_from_component<3>
+        (const unsigned int component_n,
+         const bool         symmetric)
         {
           if (symmetric == true)
             {

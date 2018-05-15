@@ -139,7 +139,8 @@ public:
    * @note The row and column block structure of the sparsity pattern must be
    * equal.
    */
-  void reinit(const BlockSparsityPattern &sparsity);
+  void
+  reinit(const BlockSparsityPattern &sparsity);
 
   operator MatrixType &();
   operator const MatrixType &() const;
@@ -148,9 +149,10 @@ public:
    * Add <tt>value</tt> to the element (<i>i,j</i>). Throws an error if the
    * entry does not exist or if it is in a different block.
    */
-  void add (const size_type                       i,
-            const size_type                       j,
-            const typename MatrixType::value_type value);
+  void
+  add (const size_type                       i,
+       const size_type                       j,
+       const typename MatrixType::value_type value);
 
   /**
    * Add all elements in a FullMatrix into sparse matrix locations given by
@@ -168,9 +170,10 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const std::vector<size_type> &indices,
-            const FullMatrix<number>     &full_matrix,
-            const bool                    elide_zero_values = true);
+  void
+  add (const std::vector<size_type> &indices,
+       const FullMatrix<number>     &full_matrix,
+       const bool                    elide_zero_values = true);
 
   /**
    * Add all elements in a FullMatrix into global locations given by
@@ -187,10 +190,11 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const std::vector<size_type> &row_indices,
-            const std::vector<size_type> &col_indices,
-            const FullMatrix<number>        &full_matrix,
-            const bool                       elide_zero_values = true);
+  void
+  add (const std::vector<size_type> &row_indices,
+       const std::vector<size_type> &col_indices,
+       const FullMatrix<number>        &full_matrix,
+       const bool                       elide_zero_values = true);
 
   /**
    * Set several elements in the specified row of the matrix with column
@@ -209,10 +213,11 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const size_type               row_index,
-            const std::vector<size_type> &col_indices,
-            const std::vector<number>    &values,
-            const bool                    elide_zero_values = true);
+  void
+  add (const size_type               row_index,
+       const std::vector<size_type> &col_indices,
+       const std::vector<number>    &values,
+       const bool                    elide_zero_values = true);
 
   /**
    * Add an array of values given by <tt>values</tt> in the given global
@@ -224,12 +229,13 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const size_type  row,
-            const size_type  n_cols,
-            const size_type *col_indices,
-            const number    *values,
-            const bool       elide_zero_values = true,
-            const bool       col_indices_are_sorted = false);
+  void
+  add (const size_type  row,
+       const size_type  n_cols,
+       const size_type *col_indices,
+       const number    *values,
+       const bool       elide_zero_values = true,
+       const bool       col_indices_are_sorted = false);
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in
@@ -237,7 +243,8 @@ public:
    * have sizes matching #matrix.
    */
   template <class VectorType>
-  void vmult (VectorType &w, const VectorType &v) const;
+  void
+  vmult (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in
@@ -245,7 +252,8 @@ public:
    * have sizes matching #matrix.
    */
   template <class VectorType>
-  void vmult_add (VectorType &w, const VectorType &v) const;
+  void
+  vmult_add (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in
@@ -253,7 +261,8 @@ public:
    * have sizes matching #matrix.
    */
   template <class VectorType>
-  void Tvmult (VectorType &w, const VectorType &v) const;
+  void
+  Tvmult (VectorType &w, const VectorType &v) const;
 
   /**
    * Matrix-vector-multiplication, forwarding to the same function in
@@ -261,12 +270,14 @@ public:
    * have sizes matching #matrix.
    */
   template <class VectorType>
-  void Tvmult_add (VectorType &w, const VectorType &v) const;
+  void
+  Tvmult_add (VectorType &w, const VectorType &v) const;
 
   /**
    * The memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * The block number computed from an index by using BlockIndices does not
@@ -306,13 +317,15 @@ private:
 
   template <class OTHER_MatrixType>
   friend
-  void dealii::internal::reinit(MatrixBlock<OTHER_MatrixType> &,
-                                const BlockSparsityPattern &);
+  void
+  dealii::internal::reinit(MatrixBlock<OTHER_MatrixType> &,
+                           const BlockSparsityPattern &);
 
   template <typename number>
   friend
-  void internal::reinit(MatrixBlock<dealii::SparseMatrix<number> > &v,
-                        const BlockSparsityPattern &p);
+  void
+  internal::reinit(MatrixBlock<dealii::SparseMatrix<number> > &v,
+                   const BlockSparsityPattern &p);
 };
 
 
@@ -351,13 +364,15 @@ public:
    * Add a new matrix block at the position <tt>(row,column)</tt> in the block
    * system.
    */
-  void add(size_type row, size_type column, const std::string &name);
+  void
+  add(size_type row, size_type column, const std::string &name);
 
   /**
    * For matrices using a SparsityPattern, this function reinitializes each
    * matrix in the vector with the correct pattern from the block system.
    */
-  void reinit(const BlockSparsityPattern &sparsity);
+  void
+  reinit(const BlockSparsityPattern &sparsity);
 
   /**
    * Clear the object.
@@ -369,27 +384,32 @@ public:
    * really_clean is @p true, then the object will contain no blocks at the
    * end.
    */
-  void clear (bool really_clean = false);
+  void
+  clear (bool really_clean = false);
 
   /**
    * The memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Access a constant reference to the block at position <i>i</i>.
    */
-  const value_type &block(size_type i) const;
+  const value_type &
+  block(size_type i) const;
 
   /**
    * Access a reference to the block at position <i>i</i>.
    */
-  value_type &block(size_type i);
+  value_type &
+  block(size_type i);
 
   /**
    * Access the matrix at position <i>i</i> for read and write access.
    */
-  MatrixType &matrix(size_type i);
+  MatrixType &
+  matrix(size_type i);
 
   /**
    * import functions from private base class
@@ -439,14 +459,16 @@ public:
   /**
    * The number of blocks.
    */
-  unsigned int size () const;
+  unsigned int
+  size () const;
 
   /**
    * Add a new matrix block at the position <tt>(row,column)</tt> in the block
    * system. The third argument allows to give the matrix a name for later
    * identification.
    */
-  void add(size_type row, size_type column, const std::string &name);
+  void
+  add(size_type row, size_type column, const std::string &name);
 
   /**
    * For matrices using a SparsityPattern, this function reinitializes each
@@ -454,7 +476,8 @@ public:
    *
    * This function reinitializes the level matrices.
    */
-  void reinit_matrix(const MGLevelObject<BlockSparsityPattern> &sparsity);
+  void
+  reinit_matrix(const MGLevelObject<BlockSparsityPattern> &sparsity);
   /**
    * For matrices using a SparsityPattern, this function reinitializes each
    * matrix in the vector with the correct pattern from the block system.
@@ -462,14 +485,16 @@ public:
    * This function reinitializes the matrices for degrees of freedom on the
    * refinement edge.
    */
-  void reinit_edge(const MGLevelObject<BlockSparsityPattern> &sparsity);
+  void
+  reinit_edge(const MGLevelObject<BlockSparsityPattern> &sparsity);
   /**
    * For matrices using a SparsityPattern, this function reinitializes each
    * matrix in the vector with the correct pattern from the block system.
    *
    * This function reinitializes the flux matrices over the refinement edge.
    */
-  void reinit_edge_flux(const MGLevelObject<BlockSparsityPattern> &sparsity);
+  void
+  reinit_edge_flux(const MGLevelObject<BlockSparsityPattern> &sparsity);
 
   /**
    * Clear the object.
@@ -481,69 +506,82 @@ public:
    * really_clean is @p true, then the object will contain no blocks at the
    * end.
    */
-  void clear (bool really_clean = false);
+  void
+  clear (bool really_clean = false);
 
   /**
    * Access a constant reference to the matrix block at position <i>i</i>.
    */
-  const value_type &block(size_type i) const;
+  const value_type &
+  block(size_type i) const;
 
   /**
    * Access a reference to the matrix block at position <i>i</i>.
    */
-  value_type &block(size_type i);
+  value_type &
+  block(size_type i);
 
   /**
    * Access a constant reference to the edge matrix block at position
    * <i>i</i>.
    */
-  const value_type &block_in(size_type i) const;
+  const value_type &
+  block_in(size_type i) const;
 
   /**
    * Access a reference to the edge matrix block at position <i>i</i>.
    */
-  value_type &block_in(size_type i);
+  value_type &
+  block_in(size_type i);
 
   /**
    * Access a constant reference to the edge matrix block at position
    * <i>i</i>.
    */
-  const value_type &block_out(size_type i) const;
+  const value_type &
+  block_out(size_type i) const;
 
   /**
    * Access a reference to the edge matrix block at position <i>i</i>.
    */
-  value_type &block_out(size_type i);
+  value_type &
+  block_out(size_type i);
 
   /**
    * Access a constant reference to the  edge flux matrix block at position
    * <i>i</i>.
    */
-  const value_type &block_up(size_type i) const;
+  const value_type &
+  block_up(size_type i) const;
 
   /**
    * Access a reference to the  edge flux matrix block at position <i>i</i>.
    */
-  value_type &block_up(size_type i);
+  value_type &
+  block_up(size_type i);
 
   /**
    * Access a constant reference to the  edge flux matrix block at position
    * <i>i</i>.
    */
-  const value_type &block_down(size_type i) const;
+  const value_type &
+  block_down(size_type i) const;
 
   /**
    * Access a reference to the edge flux matrix block at position <i>i</i>.
    */
-  value_type &block_down(size_type i);
+  value_type &
+  block_down(size_type i);
 
   /**
    * The memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 private:
   /// Clear one of the matrix objects
-  void clear_object(AnyData &);
+  void
+  clear_object(AnyData &);
 
   /// Flag for storing matrices_in and matrices_out
   const bool edge_matrices;

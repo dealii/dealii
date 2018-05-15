@@ -27,8 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   template <typename Number>
-  void Vector<Number>::reinit(const size_type size,
-                              const bool omit_zeroing_entries)
+  void
+  Vector<Number>::reinit(const size_type size,
+                         const bool omit_zeroing_entries)
   {
     ReadWriteVector<Number>::reinit(size, omit_zeroing_entries);
   }
@@ -37,8 +38,9 @@ namespace LinearAlgebra
 
   template <typename Number>
   template <typename Number2>
-  void Vector<Number>::reinit(const ReadWriteVector<Number2> &in_vector,
-                              const bool                      omit_zeroing_entries)
+  void
+  Vector<Number>::reinit(const ReadWriteVector<Number2> &in_vector,
+                         const bool                      omit_zeroing_entries)
   {
     ReadWriteVector<Number>::reinit(in_vector, omit_zeroing_entries);
   }
@@ -46,8 +48,9 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::reinit(const IndexSet &locally_stored_indices,
-                              const bool      omit_zeroing_entries)
+  void
+  Vector<Number>::reinit(const IndexSet &locally_stored_indices,
+                         const bool      omit_zeroing_entries)
   {
     ReadWriteVector<Number>::reinit(locally_stored_indices, omit_zeroing_entries);
   }
@@ -55,8 +58,9 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
-                              const bool omit_zeroing_entries)
+  void
+  Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                         const bool omit_zeroing_entries)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr, ExcVectorTypeNotCompatible());
@@ -72,7 +76,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator= (const Vector<Number> &in_vector)
+  Vector<Number> &
+  Vector<Number>::operator= (const Vector<Number> &in_vector)
   {
     if (PointerComparison::equal(this, &in_vector))
       return *this;
@@ -91,7 +96,8 @@ namespace LinearAlgebra
 
   template <typename Number>
   template <typename Number2>
-  Vector<Number> &Vector<Number>::operator= (const Vector<Number2> &in_vector)
+  Vector<Number> &
+  Vector<Number>::operator= (const Vector<Number2> &in_vector)
   {
     this->thread_loop_partitioner = in_vector.thread_loop_partitioner;
     if (this->size() != in_vector.size())
@@ -106,7 +112,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator= (const Number s)
+  Vector<Number> &
+  Vector<Number>::operator= (const Number s)
   {
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
     (void) s;
@@ -120,7 +127,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator*= (const Number factor)
+  Vector<Number> &
+  Vector<Number>::operator*= (const Number factor)
   {
     AssertIsFinite(factor);
 
@@ -133,7 +141,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator/= (const Number factor)
+  Vector<Number> &
+  Vector<Number>::operator/= (const Number factor)
   {
     AssertIsFinite(factor);
     Assert(factor!=Number(0.), ExcZero());
@@ -145,7 +154,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
+  Vector<Number> &
+  Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr, ExcVectorTypeNotCompatible());
@@ -164,7 +174,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Vector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
+  Vector<Number> &
+  Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr, ExcVectorTypeNotCompatible());
@@ -182,7 +193,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
+  Number
+  Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -203,9 +215,10 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::import(const ReadWriteVector<Number> &,
-                              VectorOperation::values,
-                              std::shared_ptr<const CommunicationPatternBase>)
+  void
+  Vector<Number>::import(const ReadWriteVector<Number> &,
+                         VectorOperation::values,
+                         std::shared_ptr<const CommunicationPatternBase>)
   {
     AssertThrow(false, ExcMessage("This function is not implemented."));
   }
@@ -214,7 +227,8 @@ namespace LinearAlgebra
 
   template <typename Number>
   inline
-  void Vector<Number>::add(const Number a)
+  void
+  Vector<Number>::add(const Number a)
   {
     AssertIsFinite(a);
 
@@ -225,7 +239,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
+  void
+  Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -244,8 +259,9 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V,
-                           const Number b, const VectorSpaceVector<Number> &W)
+  void
+  Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V,
+                      const Number b, const VectorSpaceVector<Number> &W)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -273,8 +289,9 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::sadd(const Number s, const Number a,
-                            const VectorSpaceVector<Number> &V)
+  void
+  Vector<Number>::sadd(const Number s, const Number a,
+                       const VectorSpaceVector<Number> &V)
   {
     AssertIsFinite(s);
     AssertIsFinite(a);
@@ -293,7 +310,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
+  void
+  Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&scaling_factors)!=nullptr,
@@ -312,7 +330,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
+  void
+  Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
   {
     AssertIsFinite(a);
 
@@ -329,7 +348,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  bool Vector<Number>::all_zero() const
+  bool
+  Vector<Number>::all_zero() const
   {
     Assert(this->size(), ExcEmptyObject());
 
@@ -344,7 +364,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename Vector<Number>::value_type Vector<Number>::mean_value() const
+  typename Vector<Number>::value_type
+  Vector<Number>::mean_value() const
   {
     Assert (this->size(), ExcEmptyObject());
 
@@ -359,7 +380,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l1_norm() const
+  typename VectorSpaceVector<Number>::real_type
+  Vector<Number>::l1_norm() const
   {
     Assert (this->size(), ExcEmptyObject());
 
@@ -375,7 +397,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::l2_norm() const
+  typename VectorSpaceVector<Number>::real_type
+  Vector<Number>::l2_norm() const
   {
     Assert (this->size(), ExcEmptyObject());
 
@@ -420,7 +443,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  typename VectorSpaceVector<Number>::real_type Vector<Number>::linfty_norm() const
+  typename VectorSpaceVector<Number>::real_type
+  Vector<Number>::linfty_norm() const
   {
     typename ReadWriteVector<Number>::real_type norm = 0.;
     const size_type size = this->size();
@@ -433,9 +457,10 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  Number Vector<Number>::add_and_dot(const Number a,
-                                     const VectorSpaceVector<Number> &V,
-                                     const VectorSpaceVector<Number> &W)
+  Number
+  Vector<Number>::add_and_dot(const Number a,
+                              const VectorSpaceVector<Number> &V,
+                              const VectorSpaceVector<Number> &W)
   {
     // Check that casting will work.
     Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -465,7 +490,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::block_write(std::ostream &out) const
+  void
+  Vector<Number>::block_write(std::ostream &out) const
   {
     AssertThrow(out, ExcIO());
 
@@ -497,7 +523,8 @@ namespace LinearAlgebra
 
 
   template <typename Number>
-  void Vector<Number>::block_read(std::istream &in)
+  void
+  Vector<Number>::block_read(std::istream &in)
   {
     AssertThrow(in, ExcIO());
 

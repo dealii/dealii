@@ -42,7 +42,8 @@ namespace internal
 {
   namespace GrowingVectorMemoryImplementation
   {
-    void release_all_unused_memory()
+    void
+    release_all_unused_memory()
     {
 #include "vector_memory_release.inst"
 

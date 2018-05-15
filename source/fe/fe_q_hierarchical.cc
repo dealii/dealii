@@ -715,7 +715,8 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
 
 
 template <int dim>
-void FE_Q_Hierarchical<dim>::initialize_generalized_support_points ()
+void
+FE_Q_Hierarchical<dim>::initialize_generalized_support_points ()
 {
   // number of points: (degree+1)^dim
   unsigned int n = this->degree+1;
@@ -791,7 +792,8 @@ void FE_Q_Hierarchical<dim>::initialize_generalized_support_points ()
 
 
 template <>
-void FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ()
+void
+FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ()
 {
   // no faces in 1d, so nothing to do
 }
@@ -1574,7 +1576,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 
 template <int dim>
-void FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points ()
+void
+FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points ()
 {
   const unsigned int codim = dim-1;
 

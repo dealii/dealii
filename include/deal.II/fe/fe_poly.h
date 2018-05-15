@@ -81,7 +81,8 @@ public:
    * Return the polynomial degree of this finite element, i.e. the value
    * passed to the constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree () const;
 
   // for documentation, see the FiniteElement base class
   virtual
@@ -93,21 +94,24 @@ public:
    * lexicographic ordering of the basis functions. Returns
    * PolynomialType::get_numbering().
    */
-  std::vector<unsigned int> get_poly_space_numbering() const;
+  std::vector<unsigned int>
+  get_poly_space_numbering() const;
 
   /**
    * Return the inverse numbering of the underlying polynomial space. Returns
    * PolynomialType::get_numbering_inverse().
    */
-  std::vector<unsigned int> get_poly_space_numbering_inverse() const;
+  std::vector<unsigned int>
+  get_poly_space_numbering_inverse() const;
 
   /**
    * Return the value of the <tt>i</tt>th shape function at the point
    * <tt>p</tt>. See the FiniteElement base class for more information about
    * the semantics of this function.
    */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const override;
+  virtual double
+  shape_value (const unsigned int i,
+               const Point<dim> &p) const override;
 
   /**
    * Return the value of the <tt>component</tt>th vector component of the
@@ -119,17 +123,19 @@ public:
    * function without the <tt>_component</tt> suffix were called, provided
    * that the specified component is zero.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim> &p,
-                                        const unsigned int component) const override;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim> &p,
+                         const unsigned int component) const override;
 
   /**
    * Return the gradient of the <tt>i</tt>th shape function at the point
    * <tt>p</tt>. See the FiniteElement base class for more information about
    * the semantics of this function.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const override;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int  i,
+              const Point<dim>   &p) const override;
 
   /**
    * Return the gradient of the <tt>component</tt>th vector component of the
@@ -141,17 +147,19 @@ public:
    * function without the <tt>_component</tt> suffix were called, provided
    * that the specified component is zero.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
-                                              const unsigned int component) const override;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim> &p,
+                        const unsigned int component) const override;
 
   /**
    * Return the tensor of second derivatives of the <tt>i</tt>th shape
    * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
    * class for more information about the semantics of this function.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int  i,
+                   const Point<dim> &p) const override;
 
   /**
    * Return the second derivative of the <tt>component</tt>th vector component
@@ -163,17 +171,19 @@ public:
    * function without the <tt>_component</tt> suffix were called, provided
    * that the specified component is zero.
    */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim> &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad_component (const unsigned int i,
+                             const Point<dim> &p,
+                             const unsigned int component) const override;
 
   /**
    * Return the tensor of third derivatives of the <tt>i</tt>th shape function
    * at point <tt>p</tt> on the unit cell. See the FiniteElement base class
    * for more information about the semantics of this function.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const override;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const override;
 
   /**
    * Return the third derivative of the <tt>component</tt>th vector component
@@ -185,17 +195,19 @@ public:
    * function without the <tt>_component</tt> suffix were called, provided
    * that the specified component is zero.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const override;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const override;
 
   /**
    * Return the tensor of fourth derivatives of the <tt>i</tt>th shape
    * function at point <tt>p</tt> on the unit cell. See the FiniteElement base
    * class for more information about the semantics of this function.
    */
-  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const override;
+  virtual Tensor<4,dim>
+  shape_4th_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const override;
 
   /**
    * Return the fourth derivative of the <tt>component</tt>th vector component
@@ -207,9 +219,10 @@ public:
    * function without the <tt>_component</tt> suffix were called, provided
    * that the specified component is zero.
    */
-  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const override;
+  virtual Tensor<4,dim>
+  shape_4th_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const override;
 
 protected:
   /*

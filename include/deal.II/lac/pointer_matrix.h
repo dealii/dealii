@@ -68,36 +68,42 @@ public:
    * of any derived class is called whenever a pointer-to-base-class object is
    * destroyed.
    */
-  virtual ~PointerMatrixBase () override = default;
+  virtual
+  ~PointerMatrixBase () override = default;
 
   /**
    * Reset the object to its original state.
    */
-  virtual void clear () = 0;
+  virtual void
+  clear () = 0;
 
   /**
    * Matrix-vector product.
    */
-  virtual void vmult (VectorType       &dst,
-                      const VectorType &src) const = 0;
+  virtual void
+  vmult (VectorType       &dst,
+         const VectorType &src) const = 0;
 
   /**
    * Transposed matrix-vector product.
    */
-  virtual void Tvmult (VectorType       &dst,
-                       const VectorType &src) const = 0;
+  virtual void
+  Tvmult (VectorType       &dst,
+          const VectorType &src) const = 0;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void vmult_add (VectorType       &dst,
-                          const VectorType &src) const = 0;
+  virtual void
+  vmult_add (VectorType       &dst,
+             const VectorType &src) const = 0;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void Tvmult_add (VectorType       &dst,
-                           const VectorType &src) const = 0;
+  virtual void
+  Tvmult_add (VectorType       &dst,
+              const VectorType &src) const = 0;
 };
 
 
@@ -153,43 +159,50 @@ public:
                 const char *name);
 
   // Use doc from base class
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Return whether the object is empty.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
    * matrix.
    * @see SmartPointer
    */
-  const PointerMatrix &operator= (const MatrixType *M);
+  const PointerMatrix &
+  operator= (const MatrixType *M);
 
   /**
    * Matrix-vector product.
    */
-  virtual void vmult (VectorType       &dst,
-                      const VectorType &src) const override;
+  virtual void
+  vmult (VectorType       &dst,
+         const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product.
    */
-  virtual void Tvmult (VectorType       &dst,
-                       const VectorType &src) const override;
+  virtual void
+  Tvmult (VectorType       &dst,
+          const VectorType &src) const override;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void vmult_add (VectorType       &dst,
-                          const VectorType &src) const override;
+  virtual void
+  vmult_add (VectorType       &dst,
+             const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void Tvmult_add (VectorType       &dst,
-                           const VectorType &src) const override;
+  virtual void
+  Tvmult_add (VectorType       &dst,
+              const VectorType &src) const override;
 
 private:
   /**
@@ -260,48 +273,56 @@ public:
                    const char               *name);
 
   // Use doc from base class
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Return whether the object is empty.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Assign a new VectorMemory object for getting auxiliary vectors.
    */
-  void set_memory(VectorMemory<VectorType> *mem);
+  void
+  set_memory(VectorMemory<VectorType> *mem);
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
    * matrix.
    * @see SmartPointer
    */
-  const PointerMatrixAux &operator= (const MatrixType *M);
+  const PointerMatrixAux &
+  operator= (const MatrixType *M);
 
   /**
    * Matrix-vector product.
    */
-  virtual void vmult (VectorType       &dst,
-                      const VectorType &src) const override;
+  virtual void
+  vmult (VectorType       &dst,
+         const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product.
    */
-  virtual void Tvmult (VectorType       &dst,
-                       const VectorType &src) const override;
+  virtual void
+  Tvmult (VectorType       &dst,
+          const VectorType &src) const override;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void vmult_add (VectorType       &dst,
-                          const VectorType &src) const override;
+  virtual void
+  vmult_add (VectorType       &dst,
+             const VectorType &src) const override;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
    */
-  virtual void Tvmult_add (VectorType       &dst,
-                           const VectorType &src) const override;
+  virtual void
+  Tvmult_add (VectorType       &dst,
+              const VectorType &src) const override;
 
 private:
   /**
@@ -374,19 +395,22 @@ public:
                        const char *name);
 
   // Use doc from base class
-  virtual void clear();
+  virtual void
+  clear();
 
   /**
    * Return whether the object is empty.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Assign a new matrix pointer. Deletes the old pointer and releases its
    * matrix.
    * @see SmartPointer
    */
-  const PointerMatrixVector &operator= (const Vector<number> *M);
+  const PointerMatrixVector &
+  operator= (const Vector<number> *M);
 
   /**
    * Matrix-vector product, actually the scalar product of <tt>src</tt> and
@@ -395,8 +419,9 @@ public:
    * The dimension of <tt>dst</tt> is 1, while that of <tt>src</tt> is the
    * size of the vector representing this matrix.
    */
-  virtual void vmult (Vector<number> &dst,
-                      const Vector<number> &src) const;
+  virtual void
+  vmult (Vector<number> &dst,
+         const Vector<number> &src) const;
 
   /**
    * Transposed matrix-vector product, actually the multiplication of the
@@ -405,8 +430,9 @@ public:
    * The dimension of <tt>src</tt> is 1, while that of <tt>dst</tt> is the
    * size of the vector representing this matrix.
    */
-  virtual void Tvmult (Vector<number> &dst,
-                       const Vector<number> &src) const;
+  virtual void
+  Tvmult (Vector<number> &dst,
+          const Vector<number> &src) const;
 
   /**
    * Matrix-vector product, adding to <tt>dst</tt>.
@@ -414,8 +440,9 @@ public:
    * The dimension of <tt>dst</tt> is 1, while that of <tt>src</tt> is the
    * size of the vector representing this matrix.
    */
-  virtual void vmult_add (Vector<number> &dst,
-                          const Vector<number> &src) const;
+  virtual void
+  vmult_add (Vector<number> &dst,
+             const Vector<number> &src) const;
 
   /**
    * Transposed matrix-vector product, adding to <tt>dst</tt>.
@@ -423,8 +450,9 @@ public:
    * The dimension of <tt>src</tt> is 1, while that of <tt>dst</tt> is the
    * size of the vector representing this matrix.
    */
-  virtual void Tvmult_add (Vector<number> &dst,
-                           const Vector<number> &src) const;
+  virtual void
+  Tvmult_add (Vector<number> &dst,
+              const Vector<number> &src) const;
 
 private:
   /**

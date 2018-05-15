@@ -223,8 +223,9 @@ ChunkSparsityPattern::copy_from (const SparsityPatternType &dsp,
 
 
 template <typename number>
-void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
-                                      const size_type chunk_size)
+void
+ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
+                                 const size_type chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
@@ -280,14 +281,16 @@ namespace internal
   namespace
   {
     template <typename SparsityPatternType>
-    void copy_sparsity (const SparsityPatternType &src,
-                        SparsityPattern           &dst)
+    void
+    copy_sparsity (const SparsityPatternType &src,
+                   SparsityPattern           &dst)
     {
       dst.copy_from(src);
     }
 
-    void copy_sparsity (const SparsityPattern &src,
-                        SparsityPattern       &dst)
+    void
+    copy_sparsity (const SparsityPattern &src,
+                   SparsityPattern       &dst)
     {
       dst = src;
     }
@@ -618,8 +621,9 @@ ChunkSparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template
-void ChunkSparsityPattern::copy_from<DynamicSparsityPattern> (const DynamicSparsityPattern &,
-    const size_type);
+void ChunkSparsityPattern::copy_from<DynamicSparsityPattern>
+(const DynamicSparsityPattern &,
+ const size_type);
 template
 void ChunkSparsityPattern::create_from<SparsityPattern>
 (const unsigned int,
@@ -635,10 +639,12 @@ void ChunkSparsityPattern::create_from<DynamicSparsityPattern>
  const unsigned int,
  const bool);
 template
-void ChunkSparsityPattern::copy_from<float> (const FullMatrix<float> &,
-                                             const size_type);
+void ChunkSparsityPattern::copy_from<float>
+(const FullMatrix<float> &,
+ const size_type);
 template
-void ChunkSparsityPattern::copy_from<double> (const FullMatrix<double> &,
-                                              const size_type);
+void ChunkSparsityPattern::copy_from<double>
+(const FullMatrix<double> &,
+ const size_type);
 
 DEAL_II_NAMESPACE_CLOSE

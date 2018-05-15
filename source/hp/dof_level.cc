@@ -234,7 +234,8 @@ namespace internal
 
 
 
-    void DoFLevel::normalize_active_fe_indices ()
+    void
+    DoFLevel::normalize_active_fe_indices ()
     {
       for (unsigned int i=0; i<active_fe_indices.size(); ++i)
         if (is_compressed_entry(active_fe_indices[i]))
@@ -245,19 +246,31 @@ namespace internal
 
 
     // explicit instantiations
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<1,1> &);
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<1,2> &);
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<1,3> &);
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<2,2> &);
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<2,3> &);
-    template void DoFLevel::compress_data(const dealii::hp::FECollection<3,3> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<1,1> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<1,2> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<1,3> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<2,2> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<2,3> &);
+    template void
+    DoFLevel::compress_data(const dealii::hp::FECollection<3,3> &);
 
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<1,1> &);
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<1,2> &);
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<1,3> &);
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<2,2> &);
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<2,3> &);
-    template void DoFLevel::uncompress_data(const dealii::hp::FECollection<3,3> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<1,1> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<1,2> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<1,3> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<2,2> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<2,3> &);
+    template void
+    DoFLevel::uncompress_data(const dealii::hp::FECollection<3,3> &);
   }
 }
 

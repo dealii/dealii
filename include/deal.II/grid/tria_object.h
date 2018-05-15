@@ -78,26 +78,30 @@ namespace internal
       /**
        * Return the index of the ith face object.
        */
-      int face (const unsigned int i) const;
+      int
+      face (const unsigned int i) const;
 
       /**
        * Set the index of the ith face object.
        */
-      void set_face (const unsigned int i, const int index);
+      void
+      set_face (const unsigned int i, const int index);
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      static std::size_t memory_consumption ();
+      static std::size_t
+      memory_consumption ();
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
 
     protected:
       /**
@@ -165,7 +169,8 @@ namespace internal
 
     template <int structdim>
     inline
-    int TriaObject<structdim>::face (const unsigned int i) const
+    int
+    TriaObject<structdim>::face (const unsigned int i) const
     {
       Assert (i<GeometryInfo<structdim>::faces_per_cell,
               ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
@@ -176,7 +181,8 @@ namespace internal
 
     template <int structdim>
     inline
-    void TriaObject<structdim>::set_face (const unsigned int i, const int index)
+    void
+    TriaObject<structdim>::set_face (const unsigned int i, const int index)
     {
       Assert (i<GeometryInfo<structdim>::faces_per_cell,
               ExcIndexRange(i,0,GeometryInfo<structdim>::faces_per_cell));
@@ -196,8 +202,9 @@ namespace internal
 
     template <int structdim>
     template <class Archive>
-    void TriaObject<structdim>::serialize(Archive &ar,
-                                          const unsigned int)
+    void
+    TriaObject<structdim>::serialize(Archive &ar,
+                                     const unsigned int)
     {
       ar &faces;
     }

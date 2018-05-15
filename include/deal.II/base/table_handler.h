@@ -70,7 +70,8 @@ namespace internal
      * object.
      */
     template <typename T>
-    T get () const;
+    T
+    get () const;
 
     /**
      * Return the numeric value of this object if data has been stored in it
@@ -78,7 +79,8 @@ namespace internal
      *
      * @return double
      */
-    double get_numeric_value () const;
+    double
+    get_numeric_value () const;
 
     /**
      * Cache the contained value with the given formatting and return it. The
@@ -87,13 +89,15 @@ namespace internal
      * The cache needs to be invalidated with this routine if the formatting
      * of the column changes.
      */
-    void cache_string(bool scientific, unsigned int precision) const;
+    void
+    cache_string(bool scientific, unsigned int precision) const;
 
     /**
      * Return the value cached using cache_string(). This is just a wrapper
      * around cached_value.
      */
-    const std::string &get_cached_string() const;
+    const std::string &
+    get_cached_string() const;
 
 
     /**
@@ -101,21 +105,24 @@ namespace internal
      * value but with a value that is default constructed for this data type.
      * This is used to pad columns below previously set ones.
      */
-    TableEntry get_default_constructed_copy() const;
+    TableEntry
+    get_default_constructed_copy() const;
 
     /**
      * Write the data of this object to a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void save (Archive &ar, const unsigned int version) const;
+    void
+    save (Archive &ar, const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void load (Archive &ar, const unsigned int version);
+    void
+    load (Archive &ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -368,7 +375,8 @@ public:
    * large code bases in which parts of the code base are only
    * executed based on run-time parameters.)
    */
-  void declare_column (const std::string &key);
+  void
+  declare_column (const std::string &key);
 
   /**
    * Adds a column (if not yet existent) with the key <tt>key</tt> and adds
@@ -377,8 +385,9 @@ public:
    * std::string</code> or a compiler error will result.
    */
   template <typename T>
-  void add_value (const std::string &key,
-                  const T            value);
+  void
+  add_value (const std::string &key,
+             const T            value);
 
   /**
    * If a row is only partially filled, then set all elements of that
@@ -393,13 +402,15 @@ public:
    * conceptually the function "completes" the current row, though its
    * use case is to "start" a new row.
    */
-  void start_new_row ();
+  void
+  start_new_row ();
 
   /**
    * Switch auto-fill mode on or off. See the general documentation of this
    * class for a description of what auto-fill mode does.
    */
-  void set_auto_fill_mode (const bool state);
+  void
+  set_auto_fill_mode (const bool state);
 
   /**
    * Creates a supercolumn (if not yet existent) and includes column to it.
@@ -413,8 +424,9 @@ public:
    * column that is added to the supercolumn. Within the supercolumn the order
    * of output follows the order the columns are added to the supercolumn.
    */
-  void add_column_to_supercolumn (const std::string &key,
-                                  const std::string &superkey);
+  void
+  add_column_to_supercolumn (const std::string &key,
+                             const std::string &superkey);
 
   /**
    * Change the order of columns and supercolumns in the table.
@@ -432,48 +444,55 @@ public:
    * call this function with the next five columns and again <tt>write_*</tt>,
    * and so on.
    */
-  void set_column_order (const std::vector<std::string> &new_order);
+  void
+  set_column_order (const std::vector<std::string> &new_order);
 
   /**
    * Set the <tt>precision</tt> e.g. double or float variables are written
    * with. <tt>precision</tt> is the same as in calling
    * <tt>out<<setprecision(precision)</tt>.
    */
-  void set_precision (const std::string &key,
-                      const unsigned int precision);
+  void
+  set_precision (const std::string &key,
+                 const unsigned int precision);
 
   /**
    * Set the <tt>scientific_flag</tt>. True means scientific, false means
    * fixed point notation.
    */
-  void set_scientific (const std::string &key,
-                       const bool         scientific);
+  void
+  set_scientific (const std::string &key,
+                  const bool         scientific);
 
   /**
    * Set the caption of the column <tt>key</tt> for tex output. You may want
    * to chose this different from <tt>key</tt>, if it contains formulas or
    * similar constructs.
    */
-  void set_tex_caption (const std::string &key,
-                        const std::string &tex_caption);
+  void
+  set_tex_caption (const std::string &key,
+                   const std::string &tex_caption);
 
   /**
    * Set the tex caption of the entire <tt>table</tt> for tex output.
    */
-  void set_tex_table_caption (const std::string &table_caption);
+  void
+  set_tex_table_caption (const std::string &table_caption);
 
   /**
    * Set the label of this <tt>table</tt> for tex output.
    */
-  void set_tex_table_label (const std::string &table_label);
+  void
+  set_tex_table_label (const std::string &table_label);
 
   /**
    * Set the caption the supercolumn <tt>superkey</tt> for tex output.
    * You may want to chose this different from <tt>superkey</tt>, if it
    * contains formulas or similar constructs.
    */
-  void set_tex_supercaption (const std::string &superkey,
-                             const std::string &tex_supercaption);
+  void
+  set_tex_supercaption (const std::string &superkey,
+                        const std::string &tex_supercaption);
 
   /**
    * Set the tex output format of a column, e.g. <tt>c</tt>, <tt>r</tt>,
@@ -481,8 +500,9 @@ public:
    * function is not called for a column, the default is preset to be
    * <tt>c</tt>.
    */
-  void set_tex_format (const std::string &key,
-                       const std::string &format="c");
+  void
+  set_tex_format (const std::string &key,
+                  const std::string &format="c");
 
   /**
    * Write table as formatted text to the given stream. The text is formatted
@@ -495,8 +515,9 @@ public:
    * The second argument indicates how column keys are to be displayed. See
    * the description of TextOutputFormat for more information
    */
-  void write_text (std::ostream &out,
-                   const TextOutputFormat format = table_with_headers) const;
+  void
+  write_text (std::ostream &out,
+              const TextOutputFormat format = table_with_headers) const;
 
   /**
    * Write table as a tex file. If @p with_header is set to false, then no
@@ -505,27 +526,31 @@ public:
    * included into an existing tex file using a command like
    * <code>\\input{table_file}</code>.
    */
-  void write_tex (std::ostream &file, const bool with_header=true) const;
+  void
+  write_tex (std::ostream &file, const bool with_header=true) const;
 
   /**
    * Clear the rows of the table, i.e. calls clear() on all the underlying
    * storage data structures.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Remove all values added at the current row. This is useful when, for
    * example, a time-step is rejected and all data recorded about it needs to
    * be discarded.
    */
-  void clear_current_row ();
+  void
+  clear_current_row ();
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization.
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
   /**
    * @addtogroup Exceptions
@@ -592,16 +617,19 @@ protected:
      * Pad this column with default constructed elements to the number of rows
      * given by the argument.
      */
-    void pad_column_below (const unsigned int length);
+    void
+    pad_column_below (const unsigned int length);
 
     /**
      * Read or write the data of this object to or from a stream for the
      * purpose of serialization.
      */
     template <class Archive>
-    void save(Archive &ar, const unsigned int version) const;
+    void
+    save(Archive &ar, const unsigned int version) const;
     template <class Archive>
-    void load(Archive &ar, const unsigned int version);
+    void
+    load(Archive &ar, const unsigned int version);
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 
@@ -669,14 +697,16 @@ protected:
    * This function implicitly checks the consistency of the data. The result
    * is returned in <tt>sel_columns</tt>.
    */
-  void get_selected_columns (std::vector<std::string> &sel_columns) const;
+  void
+  get_selected_columns (std::vector<std::string> &sel_columns) const;
 
   /**
    * Builtin function, that gives the number of rows in the table and that
    * checks if the number of rows is equal in every column. This function is
    * e.g. called before writing output.
    */
-  unsigned int n_rows() const;
+  unsigned int
+  n_rows() const;
 
   /**
    * A variable storing the column and supercolumn keys in the order desired by the user.
@@ -739,7 +769,8 @@ namespace internal
 
 
   template <typename T>
-  T TableEntry::get () const
+  T
+  TableEntry::get () const
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
@@ -761,8 +792,9 @@ namespace internal
 
 
   template <class Archive>
-  void TableEntry::save (Archive &ar,
-                         const unsigned int) const
+  void
+  TableEntry::save (Archive &ar,
+                    const unsigned int) const
   {
     // write first an identifier for the kind
     // of data stored and then the actual
@@ -799,8 +831,9 @@ namespace internal
 
 
   template <class Archive>
-  void TableEntry::load (Archive &ar,
-                         const unsigned int)
+  void
+  TableEntry::load (Archive &ar,
+                    const unsigned int)
   {
     // following what we do in the save()
     // function, first read in the data type
@@ -860,8 +893,9 @@ namespace internal
 
 
 template <typename T>
-void TableHandler::add_value (const std::string &key,
-                              const T            value)
+void
+TableHandler::add_value (const std::string &key,
+                         const T            value)
 {
   // see if the column already exists
   if (columns.find(key) == columns.end())

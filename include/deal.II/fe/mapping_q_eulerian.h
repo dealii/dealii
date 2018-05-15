@@ -126,7 +126,8 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
   /**
    * Always return @p false because MappingQEulerian does not in general
@@ -134,7 +135,8 @@ public:
    * provide zero displacements at vertex locations).
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * Exception which is thrown when the mapping is being evaluated at
@@ -217,7 +219,8 @@ private:
      * provide for zero displacements at vertex locations).
      */
     virtual
-    bool preserves_vertex_locations () const override;
+    bool
+    preserves_vertex_locations () const override;
 
   private:
     /**

@@ -38,25 +38,29 @@ namespace internal
    * Find out if an iterator supports inactive cells.
    */
   template <class DI>
-  inline bool is_active_iterator(const DI &)
+  inline bool
+  is_active_iterator(const DI &)
   {
     return false;
   }
 
   template <class ACCESSOR>
-  inline bool is_active_iterator(const TriaActiveIterator<ACCESSOR> &)
+  inline bool
+  is_active_iterator(const TriaActiveIterator<ACCESSOR> &)
   {
     return true;
   }
 
   template <class ACCESSOR>
-  inline bool is_active_iterator(const dealii::FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
+  inline bool
+  is_active_iterator(const dealii::FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
   {
     return true;
   }
 
   template <int dim, class DOFINFO, class A>
-  void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo, A *assembler)
+  void
+  assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo, A *assembler)
   {
     dinfo.assemble(*assembler);
   }
@@ -175,7 +179,8 @@ namespace MeshWorker
    * @date 2010
    */
   template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
-  void cell_action(
+  void
+  cell_action(
     ITERATOR cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
     INFOBOX &info,
@@ -383,17 +388,18 @@ namespace MeshWorker
    * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
-  void loop(ITERATOR begin,
-            typename identity<ITERATOR>::type end,
-            DOFINFO &dinfo,
-            INFOBOX &info,
-            const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
-            const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
-            const std::function<void (DOFINFO &, DOFINFO &,
-                                      typename INFOBOX::CellInfo &,
-                                      typename INFOBOX::CellInfo &)> &face_worker,
-            ASSEMBLER &assembler,
-            const LoopControl &lctrl = LoopControl())
+  void
+  loop(ITERATOR begin,
+       typename identity<ITERATOR>::type end,
+       DOFINFO &dinfo,
+       INFOBOX &info,
+       const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &cell_worker,
+       const std::function<void (DOFINFO &, typename INFOBOX::CellInfo &)> &boundary_worker,
+       const std::function<void (DOFINFO &, DOFINFO &,
+                                 typename INFOBOX::CellInfo &,
+                                 typename INFOBOX::CellInfo &)> &face_worker,
+       ASSEMBLER &assembler,
+       const LoopControl &lctrl = LoopControl())
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
@@ -422,13 +428,14 @@ namespace MeshWorker
    * @author Guido Kanschat, 2009
    */
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
-  void integration_loop(ITERATOR begin,
-                        typename identity<ITERATOR>::type end,
-                        DoFInfo<dim, spacedim> &dof_info,
-                        IntegrationInfoBox<dim, spacedim> &box,
-                        const LocalIntegrator<dim, spacedim> &integrator,
-                        ASSEMBLER &assembler,
-                        const LoopControl &lctrl = LoopControl())
+  void
+  integration_loop(ITERATOR begin,
+                   typename identity<ITERATOR>::type end,
+                   DoFInfo<dim, spacedim> &dof_info,
+                   IntegrationInfoBox<dim, spacedim> &box,
+                   const LocalIntegrator<dim, spacedim> &integrator,
+                   ASSEMBLER &assembler,
+                   const LoopControl &lctrl = LoopControl())
   {
     std::function<void (DoFInfo<dim, spacedim>&, IntegrationInfo<dim, spacedim>&)> cell_worker;
     std::function<void (DoFInfo<dim, spacedim>&, IntegrationInfo<dim, spacedim>&)> boundary_worker;

@@ -72,14 +72,16 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
   /**
    * Always returns @p true because this class assumes that the
    * vertices always lies on the underlying Manifold.
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -218,7 +220,8 @@ public:
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * The current cell vertices.

@@ -257,7 +257,8 @@ namespace TrilinosWrappers
 
 
 
-  void PreconditionAMG::reinit ()
+  void
+  PreconditionAMG::reinit ()
   {
     ML_Epetra::MultiLevelPreconditioner *multilevel_operator =
       dynamic_cast<ML_Epetra::MultiLevelPreconditioner *> (preconditioner.get());
@@ -266,7 +267,8 @@ namespace TrilinosWrappers
 
 
 
-  void PreconditionAMG::clear ()
+  void
+  PreconditionAMG::clear ()
   {
     PreconditionBase::clear();
     trilinos_matrix.reset();
@@ -290,12 +292,14 @@ namespace TrilinosWrappers
 
 
   // explicit instantiations
-  template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<double> &,
-                                             const AdditionalData &, const double,
-                                             const ::dealii::SparsityPattern *);
-  template void PreconditionAMG::initialize (const ::dealii::SparseMatrix<float> &,
-                                             const AdditionalData &, const double,
-                                             const ::dealii::SparsityPattern *);
+  template void
+  PreconditionAMG::initialize (const ::dealii::SparseMatrix<double> &,
+                               const AdditionalData &, const double,
+                               const ::dealii::SparsityPattern *);
+  template void
+  PreconditionAMG::initialize (const ::dealii::SparseMatrix<float> &,
+                               const AdditionalData &, const double,
+                               const ::dealii::SparsityPattern *);
 
 
 

@@ -40,8 +40,9 @@ namespace
   // subface concerning the FaceRefineCase of
   // the face
   inline
-  unsigned int translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
-                                    const unsigned int                           subface_no)
+  unsigned int
+  translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
+                       const unsigned int                           subface_no)
   {
     Assert(face->has_children(), ExcInternalError());
     Assert(subface_no<face->n_children(), ExcInternalError());
@@ -82,9 +83,10 @@ namespace
   // subface concerning the FaceRefineCase of
   // the face
   inline
-  unsigned int translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
-                                    const unsigned int                           subface_no,
-                                    const unsigned int                           subsubface_no)
+  unsigned int
+  translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3> > &face,
+                       const unsigned int                           subface_no,
+                       const unsigned int                           subsubface_no)
   {
     Assert(face->has_children(), ExcInternalError());
     // the subface must be refined, otherwise
@@ -974,7 +976,8 @@ namespace
 
 
   // a 2d face in 3d space
-  double measure (const dealii::TriaAccessor<2,3,3> &accessor)
+  double
+  measure (const dealii::TriaAccessor<2,3,3> &accessor)
   {
     // If the face is planar, the diagonal from vertex 0 to vertex 3,
     // v_03, should be in the plane P_012 of vertices 0, 1 and 2.  Get
@@ -1023,29 +1026,33 @@ namespace
 
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
+  Point<spacedim>
+  get_new_point_on_object(const TriaAccessor<1, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<1,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_line(it);
   }
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
+  Point<spacedim>
+  get_new_point_on_object(const TriaAccessor<2, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<2,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_quad(it);
   }
 
   template <int dim, int spacedim>
-  Point<spacedim> get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
+  Point<spacedim>
+  get_new_point_on_object(const TriaAccessor<3, dim, spacedim> &obj)
   {
     TriaIterator<TriaAccessor<3,dim,spacedim> > it(obj);
     return obj.get_manifold().get_new_point_on_hex(it);
   }
 
   template <int structdim, int dim, int spacedim>
-  Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
-                                          const bool use_interpolation)
+  Point<spacedim>
+  get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
+                          const bool use_interpolation)
   {
     // if we should not interpolate from the surroundings of the current
     // object or if the object is of the old Boundary type, only use the
@@ -1139,7 +1146,8 @@ bounding_box () const
 
 
 template <int structdim, int dim, int spacedim>
-double TriaAccessor<structdim, dim, spacedim>::extent_in_direction(const unsigned int /*axis*/) const
+double
+TriaAccessor<structdim, dim, spacedim>::extent_in_direction(const unsigned int /*axis*/) const
 {
   Assert(false, ExcNotImplemented());
   return std::numeric_limits<double>::signaling_NaN();
@@ -1148,7 +1156,8 @@ double TriaAccessor<structdim, dim, spacedim>::extent_in_direction(const unsigne
 
 
 template <>
-double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
+double
+TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
   Assert (axis == 0, ExcIndexRange (axis, 0, 1));
@@ -1158,7 +1167,8 @@ double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 
 
 template <>
-double TriaAccessor<1,1,2>::extent_in_direction(const unsigned int axis) const
+double
+TriaAccessor<1,1,2>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
   Assert (axis == 0, ExcIndexRange (axis, 0, 1));
@@ -1168,7 +1178,8 @@ double TriaAccessor<1,1,2>::extent_in_direction(const unsigned int axis) const
 
 
 template <>
-double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
+double
+TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
     {0,1}
@@ -1181,7 +1192,8 @@ double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
 }
 
 template <>
-double TriaAccessor<2,2,3>::extent_in_direction(const unsigned int axis) const
+double
+TriaAccessor<2,2,3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
     {0,1}
@@ -1195,7 +1207,8 @@ double TriaAccessor<2,2,3>::extent_in_direction(const unsigned int axis) const
 
 
 template <>
-double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
+double
+TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[3][4] = {{2,3,6,7},     /// Lines along x-axis, see GeometryInfo
     {0,1,4,5},    /// Lines along y-axis
@@ -1367,7 +1380,8 @@ namespace
 template <int structdim, int dim, int spacedim>
 Point<structdim>
 TriaAccessor<structdim, dim, spacedim>
-::real_to_unit_cell_affine_approximation (const Point<spacedim> &point) const
+::
+real_to_unit_cell_affine_approximation (const Point<spacedim> &point) const
 {
   // A = vertex * KA
   DerivativeForm<1,structdim,spacedim> A;
@@ -1414,7 +1428,8 @@ TriaAccessor<structdim, dim, spacedim>::center (const bool respect_manifold,
 
 
 template <>
-bool CellAccessor<1>::point_inside (const Point<1> &p) const
+bool
+CellAccessor<1>::point_inside (const Point<1> &p) const
 {
   return (this->vertex(0)[0] <= p[0]) && (p[0] <= this->vertex(1)[0]);
 }
@@ -1429,7 +1444,8 @@ bool CellAccessor<1>::point_inside (const Point<1> &p) const
 
 
 template <>
-bool CellAccessor<2>::point_inside (const Point<2> &p) const
+bool
+CellAccessor<2>::point_inside (const Point<2> &p) const
 {
   // we check whether the point is
   // inside the cell by making sure
@@ -1493,7 +1509,8 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 
 
 template <>
-bool CellAccessor<3>::point_inside (const Point<3> &p) const
+bool
+CellAccessor<3>::point_inside (const Point<3> &p) const
 {
   // original implementation by Joerg
   // Weimar
@@ -1566,21 +1583,24 @@ point_inside_codim(const Point<spacedim_> &p) const
 
 
 template <>
-bool CellAccessor<1,2>::point_inside (const Point<2> &p) const
+bool
+CellAccessor<1,2>::point_inside (const Point<2> &p) const
 {
   return point_inside_codim<1,2>(p);
 }
 
 
 template <>
-bool CellAccessor<1,3>::point_inside (const Point<3> &p) const
+bool
+CellAccessor<1,3>::point_inside (const Point<3> &p) const
 {
   return point_inside_codim<1,3>(p);
 }
 
 
 template <>
-bool CellAccessor<2,3>::point_inside (const Point<3> &p) const
+bool
+CellAccessor<2,3>::point_inside (const Point<3> &p) const
 {
   return point_inside_codim<2,3>(p);
 }
@@ -1588,7 +1608,8 @@ bool CellAccessor<2,3>::point_inside (const Point<3> &p) const
 
 
 template <int dim, int spacedim>
-bool CellAccessor<dim, spacedim>::at_boundary () const
+bool
+CellAccessor<dim, spacedim>::at_boundary () const
 {
   switch (dim)
     {
@@ -1610,7 +1631,8 @@ bool CellAccessor<dim, spacedim>::at_boundary () const
 
 
 template <int dim, int spacedim>
-types::material_id CellAccessor<dim, spacedim>::material_id () const
+types::material_id
+CellAccessor<dim, spacedim>::material_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id;
@@ -1619,7 +1641,8 @@ types::material_id CellAccessor<dim, spacedim>::material_id () const
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::set_material_id (const types::material_id mat_id) const
+void
+CellAccessor<dim, spacedim>::set_material_id (const types::material_id mat_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert ( mat_id < numbers::invalid_material_id, ExcIndexRange(mat_id,0,numbers::invalid_material_id));
@@ -1629,7 +1652,8 @@ void CellAccessor<dim, spacedim>::set_material_id (const types::material_id mat_
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::material_id mat_id) const
+void
+CellAccessor<dim, spacedim>::recursively_set_material_id (const types::material_id mat_id) const
 {
   set_material_id (mat_id);
 
@@ -1653,7 +1677,8 @@ CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_sub
 
 
 template <int dim, int spacedim>
-types::subdomain_id CellAccessor<dim, spacedim>::level_subdomain_id () const
+types::subdomain_id
+CellAccessor<dim, spacedim>::level_subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->level_subdomain_ids[this->present_index];
@@ -1672,7 +1697,8 @@ CellAccessor<dim, spacedim>::set_level_subdomain_id (const types::subdomain_id n
 
 
 template <int dim, int spacedim>
-bool CellAccessor<dim, spacedim>::direction_flag () const
+bool
+CellAccessor<dim, spacedim>::direction_flag () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (dim==spacedim)
@@ -1777,8 +1803,9 @@ recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::set_neighbor (const unsigned int i,
-                                                const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const
+void
+CellAccessor<dim, spacedim>::set_neighbor (const unsigned int i,
+                                           const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const
 {
   AssertIndexRange (i, GeometryInfo<dim>::faces_per_cell);
 
@@ -1844,7 +1871,8 @@ CellAccessor<dim,spacedim>::id() const
 
 
 template <int dim, int spacedim>
-unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const unsigned int neighbor) const
+unsigned int
+CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const unsigned int neighbor) const
 {
   AssertIndexRange (neighbor, GeometryInfo<dim>::faces_per_cell);
 
@@ -1906,7 +1934,8 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 
 
 template <int dim, int spacedim>
-unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor (const unsigned int neighbor) const
+unsigned int
+CellAccessor<dim,spacedim>::neighbor_of_neighbor (const unsigned int neighbor) const
 {
   const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
   Assert (n2!=numbers::invalid_unsigned_int,
@@ -2386,7 +2415,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser (const unsigned int i_
 
 
 template <int dim, int spacedim>
-bool CellAccessor<dim, spacedim>::at_boundary (const unsigned int i) const
+bool
+CellAccessor<dim, spacedim>::at_boundary (const unsigned int i) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert (i<GeometryInfo<dim>::faces_per_cell,
@@ -2398,7 +2428,8 @@ bool CellAccessor<dim, spacedim>::at_boundary (const unsigned int i) const
 
 
 template <int dim, int spacedim>
-bool CellAccessor<dim, spacedim>::has_boundary_lines () const
+bool
+CellAccessor<dim, spacedim>::has_boundary_lines () const
 {
   if (dim == 1)
     return at_boundary ();

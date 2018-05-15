@@ -83,7 +83,8 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~TimeStepping() = default;
+    virtual
+    ~TimeStepping() = default;
 
     /**
      * Purely virtual function. This function is used to advance from time @p
@@ -110,7 +111,8 @@ namespace TimeStepping
     /**
      * Purely virtual function that return Status.
      */
-    virtual const Status &get_status() const = 0;
+    virtual const Status &
+    get_status() const = 0;
   };
 
 
@@ -128,12 +130,14 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~RungeKutta() override = default;
+    virtual
+    ~RungeKutta() override = default;
 
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
      */
-    virtual void initialize(const runge_kutta_method method) = 0;
+    virtual void
+    initialize(const runge_kutta_method method) = 0;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p F
@@ -220,7 +224,8 @@ namespace TimeStepping
     /**
      * Initialize the explicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method) override;
+    void
+    initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -269,7 +274,8 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const override;
+    const Status &
+    get_status() const override;
 
   private:
     /**
@@ -319,7 +325,8 @@ namespace TimeStepping
     /**
      * Initialize the implicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method) override;
+    void
+    initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -343,8 +350,9 @@ namespace TimeStepping
      * Set the maximum number of iterations and the tolerance used by the
      * Newton solver.
      */
-    void set_newton_solver_parameters(const unsigned int max_it,
-                                      const double       tolerance);
+    void
+    set_newton_solver_parameters(const unsigned int max_it,
+                                 const double       tolerance);
 
     /**
      * Structure that stores the name of the method, the number of Newton
@@ -367,7 +375,8 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const override;
+    const Status &
+    get_status() const override;
 
   private:
     /**
@@ -384,20 +393,22 @@ namespace TimeStepping
     /**
      * Newton solver used for the implicit stages.
      */
-    void newton_solve(const std::function<void (const VectorType &,VectorType &)> &get_residual,
-                      const std::function<VectorType (const VectorType &)>        &id_minus_tau_J_inverse,
-                      VectorType                                                  &y);
+    void
+    newton_solve(const std::function<void (const VectorType &,VectorType &)> &get_residual,
+                 const std::function<VectorType (const VectorType &)>        &id_minus_tau_J_inverse,
+                 VectorType                                                  &y);
 
     /**
      * Compute the residual needed by the Newton solver.
      */
-    void compute_residual(const std::function<VectorType (const double, const VectorType &)> &f,
-                          double                                                             t,
-                          double                                                             delta_t,
-                          const VectorType                                                   &new_y,
-                          const VectorType                                                   &y,
-                          VectorType                                                         &tendency,
-                          VectorType                                                         &residual) const;
+    void
+    compute_residual(const std::function<VectorType (const double, const VectorType &)> &f,
+                     double                                                             t,
+                     double                                                             delta_t,
+                     const VectorType                                                   &new_y,
+                     const VectorType                                                   &y,
+                     VectorType                                                         &tendency,
+                     VectorType                                                         &residual) const;
 
     /**
      * When using SDIRK, there is no need to compute the linear combination of
@@ -464,12 +475,14 @@ namespace TimeStepping
     /**
      * If necessary, deallocate memory allocated by the object.
      */
-    void free_memory();
+    void
+    free_memory();
 
     /**
      * Initialize the embedded explicit Runge-Kutta method.
      */
-    void initialize(const runge_kutta_method method) override;
+    void
+    initialize(const runge_kutta_method method) override;
 
     /**
      * This function is used to advance from time @p t to t+ @p delta_t. @p f
@@ -505,12 +518,13 @@ namespace TimeStepping
     /**
      * Set the parameters necessary for the time adaptation.
      */
-    void set_time_adaptation_parameters(const double coarsen_param,
-                                        const double refine_param,
-                                        const double min_delta,
-                                        const double max_delta,
-                                        const double refine_tol,
-                                        const double coarsen_tol);
+    void
+    set_time_adaptation_parameters(const double coarsen_param,
+                                   const double refine_param,
+                                   const double min_delta,
+                                   const double max_delta,
+                                   const double refine_tol,
+                                   const double coarsen_tol);
 
     /**
      * Structure that stores the name of the method, the reason to exit
@@ -530,17 +544,19 @@ namespace TimeStepping
     /**
      * Return the status of the current object.
      */
-    const Status &get_status() const override;
+    const Status &
+    get_status() const override;
 
   private:
     /**
      * Compute the different stages needed.
      */
-    void compute_stages(const std::function<VectorType (const double, const VectorType &)> &f,
-                        const double                                                 t,
-                        const double                                                 delta_t,
-                        const VectorType                                             &y,
-                        std::vector<VectorType>                                      &f_stages);
+    void
+    compute_stages(const std::function<VectorType (const double, const VectorType &)> &f,
+                   const double                                                 t,
+                   const double                                                 delta_t,
+                   const VectorType                                             &y,
+                   std::vector<VectorType>                                      &f_stages);
 
     /**
      * This parameter is the factor (>1) by which the time step is multiplied

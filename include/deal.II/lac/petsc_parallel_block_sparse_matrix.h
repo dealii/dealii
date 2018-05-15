@@ -140,8 +140,9 @@ namespace PETScWrappers
        * SparsityPattern class here but rather let the user call whatever
        * function she desires.
        */
-      void reinit (const size_type n_block_rows,
-                   const size_type n_block_columns);
+      void
+      reinit (const size_type n_block_rows,
+              const size_type n_block_columns);
 
 
       /**
@@ -153,18 +154,20 @@ namespace PETScWrappers
        * For a symmetric structure hand in the same vector for the first two
        * arguments.
        */
-      void reinit(const std::vector<IndexSet> &rows,
-                  const std::vector<IndexSet> &cols,
-                  const BlockDynamicSparsityPattern &bdsp,
-                  const MPI_Comm &com);
+      void
+      reinit(const std::vector<IndexSet> &rows,
+             const std::vector<IndexSet> &cols,
+             const BlockDynamicSparsityPattern &bdsp,
+             const MPI_Comm &com);
 
 
       /**
        * Same as above but for a symmetric structure only.
        */
-      void reinit(const std::vector<IndexSet> &sizes,
-                  const BlockDynamicSparsityPattern &bdsp,
-                  const MPI_Comm &com);
+      void
+      reinit(const std::vector<IndexSet> &sizes,
+             const BlockDynamicSparsityPattern &bdsp,
+             const MPI_Comm &com);
 
 
 
@@ -172,58 +175,66 @@ namespace PETScWrappers
        * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
        * matrix.
        */
-      void vmult (BlockVector       &dst,
-                  const BlockVector &src) const;
+      void
+      vmult (BlockVector       &dst,
+             const BlockVector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block column.
        */
-      void vmult (BlockVector          &dst,
-                  const Vector &src) const;
+      void
+      vmult (BlockVector          &dst,
+             const Vector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block row.
        */
-      void vmult (Vector    &dst,
-                  const BlockVector &src) const;
+      void
+      vmult (Vector    &dst,
+             const BlockVector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block.
        */
-      void vmult (Vector       &dst,
-                  const Vector &src) const;
+      void
+      vmult (Vector       &dst,
+             const Vector &src) const;
 
       /**
        * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
        * matrix. This function does the same as vmult() but takes the
        * transposed matrix.
        */
-      void Tvmult (BlockVector       &dst,
-                   const BlockVector &src) const;
+      void
+      Tvmult (BlockVector       &dst,
+              const BlockVector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block row.
        */
-      void Tvmult (BlockVector  &dst,
-                   const Vector &src) const;
+      void
+      Tvmult (BlockVector  &dst,
+              const Vector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block column.
        */
-      void Tvmult (Vector    &dst,
-                   const BlockVector &src) const;
+      void
+      Tvmult (Vector    &dst,
+              const BlockVector &src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block.
        */
-      void Tvmult (Vector       &dst,
-                   const Vector &src) const;
+      void
+      Tvmult (Vector       &dst,
+              const Vector &src) const;
 
       /**
        * This function collects the sizes of the sub-objects and stores them
@@ -232,26 +243,30 @@ namespace PETScWrappers
        * function each time after you have changed the size of the sub-
        * objects.
        */
-      void collect_sizes ();
+      void
+      collect_sizes ();
 
       /**
        * Return the partitioning of the domain space of this matrix, i.e., the
        * partitioning of the vectors this matrix has to be multiplied with.
        */
-      std::vector< IndexSet > locally_owned_domain_indices() const;
+      std::vector< IndexSet >
+      locally_owned_domain_indices() const;
 
       /**
        * Return the partitioning of the range space of this matrix, i.e., the
        * partitioning of the vectors that are result from matrix-vector
        * products.
        */
-      std::vector< IndexSet > locally_owned_range_indices() const;
+      std::vector< IndexSet >
+      locally_owned_range_indices() const;
 
       /**
        * Return a reference to the MPI communicator object in use with this
        * matrix.
        */
-      const MPI_Comm &get_mpi_communicator () const;
+      const MPI_Comm &
+      get_mpi_communicator () const;
 
       /**
        * Make the clear() function in the base class visible, though it is

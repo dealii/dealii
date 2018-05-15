@@ -187,12 +187,14 @@ public:
    * the portion of the overall problem that is handled by the current
    * processor.
    */
-  explicit ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
+  explicit
+  ConstraintMatrix (const IndexSet &local_constraints = IndexSet());
 
   /**
    * Copy constructor
    */
-  explicit ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
+  explicit
+  ConstraintMatrix (const ConstraintMatrix &constraint_matrix);
 
   /**
    * Move constructor
@@ -208,12 +210,14 @@ public:
    * However, you can use the copy_from() function to explicitly
    * copy ConstraintMatrix objects.
    */
-  ConstraintMatrix &operator= (const ConstraintMatrix &) = delete;
+  ConstraintMatrix &
+  operator= (const ConstraintMatrix &) = delete;
 
   /**
    * Move assignment operator
    */
-  ConstraintMatrix &operator= (ConstraintMatrix &&constraint_matrix) = default;
+  ConstraintMatrix &
+  operator= (ConstraintMatrix &&constraint_matrix) = default;
 
   /**
    * Copy the given object to the current one.
@@ -221,7 +225,8 @@ public:
    * This function exists because @p operator=() is explicitly
    * disabled.
    */
-  void copy_from (const ConstraintMatrix &other);
+  void
+  copy_from (const ConstraintMatrix &other);
 
   /**
    * clear() the ConstraintMatrix object and supply an IndexSet with lines
@@ -229,7 +234,8 @@ public:
    * distributed case to supply a different IndexSet. Otherwise this routine
    * is equivalent to calling clear(). See the constructor for details.
    */
-  void reinit (const IndexSet &local_constraints = IndexSet());
+  void
+  reinit (const IndexSet &local_constraints = IndexSet());
 
   /**
    * Determines if we can store a constraint for the given @p line_index. This
@@ -237,7 +243,8 @@ public:
    * allows storage of this line. Always returns true if not in the
    * distributed case.
    */
-  bool can_store_line (const size_type line_index) const;
+  bool
+  can_store_line (const size_type line_index) const;
 
   /**
    * Return the index set describing locally relevant lines if any are
@@ -245,7 +252,8 @@ public:
    * IndexSet, whereas otherwise it contains the global problem size and the
    * local range.
    */
-  const IndexSet &get_local_lines() const;
+  const IndexSet &
+  get_local_lines() const;
 
   /**
    * This function copies the content of @p constraints_in with DoFs that are
@@ -266,8 +274,9 @@ public:
    * ConstraintMatrix, i.e. extracting a diagonal subblock from a larger
    * ConstraintMatrix. The block is specified by the IndexSet argument.
    */
-  void add_selected_constraints (const ConstraintMatrix &constraints_in,
-                                 const IndexSet         &filter);
+  void
+  add_selected_constraints (const ConstraintMatrix &constraints_in,
+                            const IndexSet         &filter);
 
   /**
    * @name Adding constraints
@@ -278,7 +287,8 @@ public:
    * Add a new line to the matrix. If the line already exists, then the
    * function simply returns without doing anything.
    */
-  void add_line (const size_type line);
+  void
+  add_line (const size_type line);
 
   /**
    * Call the first add_line() function for every index <code>i</code> for
@@ -292,7 +302,8 @@ public:
    * later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
-  void add_lines (const std::vector<bool> &lines);
+  void
+  add_lines (const std::vector<bool> &lines);
 
   /**
    * Call the first add_line() function for every index <code>i</code> that
@@ -306,7 +317,8 @@ public:
    * later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
-  void add_lines (const std::set<size_type> &lines);
+  void
+  add_lines (const std::set<size_type> &lines);
 
   /**
    * Call the first add_line() function for every index <code>i</code> that
@@ -320,7 +332,8 @@ public:
    * later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
-  void add_lines (const IndexSet &lines);
+  void
+  add_lines (const IndexSet &lines);
 
   /**
    * Add an entry to a given line. The list of lines is searched from the back
@@ -333,17 +346,19 @@ public:
    * of the entry is the same. Thus, it does no harm to enter a constraint
    * twice.
    */
-  void add_entry (const size_type line,
-                  const size_type column,
-                  const double value);
+  void
+  add_entry (const size_type line,
+             const size_type column,
+             const double value);
 
   /**
    * Add a whole series of entries, denoted by pairs of column indices and
    * values, to a line of constraints. This function is equivalent to calling
    * the preceding function several times, but is faster.
    */
-  void add_entries (const size_type                                  line,
-                    const std::vector<std::pair<size_type,double> > &col_val_pairs);
+  void
+  add_entries (const size_type                                  line,
+               const std::vector<std::pair<size_type,double> > &col_val_pairs);
 
   /**
    * Set an inhomogeneity to the constraint line <i>i</i>, according to the
@@ -351,8 +366,9 @@ public:
    *
    * @note the line needs to be added with one of the add_line() calls first.
    */
-  void set_inhomogeneity (const size_type line,
-                          const double    value);
+  void
+  set_inhomogeneity (const size_type line,
+                     const double    value);
 
   /**
    * Close the filling of entries. Since the lines of a matrix of this type
@@ -374,7 +390,8 @@ public:
    * cycles in this graph of constraints are not allowed, i.e. for example
    * $u_4$ may not be constrained, directly or indirectly, to $u_{13}$ again.
    */
-  void close ();
+  void
+  close ();
 
   /**
    * Merge the constraints represented by the object given as argument into
@@ -400,9 +417,10 @@ public:
    * Merging a ConstraintMatrix that is initialized with an IndexSet
    * and one that is not initialized with an IndexSet is not yet implemented.
    */
-  void merge (const ConstraintMatrix &other_constraints,
-              const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed,
-              const bool allow_different_local_lines = false);
+  void
+  merge (const ConstraintMatrix &other_constraints,
+         const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed,
+         const bool allow_different_local_lines = false);
 
   /**
    * Shift all entries of this matrix down @p offset rows and over @p offset
@@ -416,7 +434,8 @@ public:
    * several constraint objects, then shift them, and finally merge() them
    * together again.
    */
-  void shift (const size_type offset);
+  void
+  shift (const size_type offset);
 
   /**
    * Clear all entries of this matrix. Reset the flag determining whether new
@@ -425,7 +444,8 @@ public:
    * This function may be called also on objects which are empty or already
    * cleared.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * @}
@@ -440,7 +460,8 @@ public:
   /**
    * Return number of constraints stored in this matrix.
    */
-  size_type n_constraints () const;
+  size_type
+  n_constraints () const;
 
   /**
    * Return whether the degree of freedom with number @p index is a
@@ -451,7 +472,8 @@ public:
    * sorted and we can do a binary search, while before close() was called, we
    * have to perform a linear search through all entries.
    */
-  bool is_constrained (const size_type index) const;
+  bool
+  is_constrained (const size_type index) const;
 
   /**
    * Return whether the dof is constrained, and whether it is constrained to
@@ -464,7 +486,8 @@ public:
    * of freedom, or if it is constrained to only one degree of freedom but
    * with a weight different from one.
    */
-  bool is_identity_constrained (const size_type index) const;
+  bool
+  is_identity_constrained (const size_type index) const;
 
   /**
    * Return whether the two given degrees of freedom are linked by an equality
@@ -472,8 +495,9 @@ public:
    * <code>index1=index2</code> or constrains index2 so that
    * <code>index2=index1</code>.
    */
-  bool are_identity_constrained (const size_type index1,
-                                 const size_type index2) const;
+  bool
+  are_identity_constrained (const size_type index1,
+                            const size_type index2) const;
 
   /**
    * Return the maximum number of other dofs that one dof is constrained to.
@@ -485,20 +509,23 @@ public:
    * The name indicates that within the system matrix, references to a
    * constrained node are indirected to the nodes it is constrained to.
    */
-  size_type max_constraint_indirections () const;
+  size_type
+  max_constraint_indirections () const;
 
   /**
    * Return <tt>true</tt> in case the dof is constrained and there is a non-
    * trivial inhomogeneous values set to the dof.
    */
-  bool is_inhomogeneously_constrained (const size_type index) const;
+  bool
+  is_inhomogeneously_constrained (const size_type index) const;
 
   /**
    * Return <tt>false</tt> if all constraints in the ConstraintMatrix are
    * homogeneous ones, and <tt>true</tt> if there is at least one
    * inhomogeneity.
    */
-  bool has_inhomogeneities () const;
+  bool
+  has_inhomogeneities () const;
 
   /**
    * Return a pointer to the vector of entries if a line is constrained,
@@ -511,7 +538,8 @@ public:
    * Return the value of the inhomogeneity stored in the constrained dof @p
    * line. Unconstrained dofs also return a zero value.
    */
-  double get_inhomogeneity (const size_type line) const;
+  double
+  get_inhomogeneity (const size_type line) const;
 
   /**
    * Print the constraints represented by the current object to the
@@ -533,7 +561,8 @@ public:
    * A block of lines such as the one above is repeated for each
    * constrained degree of freedom.
    */
-  void print (std::ostream &out) const;
+  void
+  print (std::ostream &out) const;
 
   /**
    * Write the graph of constraints in 'dot' format. 'dot' is a program that
@@ -547,13 +576,15 @@ public:
    *
    * This function exists mostly for debugging purposes.
    */
-  void write_dot (std::ostream &) const;
+  void
+  write_dot (std::ostream &) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Add the constraint indices associated to the indices in the given vector.
@@ -561,7 +592,8 @@ public:
    * elements and all the associated constrained indices. This function sorts
    * the elements and suppresses duplicates.
    */
-  void resolve_indices(std::vector<types::global_dof_index> &indices) const;
+  void
+  resolve_indices(std::vector<types::global_dof_index> &indices) const;
 
   /**
    * @}
@@ -590,24 +622,28 @@ public:
    * (i.e., the current object) must be closed. The sparsity pattern is
    * compressed at the end of the function.
    */
-  void condense (SparsityPattern &sparsity) const;
+  void
+  condense (SparsityPattern &sparsity) const;
 
   /**
    * Same function as above, but condenses square block sparsity patterns.
    */
-  void condense (BlockSparsityPattern &sparsity) const;
+  void
+  condense (BlockSparsityPattern &sparsity) const;
 
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
-  void condense (DynamicSparsityPattern &sparsity) const;
+  void
+  condense (DynamicSparsityPattern &sparsity) const;
 
   /**
    * Same function as above, but condenses square compressed sparsity
    * patterns.
    */
-  void condense (BlockDynamicSparsityPattern &sparsity) const;
+  void
+  condense (BlockDynamicSparsityPattern &sparsity) const;
 
   /**
    * Condense a given matrix, i.e., eliminate the rows and columns of the
@@ -617,13 +653,15 @@ public:
    * information.
    */
   template <typename number>
-  void condense (SparseMatrix<number> &matrix) const;
+  void
+  condense (SparseMatrix<number> &matrix) const;
 
   /**
    * Same function as above, but condenses square block sparse matrices.
    */
   template <typename number>
-  void condense (BlockSparseMatrix<number> &matrix) const;
+  void
+  condense (BlockSparseMatrix<number> &matrix) const;
 
   /**
    * Condense the given vector in-place. The @p VectorType may be a
@@ -637,7 +675,8 @@ public:
    * two vector arguments instead.
    */
   template <class VectorType>
-  void condense (VectorType &vec) const;
+  void
+  condense (VectorType &vec) const;
 
   /**
    * The function copies and condenses values from @p vec_ghosted into @p
@@ -646,8 +685,9 @@ public:
    * while @p output should not.
    */
   template <class VectorType>
-  void condense (const VectorType &vec_ghosted,
-                 VectorType       &output) const;
+  void
+  condense (const VectorType &vec_ghosted,
+            VectorType       &output) const;
 
   /**
    * Condense a given matrix and a given vector by eliminating rows and
@@ -662,16 +702,18 @@ public:
    * information.
    */
   template <typename number, class VectorType>
-  void condense (SparseMatrix<number> &matrix,
-                 VectorType           &vector) const;
+  void
+  condense (SparseMatrix<number> &matrix,
+            VectorType           &vector) const;
 
   /**
    * Same function as above, but condenses square block sparse matrices and
    * vectors.
    */
   template <typename number, class BlockVectorType>
-  void condense (BlockSparseMatrix<number> &matrix,
-                 BlockVectorType           &vector) const;
+  void
+  condense (BlockSparseMatrix<number> &matrix,
+            BlockVectorType           &vector) const;
 
   /**
    * Set the values of all constrained DoFs in a vector to zero.  The @p
@@ -680,7 +722,8 @@ public:
    * any other type having the same interface.
    */
   template <class VectorType>
-  void set_zero (VectorType &vec) const;
+  void
+  set_zero (VectorType &vec) const;
 
   /**
    * @}
@@ -1116,7 +1159,8 @@ public:
    * vector must not contain ghost elements.
    */
   template <class VectorType>
-  void distribute (VectorType &vec) const;
+  void
+  distribute (VectorType &vec) const;
 
   /**
    * @}
@@ -1163,26 +1207,30 @@ public:
      * albeit unintuitive since two lines really have no god-given order
      * relation.
      */
-    bool operator < (const ConstraintLine &) const;
+    bool
+    operator < (const ConstraintLine &) const;
 
     /**
      * This operator is likewise weird: it checks whether the line indices of
      * the two operands are equal, irrespective of the fact that the contents
      * of the line may be different.
      */
-    bool operator == (const ConstraintLine &) const;
+    bool
+    operator == (const ConstraintLine &) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     /**
      * Support for boost:serialization.
      */
     template <class Archive>
-    void serialize(Archive &ar, const unsigned int)
+    void
+    serialize(Archive &ar, const unsigned int)
     {
       ar &index &entries &inhomogeneity;
     }
@@ -1210,7 +1258,8 @@ public:
    * @return A range object for the half open range <code>[this->begin(),
    * this->end())</code> of line entries.
    */
-  const LineRange get_lines() const;
+  const LineRange
+  get_lines() const;
 
 
   /**
@@ -1240,10 +1289,11 @@ public:
    * @return Whether all ConstraintMatrix objects are consistent. Returns the
    * same value on all processors.
    */
-  bool is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
-                                 const IndexSet &locally_active_dofs,
-                                 const MPI_Comm mpi_communicator,
-                                 const bool verbose=false) const;
+  bool
+  is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
+                            const IndexSet &locally_active_dofs,
+                            const MPI_Comm mpi_communicator,
+                            const bool verbose=false) const;
 
 
   /**
@@ -1416,13 +1466,15 @@ private:
    * Internal function to calculate the index of line @p line in the vector
    * lines_cache using local_lines.
    */
-  size_type calculate_line_index (const size_type line) const;
+  size_type
+  calculate_line_index (const size_type line) const;
 
   /**
    * Return @p true if the weight of an entry (the second element of the pair)
    * equals zero. This function is used to delete entries with zero weight.
    */
-  static bool check_zero_weight (const std::pair<size_type, double> &p);
+  static bool
+  check_zero_weight (const std::pair<size_type, double> &p);
 
   /**
    * Dummy table that serves as default argument for function
@@ -1744,7 +1796,8 @@ ConstraintMatrix::get_local_lines () const
 
 template <class VectorType>
 inline
-void ConstraintMatrix::distribute_local_to_global (
+void
+ConstraintMatrix::distribute_local_to_global (
   const size_type index,
   const double    value,
   VectorType     &global_vector) const
@@ -1767,7 +1820,8 @@ void ConstraintMatrix::distribute_local_to_global (
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
           class VectorType>
 inline
-void ConstraintMatrix::distribute_local_to_global (
+void
+ConstraintMatrix::distribute_local_to_global (
   ForwardIteratorVec local_vector_begin,
   ForwardIteratorVec local_vector_end,
   ForwardIteratorInd local_indices_begin,
@@ -1812,10 +1866,11 @@ ConstraintMatrix::distribute_local_to_global (
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
           class VectorType>
 inline
-void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
-                                       ForwardIteratorInd local_indices_begin,
-                                       ForwardIteratorVec local_vector_begin,
-                                       ForwardIteratorVec local_vector_end) const
+void
+ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
+                                  ForwardIteratorInd local_indices_begin,
+                                  ForwardIteratorVec local_vector_begin,
+                                  ForwardIteratorVec local_vector_end) const
 {
   Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
   for ( ; local_vector_begin != local_vector_end;
@@ -1878,27 +1933,31 @@ private:
    * BlockSparseMatrixEZ).
    */
   template <typename T>
-  static yes_type check_for_block_matrix (const BlockMatrixBase<T> *);
+  static yes_type
+  check_for_block_matrix (const BlockMatrixBase<T> *);
 
   /**
    * Overload returning true if the class is derived from
    * BlockSparsityPatternBase, which is what block sparsity patterns do.
    */
   template <typename T>
-  static yes_type check_for_block_matrix (const BlockSparsityPatternBase<T> *);
+  static yes_type
+  check_for_block_matrix (const BlockSparsityPatternBase<T> *);
 
   /**
    * Overload for BlockSparseMatrixEZ, which is the only block matrix not
    * derived from BlockMatrixBase at the time of writing this class.
    */
   template <typename T>
-  static yes_type check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
+  static yes_type
+  check_for_block_matrix (const BlockSparseMatrixEZ<T> *);
 
   /**
    * Catch all for all other potential matrix types that are not block
    * matrices.
    */
-  static no_type check_for_block_matrix (...);
+  static no_type
+  check_for_block_matrix (...);
 
 public:
   /**

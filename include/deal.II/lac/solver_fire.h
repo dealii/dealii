@@ -140,7 +140,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverFIRE();
+  virtual
+  ~SolverFIRE();
 
   /**
    * Obtain a set of variables @p x that minimize an objective function
@@ -163,10 +164,11 @@ public:
    * = \frac{1}{2} \mathbf x^{T} \mathbf A \mathbf x - \mathbf x^{T} \mathbf b$.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void solve (const MatrixType         &A,
-              VectorType               &x,
-              const VectorType         &b,
-              const PreconditionerType &preconditioner);
+  void
+  solve (const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
+         const PreconditionerType &preconditioner);
 
 protected:
 
@@ -176,10 +178,11 @@ protected:
    * each step.
    * It can be used for graphical output of the convergence history.
    */
-  virtual void print_vectors (const unsigned int,
-                              const VectorType &x,
-                              const VectorType &v,
-                              const VectorType &g) const;
+  virtual void
+  print_vectors (const unsigned int,
+                 const VectorType &x,
+                 const VectorType &v,
+                 const VectorType &g) const;
 
   /**
    * Additional data to the solver.
@@ -372,10 +375,11 @@ SolverFIRE<VectorType>::solve
 
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
-void SolverFIRE<VectorType>::solve (const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner)
+void
+SolverFIRE<VectorType>::solve (const MatrixType         &A,
+                               VectorType               &x,
+                               const VectorType         &b,
+                               const PreconditionerType &preconditioner)
 {
 
   std::function<double(VectorType &,  const VectorType &)> compute_func =

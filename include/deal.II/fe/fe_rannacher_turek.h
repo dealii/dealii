@@ -64,7 +64,8 @@ public:
   FE_RannacherTurek(const unsigned int order = 0,
                     const unsigned int n_face_support_points = 2);
 
-  virtual std::string get_name() const override;
+  virtual std::string
+  get_name() const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -96,12 +97,14 @@ private:
   /**
    * Compute generalized support points and their weights.
    */
-  void initialize_support_points();
+  void
+  initialize_support_points();
   /**
    * Return information about degrees of freedom per object as needed during
    * construction.
    */
-  std::vector<unsigned int> get_dpo_vector();
+  std::vector<unsigned int>
+  get_dpo_vector();
 };
 
 

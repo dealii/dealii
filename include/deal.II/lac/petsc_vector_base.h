@@ -103,44 +103,52 @@ namespace PETScWrappers
        * this operation. Note also that this allows us to make the assignment
        * operator const.
        */
-      const VectorReference &operator = (const VectorReference &r) const;
+      const VectorReference &
+      operator = (const VectorReference &r) const;
 
       /**
        * The same function as above, but for non-const reference objects. The
        * function is needed since the compiler might otherwise automatically
        * generate a copy operator for non-const objects.
        */
-      VectorReference &operator = (const VectorReference &r);
+      VectorReference &
+      operator = (const VectorReference &r);
 
       /**
        * Set the referenced element of the vector to <tt>s</tt>.
        */
-      const VectorReference &operator = (const PetscScalar &s) const;
+      const VectorReference &
+      operator = (const PetscScalar &s) const;
 
       /**
        * Add <tt>s</tt> to the referenced element of the vector.
        */
-      const VectorReference &operator += (const PetscScalar &s) const;
+      const VectorReference &
+      operator += (const PetscScalar &s) const;
 
       /**
        * Subtract <tt>s</tt> from the referenced element of the vector.
        */
-      const VectorReference &operator -= (const PetscScalar &s) const;
+      const VectorReference &
+      operator -= (const PetscScalar &s) const;
 
       /**
        * Multiply the referenced element of the vector by <tt>s</tt>.
        */
-      const VectorReference &operator *= (const PetscScalar &s) const;
+      const VectorReference &
+      operator *= (const PetscScalar &s) const;
 
       /**
        * Divide the referenced element of the vector by <tt>s</tt>.
        */
-      const VectorReference &operator /= (const PetscScalar &s) const;
+      const VectorReference &
+      operator /= (const PetscScalar &s) const;
 
       /**
        * Return the real part of the value of the referenced element.
        */
-      PetscReal real () const;
+      PetscReal
+      real () const;
 
       /**
        * Return the imaginary part of the value of the referenced element.
@@ -148,7 +156,8 @@ namespace PETScWrappers
        * @note This operation is not defined for real numbers and an exception
        * is thrown.
        */
-      PetscReal imag () const;
+      PetscReal
+      imag () const;
 
       /**
        * Convert the reference to an actual value, i.e. return the value of
@@ -261,18 +270,21 @@ namespace PETScWrappers
      * the vector and we do not obtain ownership, so we do not destroy the
      * PETSc object in the destructor.
      */
-    explicit VectorBase (const Vec &v);
+    explicit
+    VectorBase (const Vec &v);
 
     /**
      * Destructor
      */
-    virtual ~VectorBase () override;
+    virtual
+    ~VectorBase () override;
 
     /**
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
-    virtual void clear ();
+    virtual void
+    clear ();
 
     /**
      * Compress the underlying representation of the PETSc object, i.e. flush
@@ -284,7 +296,8 @@ namespace PETScWrappers
      * @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (const VectorOperation::values operation);
+    void
+    compress (const VectorOperation::values operation);
 
     /**
      * Set all components of the vector to the given number @p s. Simply pass
@@ -299,26 +312,30 @@ namespace PETScWrappers
      * <tt>v=0</tt>. Assigning other values is deprecated and may be
      * disallowed in the future.
      */
-    VectorBase &operator = (const PetscScalar s);
+    VectorBase &
+    operator = (const PetscScalar s);
 
     /**
      * Test for equality. This function assumes that the present vector and
      * the one to compare with have the same size already, since comparing
      * vectors of different sizes makes not much sense anyway.
      */
-    bool operator == (const VectorBase &v) const;
+    bool
+    operator == (const VectorBase &v) const;
 
     /**
      * Test for inequality. This function assumes that the present vector and
      * the one to compare with have the same size already, since comparing
      * vectors of different sizes makes not much sense anyway.
      */
-    bool operator != (const VectorBase &v) const;
+    bool
+    operator != (const VectorBase &v) const;
 
     /**
      * Return the global dimension of the vector.
      */
-    size_type size () const;
+    size_type
+    size () const;
 
     /**
      * Return the local dimension of the vector, i.e. the number of elements
@@ -328,7 +345,8 @@ namespace PETScWrappers
      * To figure out which elements exactly are stored locally, use
      * local_range().
      */
-    size_type local_size () const;
+    size_type
+    local_size () const;
 
     /**
      * Return a pair of indices indicating which elements of this vector are
@@ -345,7 +363,8 @@ namespace PETScWrappers
      * Return whether @p index is in the local range or not, see also
      * local_range().
      */
-    bool in_local_range (const size_type index) const;
+    bool
+    in_local_range (const size_type index) const;
 
     /**
      * Return an index set that describes which elements of this vector are
@@ -360,7 +379,8 @@ namespace PETScWrappers
      *   vec.locally_owned_elements() == complete_index_set (vec.size())
      * @endcode
      */
-    IndexSet locally_owned_elements () const;
+    IndexSet
+    locally_owned_elements () const;
 
     /**
      * Return if the vector contains ghost elements.
@@ -368,7 +388,8 @@ namespace PETScWrappers
      * @see
      * @ref GlossGhostedVector "vectors with ghost elements"
      */
-    bool has_ghost_elements() const;
+    bool
+    has_ghost_elements() const;
 
     /**
      * This function only exists for compatibility with the @p
@@ -376,7 +397,8 @@ namespace PETScWrappers
      * implements ghost value updates in a different way that is a better fit
      * with the underlying PETSc vector object.
      */
-    void update_ghost_values () const;
+    void
+    update_ghost_values () const;
 
     /**
      * Provide access to a given element, both read and write.
@@ -412,8 +434,9 @@ namespace PETScWrappers
      * The indices of the elements to be set are stated in the first argument,
      * the corresponding values in the second.
      */
-    void set (const std::vector<size_type>   &indices,
-              const std::vector<PetscScalar>  &values);
+    void
+    set (const std::vector<size_type>   &indices,
+         const std::vector<PetscScalar>  &values);
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -430,8 +453,9 @@ namespace PETScWrappers
      *
      * @pre The sizes of the @p indices and @p values arrays must be identical.
      */
-    void extract_subvector_to (const std::vector<size_type> &indices,
-                               std::vector<PetscScalar> &values) const;
+    void
+    extract_subvector_to (const std::vector<size_type> &indices,
+                          std::vector<PetscScalar> &values) const;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -461,32 +485,36 @@ namespace PETScWrappers
      *   @p indices_begin and @p indices_end.
      */
     template <typename ForwardIterator, typename OutputIterator>
-    void extract_subvector_to (const ForwardIterator    indices_begin,
-                               const ForwardIterator    indices_end,
-                               OutputIterator           values_begin) const;
+    void
+    extract_subvector_to (const ForwardIterator    indices_begin,
+                          const ForwardIterator    indices_end,
+                          OutputIterator           values_begin) const;
 
     /**
      * A collective add operation: This function adds a whole set of values
      * stored in @p values to the vector components specified by @p indices.
      */
-    void add (const std::vector<size_type> &indices,
-              const std::vector<PetscScalar>  &values);
+    void
+    add (const std::vector<size_type> &indices,
+         const std::vector<PetscScalar>  &values);
 
     /**
      * This is a second collective add operation. As a difference, this
      * function takes a deal.II vector of values.
      */
-    void add (const std::vector<size_type>        &indices,
-              const ::dealii::Vector<PetscScalar> &values);
+    void
+    add (const std::vector<size_type>        &indices,
+         const ::dealii::Vector<PetscScalar> &values);
 
     /**
      * Take an address where <tt>n_elements</tt> are stored contiguously and
      * add them into the vector. Handles all cases which are not covered by
      * the other two <tt>add()</tt> functions above.
      */
-    void add (const size_type    n_elements,
-              const size_type   *indices,
-              const PetscScalar  *values);
+    void
+    add (const size_type    n_elements,
+         const size_type   *indices,
+         const PetscScalar  *values);
 
     /**
      * Return the scalar product of two vectors. The vectors must have the
@@ -494,17 +522,20 @@ namespace PETScWrappers
      *
      * For complex valued vector, this gives$\left(v^\ast,vec\right)$.
      */
-    PetscScalar operator * (const VectorBase &vec) const;
+    PetscScalar
+    operator * (const VectorBase &vec) const;
 
     /**
      * Return the square of the $l_2$-norm.
      */
-    real_type norm_sqr () const;
+    real_type
+    norm_sqr () const;
 
     /**
      * Return the mean value of the elements of this vector.
      */
-    PetscScalar mean_value () const;
+    PetscScalar
+    mean_value () const;
 
     /**
      * $l_1$-norm of the vector. The sum of the absolute values.
@@ -513,25 +544,29 @@ namespace PETScWrappers
      * as the sum of absolute values of real and imaginary parts of elements
      * of a complex vector.
      */
-    real_type l1_norm () const;
+    real_type
+    l1_norm () const;
 
     /**
      * $l_2$-norm of the vector.  The square root of the sum of the squares of
      * the elements.
      */
-    real_type l2_norm () const;
+    real_type
+    l2_norm () const;
 
     /**
      * $l_p$-norm of the vector. The pth root of the sum of the pth powers of
      * the absolute values of the elements.
      */
-    real_type lp_norm (const real_type p) const;
+    real_type
+    lp_norm (const real_type p) const;
 
     /**
      * $l_\infty$-norm of the vector. Return the value of the vector element
      * with the maximum absolute value.
      */
-    real_type linfty_norm () const;
+    real_type
+    linfty_norm () const;
 
     /**
      * Performs a combined operation of a vector addition and a subsequent
@@ -551,95 +586,111 @@ namespace PETScWrappers
      * For complex-valued vectors, the scalar product in the second step is implemented as
      * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
      */
-    PetscScalar add_and_dot (const PetscScalar a,
-                             const VectorBase &V,
-                             const VectorBase &W);
+    PetscScalar
+    add_and_dot (const PetscScalar a,
+                 const VectorBase &V,
+                 const VectorBase &W);
 
     /**
      * Return the value of the vector element with the largest negative value.
      */
-    real_type min () const;
+    real_type
+    min () const;
 
     /**
      * Return the value of the vector element with the largest positive value.
      */
-    real_type max () const;
+    real_type
+    max () const;
 
     /**
      * Return whether the vector contains only elements with value zero. This
      * is a collective operation. This function is expensive, because
      * potentially all elements have to be checked.
      */
-    bool all_zero () const;
+    bool
+    all_zero () const;
 
     /**
      * Return @p true if the vector has no negative entries, i.e. all entries
      * are zero or positive. This function is used, for example, to check
      * whether refinement indicators are really all positive (or zero).
      */
-    bool is_non_negative () const;
+    bool
+    is_non_negative () const;
 
     /**
      * Multiply the entire vector by a fixed factor.
      */
-    VectorBase &operator *= (const PetscScalar factor);
+    VectorBase &
+    operator *= (const PetscScalar factor);
 
     /**
      * Divide the entire vector by a fixed factor.
      */
-    VectorBase &operator /= (const PetscScalar factor);
+    VectorBase &
+    operator /= (const PetscScalar factor);
 
     /**
      * Add the given vector to the present one.
      */
-    VectorBase &operator += (const VectorBase &V);
+    VectorBase &
+    operator += (const VectorBase &V);
 
     /**
      * Subtract the given vector from the present one.
      */
-    VectorBase &operator -= (const VectorBase &V);
+    VectorBase &
+    operator -= (const VectorBase &V);
 
     /**
      * Addition of @p s to all components. Note that @p s is a scalar and not
      * a vector.
      */
-    void add (const PetscScalar s);
+    void
+    add (const PetscScalar s);
 
     /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
-    void add (const PetscScalar a, const VectorBase &V);
+    void
+    add (const PetscScalar a, const VectorBase &V);
 
     /**
      * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
      */
-    void add (const PetscScalar a, const VectorBase &V,
-              const PetscScalar b, const VectorBase &W);
+    void
+    add (const PetscScalar a, const VectorBase &V,
+         const PetscScalar b, const VectorBase &W);
 
     /**
      * Scaling and simple vector addition, i.e. <tt>*this = s*(*this)+V</tt>.
      */
-    void sadd (const PetscScalar s,
-               const VectorBase     &V);
+    void
+    sadd (const PetscScalar s,
+          const VectorBase     &V);
 
     /**
      * Scaling and simple addition, i.e. <tt>*this = s*(*this)+a*V</tt>.
      */
-    void sadd (const PetscScalar s,
-               const PetscScalar a,
-               const VectorBase     &V);
+    void
+    sadd (const PetscScalar s,
+          const PetscScalar a,
+          const VectorBase     &V);
 
     /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignment) by a diagonal scaling matrix.
      */
-    void scale (const VectorBase &scaling_factors);
+    void
+    scale (const VectorBase &scaling_factors);
 
     /**
      * Assignment <tt>*this = a*V</tt>.
      */
-    void equ (const PetscScalar a, const VectorBase &V);
+    void
+    equ (const PetscScalar a, const VectorBase &V);
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let
@@ -652,8 +703,9 @@ namespace PETScWrappers
      * attempt is made to catch such situations.
      */
     DEAL_II_DEPRECATED
-    void ratio (const VectorBase &a,
-                const VectorBase &b);
+    void
+    ratio (const VectorBase &a,
+           const VectorBase &b);
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector
@@ -662,7 +714,8 @@ namespace PETScWrappers
      * valid view formats, consult
      * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecView.html
      */
-    void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT) ;
+    void
+    write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT) ;
 
     /**
      * Print to a stream. @p precision denotes the desired precision with
@@ -671,10 +724,11 @@ namespace PETScWrappers
      * printed in a line, while if @p false then the elements are printed on a
      * separate line each.
      */
-    void print (std::ostream       &out,
-                const unsigned int  precision  = 3,
-                const bool          scientific = true,
-                const bool          across     = true) const;
+    void
+    print (std::ostream       &out,
+           const unsigned int  precision  = 3,
+           const bool          scientific = true,
+           const bool          across     = true) const;
 
     /**
      * Swap the contents of this vector and the other vector @p v. One could
@@ -688,7 +742,8 @@ namespace PETScWrappers
      * <tt>swap(u,v)</tt> that simply calls <tt>u.swap(v)</tt>, again in
      * analogy to standard functions.
      */
-    void swap (VectorBase &v);
+    void
+    swap (VectorBase &v);
 
     /**
      * Conversion operator to gain access to the underlying PETSc type. If you
@@ -702,13 +757,15 @@ namespace PETScWrappers
     /**
      * Estimate for the memory consumption (not implemented for this class).
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     /**
      * Return a reference to the MPI communicator object in use with this
      * object.
      */
-    virtual const MPI_Comm &get_mpi_communicator () const;
+    virtual const MPI_Comm &
+    get_mpi_communicator () const;
 
   protected:
     /**
@@ -755,10 +812,11 @@ namespace PETScWrappers
      * collective @p set and @p add with the @p add_values flag set to the
      * corresponding value.
      */
-    void do_set_add_operation (const size_type    n_elements,
-                               const size_type   *indices,
-                               const PetscScalar  *values,
-                               const bool         add_values);
+    void
+    do_set_add_operation (const size_type    n_elements,
+                          const size_type   *indices,
+                          const PetscScalar  *values,
+                          const bool         add_values);
 
   private:
     /**
@@ -766,7 +824,8 @@ namespace PETScWrappers
      * deliberately left as private (and undefined) to prevent accidental
      * usage.
      */
-    VectorBase &operator=(const VectorBase &) = delete;
+    VectorBase &
+    operator=(const VectorBase &) = delete;
   };
 
 
@@ -782,7 +841,8 @@ namespace PETScWrappers
    * @author Wolfgang Bangerth, 2004
    */
   inline
-  void swap (VectorBase &u, VectorBase &v)
+  void
+  swap (VectorBase &u, VectorBase &v)
   {
     u.swap (v);
   }
@@ -1115,17 +1175,19 @@ namespace PETScWrappers
   }
 
   inline
-  void VectorBase::extract_subvector_to (const std::vector<size_type> &indices,
-                                         std::vector<PetscScalar> &values) const
+  void
+  VectorBase::extract_subvector_to (const std::vector<size_type> &indices,
+                                    std::vector<PetscScalar> &values) const
   {
     extract_subvector_to(&(indices[0]), &(indices[0]) + indices.size(),  &(values[0]));
   }
 
   template <typename ForwardIterator, typename OutputIterator>
   inline
-  void VectorBase::extract_subvector_to (const ForwardIterator    indices_begin,
-                                         const ForwardIterator    indices_end,
-                                         OutputIterator           values_begin) const
+  void
+  VectorBase::extract_subvector_to (const ForwardIterator    indices_begin,
+                                    const ForwardIterator    indices_end,
+                                    OutputIterator           values_begin) const
   {
     const PetscInt n_idx = static_cast<PetscInt>(indices_end - indices_begin);
     if (n_idx == 0)

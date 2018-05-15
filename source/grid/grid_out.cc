@@ -53,7 +53,8 @@ namespace GridOutFlags
     write_all_faces (write_all_faces)
   {}
 
-  void DX::declare_parameters (ParameterHandler &param)
+  void
+  DX::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write cells", "true", Patterns::Bool(),
                         "Write the mesh connectivity as DX grid cells");
@@ -70,7 +71,8 @@ namespace GridOutFlags
                         "Write all faces, not only boundary");
   }
 
-  void DX::parse_parameters (ParameterHandler &param)
+  void
+  DX::parse_parameters (ParameterHandler &param)
   {
     write_cells = param.get_bool("Write cells");
     write_faces = param.get_bool("Write faces");
@@ -86,14 +88,16 @@ namespace GridOutFlags
     write_lines (write_lines)
   {}
 
-  void Msh::declare_parameters (ParameterHandler &param)
+  void
+  Msh::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write faces", "false", Patterns::Bool());
     param.declare_entry("Write lines", "false", Patterns::Bool());
   }
 
 
-  void Msh::parse_parameters (ParameterHandler &param)
+  void
+  Msh::parse_parameters (ParameterHandler &param)
   {
     write_faces = param.get_bool("Write faces");
     write_lines = param.get_bool("Write lines");
@@ -110,7 +114,8 @@ namespace GridOutFlags
 
 
 
-  void Ucd::declare_parameters (ParameterHandler &param)
+  void
+  Ucd::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write preamble", "true", Patterns::Bool());
     param.declare_entry("Write faces", "false", Patterns::Bool());
@@ -118,7 +123,8 @@ namespace GridOutFlags
   }
 
 
-  void Ucd::parse_parameters (ParameterHandler &param)
+  void
+  Ucd::parse_parameters (ParameterHandler &param)
   {
     write_preamble = param.get_bool("Write preamble");
     write_faces = param.get_bool("Write faces");
@@ -136,14 +142,16 @@ namespace GridOutFlags
 
 
 
-  void Gnuplot::declare_parameters (ParameterHandler &param)
+  void
+  Gnuplot::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool());
     param.declare_entry("Boundary points", "2", Patterns::Integer());
   }
 
 
-  void Gnuplot::parse_parameters (ParameterHandler &param)
+  void
+  Gnuplot::parse_parameters (ParameterHandler &param)
   {
     write_cell_numbers = param.get_bool("Cell number");
     n_boundary_face_points = param.get_integer("Boundary points");
@@ -165,7 +173,8 @@ namespace GridOutFlags
   {}
 
 
-  void EpsFlagsBase::declare_parameters (ParameterHandler &param)
+  void
+  EpsFlagsBase::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Size by", "width",
                         Patterns::Selection("width|height"),
@@ -186,7 +195,8 @@ namespace GridOutFlags
   }
 
 
-  void EpsFlagsBase::parse_parameters (ParameterHandler &param)
+  void
+  EpsFlagsBase::parse_parameters (ParameterHandler &param)
   {
     if (param.get("Size by") == std::string("width"))
       size_type = width;
@@ -213,11 +223,13 @@ namespace GridOutFlags
   {}
 
 
-  void Eps<1>::declare_parameters (ParameterHandler &)
+  void
+  Eps<1>::declare_parameters (ParameterHandler &)
   {}
 
 
-  void Eps<1>::parse_parameters (ParameterHandler &param)
+  void
+  Eps<1>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
   }
@@ -245,7 +257,8 @@ namespace GridOutFlags
   {}
 
 
-  void Eps<2>::declare_parameters (ParameterHandler &param)
+  void
+  Eps<2>::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool(),
                         "(2D only) Write cell numbers"
@@ -258,7 +271,8 @@ namespace GridOutFlags
   }
 
 
-  void Eps<2>::parse_parameters (ParameterHandler &param)
+  void
+  Eps<2>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
     write_cell_numbers = param.get_bool("Cell number");
@@ -284,7 +298,8 @@ namespace GridOutFlags
   {}
 
 
-  void Eps<3>::declare_parameters (ParameterHandler &param)
+  void
+  Eps<3>::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Azimuth", "30", Patterns::Double(),
                         "Azimuth of the viw point, that is, the angle "
@@ -294,7 +309,8 @@ namespace GridOutFlags
   }
 
 
-  void Eps<3>::parse_parameters (ParameterHandler &param)
+  void
+  Eps<3>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
     azimut_angle = 90- param.get_double("Elevation");
@@ -318,7 +334,8 @@ namespace GridOutFlags
   {}
 
 
-  void XFig::declare_parameters (ParameterHandler &param)
+  void
+  XFig::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Boundary", "true", Patterns::Bool());
     param.declare_entry("Level color", "false", Patterns::Bool());
@@ -333,7 +350,8 @@ namespace GridOutFlags
   }
 
 
-  void XFig::parse_parameters (ParameterHandler &param)
+  void
+  XFig::parse_parameters (ParameterHandler &param)
   {
     draw_boundary = param.get_bool("Boundary");
     level_depth = param.get_bool("Level depth");
@@ -386,12 +404,14 @@ namespace GridOutFlags
     draw_bounding_box (false) // box
   {}
 
-  void MathGL::declare_parameters (ParameterHandler &param)
+  void
+  MathGL::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry ("Draw bounding box", "false", Patterns::Bool ());
   }
 
-  void MathGL::parse_parameters (ParameterHandler &param)
+  void
+  MathGL::parse_parameters (ParameterHandler &param)
   {
     draw_bounding_box = param.get_bool ("Draw bounding box");
   }
@@ -405,77 +425,89 @@ GridOut::GridOut ()
 {}
 
 
-void GridOut::set_flags (const GridOutFlags::DX &flags)
+void
+GridOut::set_flags (const GridOutFlags::DX &flags)
 {
   dx_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Msh &flags)
+void
+GridOut::set_flags (const GridOutFlags::Msh &flags)
 {
   msh_flags = flags;
 }
 
 
-void GridOut::set_flags (const GridOutFlags::Ucd &flags)
+void
+GridOut::set_flags (const GridOutFlags::Ucd &flags)
 {
   ucd_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Gnuplot &flags)
+void
+GridOut::set_flags (const GridOutFlags::Gnuplot &flags)
 {
   gnuplot_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<1> &flags)
+void
+GridOut::set_flags (const GridOutFlags::Eps<1> &flags)
 {
   eps_flags_1 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<2> &flags)
+void
+GridOut::set_flags (const GridOutFlags::Eps<2> &flags)
 {
   eps_flags_2 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<3> &flags)
+void
+GridOut::set_flags (const GridOutFlags::Eps<3> &flags)
 {
   eps_flags_3 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::XFig &flags)
+void
+GridOut::set_flags (const GridOutFlags::XFig &flags)
 {
   xfig_flags = flags;
 }
 
 
-void GridOut::set_flags (const GridOutFlags::Svg &flags)
+void
+GridOut::set_flags (const GridOutFlags::Svg &flags)
 {
   svg_flags = flags;
 }
 
 
-void GridOut::set_flags (const GridOutFlags::MathGL &flags)
+void
+GridOut::set_flags (const GridOutFlags::MathGL &flags)
 {
   mathgl_flags = flags;
 }
 
-void GridOut::set_flags (const GridOutFlags::Vtk &flags)
+void
+GridOut::set_flags (const GridOutFlags::Vtk &flags)
 {
   vtk_flags = flags;
 }
 
-void GridOut::set_flags (const GridOutFlags::Vtu &flags)
+void
+GridOut::set_flags (const GridOutFlags::Vtu &flags)
 {
   vtu_flags = flags;
 }
@@ -566,7 +598,8 @@ GridOut::parse_output_format (const std::string &format_name)
 
 
 
-std::string GridOut::get_output_format_names ()
+std::string
+GridOut::get_output_format_names ()
 {
   return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl|vtk|vtu";
 }
@@ -686,22 +719,25 @@ GridOut::memory_consumption () const
 
 
 template <>
-void GridOut::write_dx (const Triangulation<1> &,
-                        std::ostream &) const
+void
+GridOut::write_dx (const Triangulation<1> &,
+                   std::ostream &) const
 {
   Assert (false, ExcNotImplemented());
 }
 
 template <>
-void GridOut::write_dx (const Triangulation<1,2> &,
-                        std::ostream &) const
+void
+GridOut::write_dx (const Triangulation<1,2> &,
+                   std::ostream &) const
 {
   Assert (false, ExcNotImplemented());
 }
 
 template <>
-void GridOut::write_dx (const Triangulation<1,3> &,
-                        std::ostream &) const
+void
+GridOut::write_dx (const Triangulation<1,3> &,
+                   std::ostream &) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -709,8 +745,9 @@ void GridOut::write_dx (const Triangulation<1,3> &,
 
 
 template <int dim, int spacedim>
-void GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
-                        std::ostream             &out) const
+void
+GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
+                   std::ostream             &out) const
 {
 //TODO:[GK] allow for boundary faces only
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
@@ -942,8 +979,9 @@ void GridOut::write_dx (const Triangulation<dim, spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
-                         std::ostream             &out) const
+void
+GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
+                    std::ostream             &out) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1088,8 +1126,9 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
-                         std::ostream             &out) const
+void
+GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
+                    std::ostream             &out) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1214,7 +1253,8 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write_xfig (
+void
+GridOut::write_xfig (
   const Triangulation<dim, spacedim> &,
   std::ostream &,
   const Mapping<dim, spacedim> *) const
@@ -1225,7 +1265,8 @@ void GridOut::write_xfig (
 
 //TODO:[GK] Obey parameters
 template <>
-void GridOut::write_xfig (
+void
+GridOut::write_xfig (
   const Triangulation<2> &tria,
   std::ostream             &out,
   const Mapping<2> *       /*mapping*/) const
@@ -1415,14 +1456,16 @@ void GridOut::write_xfig (
 
 
 template <int dim, int spacedim>
-void GridOut::write_svg (const Triangulation<dim,spacedim> &,
-                         std::ostream &/*out*/) const
+void
+GridOut::write_svg (const Triangulation<dim,spacedim> &,
+                    std::ostream &/*out*/) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
+void
+GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 {
 
   unsigned int n_materials = 0;
@@ -2283,8 +2326,9 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
 
 template <>
-void GridOut::write_mathgl (const Triangulation<1> &,
-                            std::ostream &) const
+void
+GridOut::write_mathgl (const Triangulation<1> &,
+                       std::ostream &) const
 {
   // 1d specialization not done yet
   Assert (false, ExcNotImplemented());
@@ -2292,8 +2336,9 @@ void GridOut::write_mathgl (const Triangulation<1> &,
 
 
 template <int dim, int spacedim>
-void GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
-                            std::ostream             &out) const
+void
+GridOut::write_mathgl (const Triangulation<dim, spacedim> &tria,
+                       std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
 
@@ -2466,7 +2511,8 @@ namespace
       }
   }
 
-  std::vector<std::string> triangulation_patch_data_names ()
+  std::vector<std::string>
+  triangulation_patch_data_names ()
   {
     std::vector<std::string> v(5);
     v[0] = "level";
@@ -2481,8 +2527,9 @@ namespace
 
 
 template <int dim, int spacedim>
-void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
-                         std::ostream             &out) const
+void
+GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
+                    std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
 
@@ -2505,8 +2552,9 @@ void GridOut::write_vtk (const Triangulation<dim,spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
-                         std::ostream             &out) const
+void
+GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
+                    std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
 
@@ -2529,10 +2577,11 @@ void GridOut::write_vtu (const Triangulation<dim,spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim> &tria,
-                                               const std::string                 &filename_without_extension,
-                                               const bool                        view_levels,
-                                               const bool                        include_artificial) const
+void
+GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim> &tria,
+                                          const std::string                 &filename_without_extension,
+                                          const bool                        view_levels,
+                                          const bool                        include_artificial) const
 {
   std::vector<DataOutBase::Patch<dim,spacedim> > patches;
   const unsigned int n_datasets=4;
@@ -2651,43 +2700,51 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
 
 
 
-unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
+unsigned int
+GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<1> &) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<1> &) const
 {
   return 0;
 }
 
 
-unsigned int GridOut::n_boundary_faces (const Triangulation<1,2> &) const
+unsigned int
+GridOut::n_boundary_faces (const Triangulation<1,2> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<1,2> &) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<1,2> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_faces (const Triangulation<1,3> &) const
+unsigned int
+GridOut::n_boundary_faces (const Triangulation<1,3> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<1,3> &) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<1,3> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<2,2> &) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<2,2> &) const
 {
   return 0;
 }
 
-unsigned int GridOut::n_boundary_lines (const Triangulation<2,3> &) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<2,3> &) const
 {
   return 0;
 }
@@ -2695,7 +2752,8 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<2,3> &) const
 
 
 template <int dim, int spacedim>
-unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria) const
+unsigned int
+GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria) const
 {
   typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int n_faces = 0;
@@ -2712,7 +2770,8 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria)
 
 
 template <int dim, int spacedim>
-unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria) const
+unsigned int
+GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria) const
 {
   // save the user flags for lines so
   // we can use these flags to track
@@ -3081,7 +3140,8 @@ GridOut::write_ucd_lines(const Triangulation<dim, spacedim> &tria,
 }
 
 
-Point<2> GridOut::svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus)
+Point<2>
+GridOut::svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus)
 {
   // ...
   Point<3> camera_vertical;
@@ -3117,10 +3177,11 @@ namespace internal
   namespace
   {
     template <int spacedim>
-    void write_gnuplot (const dealii::Triangulation<1,spacedim> &tria,
-                        std::ostream             &out,
-                        const Mapping<1,spacedim> *,
-                        const GridOutFlags::Gnuplot &gnuplot_flags)
+    void
+    write_gnuplot (const dealii::Triangulation<1,spacedim> &tria,
+                   std::ostream             &out,
+                   const Mapping<1,spacedim> *,
+                   const GridOutFlags::Gnuplot &gnuplot_flags)
     {
       AssertThrow (out, ExcIO());
 
@@ -3154,10 +3215,11 @@ namespace internal
 
 
     template <int spacedim>
-    void write_gnuplot (const dealii::Triangulation<2,spacedim> &tria,
-                        std::ostream           &out,
-                        const Mapping<2,spacedim>       *mapping,
-                        const GridOutFlags::Gnuplot &gnuplot_flags)
+    void
+    write_gnuplot (const dealii::Triangulation<2,spacedim> &tria,
+                   std::ostream           &out,
+                   const Mapping<2,spacedim>       *mapping,
+                   const GridOutFlags::Gnuplot &gnuplot_flags)
     {
       AssertThrow (out, ExcIO());
 
@@ -3283,10 +3345,11 @@ namespace internal
 
 
     template <int spacedim>
-    void write_gnuplot (const dealii::Triangulation<3,spacedim> &tria,
-                        std::ostream           &out,
-                        const Mapping<3,spacedim>       *mapping,
-                        const GridOutFlags::Gnuplot &gnuplot_flags)
+    void
+    write_gnuplot (const dealii::Triangulation<3,spacedim> &tria,
+                   std::ostream           &out,
+                   const Mapping<3,spacedim>       *mapping,
+                   const GridOutFlags::Gnuplot &gnuplot_flags)
     {
       AssertThrow (out, ExcIO());
 
@@ -3497,7 +3560,8 @@ namespace internal
 
 
 template <int dim, int spacedim>
-void GridOut::write_gnuplot (
+void
+GridOut::write_gnuplot (
   const Triangulation<dim,spacedim> &tria,
   std::ostream             &out,
   const Mapping<dim,spacedim>       *mapping) const
@@ -3528,38 +3592,42 @@ namespace internal
     };
 
 
-    void write_eps (const dealii::Triangulation<1> &,
-                    std::ostream &,
-                    const Mapping<1> *,
-                    const GridOutFlags::Eps<2> &,
-                    const GridOutFlags::Eps<3> &)
+    void
+    write_eps (const dealii::Triangulation<1> &,
+               std::ostream &,
+               const Mapping<1> *,
+               const GridOutFlags::Eps<2> &,
+               const GridOutFlags::Eps<3> &)
     {
       Assert(false, ExcNotImplemented());
     }
 
-    void write_eps (const dealii::Triangulation<1,2> &,
-                    std::ostream &,
-                    const Mapping<1,2> *,
-                    const GridOutFlags::Eps<2> &,
-                    const GridOutFlags::Eps<3> &)
+    void
+    write_eps (const dealii::Triangulation<1,2> &,
+               std::ostream &,
+               const Mapping<1,2> *,
+               const GridOutFlags::Eps<2> &,
+               const GridOutFlags::Eps<3> &)
     {
       Assert(false, ExcNotImplemented());
     }
 
-    void write_eps (const dealii::Triangulation<1,3> &,
-                    std::ostream &,
-                    const Mapping<1,3> *,
-                    const GridOutFlags::Eps<2> &,
-                    const GridOutFlags::Eps<3> &)
+    void
+    write_eps (const dealii::Triangulation<1,3> &,
+               std::ostream &,
+               const Mapping<1,3> *,
+               const GridOutFlags::Eps<2> &,
+               const GridOutFlags::Eps<3> &)
     {
       Assert(false, ExcNotImplemented());
     }
 
-    void write_eps (const dealii::Triangulation<2,3> &,
-                    std::ostream &,
-                    const Mapping<2,3> *,
-                    const GridOutFlags::Eps<2> &,
-                    const GridOutFlags::Eps<3> &)
+    void
+    write_eps (const dealii::Triangulation<2,3> &,
+               std::ostream &,
+               const Mapping<2,3> *,
+               const GridOutFlags::Eps<2> &,
+               const GridOutFlags::Eps<3> &)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -3567,11 +3635,12 @@ namespace internal
 
 
     template <int dim, int spacedim>
-    void write_eps (const dealii::Triangulation<dim, spacedim> &tria,
-                    std::ostream             &out,
-                    const Mapping<dim,spacedim>       *mapping,
-                    const GridOutFlags::Eps<2> &eps_flags_2,
-                    const GridOutFlags::Eps<3> &eps_flags_3)
+    void
+    write_eps (const dealii::Triangulation<dim, spacedim> &tria,
+               std::ostream             &out,
+               const Mapping<dim,spacedim>       *mapping,
+               const GridOutFlags::Eps<2> &eps_flags_2,
+               const GridOutFlags::Eps<3> &eps_flags_3)
     {
       typedef std::list<LineEntry> LineList;
 
@@ -4023,9 +4092,10 @@ namespace internal
 
 
 template <int dim, int spacedim>
-void GridOut::write_eps (const Triangulation<dim, spacedim> &tria,
-                         std::ostream             &out,
-                         const Mapping<dim,spacedim>       *mapping) const
+void
+GridOut::write_eps (const Triangulation<dim, spacedim> &tria,
+                    std::ostream             &out,
+                    const Mapping<dim,spacedim>       *mapping) const
 {
   internal::write_eps (tria, out, mapping,
                        eps_flags_2, eps_flags_3);
@@ -4033,10 +4103,11 @@ void GridOut::write_eps (const Triangulation<dim, spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write (const Triangulation<dim, spacedim> &tria,
-                     std::ostream             &out,
-                     const OutputFormat        output_format,
-                     const Mapping<dim,spacedim>       *mapping) const
+void
+GridOut::write (const Triangulation<dim, spacedim> &tria,
+                std::ostream             &out,
+                const OutputFormat        output_format,
+                const Mapping<dim,spacedim>       *mapping) const
 {
   switch (output_format)
     {
@@ -4089,9 +4160,10 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
 
 template <int dim, int spacedim>
-void GridOut::write (const Triangulation<dim, spacedim> &tria,
-                     std::ostream             &out,
-                     const Mapping<dim,spacedim>  *mapping) const
+void
+GridOut::write (const Triangulation<dim, spacedim> &tria,
+                std::ostream             &out,
+                const Mapping<dim,spacedim>  *mapping) const
 {
   write(tria, out, default_format, mapping);
 }

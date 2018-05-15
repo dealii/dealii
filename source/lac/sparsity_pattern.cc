@@ -545,7 +545,8 @@ SparsityPattern::copy_from (const DynamicSparsityPattern &dsp)
 
 
 template <typename number>
-void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
+void
+SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 {
   // first init with the number of entries per row. if this matrix is square
   // then we also have to allocate memory for the diagonal entry, unless we
@@ -1049,13 +1050,16 @@ SparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void SparsityPattern::copy_from<float> (const FullMatrix<float> &);
-template void SparsityPattern::copy_from<double> (const FullMatrix<double> &);
+template void SparsityPattern::copy_from<float>
+(const FullMatrix<float> &);
+template void SparsityPattern::copy_from<double>
+(const FullMatrix<double> &);
 
-template void SparsityPattern::add_entries<const SparsityPattern::size_type *> (const size_type,
-    const size_type *,
-    const size_type *,
-    const bool);
+template void SparsityPattern::add_entries<const SparsityPattern::size_type *>
+(const size_type,
+ const size_type *,
+ const size_type *,
+ const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void SparsityPattern::add_entries<std::vector<SparsityPattern::size_type>::const_iterator>
 (const size_type,

@@ -130,54 +130,60 @@ namespace PETScWrappers
      * properties as if it were created by the constructor of this class with
      * the same argument list as the present function.
      */
-    void reinit (const MPI_Comm     &communicator,
-                 const unsigned int  m,
-                 const unsigned int  n,
-                 const unsigned int  local_rows,
-                 const unsigned int  local_columns);
+    void
+    reinit (const MPI_Comm     &communicator,
+            const unsigned int  m,
+            const unsigned int  n,
+            const unsigned int  local_rows,
+            const unsigned int  local_columns);
 
     /**
      * Throw away the present matrix and generate one that has the same
      * properties as if it were created by the constructor of this class with
      * the same argument list as the present function.
      */
-    void reinit (const MPI_Comm     &communicator,
-                 const unsigned int  m,
-                 const unsigned int  n,
-                 const std::vector<unsigned int> &local_rows_per_process,
-                 const std::vector<unsigned int> &local_columns_per_process,
-                 const unsigned int  this_process);
+    void
+    reinit (const MPI_Comm     &communicator,
+            const unsigned int  m,
+            const unsigned int  n,
+            const std::vector<unsigned int> &local_rows_per_process,
+            const std::vector<unsigned int> &local_columns_per_process,
+            const unsigned int  this_process);
 
     /**
      * Call the @p reinit() function above with <tt>communicator =
      * MPI_COMM_WORLD</tt>.
      */
-    void reinit (const unsigned int  m,
-                 const unsigned int  n,
-                 const unsigned int  local_rows,
-                 const unsigned int  local_columns);
+    void
+    reinit (const unsigned int  m,
+            const unsigned int  n,
+            const unsigned int  local_rows,
+            const unsigned int  local_columns);
 
     /**
      * Call the @p reinit() function above with <tt>communicator =
      * MPI_COMM_WORLD</tt>.
      */
-    void reinit (const unsigned int  m,
-                 const unsigned int  n,
-                 const std::vector<unsigned int> &local_rows_per_process,
-                 const std::vector<unsigned int> &local_columns_per_process,
-                 const unsigned int  this_process);
+    void
+    reinit (const unsigned int  m,
+            const unsigned int  n,
+            const std::vector<unsigned int> &local_rows_per_process,
+            const std::vector<unsigned int> &local_columns_per_process,
+            const unsigned int  this_process);
 
     /**
      * Release all memory and return to a state just like after having called
      * the default constructor.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Return a reference to the MPI communicator object in use with this
      * matrix.
      */
-    const MPI_Comm &get_mpi_communicator () const override;
+    const MPI_Comm &
+    get_mpi_communicator () const override;
 
     /**
      * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
@@ -191,8 +197,9 @@ namespace PETScWrappers
      * not distributed, then neither of the vectors may be.
      */
     virtual
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const = 0;
+    void
+    vmult (VectorBase       &dst,
+           const VectorBase &src) const = 0;
 
     /**
      * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
@@ -207,8 +214,9 @@ namespace PETScWrappers
      * vectors may be.
      */
     virtual
-    void Tvmult (VectorBase       &dst,
-                 const VectorBase &src) const = 0;
+    void
+    Tvmult (VectorBase       &dst,
+            const VectorBase &src) const = 0;
 
     /**
      * Adding Matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
@@ -222,8 +230,9 @@ namespace PETScWrappers
      * vectors may be.
      */
     virtual
-    void vmult_add (VectorBase       &dst,
-                    const VectorBase &src) const = 0;
+    void
+    vmult_add (VectorBase       &dst,
+               const VectorBase &src) const = 0;
 
     /**
      * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
@@ -238,8 +247,9 @@ namespace PETScWrappers
      * vectors may be.
      */
     virtual
-    void Tvmult_add (VectorBase       &dst,
-                     const VectorBase &src) const = 0;
+    void
+    Tvmult_add (VectorBase       &dst,
+                const VectorBase &src) const = 0;
 
     /**
      * The matrix-vector multiplication called by @p matrix_free_mult(). This
@@ -250,7 +260,8 @@ namespace PETScWrappers
      * in derived classes.
      */
     virtual
-    void vmult (Vec  &dst, const Vec  &src) const;
+    void
+    vmult (Vec  &dst, const Vec  &src) const;
 
   private:
 
@@ -271,17 +282,19 @@ namespace PETScWrappers
      * This function calls <tt>vmult(Vec &dst, const Vec &src)</tt> which
      * should be reimplemented in derived classes.
      */
-    static int matrix_free_mult (Mat  A, Vec  src, Vec  dst);
+    static int
+    matrix_free_mult (Mat  A, Vec  src, Vec  dst);
 
     /**
      * Do the actual work for the respective @p reinit() function and the
      * matching constructor, i.e. create a matrix object. Getting rid of the
      * previous matrix is left to the caller.
      */
-    void do_reinit (const unsigned int  m,
-                    const unsigned int  n,
-                    const unsigned int  local_rows,
-                    const unsigned int  local_columns);
+    void
+    do_reinit (const unsigned int  m,
+               const unsigned int  n,
+               const unsigned int  local_rows,
+               const unsigned int  local_columns);
   };
 
 

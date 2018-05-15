@@ -64,32 +64,38 @@ public:
   /**
    * Prefix increment.
    */
-  MatrixIterator &operator++ ();
+  MatrixIterator &
+  operator++ ();
 
   /**
    * Postfix increment.
    */
-  MatrixIterator operator++ (int);
+  MatrixIterator
+  operator++ (int);
 
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR &operator* () const;
+  const ACCESSOR &
+  operator* () const;
 
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR *operator-> () const;
+  const ACCESSOR *
+  operator-> () const;
 
   /**
    * Comparison. True, if both accessors are equal.
    */
-  bool operator == (const MatrixIterator &) const;
+  bool
+  operator == (const MatrixIterator &) const;
 
   /**
    * Inverse of <tt>==</tt>.
    */
-  bool operator != (const MatrixIterator &) const;
+  bool
+  operator != (const MatrixIterator &) const;
 
   /**
    * Comparison operator. Result is true if either the first row number is
@@ -97,13 +103,15 @@ public:
    *
    * This function is only valid if both iterators point into the same matrix.
    */
-  bool operator < (const MatrixIterator &) const;
+  bool
+  operator < (const MatrixIterator &) const;
 
   /**
    * Comparison operator. Works in the same way as above operator, just the
    * other way round.
    */
-  bool operator > (const MatrixIterator &) const;
+  bool
+  operator > (const MatrixIterator &) const;
 
 private:
   /**

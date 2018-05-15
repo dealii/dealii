@@ -45,13 +45,15 @@ namespace SLEPcWrappers
       }
   }
 
-  void TransformationBase::set_matrix_mode(const STMatMode mode)
+  void
+  TransformationBase::set_matrix_mode(const STMatMode mode)
   {
     const PetscErrorCode ierr = STSetMatMode(st,mode);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
-  void TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
+  void
+  TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
   {
     PetscErrorCode ierr = STSetKSP(st,solver.solver_data->ksp);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));

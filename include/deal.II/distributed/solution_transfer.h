@@ -156,13 +156,15 @@ namespace parallel
        * includes all vectors that are to be interpolated onto the new
        * (refined and/or coarsened) grid.
        */
-      void prepare_for_coarsening_and_refinement (const std::vector<const VectorType *> &all_in);
+      void
+      prepare_for_coarsening_and_refinement (const std::vector<const VectorType *> &all_in);
 
       /**
        * Same as the previous function but for only one discrete function to be
        * interpolated.
        */
-      void prepare_for_coarsening_and_refinement (const VectorType &in);
+      void
+      prepare_for_coarsening_and_refinement (const VectorType &in);
 
       /**
        * Interpolate the data previously stored in this object before the mesh
@@ -171,7 +173,8 @@ namespace parallel
        * prepare_for_coarsening_and_refinement() and write the result into the
        * given set of vectors.
        */
-      void interpolate (std::vector<VectorType *> &all_out);
+      void
+      interpolate (std::vector<VectorType *> &all_out);
 
       /**
        * Same as the previous function. It interpolates only one function. It
@@ -182,13 +185,15 @@ namespace parallel
        * several functions can be performed in one step by using
        * <tt>interpolate (all_in, all_out)</tt>
        */
-      void interpolate (VectorType &out);
+      void
+      interpolate (VectorType &out);
 
 
       /**
        * Return the size in bytes that need to be stored per cell.
        */
-      unsigned int get_data_size() const;
+      unsigned int
+      get_data_size() const;
 
 
       /**
@@ -197,13 +202,15 @@ namespace parallel
        * on the locally active DoFs (it must be ghosted). See documentation of
        * this class for more information.
        */
-      void prepare_serialization(const VectorType &in);
+      void
+      prepare_serialization(const VectorType &in);
 
 
       /**
        * Same as the function above, only for a list of vectors.
        */
-      void prepare_serialization(const std::vector<const VectorType *> &all_in);
+      void
+      prepare_serialization(const std::vector<const VectorType *> &all_in);
 
 
       /**
@@ -212,13 +219,15 @@ namespace parallel
        * fully distributed vector without ghost elements. See documentation of
        * this class for more information.
        */
-      void deserialize(VectorType &in);
+      void
+      deserialize(VectorType &in);
 
 
       /**
        * Same as the function above, only for a list of vectors.
        */
-      void deserialize(std::vector<VectorType *> &all_in);
+      void
+      deserialize(std::vector<VectorType *> &all_in);
 
     private:
       /**
@@ -243,25 +252,28 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void pack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
-                         const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
-                         void *data);
+      void
+      pack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                    const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
+                    void *data);
 
       /**
        * A callback function used to unpack the data on the current mesh that
        * has been packed up previously on the mesh before refinement,
        * coarsening and repartitioning.
        */
-      void unpack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
-                           const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
-                           const void *data,
-                           std::vector<VectorType *> &all_out);
+      void
+      unpack_callback(const typename Triangulation<dim,DoFHandlerType::space_dimension>::cell_iterator &cell,
+                      const typename Triangulation<dim,DoFHandlerType::space_dimension>::CellStatus status,
+                      const void *data,
+                      std::vector<VectorType *> &all_out);
 
 
       /**
        *
        */
-      void register_data_attach(const std::size_t size);
+      void
+      register_data_attach(const std::size_t size);
 
     };
 

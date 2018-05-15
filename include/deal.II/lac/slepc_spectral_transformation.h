@@ -80,7 +80,8 @@ namespace SLEPcWrappers
     /**
      * Destructor.
      */
-    virtual ~TransformationBase ();
+    virtual
+    ~TransformationBase ();
 
     /**
      * Set a flag to indicate how the transformed matrices are being stored in
@@ -90,7 +91,8 @@ namespace SLEPcWrappers
      * library
      * http://www.grycap.upv.es/slepc/documentation/current/docs/manualpages/ST/STMatMode.html
      */
-    void set_matrix_mode(const STMatMode mode);
+    void
+    set_matrix_mode(const STMatMode mode);
 
     /**
      * Set solver to be used when solving a system of linear algebraic

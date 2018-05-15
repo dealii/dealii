@@ -153,17 +153,20 @@ namespace Rol
      * Return the Teuchos smart reference counting pointer to
      * the wrapper vector, #vector_ptr.
      */
-    Teuchos::RCP<VectorType> getVector ();
+    Teuchos::RCP<VectorType>
+    getVector ();
 
     /**
      * Return the Teuchos smart reference counting pointer to const vector.
      */
-    Teuchos::RCP<const VectorType> getVector () const;
+    Teuchos::RCP<const VectorType>
+    getVector () const;
 
     /**
      * Return the dimension (global vector size) of the wrapped vector.
      */
-    int dimension () const;
+    int
+    dimension () const;
 
     /**
      * Set the wrapper vector to a given ROL::Vector @p rol_vector by
@@ -173,29 +176,34 @@ namespace Rol
      * then <code> VectorType::operator=(const VectorType&) </code> should still
      * be allowed on it.
      */
-    void set (const ROL::Vector<value_type> &rol_vector);
+    void
+    set (const ROL::Vector<value_type> &rol_vector);
 
     /**
      * Perform addition.
      */
-    void plus (const ROL::Vector<value_type> &rol_vector);
+    void
+    plus (const ROL::Vector<value_type> &rol_vector);
 
     /**
      * Scale the wrapper vector by @p alpha and add ROL::Vector @p rol_vector
      * to it.
      */
-    void axpy (const value_type               alpha,
-               const ROL::Vector<value_type> &rol_vector);
+    void
+    axpy (const value_type               alpha,
+          const ROL::Vector<value_type> &rol_vector);
 
     /**
      * Scale the wrapper vector.
      */
-    void scale (const value_type alpha);
+    void
+    scale (const value_type alpha);
 
     /**
      * Return the dot product with a given ROL::Vector @p rol_vector.
      */
-    value_type dot (const ROL::Vector<value_type> &rol_vector) const;
+    value_type
+    dot (const ROL::Vector<value_type> &rol_vector) const;
 
     /**
      * Return the $L^{2}$ norm of the wrapped vector.
@@ -206,42 +214,49 @@ namespace Rol
      * <code> VectorAdaptor::real_type norm() const; </code>
      * if real_type and value_type are not of the same type.
      */
-    value_type norm() const;
+    value_type
+    norm() const;
 
     /**
      * Return a clone of the wrapped vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>> clone() const;
+    Teuchos::RCP<ROL::Vector<value_type>>
+                                       clone() const;
 
     /**
      * Create and return a Teuchos smart reference counting pointer to the basis
      * vector corresponding to the @p i ${}^{th}$ element of
      * the wrapper vector.
      */
-    Teuchos::RCP<ROL::Vector<value_type>> basis (const int i) const;
+    Teuchos::RCP<ROL::Vector<value_type>>
+                                       basis (const int i) const;
 
     /**
      * Apply unary function @p f to all the elements of the wrapped vector.
      */
-    void applyUnary (const ROL::Elementwise::UnaryFunction<value_type> &f);
+    void
+    applyUnary (const ROL::Elementwise::UnaryFunction<value_type> &f);
 
     /**
      * Apply binary function @p f along with ROL::Vector @p rol_vector to all
      * the elements of the wrapped vector.
      */
-    void applyBinary (const ROL::Elementwise::BinaryFunction<value_type> &f,
-                      const ROL::Vector<value_type>                      &rol_vector);
+    void
+    applyBinary (const ROL::Elementwise::BinaryFunction<value_type> &f,
+                 const ROL::Vector<value_type>                      &rol_vector);
 
     /**
      * Return the accumulated value on applying reduction operation @p r on
      * all the elements of the wrapped vector.
      */
-    value_type reduce (const ROL::Elementwise::ReductionOp<value_type> &r) const;
+    value_type
+    reduce (const ROL::Elementwise::ReductionOp<value_type> &r) const;
 
     /**
      * Print the wrapped vector to the output stream @p outStream.
      */
-    void print (std::ostream &outStream) const;
+    void
+    print (std::ostream &outStream) const;
 
   };
 

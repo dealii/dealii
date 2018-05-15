@@ -109,45 +109,51 @@ public:
    * information on this.
    */
   template <typename number>
-  void evaluate (const std::vector<Vector<number> > &values,
-                 const std::vector<double>                   &y_values,
-                 const unsigned int                           n_intervals,
-                 const IntervalSpacing                        interval_spacing = linear);
+  void
+  evaluate (const std::vector<Vector<number> > &values,
+            const std::vector<double>                   &y_values,
+            const unsigned int                           n_intervals,
+            const IntervalSpacing                        interval_spacing = linear);
 
   /**
    * This function is only a wrapper to the above one in case you have only
    * one data set.
    */
   template <typename number>
-  void evaluate (const Vector<number>          &values,
-                 const unsigned int             n_intervals,
-                 const IntervalSpacing          interval_spacing = linear);
+  void
+  evaluate (const Vector<number>          &values,
+            const unsigned int             n_intervals,
+            const IntervalSpacing          interval_spacing = linear);
 
   /**
    * Write the histogram computed by the @p evaluate function to a stream in a
    * format suitable to the GNUPLOT program. The function generates 2d or 3d
    * histograms.
    */
-  void write_gnuplot (std::ostream &out) const;
+  void
+  write_gnuplot (std::ostream &out) const;
 
   /**
    * Return allowed names for the interval spacing as string. At present this
    * is "linear|logarithmic".
    */
-  static std::string get_interval_spacing_names ();
+  static std::string
+  get_interval_spacing_names ();
 
   /**
    * Get a string containing one of the names returned by the above function
    * and return the respective value of @p IntervalSpacing. Throw an error if
    * the string is no valid one.
    */
-  static IntervalSpacing parse_interval_spacing (const std::string &name);
+  static IntervalSpacing
+  parse_interval_spacing (const std::string &name);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Exception.
@@ -187,7 +193,8 @@ private:
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     /**
      * Left bound of the interval.
@@ -216,8 +223,9 @@ private:
    * negative numbers to be larger than the largest positive number.
    */
   template <typename number>
-  static bool logarithmic_less (const number n1,
-                                const number n2);
+  static bool
+  logarithmic_less (const number n1,
+                    const number n2);
 
   /**
    * Vector holding one set of intervals for each data set given to the @p

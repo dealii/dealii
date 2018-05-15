@@ -117,17 +117,20 @@ namespace TrilinosWrappers
       /**
        * Row number of the element represented by this object.
        */
-      size_type row() const;
+      size_type
+      row() const;
 
       /**
        * Index in row of the element represented by this object.
        */
-      size_type index() const;
+      size_type
+      index() const;
 
       /**
        * Column number of the element represented by this object.
        */
-      size_type column() const;
+      size_type
+      column() const;
 
     protected:
       /**
@@ -152,7 +155,8 @@ namespace TrilinosWrappers
        * accessors) and generate new ones for the row pointed to presently by
        * this accessor.
        */
-      void visit_present_row ();
+      void
+      visit_present_row ();
 
       /**
        * Cache where we store the column indices of the present row. This is
@@ -190,12 +194,14 @@ namespace TrilinosWrappers
       /**
        * Value of this matrix entry.
        */
-      TrilinosScalar value() const;
+      TrilinosScalar
+      value() const;
 
       /**
        * Value of this matrix entry.
        */
-      TrilinosScalar &value();
+      TrilinosScalar &
+      value();
     };
 
     /**
@@ -229,7 +235,8 @@ namespace TrilinosWrappers
       /**
        * Value of this matrix entry.
        */
-      TrilinosScalar value() const;
+      TrilinosScalar
+      value() const;
 
     private:
       /**
@@ -260,27 +267,32 @@ namespace TrilinosWrappers
         /**
          * Set the element of the matrix we presently point to to @p n.
          */
-        const Reference &operator = (const TrilinosScalar n) const;
+        const Reference &
+        operator = (const TrilinosScalar n) const;
 
         /**
          * Add @p n to the element of the matrix we presently point to.
          */
-        const Reference &operator += (const TrilinosScalar n) const;
+        const Reference &
+        operator += (const TrilinosScalar n) const;
 
         /**
          * Subtract @p n from the element of the matrix we presently point to.
          */
-        const Reference &operator -= (const TrilinosScalar n) const;
+        const Reference &
+        operator -= (const TrilinosScalar n) const;
 
         /**
          * Multiply the element of the matrix we presently point to by @p n.
          */
-        const Reference &operator *= (const TrilinosScalar n) const;
+        const Reference &
+        operator *= (const TrilinosScalar n) const;
 
         /**
          * Divide the element of the matrix we presently point to by @p n.
          */
-        const Reference &operator /= (const TrilinosScalar n) const;
+        const Reference &
+        operator /= (const TrilinosScalar n) const;
 
       private:
         /**
@@ -308,7 +320,8 @@ namespace TrilinosWrappers
       /**
        * Value of this matrix entry.
        */
-      Reference value() const;
+      Reference
+      value() const;
 
     private:
       /**
@@ -367,45 +380,53 @@ namespace TrilinosWrappers
       /**
        * Prefix increment.
        */
-      Iterator<Constness> &operator++ ();
+      Iterator<Constness> &
+      operator++ ();
 
       /**
        * Postfix increment.
        */
-      Iterator<Constness> operator++ (int);
+      Iterator<Constness>
+      operator++ (int);
 
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> &operator* () const;
+      const Accessor<Constness> &
+      operator* () const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor<Constness> *operator-> () const;
+      const Accessor<Constness> *
+      operator-> () const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool operator == (const Iterator<Constness> &) const;
+      bool
+      operator == (const Iterator<Constness> &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
-      bool operator != (const Iterator<Constness> &) const;
+      bool
+      operator != (const Iterator<Constness> &) const;
 
       /**
        * Comparison operator. Result is true if either the first row number is
        * smaller or if the row numbers are equal and the first index is
        * smaller.
        */
-      bool operator < (const Iterator<Constness> &) const;
+      bool
+      operator < (const Iterator<Constness> &) const;
 
       /**
        * Comparison operator. The opposite of the previous operator
        */
-      bool operator > (const Iterator<Constness> &) const;
+      bool
+      operator > (const Iterator<Constness> &) const;
 
       /**
        * Exception
@@ -578,12 +599,14 @@ namespace TrilinosWrappers
     /**
      * operator= is deleted.
      */
-    SparseMatrix &operator = (const SparseMatrix &) = delete;
+    SparseMatrix &
+    operator = (const SparseMatrix &) = delete;
 
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~SparseMatrix () override = default;
+    virtual
+    ~SparseMatrix () override = default;
 
     /**
      * This function initializes the Trilinos matrix with a deal.II sparsity
@@ -601,7 +624,8 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    void reinit (const SparsityPatternType &sparsity_pattern);
+    void
+    reinit (const SparsityPatternType &sparsity_pattern);
 
     /**
      * This function reinitializes the Trilinos sparse matrix from a (possibly
@@ -615,7 +639,8 @@ namespace TrilinosWrappers
      * been created with explicitly stating writeable rows. In all other
      * cases, you cannot mix MPI with multithreaded writing into the matrix.
      */
-    void reinit (const SparsityPattern &sparsity_pattern);
+    void
+    reinit (const SparsityPattern &sparsity_pattern);
 
     /**
      * This function copies the layout of @p sparse_matrix to the calling
@@ -625,7 +650,8 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    void reinit (const SparseMatrix &sparse_matrix);
+    void
+    reinit (const SparseMatrix &sparse_matrix);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -648,18 +674,20 @@ namespace TrilinosWrappers
      * will in fact be dropped.
      */
     template <typename number>
-    void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-                 const double                          drop_tolerance=1e-13,
-                 const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
+    void
+    reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+            const double                          drop_tolerance=1e-13,
+            const bool                            copy_values=true,
+            const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This reinit function takes as input a Trilinos Epetra_CrsMatrix and
      * copies its sparsity pattern. If so requested, even the content (values)
      * will be copied.
      */
-    void reinit (const Epetra_CrsMatrix &input_matrix,
-                 const bool              copy_values = true);
+    void
+    reinit (const Epetra_CrsMatrix &input_matrix,
+            const bool              copy_values = true);
 //@}
     /**
      * @name Constructors and initialization using an Epetra_Map description
@@ -768,9 +796,10 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     DEAL_II_DEPRECATED
-    void reinit (const Epetra_Map          &parallel_partitioning,
-                 const SparsityPatternType &sparsity_pattern,
-                 const bool                 exchange_data = false);
+    void
+    reinit (const Epetra_Map          &parallel_partitioning,
+            const SparsityPatternType &sparsity_pattern,
+            const bool                 exchange_data = false);
 
     /**
      * This function is similar to the other initialization function above,
@@ -788,10 +817,11 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     DEAL_II_DEPRECATED
-    void reinit (const Epetra_Map          &row_parallel_partitioning,
-                 const Epetra_Map          &col_parallel_partitioning,
-                 const SparsityPatternType &sparsity_pattern,
-                 const bool                 exchange_data = false);
+    void
+    reinit (const Epetra_Map          &row_parallel_partitioning,
+            const Epetra_Map          &col_parallel_partitioning,
+            const SparsityPatternType &sparsity_pattern,
+            const bool                 exchange_data = false);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -813,11 +843,12 @@ namespace TrilinosWrappers
      */
     template <typename number>
     DEAL_II_DEPRECATED
-    void reinit (const Epetra_Map                     &parallel_partitioning,
-                 const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-                 const double                          drop_tolerance=1e-13,
-                 const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
+    void
+    reinit (const Epetra_Map                     &parallel_partitioning,
+            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+            const double                          drop_tolerance=1e-13,
+            const bool                            copy_values=true,
+            const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This function is similar to the other initialization function with
@@ -836,12 +867,13 @@ namespace TrilinosWrappers
      */
     template <typename number>
     DEAL_II_DEPRECATED
-    void reinit (const Epetra_Map                      &row_parallel_partitioning,
-                 const Epetra_Map                      &col_parallel_partitioning,
-                 const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
-                 const double                           drop_tolerance=1e-13,
-                 const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
+    void
+    reinit (const Epetra_Map                      &row_parallel_partitioning,
+            const Epetra_Map                      &col_parallel_partitioning,
+            const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
+            const double                           drop_tolerance=1e-13,
+            const bool                             copy_values=true,
+            const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -933,10 +965,11 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    void reinit (const IndexSet            &parallel_partitioning,
-                 const SparsityPatternType &sparsity_pattern,
-                 const MPI_Comm            &communicator  = MPI_COMM_WORLD,
-                 const bool                 exchange_data = false);
+    void
+    reinit (const IndexSet            &parallel_partitioning,
+            const SparsityPatternType &sparsity_pattern,
+            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+            const bool                 exchange_data = false);
 
     /**
      * This function is similar to the other initialization function above,
@@ -951,11 +984,12 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
-    void reinit (const IndexSet            &row_parallel_partitioning,
-                 const IndexSet            &col_parallel_partitioning,
-                 const SparsityPatternType &sparsity_pattern,
-                 const MPI_Comm            &communicator  = MPI_COMM_WORLD,
-                 const bool                 exchange_data = false);
+    void
+    reinit (const IndexSet            &row_parallel_partitioning,
+            const IndexSet            &col_parallel_partitioning,
+            const SparsityPatternType &sparsity_pattern,
+            const MPI_Comm            &communicator  = MPI_COMM_WORLD,
+            const bool                 exchange_data = false);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -974,12 +1008,13 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename number>
-    void reinit (const IndexSet                       &parallel_partitioning,
-                 const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-                 const MPI_Comm                       &communicator = MPI_COMM_WORLD,
-                 const double                          drop_tolerance=1e-13,
-                 const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
+    void
+    reinit (const IndexSet                       &parallel_partitioning,
+            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+            const MPI_Comm                       &communicator = MPI_COMM_WORLD,
+            const double                          drop_tolerance=1e-13,
+            const bool                            copy_values=true,
+            const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This function is similar to the other initialization function with
@@ -995,13 +1030,14 @@ namespace TrilinosWrappers
      * processors in order to avoid a dead lock.
      */
     template <typename number>
-    void reinit (const IndexSet                        &row_parallel_partitioning,
-                 const IndexSet                        &col_parallel_partitioning,
-                 const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
-                 const MPI_Comm                        &communicator = MPI_COMM_WORLD,
-                 const double                           drop_tolerance=1e-13,
-                 const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
+    void
+    reinit (const IndexSet                        &row_parallel_partitioning,
+            const IndexSet                        &col_parallel_partitioning,
+            const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
+            const MPI_Comm                        &communicator = MPI_COMM_WORLD,
+            const double                           drop_tolerance=1e-13,
+            const bool                             copy_values=true,
+            const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 //@}
     /**
      * @name Information on the matrix
@@ -1011,12 +1047,14 @@ namespace TrilinosWrappers
     /**
      * Return the number of rows in this matrix.
      */
-    size_type m () const;
+    size_type
+    m () const;
 
     /**
      * Return the number of columns in this matrix.
      */
-    size_type n () const;
+    size_type
+    n () const;
 
     /**
      * Return the local dimension of the matrix, i.e. the number of rows
@@ -1026,7 +1064,8 @@ namespace TrilinosWrappers
      * To figure out which elements exactly are stored locally, use
      * local_range().
      */
-    unsigned int local_size () const;
+    unsigned int
+    local_size () const;
 
     /**
      * Return a pair of indices indicating which rows of this matrix are
@@ -1043,18 +1082,21 @@ namespace TrilinosWrappers
      * Return whether @p index is in the local range or not, see also
      * local_range().
      */
-    bool in_local_range (const size_type index) const;
+    bool
+    in_local_range (const size_type index) const;
 
     /**
      * Return the total number of nonzero elements of this matrix (summed
      * over all MPI processes).
      */
-    size_type n_nonzero_elements () const;
+    size_type
+    n_nonzero_elements () const;
 
     /**
      * Number of entries in a specific row.
      */
-    unsigned int row_length (const size_type row) const;
+    unsigned int
+    row_length (const size_type row) const;
 
     /**
      * Return the state of the matrix, i.e., whether compress() needs to be
@@ -1062,19 +1104,22 @@ namespace TrilinosWrappers
      * is also needed when the method set() has been called (even when working
      * in serial).
      */
-    bool is_compressed () const;
+    bool
+    is_compressed () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object. Note that only the memory reserved on the current processor is
      * returned in case this is called in an MPI-based program.
      */
-    size_type memory_consumption () const;
+    size_type
+    memory_consumption () const;
 
     /**
      * Return the MPI communicator object in use with this matrix.
      */
-    MPI_Comm get_mpi_communicator () const;
+    MPI_Comm
+    get_mpi_communicator () const;
 
 //@}
     /**
@@ -1101,7 +1146,8 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * This command does two things:
@@ -1130,7 +1176,8 @@ namespace TrilinosWrappers
      * @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation);
+    void
+    compress (::dealii::VectorOperation::values operation);
 
     /**
      * Set the element (<i>i,j</i>) to @p value.
@@ -1153,9 +1200,10 @@ namespace TrilinosWrappers
      * initialize the matrix with a sparsity pattern to fix the matrix
      * structure before inserting elements.
      */
-    void set (const size_type i,
-              const size_type j,
-              const TrilinosScalar value);
+    void
+    set (const size_type i,
+         const size_type j,
+         const TrilinosScalar value);
 
     /**
      * Set all elements given in a FullMatrix<double> into the sparse matrix
@@ -1189,19 +1237,21 @@ namespace TrilinosWrappers
      * initialize the matrix with a sparsity pattern to fix the matrix
      * structure before inserting elements.
      */
-    void set (const std::vector<size_type>     &indices,
-              const FullMatrix<TrilinosScalar> &full_matrix,
-              const bool                        elide_zero_values = false);
+    void
+    set (const std::vector<size_type>     &indices,
+         const FullMatrix<TrilinosScalar> &full_matrix,
+         const bool                        elide_zero_values = false);
 
     /**
      * Same function as before, but now including the possibility to use
      * rectangular full_matrices and different local-to-global indexing on
      * rows and columns, respectively.
      */
-    void set (const std::vector<size_type>     &row_indices,
-              const std::vector<size_type>     &col_indices,
-              const FullMatrix<TrilinosScalar> &full_matrix,
-              const bool                        elide_zero_values = false);
+    void
+    set (const std::vector<size_type>     &row_indices,
+         const std::vector<size_type>     &col_indices,
+         const FullMatrix<TrilinosScalar> &full_matrix,
+         const bool                        elide_zero_values = false);
 
     /**
      * Set several elements in the specified row of the matrix with column
@@ -1230,10 +1280,11 @@ namespace TrilinosWrappers
      * initialize the matrix with a sparsity pattern to fix the matrix
      * structure before inserting elements.
      */
-    void set (const size_type                    row,
-              const std::vector<size_type>      &col_indices,
-              const std::vector<TrilinosScalar> &values,
-              const bool                         elide_zero_values = false);
+    void
+    set (const size_type                    row,
+         const std::vector<size_type>      &col_indices,
+         const std::vector<TrilinosScalar> &values,
+         const bool                         elide_zero_values = false);
 
     /**
      * Set several elements to values given by <tt>values</tt> in a given row
@@ -1262,11 +1313,12 @@ namespace TrilinosWrappers
      * initialize the matrix with a sparsity pattern to fix the matrix
      * structure before inserting elements.
      */
-    void set (const size_type       row,
-              const size_type       n_cols,
-              const size_type      *col_indices,
-              const TrilinosScalar *values,
-              const bool            elide_zero_values = false);
+    void
+    set (const size_type       row,
+         const size_type       n_cols,
+         const size_type      *col_indices,
+         const TrilinosScalar *values,
+         const bool            elide_zero_values = false);
 
     /**
      * Add @p value to the element (<i>i,j</i>).
@@ -1277,9 +1329,10 @@ namespace TrilinosWrappers
      * Moreover, if <tt>value</tt> is not a finite number an exception is
      * thrown.
      */
-    void add (const size_type      i,
-              const size_type      j,
-              const TrilinosScalar value);
+    void
+    add (const size_type      i,
+         const size_type      j,
+         const TrilinosScalar value);
 
     /**
      * Add all elements given in a FullMatrix<double> into sparse matrix
@@ -1299,19 +1352,21 @@ namespace TrilinosWrappers
      * filtered away and only non-zero data is added. The default value is
      * <tt>true</tt>, i.e., zero values won't be added into the matrix.
      */
-    void add (const std::vector<size_type>  &indices,
-              const FullMatrix<TrilinosScalar> &full_matrix,
-              const bool                        elide_zero_values = true);
+    void
+    add (const std::vector<size_type>  &indices,
+         const FullMatrix<TrilinosScalar> &full_matrix,
+         const bool                        elide_zero_values = true);
 
     /**
      * Same function as before, but now including the possibility to use
      * rectangular full_matrices and different local-to-global indexing on
      * rows and columns, respectively.
      */
-    void add (const std::vector<size_type>     &row_indices,
-              const std::vector<size_type>     &col_indices,
-              const FullMatrix<TrilinosScalar> &full_matrix,
-              const bool                        elide_zero_values = true);
+    void
+    add (const std::vector<size_type>     &row_indices,
+         const std::vector<size_type>     &col_indices,
+         const FullMatrix<TrilinosScalar> &full_matrix,
+         const bool                        elide_zero_values = true);
 
     /**
      * Set several elements in the specified row of the matrix with column
@@ -1326,10 +1381,11 @@ namespace TrilinosWrappers
      * filtered away and only non-zero data is added. The default value is
      * <tt>true</tt>, i.e., zero values won't be added into the matrix.
      */
-    void add (const size_type                    row,
-              const std::vector<size_type>      &col_indices,
-              const std::vector<TrilinosScalar> &values,
-              const bool                         elide_zero_values = true);
+    void
+    add (const size_type                    row,
+         const std::vector<size_type>      &col_indices,
+         const std::vector<TrilinosScalar> &values,
+         const bool                         elide_zero_values = true);
 
     /**
      * Add an array of values given by <tt>values</tt> in the given global
@@ -1344,27 +1400,31 @@ namespace TrilinosWrappers
      * filtered away and only non-zero data is added. The default value is
      * <tt>true</tt>, i.e., zero values won't be added into the matrix.
      */
-    void add (const size_type       row,
-              const size_type       n_cols,
-              const size_type      *col_indices,
-              const TrilinosScalar *values,
-              const bool            elide_zero_values = true,
-              const bool            col_indices_are_sorted = false);
+    void
+    add (const size_type       row,
+         const size_type       n_cols,
+         const size_type      *col_indices,
+         const TrilinosScalar *values,
+         const bool            elide_zero_values = true,
+         const bool            col_indices_are_sorted = false);
 
     /**
      * Multiply the entire matrix by a fixed factor.
      */
-    SparseMatrix &operator *= (const TrilinosScalar factor);
+    SparseMatrix &
+    operator *= (const TrilinosScalar factor);
 
     /**
      * Divide the entire matrix by a fixed factor.
      */
-    SparseMatrix &operator /= (const TrilinosScalar factor);
+    SparseMatrix &
+    operator /= (const TrilinosScalar factor);
 
     /**
      * Copy the given (Trilinos) matrix (sparsity pattern and entries).
      */
-    void copy_from (const SparseMatrix &source);
+    void
+    copy_from (const SparseMatrix &source);
 
     /**
      * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
@@ -1373,8 +1433,9 @@ namespace TrilinosWrappers
      * elements in the sparsity pattern of the input matrix, this function
      * will throw an exception.
      */
-    void add (const TrilinosScalar  factor,
-              const SparseMatrix   &matrix);
+    void
+    add (const TrilinosScalar  factor,
+         const SparseMatrix   &matrix);
 
     /**
      * Remove all elements from this <tt>row</tt> by setting them to zero. The
@@ -1402,8 +1463,9 @@ namespace TrilinosWrappers
      * compress() after you made the last modifications to a matrix and before
      * starting to clear rows.
      */
-    void clear_row (const size_type      row,
-                    const TrilinosScalar new_diag_value = 0);
+    void
+    clear_row (const size_type      row,
+               const TrilinosScalar new_diag_value = 0);
 
     /**
      * Same as clear_row(), except that it works on a number of rows at once.
@@ -1425,8 +1487,9 @@ namespace TrilinosWrappers
      * compress() after you made the last modifications to a matrix and before
      * starting to clear rows.
      */
-    void clear_rows (const std::vector<size_type> &rows,
-                     const TrilinosScalar          new_diag_value = 0);
+    void
+    clear_rows (const std::vector<size_type> &rows,
+                const TrilinosScalar          new_diag_value = 0);
 
     /**
      * Sets an internal flag so that all operations performed by the matrix,
@@ -1437,7 +1500,8 @@ namespace TrilinosWrappers
      * @note Calling this function any even number of times in succession will
      * return the object to its original state.
      */
-    void transpose ();
+    void
+    transpose ();
 
 //@}
     /**
@@ -1453,8 +1517,9 @@ namespace TrilinosWrappers
      * which is requested from Trilinos. Moreover, an exception will be thrown
      * when the requested element is not saved on the calling process.
      */
-    TrilinosScalar operator () (const size_type i,
-                                const size_type j) const;
+    TrilinosScalar
+    operator () (const size_type i,
+                 const size_type j) const;
 
     /**
      * Return the value of the matrix entry (<i>i,j</i>). If this entry does
@@ -1472,8 +1537,9 @@ namespace TrilinosWrappers
      * the current processor; in that case, it may be stored on a different
      * processor, and possibly so with a nonzero value.
      */
-    TrilinosScalar el (const size_type i,
-                       const size_type j) const;
+    TrilinosScalar
+    el (const size_type i,
+        const size_type j) const;
 
     /**
      * Return the main diagonal element in the <i>i</i>th row. This function
@@ -1481,7 +1547,8 @@ namespace TrilinosWrappers
      * error if <i>(i,i)</i> is not element of the local matrix.  See also the
      * comment in trilinos_sparse_matrix.cc.
      */
-    TrilinosScalar diag_element (const size_type i) const;
+    TrilinosScalar
+    diag_element (const size_type i) const;
 
 //@}
     /**
@@ -1510,8 +1577,9 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    void vmult (VectorType       &dst,
-                const VectorType &src) const;
+    void
+    vmult (VectorType       &dst,
+           const VectorType &src) const;
 
     /**
      * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
@@ -1535,8 +1603,9 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    void Tvmult (VectorType       &dst,
-                 const VectorType &src) const;
+    void
+    Tvmult (VectorType       &dst,
+            const VectorType &src) const;
 
     /**
      * Adding matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
@@ -1560,8 +1629,9 @@ namespace TrilinosWrappers
      *
      */
     template <typename VectorType>
-    void vmult_add (VectorType       &dst,
-                    const VectorType &src) const;
+    void
+    vmult_add (VectorType       &dst,
+               const VectorType &src) const;
 
     /**
      * Adding matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
@@ -1585,8 +1655,9 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    void Tvmult_add (VectorType       &dst,
-                     const VectorType &src) const;
+    void
+    Tvmult_add (VectorType       &dst,
+                const VectorType &src) const;
 
     /**
      * Return the square of the norm of the vector $v$ with respect to the
@@ -1609,7 +1680,8 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
-    TrilinosScalar matrix_norm_square (const MPI::Vector &v) const;
+    TrilinosScalar
+    matrix_norm_square (const MPI::Vector &v) const;
 
     /**
      * Compute the matrix scalar product $\left(u,Mv\right)$.
@@ -1630,8 +1702,9 @@ namespace TrilinosWrappers
      *
      * This function is only implemented for square matrices.
      */
-    TrilinosScalar matrix_scalar_product (const MPI::Vector &u,
-                                          const MPI::Vector &v) const;
+    TrilinosScalar
+    matrix_scalar_product (const MPI::Vector &u,
+                           const MPI::Vector &v) const;
 
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
@@ -1649,9 +1722,10 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
-    TrilinosScalar residual (MPI::Vector       &dst,
-                             const MPI::Vector &x,
-                             const MPI::Vector &b) const;
+    TrilinosScalar
+    residual (MPI::Vector       &dst,
+              const MPI::Vector &x,
+              const MPI::Vector &b) const;
 
     /**
      * Perform the matrix-matrix multiplication <tt>C = A * B</tt>, or, if an
@@ -1667,9 +1741,10 @@ namespace TrilinosWrappers
      * used somewhere else in your program. This is an expensive operation, so
      * think twice before you use this function.
      */
-    void mmult (SparseMatrix       &C,
-                const SparseMatrix &B,
-                const MPI::Vector  &V = MPI::Vector()) const;
+    void
+    mmult (SparseMatrix       &C,
+           const SparseMatrix &B,
+           const MPI::Vector  &V = MPI::Vector()) const;
 
 
     /**
@@ -1688,9 +1763,10 @@ namespace TrilinosWrappers
      * used somewhere else in your program. This is an expensive operation, so
      * think twice before you use this function.
      */
-    void Tmmult (SparseMatrix       &C,
-                 const SparseMatrix &B,
-                 const MPI::Vector  &V = MPI::Vector()) const;
+    void
+    Tmmult (SparseMatrix       &C,
+            const SparseMatrix &B,
+            const MPI::Vector  &V = MPI::Vector()) const;
 
 //@}
     /**
@@ -1705,7 +1781,8 @@ namespace TrilinosWrappers
      * is compatible to the l1-norm for vectors, i.e.  $|Mv|_1 \leq |M|_1
      * |v|_1$.  (cf. Haemmerlin-Hoffmann: Numerische Mathematik)
      */
-    TrilinosScalar l1_norm () const;
+    TrilinosScalar
+    l1_norm () const;
 
     /**
      * Return the linfty-norm of the matrix, that is
@@ -1715,13 +1792,15 @@ namespace TrilinosWrappers
      * |M|_\infty |v|_\infty$.  (cf. Haemmerlin-Hoffmann: Numerische
      * Mathematik)
      */
-    TrilinosScalar linfty_norm () const;
+    TrilinosScalar
+    linfty_norm () const;
 
     /**
      * Return the frobenius norm of the matrix, i.e. the square root of the
      * sum of squares of all entries in the matrix.
      */
-    TrilinosScalar frobenius_norm () const;
+    TrilinosScalar
+    frobenius_norm () const;
 
 //@}
     /**
@@ -1733,13 +1812,15 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_CrsMatrix
      * data.
      */
-    const Epetra_CrsMatrix &trilinos_matrix () const;
+    const Epetra_CrsMatrix &
+    trilinos_matrix () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_CrsGraph
      * data that stores the sparsity pattern of the matrix.
      */
-    const Epetra_CrsGraph &trilinos_sparsity_pattern () const;
+    const Epetra_CrsGraph &
+    trilinos_sparsity_pattern () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1749,7 +1830,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_domain_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &domain_partitioner ()  const;
+    const Epetra_Map &
+    domain_partitioner ()  const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1760,7 +1842,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &range_partitioner () const;
+    const Epetra_Map &
+    range_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1770,7 +1853,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &row_partitioner () const;
+    const Epetra_Map &
+    row_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1782,7 +1866,8 @@ namespace TrilinosWrappers
      * Epetra_CrsMatrix.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &col_partitioner () const;
+    const Epetra_Map &
+    col_partitioner () const;
 //@}
 
     /**
@@ -1794,14 +1879,16 @@ namespace TrilinosWrappers
      * Return the partitioning of the domain space of this matrix, i.e., the
      * partitioning of the vectors this matrix has to be multiplied with.
      */
-    IndexSet locally_owned_domain_indices() const;
+    IndexSet
+    locally_owned_domain_indices() const;
 
     /**
      * Return the partitioning of the range space of this matrix, i.e., the
      * partitioning of the vectors that are result from matrix-vector
      * products.
      */
-    IndexSet locally_owned_range_indices() const;
+    IndexSet
+    locally_owned_range_indices() const;
 
 //@}
 
@@ -1828,23 +1915,27 @@ namespace TrilinosWrappers
      * want to call the begin() function that takes the row as an argument to
      * limit the range of elements to loop over.
      */
-    const_iterator begin () const;
+    const_iterator
+    begin () const;
 
     /**
      * Like the function above, but for non-const matrices.
      */
-    iterator begin ();
+    iterator
+    begin ();
 
     /**
      * Return an iterator pointing the element past the last one of this
      * matrix.
      */
-    const_iterator end () const;
+    const_iterator
+    end () const;
 
     /**
      * Like the function above, but for non-const matrices.
      */
-    iterator end ();
+    iterator
+    end ();
 
     /**
      * Return an iterator pointing to the first element of row @p r.
@@ -1874,12 +1965,14 @@ namespace TrilinosWrappers
      * accessing it on the current processor. See the documentation of the
      * compress() function for more information.
      */
-    const_iterator begin (const size_type r) const;
+    const_iterator
+    begin (const size_type r) const;
 
     /**
      * Like the function above, but for non-const matrices.
      */
-    iterator begin (const size_type r);
+    iterator
+    begin (const size_type r);
 
     /**
      * Return an iterator pointing the element past the last one of row @p r ,
@@ -1890,12 +1983,14 @@ namespace TrilinosWrappers
      * in particular the case if it is the end iterator for the last row of a
      * matrix.
      */
-    const_iterator end (const size_type r) const;
+    const_iterator
+    end (const size_type r) const;
 
     /**
      * Like the function above, but for non-const matrices.
      */
-    iterator end (const size_type r);
+    iterator
+    end (const size_type r);
 
 //@}
     /**
@@ -1908,7 +2003,8 @@ namespace TrilinosWrappers
      * objects. Currently this function is not implemented.  TODO: Not
      * implemented.
      */
-    void write_ascii ();
+    void
+    write_ascii ();
 
     /**
      * Print the matrix to the given stream, using the format <tt>(line,col)
@@ -1917,8 +2013,9 @@ namespace TrilinosWrappers
      * sorted according to the processor number when printed to the stream, as
      * well as a summary of the matrix like the global size.
      */
-    void print (std::ostream &out,
-                const bool    write_extended_trilinos_info = false) const;
+    void
+    print (std::ostream &out,
+           const bool    write_extended_trilinos_info = false) const;
 
 //@}
     /**
@@ -1991,14 +2088,16 @@ namespace TrilinosWrappers
      * that the matrix is in a state that allows adding elements; if it
      * previously already was in this state, the function does nothing.
      */
-    void prepare_add();
+    void
+    prepare_add();
 
     /**
      * Same as prepare_add() but prepare the matrix for setting elements if
      * the representation of elements in this class requires such an
      * operation.
      */
-    void prepare_set();
+    void
+    prepare_set();
 
 
 
@@ -2064,10 +2163,11 @@ namespace TrilinosWrappers
     namespace
     {
       inline
-      void check_vector_map_equality(const Epetra_CrsMatrix   &mtrx,
-                                     const Epetra_MultiVector &src,
-                                     const Epetra_MultiVector &dst,
-                                     const bool                transpose)
+      void
+      check_vector_map_equality(const Epetra_CrsMatrix   &mtrx,
+                                const Epetra_MultiVector &src,
+                                const Epetra_MultiVector &dst,
+                                const bool                transpose)
       {
         if (transpose == false)
           {
@@ -2089,10 +2189,11 @@ namespace TrilinosWrappers
       }
 
       inline
-      void check_vector_map_equality(const Epetra_Operator    &op,
-                                     const Epetra_MultiVector &src,
-                                     const Epetra_MultiVector &dst,
-                                     const bool                transpose)
+      void
+      check_vector_map_equality(const Epetra_Operator    &op,
+                                const Epetra_MultiVector &src,
+                                const Epetra_MultiVector &dst,
+                                const bool                transpose)
       {
         if (transpose == false)
           {
@@ -2206,22 +2307,26 @@ namespace TrilinosWrappers
         /**
          * Destructor
          */
-        virtual ~TrilinosPayload() override = default;
+        virtual
+        ~TrilinosPayload() override = default;
 
         /**
          * Return a payload configured for identity operations
          */
-        TrilinosPayload identity_payload () const;
+        TrilinosPayload
+        identity_payload () const;
 
         /**
          * Return a payload configured for null operations
          */
-        TrilinosPayload null_payload () const;
+        TrilinosPayload
+        null_payload () const;
 
         /**
          * Return a payload configured for transpose operations
          */
-        TrilinosPayload transpose_payload () const;
+        TrilinosPayload
+        transpose_payload () const;
 
         /**
          * Return a payload configured for inverse operations
@@ -2516,15 +2621,17 @@ namespace TrilinosWrappers
        * Return an operator that returns a payload configured to support the
        * addition of two LinearOperators
        */
-      TrilinosPayload operator+(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op);
+      TrilinosPayload
+      operator+(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op);
 
       /**
        * Return an operator that returns a payload configured to support the
        * multiplication of two LinearOperators
        */
-      TrilinosPayload operator*(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op);
+      TrilinosPayload
+      operator*(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op);
 
     } /* namespace LinearOperator */
   } /* namespace internal */
@@ -3097,10 +3204,11 @@ namespace TrilinosWrappers
 
   template <typename SparsityPatternType>
   inline
-  void SparseMatrix::reinit (const IndexSet            &parallel_partitioning,
-                             const SparsityPatternType &sparsity_pattern,
-                             const MPI_Comm            &communicator,
-                             const bool                 exchange_data)
+  void
+  SparseMatrix::reinit (const IndexSet            &parallel_partitioning,
+                        const SparsityPatternType &sparsity_pattern,
+                        const MPI_Comm            &communicator,
+                        const bool                 exchange_data)
   {
     reinit (parallel_partitioning, parallel_partitioning,
             sparsity_pattern, communicator, exchange_data);
@@ -3110,12 +3218,13 @@ namespace TrilinosWrappers
 
   template <typename number>
   inline
-  void SparseMatrix::reinit (const IndexSet                       &parallel_partitioning,
-                             const ::dealii::SparseMatrix<number> &sparse_matrix,
-                             const MPI_Comm                       &communicator,
-                             const double                          drop_tolerance,
-                             const bool                            copy_values,
-                             const ::dealii::SparsityPattern      *use_this_sparsity)
+  void
+  SparseMatrix::reinit (const IndexSet                       &parallel_partitioning,
+                        const ::dealii::SparseMatrix<number> &sparse_matrix,
+                        const MPI_Comm                       &communicator,
+                        const double                          drop_tolerance,
+                        const bool                            copy_values,
+                        const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator, false);
     reinit (parallel_partitioning, parallel_partitioning, sparse_matrix,

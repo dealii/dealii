@@ -50,7 +50,8 @@ namespace
      * Comparison operator for edges. It compares based on the
      * lexicographic ordering of the two vertex indices.
      */
-    bool operator < (const CheapEdge &e) const
+    bool
+    operator < (const CheapEdge &e) const
     {
       return ((v0 < e.v0) || ((v0 == e.v0) && (v1 < e.v1)));
     }
@@ -211,7 +212,8 @@ namespace
      * one element already, since we can not add more than two
      * adjacent cells for each edge.
      */
-    void push_back (const AdjacentCell &adjacent_cell)
+    void
+    push_back (const AdjacentCell &adjacent_cell)
     {
       if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
         adjacent_cells[0] = adjacent_cell;
@@ -228,7 +230,8 @@ namespace
      * Return an iterator to the first valid cell stored as adjacent to the
      * edge represented by the current object.
      */
-    const_iterator begin () const
+    const_iterator
+    begin () const
     {
       return adjacent_cells;
     }
@@ -239,7 +242,8 @@ namespace
      * as adjacent to the edge represented by the current object.
      * @return
      */
-    const_iterator end () const
+    const_iterator
+    end () const
     {
       // check whether the current object stores zero, one, or two
       // adjacent cells, and use this to point to the element past the
@@ -314,7 +318,8 @@ namespace
      * Comparison operator for edges. It compares based on the
      * lexicographic ordering of the two vertex indices.
      */
-    bool operator< (const Edge<dim> &e) const
+    bool
+    operator< (const Edge<dim> &e) const
     {
       return ((vertex_indices[0] < e.vertex_indices[0])
               ||
@@ -324,7 +329,8 @@ namespace
     /**
      * Compare two edges for equality based on their vertex indices.
      */
-    bool operator== (const Edge<dim> &e) const
+    bool
+    operator== (const Edge<dim> &e) const
     {
       return ((vertex_indices[0] == e.vertex_indices[0])
               &&
@@ -437,7 +443,8 @@ namespace
     /**
      * Delete the elements of the set by marking both slots as unused.
      */
-    void clear ()
+    void
+    clear ()
     {
       edge_indices[0] = edge_indices[1] = numbers::invalid_unsigned_int;
     }
@@ -446,7 +453,8 @@ namespace
      * Insert one element into the set. This will fail if the set already
      * has two elements.
      */
-    void insert (const unsigned int edge_index)
+    void
+    insert (const unsigned int edge_index)
     {
       if (edge_indices[0] == numbers::invalid_unsigned_int)
         edge_indices[0] = edge_index;
@@ -462,7 +470,8 @@ namespace
     /**
      * Return an iterator pointing to the first element of the set.
      */
-    const_iterator begin () const
+    const_iterator
+    begin () const
     {
       return edge_indices;
     }
@@ -471,7 +480,8 @@ namespace
     /**
      * Return an iterator pointing to the element past the last used one.
      */
-    const_iterator end () const
+    const_iterator
+    end () const
     {
       // check whether the current object stores zero, one, or two
       // indices, and use this to point to the element past the
@@ -910,7 +920,8 @@ namespace
    * coincides with the coordinate systems of the adjacent edges.
    */
   template <int dim>
-  void reorient (std::vector<CellData<dim> > &cells)
+  void
+  reorient (std::vector<CellData<dim> > &cells)
   {
     // first build the arrays that connect cells to edges and the other
     // way around
@@ -962,7 +973,8 @@ namespace
 
   // overload of the function above for 1d -- there is nothing
   // to orient in that case
-  void reorient (std::vector<CellData<1> > &)
+  void
+  reorient (std::vector<CellData<1> > &)
   {}
 }
 

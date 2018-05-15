@@ -87,8 +87,9 @@ public:
    * from @p DataType. @p T needs to be default constructible.
    */
   template <typename T=DataType>
-  void initialize(const CellIteratorType &cell,
-                  const unsigned int number_of_data_points_per_cell);
+  void
+  initialize(const CellIteratorType &cell,
+             const unsigned int number_of_data_points_per_cell);
 
   /**
    * Same as above but for a range of iterators starting at @p cell_start
@@ -96,9 +97,10 @@ public:
    * for which `cell->is_locally_owned()==true` .
    */
   template <typename T=DataType>
-  void initialize(const CellIteratorType &cell_start,
-                  const CellIteratorType &cell_end,
-                  const unsigned int number_of_data_points_per_cell);
+  void
+  initialize(const CellIteratorType &cell_start,
+             const CellIteratorType &cell_end,
+             const unsigned int number_of_data_points_per_cell);
 
   /**
    * Removes data stored at the @p cell. Returns true if the data was removed.
@@ -109,12 +111,14 @@ public:
    * outstanding references to the data stored on this cell. That is to say,
    * that the only references to the stored data are that made by this class.
    */
-  bool erase(const CellIteratorType &cell);
+  bool
+  erase(const CellIteratorType &cell);
 
   /**
    * Clear all the data stored in this object.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Get a vector of the data located at @p cell .
@@ -127,7 +131,8 @@ public:
    * @pre The type @p T needs to match the class provided to initialize() .
    */
   template <typename T=DataType>
-  std::vector<std::shared_ptr<T> > get_data(const CellIteratorType &cell);
+  std::vector<std::shared_ptr<T> >
+  get_data(const CellIteratorType &cell);
 
   /**
    * Get a vector of constant pointers to data located at @p cell .
@@ -140,7 +145,8 @@ public:
    * @pre The type @p T needs to match the class provided to initialize() .
    */
   template <typename T=DataType>
-  std::vector<std::shared_ptr<const T> > get_data(const CellIteratorType &cell) const;
+  std::vector<std::shared_ptr<const T> >
+  get_data(const CellIteratorType &cell) const;
 
 private:
   /**
@@ -179,14 +185,16 @@ public:
   /**
    * Default virtual destructor.
    */
-  virtual ~TransferableQuadraturePointData() = default;
+  virtual
+  ~TransferableQuadraturePointData() = default;
 
   /**
    * Return the total number of values which will be
    * packed/unpacked from the user's DataType class. Consequently it is also
    * the size of the vectors in pack_values() and unpack_values() .
    */
-  virtual unsigned int number_of_values() const = 0;
+  virtual unsigned int
+  number_of_values() const = 0;
 
   /**
    * A virtual function that have to be implemented in derived classes to
@@ -197,7 +205,8 @@ public:
    * @note  The function will be called with @p values of size number_of_values().
    * The implementation may still have an assert to check that it is indeed the case.
    */
-  virtual void pack_values(std::vector<double> &values) const = 0;
+  virtual void
+  pack_values(std::vector<double> &values) const = 0;
 
   /**
    * The opposite of the above, namely
@@ -206,7 +215,8 @@ public:
    * @note  The function will be called with @p values of size number_of_values().
    * The implementation may still have an assert to check that it is indeed the case.
    */
-  virtual void unpack_values(const std::vector<double> &values) = 0;
+  virtual void
+  unpack_values(const std::vector<double> &values) = 0;
 };
 
 
@@ -358,8 +368,9 @@ namespace parallel
        * @p data_storage contains objects of the same type, more specifically
        * they pack/unpack the same data.
        */
-      void prepare_for_coarsening_and_refinement (parallel::distributed::Triangulation<dim> &tria,
-                                                  CellDataStorage<CellIteratorType,DataType> &data_storage);
+      void
+      prepare_for_coarsening_and_refinement (parallel::distributed::Triangulation<dim> &tria,
+                                             CellDataStorage<CellIteratorType,DataType> &data_storage);
 
       /**
        * Interpolate the data previously stored in this object before the mesh
@@ -371,7 +382,8 @@ namespace parallel
        * at new cells using CellDataStorage::initialize(). If that is not the case,
        * an exception will be thrown in debug mode.
        */
-      void interpolate ();
+      void
+      interpolate ();
 
     private:
       /**
@@ -379,18 +391,20 @@ namespace parallel
        * objects that can later be retrieved after refinement, coarsening and
        * repartitioning.
        */
-      void pack_function(const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-                         const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                         void *data);
+      void
+      pack_function(const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
+                    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                    void *data);
 
       /**
        * A callback function used to unpack the data on the current mesh that
        * has been packed up previously on the mesh before refinement,
        * coarsening and repartitioning.
        */
-      void unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-                            const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                            const void *data);
+      void
+      unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
+                       const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                       const void *data);
 
       /**
        * FiniteElement used to project data from and to quadrature points.
@@ -472,8 +486,9 @@ namespace parallel
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell,
-                                                            const unsigned int n_q_points)
+void
+CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell,
+                                                       const unsigned int n_q_points)
 {
   static_assert(std::is_base_of<DataType, T>::value,
                 "User's T class should be derived from user's DataType class");
@@ -493,9 +508,10 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
 
 template <typename CellIteratorType, typename DataType>
 template <typename T>
-void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell_start,
-                                                            const CellIteratorType &cell_end,
-                                                            const unsigned int number)
+void
+CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell_start,
+                                                       const CellIteratorType &cell_end,
+                                                       const unsigned int number)
 {
   for (CellIteratorType it = cell_start; it != cell_end; it++)
     if (it->is_locally_owned())
@@ -505,7 +521,8 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
 
 
 template <typename CellIteratorType, typename DataType>
-bool CellDataStorage<CellIteratorType,DataType>::erase(const CellIteratorType &cell)
+bool
+CellDataStorage<CellIteratorType,DataType>::erase(const CellIteratorType &cell)
 {
   const auto it = map.find(cell);
   for (unsigned int i = 0; i < it->second.size(); i++)
@@ -521,7 +538,8 @@ bool CellDataStorage<CellIteratorType,DataType>::erase(const CellIteratorType &c
 
 
 template <typename CellIteratorType, typename DataType>
-void CellDataStorage<CellIteratorType,DataType>::clear()
+void
+CellDataStorage<CellIteratorType,DataType>::clear()
 {
   // Do not call
   // map.clear();
@@ -743,7 +761,8 @@ namespace parallel
 
 
     template <int dim, typename DataType>
-    void ContinuousQuadratureDataTransfer<dim,DataType>::interpolate ()
+    void
+    ContinuousQuadratureDataTransfer<dim,DataType>::interpolate ()
     {
       triangulation->notify_ready_to_unpack(handle,
                                             std::bind(&ContinuousQuadratureDataTransfer<dim,DataType>::unpack_function,

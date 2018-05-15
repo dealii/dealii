@@ -430,7 +430,8 @@ public:
    * virtual to ensure that data postprocessors can be destroyed through
    * pointers to the base class.
    */
-  virtual ~DataPostprocessor () override = default;
+  virtual
+  ~DataPostprocessor () override = default;
 
   /**
    * This is the main function which actually performs the postprocessing. The
@@ -469,7 +470,8 @@ public:
    * Return the vector of strings describing the names of the computed
    * quantities.
    */
-  virtual std::vector<std::string> get_names () const = 0;
+  virtual std::vector<std::string>
+  get_names () const = 0;
 
   /**
    * This function returns information about how the individual components of
@@ -504,7 +506,8 @@ public:
    * with DataOutFaces, you may also ask for a update of normals via the @p
    * update_normal_vectors flag.
    */
-  virtual UpdateFlags get_needed_update_flags () const = 0;
+  virtual UpdateFlags
+  get_needed_update_flags () const = 0;
 };
 
 
@@ -555,7 +558,8 @@ public:
    * quantities. Given the purpose of this class, this is a vector with a
    * single entry equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names () const override;
 
   /**
    * This function returns information about how the individual components of
@@ -573,7 +577,8 @@ public:
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags () const override;
 
 private:
   /**
@@ -790,7 +795,8 @@ public:
    * quantities. Given the purpose of this class, this is a vector with dim
    * entries all equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names () const override;
 
   /**
    * This function returns information about how the individual components of
@@ -808,7 +814,8 @@ public:
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags () const override;
 
 private:
   /**
@@ -1029,7 +1036,8 @@ public:
    * quantities. Given the purpose of this class, this is a vector with dim
    * entries all equal to the name given to the constructor.
    */
-  virtual std::vector<std::string> get_names () const override;
+  virtual std::vector<std::string>
+  get_names () const override;
 
   /**
    * This function returns information about how the individual components of
@@ -1047,7 +1055,8 @@ public:
    * The flags returned here are the ones passed to the constructor of this
    * class.
    */
-  virtual UpdateFlags get_needed_update_flags () const override;
+  virtual UpdateFlags
+  get_needed_update_flags () const override;
 
 private:
   /**

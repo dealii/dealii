@@ -2993,8 +2993,9 @@ namespace internal
            * serialization.
            */
           template <class Archive>
-          void save (Archive &ar,
-                     const unsigned int /*version*/) const
+          void
+          save (Archive &ar,
+                const unsigned int /*version*/) const
           {
             // we would like to directly serialize the 'quadrants' vector,
             // but the element type is internal to p4est and does not
@@ -3020,8 +3021,9 @@ namespace internal
            * serialization. Throw away the previous content.
            */
           template <class Archive>
-          void load (Archive &ar,
-                     const unsigned int /*version*/)
+          void
+          load (Archive &ar,
+                const unsigned int /*version*/)
           {
             // undo the copying trick from the 'save' function
             std::vector<char> quadrants_as_chars;
@@ -3084,7 +3086,8 @@ namespace internal
            * restore the current object to the state that it was when
            * it was packed into said buffer by the pack_data() function.
            */
-          void unpack_data (const std::vector<char> &buffer)
+          void
+          unpack_data (const std::vector<char> &buffer)
           {
             std::string decompressed_buffer;
 

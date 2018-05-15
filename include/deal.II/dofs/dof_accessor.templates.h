@@ -1452,10 +1452,11 @@ namespace internal
 
       template <typename DoFHandlerType, bool level_dof_access>
       static
-      void set_mg_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &,
-                               const int,
-                               const std::vector<types::global_dof_index> &,
-                               const unsigned int)
+      void
+      set_mg_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &,
+                          const int,
+                          const std::vector<types::global_dof_index> &,
+                          const unsigned int)
       {
         AssertThrow (false, ExcNotImplemented ()); //TODO[TH]: implement
       }
@@ -1464,10 +1465,11 @@ namespace internal
 
       template <typename DoFHandlerType, bool level_dof_access>
       static
-      void set_mg_dof_indices (dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
-                               const int level,
-                               const std::vector<types::global_dof_index> &dof_indices,
-                               const unsigned int fe_index)
+      void
+      set_mg_dof_indices (dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
+                          const int level,
+                          const std::vector<types::global_dof_index> &dof_indices,
+                          const unsigned int fe_index)
       {
         const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
           = accessor.get_dof_handler ().get_fe(fe_index);
@@ -1530,10 +1532,11 @@ namespace internal
 
       template <typename InputVector, typename ForwardIterator>
       static
-      void extract_subvector_to(const InputVector &values,
-                                const types::global_dof_index *cache,
-                                const types::global_dof_index *cache_end,
-                                ForwardIterator local_values_begin)
+      void
+      extract_subvector_to(const InputVector &values,
+                           const types::global_dof_index *cache,
+                           const types::global_dof_index *cache_end,
+                           ForwardIterator local_values_begin)
       {
         values.extract_subvector_to (cache, cache_end, local_values_begin);
       }
@@ -1542,8 +1545,9 @@ namespace internal
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
       static
-      std::vector<unsigned int> sort_indices(const types::global_dof_index *v_begin,
-                                             const types::global_dof_index *v_end)
+      std::vector<unsigned int>
+      sort_indices(const types::global_dof_index *v_begin,
+                   const types::global_dof_index *v_end)
       {
         // initialize original index locations
         std::vector<unsigned int> idx(v_end-v_begin);
@@ -1563,10 +1567,11 @@ namespace internal
 
       template <typename ForwardIterator>
       static
-      void extract_subvector_to(const LinearAlgebra::EpetraWrappers::Vector &values,
-                                const types::global_dof_index *cache_begin,
-                                const types::global_dof_index *cache_end,
-                                ForwardIterator local_values_begin)
+      void
+      extract_subvector_to(const LinearAlgebra::EpetraWrappers::Vector &values,
+                           const types::global_dof_index *cache_begin,
+                           const types::global_dof_index *cache_end,
+                           ForwardIterator local_values_begin)
       {
         std::vector<unsigned int> sorted_indices_pos = sort_indices(cache_begin,
                                                                     cache_end);
@@ -1803,9 +1808,10 @@ namespace internal
   namespace DoFAccessorImplementation
   {
     template <typename DoFHandlerType, bool level_dof_access>
-    void get_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &accessor,
-                          std::vector<types::global_dof_index>                         &dof_indices,
-                          const unsigned int                                            fe_index)
+    void
+    get_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &accessor,
+                     std::vector<types::global_dof_index>                         &dof_indices,
+                     const unsigned int                                            fe_index)
     {
       const unsigned int dofs_per_vertex = accessor.get_fe(fe_index).dofs_per_vertex,
                          dofs_per_line   = accessor.get_fe(fe_index).dofs_per_line;
@@ -1820,9 +1826,10 @@ namespace internal
 
 
     template <typename DoFHandlerType, bool level_dof_access>
-    void get_dof_indices (const dealii::DoFAccessor<2,DoFHandlerType,level_dof_access> &accessor,
-                          std::vector<types::global_dof_index>                         &dof_indices,
-                          const unsigned int                                            fe_index)
+    void
+    get_dof_indices (const dealii::DoFAccessor<2,DoFHandlerType,level_dof_access> &accessor,
+                     std::vector<types::global_dof_index>                         &dof_indices,
+                     const unsigned int                                            fe_index)
     {
       const unsigned int dofs_per_vertex = accessor.get_fe(fe_index).dofs_per_vertex,
                          dofs_per_line   = accessor.get_fe(fe_index).dofs_per_line,
@@ -1855,9 +1862,10 @@ namespace internal
 
 
     template <typename DoFHandlerType, bool level_dof_access>
-    void get_dof_indices (const dealii::DoFAccessor<3,DoFHandlerType,level_dof_access> &accessor,
-                          std::vector<types::global_dof_index>                         &dof_indices,
-                          const unsigned int                                            fe_index)
+    void
+    get_dof_indices (const dealii::DoFAccessor<3,DoFHandlerType,level_dof_access> &accessor,
+                     std::vector<types::global_dof_index>                         &dof_indices,
+                     const unsigned int                                            fe_index)
     {
       const unsigned int dofs_per_vertex = accessor.get_fe(fe_index).dofs_per_vertex,
                          dofs_per_line   = accessor.get_fe(fe_index).dofs_per_line,
@@ -1936,10 +1944,11 @@ namespace internal
 
 
     template <typename DoFHandlerType, bool level_dof_access>
-    void get_mg_dof_indices (const dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
-                             const int level,
-                             std::vector<types::global_dof_index> &dof_indices,
-                             const unsigned int fe_index)
+    void
+    get_mg_dof_indices (const dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
+                        const int level,
+                        std::vector<types::global_dof_index> &dof_indices,
+                        const unsigned int fe_index)
     {
       const DoFHandlerType &handler = accessor.get_dof_handler();
 

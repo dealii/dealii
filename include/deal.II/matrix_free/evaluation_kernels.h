@@ -100,25 +100,27 @@ namespace internal
   struct FEEvaluationImpl
   {
     static
-    void evaluate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
-                   const Number *values_dofs_actual,
-                   Number *values_quad,
-                   Number *gradients_quad,
-                   Number *hessians_quad,
-                   Number *scratch_data,
-                   const bool               evaluate_values,
-                   const bool               evaluate_gradients,
-                   const bool               evaluate_hessians);
+    void
+    evaluate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+              const Number *values_dofs_actual,
+              Number *values_quad,
+              Number *gradients_quad,
+              Number *hessians_quad,
+              Number *scratch_data,
+              const bool               evaluate_values,
+              const bool               evaluate_gradients,
+              const bool               evaluate_hessians);
 
     static
-    void integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
-                    Number *values_dofs_actual,
-                    Number *values_quad,
-                    Number *gradients_quad,
-                    Number *scratch_data,
-                    const bool               integrate_values,
-                    const bool               integrate_gradients,
-                    const bool               add_into_values_array);
+    void
+    integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+               Number *values_dofs_actual,
+               Number *values_quad,
+               Number *gradients_quad,
+               Number *scratch_data,
+               const bool               integrate_values,
+               const bool               integrate_gradients,
+               const bool               add_into_values_array);
   };
 
 
@@ -128,15 +130,16 @@ namespace internal
   inline
   void
   FEEvaluationImpl<type,dim,fe_degree,n_q_points_1d,n_components,Number>
-  ::evaluate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
-              const Number *values_dofs_actual,
-              Number *values_quad,
-              Number *gradients_quad,
-              Number *hessians_quad,
-              Number *scratch_data,
-              const bool               evaluate_values,
-              const bool               evaluate_gradients,
-              const bool               evaluate_hessians)
+  ::
+  evaluate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+            const Number *values_dofs_actual,
+            Number *values_quad,
+            Number *gradients_quad,
+            Number *hessians_quad,
+            Number *scratch_data,
+            const bool               evaluate_values,
+            const bool               evaluate_gradients,
+            const bool               evaluate_hessians)
   {
     if (evaluate_values == false && evaluate_gradients == false && evaluate_hessians == false)
       return;
@@ -359,14 +362,15 @@ namespace internal
   inline
   void
   FEEvaluationImpl<type,dim,fe_degree,n_q_points_1d,n_components,Number>
-  ::integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
-               Number *values_dofs_actual,
-               Number *values_quad,
-               Number *gradients_quad,
-               Number *scratch_data,
-               const bool               integrate_values,
-               const bool               integrate_gradients,
-               const bool               add_into_values_array)
+  ::
+  integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+             Number *values_dofs_actual,
+             Number *values_quad,
+             Number *gradients_quad,
+             Number *scratch_data,
+             const bool               integrate_values,
+             const bool               integrate_gradients,
+             const bool               add_into_values_array)
   {
     const EvaluatorVariant variant =
       EvaluatorSelector<type,(fe_degree+n_q_points_1d>4)>::variant;
@@ -596,11 +600,12 @@ namespace internal
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
 #endif
-    static void do_forward (const AlignedVector<Number2> &transformation_matrix,
-                            const Number      *values_in,
-                            Number            *values_out,
-                            const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
-                            const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
+    static void
+    do_forward (const AlignedVector<Number2> &transformation_matrix,
+                const Number      *values_in,
+                Number            *values_out,
+                const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
+                const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
       Assert(basis_size_1 != 0 ||
              basis_size_1_variable <= basis_size_2_variable,
@@ -691,12 +696,13 @@ namespace internal
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
 #endif
-    static void do_backward (const AlignedVector<Number2> &transformation_matrix,
-                             const bool         add_into_result,
-                             Number            *values_in,
-                             Number            *values_out,
-                             const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
-                             const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
+    static void
+    do_backward (const AlignedVector<Number2> &transformation_matrix,
+                 const bool         add_into_result,
+                 Number            *values_in,
+                 Number            *values_out,
+                 const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
+                 const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
       Assert(basis_size_1 != 0 ||
              basis_size_1_variable <= basis_size_2_variable,
@@ -772,11 +778,12 @@ namespace internal
      *                     of the transformation are stored. It may alias with
      *                     the values_in array.
      */
-    static void do_mass (const AlignedVector<Number2> &transformation_matrix,
-                         const AlignedVector<Number>  &coefficients,
-                         const Number *values_in,
-                         Number *scratch_data,
-                         Number *values_out)
+    static void
+    do_mass (const AlignedVector<Number2> &transformation_matrix,
+             const AlignedVector<Number>  &coefficients,
+             const Number *values_in,
+             Number *scratch_data,
+             Number *values_out)
     {
       constexpr int next_dim = dim > 1 ? dim-1 : dim;
       Number *my_scratch = basis_size_1 != basis_size_2 ? scratch_data : values_out;
@@ -828,25 +835,27 @@ namespace internal
   struct FEEvaluationImplCollocation
   {
     static
-    void evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                   const Number *values_dofs,
-                   Number       *values_quad,
-                   Number       *gradients_quad,
-                   Number       *hessians_quad,
-                   Number       *scratch_data,
-                   const bool    evaluate_values,
-                   const bool    evaluate_gradients,
-                   const bool    evaluate_hessians);
+    void
+    evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+              const Number *values_dofs,
+              Number       *values_quad,
+              Number       *gradients_quad,
+              Number       *hessians_quad,
+              Number       *scratch_data,
+              const bool    evaluate_values,
+              const bool    evaluate_gradients,
+              const bool    evaluate_hessians);
 
     static
-    void integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                    Number      *values_dofs,
-                    Number      *values_quad,
-                    Number      *gradients_quad,
-                    Number      *scratch_data,
-                    const bool   integrate_values,
-                    const bool   integrate_gradients,
-                    const bool   add_into_values_array);
+    void
+    integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+               Number      *values_dofs,
+               Number      *values_quad,
+               Number      *gradients_quad,
+               Number      *scratch_data,
+               const bool   integrate_values,
+               const bool   integrate_gradients,
+               const bool   add_into_values_array);
   };
 
 
@@ -855,15 +864,16 @@ namespace internal
   inline
   void
   FEEvaluationImplCollocation<dim, fe_degree, n_components, Number>
-  ::evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-              const Number *values_dofs,
-              Number       *values_quad,
-              Number       *gradients_quad,
-              Number       *hessians_quad,
-              Number *,
-              const bool    evaluate_values,
-              const bool    evaluate_gradients,
-              const bool    evaluate_hessians)
+  ::
+  evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+            const Number *values_dofs,
+            Number       *values_quad,
+            Number       *gradients_quad,
+            Number       *hessians_quad,
+            Number *,
+            const bool    evaluate_values,
+            const bool    evaluate_gradients,
+            const bool    evaluate_hessians)
   {
     AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
                     (fe_degree+2)/2*(fe_degree+1));
@@ -915,14 +925,15 @@ namespace internal
   inline
   void
   FEEvaluationImplCollocation<dim, fe_degree, n_components, Number>
-  ::integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
-               Number     *values_dofs,
-               Number     *values_quad,
-               Number     *gradients_quad,
-               Number *,
-               const bool  integrate_values,
-               const bool  integrate_gradients,
-               const bool  add_into_values_array)
+  ::
+  integrate (const MatrixFreeFunctions::ShapeInfo<Number>  &shape_info,
+             Number     *values_dofs,
+             Number     *values_quad,
+             Number     *gradients_quad,
+             Number *,
+             const bool  integrate_values,
+             const bool  integrate_gradients,
+             const bool  add_into_values_array)
   {
     AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
                     (fe_degree+2)/2*(fe_degree+1));
@@ -977,25 +988,27 @@ namespace internal
   struct FEEvaluationImplTransformToCollocation
   {
     static
-    void evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                   const Number *values_dofs,
-                   Number       *values_quad,
-                   Number       *gradients_quad,
-                   Number       *hessians_quad,
-                   Number       *scratch_data,
-                   const bool    evaluate_values,
-                   const bool    evaluate_gradients,
-                   const bool    evaluate_hessians);
+    void
+    evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+              const Number *values_dofs,
+              Number       *values_quad,
+              Number       *gradients_quad,
+              Number       *hessians_quad,
+              Number       *scratch_data,
+              const bool    evaluate_values,
+              const bool    evaluate_gradients,
+              const bool    evaluate_hessians);
 
     static
-    void integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-                    Number      *values_dofs,
-                    Number      *values_quad,
-                    Number      *gradients_quad,
-                    Number      *scratch_data,
-                    const bool   integrate_values,
-                    const bool   integrate_gradients,
-                    const bool   add_into_values_array);
+    void
+    integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+               Number      *values_dofs,
+               Number      *values_quad,
+               Number      *gradients_quad,
+               Number      *scratch_data,
+               const bool   integrate_values,
+               const bool   integrate_gradients,
+               const bool   add_into_values_array);
   };
 
 
@@ -1004,15 +1017,16 @@ namespace internal
   inline
   void
   FEEvaluationImplTransformToCollocation<dim, fe_degree, n_q_points_1d, n_components, Number>
-  ::evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-              const Number  *values_dofs,
-              Number        *values_quad,
-              Number        *gradients_quad,
-              Number        *hessians_quad,
-              Number *,
-              const bool,
-              const bool     evaluate_gradients,
-              const bool     evaluate_hessians)
+  ::
+  evaluate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+            const Number  *values_dofs,
+            Number        *values_quad,
+            Number        *gradients_quad,
+            Number        *hessians_quad,
+            Number *,
+            const bool,
+            const bool     evaluate_gradients,
+            const bool     evaluate_hessians)
   {
     Assert(n_q_points_1d > fe_degree,
            ExcMessage("You lose information when going to a collocation space "
@@ -1048,14 +1062,15 @@ namespace internal
   inline
   void
   FEEvaluationImplTransformToCollocation<dim, fe_degree, n_q_points_1d, n_components, Number>
-  ::integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
-               Number      *values_dofs,
-               Number      *values_quad,
-               Number      *gradients_quad,
-               Number *,
-               const bool   integrate_values,
-               const bool   integrate_gradients,
-               const bool   add_into_values_array)
+  ::
+  integrate (const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
+             Number      *values_dofs,
+             Number      *values_quad,
+             Number      *gradients_quad,
+             Number *,
+             const bool   integrate_values,
+             const bool   integrate_gradients,
+             const bool   add_into_values_array)
   {
     Assert(n_q_points_1d > fe_degree,
            ExcMessage("You lose information when going to a collocation space "
@@ -1095,14 +1110,15 @@ namespace internal
   struct FEFaceEvaluationImpl
   {
     static
-    void evaluate_in_face (const MatrixFreeFunctions::ShapeInfo<Number>  &data,
-                           Number             *values_dofs,
-                           Number             *values_quad,
-                           Number             *gradients_quad,
-                           Number             *scratch_data,
-                           const bool          evaluate_val,
-                           const bool          evaluate_grad,
-                           const unsigned int  subface_index)
+    void
+    evaluate_in_face (const MatrixFreeFunctions::ShapeInfo<Number>  &data,
+                      Number             *values_dofs,
+                      Number             *values_quad,
+                      Number             *gradients_quad,
+                      Number             *scratch_data,
+                      const bool          evaluate_val,
+                      const bool          evaluate_grad,
+                      const unsigned int  subface_index)
     {
       const AlignedVector<Number> &val1
         = symmetric_evaluate ? data.shape_values_eo :
@@ -1214,14 +1230,15 @@ namespace internal
     }
 
     static
-    void integrate_in_face (const MatrixFreeFunctions::ShapeInfo<Number> &data,
-                            Number             *values_dofs,
-                            Number             *values_quad,
-                            Number             *gradients_quad,
-                            Number             *scratch_data,
-                            const bool          integrate_val,
-                            const bool          integrate_grad,
-                            const unsigned int  subface_index)
+    void
+    integrate_in_face (const MatrixFreeFunctions::ShapeInfo<Number> &data,
+                       Number             *values_dofs,
+                       Number             *values_quad,
+                       Number             *gradients_quad,
+                       Number             *scratch_data,
+                       const bool          integrate_val,
+                       const bool          integrate_grad,
+                       const unsigned int  subface_index)
     {
       const AlignedVector<Number> &val1
         = symmetric_evaluate ? data.shape_values_eo :
@@ -1347,11 +1364,12 @@ namespace internal
   struct FEFaceNormalEvaluationImpl
   {
     template <bool do_evaluate, bool add_into_output>
-    static void interpolate(const MatrixFreeFunctions::ShapeInfo<Number> &data,
-                            const Number       *input,
-                            Number             *output,
-                            const bool          do_gradients,
-                            const unsigned int  face_no)
+    static void
+    interpolate(const MatrixFreeFunctions::ShapeInfo<Number> &data,
+                const Number       *input,
+                Number             *output,
+                const bool          do_gradients,
+                const unsigned int  face_no)
     {
       internal::EvaluatorTensorProduct<internal::evaluate_general,dim,
                fe_degree+1,0,Number>

@@ -50,7 +50,8 @@ namespace LocalIntegrators
      * @date 2011
      */
     template <int dim>
-    void cell_matrix (
+    void
+    cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const FEValuesBase<dim> &fetest,
@@ -92,7 +93,8 @@ namespace LocalIntegrators
      * @date 2011
      */
     template <int dim, typename number>
-    void cell_residual(
+    void
+    cell_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
@@ -127,7 +129,8 @@ namespace LocalIntegrators
      * @date 2013
      */
     template <int dim, typename number>
-    void cell_residual(
+    void
+    cell_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -160,7 +163,8 @@ namespace LocalIntegrators
      * @date 2011
      */
     template <int dim>
-    void gradient_matrix(
+    void
+    gradient_matrix(
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const FEValuesBase<dim> &fetest,
@@ -203,7 +207,8 @@ namespace LocalIntegrators
      * @date 2011
      */
     template <int dim, typename number>
-    void gradient_residual(
+    void
+    gradient_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const std::vector<Tensor<1,dim> > &input,
@@ -237,7 +242,8 @@ namespace LocalIntegrators
      * @date 2013
      */
     template <int dim, typename number>
-    void gradient_residual(
+    void
+    gradient_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const std::vector<double> &input,
@@ -428,13 +434,15 @@ namespace LocalIntegrators
      */
     template <int dim>
     DEAL_II_DEPRECATED
-    void grad_div_matrix (
+    void
+    grad_div_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const double factor = 1.);
 
     template <int dim>
-    void grad_div_matrix (
+    void
+    grad_div_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const double factor)
@@ -447,14 +455,16 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     DEAL_II_DEPRECATED
-    void grad_div_residual (
+    void
+    grad_div_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
       const double factor = 1.);
 
     template <int dim, typename number>
-    void grad_div_residual (
+    void
+    grad_div_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
@@ -531,8 +541,9 @@ namespace LocalIntegrators
      * @date 2013
      */
     template <int dim>
-    double norm(const FEValuesBase<dim> &fe,
-                const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Du)
+    double
+    norm(const FEValuesBase<dim> &fe,
+         const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Du)
     {
       AssertDimension(fe.get_fe().n_components(), dim);
       AssertVectorVectorDimension (Du, dim, fe.n_quadrature_points);

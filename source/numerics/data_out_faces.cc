@@ -278,7 +278,8 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 
 
 template <int dim, typename DoFHandlerType>
-void DataOutFaces<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions_)
+void
+DataOutFaces<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions_)
 {
   build_patches (StaticMappingQ1<dimension>::mapping, n_subdivisions_);
 }
@@ -286,8 +287,9 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const unsigned int n_subdi
 
 
 template <int dim, typename DoFHandlerType>
-void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &mapping,
-                                                      const unsigned int n_subdivisions_)
+void
+DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &mapping,
+                                                 const unsigned int n_subdivisions_)
 {
   // Check consistency of redundant template parameter
   Assert (dim==dimension, ExcDimensionMismatch(dim, dimension));

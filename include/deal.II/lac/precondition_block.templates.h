@@ -57,7 +57,8 @@ PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
 
 
 template <typename MatrixType, typename inverse_type>
-void PreconditionBlock<MatrixType,inverse_type>::clear ()
+void
+PreconditionBlock<MatrixType,inverse_type>::clear ()
 {
   PreconditionBlockBase<inverse_type>::clear();
   blocksize     = 0;
@@ -105,7 +106,8 @@ void PreconditionBlock<MatrixType,inverse_type>::initialize
 }
 
 template <typename MatrixType, typename inverse_type>
-void PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks()
+void
+PreconditionBlock<MatrixType,inverse_type>::invert_permuted_diagblocks()
 {
   Assert (A!=nullptr, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
@@ -415,7 +417,8 @@ PreconditionBlock<MatrixType,inverse_type>::block_size() const
 
 
 template <typename MatrixType, typename inverse_type>
-void PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
+void
+PreconditionBlock<MatrixType,inverse_type>::invert_diagblocks()
 {
   Assert (A!=nullptr, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
@@ -541,9 +544,10 @@ PreconditionBlock<MatrixType,inverse_type>::memory_consumption () const
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<MatrixType,inverse_type>
-::do_vmult (Vector<number2>       &dst,
-            const Vector<number2> &src,
-            bool                   adding) const
+::
+do_vmult (Vector<number2>       &dst,
+          const Vector<number2> &src,
+          bool                   adding) const
 {
   Assert(this->A!=nullptr, ExcNotInitialized());
 
@@ -616,8 +620,9 @@ void PreconditionBlockJacobi<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<MatrixType,inverse_type>
-::vmult (Vector<number2>       &dst,
-         const Vector<number2> &src) const
+::
+vmult (Vector<number2>       &dst,
+       const Vector<number2> &src) const
 {
   do_vmult(dst, src, false);
 }
@@ -626,38 +631,42 @@ void PreconditionBlockJacobi<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<MatrixType,inverse_type>
-::Tvmult (Vector<number2>       &dst,
-          const Vector<number2> &src) const
-{
-  do_vmult(dst, src, false);
-}
-
-
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void PreconditionBlockJacobi<MatrixType,inverse_type>
-::vmult_add (Vector<number2>       &dst,
-             const Vector<number2> &src) const
-{
-  do_vmult(dst, src, true);
-}
-
-
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void PreconditionBlockJacobi<MatrixType,inverse_type>
-::Tvmult_add (Vector<number2>       &dst,
-              const Vector<number2> &src) const
-{
-  do_vmult(dst, src, true);
-}
-
-
-template <typename MatrixType, typename inverse_type>
-template <typename number2>
-void PreconditionBlockJacobi<MatrixType,inverse_type>
-::step (Vector<number2>       &dst,
+::
+Tvmult (Vector<number2>       &dst,
         const Vector<number2> &src) const
+{
+  do_vmult(dst, src, false);
+}
+
+
+template <typename MatrixType, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
+::
+vmult_add (Vector<number2>       &dst,
+           const Vector<number2> &src) const
+{
+  do_vmult(dst, src, true);
+}
+
+
+template <typename MatrixType, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
+::
+Tvmult_add (Vector<number2>       &dst,
+            const Vector<number2> &src) const
+{
+  do_vmult(dst, src, true);
+}
+
+
+template <typename MatrixType, typename inverse_type>
+template <typename number2>
+void PreconditionBlockJacobi<MatrixType,inverse_type>
+::
+step (Vector<number2>       &dst,
+      const Vector<number2> &src) const
 {
   GrowingVectorMemory<Vector<number2> > mem;
   typename VectorMemory<Vector<number2> >::Pointer aux(mem);
@@ -671,8 +680,9 @@ void PreconditionBlockJacobi<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockJacobi<MatrixType,inverse_type>
-::Tstep (Vector<number2>       &dst,
-         const Vector<number2> &src) const
+::
+Tstep (Vector<number2>       &dst,
+       const Vector<number2> &src) const
 {
   GrowingVectorMemory<Vector<number2> > mem;
   typename VectorMemory<Vector<number2> >::Pointer aux(mem);
@@ -890,8 +900,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>::backward
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::vmult (Vector<number2>       &dst,
-         const Vector<number2> &src) const
+::
+vmult (Vector<number2>       &dst,
+       const Vector<number2> &src) const
 {
   forward(dst, src, false, false);
 }
@@ -900,8 +911,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::vmult_add (Vector<number2>       &dst,
-             const Vector<number2> &src) const
+::
+vmult_add (Vector<number2>       &dst,
+           const Vector<number2> &src) const
 {
   forward(dst, src, false, true);
 }
@@ -910,8 +922,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::Tvmult (Vector<number2>       &dst,
-          const Vector<number2> &src) const
+::
+Tvmult (Vector<number2>       &dst,
+        const Vector<number2> &src) const
 {
   backward(dst, src, true, false);
 }
@@ -920,8 +933,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::Tvmult_add (Vector<number2>       &dst,
-              const Vector<number2> &src) const
+::
+Tvmult_add (Vector<number2>       &dst,
+            const Vector<number2> &src) const
 {
   backward(dst, src, true, true);
 }
@@ -931,8 +945,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::step (Vector<number2>       &dst,
-        const Vector<number2> &src) const
+::
+step (Vector<number2>       &dst,
+      const Vector<number2> &src) const
 {
   this->forward_step(dst, dst, src, false);
 }
@@ -941,8 +956,9 @@ void PreconditionBlockSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSOR<MatrixType,inverse_type>
-::Tstep (Vector<number2>       &dst,
-         const Vector<number2> &src) const
+::
+Tstep (Vector<number2>       &dst,
+       const Vector<number2> &src) const
 {
   this->backward_step(dst, dst, src, true);
 }
@@ -962,8 +978,9 @@ PreconditionBlockSSOR<MatrixType,inverse_type>::PreconditionBlockSSOR ()
 
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>       &dst,
-                                                            const Vector<number2> &src) const
+void
+PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>       &dst,
+                                                       const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
@@ -993,8 +1010,9 @@ void PreconditionBlockSSOR<MatrixType,inverse_type>::vmult (Vector<number2>     
 
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
-void PreconditionBlockSSOR<MatrixType,inverse_type>::Tvmult (Vector<number2>       &dst,
-    const Vector<number2> &src) const
+void
+PreconditionBlockSSOR<MatrixType,inverse_type>::Tvmult (Vector<number2>       &dst,
+                                                        const Vector<number2> &src) const
 {
   Vector<number2> help;
   help.reinit(dst);
@@ -1026,8 +1044,9 @@ void PreconditionBlockSSOR<MatrixType,inverse_type>::Tvmult (Vector<number2>    
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSSOR<MatrixType,inverse_type>
-::step (Vector<number2>       &dst,
-        const Vector<number2> &src) const
+::
+step (Vector<number2>       &dst,
+      const Vector<number2> &src) const
 {
   this->forward_step(dst, dst, src, false);
   this->backward_step(dst, dst, src, false);
@@ -1037,8 +1056,9 @@ void PreconditionBlockSSOR<MatrixType,inverse_type>
 template <typename MatrixType, typename inverse_type>
 template <typename number2>
 void PreconditionBlockSSOR<MatrixType,inverse_type>
-::Tstep (Vector<number2>       &dst,
-         const Vector<number2> &src) const
+::
+Tstep (Vector<number2>       &dst,
+       const Vector<number2> &src) const
 {
   this->backward_step(dst, dst, src, true);
   this->forward_step(dst, dst, src, true);

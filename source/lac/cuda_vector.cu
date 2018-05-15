@@ -33,9 +33,10 @@ namespace LinearAlgebra
     namespace internal
     {
       template <typename Number>
-      __global__ void vec_scale(Number                                   *val,
-                                const Number                              a,
-                                const typename Vector<Number>::size_type  N)
+      __global__ void
+      vec_scale(Number                                   *val,
+                const Number                              a,
+                const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -54,8 +55,9 @@ namespace LinearAlgebra
       struct Binop_Addition
       {
         template <typename Number>
-        __device__ static inline Number operation(const Number a,
-                                                  const Number b)
+        __device__ static inline Number
+        operation(const Number a,
+                  const Number b)
         {
           return a+b;
         }
@@ -66,8 +68,9 @@ namespace LinearAlgebra
       struct Binop_Subtraction
       {
         template <typename Number>
-        __device__ static inline Number operation(const Number a,
-                                                  const Number b)
+        __device__ static inline Number
+        operation(const Number a,
+                  const Number b)
         {
           return a-b;
         }
@@ -76,9 +79,10 @@ namespace LinearAlgebra
 
 
       template <typename Number, typename Binop>
-      __global__ void vector_bin_op(Number                                   *v1,
-                                    Number                                   *v2,
-                                    const typename Vector<Number>::size_type  N)
+      __global__ void
+      vector_bin_op(Number                                   *v1,
+                    Number                                   *v2,
+                    const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -97,22 +101,26 @@ namespace LinearAlgebra
       template <typename Number>
       struct ElemSum
       {
-        __device__ static Number reduction_op(const Number a, const Number b)
+        __device__ static Number
+        reduction_op(const Number a, const Number b)
         {
           return (a + b);
         }
 
-        __device__ static Number atomic_op(Number *dst, const Number a)
+        __device__ static Number
+        atomic_op(Number *dst, const Number a)
         {
           return atomicAdd_wrapper(dst, a);
         }
 
-        __device__ static Number element_wise_op(const Number a)
+        __device__ static Number
+        element_wise_op(const Number a)
         {
           return a;
         }
 
-        __device__ static Number null_value()
+        __device__ static Number
+        null_value()
         {
           return Number();
         }
@@ -123,22 +131,26 @@ namespace LinearAlgebra
       template <typename Number>
       struct L1Norm
       {
-        __device__ static Number reduction_op(const Number a, const Number b)
+        __device__ static Number
+        reduction_op(const Number a, const Number b)
         {
           return (a + b);
         }
 
-        __device__ static Number atomic_op(Number *dst, const Number a)
+        __device__ static Number
+        atomic_op(Number *dst, const Number a)
         {
           return atomicAdd_wrapper(dst, a);
         }
 
-        __device__ static Number element_wise_op(const Number a)
+        __device__ static Number
+        element_wise_op(const Number a)
         {
           return std::fabs(a);
         }
 
-        __device__ static Number null_value()
+        __device__ static Number
+        null_value()
         {
           return Number();
         }
@@ -149,7 +161,8 @@ namespace LinearAlgebra
       template <typename Number>
       struct LInfty
       {
-        __device__ static Number reduction_op(const Number a, const Number b)
+        __device__ static Number
+        reduction_op(const Number a, const Number b)
         {
           if  (a > b)
             return a;
@@ -157,17 +170,20 @@ namespace LinearAlgebra
             return b;
         }
 
-        __device__ static Number atomic_op(Number *dst, const Number a)
+        __device__ static Number
+        atomic_op(Number *dst, const Number a)
         {
           return atomicMax_wrapper(dst, a);
         }
 
-        __device__ static Number element_wise_op(const Number a)
+        __device__ static Number
+        element_wise_op(const Number a)
         {
           return std::fabs(a);
         }
 
-        __device__ static Number null_value()
+        __device__ static Number
+        null_value()
         {
           return Number();
         }
@@ -176,8 +192,9 @@ namespace LinearAlgebra
 
 
       template <typename Number, typename Operation>
-      __device__ void reduce_within_warp(volatile Number                    *result_buffer,
-                                         typename Vector<Number>::size_type  local_idx)
+      __device__ void
+      reduce_within_warp(volatile Number                    *result_buffer,
+                         typename Vector<Number>::size_type  local_idx)
       {
         if (block_size >= 64)
           result_buffer[local_idx] =
@@ -208,11 +225,12 @@ namespace LinearAlgebra
 
 
       template <typename Number, typename Operation>
-      __device__ void reduce(Number                                   *result,
-                             Number                                   *result_buffer,
-                             const typename Vector<Number>::size_type  local_idx,
-                             const typename Vector<Number>::size_type  global_idx,
-                             const typename Vector<Number>::size_type  N)
+      __device__ void
+      reduce(Number                                   *result,
+             Number                                   *result_buffer,
+             const typename Vector<Number>::size_type  local_idx,
+             const typename Vector<Number>::size_type  global_idx,
+             const typename Vector<Number>::size_type  N)
       {
         for (typename Vector<Number>::size_type s=block_size/2; s>32; s=s>>1)
           {
@@ -232,9 +250,10 @@ namespace LinearAlgebra
 
 
       template <typename Number, typename Operation>
-      __global__ void reduction(Number       *result,
-                                const Number *v,
-                                const typename Vector<Number>::size_type N)
+      __global__ void
+      reduction(Number       *result,
+                const Number *v,
+                const typename Vector<Number>::size_type N)
       {
         __shared__ Number result_buffer[block_size];
 
@@ -257,22 +276,26 @@ namespace LinearAlgebra
       template <typename Number>
       struct DotProduct
       {
-        __device__ static Number binary_op(const Number a, const Number b)
+        __device__ static Number
+        binary_op(const Number a, const Number b)
         {
           return a*b;
         }
 
-        __device__ static Number reduction_op(const Number a, const Number b)
+        __device__ static Number
+        reduction_op(const Number a, const Number b)
         {
           return a+b;
         }
 
-        __device__ static Number atomic_op(Number *dst, const Number a)
+        __device__ static Number
+        atomic_op(Number *dst, const Number a)
         {
           return atomicAdd_wrapper(dst, a);
         }
 
-        __device__ static Number null_value()
+        __device__ static Number
+        null_value()
         {
           return Number();
         }
@@ -281,10 +304,11 @@ namespace LinearAlgebra
 
 
       template <typename Number, typename Operation>
-      __global__ void double_vector_reduction(Number       *result,
-                                              Number *v1,
-                                              Number *v2,
-                                              const typename Vector<Number>::size_type N)
+      __global__ void
+      double_vector_reduction(Number       *result,
+                              Number *v1,
+                              Number *v2,
+                              const typename Vector<Number>::size_type N)
       {
         __shared__ Number result_buffer[block_size];
 
@@ -315,9 +339,10 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void vec_add(Number       *val,
-                              const Number  a,
-                              const typename Vector<Number>::size_type  N)
+      __global__ void
+      vec_add(Number       *val,
+              const Number  a,
+              const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -334,10 +359,11 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void add_aV(Number       *val,
-                             const Number  a,
-                             Number       *V_val,
-                             const typename Vector<Number>::size_type  N)
+      __global__ void
+      add_aV(Number       *val,
+             const Number  a,
+             Number       *V_val,
+             const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -354,12 +380,13 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void add_aVbW(Number       *val,
-                               const Number  a,
-                               Number       *V_val,
-                               const Number  b,
-                               Number       *W_val,
-                               const typename Vector<Number>::size_type  N)
+      __global__ void
+      add_aVbW(Number       *val,
+               const Number  a,
+               Number       *V_val,
+               const Number  b,
+               Number       *W_val,
+               const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -376,11 +403,12 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void sadd(const Number  s,
-                           Number       *val,
-                           const Number  a,
-                           const Number *V_val,
-                           const typename Vector<Number>::size_type  N)
+      __global__ void
+      sadd(const Number  s,
+           Number       *val,
+           const Number  a,
+           const Number *V_val,
+           const typename Vector<Number>::size_type  N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -397,9 +425,10 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void scale(Number       *val,
-                            const Number *V_val,
-                            const typename Vector<Number>::size_type N)
+      __global__ void
+      scale(Number       *val,
+            const Number *V_val,
+            const typename Vector<Number>::size_type N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -416,10 +445,11 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void equ(Number       *val,
-                          const Number a,
-                          const Number *V_val,
-                          const typename Vector<Number>::size_type N)
+      __global__ void
+      equ(Number       *val,
+          const Number a,
+          const Number *V_val,
+          const typename Vector<Number>::size_type N)
       {
         const typename Vector<Number>::size_type idx_base = threadIdx.x +
                                                             blockIdx.x *
@@ -436,12 +466,13 @@ namespace LinearAlgebra
 
 
       template <typename Number>
-      __global__ void add_and_dot(Number       *res,
-                                  Number       *v1,
-                                  const Number *v2,
-                                  const Number *v3,
-                                  const Number  a,
-                                  const typename Vector<Number>::size_type N)
+      __global__ void
+      add_and_dot(Number       *res,
+                  Number       *v1,
+                  const Number *v2,
+                  const Number *v3,
+                  const Number  a,
+                  const typename Vector<Number>::size_type N)
       {
         __shared__ Number res_buf[block_size];
 
@@ -526,8 +557,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::reinit(const size_type n,
-                                const bool      omit_zeroing_entries)
+    void
+    Vector<Number>::reinit(const size_type n,
+                           const bool      omit_zeroing_entries)
     {
       // Resize the underlying array if necessary
       if (n == 0)
@@ -564,8 +596,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
-                                const bool omit_zeroing_entries)
+    void
+    Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                           const bool omit_zeroing_entries)
     {
       reinit(V.size(), omit_zeroing_entries);
     }
@@ -573,9 +606,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::import(const ReadWriteVector<Number> &V,
-                                VectorOperation::values operation,
-                                std::shared_ptr<const CommunicationPatternBase> )
+    void
+    Vector<Number>::import(const ReadWriteVector<Number> &V,
+                           VectorOperation::values operation,
+                           std::shared_ptr<const CommunicationPatternBase> )
     {
       if (operation == VectorOperation::insert)
         {
@@ -615,7 +649,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number> &Vector<Number>::operator= (const Number s)
+    Vector<Number> &
+    Vector<Number>::operator= (const Number s)
     {
       Assert(s == Number(), ExcMessage("Onlyt 0 can be assigned to a vector."));
       (void)s;
@@ -629,7 +664,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number> &Vector<Number>::operator*= (const Number factor)
+    Vector<Number> &
+    Vector<Number>::operator*= (const Number factor)
     {
       AssertIsFinite(factor);
       const int n_blocks = 1 + (n_elements-1)/(chunk_size*block_size);
@@ -647,7 +683,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number> &Vector<Number>::operator/= (const Number factor)
+    Vector<Number> &
+    Vector<Number>::operator/= (const Number factor)
     {
       AssertIsFinite(factor);
       Assert(factor!=Number(0.), ExcZero());
@@ -666,7 +703,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number> &Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
+    Vector<Number> &
+    Vector<Number>::operator+= (const VectorSpaceVector<Number> &V)
     {
       // Check that casting will work
       Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -693,7 +731,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Vector<Number> &Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
+    Vector<Number> &
+    Vector<Number>::operator-= (const VectorSpaceVector<Number> &V)
     {
       // Check that casting will work
       Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -720,7 +759,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Number Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
+    Number
+    Vector<Number>::operator* (const VectorSpaceVector<Number> &V) const
     {
       // Check that casting will work
       Assert(dynamic_cast<const Vector<Number>*>(&V)!=nullptr,
@@ -757,7 +797,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::add(const Number a)
+    void
+    Vector<Number>::add(const Number a)
     {
       AssertIsFinite(a);
       const int n_blocks = 1 + (n_elements-1)/(chunk_size*block_size);
@@ -773,7 +814,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
+    void
+    Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
     {
       AssertIsFinite(a);
 
@@ -799,8 +841,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V,
-                             const Number b, const VectorSpaceVector<Number> &W)
+    void
+    Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V,
+                        const Number b, const VectorSpaceVector<Number> &W)
     {
       AssertIsFinite(a);
       AssertIsFinite(b);
@@ -836,8 +879,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::sadd(const Number s, const Number a,
-                              const VectorSpaceVector<Number> &V)
+    void
+    Vector<Number>::sadd(const Number s, const Number a,
+                         const VectorSpaceVector<Number> &V)
     {
       AssertIsFinite(s);
       AssertIsFinite(a);
@@ -864,7 +908,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
+    void
+    Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector<Number>*>(&scaling_factors) != nullptr,
@@ -889,7 +934,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
+    void
+    Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
     {
       AssertIsFinite(a);
 
@@ -915,7 +961,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    bool Vector<Number>::all_zero() const
+    bool
+    Vector<Number>::all_zero() const
     {
       return (linfty_norm() == 0) ? true : false;
     }
@@ -923,7 +970,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    typename Vector<Number>::value_type Vector<Number>::mean_value() const
+    typename Vector<Number>::value_type
+    Vector<Number>::mean_value() const
     {
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
@@ -951,7 +999,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    typename Vector<Number>::real_type Vector<Number>::l1_norm() const
+    typename Vector<Number>::real_type
+    Vector<Number>::l1_norm() const
     {
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
@@ -979,7 +1028,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    typename Vector<Number>::real_type Vector<Number>::l2_norm() const
+    typename Vector<Number>::real_type
+    Vector<Number>::l2_norm() const
     {
       return std::sqrt((*this)*(*this));
     }
@@ -987,7 +1037,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    typename Vector<Number>::real_type Vector<Number>::linfty_norm() const
+    typename Vector<Number>::real_type
+    Vector<Number>::linfty_norm() const
     {
       Number *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
@@ -1015,9 +1066,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Number Vector<Number>::add_and_dot(const Number                     a,
-                                       const VectorSpaceVector<Number> &V,
-                                       const VectorSpaceVector<Number> &W)
+    Number
+    Vector<Number>::add_and_dot(const Number                     a,
+                                const VectorSpaceVector<Number> &V,
+                                const VectorSpaceVector<Number> &W)
     {
       AssertIsFinite(a);
 
@@ -1056,10 +1108,11 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::print(std::ostream       &out,
-                               const unsigned int  precision,
-                               const bool          scientific,
-                               const bool          ) const
+    void
+    Vector<Number>::print(std::ostream       &out,
+                          const unsigned int  precision,
+                          const bool          scientific,
+                          const bool          ) const
     {
       AssertThrow(out, ExcIO());
       std::ios::fmtflags old_flags = out.flags();
@@ -1097,7 +1150,8 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    std::size_t Vector<Number>::memory_consumption() const
+    std::size_t
+    Vector<Number>::memory_consumption() const
     {
       std::size_t memory = sizeof(*this);
       memory += sizeof (Number) * static_cast<std::size_t>(n_elements);

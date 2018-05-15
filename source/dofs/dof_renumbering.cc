@@ -562,10 +562,11 @@ namespace DoFRenumbering
 
 
   template <typename DoFHandlerType>
-  void Cuthill_McKee (DoFHandlerType                             &dof_handler,
-                      const unsigned int                          level,
-                      const bool                                  reversed_numbering,
-                      const std::vector<types::global_dof_index> &starting_indices)
+  void
+  Cuthill_McKee (DoFHandlerType                             &dof_handler,
+                 const unsigned int                          level,
+                 const bool                                  reversed_numbering,
+                 const std::vector<types::global_dof_index> &starting_indices)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcDoFHandlerNotInitialized());
@@ -1751,10 +1752,11 @@ namespace DoFRenumbering
 
 
   template <typename DoFHandlerType>
-  void downstream (DoFHandlerType                                  &dof,
-                   const unsigned int                               level,
-                   const Tensor<1,DoFHandlerType::space_dimension> &direction,
-                   const bool                                       dof_wise_renumbering)
+  void
+  downstream (DoFHandlerType                                  &dof,
+              const unsigned int                               level,
+              const Tensor<1,DoFHandlerType::space_dimension> &direction,
+              const bool                                       dof_wise_renumbering)
   {
     std::vector<types::global_dof_index> renumbering(dof.n_dofs(level));
     std::vector<types::global_dof_index> reverse(dof.n_dofs(level));
@@ -1870,8 +1872,9 @@ namespace DoFRenumbering
        * Comparison operator
        */
       template <class DHCellIterator>
-      bool operator () (const DHCellIterator &c1,
-                        const DHCellIterator &c2) const
+      bool
+      operator () (const DHCellIterator &c1,
+                   const DHCellIterator &c2) const
       {
         // dispatch to
         // dimension-dependent functions
@@ -1883,9 +1886,10 @@ namespace DoFRenumbering
        * Comparison operator for dim>=2
        */
       template <class DHCellIterator, int xdim>
-      bool compare (const DHCellIterator &c1,
-                    const DHCellIterator &c2,
-                    std::integral_constant<int, xdim>) const
+      bool
+      compare (const DHCellIterator &c1,
+               const DHCellIterator &c2,
+               std::integral_constant<int, xdim>) const
       {
         const Tensor<1,dim> v1 = c1->center() - center;
         const Tensor<1,dim> v2 = c2->center() - center;
@@ -1900,9 +1904,10 @@ namespace DoFRenumbering
        * where this function makes no sense
        */
       template <class DHCellIterator>
-      bool compare (const DHCellIterator &,
-                    const DHCellIterator &,
-                    std::integral_constant<int, 1>) const
+      bool
+      compare (const DHCellIterator &,
+               const DHCellIterator &,
+               std::integral_constant<int, 1>) const
       {
         Assert (dim >= 2,
                 ExcMessage ("This operation only makes sense for dim>=2."));
@@ -1958,10 +1963,11 @@ namespace DoFRenumbering
 
 
   template <typename DoFHandlerType>
-  void clockwise_dg (DoFHandlerType                               &dof,
-                     const unsigned int                            level,
-                     const Point<DoFHandlerType::space_dimension> &center,
-                     const bool                                    counter)
+  void
+  clockwise_dg (DoFHandlerType                               &dof,
+                const unsigned int                            level,
+                const Point<DoFHandlerType::space_dimension> &center,
+                const bool                                    counter)
   {
     std::vector<typename DoFHandlerType::level_cell_iterator> ordered_cells;
     ordered_cells.reserve(dof.get_triangulation().n_active_cells());

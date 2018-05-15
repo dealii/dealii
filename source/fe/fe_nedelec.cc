@@ -2988,8 +2988,9 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 template <int dim>
 const FullMatrix<double> &
 FE_Nedelec<dim>
-::get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case) const
+::
+get_prolongation_matrix (const unsigned int child,
+                         const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
@@ -3039,8 +3040,9 @@ FE_Nedelec<dim>
 template <int dim>
 const FullMatrix<double> &
 FE_Nedelec<dim>
-::get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case) const
+::
+get_restriction_matrix (const unsigned int child,
+                        const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));

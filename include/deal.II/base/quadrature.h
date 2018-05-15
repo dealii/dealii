@@ -97,7 +97,8 @@ public:
    * <code>hp::QCollection@<dim@> q_collection(QGauss@<dim@>(3))</code> was
    * meant.
    */
-  explicit Quadrature (const unsigned int n_quadrature_points = 0);
+  explicit
+  Quadrature (const unsigned int n_quadrature_points = 0);
 
   /**
    * Build this quadrature formula as the tensor product of a formula in a
@@ -126,7 +127,8 @@ public:
    * exactly. Therefore, it is appropriate if the one-dimensional formula
    * is defined with respect to a weighting function.
    */
-  explicit Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
+  explicit
+  Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
   /**
    * Copy constructor.
@@ -165,76 +167,89 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Quadrature () override = default;
+  virtual
+  ~Quadrature () override = default;
 
   /**
    * Assignment operator. Copies contents of #weights and #quadrature_points
    * as well as size.
    */
-  Quadrature &operator = (const Quadrature<dim> &);
+  Quadrature &
+  operator = (const Quadrature<dim> &);
 
   /**
    * Move assignment operator. Moves all data from another quadrature object
    * to this object.
    */
-  Quadrature &operator = (Quadrature<dim> &&) = default; // NOLINT
+  Quadrature &
+  operator = (Quadrature<dim> &&) = default; // NOLINT
 
   /**
    * Test for equality of two quadratures.
    */
-  bool operator == (const Quadrature<dim> &p) const;
+  bool
+  operator == (const Quadrature<dim> &p) const;
 
   /**
    * Set the quadrature points and weights to the values provided in the
    * arguments.
    */
-  void initialize(const std::vector<Point<dim> > &points,
-                  const std::vector<double>      &weights);
+  void
+  initialize(const std::vector<Point<dim> > &points,
+             const std::vector<double>      &weights);
 
   /**
    * Number of quadrature points.
    */
-  unsigned int size () const;
+  unsigned int
+  size () const;
 
   /**
    * Return the <tt>i</tt>th quadrature point.
    */
-  const Point<dim> &point (const unsigned int i) const;
+  const Point<dim> &
+  point (const unsigned int i) const;
 
   /**
    * Return a reference to the whole array of quadrature points.
    */
-  const std::vector<Point<dim> > &get_points () const;
+  const std::vector<Point<dim> > &
+  get_points () const;
 
   /**
    * Return the weight of the <tt>i</tt>th quadrature point.
    */
-  double weight (const unsigned int i) const;
+  double
+  weight (const unsigned int i) const;
 
   /**
    * Return a reference to the whole array of weights.
    */
-  const std::vector<double> &get_weights () const;
+  const std::vector<double> &
+  get_weights () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
    * of serialization.
    */
   template <class Archive>
-  void serialize (Archive &ar, const unsigned int version);
+  void
+  serialize (Archive &ar, const unsigned int version);
 
   /**
    * This function returns true if the quadrature object is a tensor product
    * of one-dimensional formulas and the quadrature points are sorted
    * lexicographically.
    */
-  bool is_tensor_product() const;
+  bool
+  is_tensor_product() const;
 
   /**
    * In case the quadrature formula is a tensor product, this function

@@ -47,7 +47,8 @@ namespace Manifolds
    */
   template <typename MeshIteratorType>
   inline
-  constexpr std::size_t n_default_points_per_cell()
+  constexpr std::size_t
+  n_default_points_per_cell()
   {
     // Note that in C++11 a constexpr function can only have a return
     // statement, so we cannot alias the structure dimension
@@ -348,14 +349,16 @@ public:
    * Destructor. Does nothing here, but needs to be declared virtual to make
    * class hierarchies derived from this class possible.
    */
-  virtual ~Manifold () override = default;
+  virtual
+  ~Manifold () override = default;
 
   /**
    * Return a copy of this manifold.
    *
    * Every derived class should implement this operation in a sensible manner.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const = 0;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const = 0;
 
   /**
    * @name Computing the location of points.
@@ -445,8 +448,9 @@ public:
    * the default behavior should work out of the box.
    */
   virtual
-  Point<spacedim> project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                                       const Point<spacedim>                  &candidate) const;
+  Point<spacedim>
+  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                       const Point<spacedim>                  &candidate) const;
 
   /**
    * Backward compatibility interface.  Return the point which shall become
@@ -702,7 +706,8 @@ public:
   /**
    * Return a copy of this manifold.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Let the new point be the average sum of surrounding vertices.
@@ -813,7 +818,8 @@ public:
   /**
    * Return the periodicity of this Manifold.
    */
-  const Tensor<1,spacedim> &get_periodicity() const;
+  const Tensor<1,spacedim> &
+  get_periodicity() const;
 
 private:
   /**
@@ -960,7 +966,8 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~ChartManifold () override = default;
+  virtual
+  ~ChartManifold () override = default;
 
   /**
    * Refer to the general documentation of this class and the documentation of
@@ -1110,7 +1117,8 @@ public:
   /**
    * Return the periodicity associated with the submanifold.
    */
-  const Tensor<1,chartdim> &get_periodicity() const;
+  const Tensor<1,chartdim> &
+  get_periodicity() const;
 
 private:
   /**

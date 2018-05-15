@@ -405,25 +405,28 @@ namespace LinearAlgebra
     namespace petsc_helpers
     {
       template <typename PETSC_Number, typename Number>
-      void copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
-                              const PETSC_Number *petsc_end_ptr,
-                              Number *ptr)
+      void
+      copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
+                         const PETSC_Number *petsc_end_ptr,
+                         Number *ptr)
       {
         std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
       }
 
       template <typename PETSC_Number, typename Number>
-      void copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
-                              const std::complex<PETSC_Number> *petsc_end_ptr,
-                              std::complex<Number> *ptr)
+      void
+      copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
+                         const std::complex<PETSC_Number> *petsc_end_ptr,
+                         std::complex<Number> *ptr)
       {
         std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
       }
 
       template <typename PETSC_Number, typename Number>
-      void copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
-                              const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
-                              Number * /*ptr*/)
+      void
+      copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
+                         const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
+                         Number * /*ptr*/)
       {
         AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
       }
@@ -763,8 +766,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
-                                const bool omit_zeroing_entries)
+    void
+    Vector<Number>::reinit(const VectorSpaceVector<Number> &V,
+                           const bool omit_zeroing_entries)
     {
       // Downcast. Throws an exception if invalid.
       Assert(dynamic_cast<const Vector<Number> *>(&V)!=nullptr,

@@ -67,7 +67,8 @@ KDTree<dim>::get_closest_points(const Point<dim> &target,
 
 
 template <int dim>
-void KDTree<dim>::set_points(const std::vector<Point<dim> > &pts)
+void
+KDTree<dim>::set_points(const std::vector<Point<dim> > &pts)
 {
   Assert(pts.size() > 0, ExcMessage("Expecting a non zero set of points."));
   adaptor = std_cxx14::make_unique<PointCloudAdaptor>(pts);

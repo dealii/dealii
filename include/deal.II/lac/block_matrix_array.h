@@ -137,14 +137,16 @@ public:
    * Initialize object completely. This is the function to call for an object
    * created by the default constructor.
    */
-  void initialize (const unsigned int n_block_rows,
-                   const unsigned int n_block_cols);
+  void
+  initialize (const unsigned int n_block_rows,
+              const unsigned int n_block_cols);
 
   /**
    * Adjust the matrix to a new size and delete all blocks.
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_cols);
+  void
+  reinit (const unsigned int n_block_rows,
+          const unsigned int n_block_cols);
 
   /**
    * Add a block matrix entry. The <tt>matrix</tt> is entered into a list of
@@ -157,63 +159,73 @@ public:
    * ExcDimensionMismatch in one of the multiplication functions.
    */
   template <typename MatrixType>
-  void enter (const MatrixType   &matrix,
-              const unsigned int  row,
-              const unsigned int  col,
-              const number        prefix = 1.,
-              const bool          transpose = false);
+  void
+  enter (const MatrixType   &matrix,
+         const unsigned int  row,
+         const unsigned int  col,
+         const number        prefix = 1.,
+         const bool          transpose = false);
 
   /**
    * Delete all entries, i.e. reset the matrix to an empty state.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Number of block-entries per column.
    */
-  unsigned int n_block_rows () const;
+  unsigned int
+  n_block_rows () const;
 
   /**
    * Number of block-entries per row.
    */
-  unsigned int n_block_cols () const;
+  unsigned int
+  n_block_cols () const;
 
   /**
    * Matrix-vector multiplication.
    */
-  void vmult (BlockVectorType &dst,
-              const BlockVectorType &src) const;
+  void
+  vmult (BlockVectorType &dst,
+         const BlockVectorType &src) const;
 
   /**
    * Matrix-vector multiplication adding to <tt>dst</tt>.
    */
-  void vmult_add(BlockVectorType &dst,
-                 const BlockVectorType &src) const;
+  void
+  vmult_add(BlockVectorType &dst,
+            const BlockVectorType &src) const;
 
   /**
    * Transposed matrix-vector multiplication.
    */
-  void Tvmult (BlockVectorType &dst,
-               const BlockVectorType &src) const;
+  void
+  Tvmult (BlockVectorType &dst,
+          const BlockVectorType &src) const;
 
   /**
    * Transposed matrix-vector multiplication adding to <tt>dst</tt>.
    */
-  void Tvmult_add (BlockVectorType &dst,
-                   const BlockVectorType &src) const;
+  void
+  Tvmult_add (BlockVectorType &dst,
+              const BlockVectorType &src) const;
 
   /**
    * Matrix scalar product between two vectors (at least for a symmetric
    * matrix).
    */
-  number matrix_scalar_product (const BlockVectorType &u,
-                                const BlockVectorType &v) const;
+  number
+  matrix_scalar_product (const BlockVectorType &u,
+                         const BlockVectorType &v) const;
 
   /**
    * Compute $u^T M u$. This is the square of the norm induced by the matrix
    * assuming the matrix is symmetric positive definitive.
    */
-  number matrix_norm_square (const BlockVectorType &u) const;
+  number
+  matrix_norm_square (const BlockVectorType &u) const;
 
   /**
    * Print the block structure as a LaTeX-array. This output will not be very
@@ -255,7 +267,8 @@ public:
    * structure of this matrix.
    */
   template <class StreamType>
-  void print_latex (StreamType &out) const;
+  void
+  print_latex (StreamType &out) const;
 
 protected:
   /**
@@ -328,7 +341,8 @@ protected:
      * and only exists for convenience there is no reasonable way to implement
      * this, so it is explicitly deleted.
      */
-    Entry &operator= (const Entry &) = delete;
+    Entry &
+    operator= (const Entry &) = delete;
   };
 
   /**
@@ -431,7 +445,8 @@ public:
   /**
    * Resize preconditioner to a new size and clear all blocks.
    */
-  void reinit (const unsigned int n_block_rows);
+  void
+  reinit (const unsigned int n_block_rows);
 
 
   /**
@@ -439,35 +454,40 @@ public:
    * diagonal blocks should actually be inverse matrices or preconditioners.
    */
   template <typename MatrixType>
-  void enter (const MatrixType &matrix,
-              const size_type   row,
-              const size_type   col,
-              const number      prefix    = 1.,
-              const bool        transpose = false);
+  void
+  enter (const MatrixType &matrix,
+         const size_type   row,
+         const size_type   col,
+         const number      prefix    = 1.,
+         const bool        transpose = false);
 
   /**
    * Preconditioning.
    */
-  void vmult (BlockVectorType &dst,
-              const BlockVectorType &src) const;
+  void
+  vmult (BlockVectorType &dst,
+         const BlockVectorType &src) const;
 
   /**
    * Preconditioning adding to <tt>dst</tt>.
    */
-  void vmult_add (BlockVectorType &dst,
-                  const BlockVectorType &src) const;
+  void
+  vmult_add (BlockVectorType &dst,
+             const BlockVectorType &src) const;
 
   /**
    * Transposed preconditioning
    */
-  void Tvmult (BlockVectorType &dst,
-               const BlockVectorType &src) const;
+  void
+  Tvmult (BlockVectorType &dst,
+          const BlockVectorType &src) const;
 
   /**
    * Transposed preconditioning adding to <tt>dst</tt>.
    */
-  void Tvmult_add (BlockVectorType &dst,
-                   const BlockVectorType &src) const;
+  void
+  Tvmult_add (BlockVectorType &dst,
+              const BlockVectorType &src) const;
 
   /**
    * Make function of base class available.
@@ -514,8 +534,9 @@ private:
    * Add all off-diagonal contributions and return the entry of the diagonal
    * element for one row.
    */
-  void do_row (BlockVectorType &dst,
-               size_type row_num) const;
+  void
+  do_row (BlockVectorType &dst,
+          size_type row_num) const;
 
   /**
    * Flag for backward insertion.

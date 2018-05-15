@@ -61,7 +61,8 @@ public:
    * matrix.
    */
   template <int dim, int spacedim>
-  void initialize (const DoFHandler<dim,spacedim> &dof);
+  void
+  initialize (const DoFHandler<dim,spacedim> &dof);
 
   /**
    * Fill the internal data structures with values extracted from the dof
@@ -75,9 +76,10 @@ public:
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
-  void initialize(const DoFHandler<dim,spacedim> &dof,
-                  const typename FunctionMap<dim>::type &function_map,
-                  const ComponentMask &component_mask = ComponentMask());
+  void
+  initialize(const DoFHandler<dim,spacedim> &dof,
+             const typename FunctionMap<dim>::type &function_map,
+             const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Fill the internal data structures with information
@@ -90,26 +92,30 @@ public:
    * different sets of boundary_ids for different components.
    */
   template <int dim, int spacedim>
-  void make_zero_boundary_constraints(const DoFHandler<dim,spacedim> &dof,
-                                      const std::set<types::boundary_id> &boundary_ids,
-                                      const ComponentMask &component_mask = ComponentMask());
+  void
+  make_zero_boundary_constraints(const DoFHandler<dim,spacedim> &dof,
+                                 const std::set<types::boundary_id> &boundary_ids,
+                                 const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Reset the data structures.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Determine whether a dof index is subject to a boundary constraint.
    */
-  bool is_boundary_index (const unsigned int level,
-                          const types::global_dof_index index) const;
+  bool
+  is_boundary_index (const unsigned int level,
+                     const types::global_dof_index index) const;
 
   /**
    * Determine whether a dof index is at the refinement edge.
    */
-  bool at_refinement_edge (const unsigned int level,
-                           const types::global_dof_index index) const;
+  bool
+  at_refinement_edge (const unsigned int level,
+                      const types::global_dof_index index) const;
 
 
   /**
@@ -118,9 +124,10 @@ public:
    * dof i, that is, return true if i is at a refinement edge,
    * j is not, and both are not on the external boundary.
    */
-  bool is_interface_matrix_entry (const unsigned int level,
-                                  const types::global_dof_index i,
-                                  const types::global_dof_index j) const;
+  bool
+  is_interface_matrix_entry (const unsigned int level,
+                             const types::global_dof_index i,
+                             const types::global_dof_index j) const;
 
   /**
    * Return the indices of level dofs on the given level that are subject to
@@ -143,7 +150,8 @@ public:
   /**
    * Return if Dirichlet boundary indices are set in initialize().
    */
-  bool have_boundary_indices () const;
+  bool
+  have_boundary_indices () const;
 
   /**
    * Return the level constraint matrix for a given level, containing

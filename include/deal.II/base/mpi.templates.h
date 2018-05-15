@@ -40,70 +40,80 @@ namespace Utilities
       /**
        * Return the corresponding MPI data type id for the argument given.
        */
-      inline MPI_Datatype mpi_type_id (const int *)
+      inline MPI_Datatype
+      mpi_type_id (const int *)
       {
         return MPI_INT;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const long int *)
+      inline MPI_Datatype
+      mpi_type_id (const long int *)
       {
         return MPI_LONG;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const unsigned int *)
+      inline MPI_Datatype
+      mpi_type_id (const unsigned int *)
       {
         return MPI_UNSIGNED;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const unsigned long int *)
+      inline MPI_Datatype
+      mpi_type_id (const unsigned long int *)
       {
         return MPI_UNSIGNED_LONG;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const unsigned long long int *)
+      inline MPI_Datatype
+      mpi_type_id (const unsigned long long int *)
       {
         return MPI_UNSIGNED_LONG_LONG;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const float *)
+      inline MPI_Datatype
+      mpi_type_id (const float *)
       {
         return MPI_FLOAT;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const double *)
+      inline MPI_Datatype
+      mpi_type_id (const double *)
       {
         return MPI_DOUBLE;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const long double *)
+      inline MPI_Datatype
+      mpi_type_id (const long double *)
       {
         return MPI_LONG_DOUBLE;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const std::complex<float> *)
+      inline MPI_Datatype
+      mpi_type_id (const std::complex<float> *)
       {
         return MPI_COMPLEX;
       }
 
 
 
-      inline MPI_Datatype mpi_type_id (const std::complex<double> *)
+      inline MPI_Datatype
+      mpi_type_id (const std::complex<double> *)
       {
         return MPI_DOUBLE_COMPLEX;
       }
@@ -111,10 +121,11 @@ namespace Utilities
 
 
       template <typename T>
-      void all_reduce (const MPI_Op             &mpi_op,
-                       const ArrayView<const T> &values,
-                       const MPI_Comm           &mpi_communicator,
-                       const ArrayView<T>       &output)
+      void
+      all_reduce (const MPI_Op             &mpi_op,
+                  const ArrayView<const T> &values,
+                  const MPI_Comm           &mpi_communicator,
+                  const ArrayView<T>       &output)
       {
         AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
@@ -166,10 +177,11 @@ namespace Utilities
 
 
       template <typename T>
-      void all_reduce (const MPI_Op                           &mpi_op,
-                       const ArrayView<const std::complex<T>> &values,
-                       const MPI_Comm                         &mpi_communicator,
-                       const ArrayView<std::complex<T>>       &output)
+      void
+      all_reduce (const MPI_Op                           &mpi_op,
+                  const ArrayView<const std::complex<T>> &values,
+                  const MPI_Comm                         &mpi_communicator,
+                  const ArrayView<std::complex<T>>       &output)
       {
         AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
@@ -207,8 +219,9 @@ namespace Utilities
 
 
     template <typename T>
-    T sum (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    sum (const T &t,
+         const MPI_Comm &mpi_communicator)
     {
       T return_value;
       internal::all_reduce(MPI_SUM, ArrayView<const T>(&t,1),
@@ -219,9 +232,10 @@ namespace Utilities
 
 
     template <typename T, typename U>
-    void sum (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &sums)
+    void
+    sum (const T        &values,
+         const MPI_Comm &mpi_communicator,
+         U              &sums)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                     typename std::decay<U>::type>::value,
@@ -236,9 +250,10 @@ namespace Utilities
 
 
     template <typename T>
-    void sum (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &sums)
+    void
+    sum (const ArrayView<const T> &values,
+         const MPI_Comm           &mpi_communicator,
+         const ArrayView<T>       &sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
@@ -304,8 +319,9 @@ namespace Utilities
 
 
     template <typename T>
-    T max (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    max (const T &t,
+         const MPI_Comm &mpi_communicator)
     {
       T return_value;
       internal::all_reduce(MPI_MAX, ArrayView<const T>(&t,1),
@@ -316,9 +332,10 @@ namespace Utilities
 
 
     template <typename T, typename U>
-    void max (const T         &values,
-              const MPI_Comm  &mpi_communicator,
-              U               &maxima)
+    void
+    max (const T         &values,
+         const MPI_Comm  &mpi_communicator,
+         U               &maxima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                     typename std::decay<U>::type>::value,
@@ -333,9 +350,10 @@ namespace Utilities
 
 
     template <typename T>
-    void max (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &maxima)
+    void
+    max (const ArrayView<const T> &values,
+         const MPI_Comm           &mpi_communicator,
+         const ArrayView<T>       &maxima)
     {
       internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
@@ -343,8 +361,9 @@ namespace Utilities
 
 
     template <typename T>
-    T min (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    min (const T &t,
+         const MPI_Comm &mpi_communicator)
     {
       T return_value;
       internal::all_reduce(MPI_MIN, ArrayView<const T>(&t,1),
@@ -355,9 +374,10 @@ namespace Utilities
 
 
     template <typename T, typename U>
-    void min (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &minima)
+    void
+    min (const T        &values,
+         const MPI_Comm &mpi_communicator,
+         U              &minima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                     typename std::decay<U>::type>::value,
@@ -372,9 +392,10 @@ namespace Utilities
 
 
     template <typename T>
-    void min (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &minima)
+    void
+    min (const ArrayView<const T> &values,
+         const MPI_Comm           &mpi_communicator,
+         const ArrayView<T>       &minima)
     {
       internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }

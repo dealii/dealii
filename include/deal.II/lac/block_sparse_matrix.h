@@ -106,7 +106,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~BlockSparseMatrix () override;
+  virtual
+  ~BlockSparseMatrix () override;
 
 
 
@@ -136,7 +137,8 @@ public:
    * This calls SparseMatrix::clear on all sub-matrices and then resets this
    * object to have no blocks at all.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Reinitialize the sparse matrix with the given sparsity pattern. The
@@ -152,7 +154,8 @@ public:
    *
    * The elements of the matrix are set to zero by this function.
    */
-  virtual void reinit (const BlockSparsityPattern &sparsity);
+  virtual void
+  reinit (const BlockSparsityPattern &sparsity);
 //@}
 
   /**
@@ -163,26 +166,30 @@ public:
    * Return whether the object is empty. It is empty if either both dimensions
    * are zero or no BlockSparsityPattern is associated.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the number of entries in a specific row.
    */
-  size_type get_row_length (const size_type row) const;
+  size_type
+  get_row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
    * returns the number of entries in the sparsity pattern; if any of the
    * entries should happen to be zero, it is counted anyway.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements () const;
 
   /**
    * Return the number of actually nonzero elements. Just counts the number of
    * actually nonzero elements (with absolute value larger than threshold) of
    * all the blocks.
    */
-  size_type n_actually_nonzero_elements (const double threshold = 0.0) const;
+  size_type
+  n_actually_nonzero_elements (const double threshold = 0.0) const;
 
   /**
    * Return a (constant) reference to the underlying sparsity pattern of this
@@ -199,7 +206,8 @@ public:
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 //@}
 
   /**
@@ -211,8 +219,9 @@ public:
    * matrix.
    */
   template <typename block_number>
-  void vmult (BlockVector<block_number>       &dst,
-              const BlockVector<block_number> &src) const;
+  void
+  vmult (BlockVector<block_number>       &dst,
+         const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -220,8 +229,9 @@ public:
    */
   template <typename block_number,
             typename nonblock_number>
-  void vmult (BlockVector<block_number>          &dst,
-              const Vector<nonblock_number> &src) const;
+  void
+  vmult (BlockVector<block_number>          &dst,
+         const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -229,16 +239,18 @@ public:
    */
   template <typename block_number,
             typename nonblock_number>
-  void vmult (Vector<nonblock_number>    &dst,
-              const BlockVector<block_number> &src) const;
+  void
+  vmult (Vector<nonblock_number>    &dst,
+         const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block.
    */
   template <typename nonblock_number>
-  void vmult (Vector<nonblock_number>       &dst,
-              const Vector<nonblock_number> &src) const;
+  void
+  vmult (Vector<nonblock_number>       &dst,
+         const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -246,8 +258,9 @@ public:
    * matrix.
    */
   template <typename block_number>
-  void Tvmult (BlockVector<block_number>       &dst,
-               const BlockVector<block_number> &src) const;
+  void
+  Tvmult (BlockVector<block_number>       &dst,
+          const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -255,8 +268,9 @@ public:
    */
   template <typename block_number,
             typename nonblock_number>
-  void Tvmult (BlockVector<block_number>  &dst,
-               const Vector<nonblock_number> &src) const;
+  void
+  Tvmult (BlockVector<block_number>  &dst,
+          const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -264,16 +278,18 @@ public:
    */
   template <typename block_number,
             typename nonblock_number>
-  void Tvmult (Vector<nonblock_number>    &dst,
-               const BlockVector<block_number> &src) const;
+  void
+  Tvmult (Vector<nonblock_number>    &dst,
+          const BlockVector<block_number> &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block.
    */
   template <typename nonblock_number>
-  void Tvmult (Vector<nonblock_number>       &dst,
-               const Vector<nonblock_number> &src) const;
+  void
+  Tvmult (Vector<nonblock_number>       &dst,
+          const Vector<nonblock_number> &src) const;
 //@}
 
   /**
@@ -288,9 +304,10 @@ public:
    * All diagonal blocks must be square matrices for this operation.
    */
   template <class BlockVectorType>
-  void precondition_Jacobi (BlockVectorType       &dst,
-                            const BlockVectorType &src,
-                            const number           omega = 1.) const;
+  void
+  precondition_Jacobi (BlockVectorType       &dst,
+                       const BlockVectorType &src,
+                       const number           omega = 1.) const;
 
   /**
    * Apply the Jacobi preconditioner to a simple vector.
@@ -298,9 +315,10 @@ public:
    * The matrix must be a single square block for this.
    */
   template <typename number2>
-  void precondition_Jacobi (Vector<number2>       &dst,
-                            const Vector<number2> &src,
-                            const number           omega = 1.) const;
+  void
+  precondition_Jacobi (Vector<number2>       &dst,
+                       const Vector<number2> &src,
+                       const number           omega = 1.) const;
 //@}
 
   /**
@@ -327,12 +345,13 @@ public:
    * @attention This function may produce <b>large</b> amounts of output if
    * applied to a large matrix!
    */
-  void print_formatted (std::ostream       &out,
-                        const unsigned int  precision   = 3,
-                        const bool          scientific  = true,
-                        const unsigned int  width       = 0,
-                        const char         *zero_string = " ",
-                        const double        denominator = 1.) const;
+  void
+  print_formatted (std::ostream       &out,
+                   const unsigned int  precision   = 3,
+                   const bool          scientific  = true,
+                   const unsigned int  width       = 0,
+                   const char         *zero_string = " ",
+                   const double        denominator = 1.) const;
 //@}
   /**
    * @addtogroup Exceptions

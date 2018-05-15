@@ -49,7 +49,8 @@ namespace LocalIntegrators
      * @date 2011
      */
     template <int dim>
-    void cell_matrix (
+    void
+    cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       double factor = 1.)
@@ -84,7 +85,8 @@ namespace LocalIntegrators
      * @date 2014
      */
     template <int dim, typename number>
-    void cell_residual (
+    void
+    cell_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
@@ -118,7 +120,8 @@ namespace LocalIntegrators
      * @f]
      */
     template <int dim>
-    inline void nitsche_matrix (
+    inline void
+    nitsche_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       double penalty,
@@ -171,7 +174,8 @@ namespace LocalIntegrators
      * @date 2008, 2009, 2010
      */
     template <int dim>
-    void nitsche_residual (
+    void
+    nitsche_residual (
       Vector<double> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -220,7 +224,8 @@ namespace LocalIntegrators
      */
 
     template <int dim>
-    void ip_matrix (
+    void
+    ip_matrix (
       FullMatrix<double> &M11,
       FullMatrix<double> &M12,
       FullMatrix<double> &M21,

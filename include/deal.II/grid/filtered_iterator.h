@@ -61,7 +61,8 @@ namespace IteratorFilters
      * the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 
   /**
@@ -80,7 +81,8 @@ namespace IteratorFilters
      * or past the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 
 
@@ -99,7 +101,8 @@ namespace IteratorFilters
      * flag or past the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 
 
@@ -125,7 +128,8 @@ namespace IteratorFilters
      * end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
 
   protected:
     /**
@@ -159,7 +163,8 @@ namespace IteratorFilters
      * end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
 
   protected:
     /**
@@ -188,7 +193,8 @@ namespace IteratorFilters
      * Evaluation operator. Returns true if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 
 
@@ -207,7 +213,8 @@ namespace IteratorFilters
      * is equal to the current processor id.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 
 
@@ -244,7 +251,8 @@ namespace IteratorFilters
      * and, if required, if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
 
   protected:
     /**
@@ -290,7 +298,8 @@ namespace IteratorFilters
      * and, if required, if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
 
   protected:
     /**
@@ -318,7 +327,8 @@ namespace IteratorFilters
      * Evaluate the iterator and return true if the object at the boundary.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator () (const Iterator &i) const;
   };
 }
 
@@ -562,14 +572,16 @@ public:
    * not copied. The iterator value underlying the argument has to satisfy the
    * predicate of the object assigned to, as given at its construction time.
    */
-  FilteredIterator &operator = (const FilteredIterator &fi);
+  FilteredIterator &
+  operator = (const FilteredIterator &fi);
 
   /**
    * Assignment operator. Copy the iterator value of the argument, and keep
    * the predicate of this object. The given iterator value has to satisfy the
    * predicate of the object assigned to, as given at its construction time.
    */
-  FilteredIterator &operator = (const BaseIterator &fi);
+  FilteredIterator &
+  operator = (const BaseIterator &fi);
 
   /**
    * Search for the next iterator from @p bi onwards that satisfies the
@@ -599,7 +611,8 @@ public:
    *
    * We do not compare for equality of the predicates.
    */
-  bool operator == (const FilteredIterator &fi) const;
+  bool
+  operator == (const FilteredIterator &fi) const;
 
   /**
    * Compare for equality of the underlying iterator value of this object with
@@ -607,7 +620,8 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator == (const BaseIterator &fi) const;
+  bool
+  operator == (const BaseIterator &fi) const;
 
   /**
    * Compare for inequality of the underlying iterator values of this and the
@@ -615,7 +629,8 @@ public:
    *
    * We do not compare for equality of the predicates.
    */
-  bool operator != (const FilteredIterator &fi) const;
+  bool
+  operator != (const FilteredIterator &fi) const;
 
   /**
    * Compare for inequality of the underlying iterator value of this object
@@ -623,7 +638,8 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator != (const BaseIterator &fi) const;
+  bool
+  operator != (const BaseIterator &fi) const;
 
   /**
    * Compare for ordering of the underlying iterator values of this and the
@@ -631,7 +647,8 @@ public:
    *
    * We do not compare the predicates.
    */
-  bool operator <  (const FilteredIterator &fi) const;
+  bool
+  operator <  (const FilteredIterator &fi) const;
 
   /**
    * Compare for ordering of the underlying iterator value of this object with
@@ -639,31 +656,36 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator <  (const BaseIterator &fi) const;
+  bool
+  operator <  (const BaseIterator &fi) const;
 
   /**
    * Prefix advancement operator: move to the next iterator value satisfying
    * the predicate and return the new iterator value.
    */
-  FilteredIterator &operator ++ ();
+  FilteredIterator &
+  operator ++ ();
 
   /**
    * Postfix advancement operator: move to the next iterator value satisfying
    * the predicate and return the old iterator value.
    */
-  FilteredIterator   operator ++ (int);
+  FilteredIterator
+  operator ++ (int);
 
   /**
    * Prefix decrement operator: move to the previous iterator value satisfying
    * the predicate and return the new iterator value.
    */
-  FilteredIterator &operator -- ();
+  FilteredIterator &
+  operator -- ();
 
   /**
    * Postfix advancement operator: move to the previous iterator value
    * satisfying the predicate and return the old iterator value.
    */
-  FilteredIterator   operator -- (int);
+  FilteredIterator
+  operator -- (int);
 
   /**
    * Exception.
@@ -692,19 +714,22 @@ private:
      * Mark the destructor virtual to allow destruction through pointers to
      * the base class.
      */
-    virtual ~PredicateBase () = default;
+    virtual
+    ~PredicateBase () = default;
 
     /**
      * Abstract function which in derived classes denotes the evaluation of
      * the predicate on the given iterator.
      */
-    virtual bool operator () (const BaseIterator &bi) const = 0;
+    virtual bool
+    operator () (const BaseIterator &bi) const = 0;
 
     /**
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual std::unique_ptr<PredicateBase> clone () const = 0;
+    virtual std::unique_ptr<PredicateBase>
+    clone () const = 0;
   };
 
 
@@ -728,13 +753,15 @@ private:
     /**
      * Evaluate the iterator with the stored copy of the predicate.
      */
-    virtual bool operator () (const BaseIterator &bi) const override;
+    virtual bool
+    operator () (const BaseIterator &bi) const override;
 
     /**
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual std::unique_ptr<PredicateBase> clone () const override;
+    virtual std::unique_ptr<PredicateBase>
+    clone () const override;
 
   private:
     /**

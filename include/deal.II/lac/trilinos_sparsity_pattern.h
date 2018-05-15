@@ -88,17 +88,20 @@ namespace TrilinosWrappers
       /**
        * Row number of the element represented by this object.
        */
-      size_type row() const;
+      size_type
+      row() const;
 
       /**
        * Index in row of the element represented by this object.
        */
-      size_type index() const;
+      size_type
+      index() const;
 
       /**
        * Column number of the element represented by this object.
        */
-      size_type column() const;
+      size_type
+      column() const;
 
       /**
        * Exception
@@ -150,7 +153,8 @@ namespace TrilinosWrappers
        * accessors) and generate new ones for the row pointed to presently by
        * this accessor.
        */
-      void visit_present_row ();
+      void
+      visit_present_row ();
 
       /**
        * Make enclosing class a friend.
@@ -187,40 +191,47 @@ namespace TrilinosWrappers
       /**
        * Prefix increment.
        */
-      Iterator &operator++ ();
+      Iterator &
+      operator++ ();
 
       /**
        * Postfix increment.
        */
-      Iterator operator++ (int);
+      Iterator
+      operator++ (int);
 
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator* () const;
+      const Accessor &
+      operator* () const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator-> () const;
+      const Accessor *
+      operator-> () const;
 
       /**
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
-      bool operator == (const Iterator &) const;
+      bool
+      operator == (const Iterator &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
-      bool operator != (const Iterator &) const;
+      bool
+      operator != (const Iterator &) const;
 
       /**
        * Comparison operator. Result is true if either the first row number is
        * smaller or if the row numbers are equal and the first index is
        * smaller.
        */
-      bool operator < (const Iterator &) const;
+      bool
+      operator < (const Iterator &) const;
 
       /**
        * Exception
@@ -329,7 +340,8 @@ namespace TrilinosWrappers
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~SparsityPattern () override = default;
+    virtual
+    ~SparsityPattern () override = default;
 
     /**
      * Initialize a sparsity pattern that is completely stored locally, having
@@ -382,7 +394,8 @@ namespace TrilinosWrappers
      * the compiler. Use copy_from() instead if you know that you really want
      * to copy a sparsity pattern with non-trivial content.
      */
-    SparsityPattern &operator = (const SparsityPattern &input_sparsity_pattern);
+    SparsityPattern &
+    operator = (const SparsityPattern &input_sparsity_pattern);
 
     /**
      * Release all memory and return to a state just like after having called
@@ -391,7 +404,8 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * In analogy to our own SparsityPattern class, this function compresses
@@ -402,7 +416,8 @@ namespace TrilinosWrappers
      * the structure is fixed. This is a collective operation, i.e., it needs
      * to be run on all processors when used in parallel.
      */
-    void compress ();
+    void
+    compress ();
 //@}
     /**
      * @name Constructors and initialization using an Epetra_Map description
@@ -841,22 +856,26 @@ namespace TrilinosWrappers
      * Return the state of the sparsity pattern, i.e., whether compress()
      * needs to be called after an operation requiring data exchange.
      */
-    bool is_compressed () const;
+    bool
+    is_compressed () const;
 
     /**
      * Return the maximum number of entries per row on the current processor.
      */
-    unsigned int max_entries_per_row () const;
+    unsigned int
+    max_entries_per_row () const;
 
     /**
      * Return the number of rows in this sparsity pattern.
      */
-    size_type n_rows () const;
+    size_type
+    n_rows () const;
 
     /**
      * Return the number of columns in this sparsity pattern.
      */
-    size_type n_cols () const;
+    size_type
+    n_cols () const;
 
     /**
      * Return the local dimension of the sparsity pattern, i.e. the number of
@@ -867,7 +886,8 @@ namespace TrilinosWrappers
      * To figure out which elements exactly are stored locally, use
      * local_range().
      */
-    unsigned int local_size () const;
+    unsigned int
+    local_size () const;
 
     /**
      * Return a pair of indices indicating which rows of this sparsity pattern
@@ -884,17 +904,20 @@ namespace TrilinosWrappers
      * Return whether @p index is in the local range or not, see also
      * local_range().
      */
-    bool in_local_range (const size_type index) const;
+    bool
+    in_local_range (const size_type index) const;
 
     /**
      * Return the number of nonzero elements of this sparsity pattern.
      */
-    size_type n_nonzero_elements () const;
+    size_type
+    n_nonzero_elements () const;
 
     /**
      * Number of entries in a specific row.
      */
-    size_type row_length (const size_type row) const;
+    size_type
+    row_length (const size_type row) const;
 
     /**
      * Compute the bandwidth of the matrix represented by this structure. The
@@ -902,26 +925,30 @@ namespace TrilinosWrappers
      * represents a nonzero entry of the matrix. Consequently, the maximum
      * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
      */
-    size_type bandwidth () const;
+    size_type
+    bandwidth () const;
 
     /**
      * Return whether the object is empty. It is empty if no memory is
      * allocated, which is the same as when both dimensions are zero.
      */
-    bool empty () const;
+    bool
+    empty () const;
 
     /**
      * Return whether the index (<i>i,j</i>) exists in the sparsity pattern
      * (i.e., it may be non-zero) or not.
      */
-    bool exists (const size_type i,
-                 const size_type j) const;
+    bool
+    exists (const size_type i,
+            const size_type j) const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object. Currently not implemented for this class.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
 //@}
     /**
@@ -931,18 +958,20 @@ namespace TrilinosWrappers
     /**
      * Add the element (<i>i,j</i>) to the sparsity pattern.
      */
-    void add (const size_type i,
-              const size_type j);
+    void
+    add (const size_type i,
+         const size_type j);
 
 
     /**
      * Add several elements in one row to the sparsity pattern.
      */
     template <typename ForwardIterator>
-    void add_entries (const size_type  row,
-                      ForwardIterator  begin,
-                      ForwardIterator  end,
-                      const bool       indices_are_sorted = false);
+    void
+    add_entries (const size_type  row,
+                 ForwardIterator  begin,
+                 ForwardIterator  end,
+                 const bool       indices_are_sorted = false);
 //@}
     /**
      * @name Access of underlying Trilinos data
@@ -953,7 +982,8 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_CrsGraph
      * data that stores the sparsity pattern.
      */
-    const Epetra_FECrsGraph &trilinos_sparsity_pattern () const;
+    const Epetra_FECrsGraph &
+    trilinos_sparsity_pattern () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -964,7 +994,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_domain_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &domain_partitioner () const;
+    const Epetra_Map &
+    domain_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -975,7 +1006,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &range_partitioner () const;
+    const Epetra_Map &
+    range_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -985,7 +1017,8 @@ namespace TrilinosWrappers
      * @deprecated Use locally_owned_range_indices() instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &row_partitioner () const;
+    const Epetra_Map &
+    row_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -997,7 +1030,8 @@ namespace TrilinosWrappers
      * Epetra_FECrsGraph.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Map &col_partitioner () const;
+    const Epetra_Map &
+    col_partitioner () const;
 
     /**
      * Return a const reference to the communicator used for this object.
@@ -1005,12 +1039,14 @@ namespace TrilinosWrappers
      * @deprecated Use get_mpi_communicator instead.
      */
     DEAL_II_DEPRECATED
-    const Epetra_Comm &trilinos_communicator () const;
+    const Epetra_Comm &
+    trilinos_communicator () const;
 
     /**
      * Return the MPI communicator object in use with this matrix.
      */
-    MPI_Comm get_mpi_communicator () const;
+    MPI_Comm
+    get_mpi_communicator () const;
 //@}
 
     /**
@@ -1023,14 +1059,16 @@ namespace TrilinosWrappers
      * partitioning of the vectors a matrix based on this sparsity pattern has
      * to be multiplied with.
      */
-    IndexSet locally_owned_domain_indices() const;
+    IndexSet
+    locally_owned_domain_indices() const;
 
     /**
      * Return the partitioning of the range space of this pattern, i.e., the
      * partitioning of the vectors that are the result from matrix-vector
      * products from a matrix based on this pattern.
      */
-    IndexSet locally_owned_range_indices() const;
+    IndexSet
+    locally_owned_range_indices() const;
 
 //@}
 
@@ -1042,12 +1080,14 @@ namespace TrilinosWrappers
     /**
      * Iterator starting at the first entry.
      */
-    const_iterator begin () const;
+    const_iterator
+    begin () const;
 
     /**
      * Final iterator.
      */
-    const_iterator end () const;
+    const_iterator
+    end () const;
 
     /**
      * Iterator starting at the first entry of row @p r.
@@ -1057,7 +1097,8 @@ namespace TrilinosWrappers
      * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable
      * in that case.
      */
-    const_iterator begin (const size_type r) const;
+    const_iterator
+    begin (const size_type r) const;
 
     /**
      * Final iterator of row <tt>r</tt>. It points to the first element past
@@ -1067,7 +1108,8 @@ namespace TrilinosWrappers
      * in particular the case if it is the end iterator for the last row of a
      * matrix.
      */
-    const_iterator end (const size_type r) const;
+    const_iterator
+    end (const size_type r) const;
 
 //@}
     /**
@@ -1080,7 +1122,8 @@ namespace TrilinosWrappers
      * objects. Currently this function is not implemented.  TODO: Not
      * implemented.
      */
-    void write_ascii ();
+    void
+    write_ascii ();
 
     /**
      * Print (the locally owned part of) the sparsity pattern to the given
@@ -1089,8 +1132,9 @@ namespace TrilinosWrappers
      * processor number is printed to the stream, as well as a summary before
      * actually writing the entries.
      */
-    void print (std::ostream &out,
-                const bool    write_extended_trilinos_info = false) const;
+    void
+    print (std::ostream &out,
+           const bool    write_extended_trilinos_info = false) const;
 
     /**
      * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
@@ -1106,7 +1150,8 @@ namespace TrilinosWrappers
      * Print the sparsity pattern in gnuplot by setting the data style to dots
      * or points and use the <tt>plot</tt> command.
      */
-    void print_gnuplot (std::ostream &out) const;
+    void
+    print_gnuplot (std::ostream &out) const;
 
 //@}
     /**

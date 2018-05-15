@@ -410,7 +410,8 @@ namespace SUNDIALS
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
-      void add_parameters(ParameterHandler &prm)
+      void
+      add_parameters(ParameterHandler &prm)
       {
         prm.add_parameter("Initial time", initial_time);
         prm.add_parameter("Final time", final_time);
@@ -512,7 +513,8 @@ namespace SUNDIALS
      * Integrate the initial value problem. This function returns the final
      * number of computed steps.
      */
-    unsigned int solve_ode(VectorType &solution);
+    unsigned int
+    solve_ode(VectorType &solution);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -528,9 +530,10 @@ namespace SUNDIALS
      * @param[in] h  The new starting time step
      * @param[in,out] y   The new initial solution
      */
-    void reset(const double &t,
-               const double &h,
-               const VectorType &y);
+    void
+    reset(const double &t,
+          const double &h,
+          const VectorType &y);
 
     /**
      * A function object that users need to supply and that is intended to
@@ -839,7 +842,8 @@ namespace SUNDIALS
      * std::function above to trigger an assert if they are not
      * implemented.
      */
-    void set_functions_to_trigger_an_assert();
+    void
+    set_functions_to_trigger_an_assert();
 
     /**
      * ARKode configuration data.

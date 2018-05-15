@@ -105,12 +105,14 @@ namespace Utilities
       /**
        * Return the number of rows in the processes grid.
        */
-      unsigned int get_process_grid_rows() const;
+      unsigned int
+      get_process_grid_rows() const;
 
       /**
        * Return the number of columns in the processes grid.
        */
-      unsigned int get_process_grid_columns() const;
+      unsigned int
+      get_process_grid_columns() const;
 
       /**
        * Send @p count values stored consequently starting at @p value from
@@ -118,12 +120,14 @@ namespace Utilities
        * are not in the process grid.
        */
       template <typename NumberType>
-      void send_to_inactive(NumberType *value, const int count=1) const;
+      void
+      send_to_inactive(NumberType *value, const int count=1) const;
 
       /**
        * Return <code>true</code> if the process is active within the grid.
        */
-      bool is_process_active() const;
+      bool
+      is_process_active() const;
 
     private:
 
@@ -194,7 +198,8 @@ namespace Utilities
 #ifndef DOXYGEN
 
     inline
-    unsigned int ProcessGrid::get_process_grid_rows() const
+    unsigned int
+    ProcessGrid::get_process_grid_rows() const
     {
       return n_process_rows;
     }
@@ -202,7 +207,8 @@ namespace Utilities
 
 
     inline
-    unsigned int ProcessGrid::get_process_grid_columns() const
+    unsigned int
+    ProcessGrid::get_process_grid_columns() const
     {
       return n_process_columns;
     }
@@ -210,7 +216,8 @@ namespace Utilities
 
 
     inline
-    bool ProcessGrid::is_process_active() const
+    bool
+    ProcessGrid::is_process_active() const
     {
       return mpi_process_is_active;
     }

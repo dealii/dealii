@@ -146,40 +146,46 @@ public:
    *
    * The optional argument @p print_job_id specifies whether
    */
-  void attach (std::ostream &o,
-               const bool    print_job_id = true);
+  void
+  attach (std::ostream &o,
+          const bool    print_job_id = true);
 
 
   /**
    * Disable output to the second stream. You may want to call <tt>close</tt>
    * on the stream that was previously attached to this object.
    */
-  void detach ();
+  void
+  detach ();
 
 
   /**
    * Return the default stream (<tt>std_out</tt>).
    */
-  std::ostream &get_console ();
+  std::ostream &
+  get_console ();
 
 
   /**
    * Return the file stream.
    */
-  std::ostream &get_file_stream ();
+  std::ostream &
+  get_file_stream ();
 
 
   /**
    * Return @p true if file stream has already been attached,
    * @p false otherwise.
    */
-  bool has_file () const;
+  bool
+  has_file () const;
 
 
   /**
    * Return the prefix string.
    */
-  const std::string &get_prefix () const;
+  const std::string &
+  get_prefix () const;
 
 
   /**
@@ -194,13 +200,15 @@ public:
    * because an intermediate function call results in an exception that
    * is not immediately caught.
    */
-  void push (const std::string &text);
+  void
+  push (const std::string &text);
 
 
   /**
    * Remove the last prefix added with push().
    */
-  void pop ();
+  void
+  pop ();
 
 
   /**
@@ -213,7 +221,8 @@ public:
    *
    * The previous value of this parameter is returned.
    */
-  unsigned int depth_console (const unsigned int n);
+  unsigned int
+  depth_console (const unsigned int n);
 
 
   /**
@@ -223,13 +232,15 @@ public:
    *
    * The previous value of this parameter is returned.
    */
-  unsigned int depth_file (const unsigned int n);
+  unsigned int
+  depth_file (const unsigned int n);
 
 
   /**
    * Log the thread id.
    */
-  bool log_thread_id (const bool flag);
+  bool
+  log_thread_id (const bool flag);
 
 
   /**
@@ -237,7 +248,8 @@ public:
    * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
-  std::streamsize precision (const std::streamsize prec);
+  std::streamsize
+  precision (const std::streamsize prec);
 
 
   /**
@@ -245,7 +257,8 @@ public:
    * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
-  std::streamsize width (const std::streamsize wide);
+  std::streamsize
+  width (const std::streamsize wide);
 
 
   /**
@@ -253,7 +266,8 @@ public:
    * flags. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
    */
-  std::ios::fmtflags flags(const std::ios::fmtflags f);
+  std::ios::fmtflags
+  flags(const std::ios::fmtflags f);
 
 
   /**
@@ -270,7 +284,8 @@ public:
    * @p std::wostream, and potentially more of this kind. This function is
    * therefore necessary to pick one element from this overload set.
    */
-  LogStream &operator<< (std::ostream& (*p) (std::ostream &));
+  LogStream &
+  operator<< (std::ostream& (*p) (std::ostream &));
 
 
   /**
@@ -278,7 +293,8 @@ public:
    * This is not exact (but will usually be close) because calculating the
    * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
 
@@ -290,7 +306,8 @@ private:
    * that created this LogStream instance (usually, in the case of deallog,
    * the "main" thread).
    */
-  std::stack<std::string> &get_prefixes() const;
+  std::stack<std::string> &
+  get_prefixes() const;
 
   /**
    * Stack of strings which are printed at the beginning of each line to allow
@@ -339,13 +356,15 @@ private:
   /**
    * Print head of line.
    */
-  void print_line_head ();
+  void
+  print_line_head ();
 
   /**
    * Internal wrapper around "thread local" outstreams. This private function
    * will return the correct internal ostringstream buffer for operator<<.
    */
-  std::ostringstream &get_stream();
+  std::ostringstream &
+  get_stream();
 
   /**
    * We use tbb's thread local storage facility to generate a stringstream for
@@ -353,7 +372,8 @@ private:
    */
   Threads::ThreadLocalStorage<std::shared_ptr<std::ostringstream> > outstreams;
 
-  template <typename T> friend LogStream &operator << (LogStream &log, const T &t);
+  template <typename T> friend LogStream &
+  operator << (LogStream &log, const T &t);
 };
 
 
@@ -369,7 +389,8 @@ private:
  */
 template <typename T>
 inline
-LogStream &operator<< (LogStream &log, const T &t)
+LogStream &
+operator<< (LogStream &log, const T &t)
 {
   // print to the internal stringstream
   log.get_stream() << t;

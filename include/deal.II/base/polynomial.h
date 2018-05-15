@@ -99,7 +99,8 @@ namespace Polynomials
      * evaluation for polynomials in the coefficient form or the product of
      * terms involving the roots if that representation is used.
      */
-    number value (const number x) const;
+    number
+    value (const number x) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -111,8 +112,9 @@ namespace Polynomials
      * evaluation for polynomials in the coefficient form or the product of
      * terms involving the roots if that representation is used.
      */
-    void value (const number         x,
-                std::vector<number> &values) const;
+    void
+    value (const number         x,
+           std::vector<number> &values) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -125,16 +127,18 @@ namespace Polynomials
      * evaluation for polynomials in the coefficient form or the product of
      * terms involving the roots if that representation is used.
      */
-    void value (const number         x,
-                const unsigned int n_derivatives,
-                number *values) const;
+    void
+    value (const number         x,
+           const unsigned int n_derivatives,
+           number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
      * coefficients provided by the constructor. Leading non-zero coefficients
      * are not treated separately.
      */
-    unsigned int degree () const;
+    unsigned int
+    degree () const;
 
     /**
      * Scale the abscissa of the polynomial.  Given the polynomial <i>p(t)</i>
@@ -143,7 +147,8 @@ namespace Polynomials
      *
      * The operation is performed in place.
      */
-    void scale (const number factor);
+    void
+    scale (const number factor);
 
     /**
      * Shift the abscissa oft the polynomial.  Given the polynomial
@@ -161,83 +166,97 @@ namespace Polynomials
      * present object are changed.
      */
     template <typename number2>
-    void shift (const number2 offset);
+    void
+    shift (const number2 offset);
 
     /**
      * Compute the derivative of a polynomial.
      */
-    Polynomial<number> derivative () const;
+    Polynomial<number>
+    derivative () const;
 
     /**
      * Compute the primitive of a polynomial. the coefficient of the zero
      * order term of the polynomial is zero.
      */
-    Polynomial<number> primitive () const;
+    Polynomial<number>
+    primitive () const;
 
     /**
      * Multiply with a scalar.
      */
-    Polynomial<number> &operator *= (const double s);
+    Polynomial<number> &
+    operator *= (const double s);
 
     /**
      * Multiply with another polynomial.
      */
-    Polynomial<number> &operator *= (const Polynomial<number> &p);
+    Polynomial<number> &
+    operator *= (const Polynomial<number> &p);
 
     /**
      * Add a second polynomial.
      */
-    Polynomial<number> &operator += (const Polynomial<number> &p);
+    Polynomial<number> &
+    operator += (const Polynomial<number> &p);
 
     /**
      * Subtract a second polynomial.
      */
-    Polynomial<number> &operator -= (const Polynomial<number> &p);
+    Polynomial<number> &
+    operator -= (const Polynomial<number> &p);
 
     /**
      * Test for equality of two polynomials.
      */
-    bool operator == (const Polynomial<number> &p)  const;
+    bool
+    operator == (const Polynomial<number> &p)  const;
 
     /**
      * Print coefficients.
      */
-    void print(std::ostream &out) const;
+    void
+    print(std::ostream &out) const;
 
     /**
      * Write or read the data of this object to or from a stream for the
      * purpose of serialization.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void
+    serialize (Archive &ar, const unsigned int version);
 
   protected:
 
     /**
      * This function performs the actual scaling.
      */
-    static void scale (std::vector<number> &coefficients,
-                       const number         factor);
+    static void
+    scale (std::vector<number> &coefficients,
+           const number         factor);
 
     /**
      * This function performs the actual shift
      */
     template <typename number2>
-    static void shift (std::vector<number> &coefficients,
-                       const number2        shift);
+    static void
+    shift (std::vector<number> &coefficients,
+           const number2        shift);
 
     /**
      * Multiply polynomial by a factor.
      */
-    static void multiply (std::vector<number> &coefficients,
-                          const number factor);
+    static void
+    multiply (std::vector<number> &coefficients,
+              const number factor);
 
     /**
      * Transform polynomial form of product of linear factors into standard
      * form, $\sum_i a_i x^i$. Deletes all data structures related to the
      * product form.
      */
-    void transform_into_standard_form ();
+    void
+    transform_into_standard_form ();
 
     /**
      * Coefficients of the polynomial $\sum_i a_i x^i$. This vector is filled
@@ -300,8 +319,9 @@ namespace Polynomials
     /**
      * Needed by constructor.
      */
-    static std::vector<number> make_vector(unsigned int n,
-                                           const double coefficient);
+    static std::vector<number>
+    make_vector(unsigned int n,
+                const double coefficient);
   };
 
 
@@ -446,7 +466,8 @@ namespace Polynomials
     /**
      * Compute coefficients recursively.
      */
-    std::vector<double> compute_coefficients (const unsigned int p);
+    std::vector<double>
+    compute_coefficients (const unsigned int p);
   };
 
 
@@ -517,7 +538,8 @@ namespace Polynomials
     /**
      * Compute coefficients recursively.
      */
-    static void compute_coefficients (const unsigned int p);
+    static void
+    compute_coefficients (const unsigned int p);
 
     /**
      * Get coefficients for constructor.  This way, it can use the non-

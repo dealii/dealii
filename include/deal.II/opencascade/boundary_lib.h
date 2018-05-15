@@ -79,7 +79,8 @@ namespace OpenCASCADE
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim,spacedim> >
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -146,7 +147,8 @@ namespace OpenCASCADE
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim,spacedim> >
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -241,7 +243,8 @@ namespace OpenCASCADE
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim,spacedim> >
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -300,7 +303,8 @@ namespace OpenCASCADE
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim,spacedim> >
+    clone() const override;
 
     /**
      * Given a point on real space, find its arclength parameter. Throws an
@@ -361,7 +365,8 @@ namespace OpenCASCADE
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim,spacedim> >
+    clone() const override;
 
     /**
      * Pull back the given point from the Euclidean space. Will return the uv

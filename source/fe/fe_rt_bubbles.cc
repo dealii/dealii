@@ -103,7 +103,8 @@ FE_RT_Bubbles<dim>::get_name () const
 
 
 template <int dim>
-std::unique_ptr<FiniteElement<dim,dim> > FE_RT_Bubbles<dim>::clone() const
+std::unique_ptr<FiniteElement<dim,dim> >
+FE_RT_Bubbles<dim>::clone() const
 {
   return std_cxx14::make_unique<FE_RT_Bubbles<dim>>(*this);
 }

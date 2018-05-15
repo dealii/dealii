@@ -48,14 +48,16 @@ template <typename Range = Vector<double>,
           typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
           typename OperatorExemplar,
           typename Matrix>
-LinearOperator<Range, Domain, Payload> linear_operator (const OperatorExemplar &,
-                                                        const Matrix &);
+LinearOperator<Range, Domain, Payload>
+linear_operator (const OperatorExemplar &,
+                 const Matrix &);
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
           typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
           typename Matrix>
-LinearOperator<Range, Domain, Payload> linear_operator (const Matrix &);
+LinearOperator<Range, Domain, Payload>
+linear_operator (const Matrix &);
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
@@ -232,7 +234,8 @@ public:
    */
   template <typename Op,
             typename = typename std::enable_if<!std::is_base_of<LinearOperator<Range, Domain, Payload>, Op>::value>::type>
-  LinearOperator<Range, Domain, Payload> &operator=(const Op &op)
+  LinearOperator<Range, Domain, Payload> &
+  operator=(const Op &op)
   {
     *this = linear_operator<Range, Domain, Payload, Op>(op);
     return *this;
@@ -941,7 +944,8 @@ namespace internal
        */
       template <typename Matrix>
       static
-      void reinit_range_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
+      void
+      reinit_range_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
       {
         v.reinit(matrix.m(), omit_zeroing_entries);
       }
@@ -959,7 +963,8 @@ namespace internal
        */
       template <typename Matrix>
       static
-      void reinit_domain_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
+      void
+      reinit_domain_vector (const Matrix &matrix, Vector &v, bool omit_zeroing_entries)
       {
         v.reinit(matrix.n(), omit_zeroing_entries);
       }
@@ -1040,8 +1045,9 @@ namespace internal
      * two LinearOperators
      */
     inline
-    EmptyPayload operator+(const EmptyPayload &,
-                           const EmptyPayload &)
+    EmptyPayload
+    operator+(const EmptyPayload &,
+              const EmptyPayload &)
     {
       return EmptyPayload();
     }
@@ -1051,8 +1057,9 @@ namespace internal
      * multiplication of two LinearOperators
      */
     inline
-    EmptyPayload operator*(const EmptyPayload &,
-                           const EmptyPayload &)
+    EmptyPayload
+    operator*(const EmptyPayload &,
+              const EmptyPayload &)
     {
       return EmptyPayload();
     }
@@ -1069,10 +1076,12 @@ namespace
   class has_vmult_add_and_Tvmult_add
   {
     template <typename C>
-    static std::false_type test(...);
+    static std::false_type
+    test(...);
 
     template <typename C>
-    static auto test(Range *r, Domain *d)
+    static auto
+    test(Range *r, Domain *d)
     -> decltype(std::declval<C>().vmult_add(*r,*d),
                 std::declval<C>().Tvmult_add(*d,*r),
                 std::true_type());
@@ -1081,15 +1090,17 @@ namespace
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
     // otherwise it is std::false_type
 
-    typedef decltype(test<T>(nullptr, nullptr)) type;
+    typedef
+    decltype(test<T>(nullptr, nullptr)) type;
   };
 
 
   // A helper function to apply a given vmult, or Tvmult to a vector with
   // intermediate storage
   template <typename Function, typename Range, typename Domain>
-  void apply_with_intermediate_storage(Function function, Range &v,
-                                       const Domain &u, bool add)
+  void
+  apply_with_intermediate_storage(Function function, Range &v,
+                                  const Domain &u, bool add)
   {
     GrowingVectorMemory<Range> vector_memory;
 
@@ -1112,7 +1123,8 @@ namespace
   {
   public:
     template <typename Matrix>
-    void operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
+    void
+    operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
     {
       op.vmult = [&matrix](Range &v, const Domain &u)
       {
@@ -1178,7 +1190,8 @@ namespace
   {
   public:
     template <typename Matrix>
-    void operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
+    void
+    operator()(LinearOperator<Range, Domain, Payload> &op, const Matrix &matrix)
     {
       // As above ...
 

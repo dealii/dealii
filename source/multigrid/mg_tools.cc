@@ -537,9 +537,10 @@ namespace MGTools
 
 
   template <typename DoFHandlerType, typename SparsityPatternType>
-  void make_sparsity_pattern (const DoFHandlerType &dof,
-                              SparsityPatternType  &sparsity,
-                              const unsigned int    level)
+  void
+  make_sparsity_pattern (const DoFHandlerType &dof,
+                         SparsityPatternType  &sparsity,
+                         const unsigned int    level)
   {
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;

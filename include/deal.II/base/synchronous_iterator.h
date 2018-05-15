@@ -60,13 +60,15 @@ struct SynchronousIterators
    * Dereference const operator. Returns a const reference to the iterators
    * represented by the current class.
    */
-  const Iterators &operator* () const;
+  const Iterators &
+  operator* () const;
 
   /**
    * Dereference operator. Returns a reference to the iterators
    * represented by the current class.
    */
-  Iterators &operator* ();
+  Iterators &
+  operator* ();
 
 private:
   /**
@@ -154,8 +156,9 @@ operator- (const SynchronousIterators<Iterators> &a,
  */
 template <typename I1, typename I2>
 inline
-void advance (std::tuple<I1,I2> &t,
-              const unsigned int       n)
+void
+advance (std::tuple<I1,I2> &t,
+         const unsigned int       n)
 {
   std::advance (std::get<0>(t), n);
   std::advance (std::get<1>(t), n);
@@ -168,8 +171,9 @@ void advance (std::tuple<I1,I2> &t,
  */
 template <typename I1, typename I2, typename I3>
 inline
-void advance (std::tuple<I1,I2,I3> &t,
-              const unsigned int          n)
+void
+advance (std::tuple<I1,I2,I3> &t,
+         const unsigned int          n)
 {
   std::advance (std::get<0>(t), n);
   std::advance (std::get<1>(t), n);
@@ -184,8 +188,9 @@ void advance (std::tuple<I1,I2,I3> &t,
 template <typename I1, typename I2,
           typename I3, typename I4>
 inline
-void advance (std::tuple<I1,I2,I3, I4> &t,
-              const unsigned int              n)
+void
+advance (std::tuple<I1,I2,I3, I4> &t,
+         const unsigned int              n)
 {
   std::advance (std::get<0>(t), n);
   std::advance (std::get<1>(t), n);
@@ -202,7 +207,8 @@ void advance (std::tuple<I1,I2,I3, I4> &t,
  */
 template <typename I1, typename I2>
 inline
-void advance_by_one (std::tuple<I1,I2> &t)
+void
+advance_by_one (std::tuple<I1,I2> &t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);
@@ -215,7 +221,8 @@ void advance_by_one (std::tuple<I1,I2> &t)
  */
 template <typename I1, typename I2, typename I3>
 inline
-void advance_by_one (std::tuple<I1,I2,I3> &t)
+void
+advance_by_one (std::tuple<I1,I2,I3> &t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);
@@ -230,7 +237,8 @@ void advance_by_one (std::tuple<I1,I2,I3> &t)
 template <typename I1, typename I2,
           typename I3, typename I4>
 inline
-void advance_by_one (std::tuple<I1,I2,I3,I4> &t)
+void
+advance_by_one (std::tuple<I1,I2,I3,I4> &t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);

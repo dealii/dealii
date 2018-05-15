@@ -315,14 +315,16 @@ public:
    * Reinit this class to the state that it has directly after calling the
    * Constructor
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Prepares the @p SolutionTransfer for pure refinement. It stores the dof
    * indices of each cell. After calling this function only calling the @p
    * refine_interpolate functions is allowed.
    */
-  void prepare_for_pure_refinement();
+  void
+  prepare_for_pure_refinement();
 
   /**
    * Prepares the @p SolutionTransfer for coarsening and refinement. It stores
@@ -331,13 +333,15 @@ public:
    * vectors that are to be interpolated onto the new (refined and/or
    * coarsenend) grid.
    */
-  void prepare_for_coarsening_and_refinement (const std::vector<VectorType> &all_in);
+  void
+  prepare_for_coarsening_and_refinement (const std::vector<VectorType> &all_in);
 
   /**
    * Same as previous function but for only one discrete function to be
    * interpolated.
    */
-  void prepare_for_coarsening_and_refinement (const VectorType &in);
+  void
+  prepare_for_coarsening_and_refinement (const VectorType &in);
 
   /**
    * This function interpolates the discrete function @p in, which is a vector
@@ -350,8 +354,9 @@ public:
    * is called and the refinement is executed before. Multiple calling of this
    * function is allowed. e.g. for interpolating several functions.
    */
-  void refine_interpolate (const VectorType &in,
-                           VectorType       &out) const;
+  void
+  refine_interpolate (const VectorType &in,
+                      VectorType       &out) const;
 
   /**
    * This function interpolates the discrete functions that are stored in @p
@@ -372,8 +377,9 @@ public:
    * the right size (@p n_dofs_refined). Otherwise an assertion will be
    * thrown.
    */
-  void interpolate (const std::vector<VectorType> &all_in,
-                    std::vector<VectorType>       &all_out) const;
+  void
+  interpolate (const std::vector<VectorType> &all_in,
+               std::vector<VectorType>       &all_out) const;
 
   /**
    * Same as the previous function. It interpolates only one function. It
@@ -384,14 +390,16 @@ public:
    * functions can be performed in one step by using <tt>interpolate (all_in,
    * all_out)</tt>
    */
-  void interpolate (const VectorType &in,
-                    VectorType       &out) const;
+  void
+  interpolate (const VectorType &in,
+               VectorType       &out) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Exception
@@ -492,7 +500,8 @@ private:
       indices_ptr (nullptr),
       dof_values_ptr(dof_values_ptr_in),
       active_fe_index(active_fe_index_in) {}
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     std::vector<types::global_dof_index>    *indices_ptr;
     std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr;

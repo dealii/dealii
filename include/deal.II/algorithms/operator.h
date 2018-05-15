@@ -73,21 +73,25 @@ namespace Algorithms
     /**
      * The virtual destructor.
      */
-    virtual ~OperatorBase() override = default;
+    virtual
+    ~OperatorBase() override = default;
 
     /**
      * The actual operation, which is implemented in a derived class.
      */
-    virtual void operator() (AnyData &out, const AnyData &in) = 0;
+    virtual void
+    operator() (AnyData &out, const AnyData &in) = 0;
 
     /**
      * Register an event triggered by an outer iteration.
      */
-    virtual void notify(const Event &);
+    virtual void
+    notify(const Event &);
     /**
      * Clear all #notifications.
      */
-    void clear_events();
+    void
+    clear_events();
   protected:
     /**
      * Accumulate events here. If any of those is set, the function solve() of
@@ -121,21 +125,25 @@ namespace Algorithms
     /**
      * Empty virtual destructor.
      */
-    virtual ~OutputOperator() override = default;
+    virtual
+    ~OutputOperator() override = default;
 
     /**
      * Set the stream @p os to which data is written. If no stream is selected
      * with this function, data goes to @p deallog.
      */
-    void initialize_stream(std::ostream &stream);
+    void
+    initialize_stream(std::ostream &stream);
     /**
      * Set the current step.
      */
-    void set_step(const unsigned int step);
+    void
+    set_step(const unsigned int step);
     /**
      * Output all the vectors in AnyData.
      */
-    virtual OutputOperator<VectorType> &operator<< (const AnyData &vectors);
+    virtual OutputOperator<VectorType> &
+    operator<< (const AnyData &vectors);
 
   protected:
     unsigned int step;

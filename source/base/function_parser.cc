@@ -63,10 +63,11 @@ FunctionParser<dim>::~FunctionParser() = default;
 #ifdef DEAL_II_WITH_MUPARSER
 
 template <int dim>
-void FunctionParser<dim>::initialize (const std::string              &variables,
-                                      const std::vector<std::string> &expressions,
-                                      const std::map<std::string, double> &constants,
-                                      const bool time_dependent)
+void
+FunctionParser<dim>::initialize (const std::string              &variables,
+                                 const std::vector<std::string> &expressions,
+                                 const std::map<std::string, double> &constants,
+                                 const bool time_dependent)
 {
   this->fp.clear(); // this will reset all thread-local objects
 
@@ -119,12 +120,14 @@ void FunctionParser<dim>::initialize (const std::string              &variables,
 namespace internal
 {
   // convert double into int
-  int mu_round(double val)
+  int
+  mu_round(double val)
   {
     return static_cast<int>(val + ((val>=0.0) ? 0.5 : -0.5) );
   }
 
-  double mu_if(double condition, double thenvalue, double elsevalue)
+  double
+  mu_if(double condition, double thenvalue, double elsevalue)
   {
     if (mu_round(condition))
       return thenvalue;
@@ -132,64 +135,76 @@ namespace internal
       return elsevalue;
   }
 
-  double mu_or(double left, double right)
+  double
+  mu_or(double left, double right)
   {
     return (mu_round(left)) || (mu_round(right));
   }
 
-  double mu_and(double left, double right)
+  double
+  mu_and(double left, double right)
   {
     return (mu_round(left)) && (mu_round(right));
   }
 
-  double mu_int(double value)
+  double
+  mu_int(double value)
   {
     return static_cast<double>(mu_round(value));
   }
 
-  double mu_ceil(double value)
+  double
+  mu_ceil(double value)
   {
     return ceil(value);
   }
 
-  double mu_floor(double value)
+  double
+  mu_floor(double value)
   {
     return floor(value);
   }
 
-  double mu_cot(double value)
+  double
+  mu_cot(double value)
   {
     return 1.0/tan(value);
   }
 
-  double mu_csc(double value)
+  double
+  mu_csc(double value)
   {
     return 1.0/sin(value);
   }
 
-  double mu_sec(double value)
+  double
+  mu_sec(double value)
   {
     return 1.0/cos(value);
   }
 
-  double mu_log(double value)
+  double
+  mu_log(double value)
   {
     return log(value);
   }
 
-  double mu_pow(double a, double b)
+  double
+  mu_pow(double a, double b)
   {
     return std::pow(a, b);
   }
 
-  double mu_erfc(double value)
+  double
+  mu_erfc(double value)
   {
     return boost::math::erfc(value);
   }
 
   // returns a random value in the range [0,1] initializing the generator
   // with the given seed
-  double mu_rand_seed(double seed)
+  double
+  mu_rand_seed(double seed)
   {
     static Threads::Mutex rand_mutex;
     Threads::Mutex::ScopedLock lock(rand_mutex);
@@ -207,7 +222,8 @@ namespace internal
   }
 
   // returns a random value in the range [0,1]
-  double mu_rand()
+  double
+  mu_rand()
   {
     static Threads::Mutex rand_mutex;
     Threads::Mutex::ScopedLock lock(rand_mutex);
@@ -221,7 +237,8 @@ namespace internal
 
 
 template <int dim>
-void FunctionParser<dim>::init_muparser() const
+void
+FunctionParser<dim>::init_muparser() const
 {
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
@@ -359,10 +376,11 @@ void FunctionParser<dim>::init_muparser() const
 
 
 template <int dim>
-void FunctionParser<dim>::initialize (const std::string &vars,
-                                      const std::string &expression,
-                                      const std::map<std::string, double> &constants,
-                                      const bool time_dependent)
+void
+FunctionParser<dim>::initialize (const std::string &vars,
+                                 const std::string &expression,
+                                 const std::map<std::string, double> &constants,
+                                 const bool time_dependent)
 {
   initialize(vars, Utilities::split_string_list(expression, ';'),
              constants, time_dependent);
@@ -371,8 +389,9 @@ void FunctionParser<dim>::initialize (const std::string &vars,
 
 
 template <int dim>
-double FunctionParser<dim>::value (const Point<dim>  &p,
-                                   const unsigned int component) const
+double
+FunctionParser<dim>::value (const Point<dim>  &p,
+                            const unsigned int component) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (component < this->n_components,
@@ -406,8 +425,9 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
 
 
 template <int dim>
-void FunctionParser<dim>::vector_value (const Point<dim> &p,
-                                        Vector<double>   &values) const
+void
+FunctionParser<dim>::vector_value (const Point<dim> &p,
+                                   Vector<double>   &values) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (values.size() == this->n_components,
@@ -454,7 +474,8 @@ FunctionParser<dim>::initialize(const std::string &,
 
 
 template <int dim>
-double FunctionParser<dim>::value (
+double
+FunctionParser<dim>::value (
   const Point<dim> &, unsigned int) const
 {
   Assert(false, ExcNeedsFunctionparser());
@@ -463,7 +484,8 @@ double FunctionParser<dim>::value (
 
 
 template <int dim>
-void FunctionParser<dim>::vector_value (
+void
+FunctionParser<dim>::vector_value (
   const Point<dim> &, Vector<double> &) const
 {
   Assert(false, ExcNeedsFunctionparser());

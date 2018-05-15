@@ -59,7 +59,8 @@ namespace internal
         /**
          * Destructor.
          */
-        virtual ~PolicyBase () = default;
+        virtual
+        ~PolicyBase () = default;
 
         /**
          * Distribute degrees of freedom on the DoFHandler object associated

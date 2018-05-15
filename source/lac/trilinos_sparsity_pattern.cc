@@ -501,9 +501,10 @@ namespace TrilinosWrappers
 
 
 
-  void SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
-                                const MPI_Comm     &communicator,
-                                const std::vector<size_type> &n_entries_per_row)
+  void
+  SparsityPattern::reinit (const IndexSet     &parallel_partitioning,
+                           const MPI_Comm     &communicator,
+                           const std::vector<size_type> &n_entries_per_row)
   {
     Epetra_Map map = parallel_partitioning.make_trilinos_map (communicator,
                                                               false);
@@ -513,10 +514,11 @@ namespace TrilinosWrappers
 
 
 
-  void SparsityPattern::reinit (const IndexSet &row_parallel_partitioning,
-                                const IndexSet &col_parallel_partitioning,
-                                const MPI_Comm &communicator,
-                                const size_type  n_entries_per_row)
+  void
+  SparsityPattern::reinit (const IndexSet &row_parallel_partitioning,
+                           const IndexSet &col_parallel_partitioning,
+                           const MPI_Comm &communicator,
+                           const size_type  n_entries_per_row)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);

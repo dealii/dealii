@@ -77,7 +77,8 @@ namespace Polynomials
      * the given interval (and possible the next one to the right when it
      * spans over that range).
      */
-    number value (const number x) const;
+    number
+    value (const number x) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -93,8 +94,9 @@ namespace Polynomials
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
      */
-    void value (const number         x,
-                std::vector<number> &values) const;
+    void
+    value (const number         x,
+           std::vector<number> &values) const;
 
     /**
      * Return the values and the derivatives of the Polynomial at point
@@ -111,22 +113,25 @@ namespace Polynomials
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
      */
-    void value (const number         x,
-                const unsigned int n_derivatives,
-                number *values) const;
+    void
+    value (const number         x,
+           const unsigned int n_derivatives,
+           number *values) const;
 
     /**
      * Degree of the polynomial. This is the degree of the underlying base
      * polynomial.
      */
-    unsigned int degree () const;
+    unsigned int
+    degree () const;
 
     /**
      * Write or read the data of this object to or from a stream for the
      * purpose of serialization.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void
+    serialize (Archive &ar, const unsigned int version);
 
   protected:
 

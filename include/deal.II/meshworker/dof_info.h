@@ -118,43 +118,49 @@ namespace MeshWorker
      * Set the current cell and fill @p indices.
      */
     template <class DHCellIterator>
-    void reinit(const DHCellIterator &c);
+    void
+    reinit(const DHCellIterator &c);
 
     /**
      * Set the current face and fill @p indices if the #cell changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
-    void reinit(const DHCellIterator &c,
-                const DHFaceIterator &f,
-                const unsigned int face_no);
+    void
+    reinit(const DHCellIterator &c,
+           const DHFaceIterator &f,
+           const unsigned int face_no);
 
     /**
      * Set the current subface and fill @p indices if the #cell changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
-    void reinit(const DHCellIterator &c,
-                const DHFaceIterator &f,
-                const unsigned int face_no,
-                const unsigned int subface_no);
+    void
+    reinit(const DHCellIterator &c,
+           const DHFaceIterator &f,
+           const unsigned int face_no,
+           const unsigned int subface_no);
 
     /**
      * Switch to a new face of the same cell. Does not change @p indices and
      * does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
-    void set_face (const DHFaceIterator &f,
-                   const unsigned int face_no);
+    void
+    set_face (const DHFaceIterator &f,
+              const unsigned int face_no);
 
     /**
      * Switch to a new subface of the same cell. Does not change @p indices
      * and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
-    void set_subface (const DHFaceIterator &f,
-                      const unsigned int face_no,
-                      const unsigned int subface_no);
+    void
+    set_subface (const DHFaceIterator &f,
+                 const unsigned int face_no,
+                 const unsigned int subface_no);
 
-    const BlockIndices &local_indices() const;
+    const BlockIndices &
+    local_indices() const;
 
 
     /// The block structure of the system
@@ -174,11 +180,13 @@ namespace MeshWorker
     DoFInfo ();
 
     /// Set up local block indices
-    void set_block_indices ();
+    void
+    set_block_indices ();
 
     /// Fill index vector with active indices
     template <class DHCellIterator>
-    void get_indices(const DHCellIterator &c);
+    void
+    get_indices(const DHCellIterator &c);
 
     /// Auxiliary vector
     std::vector<types::global_dof_index> indices_org;
@@ -223,7 +231,8 @@ namespace MeshWorker
     /**
      * Reset all the availability flags.
      */
-    void reset();
+    void
+    reset();
 
     /**
      * After all DOFINFO objects have been filled appropriately, use the
@@ -231,7 +240,8 @@ namespace MeshWorker
      * MeshWorker::Assembler for available classes.
      */
     template <class ASSEMBLER>
-    void assemble(ASSEMBLER &ass) const;
+    void
+    assemble(ASSEMBLER &ass) const;
 
 
     /**

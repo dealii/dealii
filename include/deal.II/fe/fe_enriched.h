@@ -290,7 +290,8 @@ public:
   /**
    * Return a string that identifies a finite element.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   /**
    * Access to a composing element. The index needs to be smaller than the
@@ -309,8 +310,9 @@ public:
    * real-space enrichment requires evaluation of the function at the point in
    * real-space.
    */
-  virtual double shape_value(const unsigned int      i,
-                             const Point< dim >     &p) const override;
+  virtual double
+  shape_value(const unsigned int      i,
+              const Point< dim >     &p) const override;
 
   /**
    * @name Transfer matrices
@@ -350,7 +352,8 @@ public:
    * This function returns @p true if and only if all its base elements return @p true
    * for this function.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -582,15 +585,16 @@ protected:
                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
 
   virtual
-  void fill_fe_values (const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-                       const CellSimilarity::Similarity cell_similarity,
-                       const Quadrature<dim> &quadrature,
-                       const Mapping<dim, spacedim> &mapping,
-                       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
-                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                       const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data
-                      ) const override;
+  void
+  fill_fe_values (const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+                  const CellSimilarity::Similarity cell_similarity,
+                  const Quadrature<dim> &quadrature,
+                  const Mapping<dim, spacedim> &mapping,
+                  const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_internal,
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data
+                 ) const override;
 
   virtual
   void
@@ -622,8 +626,9 @@ private:
    * This function sets up the index table for the system as well as @p
    * restriction and @p prolongation matrices.
    */
-  void initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                   const std::vector<unsigned int> &multiplicities);
+  void
+  initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+              const std::vector<unsigned int> &multiplicities);
 
   /**
    * The underlying FESystem object.

@@ -124,15 +124,17 @@ public:
    * returns <tt>FE_Nedelec<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -142,7 +144,8 @@ public:
    * of the degree of the element), as it implements the complete set of
    * functions necessary for hp capability.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one, which is given as
@@ -267,7 +270,8 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const override;
 
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -292,14 +296,16 @@ private:
    * class and fill the tables with interpolation weights (#boundary_weights
    * and interior_weights). Called from the constructor.
    */
-  void initialize_support_points (const unsigned int order);
+  void
+  initialize_support_points (const unsigned int order);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
    * the father cell. According to the philosophy of the Nédélec element,
    * this restriction operator preserves the curl of a function weakly.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction ();
 
   /**
    * These are the factors multiplied to a function in the

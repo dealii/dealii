@@ -63,25 +63,29 @@ namespace PETScWrappers
     /**
      * Destructor.
      */
-    virtual ~PreconditionerBase ();
+    virtual
+    ~PreconditionerBase ();
 
     /**
      * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
-    void clear ();
+    void
+    clear ();
 
     /**
      * Apply the preconditioner once to the given src vector.
      */
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const;
+    void
+    vmult (VectorBase       &dst,
+           const VectorBase &src) const;
 
 
     /**
      * Give access to the underlying PETSc object.
      */
-    const PC &get_pc () const;
+    const PC &
+    get_pc () const;
 
   protected:
     /**
@@ -98,7 +102,8 @@ namespace PETScWrappers
      * Internal function to create the PETSc preconditioner object. Fails if
      * called twice.
      */
-    void create_pc ();
+    void
+    create_pc ();
 
     /**
      * Conversion operator to get a representation of the matrix that
@@ -164,8 +169,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -178,7 +184,8 @@ namespace PETScWrappers
      * matrix. This function sets up appropriate parameters to the underlying
      * PETSc object after it has been created.
      */
-    void initialize();
+    void
+    initialize();
   };
 
 
@@ -244,8 +251,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -258,7 +266,8 @@ namespace PETScWrappers
      * matrix. This function sets up appropriate parameters to the underlying
      * PETSc object after it has been created.
      */
-    void initialize();
+    void
+    initialize();
 
   };
 
@@ -312,8 +321,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -372,8 +382,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -435,8 +446,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -495,8 +507,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -555,8 +568,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -637,8 +651,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -751,8 +766,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   protected:
     /**
@@ -765,7 +781,8 @@ namespace PETScWrappers
      * matrix. This function sets up appropriate parameters to the underlying
      * PETSc object after it has been created.
      */
-    void initialize();
+    void
+    initialize();
 
   };
 
@@ -884,8 +901,9 @@ namespace PETScWrappers
      * called when calling the constructor with the same arguments and is only
      * used if you create the preconditioner without arguments.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   private:
     /**
@@ -933,8 +951,9 @@ namespace PETScWrappers
      * used if you create the preconditioner without arguments. The matrix is
      * completely ignored in computations.
      */
-    void initialize (const MatrixBase     &matrix,
-                     const AdditionalData &additional_data = AdditionalData());
+    void
+    initialize (const MatrixBase     &matrix,
+                const AdditionalData &additional_data = AdditionalData());
 
   private:
     /**

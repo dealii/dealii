@@ -256,7 +256,8 @@ public:
    * conversion function <code>block_operator</code> is defined.
    */
   template <typename Op>
-  BlockLinearOperator<Range, Domain, BlockPayload> &operator=(const Op &op)
+  BlockLinearOperator<Range, Domain, BlockPayload> &
+  operator=(const Op &op)
   {
     *this = block_operator<Range, Domain, BlockPayload, Op>(op);
     return *this;

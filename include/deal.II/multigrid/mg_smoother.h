@@ -57,29 +57,34 @@ public:
   /**
    * Modify the number of smoothing steps on finest level.
    */
-  void set_steps (const unsigned int);
+  void
+  set_steps (const unsigned int);
 
   /**
    * Switch on/off variable smoothing.
    */
-  void set_variable (const bool);
+  void
+  set_variable (const bool);
 
   /**
    * Switch on/off symmetric smoothing.
    */
-  void set_symmetric (const bool);
+  void
+  set_symmetric (const bool);
 
   /**
    * Switch on/off transposed smoothing. The effect is overridden by
    * set_symmetric().
    */
-  void set_transpose (const bool);
+  void
+  set_transpose (const bool);
 
   /**
    * Set @p debug to a nonzero value to get debug information logged to @p
    * deallog. Increase to get more information
    */
-  void set_debug (const unsigned int level);
+  void
+  set_debug (const unsigned int level);
 
 protected:
   /**
@@ -138,11 +143,13 @@ public:
    * nothing, which by comparison with the definition of this function means
    * that the smoothing operator equals the null operator.
    */
-  virtual void smooth (const unsigned int level,
-                       VectorType         &u,
-                       const VectorType   &rhs) const;
+  virtual void
+  smooth (const unsigned int level,
+          VectorType         &u,
+          const VectorType   &rhs) const;
 
-  virtual void clear ();
+  virtual void
+  clear ();
 };
 
 
@@ -198,9 +205,10 @@ namespace mg
      * function of the relaxation method.
      */
     template <typename MatrixType2>
-    void initialize (const MGLevelObject<MatrixType2>     &matrices,
-                     const typename RelaxationType::AdditionalData &additional_data
-                     = typename RelaxationType::AdditionalData());
+    void
+    initialize (const MGLevelObject<MatrixType2>     &matrices,
+                const typename RelaxationType::AdditionalData &additional_data
+                = typename RelaxationType::AdditionalData());
 
     /**
      * Initialize matrices and additional data for each level.
@@ -210,20 +218,23 @@ namespace mg
      * certain levels even if the matrix was generated for all levels.
      */
     template <typename MatrixType2, class DATA>
-    void initialize (const MGLevelObject<MatrixType2> &matrices,
-                     const MGLevelObject<DATA>        &additional_data);
+    void
+    initialize (const MGLevelObject<MatrixType2> &matrices,
+                const MGLevelObject<DATA>        &additional_data);
 
     /**
      * Empty all vectors.
      */
-    void clear () override;
+    void
+    clear () override;
 
     /**
      * The actual smoothing method.
      */
-    virtual void smooth (const unsigned int level,
-                         VectorType         &u,
-                         const VectorType   &rhs) const override;
+    virtual void
+    smooth (const unsigned int level,
+            VectorType         &u,
+            const VectorType   &rhs) const override;
 
     /**
      * The apply variant of smoothing, setting the vector u to zero before
@@ -240,14 +251,16 @@ namespace mg
      * hand, all subsequent operations need to smooth the content already present
      * in the vector @p u given the right hand side, which is done by smooth().
      */
-    virtual void apply (const unsigned int level,
-                        VectorType         &u,
-                        const VectorType   &rhs) const override;
+    virtual void
+    apply (const unsigned int level,
+           VectorType         &u,
+           const VectorType   &rhs) const override;
 
     /**
      * Memory used by this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
   };
 }
 
@@ -303,9 +316,10 @@ public:
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2>
-  void initialize (const MGLevelObject<MatrixType2>     &matrices,
-                   const typename RelaxationType::AdditionalData &additional_data
-                   = typename RelaxationType::AdditionalData());
+  void
+  initialize (const MGLevelObject<MatrixType2>     &matrices,
+              const typename RelaxationType::AdditionalData &additional_data
+              = typename RelaxationType::AdditionalData());
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -316,8 +330,9 @@ public:
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const MGLevelObject<DATA>        &additional_data);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const MGLevelObject<DATA>        &additional_data);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -329,10 +344,11 @@ public:
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const DATA                       &additional_data,
-                   const unsigned int                block_row,
-                   const unsigned int                block_col);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const DATA                       &additional_data,
+              const unsigned int                block_row,
+              const unsigned int                block_col);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -344,22 +360,25 @@ public:
    * and is handed to the initialization function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const MGLevelObject<DATA>        &additional_data,
-                   const unsigned int                block_row,
-                   const unsigned int                block_col);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const MGLevelObject<DATA>        &additional_data,
+              const unsigned int                block_row,
+              const unsigned int                block_col);
 
   /**
    * Empty all vectors.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * The actual smoothing method.
    */
-  virtual void smooth (const unsigned int level,
-                       VectorType         &u,
-                       const VectorType   &rhs) const;
+  virtual void
+  smooth (const unsigned int level,
+          VectorType         &u,
+          const VectorType   &rhs) const;
 
   /**
    * The apply variant of smoothing, setting the vector u to zero before
@@ -376,9 +395,10 @@ public:
    * hand, all subsequent operations need to smooth the content already present
    * in the vector @p u given the right hand side, which is done by smooth().
    */
-  virtual void apply (const unsigned int level,
-                      VectorType         &u,
-                      const VectorType   &rhs) const;
+  virtual void
+  apply (const unsigned int level,
+         VectorType         &u,
+         const VectorType   &rhs) const;
 
   /**
    * Object containing relaxation methods.
@@ -388,7 +408,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 
 private:
@@ -453,8 +474,9 @@ public:
    * function of the relaxation method.
    */
   template <typename MatrixType2>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const typename PreconditionerType::AdditionalData &additional_data = typename PreconditionerType::AdditionalData());
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const typename PreconditionerType::AdditionalData &additional_data = typename PreconditionerType::AdditionalData());
 
   /**
    * Initialize for matrices. This function stores pointers to the level
@@ -466,8 +488,9 @@ public:
    * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const MGLevelObject<DATA>        &additional_data);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const MGLevelObject<DATA>        &additional_data);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -480,10 +503,11 @@ public:
    * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const DATA                       &additional_data,
-                   const unsigned int                block_row,
-                   const unsigned int                block_col);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const DATA                       &additional_data,
+              const unsigned int                block_row,
+              const unsigned int                block_col);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -496,22 +520,25 @@ public:
    * function of the relaxation method.
    */
   template <typename MatrixType2, class DATA>
-  void initialize (const MGLevelObject<MatrixType2> &matrices,
-                   const MGLevelObject<DATA>        &additional_data,
-                   const unsigned int                block_row,
-                   const unsigned int                block_col);
+  void
+  initialize (const MGLevelObject<MatrixType2> &matrices,
+              const MGLevelObject<DATA>        &additional_data,
+              const unsigned int                block_row,
+              const unsigned int                block_col);
 
   /**
    * Empty all vectors.
    */
-  void clear () override;
+  void
+  clear () override;
 
   /**
    * The actual smoothing method.
    */
-  virtual void smooth (const unsigned int level,
-                       VectorType         &u,
-                       const VectorType   &rhs) const override;
+  virtual void
+  smooth (const unsigned int level,
+          VectorType         &u,
+          const VectorType   &rhs) const override;
 
   /**
    * The apply variant of smoothing, setting the vector u to zero before
@@ -528,9 +555,10 @@ public:
    * hand, all subsequent operations need to smooth the content already present
    * in the vector @p u given the right hand side, which is done by smooth().
    */
-  virtual void apply (const unsigned int level,
-                      VectorType         &u,
-                      const VectorType   &rhs) const override;
+  virtual void
+  apply (const unsigned int level,
+         VectorType         &u,
+         const VectorType   &rhs) const override;
 
   /**
    * Object containing relaxation methods.
@@ -540,7 +568,8 @@ public:
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 
 private:

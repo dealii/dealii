@@ -160,21 +160,25 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       : flushed_(false), newline_written_(false)
     {
     }
-    bool flushed()
+    bool
+    flushed()
     {
       return flushed_;
     }
-    bool newline_written()
+    bool
+    newline_written()
     {
       return newline_written_;
     }
   private:
-    int_type overflow(int_type ch) override
+    int_type
+    overflow(int_type ch) override
     {
       newline_written_ = true;
       return ch;
     }
-    int sync() override
+    int
+    sync() override
     {
       flushed_ = true;
       return 0;
@@ -225,7 +229,8 @@ LogStream::attach(std::ostream &o,
 }
 
 
-void LogStream::detach ()
+void
+LogStream::detach ()
 {
   Threads::Mutex::ScopedLock lock(log_lock);
   file = nullptr;
@@ -309,7 +314,8 @@ LogStream::push (const std::string &text)
 
 
 
-void LogStream::pop ()
+void
+LogStream::pop ()
 {
   if (get_prefixes().size() > 0)
     get_prefixes().pop();

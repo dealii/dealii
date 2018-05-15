@@ -412,12 +412,14 @@ private:
   {
     typedef SolverControl::State result_type;
 
-    SolverControl::State operator() (const SolverControl::State state1,
-                                     const SolverControl::State state2) const;
+    SolverControl::State
+    operator() (const SolverControl::State state1,
+                const SolverControl::State state2) const;
 
     template <typename Iterator>
-    SolverControl::State operator() (const Iterator begin,
-                                     const Iterator end) const;
+    SolverControl::State
+    operator() (const Iterator begin,
+                const Iterator end) const;
   };
 
 protected:

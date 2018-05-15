@@ -48,7 +48,8 @@ FE_RannacherTurek<dim>::FE_RannacherTurek(const unsigned int order,
 
 
 template <int dim>
-std::vector<unsigned int> FE_RannacherTurek<dim>::get_dpo_vector()
+std::vector<unsigned int>
+FE_RannacherTurek<dim>::get_dpo_vector()
 {
   std::vector<unsigned int> dpo(dim + 1, 0);
   dpo[dim - 1] = 1;
@@ -59,7 +60,8 @@ std::vector<unsigned int> FE_RannacherTurek<dim>::get_dpo_vector()
 
 
 template <int dim>
-std::string FE_RannacherTurek<dim>::get_name() const
+std::string
+FE_RannacherTurek<dim>::get_name() const
 {
   std::ostringstream namebuf;
   namebuf << "FE_RannacherTurek"
@@ -80,7 +82,8 @@ FE_RannacherTurek<dim>::clone() const
 
 
 template <int dim>
-void FE_RannacherTurek<dim>::initialize_support_points()
+void
+FE_RannacherTurek<dim>::initialize_support_points()
 {
   Assert(dim == 2, ExcNotImplemented());
   dealii::QGauss<dim-1> face_quadrature(this->n_face_support_points);

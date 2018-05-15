@@ -794,14 +794,16 @@ potri(const char *uplo, const types::blas_int *n, float *A, const types::blas_in
 /// Template wrapper for lansy
 template <typename number>
 inline
-number lansy (const char *, const char *, const types::blas_int *, const number *, const types::blas_int *, number *)
+number
+lansy (const char *, const char *, const types::blas_int *, const number *, const types::blas_int *, number *)
 {
   Assert (false, ExcNotImplemented());
   return number();
 }
 
 inline
-double lansy (const char *norm, const char *uplo, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
+double
+lansy (const char *norm, const char *uplo, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return dlansy_(norm,uplo,n,A,lda,work);
@@ -819,7 +821,8 @@ double lansy (const char *norm, const char *uplo, const types::blas_int *n, cons
 }
 
 inline
-float lansy (const char *norm, const char *uplo, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
+float
+lansy (const char *norm, const char *uplo, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return slansy_(norm,uplo,n,A,lda,work);
@@ -841,14 +844,16 @@ float lansy (const char *norm, const char *uplo, const types::blas_int *n, const
 /// Template wrapper for lange
 template <typename number>
 inline
-number lange (const char *, const types::blas_int *, const types::blas_int *, const number *, const types::blas_int *, number *)
+number
+lange (const char *, const types::blas_int *, const types::blas_int *, const number *, const types::blas_int *, number *)
 {
   Assert (false, ExcNotImplemented());
   return number();
 }
 
 inline
-double lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
+double
+lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return dlange_(norm,m,n,A,lda,work);
@@ -866,7 +871,8 @@ double lange (const char *norm, const types::blas_int *m, const types::blas_int 
 }
 
 inline
-float lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
+float
+lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return slange_(norm,m,n,A,lda,work);

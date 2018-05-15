@@ -260,8 +260,9 @@ Vector<Number>::operator= (const Vector<Number2> &v)
 
 template <typename Number>
 inline
-void Vector<Number>::reinit (const size_type n,
-                             const bool omit_zeroing_entries)
+void
+Vector<Number>::reinit (const size_type n,
+                        const bool omit_zeroing_entries)
 {
   if (n==0)
     {
@@ -295,7 +296,8 @@ void Vector<Number>::reinit (const size_type n,
 
 template <typename Number>
 inline
-void Vector<Number>::grow_or_shrink (const size_type n)
+void
+Vector<Number>::grow_or_shrink (const size_type n)
 {
   if (n==0)
     {
@@ -332,8 +334,9 @@ void Vector<Number>::grow_or_shrink (const size_type n)
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::reinit (const Vector<Number2> &v,
-                             const bool omit_zeroing_entries)
+void
+Vector<Number>::reinit (const Vector<Number2> &v,
+                        const bool omit_zeroing_entries)
 {
   thread_loop_partitioner = v.thread_loop_partitioner;
 
@@ -405,7 +408,8 @@ Vector<Number>::operator= (const Number s)
 
 
 template <typename Number>
-Vector<Number> &Vector<Number>::operator *= (const Number factor)
+Vector<Number> &
+Vector<Number>::operator *= (const Number factor)
 {
   AssertIsFinite(factor);
 
@@ -456,7 +460,8 @@ Vector<Number>::sadd (const Number x,
 
 template <typename Number>
 template <typename Number2>
-Number Vector<Number>::operator * (const Vector<Number2> &v) const
+Number
+Vector<Number>::operator * (const Vector<Number2> &v) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -494,7 +499,8 @@ Vector<Number>::norm_sqr () const
 
 
 template <typename Number>
-Number Vector<Number>::mean_value () const
+Number
+Vector<Number>::mean_value () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -645,7 +651,8 @@ Vector<Number>::add_and_dot (const Number          a,
 
 
 template <typename Number>
-Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
+Vector<Number> &
+Vector<Number>::operator += (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -658,7 +665,8 @@ Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
 
 
 template <typename Number>
-Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
+Vector<Number> &
+Vector<Number>::operator -= (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -672,7 +680,8 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
 
 
 template <typename Number>
-void Vector<Number>::add (const Number v)
+void
+Vector<Number>::add (const Number v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -683,8 +692,9 @@ void Vector<Number>::add (const Number v)
 
 
 template <typename Number>
-void Vector<Number>::add (const Number a, const Vector<Number> &v,
-                          const Number b, const Vector<Number> &w)
+void
+Vector<Number>::add (const Number a, const Vector<Number> &v,
+                     const Number b, const Vector<Number> &w)
 {
   AssertIsFinite(a);
   AssertIsFinite(b);
@@ -700,8 +710,9 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
 
 
 template <typename Number>
-void Vector<Number>::sadd (const Number x,
-                           const Vector<Number> &v)
+void
+Vector<Number>::sadd (const Number x,
+                      const Vector<Number> &v)
 {
   AssertIsFinite(x);
 
@@ -715,7 +726,8 @@ void Vector<Number>::sadd (const Number x,
 
 
 template <typename Number>
-void Vector<Number>::scale (const Vector<Number> &s)
+void
+Vector<Number>::scale (const Vector<Number> &s)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
@@ -728,7 +740,8 @@ void Vector<Number>::scale (const Vector<Number> &s)
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::scale (const Vector<Number2> &s)
+void
+Vector<Number>::scale (const Vector<Number2> &s)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
@@ -740,8 +753,9 @@ void Vector<Number>::scale (const Vector<Number2> &s)
 
 
 template <typename Number>
-void Vector<Number>::equ (const Number a,
-                          const Vector<Number> &u)
+void
+Vector<Number>::equ (const Number a,
+                     const Vector<Number> &u)
 {
   AssertIsFinite(a);
 
@@ -756,8 +770,9 @@ void Vector<Number>::equ (const Number a,
 
 template <typename Number>
 template <typename Number2>
-void Vector<Number>::equ (const Number a,
-                          const Vector<Number2> &u)
+void
+Vector<Number>::equ (const Number a,
+                     const Vector<Number2> &u)
 {
   AssertIsFinite(a);
 
@@ -777,8 +792,9 @@ void Vector<Number>::equ (const Number a,
 
 
 template <typename Number>
-void Vector<Number>::ratio (const Vector<Number> &a,
-                            const Vector<Number> &b)
+void
+Vector<Number>::ratio (const Vector<Number> &a,
+                       const Vector<Number> &b)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (a.vec_size == b.vec_size,
@@ -885,7 +901,8 @@ Vector<Number>::operator== (const Vector<Number2> &v) const
 
 
 template <typename Number>
-void Vector<Number>::print (const char *format) const
+void
+Vector<Number>::print (const char *format) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -897,10 +914,11 @@ void Vector<Number>::print (const char *format) const
 
 
 template <typename Number>
-void Vector<Number>::print (std::ostream      &out,
-                            const unsigned int precision,
-                            const bool         scientific,
-                            const bool         across) const
+void
+Vector<Number>::print (std::ostream      &out,
+                       const unsigned int precision,
+                       const bool         scientific,
+                       const bool         across) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
   AssertThrow (out, ExcIO());
@@ -947,7 +965,8 @@ Vector<Number>::print (LogStream &out, const unsigned int width, const bool acro
 
 
 template <typename Number>
-void Vector<Number>::block_write (std::ostream &out) const
+void
+Vector<Number>::block_write (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
@@ -982,7 +1001,8 @@ void Vector<Number>::block_write (std::ostream &out) const
 
 
 template <typename Number>
-void Vector<Number>::block_read (std::istream &in)
+void
+Vector<Number>::block_read (std::istream &in)
 {
   AssertThrow (in, ExcIO());
 

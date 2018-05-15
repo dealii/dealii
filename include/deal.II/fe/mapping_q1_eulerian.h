@@ -123,7 +123,8 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general
@@ -131,7 +132,8 @@ public:
    * provide for zero displacements at vertex locations).
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * Exception.

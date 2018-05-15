@@ -44,9 +44,10 @@ namespace LinearAlgebra
 
 
 
-    void CommunicationPattern::reinit(const IndexSet &vector_space_vector_index_set,
-                                      const IndexSet &read_write_vector_index_set,
-                                      const MPI_Comm &communicator)
+    void
+    CommunicationPattern::reinit(const IndexSet &vector_space_vector_index_set,
+                                 const IndexSet &read_write_vector_index_set,
+                                 const MPI_Comm &communicator)
     {
       comm = std::make_shared<const MPI_Comm>(communicator);
 
@@ -63,14 +64,16 @@ namespace LinearAlgebra
 
 
 
-    const MPI_Comm &CommunicationPattern::get_mpi_communicator() const
+    const MPI_Comm &
+    CommunicationPattern::get_mpi_communicator() const
     {
       return *comm;
     }
 
 
 
-    const Epetra_Import &CommunicationPattern::get_epetra_import() const
+    const Epetra_Import &
+    CommunicationPattern::get_epetra_import() const
     {
       return *import;
     }

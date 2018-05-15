@@ -110,7 +110,8 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void FECollection<dim,spacedim>::push_back (const FiniteElement<dim,spacedim> &new_fe)
+  void
+  FECollection<dim,spacedim>::push_back (const FiniteElement<dim,spacedim> &new_fe)
   {
     // check that the new element has the right
     // number of components. only check with

@@ -367,7 +367,8 @@ build_one_patch
 
 
 template <int dim, typename DoFHandlerType>
-void DataOut<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions)
+void
+DataOut<dim,DoFHandlerType>::build_patches (const unsigned int n_subdivisions)
 {
   build_patches (StaticMappingQ1<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::mapping,
                  n_subdivisions, no_curved_cells);
