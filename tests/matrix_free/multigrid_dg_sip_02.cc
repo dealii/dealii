@@ -344,7 +344,7 @@ public:
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   ,
+  virtual void operator() (const unsigned int,
                            parallel::distributed::Vector<double> &dst,
                            const parallel::distributed::Vector<double> &src) const
   {

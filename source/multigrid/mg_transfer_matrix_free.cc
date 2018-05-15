@@ -452,7 +452,7 @@ void MGTransferMatrixFree<dim,Number>
           const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
                                      (parent_child_connect[from_level-1][cell+v].second,
                                       fe_degree+1-element_is_continuous, fe_degree);
-          AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
+          AssertIndexRange(parent_child_connect[from_level-1][cell+v].first *
                            n_child_cell_dofs+n_child_cell_dofs-1,
                            level_dof_indices[from_level-1].size());
           const unsigned int *indices = &level_dof_indices[from_level-1][parent_child_connect[from_level-1][cell+v].first*n_child_cell_dofs+shift];

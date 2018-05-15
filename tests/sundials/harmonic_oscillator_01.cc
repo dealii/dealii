@@ -83,7 +83,7 @@ public:
       return 0;
     };
 
-    time_stepper.setup_jacobian = [&](const double ,
+    time_stepper.setup_jacobian = [&](const double,
                                       const VectorType &,
                                       const VectorType &,
                                       const double alpha) ->int

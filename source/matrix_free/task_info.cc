@@ -145,7 +145,7 @@ namespace internal
 
         tbb::task *execute () override
         {
-          tbb::empty_task *root = new( tbb::task::allocate_root() )tbb::empty_task;
+          tbb::empty_task *root = new ( tbb::task::allocate_root() )tbb::empty_task;
           const unsigned int evens = task_info.partition_evens[partition];
           const unsigned int odds  = task_info.partition_odds[partition];
           const unsigned int n_blocked_workers =
@@ -157,14 +157,14 @@ namespace internal
           root->set_ref_count(evens+1);
           for (unsigned int j=0; j<evens; j++)
             {
-              worker[j] = new(root->allocate_child())
+              worker[j] = new (root->allocate_child())
               CellWork(function, task_info.
                        partition_row_index[partition]+2*j,
                        task_info, false);
               if (j>0)
                 {
                   worker[j]->set_ref_count(2);
-                  blocked_worker[j-1]->dummy = new(worker[j]->allocate_child())
+                  blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
                   tbb::empty_task;
                   worker[j-1]->spawn(*blocked_worker[j-1]);
                 }
@@ -172,7 +172,7 @@ namespace internal
                 worker[j]->set_ref_count(1);
               if (j<evens-1)
                 {
-                  blocked_worker[j] = new(worker[j]->allocate_child())
+                  blocked_worker[j] = new (worker[j]->allocate_child())
                   CellWork(function, task_info.
                            partition_row_index
                            [partition] + 2*j+1, task_info, true);
@@ -181,7 +181,7 @@ namespace internal
                 {
                   if (odds==evens)
                     {
-                      worker[evens] = new(worker[j]->allocate_child())
+                      worker[evens] = new (worker[j]->allocate_child())
                       CellWork(function, task_info.
                                partition_row_index[partition]+2*j+1,
                                task_info, false);
@@ -189,7 +189,7 @@ namespace internal
                     }
                   else
                     {
-                      tbb::empty_task *child = new(worker[j]->allocate_child())
+                      tbb::empty_task *child = new (worker[j]->allocate_child())
                       tbb::empty_task();
                       worker[j]->spawn(*child);
                     }
@@ -332,23 +332,23 @@ namespace internal
           funct.zero_dst_vector_range(numbers::invalid_unsigned_int);
           if (scheme == partition_partition)
             {
-              tbb::empty_task *root = new( tbb::task::allocate_root() )
+              tbb::empty_task *root = new ( tbb::task::allocate_root() )
               tbb::empty_task;
               root->set_ref_count(evens+1);
               std::vector<partition::PartitionWork *> worker(n_workers);
               std::vector<partition::PartitionWork *>
               blocked_worker(n_blocked_workers);
               MPICommunication *worker_compr =
-                new(root->allocate_child())MPICommunication(funct, true);
+                new (root->allocate_child())MPICommunication(funct, true);
               worker_compr->set_ref_count(1);
               for (unsigned int j=0; j<evens; j++)
                 {
                   if (j>0)
                     {
-                      worker[j] = new(root->allocate_child())
+                      worker[j] = new (root->allocate_child())
                       partition::PartitionWork (funct,2*j,*this,false);
                       worker[j]->set_ref_count(2);
-                      blocked_worker[j-1]->dummy = new(worker[j]->allocate_child())
+                      blocked_worker[j-1]->dummy = new (worker[j]->allocate_child())
                       tbb::empty_task;
                       if (j>1)
                         worker[j-1]->spawn(*blocked_worker[j-1]);
@@ -357,7 +357,7 @@ namespace internal
                     }
                   else
                     {
-                      worker[j] = new(worker_compr->allocate_child())
+                      worker[j] = new (worker_compr->allocate_child())
                       partition::PartitionWork (funct,2*j,*this,false);
                       worker[j]->set_ref_count(2);
                       MPICommunication *worker_dist =
@@ -366,20 +366,20 @@ namespace internal
                     }
                   if (j<evens-1)
                     {
-                      blocked_worker[j] = new(worker[j]->allocate_child())
+                      blocked_worker[j] = new (worker[j]->allocate_child())
                       partition::PartitionWork(funct,2*j+1,*this,true);
                     }
                   else
                     {
                       if (odds==evens)
                         {
-                          worker[evens] = new(worker[j]->allocate_child())
+                          worker[evens] = new (worker[j]->allocate_child())
                           partition::PartitionWork(funct,2*j+1,*this,false);
                           worker[j]->spawn(*worker[evens]);
                         }
                       else
                         {
-                          tbb::empty_task *child = new(worker[j]->allocate_child())
+                          tbb::empty_task *child = new (worker[j]->allocate_child())
                           tbb::empty_task();
                           worker[j]->spawn(*child);
                         }
@@ -395,7 +395,7 @@ namespace internal
               // tree of partitions
               if (odds > 0)
                 {
-                  tbb::empty_task *root = new( tbb::task::allocate_root() ) tbb::empty_task;
+                  tbb::empty_task *root = new ( tbb::task::allocate_root() ) tbb::empty_task;
                   root->set_ref_count(evens+1);
                   const unsigned int n_blocked_workers = odds-(odds+evens+1)%2;
                   const unsigned int n_workers = cell_partition_data.size()-1-
@@ -412,10 +412,10 @@ namespace internal
                     {
                       const unsigned int spawn_index_new = worker_index;
                       if (part == 0)
-                        worker[worker_index] = new(worker_compr->allocate_child())
+                        worker[worker_index] = new (worker_compr->allocate_child())
                         color::PartitionWork(funct,slice_index,*this,false);
                       else
-                        worker[worker_index] = new(root->allocate_child())
+                        worker[worker_index] = new (root->allocate_child())
                         color::PartitionWork(funct,slice_index,*this,false);
                       slice_index++;
                       for (; slice_index<partition_row_index[part+1]; slice_index++)
@@ -453,13 +453,13 @@ namespace internal
                         {
                           if (part<partition_row_index.size()-2)
                             {
-                              blocked_worker[part/2] = new(worker[worker_index-1]->allocate_child())
+                              blocked_worker[part/2] = new (worker[worker_index-1]->allocate_child())
                               color::PartitionWork(funct,slice_index,*this,true);
                               slice_index++;
                               if (slice_index<partition_row_index[part+1])
                                 {
                                   blocked_worker[part/2]->set_ref_count(1);
-                                  worker[worker_index] = new(blocked_worker[part/2]->allocate_child())
+                                  worker[worker_index] = new (blocked_worker[part/2]->allocate_child())
                                   color::PartitionWork(funct,slice_index,*this,false);
                                   slice_index++;
                                 }
@@ -508,7 +508,7 @@ namespace internal
 
                   for (unsigned int color=0; color < partition_row_index[1]; ++color)
                     {
-                      tbb::empty_task *root = new( tbb::task::allocate_root() ) tbb::empty_task;
+                      tbb::empty_task *root = new ( tbb::task::allocate_root() ) tbb::empty_task;
                       root->set_ref_count(2);
                       color::PartitionWork *worker =
                         new (root->allocate_child())color::PartitionWork(funct,color,*this,false);

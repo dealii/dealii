@@ -1611,7 +1611,7 @@ next_cell:
                                  const Point<spacedim>                                                          &p,
                                  const std::vector<std::set<typename MeshType<dim,spacedim>::active_cell_iterator > > &vertex_to_cells,
                                  const std::vector<std::vector<Tensor<1,spacedim> > >                            &vertex_to_cell_centers,
-                                 const typename MeshType<dim, spacedim>::active_cell_iterator                    &cell_hint ,
+                                 const typename MeshType<dim, spacedim>::active_cell_iterator                    &cell_hint,
                                  const std::vector<bool>                                                         &marked_vertices)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> > cell_and_position;
@@ -1631,7 +1631,7 @@ next_cell:
         // invalid cell, then query for the closest global vertex
         if (current_cell.state() == IteratorState::valid)
           {
-            const unsigned int closest_vertex = find_closest_vertex_of_cell<dim,spacedim>(current_cell , p);
+            const unsigned int closest_vertex = find_closest_vertex_of_cell<dim,spacedim>(current_cell, p);
             vertex_to_point = p - current_cell ->vertex(closest_vertex);
             closest_vertex_index = current_cell ->vertex_index(closest_vertex);
           }
@@ -4404,7 +4404,7 @@ next_cell:
     const auto &other_owned_idx = std::get<1>(guessed_points);
     std::map<
     unsigned int,
-             std::pair< std::vector<Point<spacedim>> , std::vector<unsigned int > > >
+             std::pair< std::vector<Point<spacedim>>, std::vector<unsigned int > > >
              other_owned_pts;
 
     for (const auto &indices: other_owned_idx)

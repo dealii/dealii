@@ -1633,7 +1633,7 @@ namespace TransposeTableIterators
      * Move assignment operator. This assigns a new value to the table entry at the
      * current row and column coordinates.
      */
-    const Accessor<T, false> &operator = (T&&) const;
+    const Accessor<T, false> &operator = (T &&) const;
 
     /**
      * Since we overload value() we have to explicitly use the base class

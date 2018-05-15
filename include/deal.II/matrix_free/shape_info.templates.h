@@ -385,7 +385,7 @@ namespace internal
         for (unsigned int j=0; j<n_q_points_1d; ++j)
           if (std::abs(get_first_array_element(shape_values[i*n_q_points_1d+j] -
                                                shape_values[(n_dofs_1d-i)*n_q_points_1d-j-1])) >
-              std::max(zero_tol, zero_tol*
+              std::max(zero_tol, zero_tol *
                        std::abs(get_first_array_element(shape_values[i*n_q_points_1d+j]))))
             return false;
 

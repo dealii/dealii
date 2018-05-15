@@ -230,7 +230,7 @@ namespace SUNDIALS
 
     kinsol_mem = KINCreate();
 
-    int status = KINInit(kinsol_mem, t_kinsol_function<VectorType> , solution);
+    int status = KINInit(kinsol_mem, t_kinsol_function<VectorType>, solution);
     (void) status;
     AssertKINSOL(status);
 

@@ -63,7 +63,7 @@ int main (int argc, char **argv)
   SparsityPattern sp_graph;
   sp_graph.copy_from(dynamic_sparse_graph);
 
-  Assert( num_indices == sp_graph.n_rows() , ExcInternalError() );
+  Assert( num_indices == sp_graph.n_rows(), ExcInternalError() );
 
   std::vector<unsigned int> color_indices;
   unsigned int num_colors;

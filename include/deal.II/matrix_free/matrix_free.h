@@ -2880,7 +2880,7 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   void update_ghost_values_start_block (const VectorStruct &,
-                                        const unsigned int ,
+                                        const unsigned int,
                                         std::integral_constant<bool,false>,
                                         VectorDataExchange<dim,Number> &)
   {}
@@ -2891,19 +2891,19 @@ namespace internal
   {}
   template <int dim, typename VectorStruct, typename Number>
   void update_ghost_values_finish_block (const VectorStruct &,
-                                         const unsigned int ,
+                                         const unsigned int,
                                          std::integral_constant<bool,false>,
                                          VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
   void compress_start_block (const VectorStruct &,
-                             const unsigned int ,
+                             const unsigned int,
                              std::integral_constant<bool,false>,
                              VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
   void compress_finish_block (const VectorStruct &,
-                              const unsigned int ,
+                              const unsigned int,
                               std::integral_constant<bool,false>,
                               VectorDataExchange<dim,Number> &)
   {}

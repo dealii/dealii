@@ -1492,8 +1492,8 @@ namespace Patterns
 
     namespace internal
     {
-      const std::array<std::string, 4> default_list_separator {{","  ,  ";"  ,  "|"  ,   "%"}};
-      const std::array<std::string, 4> default_map_separator {{":"  ,  "="  ,  "@"  ,   "#"}};
+      const std::array<std::string, 4> default_list_separator {{",",  ";",  "|",   "%"}};
+      const std::array<std::string, 4> default_map_separator {{":",  "=",  "@",   "#"}};
 
       //specialize a type for all of the STL containers and maps
       template <typename T>       struct is_list_compatible : std::false_type {};

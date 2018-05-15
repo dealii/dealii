@@ -4022,7 +4022,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
                                                       *src[comp], values_dofs[comp],
                                                       vector_selector);
       else
-        operation.process_dofs_vectorized_transpose(data->dofs_per_component_on_cell*
+        operation.process_dofs_vectorized_transpose(data->dofs_per_component_on_cell *
                                                     n_components,
                                                     dof_indices, *src[0],
                                                     &values_dofs[0][0],

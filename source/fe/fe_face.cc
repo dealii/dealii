@@ -84,7 +84,7 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
 
   // initialize unit support points (this makes it possible to assign initial
   // values to FE_FaceQ)
-  this->unit_support_points.resize(GeometryInfo<dim>::faces_per_cell*
+  this->unit_support_points.resize(GeometryInfo<dim>::faces_per_cell *
                                    this->unit_face_support_points.size());
   const unsigned int n_face_dofs = this->unit_face_support_points.size();
   for (unsigned int i=0; i<n_face_dofs; ++i)
