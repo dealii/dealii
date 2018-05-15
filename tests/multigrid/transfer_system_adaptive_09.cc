@@ -39,7 +39,8 @@ using namespace std;
 
 
 template <int dim>
-void refine_mesh (Triangulation<dim> &triangulation)
+void
+refine_mesh (Triangulation<dim> &triangulation)
 {
   bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
@@ -63,7 +64,8 @@ void refine_mesh (Triangulation<dim> &triangulation)
 }
 
 template <int dim>
-void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
+void
+check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -160,7 +162,8 @@ void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

@@ -30,7 +30,8 @@
 using namespace LocalIntegrators::Elasticity;
 
 template <int dim>
-void test_boundary(const FEValuesBase<dim> &fev)
+void
+test_boundary(const FEValuesBase<dim> &fev)
 {
   const unsigned int n = fev.dofs_per_cell;
   unsigned int d=fev.get_fe().n_components();
@@ -110,7 +111,8 @@ test(Triangulation<dim> &tr)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.precision(8);

@@ -29,9 +29,10 @@ using namespace Polynomials;
 
 
 template <int dim, class PolynomialType1, class PolynomialType2>
-void check_poly(const Point<dim>      &x,
-                const PolynomialType1 &p,
-                const PolynomialType2 &q)
+void
+check_poly(const Point<dim>      &x,
+           const PolynomialType1 &p,
+           const PolynomialType2 &q)
 {
   const unsigned int n = p.n();
 
@@ -172,7 +173,8 @@ check_dimensions (const std::vector<Polynomial<double> > &p)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.precision(10);

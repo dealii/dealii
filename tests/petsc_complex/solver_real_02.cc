@@ -26,7 +26,8 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

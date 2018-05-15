@@ -22,7 +22,8 @@
 #include <deal.II/base/tensor.h>
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);

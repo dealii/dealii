@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> coarse_grid (Triangulation<dim>::none, true);
 
@@ -65,7 +66,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

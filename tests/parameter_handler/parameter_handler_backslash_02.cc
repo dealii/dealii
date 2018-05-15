@@ -30,7 +30,8 @@
  * aside from whitespace and a continuation ('\') character.
  */
 
-int main ()
+int
+main ()
 {
   initlog();
 

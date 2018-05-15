@@ -22,7 +22,8 @@
 
 
 template <typename number>
-void check (const number &x)
+void
+check (const number &x)
 {
   deallog << "typeid(x).name() = " << typeid(x).name()
           << std::endl;
@@ -43,7 +44,8 @@ void check (const number &x)
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -25,7 +25,8 @@
 
 
 template <typename number>
-void check_norms ()
+void
+check_norms ()
 {
   const number acc = 1e1*std::numeric_limits<number>::epsilon();
   unsigned int skip = 73;
@@ -62,7 +63,8 @@ void check_norms ()
 
 
 template <typename number>
-void check_complex_norms ()
+void
+check_complex_norms ()
 {
   const number acc = 1e2*std::numeric_limits<number>::epsilon();
   unsigned int skip = 73;
@@ -105,7 +107,8 @@ void check_complex_norms ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

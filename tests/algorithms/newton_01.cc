@@ -27,9 +27,12 @@ using namespace dealii;
 class SquareRoot : public Subscriptor
 {
 public:
-  void start_vector (Vector<double> &start) const;
-  void residual (AnyData &out, const AnyData &in);
-  void solve (AnyData &out, const AnyData &in);
+  void
+  start_vector (Vector<double> &start) const;
+  void
+  residual (AnyData &out, const AnyData &in);
+  void
+  solve (AnyData &out, const AnyData &in);
 };
 
 class SquareRootResidual : public
@@ -43,7 +46,8 @@ public:
     : discretization(&problem)
   {}
 
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator ()(AnyData &out, const AnyData &in)
   {
     discretization->residual(out,in);
   }
@@ -60,13 +64,15 @@ public:
     : solver(&problem)
   {}
 
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator ()(AnyData &out, const AnyData &in)
   {
     solver->solve(out,in);
   }
 };
 
-void SquareRoot::residual (AnyData &out, const AnyData &in)
+void
+SquareRoot::residual (AnyData &out, const AnyData &in)
 {
   Vector<double> &v = *out.entry<Vector<double>*>(0);
   //residuum = 0
@@ -75,7 +81,8 @@ void SquareRoot::residual (AnyData &out, const AnyData &in)
   v(0) = x*x - 2.;
 }
 
-void SquareRoot::solve (AnyData &out, const AnyData &in)
+void
+SquareRoot::solve (AnyData &out, const AnyData &in)
 {
   Vector<double> &v = *out.entry<Vector<double>*>(0);
   v(0) = 0;
@@ -87,7 +94,8 @@ void SquareRoot::solve (AnyData &out, const AnyData &in)
 
 
 
-void test ()
+void
+test ()
 {
   SquareRoot square_root;
   SquareRootSolver sq_solver (square_root);
@@ -117,7 +125,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

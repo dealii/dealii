@@ -23,10 +23,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void merge_check ()
+void
+merge_check ()
 {
   deallog << "Checking ConstraintMatrix::merge" << std::endl;
 
@@ -82,7 +84,8 @@ void merge_check ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

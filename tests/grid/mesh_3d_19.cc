@@ -34,7 +34,8 @@ char logname[] = "output";
 
 
 
-void test_with_wrong_face_orientation ()
+void
+test_with_wrong_face_orientation ()
 {
   Triangulation<3>     triangulation;
   GridGenerator::hyper_ball (triangulation);
@@ -56,7 +57,8 @@ void test_with_wrong_face_orientation ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   deallog << std::setprecision (3);

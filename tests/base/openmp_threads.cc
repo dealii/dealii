@@ -20,7 +20,8 @@
 #include "../tests.h"
 
 
-int main()
+int
+main()
 {
   initlog();
 

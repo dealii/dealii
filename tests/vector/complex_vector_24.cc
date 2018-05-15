@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test (Vector<std::complex<double> > &v)
+void
+test (Vector<std::complex<double> > &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -44,7 +45,8 @@ void test (Vector<std::complex<double> > &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

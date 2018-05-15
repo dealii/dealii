@@ -99,11 +99,13 @@ class TemperatureInitialValues : public Function<dim>
 public:
   TemperatureInitialValues () : Function<dim>(1) {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &value) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &value) const;
 };
 
 
@@ -128,7 +130,8 @@ TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -312,7 +315,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

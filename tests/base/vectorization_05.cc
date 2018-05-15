@@ -24,7 +24,8 @@
 
 
 template <typename Number, int n_numbers>
-void test ()
+void
+test ()
 {
   // since the number of array elements is system dependent, it is not a good
   // idea to print them to an output file. Instead, check the values manually
@@ -91,7 +92,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

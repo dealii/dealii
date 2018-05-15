@@ -31,7 +31,8 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/signaling_nan.h>
 
-void test ()
+void
+test ()
 {
   std::vector<double> tmp (2);
   tmp[0] = numbers::signaling_nan<double>();
@@ -45,7 +46,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

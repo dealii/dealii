@@ -36,10 +36,12 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/numerics/data_out.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

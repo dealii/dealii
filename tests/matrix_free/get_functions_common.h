@@ -44,7 +44,8 @@
 
 // forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree>
-void test ();
+void
+test ();
 
 
 
@@ -67,7 +68,8 @@ public:
             update_values | update_gradients | update_hessians)
   {};
 
-  virtual ~MatrixFreeTest ()
+  virtual
+  ~MatrixFreeTest ()
   {}
 
   // make function virtual to allow derived
@@ -138,7 +140,8 @@ public:
 
 
 
-  void test_functions (const Vector<Number> &src) const
+  void
+  test_functions (const Vector<Number> &src) const
   {
     for (unsigned int i=0; i<5; ++i)
       {
@@ -208,11 +211,13 @@ public:
                  const Mapping<dim> &)
   {};
 
-  void cell_integration (Vector<Number> &,
-                         const Vector<Number> &,
-                         const std::pair<unsigned int,unsigned int>) const {}
+  void
+  cell_integration (Vector<Number> &,
+                    const Vector<Number> &,
+                    const std::pair<unsigned int,unsigned int>) const {}
 
-  void test_functions (const Vector<Number> &) const
+  void
+  test_functions (const Vector<Number> &) const
   {}
 };
 
@@ -220,8 +225,9 @@ public:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints)
+void
+do_test (const DoFHandler<dim> &dof,
+         const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem
@@ -256,7 +262,8 @@ void do_test (const DoFHandler<dim> &dof,
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -35,7 +35,8 @@
 
 
 // make sure if i is in s on proc j, j is in s on proc i
-void mpi_check(const std::set<types::subdomain_id> &s)
+void
+mpi_check(const std::set<types::subdomain_id> &s)
 {
   MPI_Barrier(MPI_COMM_WORLD);
   unsigned int tag = 1234;
@@ -56,7 +57,8 @@ void mpi_check(const std::set<types::subdomain_id> &s)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -129,7 +131,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

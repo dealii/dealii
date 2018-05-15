@@ -23,7 +23,8 @@
 // the additional Information: Index 6 is not in [0,3[.
 // Bug reported by Florian Prill
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -22,7 +22,8 @@
 #include <deal.II/lac/vector.h>
 
 
-Vector<double> result(100);
+Vector<double>
+result(100);
 
 
 struct ScratchData
@@ -35,14 +36,16 @@ struct CopyData
 };
 
 
-void worker (const std::vector<unsigned int>::iterator &i,
-             ScratchData &,
-             CopyData &ad)
+void
+worker (const std::vector<unsigned int>::iterator &i,
+        ScratchData &,
+        CopyData &ad)
 {
   ad.computed = *i * 2;
 }
 
-void copier (const CopyData &ad)
+void
+copier (const CopyData &ad)
 {
   // write into the five elements of 'result' starting at ad.computed%result.size()
   for (unsigned int j=0; j<5; ++j)
@@ -64,7 +67,8 @@ conflictor (const std::vector<unsigned int>::iterator &i)
 
 
 
-void test ()
+void
+test ()
 {
   std::vector<unsigned int> v;
   for (unsigned int i=0; i<200; ++i)
@@ -99,7 +103,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

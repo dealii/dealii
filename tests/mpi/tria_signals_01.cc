@@ -32,52 +32,60 @@ int signal_counter_any_change = 0;
 
 std::ofstream logfile;
 
-void f_create ()
+void
+f_create ()
 {
   ++signal_counter_create;
   return;
 }
 
-void f_pre_refinement ()
+void
+f_pre_refinement ()
 {
   ++signal_counter_pre_refinement;
   return;
 }
 
-void f_post_refinement ()
+void
+f_post_refinement ()
 {
   ++signal_counter_post_refinement;
   return;
 }
 
 template <int dim, int spacedim>
-void f_pre_coarsening_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
+void
+f_pre_coarsening_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_pre_coarsening_on_cell;
   return;
 }
 
 template <int dim, int spacedim>
-void f_post_refinement_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
+void
+f_post_refinement_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_post_refinement_on_cell;
   return;
 }
 
 template <int dim, int spacedim>
-void f_copy (const Triangulation<dim, spacedim> &)
+void
+f_copy (const Triangulation<dim, spacedim> &)
 {
   ++signal_counter_copy;
   return;
 }
 
-void f_clear ()
+void
+f_clear ()
 {
   ++signal_counter_clear;
   return;
 }
 
-void f_any_change ()
+void
+f_any_change ()
 {
   ++signal_counter_any_change;
   return;
@@ -85,7 +93,8 @@ void f_any_change ()
 
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   signal_counter_create = 0;
   signal_counter_pre_refinement = 0;
@@ -154,7 +163,8 @@ void test()
   return;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, /* int max_num_threads */ 1);
   MPILogInitAll log;

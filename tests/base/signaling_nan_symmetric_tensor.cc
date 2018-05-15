@@ -28,7 +28,8 @@
 
 
 template <typename T>
-void check ()
+void
+check ()
 {
   numbers::signaling_nan<SymmetricTensor<2,2,T> >();
   numbers::signaling_nan<SymmetricTensor<4,2,T> >();
@@ -37,7 +38,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

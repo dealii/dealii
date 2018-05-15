@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -52,8 +53,9 @@ std::ofstream logfile("output");
 
 template <int dim>
 inline
-double gradient_power (const Tensor<1,dim> &v,
-                       const unsigned int n)
+double
+gradient_power (const Tensor<1,dim> &v,
+                const unsigned int n)
 {
   Assert ((n/2)*2 == n, ExcMessage ("Value of 'n' must be even"));
   double p = 1;
@@ -69,14 +71,16 @@ class InitializationValues : public Function<1>
 public:
   InitializationValues () : Function<1>() {}
 
-  virtual double value (const Point<1>     &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<1>     &p,
+         const unsigned int  component = 0) const;
 };
 
 
 
-double InitializationValues::value (const Point<1> &p,
-                                    const unsigned int) const
+double
+InitializationValues::value (const Point<1> &p,
+                             const unsigned int) const
 {
   const double base = std::pow(p(0), 1./3.);
   const double random = random_value<double>(-1., 1.);
@@ -90,19 +94,28 @@ class MinimizationProblem
 {
 public:
   MinimizationProblem  (const unsigned int run_number);
-  void run ();
+  void
+  run ();
 
 private:
-  void initialize_solution ();
-  void setup_system_on_mesh ();
-  void assemble_step ();
-  double line_search (const Vector<double> &update) const;
-  void do_step ();
-  void output_results () const;
-  void refine_grid ();
+  void
+  initialize_solution ();
+  void
+  setup_system_on_mesh ();
+  void
+  assemble_step ();
+  double
+  line_search (const Vector<double> &update) const;
+  void
+  do_step ();
+  void
+  output_results () const;
+  void
+  refine_grid ();
 
-  static double energy (const DoFHandler<dim> &dof_handler,
-                        const Vector<double>  &function);
+  static double
+  energy (const DoFHandler<dim> &dof_handler,
+          const Vector<double>  &function);
 
 
   const unsigned int run_number;
@@ -133,7 +146,8 @@ MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
 
 
 template <>
-void MinimizationProblem<1>::initialize_solution ()
+void
+MinimizationProblem<1>::initialize_solution ()
 {
   present_solution.reinit (dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler,
@@ -158,7 +172,8 @@ void MinimizationProblem<1>::initialize_solution ()
 
 
 template <int dim>
-void MinimizationProblem<dim>::setup_system_on_mesh ()
+void
+MinimizationProblem<dim>::setup_system_on_mesh ()
 {
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -178,7 +193,8 @@ void MinimizationProblem<dim>::setup_system_on_mesh ()
 
 
 template <int dim>
-void MinimizationProblem<dim>::assemble_step ()
+void
+MinimizationProblem<dim>::assemble_step ()
 {
   matrix.reinit (sparsity_pattern);
   residual.reinit (dof_handler.n_dofs());
@@ -338,7 +354,8 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
 
 
 template <int dim>
-void MinimizationProblem<dim>::do_step ()
+void
+MinimizationProblem<dim>::do_step ()
 {
   assemble_step ();
 
@@ -383,7 +400,8 @@ MinimizationProblem<dim>::output_results () const
 
 
 template <>
-void MinimizationProblem<1>::refine_grid ()
+void
+MinimizationProblem<1>::refine_grid ()
 {
   const unsigned int dim = 1;
 
@@ -548,7 +566,8 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 
 
 template <int dim>
-void MinimizationProblem<dim>::run ()
+void
+MinimizationProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation, 0., 1.);
   triangulation.refine_global (4);
@@ -581,7 +600,8 @@ void MinimizationProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   try
     {

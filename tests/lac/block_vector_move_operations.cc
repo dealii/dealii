@@ -22,7 +22,8 @@
   for (unsigned int i = 0; i < var.n_blocks(); ++i) \
     deallog << "[block " << i << " ]  " << var.block(i);
 
-int main()
+int
+main()
 {
   initlog();
 

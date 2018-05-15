@@ -33,7 +33,8 @@ is_const_reference()
          std::is_const<typename std::remove_reference<T>::type>::value;
 }
 
-void test ()
+void
+test ()
 {
   // test on a built-in array
   {
@@ -139,7 +140,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

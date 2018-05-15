@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // now the same with one of the elements
   // being non-primitive. the other one can
@@ -58,7 +59,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

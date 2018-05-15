@@ -41,7 +41,8 @@
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
 
@@ -173,7 +174,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

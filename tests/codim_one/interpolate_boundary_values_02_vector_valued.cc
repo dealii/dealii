@@ -29,7 +29,8 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
 class X : public Function<dim>
@@ -37,14 +38,16 @@ class X : public Function<dim>
 public:
   X() : Function<dim>(dim) {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return p[component];
   }
 };
 
-void test()
+void
+test()
 {
   const int dim = 1;
   const int spacedim = 2;
@@ -96,7 +99,8 @@ void test()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

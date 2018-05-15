@@ -57,12 +57,16 @@ template <int dim>
 class Postprocess : public DataPostprocessor<dim>
 {
 public:
-  void evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &inputs,
-                              std::vector<Vector<double> >               &computed_quantities) const;
+  void
+  evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &inputs,
+                         std::vector<Vector<double> >               &computed_quantities) const;
 
-  std::vector<std::string> get_names () const;
-  UpdateFlags              get_needed_update_flags () const;
-  unsigned int             n_output_variables () const;
+  std::vector<std::string>
+  get_names () const;
+  UpdateFlags
+  get_needed_update_flags () const;
+  unsigned int
+  n_output_variables () const;
 };
 
 template <int dim>
@@ -115,10 +119,12 @@ class TestPointValueHistory
 {
 public:
   TestPointValueHistory();
-  void run();
+  void
+  run();
 
 private:
-  void output_results (unsigned int step, Vector <double> solution) const;
+  void
+  output_results (unsigned int step, Vector <double> solution) const;
 
   Triangulation <dim> triangulation;
   FE_Q<dim> finite_element;
@@ -140,7 +146,8 @@ TestPointValueHistory<dim>::TestPointValueHistory() :
 
 
 template <int dim>
-void TestPointValueHistory<dim>::run()
+void
+TestPointValueHistory<dim>::run()
 {
   // Make a triangulation
   GridGenerator::hyper_cube(triangulation, 0, 1);
@@ -344,7 +351,8 @@ void TestPointValueHistory<dim>::run()
 }
 
 template <int dim>
-void TestPointValueHistory<dim>::output_results (unsigned int step, Vector <double> solution)  const
+void
+TestPointValueHistory<dim>::output_results (unsigned int step, Vector <double> solution)  const
 {
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -363,7 +371,8 @@ void TestPointValueHistory<dim>::output_results (unsigned int step, Vector <doub
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile << std::setprecision(2);

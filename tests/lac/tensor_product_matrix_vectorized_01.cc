@@ -26,7 +26,8 @@
 #include <deal.II/base/vectorization.h>
 
 template <int dim>
-void do_test(const unsigned int size)
+void
+do_test(const unsigned int size)
 {
   deallog << "Testing dim=" << dim << ", degree=" << size << std::endl;
   Table<2,VectorizedArray<double> > init_mass(size, size);
@@ -132,7 +133,8 @@ void do_test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

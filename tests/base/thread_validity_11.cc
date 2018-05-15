@@ -23,11 +23,13 @@
 
 #include <deal.II/base/thread_management.h>
 
-void execute ()
+void
+execute ()
 {}
 
 
-void test ()
+void
+test ()
 {
   Threads::Thread<> t = Threads::new_thread (&execute);
   deallog << "Before first join()" << std::endl;
@@ -40,7 +42,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

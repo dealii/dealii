@@ -26,7 +26,8 @@ using namespace dealii;
 using namespace dealii::GeometricUtilities::Coordinates;
 
 template <unsigned int dim,typename T>
-void print(T point1, T point2)
+void
+print(T point1, T point2)
 {
   deallog << std::endl << "Point 1: ";
   for (unsigned int i = 0; i < dim; ++i)
@@ -40,7 +41,8 @@ void print(T point1, T point2)
 }
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Assert(dim>1, ExcNotImplemented());
 
@@ -67,7 +69,8 @@ void test ()
   print<dim>(one, from_spherical(sone));
 }
 
-void test3d()
+void
+test3d()
 {
   const dealii::Point<3> x(1,0,0);
   const dealii::Point<3> y(0,1,0);
@@ -105,7 +108,8 @@ void test3d()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

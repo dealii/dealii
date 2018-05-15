@@ -39,7 +39,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // 0 components is not okay
   FESystem<dim> fe(FE_Q<dim>(1), 1, FE_Q<dim>(2), 0);

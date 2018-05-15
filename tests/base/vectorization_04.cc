@@ -22,7 +22,8 @@
 #include <deal.II/base/aligned_vector.h>
 
 template <typename Number>
-void test ()
+void
+test ()
 {
   const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
   std::vector<Number> values(n_vectors*5);
@@ -61,7 +62,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

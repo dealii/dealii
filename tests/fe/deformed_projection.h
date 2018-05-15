@@ -61,7 +61,8 @@
 #include <deal.II/fe/fe_abf.h>
 #include <deal.II/fe/fe_dgq.h>
 
-void test();
+void
+test();
 
 
 template <int dim>
@@ -72,13 +73,16 @@ public:
     Function<dim> (n_components)
   {}
 
-  virtual ~TestMap1 () {}
+  virtual
+  ~TestMap1 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -93,8 +97,9 @@ TestMap1<dim>::value (const Point<dim> &,
 
 
 template <int dim>
-void TestMap1<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestMap1<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -109,8 +114,9 @@ void TestMap1<dim>::vector_value (const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-void EvaluateDerivative (DoFHandler<2> *dof_handler,
-                         Vector<double> &solution)
+void
+EvaluateDerivative (DoFHandler<2> *dof_handler,
+                    Vector<double> &solution)
 {
   // This quadrature rule determines the points, where the
   // derivative will be evaluated.
@@ -187,13 +193,14 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
 
 
 template <int dim>
-void create_mass_matrix (const Mapping<dim>       &mapping,
-                         const DoFHandler<dim>    &dof,
-                         const Quadrature<dim>    &q,
-                         SparseMatrix<double>     &matrix,
-                         const Function<dim>   &rhs_function,
-                         Vector<double>        &rhs_vector,
-                         const Function<dim> *const coefficient = nullptr)
+void
+create_mass_matrix (const Mapping<dim>       &mapping,
+                    const DoFHandler<dim>    &dof,
+                    const Quadrature<dim>    &q,
+                    SparseMatrix<double>     &matrix,
+                    const Function<dim>   &rhs_function,
+                    Vector<double>        &rhs_vector,
+                    const Function<dim> *const coefficient = nullptr)
 {
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values | update_quadrature_points);
   if (coefficient != nullptr)
@@ -379,11 +386,12 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
 
 
 template <int dim>
-void create_right_hand_side (const Mapping<dim>    &mapping,
-                             const DoFHandler<dim> &dof_handler,
-                             const Quadrature<dim> &quadrature,
-                             const Function<dim>   &rhs_function,
-                             Vector<double>        &rhs_vector)
+void
+create_right_hand_side (const Mapping<dim>    &mapping,
+                        const DoFHandler<dim> &dof_handler,
+                        const Quadrature<dim> &quadrature,
+                        const Function<dim>   &rhs_function,
+                        Vector<double>        &rhs_vector)
 {
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
@@ -470,16 +478,17 @@ void create_right_hand_side (const Mapping<dim>    &mapping,
 //
 
 template <int dim>
-void project (const Mapping<dim>       &mapping,
-              const DoFHandler<dim>    &dof,
-              const ConstraintMatrix   &constraints,
-              const Quadrature<dim>    &quadrature,
-              const Function<dim>      &function,
-              Vector<double>           &vec,
-              const unsigned int        min_convergence_steps,
-              const bool                enforce_zero_boundary = false,
-              const Quadrature<dim-1>  & = QGauss<dim-1>(2),
-              const bool                project_to_boundary_first = false)
+void
+project (const Mapping<dim>       &mapping,
+         const DoFHandler<dim>    &dof,
+         const ConstraintMatrix   &constraints,
+         const Quadrature<dim>    &quadrature,
+         const Function<dim>      &function,
+         Vector<double>           &vec,
+         const unsigned int        min_convergence_steps,
+         const bool                enforce_zero_boundary = false,
+         const Quadrature<dim-1>  & = QGauss<dim-1>(2),
+         const bool                project_to_boundary_first = false)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
           ExcInternalError());
@@ -592,7 +601,8 @@ void project (const Mapping<dim>       &mapping,
 }
 
 
-int create_tria (unsigned int elm, Triangulation<2> &tria)
+int
+create_tria (unsigned int elm, Triangulation<2> &tria)
 {
   std::vector<Point<2> > points_glob;
   std::vector<Point<2> > points;
@@ -645,7 +655,8 @@ int create_tria (unsigned int elm, Triangulation<2> &tria)
 }
 
 
-void plot_shapes (DoFHandler<2> &dof_handler)
+void
+plot_shapes (DoFHandler<2> &dof_handler)
 {
   Vector<double> solution (dof_handler.n_dofs ());
   std::set<unsigned int> face_dofs;
@@ -689,7 +700,8 @@ void plot_shapes (DoFHandler<2> &dof_handler)
 }
 
 
-int main (int /*argc*/, char **/*argv*/)
+int
+main (int /*argc*/, char **/*argv*/)
 {
   std::ofstream logfile (logname);
   logfile.precision (PRECISION);
@@ -704,7 +716,8 @@ int main (int /*argc*/, char **/*argv*/)
 
 
 
-void check (const FiniteElement<2> &fe, const std::array<unsigned int,3> &min_convergence_steps)
+void
+check (const FiniteElement<2> &fe, const std::array<unsigned int,3> &min_convergence_steps)
 {
   Triangulation<2> tria_test;
   DoFHandler<2> *dof_handler;

@@ -25,7 +25,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MatrixBase &m)
+void
+test (PETScWrappers::MatrixBase &m)
 {
   typedef PETScWrappers::MatrixBase::size_type size_type;
 
@@ -102,7 +103,8 @@ void test (PETScWrappers::MatrixBase &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

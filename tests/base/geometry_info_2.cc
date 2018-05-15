@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "max_children_per_cell "
           << GeometryInfo<dim>::max_children_per_cell << std::endl;
@@ -106,7 +107,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

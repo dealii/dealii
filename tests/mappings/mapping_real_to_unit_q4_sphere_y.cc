@@ -28,7 +28,8 @@
 #include <deal.II/fe/mapping_q.h>
 
 
-void test_real_to_unit_cell()
+void
+test_real_to_unit_cell()
 {
   const unsigned int dim = 3;
 

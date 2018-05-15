@@ -23,7 +23,8 @@
 #include <deal.II/grid/grid_tools.h>
 
 
-void check ()
+void
+check ()
 {
   constexpr int dim = 3;
 
@@ -65,7 +66,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

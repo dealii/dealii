@@ -24,7 +24,8 @@
 
 // Check LinearAlgebra::CUDAWrappers::Vector add and sadd.
 
-void test()
+void
+test()
 {
   const unsigned int size = 100;
   LinearAlgebra::CUDAWrappers::Vector<double> a(size);
@@ -100,7 +101,8 @@ void test()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);

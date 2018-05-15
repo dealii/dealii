@@ -24,7 +24,8 @@
 #include <deal.II/grid/grid_out.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 // 1: continuous refinement of the unit square always in the middle
 // 2: refinement of the circle at the boundary
@@ -51,7 +52,8 @@ public:
     return middle;
   }
 
-  virtual std::unique_ptr<Manifold<dim,dim> > clone() const override
+  virtual std::unique_ptr<Manifold<dim,dim> >
+  clone() const override
   {
     return std::unique_ptr<Manifold<dim,dim> >(new Ball<dim>());
   }
@@ -153,7 +155,8 @@ CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_
 
 
 template <int dim>
-void test (const int test_case)
+void
+test (const int test_case)
 {
   char testname[100];
   sprintf(testname, "Test%d.dim%d", test_case, dim);
@@ -255,7 +258,8 @@ void test (const int test_case)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(8);
   logfile << std::setprecision(8);

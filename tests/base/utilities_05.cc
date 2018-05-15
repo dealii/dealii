@@ -26,7 +26,8 @@ using namespace dealii;
 
 
 
-void test ()
+void
+test ()
 {
   int number = 5;
   for (unsigned int i=0; i<7; ++i)
@@ -54,7 +55,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

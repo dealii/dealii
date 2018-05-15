@@ -27,7 +27,8 @@
 
 
 
-void test_mpi()
+void
+test_mpi()
 {
   Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
@@ -150,7 +151,8 @@ void test_mpi()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

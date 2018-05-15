@@ -23,9 +23,11 @@
 #include <deal.II/base/numbers.h>
 #include <iostream>
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   deallog.attach (logfile);
   try

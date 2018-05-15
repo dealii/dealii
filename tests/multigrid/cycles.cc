@@ -39,30 +39,37 @@ class MGAll
   public MGCoarseGridBase<VectorType>
 {
 public:
-  virtual ~MGAll()
+  virtual
+  ~MGAll()
   {}
 
-  virtual void smooth (const unsigned int,
-                       VectorType &, const VectorType &) const
+  virtual void
+  smooth (const unsigned int,
+          VectorType &, const VectorType &) const
   {}
 
-  virtual void prolongate (const unsigned int,
-                           VectorType &, const VectorType &) const
+  virtual void
+  prolongate (const unsigned int,
+              VectorType &, const VectorType &) const
   {}
 
-  virtual void restrict_and_add (const unsigned int,
-                                 VectorType &, const VectorType &) const
+  virtual void
+  restrict_and_add (const unsigned int,
+                    VectorType &, const VectorType &) const
   {}
 
-  virtual void clear ()
+  virtual void
+  clear ()
   {}
 
-  virtual void operator() (const unsigned int,
-                           VectorType &, const VectorType &) const
+  virtual void
+  operator() (const unsigned int,
+              VectorType &, const VectorType &) const
   {}
 };
 
-void test_cycles(unsigned int minlevel, unsigned int maxlevel)
+void
+test_cycles(unsigned int minlevel, unsigned int maxlevel)
 {
   MGAll all;
   MGLevelObject<FullMatrix<double> > level_matrices(0, maxlevel);
@@ -86,7 +93,8 @@ void test_cycles(unsigned int minlevel, unsigned int maxlevel)
   mg1.cycle();
 }
 
-int main()
+int
+main()
 {
   initlog();
 

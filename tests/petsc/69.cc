@@ -25,7 +25,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MatrixBase &m)
+void
+test (PETScWrappers::MatrixBase &m)
 {
   Assert (m.m() != 0, ExcInternalError());
   Assert (m.n() != 0, ExcInternalError());
@@ -106,7 +107,8 @@ void test (PETScWrappers::MatrixBase &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -36,7 +36,8 @@
 
 
 
-void test()
+void
+test()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria);
@@ -119,7 +120,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

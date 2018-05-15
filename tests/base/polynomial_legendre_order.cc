@@ -26,7 +26,8 @@
 using namespace Polynomials;
 
 
-void check_at_one (const std::vector<Polynomial<double> > &p)
+void
+check_at_one (const std::vector<Polynomial<double> > &p)
 {
   deallog << "Function value of polynomial at right end point: ";
   for (unsigned int i=0; i<p.size(); ++i)
@@ -53,7 +54,8 @@ check_poly (const unsigned int n)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

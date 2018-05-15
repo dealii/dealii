@@ -22,7 +22,8 @@
 
 #include "../tests.h"
 
-int main ()
+int
+main ()
 {
   initlog();
   unsigned int random_value = 0;

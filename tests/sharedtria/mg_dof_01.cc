@@ -37,7 +37,8 @@
 #include <deal.II/fe/fe_dgq.h>
 
 template <int dim>
-void compare_meshes (DoFHandler<dim> &shared_dof_handler, DoFHandler<dim> &distributed_dof_handler)
+void
+compare_meshes (DoFHandler<dim> &shared_dof_handler, DoFHandler<dim> &distributed_dof_handler)
 {
   FE_Q<dim> fe (2);
 
@@ -82,7 +83,8 @@ void compare_meshes (DoFHandler<dim> &shared_dof_handler, DoFHandler<dim> &distr
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
                                                    (Triangulation<dim>::limit_level_difference_at_vertices), true,
@@ -131,7 +133,8 @@ void test()
   compare_meshes(shared_dof_handler,distributed_dof_handler);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

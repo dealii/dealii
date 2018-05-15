@@ -124,7 +124,8 @@ test_dim_3 (const double e1, Tensor<1,3> v1,
   check_value(dim, 2, e3, eig_vals[2], tol);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

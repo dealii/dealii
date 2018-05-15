@@ -47,10 +47,12 @@ class MyFunction : public dealii::Function<dim,std::complex<double> >
 public:
   MyFunction(const double k);
 
-  virtual std::complex<double> value(const dealii::Point<dim> &point,
-                                     const unsigned int component = 0 ) const;
+  virtual std::complex<double>
+  value(const dealii::Point<dim> &point,
+        const unsigned int component = 0 ) const;
 
-  double get_k() const;
+  double
+  get_k() const;
 
 private:
   const double k;
@@ -79,7 +81,8 @@ MyFunction<dim>::value(const dealii::Point<dim> &point,
 }
 
 template <int dim>
-double MyFunction<dim>::get_k() const
+double
+MyFunction<dim>::get_k() const
 {
   return k;
 }
@@ -91,10 +94,12 @@ class NeumanBC : public dealii::Function<dim, std::complex<double> >
 public:
   NeumanBC(const double c);
 
-  virtual std::complex<double> value(const dealii::Point<dim> &point,
-                                     const unsigned int component = 0 ) const;
+  virtual std::complex<double>
+  value(const dealii::Point<dim> &point,
+        const unsigned int component = 0 ) const;
 
-  double get_c() const;
+  double
+  get_c() const;
 
 private:
   const double c;
@@ -109,14 +114,16 @@ NeumanBC<dim>::NeumanBC(const double c)
 }
 
 template <int dim>
-std::complex<double> NeumanBC<dim>::value(const dealii::Point<dim> &point,
-                                          const unsigned int ) const
+std::complex<double>
+NeumanBC<dim>::value(const dealii::Point<dim> &point,
+                     const unsigned int ) const
 {
   return std::complex<double>(0, c);
 }
 
 template <int dim>
-double NeumanBC<dim>::get_c() const
+double
+NeumanBC<dim>::get_c() const
 {
   return c;
 }
@@ -124,17 +131,20 @@ double NeumanBC<dim>::get_c() const
 // helper function to get diagonal and
 // area of the squared element with length h
 template <int dim>
-void get_h_area(double &h, double &a, const double L);
+void
+get_h_area(double &h, double &a, const double L);
 
 template <>
-void get_h_area<2>(double &h, double &a, const double L)
+void get_h_area<2>
+(double &h, double &a, const double L)
 {
   h = L;
   a = L;
 }
 
 template <>
-void get_h_area<3>(double &h, double &a, const double L)
+void get_h_area<3>
+(double &h, double &a, const double L)
 {
   h = std::sqrt(2.0)*L;
   a = L*L;
@@ -143,17 +153,20 @@ void get_h_area<3>(double &h, double &a, const double L)
 // helper function to get diagonal and area of the
 // h-refined face.
 template <int dim>
-void get_h_area_sub(double &h, double &a, const double L);
+void
+get_h_area_sub(double &h, double &a, const double L);
 
 template <>
-void get_h_area_sub<2>(double &h, double &a, const double L)
+void get_h_area_sub<2>
+(double &h, double &a, const double L)
 {
   h = L/2;
   a = L/2;
 }
 
 template <>
-void get_h_area_sub<3>(double &h, double &a, const double L)
+void get_h_area_sub<3>
+(double &h, double &a, const double L)
 {
   h = std::sqrt(2.0)*L/2;
   a = L*L/4.0;
@@ -161,11 +174,12 @@ void get_h_area_sub<3>(double &h, double &a, const double L)
 
 // output for inspection
 template <int dim>
-void output(const std::string          name,
-            const Triangulation<dim>  &triangulation,
-            const hp::DoFHandler<dim> &dof_handler,
-            const Vector<std::complex<double> >      &values,
-            const Vector<float>       &error)
+void
+output(const std::string          name,
+       const Triangulation<dim>  &triangulation,
+       const hp::DoFHandler<dim> &dof_handler,
+       const Vector<std::complex<double> >      &values,
+       const Vector<float>       &error)
 {
   dealii::Vector<double> fe_degrees(triangulation.n_active_cells());
   {
@@ -192,7 +206,8 @@ void output(const std::string          name,
 
 // case 1)
 template <int dim>
-void test_neumann(const NeumanBC<dim> &func)
+void
+test_neumann(const NeumanBC<dim> &func)
 {
   deallog << "NeumanBC case:"<<std::endl;
   deallog << "--------------"<<std::endl;
@@ -271,7 +286,8 @@ void test_neumann(const NeumanBC<dim> &func)
 
 // case 2)
 template <int dim>
-void test_regular(const MyFunction<dim> &func)
+void
+test_regular(const MyFunction<dim> &func)
 {
   deallog << std::endl;
   deallog << "Regular face:"<<std::endl;
@@ -383,7 +399,8 @@ void test_regular(const MyFunction<dim> &func)
 
 // case 3)
 template <int dim>
-void test_irregular(const MyFunction<dim> &func)
+void
+test_irregular(const MyFunction<dim> &func)
 {
   deallog << std::endl;
   deallog << "Irregular face:"<<std::endl;
@@ -536,8 +553,9 @@ class MySecondFunction : public dealii::Function<dim,std::complex<double> >
 public:
   MySecondFunction();
 
-  virtual std::complex<double> value(const dealii::Point<dim> &point,
-                                     const unsigned int component = 0 ) const;
+  virtual std::complex<double>
+  value(const dealii::Point<dim> &point,
+        const unsigned int component = 0 ) const;
 };
 
 template <int dim>
@@ -549,8 +567,9 @@ MySecondFunction<dim>::MySecondFunction()
 }
 
 template <int dim>
-std::complex<double> MySecondFunction<dim>::value(const dealii::Point<dim> &point,
-                                                  const unsigned int ) const
+std::complex<double>
+MySecondFunction<dim>::value(const dealii::Point<dim> &point,
+                             const unsigned int ) const
 {
   double f = 0.0;
   const double &x = point[0];
@@ -561,7 +580,8 @@ std::complex<double> MySecondFunction<dim>::value(const dealii::Point<dim> &poin
 }
 
 template <int dim>
-void test(const MySecondFunction<dim> &func)
+void
+test(const MySecondFunction<dim> &func)
 {
   deallog << std::endl;
   deallog << "More complicated mesh:"<<std::endl;
@@ -663,7 +683,8 @@ void test(const MySecondFunction<dim> &func)
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile);

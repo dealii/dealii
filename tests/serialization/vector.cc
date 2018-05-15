@@ -20,7 +20,8 @@
 #include <deal.II/lac/vector.h>
 #include <boost/serialization/vector.hpp>
 
-void test ()
+void
+test ()
 {
   unsigned int n = 5;
 
@@ -42,7 +43,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

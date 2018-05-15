@@ -21,7 +21,8 @@
 #include <deal.II/base/array_view.h>
 
 
-void test ()
+void
+test ()
 {
   Table<2,int> v(10,8);
 
@@ -46,7 +47,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

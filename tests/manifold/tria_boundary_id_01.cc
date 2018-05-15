@@ -31,8 +31,9 @@
 using namespace dealii;
 
 template <typename Stream, int dim>
-void print_triangulation_data(Stream &stream,
-                              const Triangulation<dim> &triangulation)
+void
+print_triangulation_data(Stream &stream,
+                         const Triangulation<dim> &triangulation)
 {
 // Boundary id count
   std::map<int,int> boundary_id_count;
@@ -80,7 +81,8 @@ void print_triangulation_data(Stream &stream,
   stream << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

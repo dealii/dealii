@@ -36,8 +36,9 @@ const double delta_x = 1e-8;
 
 
 template <int dim>
-void test (const FiniteElement<dim> &fe,
-           const Quadrature<dim>    &quadrature)
+void
+test (const FiniteElement<dim> &fe,
+      const Quadrature<dim>    &quadrature)
 {
   deallog << fe.get_name() << ' ' << fe.dofs_per_cell << ' ';
 
@@ -69,8 +70,9 @@ void test (const FiniteElement<dim> &fe,
 
 
 template <template <int,int> class FE>
-void check (const unsigned int min_degree,
-            const unsigned int max_degree)
+void
+check (const unsigned int min_degree,
+       const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -85,8 +87,9 @@ void check (const unsigned int min_degree,
 
 
 template <template <int> class FE>
-void check1 (const unsigned int min_degree,
-             const unsigned int max_degree)
+void
+check1 (const unsigned int min_degree,
+        const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -102,8 +105,9 @@ void check1 (const unsigned int min_degree,
 
 // Nedelec exists only in 2d/3d
 template <>
-void check1<FE_Nedelec> (const unsigned int min_degree,
-                         const unsigned int max_degree)
+void check1<FE_Nedelec>
+(const unsigned int min_degree,
+ const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -116,8 +120,9 @@ void check1<FE_Nedelec> (const unsigned int min_degree,
 // Raviart-Thomas doesn't exists 1d. so does the nodal variant of it. the
 // former is also not implemented in 3d
 template <>
-void check1<FE_RaviartThomas> (const unsigned int min_degree,
-                               const unsigned int max_degree)
+void check1<FE_RaviartThomas>
+(const unsigned int min_degree,
+ const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
@@ -126,8 +131,9 @@ void check1<FE_RaviartThomas> (const unsigned int min_degree,
 }
 
 template <>
-void check1<FE_RaviartThomasNodal> (const unsigned int min_degree,
-                                    const unsigned int max_degree)
+void check1<FE_RaviartThomasNodal>
+(const unsigned int min_degree,
+ const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {

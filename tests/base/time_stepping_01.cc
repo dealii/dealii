@@ -19,7 +19,8 @@
 #include <deal.II/lac/vector.h>
 
 // test Runge-Kutta methods
-Vector<double> f1(double const t, Vector<double> const &y)
+Vector<double>
+f1(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -28,7 +29,8 @@ Vector<double> f1(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> f2(double const t, Vector<double> const &y)
+Vector<double>
+f2(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -37,7 +39,8 @@ Vector<double> f2(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> f3(double const t, Vector<double> const &y)
+Vector<double>
+f3(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -46,7 +49,8 @@ Vector<double> f3(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> f4(double const t, Vector<double> const &y)
+Vector<double>
+f4(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -55,7 +59,8 @@ Vector<double> f4(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> f5(double const t, Vector<double> const &y)
+Vector<double>
+f5(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -64,60 +69,71 @@ Vector<double> f5(double const t, Vector<double> const &y)
   return values;
 }
 
-Vector<double> id_minus_tau_J_inv1(double const t, double const tau, Vector<double> const &y)
+Vector<double>
+id_minus_tau_J_inv1(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv2(double const t, double const tau, Vector<double> const &y)
+Vector<double>
+id_minus_tau_J_inv2(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv3(double const t, double const tau, Vector<double> const &y)
+Vector<double>
+id_minus_tau_J_inv3(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv4(double const t, double const tau, Vector<double> const &y)
+Vector<double>
+id_minus_tau_J_inv4(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-Vector<double> id_minus_tau_J_inv5(double const t, double const tau, Vector<double> const &y)
+Vector<double>
+id_minus_tau_J_inv5(double const t, double const tau, Vector<double> const &y)
 {
   return y;
 }
 
-double my1(double const t)
+double
+my1(double const t)
 {
   return t;
 }
 
-double my2(double const t)
+double
+my2(double const t)
 {
   return t*t;
 }
 
-double my3(double const t)
+double
+my3(double const t)
 {
   return t*t*t;
 }
 
-double my4(double const t)
+double
+my4(double const t)
 {
   return t*t*t*t;
 }
 
-double my5(double const t)
+double
+my5(double const t)
 {
   return t*t*t*t*t;
 }
 
-void test(TimeStepping::RungeKutta<Vector<double> > &solver,
-          std::function<Vector<double> (double const, Vector<double> const &)> f,
-          std::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-          std::function<double (double const)> my)
+void
+test(TimeStepping::RungeKutta<Vector<double> > &solver,
+     std::function<Vector<double> (double const, Vector<double> const &)> f,
+     std::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+     std::function<double (double const)> my)
 {
   unsigned int n_time_steps = 1;
   unsigned int size = 1;
@@ -141,10 +157,11 @@ void test(TimeStepping::RungeKutta<Vector<double> > &solver,
   deallog << error_norm <<std::endl;
 }
 
-void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
-           std::function<Vector<double> (double const, Vector<double> const &)> f,
-           std::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
-           std::function<double (double const)> my)
+void
+test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
+      std::function<Vector<double> (double const, Vector<double> const &)> f,
+      std::function<Vector<double> (double const, double const, Vector<double> const &)> id_minus_tau_J_inv,
+      std::function<double (double const)> my)
 {
   double initial_time = 0.0, final_time = 1.0;
   double time_step = 1.0;
@@ -174,7 +191,8 @@ void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
   deallog<<error_norm<<std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

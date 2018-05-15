@@ -39,7 +39,8 @@
 
 
 template <int dim, int fe_degree>
-void test (const unsigned int n_blocks = 5)
+void
+test (const unsigned int n_blocks = 5)
 {
   typedef double number;
 
@@ -140,7 +141,8 @@ void test (const unsigned int n_blocks = 5)
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

@@ -34,7 +34,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria (MPI_COMM_WORLD);
   FE_Q<dim> fe(2);
@@ -91,7 +92,8 @@ void test ()
     }
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

@@ -22,7 +22,8 @@
 #include <deal.II/base/utilities.h>
 
 
-void test ()
+void
+test ()
 {
   unsigned long long int i = std::pow(2,33);
   Assert(Utilities::to_string (i) == "8589934592", ExcInternalError());
@@ -61,7 +62,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

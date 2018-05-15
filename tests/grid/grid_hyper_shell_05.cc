@@ -34,11 +34,13 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void check (const unsigned int n)
+void
+check (const unsigned int n)
 {
   deallog << "n=" << n << std::endl;
 
@@ -67,7 +69,8 @@ void check (const unsigned int n)
 }
 
 
-int main()
+int
+main()
 {
   deallog << std::setprecision(3);
   deallog.attach(logfile);

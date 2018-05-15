@@ -84,7 +84,8 @@ print_is_tensor_product()
           << q_17.is_tensor_product() << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::boolalpha;

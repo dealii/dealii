@@ -20,7 +20,8 @@
 #include <deal.II/base/tensor.h>
 
 template <int dim>
-void test_tensor ()
+void
+test_tensor ()
 {
   Tensor<1,dim> t1, t2;
   for (unsigned int i=0; i<dim; ++i)
@@ -32,7 +33,8 @@ void test_tensor ()
   deallog << "dim = " << dim << ": " << res << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

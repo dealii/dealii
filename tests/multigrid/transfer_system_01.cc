@@ -68,7 +68,8 @@ make_matrix (const Transfer &transfer,
 
 
 
-void print_matrix (const FullMatrix<double> &m)
+void
+print_matrix (const FullMatrix<double> &m)
 {
   for (unsigned int i=0; i<m.m(); ++i)
     {
@@ -82,7 +83,8 @@ void print_matrix (const FullMatrix<double> &m)
 
 
 template <int dim>
-void check (const FiniteElement<dim> &fe)
+void
+check (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -118,7 +120,8 @@ void check (const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

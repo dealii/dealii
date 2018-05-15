@@ -32,7 +32,8 @@
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);

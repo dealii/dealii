@@ -27,13 +27,15 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
-void output_double_number(double input,const std::string &text)
+void
+output_double_number(double input,const std::string &text)
 {
   deallog<<text<< input<<std::endl;
 }
 
 template <class NUMBER>
-void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
+void
+output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -84,7 +86,8 @@ check_Tsolve (SolverType         &solver,
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

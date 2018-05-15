@@ -40,21 +40,24 @@ class MySquareFunction : public Function<dim>
 public:
   MySquareFunction () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return (component+1)*p.square()+1;
   }
 
-  virtual void vector_value (const Point<dim>   &p,
-                             Vector<double> &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double> &values) const
   {
     values[0] = value(p,0);
   }
 
 
-  virtual Tensor<1, dim> gradient (const Point<dim>   &p,
-                                   const unsigned int  component) const
+  virtual Tensor<1, dim>
+  gradient (const Point<dim>   &p,
+            const unsigned int  component) const
   {
     Tensor<1, dim> return_value;
     for (unsigned int i=0; i<dim; ++i)
@@ -62,8 +65,9 @@ public:
     return return_value;
   }
 
-  virtual void   vector_gradient (const Point<dim>   &p,
-                                  std::vector<Tensor<1, dim> > &gradients) const
+  virtual void
+  vector_gradient (const Point<dim>   &p,
+                   std::vector<Tensor<1, dim> > &gradients) const
   {
     gradients[0] = gradient(p,0);
   }
@@ -76,26 +80,30 @@ class MyExpFunction : public Function<dim>
 public:
   MyExpFunction () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return std::exp (p(0));
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     values(0) = value(p,0);
   }
 
-  virtual double gradient (const Point<dim>   &p,
-                           const unsigned int  component) const
+  virtual double
+  gradient (const Point<dim>   &p,
+            const unsigned int  component) const
   {
     return std::exp (p(0));
   }
 
-  virtual void   vector_gradient (const Point<dim>   &p,
-                                  std::vector<Tensor<1, dim > > &gradients) const
+  virtual void
+  vector_gradient (const Point<dim>   &p,
+                   std::vector<Tensor<1, dim > > &gradients) const
   {
     gradients(0) = gradient(p,0);
   }
@@ -105,7 +113,8 @@ public:
 
 
 template <int dim>
-void make_mesh (Triangulation<dim> &tria)
+void
+make_mesh (Triangulation<dim> &tria)
 {
 
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -221,7 +230,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

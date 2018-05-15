@@ -35,7 +35,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << dim << "-dimensions" << std::endl;
 
@@ -51,7 +52,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   initlog();
 

@@ -187,7 +187,8 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   initlog();
 

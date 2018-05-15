@@ -22,7 +22,8 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/base/utilities.h>
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

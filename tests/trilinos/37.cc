@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::Vector &v)
+void
+test (TrilinosWrappers::MPI::Vector &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i;
@@ -42,7 +43,8 @@ void test (TrilinosWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

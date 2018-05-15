@@ -21,7 +21,8 @@
 #include <vector>
 #include <list>
 
-void test ()
+void
+test ()
 {
   std::vector<double>   v(9);
   for (unsigned int i = 0; i < v.size(); ++i)
@@ -60,7 +61,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

@@ -50,7 +50,8 @@
 
 
 template <int dim>
-void test ();
+void
+test ();
 
 
 template <int dim>
@@ -64,8 +65,9 @@ public:
     q(q)
   {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     Assert ((component == 0) && (this->n_components == 1),
             ExcInternalError());
@@ -77,8 +79,9 @@ public:
   }
 
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &v) const
   {
     for (unsigned int c=0; c<v.size(); ++c)
       {
@@ -95,10 +98,11 @@ private:
 
 
 template <int dim>
-void do_project (const Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int        p,
-                 const unsigned int        order_difference)
+void
+do_project (const Triangulation<dim> &triangulation,
+            const FiniteElement<dim> &fe,
+            const unsigned int        p,
+            const unsigned int        order_difference)
 {
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
@@ -151,9 +155,10 @@ void do_project (const Triangulation<dim> &triangulation,
 // of polynomial degree p has normal components of degree p-1 and therefore
 // can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <int dim>
-void test_no_hanging_nodes (const FiniteElement<dim> &fe,
-                            const unsigned int        p,
-                            const unsigned int        order_difference = 0)
+void
+test_no_hanging_nodes (const FiniteElement<dim> &fe,
+                       const unsigned int        p,
+                       const unsigned int        order_difference = 0)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -166,9 +171,10 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 
 // same test as above, but this time with a mesh that has hanging nodes
 template <int dim>
-void test_with_hanging_nodes (const FiniteElement<dim> &fe,
-                              const unsigned int        p,
-                              const unsigned int        order_difference = 0)
+void
+test_with_hanging_nodes (const FiniteElement<dim> &fe,
+                         const unsigned int        p,
+                         const unsigned int        order_difference = 0)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -193,9 +199,10 @@ void test_with_hanging_nodes (const FiniteElement<dim> &fe,
 // each. this also cycles through all possibilities of coarser or finer cell
 // having face_orientation==false
 template <int dim>
-void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
-                                       const unsigned int        p,
-                                       const unsigned int        order_difference = 0)
+void
+test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
+                                  const unsigned int        p,
+                                  const unsigned int        order_difference = 0)
 {
   if (dim != 3)
     return;
@@ -222,9 +229,10 @@ void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
 // elements. this tests the case of the sign_change thingy in
 // fe_poly_tensor.cc
 template <int dim>
-void test_with_2d_deformed_mesh (const FiniteElement<dim> &fe,
-                                 const unsigned int        p,
-                                 const unsigned int        order_difference = 0)
+void
+test_with_2d_deformed_mesh (const FiniteElement<dim> &fe,
+                            const unsigned int        p,
+                            const unsigned int        order_difference = 0)
 {
   if (dim != 2)
     return;
@@ -272,9 +280,10 @@ void test_with_2d_deformed_mesh (const FiniteElement<dim> &fe,
 // same as test_with_2d_deformed_mesh, but refine each element in turn. this
 // makes sure we also check the sign_change thingy for refined cells
 template <int dim>
-void test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
-                                         const unsigned int        p,
-                                         const unsigned int        order_difference = 0)
+void
+test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
+                                    const unsigned int        p,
+                                    const unsigned int        order_difference = 0)
 {
   if (dim != 2)
     return;
@@ -338,7 +347,8 @@ void test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision (3);

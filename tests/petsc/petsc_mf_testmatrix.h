@@ -30,8 +30,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void vmult (dealii::PETScWrappers::VectorBase       &dst,
-              const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  vmult (dealii::PETScWrappers::VectorBase       &dst,
+         const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Matrix-vector multiplication: let
@@ -43,8 +44,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void Tvmult (dealii::PETScWrappers::VectorBase       &dst,
-               const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  Tvmult (dealii::PETScWrappers::VectorBase       &dst,
+          const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Adding Matrix-vector
@@ -56,8 +58,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void vmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                  const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  vmult_add (dealii::PETScWrappers::VectorBase       &dst,
+             const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Adding Matrix-vector
@@ -72,8 +75,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                   const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
+              const dealii::PETScWrappers::VectorBase &src) const;
 
 private:
   /**

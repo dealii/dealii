@@ -24,7 +24,8 @@
 // Check LinearAlgebra::EpetraWrappers::Vector assignment and import
 
 
-void test()
+void
+test()
 {
   IndexSet parallel_partitioner_1(10);
   IndexSet parallel_partitioner_2(10);
@@ -200,7 +201,8 @@ void test()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);

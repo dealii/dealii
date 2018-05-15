@@ -31,7 +31,8 @@
 
 
 template <int dim>
-void test(const char *filename)
+void
+test(const char *filename)
 {
   const char *p = strrchr(filename,'/');
   deallog.push (p);
@@ -49,7 +50,8 @@ void test(const char *filename)
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

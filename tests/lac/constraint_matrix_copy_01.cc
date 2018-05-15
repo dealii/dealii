@@ -19,7 +19,8 @@
 
 #include <vector>
 
-void test()
+void
+test()
 {
   ConstraintMatrix constraints;
 
@@ -50,7 +51,8 @@ void test()
           ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

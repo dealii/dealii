@@ -26,7 +26,8 @@
 
 
 template <unsigned int dim>
-void test (const unsigned int degree)
+void
+test (const unsigned int degree)
 {
   FE_ABF<dim> fe(degree);
 
@@ -54,7 +55,8 @@ void test (const unsigned int degree)
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

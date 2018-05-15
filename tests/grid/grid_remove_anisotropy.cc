@@ -27,9 +27,11 @@
 
 #include <iostream>
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
-void check_remove_anisotropy ()
+void
+check_remove_anisotropy ()
 {
   Point<3> (corners) [3];
 
@@ -50,7 +52,8 @@ void check_remove_anisotropy ()
   triangulation.clear ();
 }
 
-int main ()
+int
+main ()
 {
   check_remove_anisotropy();
 }

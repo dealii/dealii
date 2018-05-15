@@ -34,7 +34,8 @@ struct X
   int i;
 };
 
-X initializer ()
+X
+initializer ()
 {
   X x;
   x.i = 42;
@@ -44,10 +45,12 @@ X initializer ()
 X forty_two = initializer();
 
 
-Threads::ThreadLocalStorage<X> tls_data(forty_two);
+Threads::ThreadLocalStorage<X>
+tls_data(forty_two);
 
 
-void execute (Threads::Mutex &m)
+void
+execute (Threads::Mutex &m)
 {
   // check correct default initialization
   bool exists;
@@ -75,7 +78,8 @@ void execute (Threads::Mutex &m)
 }
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 10;
   Threads::Mutex m[N];
@@ -106,7 +110,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

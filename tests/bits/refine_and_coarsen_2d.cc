@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -76,7 +77,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

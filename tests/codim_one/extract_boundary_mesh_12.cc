@@ -26,7 +26,8 @@
 
 
 
-void test()
+void
+test()
 {
   const int dim=3;
 
@@ -58,7 +59,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.depth_console(0);

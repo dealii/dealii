@@ -35,12 +35,14 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
 template <int dim>
-void output (const Triangulation<dim> &tria)
+void
+output (const Triangulation<dim> &tria)
 {
 
   deallog << "  " << tria.n_active_cells() << std::endl;
@@ -78,7 +80,8 @@ void output (const Triangulation<dim> &tria)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << dim << "d" << std::endl;
 
@@ -98,7 +101,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);

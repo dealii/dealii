@@ -43,7 +43,8 @@ using namespace dealii;
 
 
 
-void test ()
+void
+test ()
 {
   // generate a 100x3 mesh
   Triangulation<2> triangulation (Triangulation<2>::eliminate_unrefined_islands);
@@ -106,7 +107,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

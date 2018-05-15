@@ -47,7 +47,8 @@
 using namespace dealii;
 
 
-void create_coarse_grid(Triangulation<2> &coarse_grid)
+void
+create_coarse_grid(Triangulation<2> &coarse_grid)
 {
 
   static const Point<2> vertices_1[]
@@ -83,7 +84,8 @@ void create_coarse_grid(Triangulation<2> &coarse_grid)
                                     SubCellData());
 }
 
-void test()
+void
+test()
 {
   deallog << std::scientific;
   deallog.precision(16);
@@ -111,7 +113,8 @@ void test()
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -33,7 +33,8 @@ pred_ind(const TableIndices<2> &ind)
     return std::make_pair(false,val);
 }
 
-void test2d (const VectorTools::NormType norm)
+void
+test2d (const VectorTools::NormType norm)
 {
   const unsigned int dim = 2;
   const unsigned int N=4;
@@ -51,7 +52,8 @@ void test2d (const VectorTools::NormType norm)
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

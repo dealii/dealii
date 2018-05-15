@@ -20,7 +20,8 @@
 #include <deal.II/numerics/kdtree.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

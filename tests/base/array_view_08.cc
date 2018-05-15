@@ -31,7 +31,8 @@ is_const_reference()
          std::is_const<typename std::remove_reference<T>::type>::value;
 }
 
-void test ()
+void
+test ()
 {
   // test for a mutable view of a mutable vector
   {
@@ -73,7 +74,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -24,7 +24,8 @@
 
 
 template <int dim>
-void plot_FE_Nedelec_shape_functions()
+void
+plot_FE_Nedelec_shape_functions()
 {
   MappingQGeneric<dim> m(1);
   FE_Nedelec<dim> p0(0);

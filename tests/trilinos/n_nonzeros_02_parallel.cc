@@ -28,7 +28,8 @@
 #include <deal.II/distributed/tria.h>
 
 
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<2> tria (MPI_COMM_WORLD);
   GridGenerator::hyper_cube (tria);
@@ -70,7 +71,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

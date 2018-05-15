@@ -54,18 +54,20 @@ namespace Step48
     SineGordonOperation(const MatrixFree<dim,double> &data_in,
                         const double                      time_step);
 
-    void apply (LinearAlgebra::distributed::Vector<double>                        &dst,
-                const std::vector<LinearAlgebra::distributed::Vector<double>*> &src) const;
+    void
+    apply (LinearAlgebra::distributed::Vector<double>                        &dst,
+           const std::vector<LinearAlgebra::distributed::Vector<double>*> &src) const;
 
   private:
     const MatrixFree<dim,double>         &data;
     const VectorizedArray<double>         delta_t_sqr;
     LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
-    void local_apply (const MatrixFree<dim,double>               &data,
-                      LinearAlgebra::distributed::Vector<double>      &dst,
-                      const std::vector<LinearAlgebra::distributed::Vector<double>*> &src,
-                      const std::pair<unsigned int,unsigned int> &cell_range) const;
+    void
+    local_apply (const MatrixFree<dim,double>               &data,
+                 LinearAlgebra::distributed::Vector<double>      &dst,
+                 const std::vector<LinearAlgebra::distributed::Vector<double>*> &src,
+                 const std::pair<unsigned int,unsigned int> &cell_range) const;
   };
 
 
@@ -178,13 +180,15 @@ namespace Step48
   public:
     ExactSolution (const unsigned int n_components = 1,
                    const double time = 0.) : Function<dim>(n_components, time) {}
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+    virtual double
+    value (const Point<dim> &p,
+           const unsigned int component = 0) const;
   };
 
   template <int dim>
-  double ExactSolution<dim>::value (const Point<dim> &p,
-                                    const unsigned int /* component */) const
+  double
+  ExactSolution<dim>::value (const Point<dim> &p,
+                             const unsigned int /* component */) const
   {
     return std::exp(-p.distance(Point<2>(0.03, -0.2))*p.distance(Point<2>(0.03,-0.2))*0.1);
   }
@@ -197,11 +201,14 @@ namespace Step48
   {
   public:
     SineGordonProblem ();
-    void run ();
+    void
+    run ();
 
   private:
-    void make_grid_and_dofs ();
-    void output_norm ();
+    void
+    make_grid_and_dofs ();
+    void
+    output_norm ();
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -236,7 +243,8 @@ namespace Step48
 
 
   template <int dim>
-  void SineGordonProblem<dim>::make_grid_and_dofs ()
+  void
+  SineGordonProblem<dim>::make_grid_and_dofs ()
   {
     GridGenerator::hyper_cube (triangulation, -15, 15);
     triangulation.refine_global (n_global_refinements);
@@ -345,7 +353,8 @@ namespace Step48
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);

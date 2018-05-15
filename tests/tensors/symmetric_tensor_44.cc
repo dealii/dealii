@@ -23,7 +23,8 @@
 #include <type_traits>
 
 template <int rank, int dim, typename NumberType>
-void fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
+void
+fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
 {
   for (unsigned int i=0; i!=t.n_independent_components; ++i)
     {
@@ -33,7 +34,8 @@ void fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
 
 
 template <int rank, int dim, typename NumberType>
-void fill_tensor  (Tensor<rank,dim,NumberType> &t)
+void
+fill_tensor  (Tensor<rank,dim,NumberType> &t)
 {
   for (unsigned int i=0; i!=t.n_independent_components; ++i)
     {
@@ -44,8 +46,9 @@ void fill_tensor  (Tensor<rank,dim,NumberType> &t)
 template <int dim,
           template <int,int,typename> class TensorType1, typename NumberType1,
           template <int,int,typename> class TensorType2, typename NumberType2>
-void print (const TensorType1<2,dim,NumberType1> &t2,
-            const TensorType2<4,dim,NumberType2> &t4)
+void
+print (const TensorType1<2,dim,NumberType1> &t2,
+       const TensorType2<4,dim,NumberType2> &t4)
 {
   deallog << t2 << std::endl;
   deallog << t4 << std::endl;
@@ -54,10 +57,11 @@ void print (const TensorType1<2,dim,NumberType1> &t2,
 template <int dim,
           template <int,int,typename> class TensorType1, typename NumberType1,
           template <int,int,typename> class TensorType2, typename NumberType2>
-void print (const TensorType1<2,dim,NumberType1> &t2_1,
-            const TensorType2<2,dim,NumberType2> &t2_2,
-            const TensorType1<4,dim,NumberType1> &t4_1,
-            const TensorType2<4,dim,NumberType2> &t4_2)
+void
+print (const TensorType1<2,dim,NumberType1> &t2_1,
+       const TensorType2<2,dim,NumberType2> &t2_2,
+       const TensorType1<4,dim,NumberType1> &t4_1,
+       const TensorType2<4,dim,NumberType2> &t4_2)
 {
   deallog << t2_1 << std::endl;
   deallog << t2_2 << std::endl;
@@ -78,7 +82,8 @@ struct AreSame<TensorType1,TensorType1> : std::true_type
 
 template <template <int,int,typename> class TensorType1, typename NumberType1,
           template <int,int,typename> class TensorType2, typename NumberType2>
-void test_one ()
+void
+test_one ()
 {
   const unsigned int dim = 2;
   TensorType1<2,dim,NumberType1> t2_1;
@@ -198,7 +203,8 @@ test_three ()
 
 template <template <int,int,typename> class TensorType1, typename NumberType1,
           template <int,int,typename> class TensorType2, typename NumberType2>
-void test_all ()
+void
+test_all ()
 {
   test_one<TensorType1,NumberType1,TensorType2,NumberType2>();
   test_two<TensorType1,NumberType1,TensorType2,NumberType2>();
@@ -206,7 +212,8 @@ void test_all ()
 }
 
 template <typename Number1, typename Number2>
-void test_T ()
+void
+test_T ()
 {
   deallog.push("ST,ST");
   test_all<SymmetricTensor, double, SymmetricTensor, double>();
@@ -225,7 +232,8 @@ void test_T ()
   deallog.pop();
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

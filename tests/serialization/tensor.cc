@@ -25,7 +25,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   const unsigned int dim=3;
   const unsigned int rank=2;
@@ -46,7 +47,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back (FE_Q<dim>(2));
@@ -43,7 +44,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

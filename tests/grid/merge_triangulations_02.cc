@@ -28,10 +28,12 @@
 #include <deal.II/grid/grid_out.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
-void mesh_info(const Triangulation<dim> &tria)
+void
+mesh_info(const Triangulation<dim> &tria)
 {
   deallog << "Mesh info:" << std::endl
           << " dimension: " << dim << std::endl
@@ -70,7 +72,8 @@ void mesh_info(const Triangulation<dim> &tria)
 }
 
 
-void make_grid ()
+void
+make_grid ()
 {
   Triangulation<2> tria1;
   GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
@@ -95,7 +98,8 @@ void make_grid ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

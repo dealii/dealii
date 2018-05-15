@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   // use a rather complicated way to
   // generate a new mesh with one
@@ -86,7 +87,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

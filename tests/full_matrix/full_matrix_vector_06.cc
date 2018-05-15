@@ -23,7 +23,8 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -54,7 +55,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

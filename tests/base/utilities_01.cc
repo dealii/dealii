@@ -21,7 +21,8 @@
 #include <deal.II/base/utilities.h>
 
 
-void test ()
+void
+test ()
 {
   deallog << Utilities::int_to_string (42,4) << std::endl;
   deallog << Utilities::int_to_string (42) << std::endl;
@@ -82,7 +83,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -58,16 +58,22 @@ class LaplaceProblem
 public:
   LaplaceProblem (const unsigned int n_blocks);
 
-  void run ();
-  void reinit_sparsity ();
-  void reinit_vectors ();
+  void
+  run ();
+  void
+  reinit_sparsity ();
+  void
+  reinit_vectors ();
 
   VectorType solution;
 
 private:
-  void make_grid_and_dofs ();
-  void assemble_system ();
-  void solve ();
+  void
+  make_grid_and_dofs ();
+  void
+  assemble_system ();
+  void
+  solve ();
 
   const unsigned int n_blocks;
 
@@ -112,7 +118,8 @@ LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::LaplaceProble
 
 
 template <typename VectorType, class Matrix, class Sparsity>
-void LaplaceProblem<VectorType,Matrix,Sparsity>::make_grid_and_dofs ()
+void
+LaplaceProblem<VectorType,Matrix,Sparsity>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (3);
@@ -139,7 +146,8 @@ void LaplaceProblem<VectorType,Matrix,Sparsity>::make_grid_and_dofs ()
 
 
 template <>
-void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit_sparsity ()
+void
+LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit_sparsity ()
 {
   sparsity_pattern.reinit (dof_handler.n_dofs(),
                            dof_handler.n_dofs(),
@@ -149,7 +157,8 @@ void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit
 
 
 template <>
-void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit_vectors ()
+void
+LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit_vectors ()
 {
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
@@ -158,7 +167,8 @@ void LaplaceProblem<Vector<double>,SparseMatrix<double>,SparsityPattern>::reinit
 
 
 template <>
-void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_sparsity ()
+void
+LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_sparsity ()
 {
   sparsity_pattern.reinit (dof_handler.n_dofs(),
                            dof_handler.n_dofs(),
@@ -168,7 +178,8 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_s
 
 
 template <>
-void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_vectors ()
+void
+LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_vectors ()
 {
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
@@ -177,7 +188,8 @@ void LaplaceProblem<Vector<float>,SparseMatrix<float>,SparsityPattern>::reinit_v
 
 
 template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_sparsity ()
+void
+LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_sparsity ()
 {
   switch (n_blocks)
     {
@@ -217,7 +229,8 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
 
 
 template <>
-void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_vectors ()
+void
+LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityPattern>::reinit_vectors ()
 {
   switch (n_blocks)
     {
@@ -255,7 +268,8 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
 
 
 template <typename VectorType, class Matrix, class Sparsity>
-void LaplaceProblem<VectorType,Matrix,Sparsity>::assemble_system ()
+void
+LaplaceProblem<VectorType,Matrix,Sparsity>::assemble_system ()
 {
   QGauss<2>  quadrature_formula(2);
   FEValues<2> fe_values (fe, quadrature_formula,
@@ -319,7 +333,8 @@ void LaplaceProblem<VectorType,Matrix,Sparsity>::assemble_system ()
 
 
 template <typename VectorType, class Matrix, class Sparsity>
-void LaplaceProblem<VectorType,Matrix,Sparsity>::solve ()
+void
+LaplaceProblem<VectorType,Matrix,Sparsity>::solve ()
 {
   SolverControl                     solver_control (1000, 1e-12, false, false);
   PrimitiveVectorMemory<VectorType> vector_memory;
@@ -334,7 +349,8 @@ void LaplaceProblem<VectorType,Matrix,Sparsity>::solve ()
 
 
 template <typename VectorType, class Matrix, class Sparsity>
-void LaplaceProblem<VectorType,Matrix,Sparsity>::run ()
+void
+LaplaceProblem<VectorType,Matrix,Sparsity>::run ()
 {
   make_grid_and_dofs ();
   assemble_system ();
@@ -351,7 +367,8 @@ void LaplaceProblem<VectorType,Matrix,Sparsity>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(2);

@@ -70,7 +70,8 @@ plot_derivatives(Mapping<dim> &mapping,
 
 
 template <int dim>
-void plot_FE_Q_shape_functions()
+void
+plot_FE_Q_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 //  FE_Q<dim> q1(1);
@@ -86,7 +87,8 @@ void plot_FE_Q_shape_functions()
 
 
 template <int dim>
-void plot_FE_DGQ_shape_functions()
+void
+plot_FE_DGQ_shape_functions()
 {
   MappingQGeneric<dim> m(1);
   FE_DGQ<dim> q1(1);

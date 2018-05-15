@@ -30,10 +30,12 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void test (const char *filename)
+void
+test (const char *filename)
 {
   const unsigned int dim = 3;
 
@@ -65,7 +67,8 @@ void test (const char *filename)
   deallog << "  hash=" << hash << std::endl;
 }
 
-void test1()
+void
+test1()
 {
   Triangulation<3> tria;
   GridIn<3> gi;
@@ -80,7 +83,8 @@ void test1()
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);

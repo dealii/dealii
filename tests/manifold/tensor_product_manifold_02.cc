@@ -26,7 +26,8 @@
 #include <deal.II/grid/grid_out.h>
 
 
-void test()
+void
+test()
 {
   std::ostream &out = deallog.get_file_stream();
 
@@ -69,7 +70,8 @@ void test()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

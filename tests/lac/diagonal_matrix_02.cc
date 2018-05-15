@@ -41,7 +41,8 @@
 
 
 template <int dim, int fe_degree>
-void test (const bool hanging_nodes = true)
+void
+test (const bool hanging_nodes = true)
 {
   typedef double number;
 
@@ -155,7 +156,8 @@ void test (const bool hanging_nodes = true)
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

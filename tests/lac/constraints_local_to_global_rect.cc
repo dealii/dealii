@@ -28,7 +28,8 @@
 #include <iostream>
 #include <complex>
 
-void test ()
+void
+test ()
 {
   FullMatrix<double> local(2,2);
   local(0,0) = 8.;
@@ -60,7 +61,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

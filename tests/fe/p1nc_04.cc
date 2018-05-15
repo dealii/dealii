@@ -32,7 +32,8 @@
 
 
 template <int dim>
-Point<dim> bilinear (const Point<dim> &p)
+Point<dim>
+bilinear (const Point<dim> &p)
 {
   Point<dim> q = p;
   if (dim>=2)

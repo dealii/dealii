@@ -21,7 +21,8 @@
 
 using namespace dealii;
 
-int main ()
+int
+main ()
 {
   Triangulation<2,3> tria;
   GridIn<2,3> gridin;

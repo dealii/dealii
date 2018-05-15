@@ -21,7 +21,8 @@
 
 
 
-void test (const BlockIndices &idx)
+void
+test (const BlockIndices &idx)
 {
   const unsigned int n = idx.size();
   deallog << "sizes: " << idx << std::endl;
@@ -51,7 +52,8 @@ void test (const BlockIndices &idx)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -28,8 +28,9 @@
 using namespace Polynomials;
 
 
-double scalar_product (const Polynomial<double> &p1,
-                       const Polynomial<double> &p2)
+double
+scalar_product (const Polynomial<double> &p1,
+                const Polynomial<double> &p2)
 {
   unsigned int degree = (p1.degree() + p2.degree())/2 + 1;
   QGauss<1> gauss(degree);
@@ -46,7 +47,8 @@ double scalar_product (const Polynomial<double> &p1,
 }
 
 
-void polynomial_arithmetic ()
+void
+polynomial_arithmetic ()
 {
   std::vector<double> c1(4);
   c1[0] = 2;
@@ -90,7 +92,8 @@ void polynomial_arithmetic ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

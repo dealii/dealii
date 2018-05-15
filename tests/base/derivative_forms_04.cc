@@ -21,7 +21,8 @@
 
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   DerivativeForm<1,dim,spacedim,std::complex<double> > dF;
   for (unsigned int i=0; i<spacedim; ++i)
@@ -35,7 +36,8 @@ void test()
           << dF.determinant().imag() << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<1,1>();

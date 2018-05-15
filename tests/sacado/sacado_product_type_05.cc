@@ -24,14 +24,16 @@
 #include "../tests.h"
 
 template <typename T, typename U, typename CompareType>
-void check()
+void
+check()
 {
   AssertThrow (typeid(typename ProductType<T,U>::type) == typeid(CompareType),
                ExcInternalError());
 }
 
 
-int main()
+int
+main()
 {
   typedef Sacado::Fad::DFad<double> Sdouble;
   typedef Sacado::Fad::DFad<Sdouble> SSdouble;

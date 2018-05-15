@@ -27,7 +27,8 @@ typedef typename Sacado::Fad::DFad<double> Sdouble;
 typedef typename Sacado::Fad::DFad<Sdouble> SSdouble;
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   Tensor<1,dim,SSdouble> x;
   for (unsigned int j=0; j<dim; ++j)
@@ -67,7 +68,8 @@ void test()
     deallog << "ddF[" << i << "] : " << ddF[i] << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<1,1>();

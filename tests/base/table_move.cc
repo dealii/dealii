@@ -18,7 +18,8 @@
 
 #include <deal.II/base/table.h>
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -35,10 +35,13 @@ class myIntegrator: public dealii::MeshWorker::LocalIntegrator<dim>
 public:
   typedef MeshWorker::IntegrationInfo<dim> CellInfo;
 
-  void cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-            CellInfo &info1, CellInfo &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+       CellInfo &info1, CellInfo &info2) const;
 
 
 };
@@ -76,12 +79,15 @@ class DoNothingAssembler
 {
 public:
   template <class DOFINFO>
-  void initialize_info(DOFINFO &info, bool face) const {}
+  void
+  initialize_info(DOFINFO &info, bool face) const {}
   template <class DOFINFO>
-  void assemble(const DOFINFO &info) {}
+  void
+  assemble(const DOFINFO &info) {}
   template <class DOFINFO>
-  void assemble(const DOFINFO &info1,
-                const DOFINFO &info2) {}
+  void
+  assemble(const DOFINFO &info1,
+           const DOFINFO &info2) {}
 
 
 };
@@ -128,7 +134,8 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 }
 
 template <int dim>
-void test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
+void
+test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 {
   deallog << "* own_cells=" << lctrl.own_cells
           << " ghost_cells=" << lctrl.ghost_cells
@@ -218,7 +225,8 @@ test()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;

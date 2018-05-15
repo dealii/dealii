@@ -41,7 +41,8 @@ struct X
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

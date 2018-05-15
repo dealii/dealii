@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void check (const Triangulation<dim> &tria)
+void
+check (const Triangulation<dim> &tria)
 {
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler (tria);
@@ -94,7 +95,8 @@ void check (const Triangulation<dim> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -50,8 +50,9 @@ class F :  public Function<dim>
 public:
   F (const unsigned int q) : q(q) {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     double v=0;
     for (unsigned int d=0; d<dim; ++d)
@@ -67,7 +68,8 @@ private:
 
 
 template <int dim>
-void test (Triangulation<dim> &triangulation)
+void
+test (Triangulation<dim> &triangulation)
 {
   MappingQ<3> mapping(3);
   for (unsigned int p=1; p<7-dim; ++p)
@@ -105,7 +107,8 @@ void test (Triangulation<dim> &triangulation)
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

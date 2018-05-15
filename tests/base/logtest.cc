@@ -23,7 +23,8 @@
 #include <limits>
 
 
-int main()
+int
+main()
 {
   initlog();
 

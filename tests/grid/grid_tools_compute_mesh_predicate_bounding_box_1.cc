@@ -40,7 +40,8 @@ pred_locally_owned(const typename parallel::distributed::Triangulation<spacedim>
 }
 
 template <int dim, int spacedim=dim >
-void test_hypercube(unsigned int ref, unsigned int max_bbox)
+void
+test_hypercube(unsigned int ref, unsigned int max_bbox)
 {
   const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
   deallog << "Testing hypercube for spacedim = " << spacedim
@@ -102,7 +103,8 @@ void test_hypercube(unsigned int ref, unsigned int max_bbox)
   deallog << "Current test END"  << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

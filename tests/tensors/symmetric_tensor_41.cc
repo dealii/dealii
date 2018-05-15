@@ -155,7 +155,8 @@ test_dim_3 (const enum SymmetricTensorEigenvectorMethod method,
 }
 
 
-void run_tests(const enum SymmetricTensorEigenvectorMethod method)
+void
+run_tests(const enum SymmetricTensorEigenvectorMethod method)
 {
   // Dim = 1
   {
@@ -297,7 +298,8 @@ void run_tests(const enum SymmetricTensorEigenvectorMethod method)
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

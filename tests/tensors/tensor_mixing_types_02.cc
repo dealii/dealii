@@ -22,7 +22,8 @@
 #include<complex>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

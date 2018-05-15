@@ -30,7 +30,8 @@
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref=1)
 {
   std::vector<Point<spacedim> > vertices (GeometryInfo<dim>::vertices_per_cell);
   std::vector<CellData<dim> > cells (1);
@@ -59,7 +60,8 @@ void test(unsigned int ref=1)
   deallog << "Center of face 4: " << cell->face(4)->center() << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

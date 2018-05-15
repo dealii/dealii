@@ -46,7 +46,8 @@ private:
   std::string par_value;
 };
 
-int main ()
+int
+main ()
 {
   initlog();
   auto &prm = ParameterAcceptor::prm;

@@ -23,9 +23,10 @@
 #include <vector>
 
 
-void test (const unsigned int chunk_size,
-           Vector<double> &v,
-           Vector<double> &w)
+void
+test (const unsigned int chunk_size,
+      Vector<double> &v,
+      Vector<double> &w)
 {
   // set some entries in the
   // matrix. actually, set them all
@@ -72,7 +73,8 @@ void test (const unsigned int chunk_size,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

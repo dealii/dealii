@@ -35,7 +35,8 @@
 
 // create a mesh that consists of two disconnected hypercubes
 template <int dim>
-void create_disconnected_mesh (Triangulation<dim> &tria)
+void
+create_disconnected_mesh (Triangulation<dim> &tria)
 {
   std::vector<Point<dim> > vertices (2*GeometryInfo<dim>::vertices_per_cell);
   std::vector<CellData<dim> > cells (2);
@@ -131,7 +132,8 @@ void create_disconnected_mesh (Triangulation<dim> &tria)
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -141,7 +143,8 @@ void test(std::ostream & /*out*/)
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

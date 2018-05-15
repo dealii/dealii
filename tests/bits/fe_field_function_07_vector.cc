@@ -43,15 +43,17 @@ class F : public Function<dim>
 public:
   F() : Function<dim>(2) {}
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double> &v) const
   {
     v[0] = p[0];
     v[1] = 0;
   }
 
-  virtual void vector_gradient (const Point<dim> &p,
-                                std::vector<Tensor<1,dim> > &v) const
+  virtual void
+  vector_gradient (const Point<dim> &p,
+                   std::vector<Tensor<1,dim> > &v) const
   {
     v[0] = 0;
     v[1] = 0;
@@ -62,7 +64,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const SphericalManifold<dim> boundary_description;
 
@@ -125,7 +128,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

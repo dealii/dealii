@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p, std::string last_line)
+void
+check (const char *p, std::string last_line)
 {
   ParameterHandler prm;
   prm.declare_entry ("var_1", "-1",
@@ -37,7 +38,8 @@ void check (const char *p, std::string last_line)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -47,7 +47,8 @@ test(const Patterns::PatternBase &p)
 
 using namespace Patterns;
 
-int main()
+int
+main()
 {
   initlog();
   test(Integer());

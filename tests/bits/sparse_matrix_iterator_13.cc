@@ -20,7 +20,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   SparsityPattern sp (5,5,3);
   for (unsigned int i=0; i<5; ++i)
@@ -70,7 +71,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

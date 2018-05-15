@@ -40,7 +40,8 @@
 
 using namespace dealii;
 
-ConstraintMatrix make_constraint_matrix(const DoFHandler<3> &dof_handler, int version)
+ConstraintMatrix
+make_constraint_matrix(const DoFHandler<3> &dof_handler, int version)
 {
   constexpr int dim = 3;
 
@@ -88,8 +89,9 @@ class PeriodicReference : public Function<dim>
 {
 public:
   PeriodicReference () : Function<dim>() {}
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const override
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const override
   {
     if (dim==3)
       return std::sin(p(0)+1.)*std::sin(p(1)+2.)*std::sin(p(2)+3.);
@@ -110,7 +112,8 @@ void get_point_value
 }
 
 
-void check_periodicity(const DoFHandler<3> &dof_handler, Vector<double> &solution, const unsigned int cycle)
+void
+check_periodicity(const DoFHandler<3> &dof_handler, Vector<double> &solution, const unsigned int cycle)
 {
   unsigned int n_points = 2;
   for (unsigned int i = 0; i<cycle; ++i)
@@ -214,7 +217,8 @@ void check_periodicity(const DoFHandler<3> &dof_handler, Vector<double> &solutio
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
 

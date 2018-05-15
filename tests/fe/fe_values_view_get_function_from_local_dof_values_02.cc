@@ -39,19 +39,21 @@
 #include <type_traits>
 
 template <typename NumberType, int dim, typename ExtractorType>
-void test_view (const Vector<double> &solution,
-                const FEValues<dim>  &fe_values,
-                const unsigned int   &n_q_points,
-                const ExtractorType  &extractor,
-                const std::vector<NumberType> &local_dof_values);
+void
+test_view (const Vector<double> &solution,
+           const FEValues<dim>  &fe_values,
+           const unsigned int   &n_q_points,
+           const ExtractorType  &extractor,
+           const std::vector<NumberType> &local_dof_values);
 
 // Scalar view
 template <typename NumberType, int dim>
-void test_view (const Vector<double> &solution,
-                const FEValues<dim> &fe_values,
-                const unsigned int  &n_q_points,
-                const FEValuesExtractors::Scalar &extractor,
-                const std::vector<NumberType> &local_dof_values)
+void
+test_view (const Vector<double> &solution,
+           const FEValues<dim> &fe_values,
+           const unsigned int  &n_q_points,
+           const FEValuesExtractors::Scalar &extractor,
+           const std::vector<NumberType> &local_dof_values)
 {
   typedef typename std::remove_reference<typename std::remove_const<decltype(fe_values[extractor])>::type>::type View;
   const View &fe_values_view = fe_values[extractor];
@@ -82,11 +84,12 @@ void test_view (const Vector<double> &solution,
 
 // Vector view
 template <typename NumberType, int dim>
-void test_view (const Vector<double> &solution,
-                const FEValues<dim> &fe_values,
-                const unsigned int  &n_q_points,
-                const FEValuesExtractors::Vector &extractor,
-                const std::vector<NumberType> &local_dof_values)
+void
+test_view (const Vector<double> &solution,
+           const FEValues<dim> &fe_values,
+           const unsigned int  &n_q_points,
+           const FEValuesExtractors::Vector &extractor,
+           const std::vector<NumberType> &local_dof_values)
 {
   typedef typename std::remove_reference<typename std::remove_const<decltype(fe_values[extractor])>::type>::type View;
   const View &fe_values_view = fe_values[extractor];
@@ -129,11 +132,12 @@ void test_view (const Vector<double> &solution,
 
 // SymmetricTensor view
 template <typename NumberType, int dim>
-void test_view (const Vector<double> &solution,
-                const FEValues<dim>  &fe_values,
-                const unsigned int   &n_q_points,
-                const FEValuesExtractors::SymmetricTensor<2> &extractor,
-                const std::vector<NumberType> &local_dof_values)
+void
+test_view (const Vector<double> &solution,
+           const FEValues<dim>  &fe_values,
+           const unsigned int   &n_q_points,
+           const FEValuesExtractors::SymmetricTensor<2> &extractor,
+           const std::vector<NumberType> &local_dof_values)
 {
   typedef typename std::remove_reference<typename std::remove_const<decltype(fe_values[extractor])>::type>::type View;
   const View &fe_values_view = fe_values[extractor];
@@ -154,11 +158,12 @@ void test_view (const Vector<double> &solution,
 
 // Tensor view
 template <typename NumberType, int dim>
-void test_view (const Vector<double> &solution,
-                const FEValues<dim>  &fe_values,
-                const unsigned int   &n_q_points,
-                const FEValuesExtractors::Tensor<2> &extractor,
-                const std::vector<NumberType> &local_dof_values)
+void
+test_view (const Vector<double> &solution,
+           const FEValues<dim>  &fe_values,
+           const unsigned int   &n_q_points,
+           const FEValuesExtractors::Tensor<2> &extractor,
+           const std::vector<NumberType> &local_dof_values)
 {
   typedef typename std::remove_reference<typename std::remove_const<decltype(fe_values[extractor])>::type>::type View;
   const View &fe_values_view = fe_values[extractor];
@@ -184,8 +189,9 @@ void test_view (const Vector<double> &solution,
 }
 
 template <typename NumberType, int dim, typename FEType, typename ExtractorType>
-void test_extractor (const FEType        &fe,
-                     const ExtractorType &extractor)
+void
+test_extractor (const FEType        &fe,
+                const ExtractorType &extractor)
 {
   QGauss<dim> quadrature_formula(2);
 
@@ -232,7 +238,8 @@ void test_extractor (const FEType        &fe,
 }
 
 template <typename NumberType, int dim = 2>
-void test()
+void
+test()
 {
   const unsigned int degree = 3; // Need third derivatives
 
@@ -269,7 +276,8 @@ void test()
   deallog.pop();
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

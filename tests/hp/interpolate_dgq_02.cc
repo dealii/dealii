@@ -47,8 +47,9 @@ class F :  public Function<dim>
 public:
   F (const unsigned int q) : q(q) {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     double v=0;
     for (unsigned int d=0; d<dim; ++d)
@@ -64,7 +65,8 @@ private:
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -114,7 +116,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision (3);

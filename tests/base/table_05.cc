@@ -21,7 +21,8 @@
 #include <deal.II/base/table.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   dealii::TableIndices<dim> new_size;
   for (unsigned int d = 0; d < dim; d++)

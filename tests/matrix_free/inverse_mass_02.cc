@@ -35,7 +35,8 @@
 #include <deal.II/matrix_free/operators.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -91,16 +92,18 @@ public:
       }
   }
 
-  void vmult (VectorType   &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType   &dst,
+         const VectorType &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_mass_operator,
                     this, dst, src);
   };
 
-  void apply_inverse (VectorType   &dst,
-                      const VectorType &src) const
+  void
+  apply_inverse (VectorType   &dst,
+                 const VectorType &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_inverse_mass_operator,
@@ -114,7 +117,8 @@ private:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim> &dof)
+void
+do_test (const DoFHandler<dim> &dof)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -158,7 +162,8 @@ void do_test (const DoFHandler<dim> &dof)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria, -1, 1);
@@ -186,7 +191,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

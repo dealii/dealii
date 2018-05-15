@@ -27,7 +27,8 @@
 
 
 template <int dim, int spacedim>
-void do_test(const Triangulation<dim,spacedim> &tria)
+void
+do_test(const Triangulation<dim,spacedim> &tria)
 {
   for (typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
        cell != tria.end(); ++cell)
@@ -68,7 +69,8 @@ void do_test(const Triangulation<dim,spacedim> &tria)
 }
 
 template <int dim, int spacedim>
-void test_polar()
+void
+test_polar()
 {
   deallog << "Testing with PolarManifold dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -119,7 +121,8 @@ void test_polar()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

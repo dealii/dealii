@@ -196,7 +196,8 @@ create_patches(std::vector<DataOutBase::Patch<dim,spacedim> > &patches)
 
 
 template <int dim, int spacedim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   std::vector<DataOutBase::Patch<dim, spacedim> > patches;
   create_patches(patches);
@@ -204,7 +205,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   auto &logfile = deallog.get_file_stream();

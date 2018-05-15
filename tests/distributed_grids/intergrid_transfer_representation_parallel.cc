@@ -37,10 +37,12 @@
 #include <deal.II/base/timer.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
-void test (unsigned n_refinements)
+void
+test (unsigned n_refinements)
 {
   unsigned int rank = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -116,7 +118,8 @@ void test (unsigned n_refinements)
     }
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

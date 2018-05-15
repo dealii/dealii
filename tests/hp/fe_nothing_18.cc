@@ -67,7 +67,8 @@ class ElasticProblem
 public:
   ElasticProblem();
   ~ElasticProblem ();
-  void run();
+  void
+  run();
 private:
   enum
   {
@@ -75,8 +76,10 @@ private:
     lambda_block = 1
   };
 
-  void make_grid();
-  void setup_system ();
+  void
+  make_grid();
+  void
+  setup_system ();
 
   const unsigned int n_blocks;//total number of blocks
   const unsigned int n_components;// total number of components
@@ -137,24 +140,28 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim>(dim) {}
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &values) const;
-  virtual double value (const Point<dim> &p,
-                        unsigned int compoment) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &values) const;
+  virtual double
+  value (const Point<dim> &p,
+         unsigned int compoment) const;
 };
 
 template <int dim>
 inline
-void BoundaryValues<dim>::vector_value (const Point<dim> &p,
-                                        Vector<double>   &values) const
+void
+BoundaryValues<dim>::vector_value (const Point<dim> &p,
+                                   Vector<double>   &values) const
 {
   values(0) = -0.001;
 }
 
 template <int dim>
 inline
-double BoundaryValues<dim>::value (const Point<dim> &p,
-                                   unsigned int compoment) const
+double
+BoundaryValues<dim>::value (const Point<dim> &p,
+                            unsigned int compoment) const
 {
   return -0.001;
 }
@@ -167,10 +174,12 @@ class ConstrainValues :  public Function<dim>
 {
 public:
   ConstrainValues (); //need to pass down to the base class of how many components the function consists; default - 1
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &values) const;//returns calculated values in the second argument;
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<double> >   &value_list) const;//values at several points at once
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &values) const;//returns calculated values in the second argument;
+  virtual void
+  vector_value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Vector<double> >   &value_list) const;//values at several points at once
   //prevent from calling virtual function "vector_value" to frequently
 };
 
@@ -182,8 +191,9 @@ ConstrainValues<dim>::ConstrainValues ()
 
 template <int dim>
 inline
-void ConstrainValues<dim>::vector_value (const Point<dim> &p,
-                                         Vector<double>   &values) const
+void
+ConstrainValues<dim>::vector_value (const Point<dim> &p,
+                                    Vector<double>   &values) const
 {
   Assert (values.size() == dim,
           ExcDimensionMismatch (values.size(), dim));//check is the size of "values" is correct
@@ -192,8 +202,9 @@ void ConstrainValues<dim>::vector_value (const Point<dim> &p,
 }
 
 template <int dim>
-void ConstrainValues<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                              std::vector<Vector<double> >   &value_list) const
+void
+ConstrainValues<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                         std::vector<Vector<double> >   &value_list) const
 {
   Assert (value_list.size() == points.size(),
           ExcDimensionMismatch (value_list.size(), points.size()));//check if input-output is consistent
@@ -248,7 +259,8 @@ ElasticProblem<dim>::~ElasticProblem ()
 
 
 template <int dim>
-void ElasticProblem<dim>::make_grid ()
+void
+ElasticProblem<dim>::make_grid ()
 {
 
   Triangulation<dim>   triangulationL;
@@ -277,7 +289,8 @@ void ElasticProblem<dim>::make_grid ()
 
 
 template <int dim>
-void ElasticProblem<dim>::setup_system ()
+void
+ElasticProblem<dim>::setup_system ()
 {
   std::vector<unsigned int> block_component(n_components, u_block);// init to represent u everywhere
   for (unsigned int i = 0; i < dim; i++)
@@ -358,14 +371,16 @@ void ElasticProblem<dim>::setup_system ()
 
 
 template <int dim>
-void ElasticProblem<dim>::run ()
+void
+ElasticProblem<dim>::run ()
 {
   make_grid ();
   setup_system ();
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

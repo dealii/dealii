@@ -30,7 +30,8 @@ struct Vectorization_add_v
   Number *val;
   Number *v_val;
 
-  void operator() (const tbb::blocked_range<size_type> &range) const
+  void
+  operator() (const tbb::blocked_range<size_type> &range) const
   {
     if (dealii::parallel::internal::EnableOpenMPSimdFor<Number>::value)
       {
@@ -49,7 +50,8 @@ struct Vectorization_add_v
 
 const unsigned int N=3;
 
-void check()
+void
+check()
 {
   std::vector<long double> d1(N), d2(N);
   for (unsigned int i=0; i<N; ++i)
@@ -81,7 +83,8 @@ void check()
   deallog << "result: " << d1[N-1] << " should be 3" << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

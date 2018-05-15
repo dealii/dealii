@@ -25,7 +25,8 @@ using namespace std;
 
 
 template <class T>
-void check(MGLevelObject<T> &obj)
+void
+check(MGLevelObject<T> &obj)
 {
   obj.apply([&] (const unsigned int lvl, T & value)
   {
@@ -38,7 +39,8 @@ void check(MGLevelObject<T> &obj)
   });
 }
 
-int main()
+int
+main()
 {
   initlog();
 

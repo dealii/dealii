@@ -29,7 +29,8 @@
 
 // Regression test for some values of Rannacher Turek element.
 
-void test_values()
+void
+test_values()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, 0.0, 1.0);
@@ -56,7 +57,8 @@ void test_values()
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

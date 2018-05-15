@@ -24,8 +24,9 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test (PETScWrappers::MPI::Vector &v,
+      PETScWrappers::MPI::Vector &w)
 {
   // set only certain elements of each
   // vector
@@ -43,7 +44,8 @@ void test (PETScWrappers::MPI::Vector &v,
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

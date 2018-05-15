@@ -39,14 +39,16 @@ class MySquareFunction : public Function<dim>
 public:
   MySquareFunction () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return (component+1)*p.square()+1;
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     values(0) = value(p,0);
   }
@@ -59,14 +61,16 @@ class MyExpFunction : public Function<dim>
 public:
   MyExpFunction () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return std::exp (p(0));
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     values(0) = value(p,0);
   }
@@ -75,7 +79,8 @@ public:
 
 
 template <int dim>
-void make_mesh (Triangulation<dim> &tria)
+void
+make_mesh (Triangulation<dim> &tria)
 {
 
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -162,7 +167,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

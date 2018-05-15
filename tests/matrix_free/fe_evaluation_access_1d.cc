@@ -22,7 +22,8 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

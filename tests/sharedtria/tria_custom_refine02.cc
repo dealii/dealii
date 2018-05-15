@@ -28,7 +28,8 @@
 
 
 template <int dim>
-void mypartition(parallel::shared::Triangulation<dim> &tria)
+void
+mypartition(parallel::shared::Triangulation<dim> &tria)
 {
   std::vector<unsigned int> assignment = {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0};
   {
@@ -56,7 +57,8 @@ void mypartition(parallel::shared::Triangulation<dim> &tria)
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
                                                    (Triangulation<dim>::limit_level_difference_at_vertices), true,
@@ -90,7 +92,8 @@ void test()
   }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

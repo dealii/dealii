@@ -24,9 +24,10 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::Vector &v,
-           TrilinosWrappers::MPI::Vector &w,
-           TrilinosWrappers::MPI::Vector &x)
+void
+test (TrilinosWrappers::MPI::Vector &v,
+      TrilinosWrappers::MPI::Vector &w,
+      TrilinosWrappers::MPI::Vector &x)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -54,7 +55,8 @@ void test (TrilinosWrappers::MPI::Vector &v,
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

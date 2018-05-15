@@ -29,7 +29,8 @@
 
 
 template <typename T>
-void check ()
+void
+check ()
 {
   numbers::signaling_nan<DerivativeForm<1,2,3,T> >();
   numbers::signaling_nan<DerivativeForm<2,2,2,T> >();
@@ -38,7 +39,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

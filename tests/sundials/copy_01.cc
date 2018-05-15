@@ -25,7 +25,8 @@
 #include <iostream>
 #include <vector>
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log_all;

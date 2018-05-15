@@ -22,7 +22,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   IndexSet rows(5);
   rows.add_index(1);
@@ -47,7 +48,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

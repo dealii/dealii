@@ -23,7 +23,8 @@
 
 // Check LinearAlgebra::EpetraWrappers::Vector all_zero.
 
-void test()
+void
+test()
 {
   IndexSet parallel_partitioner(10);
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -45,7 +46,8 @@ void test()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);

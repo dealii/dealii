@@ -21,7 +21,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
-void test ()
+void
+test ()
 {
   // make sure that is_serial_vector< dealii::TrilinosWrappers::MPI::Vector > is working
   Assert (is_serial_vector< dealii::TrilinosWrappers::MPI::Vector >::value == false,
@@ -41,7 +42,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

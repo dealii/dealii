@@ -22,13 +22,15 @@ template<int dim>
 class Test : public ParameterAcceptor
 {
 public:
-  virtual void declare_parameters(ParameterHandler &prm)
+  virtual void
+  declare_parameters(ParameterHandler &prm)
   {
     prm.declare_entry("A double", "0.0", Patterns::Double(),
                       "Documentation");
   };
 
-  virtual void parse_parameters(ParameterHandler &prm)
+  virtual void
+  parse_parameters(ParameterHandler &prm)
   {
     deallog << "Double: "
             << prm.get_double("A double") << std::endl;
@@ -36,7 +38,8 @@ public:
 };
 
 
-int main ()
+int
+main ()
 {
   initlog();
   Test<2> a;

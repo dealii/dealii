@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -50,9 +51,10 @@ template <int dim>
 class RHS:  public Function<dim>
 {
 public:
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double> &values,
-                           const unsigned int component=0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double> &values,
+              const unsigned int component=0) const;
 };
 
 
@@ -60,9 +62,10 @@ template <int dim>
 class BoundaryValues:  public Function<dim>
 {
 public:
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double> &values,
-                           const unsigned int component=0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double> &values,
+              const unsigned int component=0) const;
 };
 
 
@@ -71,15 +74,17 @@ class Beta
 {
 public:
   Beta () {}
-  void value_list (const std::vector<Point<dim> > &points,
-                   std::vector<Point<dim> > &values) const;
+  void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<Point<dim> > &values) const;
 };
 
 
 template <int dim>
-void RHS<dim>::value_list(const std::vector<Point<dim> > &points,
-                          std::vector<double> &values,
-                          const unsigned int) const
+void
+RHS<dim>::value_list(const std::vector<Point<dim> > &points,
+                     std::vector<double> &values,
+                     const unsigned int) const
 {
   Assert(values.size()==points.size(),
          ExcDimensionMismatch(values.size(),points.size()));
@@ -90,8 +95,9 @@ void RHS<dim>::value_list(const std::vector<Point<dim> > &points,
 
 
 template <int dim>
-void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
-                           std::vector<Point<dim> > &values) const
+void
+Beta<dim>::value_list(const std::vector<Point<dim> > &points,
+                      std::vector<Point<dim> > &values) const
 {
   Assert(values.size()==points.size(),
          ExcDimensionMismatch(values.size(),points.size()));
@@ -109,9 +115,10 @@ void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
 
 
 template <int dim>
-void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
-                                     std::vector<double> &values,
-                                     const unsigned int) const
+void
+BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
+                                std::vector<double> &values,
+                                const unsigned int) const
 {
   Assert(values.size()==points.size(),
          ExcDimensionMismatch(values.size(),points.size()));
@@ -132,25 +139,29 @@ class DGTransportEquation
 public:
   DGTransportEquation();
 
-  void assemble_cell_term(const FEValues<dim> &fe_v,
-                          FullMatrix<double> &ui_vi_matrix,
-                          Vector<double> &cell_vector) const;
+  void
+  assemble_cell_term(const FEValues<dim> &fe_v,
+                     FullMatrix<double> &ui_vi_matrix,
+                     Vector<double> &cell_vector) const;
 
-  void assemble_boundary_term(const FEFaceValues<dim> &fe_v,
-                              FullMatrix<double> &ui_vi_matrix,
-                              Vector<double> &cell_vector) const;
+  void
+  assemble_boundary_term(const FEFaceValues<dim> &fe_v,
+                         FullMatrix<double> &ui_vi_matrix,
+                         Vector<double> &cell_vector) const;
 
-  void assemble_face_term1(const FEFaceValuesBase<dim> &fe_v,
-                           const FEFaceValuesBase<dim> &fe_v_neighbor,
-                           FullMatrix<double> &ui_vi_matrix,
-                           FullMatrix<double> &ue_vi_matrix) const;
+  void
+  assemble_face_term1(const FEFaceValuesBase<dim> &fe_v,
+                      const FEFaceValuesBase<dim> &fe_v_neighbor,
+                      FullMatrix<double> &ui_vi_matrix,
+                      FullMatrix<double> &ue_vi_matrix) const;
 
-  void assemble_face_term2(const FEFaceValuesBase<dim> &fe_v,
-                           const FEFaceValuesBase<dim> &fe_v_neighbor,
-                           FullMatrix<double> &ui_vi_matrix,
-                           FullMatrix<double> &ue_vi_matrix,
-                           FullMatrix<double> &ui_ve_matrix,
-                           FullMatrix<double> &ue_ve_matrix) const;
+  void
+  assemble_face_term2(const FEFaceValuesBase<dim> &fe_v,
+                      const FEFaceValuesBase<dim> &fe_v_neighbor,
+                      FullMatrix<double> &ui_vi_matrix,
+                      FullMatrix<double> &ue_vi_matrix,
+                      FullMatrix<double> &ui_ve_matrix,
+                      FullMatrix<double> &ue_ve_matrix) const;
 private:
   const Beta<dim> beta_function;
   const RHS<dim> rhs_function;
@@ -168,7 +179,8 @@ DGTransportEquation<dim>::DGTransportEquation ()
 
 
 template <int dim>
-void DGTransportEquation<dim>::assemble_cell_term(
+void
+DGTransportEquation<dim>::assemble_cell_term(
   const FEValues<dim> &fe_v,
   FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
@@ -195,7 +207,8 @@ void DGTransportEquation<dim>::assemble_cell_term(
 
 
 template <int dim>
-void DGTransportEquation<dim>::assemble_boundary_term(
+void
+DGTransportEquation<dim>::assemble_boundary_term(
   const FEFaceValues<dim> &fe_v,
   FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
@@ -230,7 +243,8 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 
 
 template <int dim>
-void DGTransportEquation<dim>::assemble_face_term1(
+void
+DGTransportEquation<dim>::assemble_face_term1(
   const FEFaceValuesBase<dim> &fe_v,
   const FEFaceValuesBase<dim> &fe_v_neighbor,
   FullMatrix<double> &ui_vi_matrix,
@@ -264,7 +278,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 
 
 template <int dim>
-void DGTransportEquation<dim>::assemble_face_term2(
+void
+DGTransportEquation<dim>::assemble_face_term2(
   const FEFaceValuesBase<dim> &fe_v,
   const FEFaceValuesBase<dim> &fe_v_neighbor,
   FullMatrix<double> &ui_vi_matrix,
@@ -325,15 +340,22 @@ public:
   DGMethod ();
   ~DGMethod ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system1 ();
-  void assemble_system2 ();
-  void solve (Vector<double> &solution);
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system1 ();
+  void
+  assemble_system2 ();
+  void
+  solve (Vector<double> &solution);
+  void
+  refine_grid ();
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
   const MappingQGeneric<dim> mapping;
@@ -375,7 +397,8 @@ DGMethod<dim>::~DGMethod ()
 
 
 template <int dim>
-void DGMethod<dim>::setup_system ()
+void
+DGMethod<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -397,7 +420,8 @@ void DGMethod<dim>::setup_system ()
 
 
 template <int dim>
-void DGMethod<dim>::assemble_system1 ()
+void
+DGMethod<dim>::assemble_system1 ()
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dofs (dofs_per_cell);
@@ -563,7 +587,8 @@ void DGMethod<dim>::assemble_system1 ()
 
 
 template <int dim>
-void DGMethod<dim>::assemble_system2 ()
+void
+DGMethod<dim>::assemble_system2 ()
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dofs (dofs_per_cell);
@@ -726,7 +751,8 @@ void DGMethod<dim>::assemble_system2 ()
 
 
 template <int dim>
-void DGMethod<dim>::solve (Vector<double> &solution)
+void
+DGMethod<dim>::solve (Vector<double> &solution)
 {
   SolverControl           solver_control (1000, 1e-12, false, false);
   SolverRichardson<>      solver (solver_control);
@@ -741,7 +767,8 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 
 
 template <int dim>
-void DGMethod<dim>::refine_grid ()
+void
+DGMethod<dim>::refine_grid ()
 {
   Vector<float> gradient_indicator (triangulation.n_active_cells());
 
@@ -765,7 +792,8 @@ void DGMethod<dim>::refine_grid ()
 
 
 template <int dim>
-void DGMethod<dim>::output_results (const unsigned int cycle) const
+void
+DGMethod<dim>::output_results (const unsigned int cycle) const
 {
   std::string filename = "grid-";
   filename += ('0' + cycle);
@@ -796,7 +824,8 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void DGMethod<dim>::run ()
+void
+DGMethod<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<4; ++cycle)
     {
@@ -845,7 +874,8 @@ void DGMethod<dim>::run ()
     }
 }
 
-int main ()
+int
+main ()
 {
   try
     {

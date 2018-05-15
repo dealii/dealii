@@ -26,7 +26,8 @@
 // test read/write access to matrices using explicit cast always.
 
 // sparse matrix elements
-void test_matrix (PETScWrappers::SparseMatrix &m)
+void
+test_matrix (PETScWrappers::SparseMatrix &m)
 {
   deallog << "Check 01 matrix access" << std::endl;
 
@@ -54,7 +55,8 @@ void test_matrix (PETScWrappers::SparseMatrix &m)
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile ("output");
   dealii::deallog.attach (logfile);

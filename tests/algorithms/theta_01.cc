@@ -33,7 +33,8 @@ class Explicit
 {
 public:
   Explicit(const FullMatrix<double> &matrix);
-  void operator() (AnyData &out, const AnyData &in);
+  void
+  operator() (AnyData &out, const AnyData &in);
 private:
   SmartPointer<const FullMatrix<double>, Explicit> matrix;
   FullMatrix<double> m;
@@ -45,7 +46,8 @@ class Implicit
 {
 public:
   Implicit(const FullMatrix<double> &matrix);
-  void operator() (AnyData &out, const AnyData &in);
+  void
+  operator() (AnyData &out, const AnyData &in);
 private:
   SmartPointer<const FullMatrix<double>, Implicit> matrix;
   FullMatrix<double> m;
@@ -53,7 +55,8 @@ private:
 
 // End of declarations
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

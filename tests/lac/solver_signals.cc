@@ -31,18 +31,21 @@
 #include <deal.II/lac/precondition.h>
 
 
-void output_double_number(double input,const std::string &text)
+void
+output_double_number(double input,const std::string &text)
 {
   deallog<<text<< input<<std::endl;
 }
 
-void output_coefficients(double alpha,double beta)
+void
+output_coefficients(double alpha,double beta)
 {
   deallog<<"alpha: "<< alpha << " beta: "<< beta << std::endl;
 }
 
 template <class NUMBER>
-void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
+void
+output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -53,7 +56,8 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
 }
 
 template <class NUMBER>
-void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &text)
+void
+output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &text)
 {
   deallog << text << std::endl;
   for (unsigned int i=0; i<H.m(); ++i)
@@ -65,7 +69,8 @@ void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &tex
 }
 
 template <class NUMBER>
-void output_arnoldi_vectors_norms(const internal::SolverGMRESImplementation::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
+void
+output_arnoldi_vectors_norms(const internal::SolverGMRESImplementation::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
 {
   deallog << text << std::endl;
   for (unsigned int i=0; i<tmp_vector.size(); ++i)
@@ -94,7 +99,8 @@ check_solve(SolverType         &solver,
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

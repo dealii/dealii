@@ -39,7 +39,8 @@
 #include <iostream>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree, int n_q_points_1d=fe_degree+1, typename Number=double>
@@ -131,7 +132,8 @@ public:
       }
   }
 
-  void test_functions (const VectorType &src) const
+  void
+  test_functions (const VectorType &src) const
   {
     for (unsigned int i=0; i<3*2; ++i)
       {
@@ -186,7 +188,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
   Triangulation<dim> tria;
@@ -265,7 +268,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   // need to set quite a loose tolerance because

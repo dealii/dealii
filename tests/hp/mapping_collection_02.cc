@@ -26,14 +26,16 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::MappingCollection<dim> mapping_collection(MappingQ<dim>(2));
 }
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

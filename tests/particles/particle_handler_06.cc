@@ -26,7 +26,8 @@
 #include <deal.II/fe/mapping_q.h>
 
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   {
     parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
@@ -71,7 +72,8 @@ void test ()
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

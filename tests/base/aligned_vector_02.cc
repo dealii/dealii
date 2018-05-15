@@ -23,7 +23,8 @@
 
 typedef AlignedVector<unsigned int> VEC;
 typedef AlignedVector<VEC> VECVEC;
-void print_vec (VECVEC &v)
+void
+print_vec (VECVEC &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -35,7 +36,8 @@ void print_vec (VECVEC &v)
   deallog << std::endl;
 }
 
-void test ()
+void
+test ()
 {
   typedef AlignedVector<unsigned int> VEC;
   VEC a(4);
@@ -84,7 +86,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

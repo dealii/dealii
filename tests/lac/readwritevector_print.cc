@@ -20,7 +20,8 @@
 #include <deal.II/lac/read_write_vector.h>
 
 
-void test()
+void
+test()
 {
   IndexSet is(10);
   is.add_range(1,3);
@@ -35,7 +36,8 @@ void test()
   vec.print(deallog.get_file_stream());
 }
 
-int main()
+int
+main()
 {
   initlog();
   test();

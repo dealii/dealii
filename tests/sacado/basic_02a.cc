@@ -56,7 +56,8 @@ d2f(const double &x, const double &y, const double &z,
   d2f_dy_dy = z*(2.0*z + x);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

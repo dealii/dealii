@@ -28,7 +28,8 @@
 
 // Known results for the Rannacher Turek element. All output should be zero.
 
-void test_known_values()
+void
+test_known_values()
 {
   PolynomialsRannacherTurek<2> pols;
   Point<2> p(0.5, 0.5);
@@ -38,7 +39,8 @@ void test_known_values()
     }
 }
 
-void test_n_dofs()
+void
+test_n_dofs()
 {
   FE_RannacherTurek<2> fe_ratu;
 
@@ -52,7 +54,8 @@ void test_n_dofs()
   deallog << dofh.n_dofs() - 12 << std::endl;
 }
 
-void test_nodal_matrix()
+void
+test_nodal_matrix()
 {
   FE_RannacherTurek<2> fe;
 
@@ -94,7 +97,8 @@ void test_nodal_matrix()
     }
 }
 
-void test_interpolation()
+void
+test_interpolation()
 {
   Triangulation<2> tr;
   GridGenerator::hyper_cube(tr, -1, 1);
@@ -138,7 +142,8 @@ void test_interpolation()
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

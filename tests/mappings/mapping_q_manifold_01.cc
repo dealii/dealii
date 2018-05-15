@@ -36,7 +36,8 @@
 
 using namespace dealii;
 
-double zvalue (const double x, const double y)
+double
+zvalue (const double x, const double y)
 {
   double xh = x * 5., yh = y * 5.;
   return (xh * exp(-xh*xh - yh*yh)) / 10.;
@@ -46,13 +47,17 @@ template <int dim>
 class Geometry: public ChartManifold<dim>
 {
 public:
-  virtual Point<dim> pull_back(const Point<dim> &space_point) const override;
-  virtual Point<dim> push_forward(const Point<dim> &chart_point) const override;
-  virtual std::unique_ptr<Manifold<dim> >clone() const override;
+  virtual Point<dim>
+  pull_back(const Point<dim> &space_point) const override;
+  virtual Point<dim>
+  push_forward(const Point<dim> &chart_point) const override;
+  virtual std::unique_ptr<Manifold<dim> >
+  clone() const override;
 };
 
 template <int dim>
-Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
+Point<dim>
+Geometry<dim>::pull_back(const Point<dim> &space_point) const
 {
   const double d = space_point[dim - 1];
   const double z = zvalue(space_point[0], dim == 3 ? space_point[1] : 0);
@@ -72,7 +77,8 @@ Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
 }
 
 template <int dim>
-Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
+Point<dim>
+Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 {
   const double d_hat = chart_point[dim - 1];
   const double z = zvalue(chart_point[0], dim == 3 ? chart_point[1] : 0);
@@ -105,39 +111,47 @@ public:
   VectorFunction(unsigned n_components):
     Function<dim>(n_components)
   {}
-  virtual double value (const Point<dim> &p, const unsigned int component) const;
-  virtual void value (const Point<dim> &p, Vector<double> &values) const;
-  virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
+  virtual double
+  value (const Point<dim> &p, const unsigned int component) const;
+  virtual void
+  value (const Point<dim> &p, Vector<double> &values) const;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const;
 };
 
 template <>
-double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
+double
+VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   return (1 - p(0)*p(0)) * (1 - p(1)*p(1)) * (1 - p(2)*p(2));
 }
 
 template <>
-double VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
+double
+VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
   return (1 - p(0)*p(0)) * (1 - p(1)*p(1));
 }
 
 template <int dim>
-void VectorFunction<dim>::value(const Point<dim> &p, Vector<double> &values) const
+void
+VectorFunction<dim>::value(const Point<dim> &p, Vector<double> &values) const
 {
   for (unsigned i = 0; i < values.size(); ++i)
     values[i] = value(p, i);
 }
 
 template <int dim>
-void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
+void
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
 template <int dim>
-void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
+void
+create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
 {
   GridGenerator::hyper_cube (triangulation, -1., 1.);
   triangulation.refine_global(3);
@@ -154,7 +168,8 @@ void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometr
 }
 
 template <int dim>
-void test(const FiniteElement<dim> &fe)
+void
+test(const FiniteElement<dim> &fe)
 {
   deallog << "dim: " << dim << "\t" << fe.get_name() << std::endl;
   deallog << "Mapping degree\t||u-u_h||" << std::endl;
@@ -198,7 +213,8 @@ void test(const FiniteElement<dim> &fe)
     }
 }
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (5);
   deallog.attach (std::cout);

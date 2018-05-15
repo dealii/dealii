@@ -37,7 +37,8 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
@@ -79,7 +80,8 @@ public:
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim>   triangulation;
   FESystem<dim>        fe(FE_DGQ<dim>(0),2);
@@ -114,7 +116,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);

@@ -22,11 +22,13 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test (const std::string &infilename)
+void
+test (const std::string &infilename)
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -40,7 +42,8 @@ void test (const std::string &infilename)
   grid_out.write_ucd (tria, logfile);
 }
 
-int main ()
+int
+main ()
 {
   test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
   test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));

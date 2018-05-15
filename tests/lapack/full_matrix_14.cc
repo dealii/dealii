@@ -23,7 +23,8 @@
 
 
 
-void test(const bool is_singular)
+void
+test(const bool is_singular)
 {
   const unsigned int n=10;
   LAPACKFullMatrix<double> A(n,n);
@@ -58,7 +59,8 @@ void test(const bool is_singular)
   deallog << "apply lu factorization succeeded with norm " << v.l2_norm() << std::endl;
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

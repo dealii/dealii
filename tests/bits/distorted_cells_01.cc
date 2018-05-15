@@ -34,7 +34,8 @@
 // create a (i) pinched cell (where two vertices coincide), or (ii)
 // twisted cell (where two vertices are swapped)
 template <int dim>
-void check (const unsigned int testcase)
+void
+check (const unsigned int testcase)
 {
   std::vector<Point<dim> > vertices;
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -84,7 +85,8 @@ void check (const unsigned int testcase)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

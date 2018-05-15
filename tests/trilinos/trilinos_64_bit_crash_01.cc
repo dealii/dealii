@@ -27,7 +27,8 @@
 
 
 template <typename int_type>
-void test ()
+void
+test ()
 {
   const Epetra_Map map (int_type(1),
                         0,
@@ -45,7 +46,8 @@ void test ()
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);

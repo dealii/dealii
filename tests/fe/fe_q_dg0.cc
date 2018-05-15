@@ -82,17 +82,23 @@ namespace Step22
   {
   public:
     StokesProblem (const unsigned int degree, FESystem<dim> &fe_);
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_dofs ();
-    void assemble_system ();
-    void solve ();
-    void output_results (const unsigned int refinement_cycle);
+    void
+    setup_dofs ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    output_results (const unsigned int refinement_cycle);
 
-    void divergence_velocity(const BlockVector<double> &calc_solution,
-                             Vector<double> &output_vector,
-                             const Quadrature<dim> &quadrature, bool norm);
+    void
+    divergence_velocity(const BlockVector<double> &calc_solution,
+                        Vector<double> &output_vector,
+                        const Quadrature<dim> &quadrature, bool norm);
 
     const unsigned int   degree;
 
@@ -124,12 +130,14 @@ namespace Step22
                               const unsigned int  component) const;
 
     /*virtual*/
-    Tensor<1,dim> gradient (const Point< dim> &p,
-                            const unsigned int component) const;
+    Tensor<1,dim>
+    gradient (const Point< dim> &p,
+              const unsigned int component) const;
 
     /*virtual*/
-    double laplacian (const Point<dim>   &p,
-                      const unsigned int  component) const;
+    double
+    laplacian (const Point<dim>   &p,
+               const unsigned int  component) const;
   };
 
 
@@ -248,8 +256,9 @@ namespace Step22
   public:
     JumpFunction () : Function<dim>(1) {}
 
-    double jump (const Point< dim> &p,
-                 const Tensor<1,dim> &normal) const;
+    double
+    jump (const Point< dim> &p,
+          const Tensor<1,dim> &normal) const;
   };
 
   template <int dim>
@@ -303,8 +312,9 @@ namespace Step22
     InverseMatrix (const Matrix         &m,
                    const Preconditioner &preconditioner);
 
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+    void
+    vmult (Vector<double>       &dst,
+           const Vector<double> &src) const;
 
   private:
     const SmartPointer<const Matrix> matrix;
@@ -321,8 +331,9 @@ namespace Step22
   {}
 
   template <class Matrix, class Preconditioner>
-  void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-                                                    const Vector<double> &src) const
+  void
+  InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
+                                               const Vector<double> &src) const
   {
     SolverControl solver_control (src.size(), 1e-6*src.l2_norm());
     SolverCG<>    cg (solver_control);
@@ -345,8 +356,9 @@ namespace Step22
                      const InverseMatrix<SparseMatrix<double>, Preconditioner>
                      &A_inverse);
 
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+    void
+    vmult (Vector<double>       &dst,
+           const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -372,8 +384,9 @@ namespace Step22
 
 
   template <class Preconditioner>
-  void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
-                                               const Vector<double> &src) const
+  void
+  SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
+                                          const Vector<double> &src) const
   {
     system_matrix->block(0,1).vmult (tmp1, src);
     A_inverse->vmult (tmp2, tmp1);
@@ -390,7 +403,8 @@ namespace Step22
   {}
 
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  void
+  StokesProblem<dim>::setup_dofs ()
   {
     A_preconditioner.reset ();
     system_matrix.clear ();
@@ -496,7 +510,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::assemble_system ()
+  void
+  StokesProblem<dim>::assemble_system ()
   {
     system_matrix=0;
     system_rhs=0;
@@ -633,7 +648,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::solve ()
+  void
+  StokesProblem<dim>::solve ()
   {
     const InverseMatrix<SparseMatrix<double>,
           typename InnerPreconditioner<dim>::type>
@@ -788,7 +804,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run ()
   {
     Assert(dim==2, ExcNotImplemented());
     GridGenerator::hyper_cube(triangulation);
@@ -919,7 +936,8 @@ namespace Step22
   }
 }
 
-int main ()
+int
+main ()
 {
   using namespace dealii;
   using namespace Step22;

@@ -94,7 +94,8 @@ test_fixed_rank()
   test_fixed_TensorType<4,dim>();
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);

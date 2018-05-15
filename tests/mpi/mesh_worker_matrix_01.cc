@@ -48,10 +48,13 @@ class Local : public Subscriptor
 public:
   typedef MeshWorker::IntegrationInfo<dim> CellInfo;
 
-  void cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void bdry(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-            CellInfo &info1, CellInfo &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  bdry(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+       CellInfo &info1, CellInfo &info2) const;
 
   bool cells;
   bool faces;
@@ -271,7 +274,8 @@ test(const FiniteElement<dim> &fe)
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;

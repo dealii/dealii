@@ -30,13 +30,15 @@
 #include <deal.II/base/multithread_info.h>
 
 
-void test ()
+void
+test ()
 {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 
-void outer ()
+void
+outer ()
 {
   // wait for some time to make sure that really all outer tasks have been
   // started, then start a bunch of new tasks and wait for them to finish. it
@@ -51,7 +53,8 @@ void outer ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

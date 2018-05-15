@@ -43,7 +43,8 @@
  * The implicit part only contains the stiff part of the problem (the part with
  * eps in right hand side of the third equation).
  */
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream out("output");
 

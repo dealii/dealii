@@ -52,14 +52,16 @@ public:
                 std::placeholders::_1));
   }
 
-  int n_active_cell_gap()
+  int
+  n_active_cell_gap()
   {
     return (n_active_cells -
             static_cast<int> (tria.n_active_cells()));
   }
 
 private:
-  void count_on_refine(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  void
+  count_on_refine(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     n_active_cells += cell->n_children();
     --n_active_cells;
@@ -67,7 +69,8 @@ private:
     return;
   }
 
-  void count_on_coarsen(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  void
+  count_on_coarsen(const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
     ++n_active_cells;
     n_active_cells -= cell->n_children();
@@ -81,7 +84,8 @@ private:
 
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;
 
@@ -172,7 +176,8 @@ void test()
   return;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, /* int max_num_threads */ 1);
   MPILogInitAll log;

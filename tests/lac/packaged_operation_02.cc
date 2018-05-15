@@ -39,8 +39,9 @@
 using namespace dealii;
 
 
-void test_applies(std::string description,
-                  const PackagedOperation<Vector<double> > &expr)
+void
+test_applies(std::string description,
+             const PackagedOperation<Vector<double> > &expr)
 {
   // test apply
   Vector<double> tmp = expr;
@@ -54,7 +55,8 @@ void test_applies(std::string description,
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);

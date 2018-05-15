@@ -23,7 +23,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << std::setprecision (8);
 

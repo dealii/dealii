@@ -65,15 +65,22 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem (const unsigned int deg);
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void assemble_multigrid ();
-  void solve ();
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  assemble_multigrid ();
+  void
+  solve ();
+  void
+  refine_grid ();
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -102,19 +109,22 @@ class Coefficient : public Function<dim>
 public:
   Coefficient () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double>            &values,
+              const unsigned int              component = 0) const;
 };
 
 
 
 template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int) const
+double
+Coefficient<dim>::value (const Point<dim> &p,
+                         const unsigned int) const
 {
   if (p.square() < 0.5*0.5)
     return 5;
@@ -125,9 +135,10 @@ double Coefficient<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
+void
+Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                              std::vector<double>            &values,
+                              const unsigned int              component) const
 {
   const unsigned int n_points = points.size();
 
@@ -154,7 +165,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs (fe);
@@ -210,7 +222,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void
+LaplaceProblem<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(degree+1);
 
@@ -265,7 +278,8 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid ()
+void
+LaplaceProblem<dim>::assemble_multigrid ()
 {
   QGauss<dim>  quadrature_formula(1+degree);
 
@@ -358,7 +372,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   typedef SparseMatrix<double> matrix_t;
   typedef Vector<double> vector_t;
@@ -408,7 +423,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void
+LaplaceProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -426,7 +442,8 @@ void LaplaceProblem<dim>::refine_grid ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<5; ++cycle)
     {
@@ -464,7 +481,8 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

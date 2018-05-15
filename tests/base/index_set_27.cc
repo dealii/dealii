@@ -19,7 +19,8 @@
 
 #include <deal.II/base/index_set.h>
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -28,7 +28,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -55,7 +56,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   try
     {

@@ -27,7 +27,8 @@
 using namespace std;
 
 
-void test ()
+void
+test ()
 {
   const unsigned int spacedim = 3;
   const unsigned int dim = spacedim-1;
@@ -61,7 +62,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   ofstream logfile("output");
   deallog.attach(logfile);

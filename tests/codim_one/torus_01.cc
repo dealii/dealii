@@ -28,7 +28,8 @@
 
 #include <string>
 
-int main ()
+int
+main ()
 {
   const int dim = 2;
   const int spacedim = 3;

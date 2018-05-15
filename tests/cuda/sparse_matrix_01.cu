@@ -25,8 +25,9 @@
 #include <deal.II/base/exceptions.h>
 
 
-void check_matrix(SparseMatrix<double> const &A,
-                  CUDAWrappers::SparseMatrix<double> &A_dev)
+void
+check_matrix(SparseMatrix<double> const &A,
+             CUDAWrappers::SparseMatrix<double> &A_dev)
 {
   cudaError_t cuda_error_code;
   double *val_dev = nullptr;
@@ -58,15 +59,17 @@ void check_matrix(SparseMatrix<double> const &A,
                   ExcInternalError());
 }
 
-void check_vector(Vector<double> const &a,
-                  LinearAlgebra::ReadWriteVector<double> const &b)
+void
+check_vector(Vector<double> const &a,
+             LinearAlgebra::ReadWriteVector<double> const &b)
 {
   unsigned int size = a.size();
   for (unsigned int i=0; i<size; ++i)
     AssertThrow(std::abs(a[i] - b[i]) < 1e-15, ExcInternalError());
 }
 
-void test(Utilities::CUDA::Handle &cuda_handle)
+void
+test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Build the sparse matrix on the host
   const unsigned int size = 10;
@@ -197,7 +200,8 @@ void test(Utilities::CUDA::Handle &cuda_handle)
   AssertThrow(std::abs(value-value_host) < 1e-15, ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

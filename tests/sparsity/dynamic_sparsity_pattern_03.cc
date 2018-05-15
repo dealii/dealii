@@ -21,7 +21,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   // set up a sparsity pattern. since
   // DynamicSparsityPatterns are most
@@ -50,7 +51,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

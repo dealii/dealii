@@ -46,14 +46,16 @@ class MySquareFunction : public Function<dim,std::complex<double>>
 public:
   MySquareFunction () : Function<dim,std::complex<double>>(2) {}
 
-  virtual std::complex<double> value (const Point<dim>   &p,
-                                      const unsigned int  component) const
+  virtual std::complex<double>
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return std::complex<double>(100*(component+1)*p.square()*std::sin(p.square()), 0);
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<std::complex<double>>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<std::complex<double>>     &values) const
   {
     for (unsigned int d=0; d<this->n_components; ++d)
       values(d) = value(p,d);
@@ -70,7 +72,8 @@ boundary_q (const DoFHandler<dim> &)
 }
 
 
-void write_map (const std::map<types::global_dof_index,std::complex<double>> &bv)
+void
+write_map (const std::map<types::global_dof_index,std::complex<double>> &bv)
 {
   for (std::map<types::global_dof_index,std::complex<double>>::const_iterator
        i=bv.begin(); i!=bv.end(); ++i)
@@ -166,7 +169,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (2);

@@ -21,7 +21,8 @@
 #include <deal.II/lac/full_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   FullMatrix<double> A(3,3);
 
@@ -55,7 +56,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

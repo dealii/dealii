@@ -26,7 +26,8 @@
 using namespace std;
 
 template <int dim>
-void plot(const PolynomialsBDM<dim> &poly)
+void
+plot(const PolynomialsBDM<dim> &poly)
 {
 
   const PolynomialSpace<dim> legendre_poly_space = Polynomials::Legendre::generate_complete_basis(poly.degree());
@@ -75,7 +76,8 @@ void plot(const PolynomialsBDM<dim> &poly)
     }
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

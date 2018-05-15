@@ -112,7 +112,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

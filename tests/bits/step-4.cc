@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/grid/tria.h>
@@ -52,13 +53,18 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void assemble_system ();
-  void solve ();
-  void output_results () const;
+  void
+  make_grid_and_dofs ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  output_results () const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -79,8 +85,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
@@ -91,16 +98,18 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
 
 
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-                                  const unsigned int /*component*/) const
+double
+RightHandSide<dim>::value (const Point<dim> &p,
+                           const unsigned int /*component*/) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -111,8 +120,9 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-                                   const unsigned int /*component*/) const
+double
+BoundaryValues<dim>::value (const Point<dim> &p,
+                            const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -132,7 +142,8 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void
+LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (2);
@@ -165,7 +176,8 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void
+LaplaceProblem<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula (2);
 
@@ -234,7 +246,8 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -249,7 +262,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results () const
+void
+LaplaceProblem<dim>::output_results () const
 {
   DataOut<dim,DoFHandler<dim> > data_out;
 
@@ -265,7 +279,8 @@ void LaplaceProblem<dim>::output_results () const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
 
@@ -277,7 +292,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

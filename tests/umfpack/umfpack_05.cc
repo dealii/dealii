@@ -26,7 +26,8 @@
 #include <deal.II/lac/sparse_direct.h>
 
 
-void test ()
+void
+test ()
 {
   std::vector<unsigned int> size (2,2U);
 
@@ -64,7 +65,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

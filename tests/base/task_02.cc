@@ -22,7 +22,8 @@
 #include <deal.II/base/thread_management.h>
 
 
-int test ()
+int
+test ()
 {
   sleep (3);
   return 42;
@@ -31,7 +32,8 @@ int test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

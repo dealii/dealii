@@ -35,7 +35,8 @@ using namespace dealii;
 // immersed dimension, and check that constants are projected correctly.
 
 template<int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "dim: " << dim << ", spacedim: "
           << spacedim << std::endl;
@@ -107,7 +108,8 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
   test<1,1>();

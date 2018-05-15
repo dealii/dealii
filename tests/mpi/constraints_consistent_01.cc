@@ -37,7 +37,8 @@
 #include <deal.II/dofs/dof_tools.h>
 
 template <int dim>
-void check(parallel::distributed::Triangulation<dim> &tria)
+void
+check(parallel::distributed::Triangulation<dim> &tria)
 {
   MPILogInitAll all;
 
@@ -93,7 +94,8 @@ void check(parallel::distributed::Triangulation<dim> &tria)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -146,7 +148,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

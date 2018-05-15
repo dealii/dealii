@@ -81,7 +81,8 @@ public:
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref=1)
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -118,7 +119,8 @@ void test(unsigned int ref=1)
     }
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

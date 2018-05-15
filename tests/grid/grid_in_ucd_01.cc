@@ -31,7 +31,8 @@
 #include <string>
 
 
-int main ()
+int
+main ()
 {
   initlog();
   std::string name(std::string(SOURCE_DIR "/grids/kcs_initial.inp"));

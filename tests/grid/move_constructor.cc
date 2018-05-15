@@ -24,7 +24,8 @@
 
 
 template <int dim>
-void print_tria_info(const Triangulation<dim> &tria)
+void
+print_tria_info(const Triangulation<dim> &tria)
 {
   const bool manifold_0_is_flat =
     dynamic_cast<const FlatManifold<dim>*>(&tria.get_manifold(0)) != nullptr;
@@ -41,7 +42,8 @@ void print_tria_info(const Triangulation<dim> &tria)
 
 
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   deallog << "Dimension: " << dim << std::endl;
 
@@ -62,7 +64,8 @@ void test_hyper_cube()
 
 
 template <int dim>
-void test_hyper_shell()
+void
+test_hyper_shell()
 {
   deallog << "Dimension: " << dim << std::endl;
 
@@ -88,7 +91,8 @@ void test_hyper_shell()
 
 
 template <int dim>
-void test_periodic_cube()
+void
+test_periodic_cube()
 {
   deallog << "Dimension: " << dim << std::endl;
 
@@ -113,7 +117,8 @@ void test_periodic_cube()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

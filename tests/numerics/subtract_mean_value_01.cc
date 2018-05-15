@@ -25,7 +25,8 @@
 #include <vector>
 
 template <class VectorType>
-void test (VectorType &v)
+void
+test (VectorType &v)
 {
   std::vector<bool> filter(v.size(), false);
   // set some elements of the vector
@@ -45,7 +46,8 @@ void test (VectorType &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

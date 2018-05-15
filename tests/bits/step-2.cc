@@ -34,10 +34,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void make_grid (Triangulation<2> &triangulation)
+void
+make_grid (Triangulation<2> &triangulation)
 {
   const Point<2> center (1,0);
   const double inner_radius = 0.5,
@@ -77,7 +79,8 @@ void make_grid (Triangulation<2> &triangulation)
 }
 
 
-void distribute_dofs (DoFHandler<2> &dof_handler)
+void
+distribute_dofs (DoFHandler<2> &dof_handler)
 {
   static const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs (finite_element);
@@ -94,7 +97,8 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 
 
 
-void renumber_dofs (DoFHandler<2> &dof_handler)
+void
+renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
   SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
@@ -110,7 +114,8 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
 

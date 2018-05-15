@@ -133,7 +133,8 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 }
 
 template <int dim>
-void test_global_refinement(
+void
+test_global_refinement(
   void (*test_block_list)(const Triangulation<dim> &tr, const FiniteElement<dim> &fe))
 {
   Triangulation<dim> trc(Triangulation<dim>::limit_level_difference_at_vertices);
@@ -156,7 +157,8 @@ void test_global_refinement(
 
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.push("2D");

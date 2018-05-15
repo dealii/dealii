@@ -31,7 +31,8 @@
 
 
 
-void check (Triangulation<3> &tria)
+void
+check (Triangulation<3> &tria)
 {
   MappingQ<3> map(3);
 
@@ -52,7 +53,8 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

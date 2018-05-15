@@ -27,14 +27,16 @@
 #include "create_mesh.h"
 #include <deal.II/grid/grid_tools.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 
 
 template <int dim, int fe_degree_>
-void test ()
+void
+test ()
 {
   // raise element degree by two to test cubic and quartic shape functions
   // rather than linears and quadratics according to

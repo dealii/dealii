@@ -27,7 +27,8 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 // We want to use the matrix-vector product provided by this function (which
@@ -36,7 +37,8 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   if (fe_degree > 1)
     return;

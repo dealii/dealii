@@ -23,7 +23,8 @@
 #include <deal.II/grid/grid_out.h>
 
 template <int dim>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> m0;
   Triangulation<dim> tria;
@@ -39,7 +40,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

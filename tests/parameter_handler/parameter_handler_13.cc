@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+void
+check (const char *p)
 {
   ParameterHandler prm;
   prm.declare_entry ("test_13", "-1:a, 0:b, 1:c",
@@ -45,7 +46,8 @@ void check (const char *p)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

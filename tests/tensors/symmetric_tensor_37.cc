@@ -26,9 +26,10 @@
 template <int rank1, int rank2, int rank3, int dim, typename number,
           template <int,int,typename> class T1,
           template <int,int,typename> class T3>
-void test_symm_tensor_contract_3(const T1<rank1,dim,number>     &l,
-                                 const Tensor<rank2,dim,number> &m,
-                                 const T3<rank3,dim,number>     &r)
+void
+test_symm_tensor_contract_3(const T1<rank1,dim,number>     &l,
+                            const Tensor<rank2,dim,number> &m,
+                            const T3<rank3,dim,number>     &r)
 {
   const double res1 = contract3(l,m,r);
   const double res2 = contract3(static_cast<Tensor<rank1,dim> >(l),
@@ -38,7 +39,8 @@ void test_symm_tensor_contract_3(const T1<rank1,dim,number>     &l,
          ExcMessage("Result from symmetric tensor contract3 is incorrect."));
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);

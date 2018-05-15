@@ -22,14 +22,16 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "create_mesh.h"
 #include "matrix_vector_common.h"
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   create_mesh (tria);

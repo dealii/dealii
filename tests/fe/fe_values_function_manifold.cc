@@ -59,8 +59,9 @@ template <int dim>
 class HardManufacturedSolution : public Function<dim>
 {
 public:
-  virtual double value(const Point<dim> &point,
-                       const unsigned int) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int) const
   {
     const double &x = point[0];
     const double &y = point[1];
@@ -78,8 +79,9 @@ template <int dim>
 class HardManufacturedForcing : public Function<dim>
 {
 public:
-  virtual double value(const Point<dim> &point,
-                       const unsigned int) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int) const
   {
     const double &x = point[0];
     const double &y = point[1];
@@ -99,8 +101,9 @@ public:
   PushForward() : Function<dim>(dim)
   {}
 
-  double value(const Point<dim>   &point,
-               const unsigned int  component = 0) const
+  double
+  value(const Point<dim>   &point,
+        const unsigned int  component = 0) const
   {
     switch (component)
       {
@@ -125,8 +128,9 @@ public:
   PullBack() : Function<dim>(dim)
   {}
 
-  double value(const Point<dim>   &point,
-               const unsigned int  component = 0) const
+  double
+  value(const Point<dim>   &point,
+        const unsigned int  component = 0) const
   {
     switch (component)
       {
@@ -192,7 +196,8 @@ class JxWError
 public:
   JxWError(const unsigned int n_global_refines);
 
-  double run();
+  double
+  run();
 
 protected:
   std::shared_ptr<Function<dim> > manufactured_solution;
@@ -211,9 +216,12 @@ protected:
   Vector<double> system_rhs;
   Vector<double> solution;
 
-  void setup_dofs();
-  void setup_matrices();
-  double solve();
+  void
+  setup_dofs();
+  void
+  setup_matrices();
+  double
+  solve();
 };
 
 
@@ -235,7 +243,8 @@ JxWError<dim>::JxWError(const unsigned int n_global_refines) :
 
 
 template <int dim>
-void JxWError<dim>::setup_dofs()
+void
+JxWError<dim>::setup_dofs()
 {
   dof_handler.distribute_dofs(finite_element);
   VectorTools::interpolate_boundary_values(cell_mapping,
@@ -256,7 +265,8 @@ void JxWError<dim>::setup_dofs()
 
 
 template <int dim>
-void JxWError<dim>::setup_matrices()
+void
+JxWError<dim>::setup_matrices()
 {
   system_matrix.reinit(sparsity_pattern);
   system_rhs.reinit(dof_handler.n_dofs());
@@ -310,7 +320,8 @@ void JxWError<dim>::setup_matrices()
 
 
 template <int dim>
-double JxWError<dim>::solve()
+double
+JxWError<dim>::solve()
 {
   {
     SolverControl solver_control(std::max(types::global_dof_index(100),
@@ -345,7 +356,8 @@ double JxWError<dim>::solve()
 
 
 template <int dim>
-double JxWError<dim>::run()
+double
+JxWError<dim>::run()
 {
   setup_dofs();
   setup_matrices();
@@ -355,7 +367,8 @@ double JxWError<dim>::run()
 
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   // Use exactly one thread so that the CellSimilarity checks are not disabled.
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

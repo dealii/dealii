@@ -20,7 +20,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/lac/vector.h>
 
-int main ()
+int
+main ()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

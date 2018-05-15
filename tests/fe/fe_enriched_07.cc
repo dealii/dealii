@@ -62,14 +62,16 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     return std::exp(-point.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> res = point;
     Assert (point.norm() > 0,
@@ -81,9 +83,10 @@ public:
 
 
 template <int dim>
-void test6(const bool do_href,
-           const unsigned int p_feq  = 1,
-           const unsigned int p_feen = 2)
+void
+test6(const bool do_href,
+      const unsigned int p_feq  = 1,
+      const unsigned int p_feen = 2)
 {
   deallog << "hp: "<<do_href<<" "<<p_feq<<" "<<p_feen<<std::endl;
 
@@ -195,7 +198,8 @@ void test6(const bool do_href,
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

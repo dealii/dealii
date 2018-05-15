@@ -23,7 +23,8 @@
 #include <deal.II/base/index_set.h>
 
 
-void test ()
+void
+test ()
 {
   IndexSet is1(250);
   is1.add_range(125,200);
@@ -50,7 +51,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

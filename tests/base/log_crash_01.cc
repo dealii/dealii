@@ -22,7 +22,8 @@
 #include <limits>
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

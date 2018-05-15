@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void check()
+void
+check()
 {
   // need cubic polynomials that have two dofs on lines
   FE_Q<dim> fe(3);
@@ -66,7 +67,8 @@ void check()
   deallog << dim << "D OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog(__FILE__);
   check<1> ();

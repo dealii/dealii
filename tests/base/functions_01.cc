@@ -45,7 +45,8 @@
   }
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

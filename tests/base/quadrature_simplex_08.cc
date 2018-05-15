@@ -27,7 +27,8 @@
 
 #include <iomanip>
 
-int main()
+int
+main()
 {
   initlog();
 

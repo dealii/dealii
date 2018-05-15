@@ -28,7 +28,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::MappingCollection<dim> mapping_collection;
   mapping_collection.push_back (MappingQ<dim>(2));
@@ -44,7 +45,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

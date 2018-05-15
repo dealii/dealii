@@ -72,7 +72,8 @@ using namespace dealii;
  * Go through the input stream @p in and filter out binary data for the key @p key .
  * The filtered stream is returned in @p out.
  */
-void filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &out)
+void
+filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &out)
 {
   std::string line;
   bool found = false;
@@ -113,7 +114,8 @@ void filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &
  */
 #ifdef DEAL_II_WITH_PETSC
 #include <deal.II/lac/petsc_vector_base.h>
-PetscReal get_real_assert_zero_imag(const PETScWrappers::internal::VectorReference &a)
+PetscReal
+get_real_assert_zero_imag(const PETScWrappers::internal::VectorReference &a)
 {
   Assert (a.imag() == 0.0, ExcInternalError());
   return a.real();
@@ -121,14 +123,16 @@ PetscReal get_real_assert_zero_imag(const PETScWrappers::internal::VectorReferen
 #endif
 
 template <typename number>
-number get_real_assert_zero_imag(const std::complex<number> &a)
+number
+get_real_assert_zero_imag(const std::complex<number> &a)
 {
   Assert (a.imag() == 0.0, ExcInternalError());
   return a.real();
 }
 
 template <typename number>
-number get_real_assert_zero_imag(const number &a)
+number
+get_real_assert_zero_imag(const number &a)
 {
   return a;
 }
@@ -157,7 +161,8 @@ namespace Testing
    * 3. $min<=a+b<=max$: No overflow.
    */
   template <typename Number>
-  Number nonoverflow_add (Number a, Number b)
+  Number
+  nonoverflow_add (Number a, Number b)
   {
     constexpr Number max = std::numeric_limits<Number>::max();
     constexpr Number min = std::numeric_limits<Number>::min();
@@ -168,8 +173,9 @@ namespace Testing
     return a+b;
   }
 
-  int rand(const bool reseed=false,
-           const int seed=1)
+  int
+  rand(const bool reseed=false,
+       const int seed=1)
   {
     static int r[32];
     static int k;
@@ -217,7 +223,8 @@ namespace Testing
   }
 
   // reseed our random number generator
-  void srand(const int seed)
+  void
+  srand(const int seed)
   {
     rand(true, seed);
   }
@@ -227,8 +234,9 @@ namespace Testing
 
 // Get a uniformly distributed random value between min and max
 template<typename T=double>
-T random_value(const T &min=static_cast<T>(0),
-               const T &max=static_cast<T>(1))
+T
+random_value(const T &min=static_cast<T>(0),
+             const T &max=static_cast<T>(1))
 {
   return min+(max-min)*(static_cast<T>(Testing::rand())/static_cast<T>(RAND_MAX));
 }
@@ -238,8 +246,9 @@ T random_value(const T &min=static_cast<T>(0),
 // Construct a uniformly distributed random point, with each coordinate
 // between min and max
 template<int dim>
-inline Point<dim> random_point(const double &min=0.0,
-                               const double &max=1.0)
+inline Point<dim>
+random_point(const double &min=0.0,
+             const double &max=1.0)
 {
   Assert(max >= min, ExcMessage("Make sure max>=min"));
   Point<dim> p;
@@ -252,7 +261,8 @@ inline Point<dim> random_point(const double &min=0.0,
 
 // given the name of a file, copy it to deallog
 // and then delete it
-void cat_file(const char *filename)
+void
+cat_file(const char *filename)
 {
   std::ifstream in(filename);
   Assert (in, dealii::ExcIO());
@@ -277,7 +287,8 @@ void cat_file(const char *filename)
  * This function does just that with the file given. All streams writing
  * to this should be closed when calling this function.
  */
-void sort_file_contents (const std::string &filename)
+void
+sort_file_contents (const std::string &filename)
 {
   int error = std::system ((std::string ("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
   AssertThrow (error == 0, ExcInternalError());
@@ -288,7 +299,8 @@ void sort_file_contents (const std::string &filename)
  * simple ADLER32 checksum for a range of chars
  */
 template <class IT>
-unsigned int checksum(const IT &begin, const IT &end)
+unsigned int
+checksum(const IT &begin, const IT &end)
 {
   AssertThrow(sizeof(unsigned int)==4, ExcInternalError());
   AssertThrow(sizeof(*begin)==1, ExcInternalError());
@@ -317,7 +329,8 @@ unsigned int checksum(const IT &begin, const IT &end)
  * Also, while GCC prepends the name by "virtual " if the function is virtual,
  * Intel's ICC does not do that, so filter that out as well.
  */
-std::string unify_pretty_function (const std::string &text)
+std::string
+unify_pretty_function (const std::string &text)
 {
   std::string t=text;
   t=Utilities::replace_in_string(t, " &", " & ");
@@ -368,7 +381,8 @@ std::string unify_pretty_function (const std::string &text)
  * have set for numdiff (that is appropriate for double variables).
  */
 template <typename Number>
-Number filter_out_small_numbers (const Number number, const double tolerance)
+Number
+filter_out_small_numbers (const Number number, const double tolerance)
 {
   if (std::abs(number) < tolerance)
     return Number();
@@ -385,7 +399,8 @@ Number filter_out_small_numbers (const Number number, const double tolerance)
  * Limit concurrency to a fixed (small) number of threads, independent
  * of the core count.
  */
-inline unsigned int testing_max_num_threads()
+inline unsigned int
+testing_max_num_threads()
 {
   return 3;
 }
@@ -405,7 +420,8 @@ struct LimitConcurrency
 
 namespace
 {
-  void check_petsc_allocations()
+  void
+  check_petsc_allocations()
   {
 #if DEAL_II_PETSC_VERSION_GTE(3, 2, 0)
     PetscStageLog stageLog;
@@ -579,8 +595,9 @@ namespace deal_II_exceptions
 DEAL_II_NAMESPACE_CLOSE
 
 
-void new_tbb_assertion_handler(const char *file, int line, const char *expr,
-                               const char *comment)
+void
+new_tbb_assertion_handler(const char *file, int line, const char *expr,
+                          const char *comment)
 {
   // Print out the original assertion message
   std::cerr << "TBB assertion:" << std::endl;

@@ -26,7 +26,8 @@ using namespace dealii;
 
 
 
-void verify (const std::string &s)
+void
+verify (const std::string &s)
 {
   bool exception_caught = false;
   try
@@ -45,7 +46,8 @@ void verify (const std::string &s)
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

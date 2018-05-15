@@ -22,7 +22,8 @@
 #include <deal.II/base/point.h>
 
 template <int dim>
-void test(const unsigned int &size)
+void
+test(const unsigned int &size)
 {
   std::vector<Point<dim> > points(size);
 
@@ -47,7 +48,8 @@ void test(const unsigned int &size)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

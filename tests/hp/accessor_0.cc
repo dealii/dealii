@@ -26,7 +26,8 @@
 
 #include "../tests.h"
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::boolalpha;

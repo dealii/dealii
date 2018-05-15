@@ -41,12 +41,15 @@ class VectorFunction : public Function<dim>
 {
 public:
   VectorFunction() : Function<dim>(dim) {}
-  virtual double value (const Point<dim> &p, const unsigned int component) const;
-  virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
+  virtual double
+  value (const Point<dim> &p, const unsigned int component) const;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const;
 };
 
 template <>
-double VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
+double
+VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
   Assert (component < 2,  ExcIndexRange (component, 0, 1));
 
@@ -65,7 +68,8 @@ double VectorFunction<2>::value(const Point<2> &p, const unsigned int component)
 }
 
 template <>
-double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
+double
+VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   Assert (component < 3, ExcIndexRange (component, 0, 2));
 
@@ -87,15 +91,17 @@ double VectorFunction<3>::value(const Point<3> &p, const unsigned int component)
 }
 
 template <int dim>
-void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
+void
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test (const Triangulation<dim> &tr,
+      const FiniteElement<dim> &fe)
 {
   deallog << "FE=" << fe.get_name()
           << std::endl;
@@ -157,7 +163,8 @@ void test (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_hyper_sphere()
+void
+test_hyper_sphere()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
@@ -172,7 +179,8 @@ void test_hyper_sphere()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (3);

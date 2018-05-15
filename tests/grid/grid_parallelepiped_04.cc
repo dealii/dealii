@@ -40,7 +40,8 @@
 #include <map>
 
 template <int dim>
-void check_parallelepiped (bool colorize, bool log, const unsigned int (&subd)[dim])
+void
+check_parallelepiped (bool colorize, bool log, const unsigned int (&subd)[dim])
 {
   deallog << "* checking dim=" << dim
           << " subd=";
@@ -143,7 +144,8 @@ void check_parallelepiped (bool colorize, bool log, const unsigned int (&subd)[d
 
 }
 
-int main ()
+int
+main ()
 {
   initlog(true);
 

@@ -46,8 +46,9 @@
 
 
 
-bool equal (const FullMatrix<double> &m1,
-            const FullMatrix<double> &m2)
+bool
+equal (const FullMatrix<double> &m1,
+       const FullMatrix<double> &m2)
 {
   double d = 0, s = 0;
   for (unsigned int i=0; i<m1.m(); ++i)
@@ -61,7 +62,8 @@ bool equal (const FullMatrix<double> &m1,
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr)
+void
+test (const Triangulation<dim> &tr)
 {
   FE_Q<dim> fe(2);
   deallog << "FE=" << fe.get_name() << std::endl;
@@ -139,7 +141,8 @@ void test (const Triangulation<dim> &tr)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr;
   Point<dim> p1 = Point<dim>();
@@ -163,7 +166,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

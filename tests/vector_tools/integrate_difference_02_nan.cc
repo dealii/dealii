@@ -60,7 +60,8 @@ using namespace dealii;
 
 
 template <int dim>
-void test(VectorTools::NormType norm, double exp = 2.0)
+void
+test(VectorTools::NormType norm, double exp = 2.0)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -103,7 +104,8 @@ void test(VectorTools::NormType norm, double exp = 2.0)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "L2_norm:" << std::endl;
   test<dim>(VectorTools::L2_norm);
@@ -133,7 +135,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   test<3>();

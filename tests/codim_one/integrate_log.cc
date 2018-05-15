@@ -41,12 +41,14 @@
 
 #include <math.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
-double test(const unsigned int n,
-            const unsigned int exponent,
-            const double a,
-            const double b)
+double
+test(const unsigned int n,
+     const unsigned int exponent,
+     const double a,
+     const double b)
 {
 
   const QGaussLog<1> qlog(n);
@@ -137,7 +139,8 @@ newton_binomial(unsigned int a,
   return c;
 }
 
-int main()
+int
+main()
 {
   deallog.attach(logfile);
   deallog<<std::fixed;

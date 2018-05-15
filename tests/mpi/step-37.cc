@@ -77,15 +77,20 @@ namespace Step37
   {
   public:
     LaplaceProblem ();
-    void run ();
+    void
+    run ();
 
     ~LaplaceProblem();
 
   private:
-    void setup_system ();
-    void assemble_rhs ();
-    void solve ();
-    void output_results (const unsigned int cycle) const;
+    void
+    setup_system ();
+    void
+    assemble_rhs ();
+    void
+    solve ();
+    void
+    output_results (const unsigned int cycle) const;
 
 #ifdef DEAL_II_WITH_P4EST
     parallel::distributed::Triangulation<dim>  triangulation;
@@ -154,7 +159,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     system_matrix.clear();
     mg_matrices.clear_elements();
@@ -271,9 +277,11 @@ namespace Step37
     {
     }
 
-    virtual ~PotentialBCFunction() = default;
+    virtual
+    ~PotentialBCFunction() = default;
 
-    virtual double value(const Point<dim> &p, const unsigned int) const
+    virtual double
+    value(const Point<dim> &p, const unsigned int) const
     {
       const double r = p.distance(x0);
       Assert (r > 0, ExcDivideByZero());
@@ -289,7 +297,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_rhs ()
+  void
+  LaplaceProblem<dim>::assemble_rhs ()
   {
     Timer time;
 
@@ -340,7 +349,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
@@ -413,7 +423,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   {
     if (triangulation.n_global_active_cells() > 1000000)
       return;
@@ -478,7 +489,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<2; ++cycle)
       {
@@ -529,7 +541,8 @@ namespace Step37
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   try
     {

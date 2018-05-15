@@ -34,7 +34,8 @@ static unsigned subcells[6][4] = {{0, 1, 2, 3},
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Assert(dim==2 || dim==3, ExcNotImplemented());
 
@@ -107,7 +108,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

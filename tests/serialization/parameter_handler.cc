@@ -22,7 +22,8 @@
 #include <boost/serialization/vector.hpp>
 
 
-void test ()
+void
+test ()
 {
   ParameterHandler prm1;
   prm1.declare_entry ("int1",
@@ -117,7 +118,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

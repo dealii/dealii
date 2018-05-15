@@ -49,8 +49,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (VectorType       &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,Number,VectorType>::local_operation,
@@ -60,10 +61,11 @@ public:
 private:
   const MatrixFree<dim,Number> &data;
 
-  void local_operation (const MatrixFree<dim,Number>               &data,
-                        VectorType                                 &out,
-                        const VectorType                           &in,
-                        const std::pair<unsigned int,unsigned int> &cell_range) const
+  void
+  local_operation (const MatrixFree<dim,Number>               &data,
+                   VectorType                                 &out,
+                   const VectorType                           &in,
+                   const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
     const unsigned int n_q_points = fe_eval.n_q_points;
@@ -93,9 +95,10 @@ private:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints,
-              const unsigned int     parallel_option = 0)
+void
+do_test (const DoFHandler<dim> &dof,
+         const ConstraintMatrix &constraints,
+         const unsigned int     parallel_option = 0)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -206,7 +209,8 @@ void do_test (const DoFHandler<dim> &dof,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -237,7 +241,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

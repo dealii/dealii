@@ -41,10 +41,12 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
-void test (unsigned int chunk_size)
+void
+test (unsigned int chunk_size)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -111,7 +113,8 @@ void test (unsigned int chunk_size)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

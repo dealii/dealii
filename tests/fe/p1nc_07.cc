@@ -32,7 +32,8 @@
 
 
 template <int dim>
-Point<dim> affine (const Point<dim> &p)
+Point<dim>
+affine (const Point<dim> &p)
 {
   Point<dim> q = p;
   if (dim>=2)

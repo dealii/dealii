@@ -24,7 +24,8 @@
 // test the method set_tex_table_caption
 // it creates a caption for the whole table
 
-int main ()
+int
+main ()
 {
   initlog();
 

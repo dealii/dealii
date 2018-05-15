@@ -22,8 +22,9 @@
 #include <vector>
 
 
-void test (Vector<std::complex<double> > &v,
-           Vector<std::complex<double> > &w)
+void
+test (Vector<std::complex<double> > &v,
+      Vector<std::complex<double> > &w)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -48,7 +49,8 @@ void test (Vector<std::complex<double> > &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

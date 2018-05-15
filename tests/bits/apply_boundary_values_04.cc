@@ -36,7 +36,8 @@
 #include <deal.II/fe/fe_q.h>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N=4;
   SparsityPattern sparsity (N,N,N);
@@ -122,7 +123,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

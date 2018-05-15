@@ -25,7 +25,8 @@
 #include <string>
 
 
-int main ()
+int
+main ()
 {
   initlog ();
 

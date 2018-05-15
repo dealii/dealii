@@ -29,7 +29,8 @@ class MySolverControl:
   public SolverControl
 {
 public:
-  virtual State check(const unsigned int step,const double)
+  virtual State
+  check(const unsigned int step,const double)
   {
     deallog << "MySolverControl " << step << std::endl;
     return SolverControl::check(step, 0);
@@ -69,7 +70,8 @@ check(const MatrixType &A, const VectorType &f)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

@@ -43,7 +43,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim>       triangulation;
   GridGenerator :: hyper_cube (triangulation, -1, 1);
@@ -80,7 +81,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

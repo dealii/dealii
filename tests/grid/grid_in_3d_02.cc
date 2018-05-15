@@ -35,10 +35,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void test (const char *filename)
+void
+test (const char *filename)
 {
   const unsigned int dim = 3;
 
@@ -83,7 +85,8 @@ void test (const char *filename)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);

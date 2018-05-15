@@ -31,7 +31,8 @@
 
 
 
-void check (Triangulation<3> &tria)
+void
+check (Triangulation<3> &tria)
 {
   const std::vector<Point<3> > &v = tria.get_vertices();
   for (unsigned i=0; i<v.size(); i++)
@@ -41,7 +42,8 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

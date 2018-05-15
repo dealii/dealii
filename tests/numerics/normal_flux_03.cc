@@ -32,8 +32,9 @@
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test (const Triangulation<dim> &tr,
+      const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -53,7 +54,8 @@ void test (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_hyper_sphere()
+void
+test_hyper_sphere()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
@@ -71,7 +73,8 @@ void test_hyper_sphere()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

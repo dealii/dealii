@@ -9645,7 +9645,8 @@ const Entry entries[] =
 };
 const unsigned int n_entries = sizeof(entries)/sizeof(entries[0]);
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 578;
 
@@ -9690,7 +9691,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

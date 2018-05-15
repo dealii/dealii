@@ -28,7 +28,8 @@
 
 // Provide memory for objects of type T such that access to a deleted
 // object does not cause a segmentation fault
-std::vector<char> memory(10000);
+std::vector<char>
+memory(10000);
 int next = 0;
 
 class Test : public Subscriptor
@@ -43,18 +44,21 @@ public:
   {
     deallog << "Destruct " << name << std::endl;
   }
-  void f()
+  void
+  f()
   {
     deallog << "mutable" << std::endl;
   }
-  void f() const
+  void
+  f() const
   {
     deallog << "const" << std::endl;
   }
 };
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

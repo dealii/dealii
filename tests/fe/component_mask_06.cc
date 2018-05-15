@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   // test for an initialized mask
   Assert (ComponentMask(12,true).n_selected_components() == 12,
@@ -58,7 +59,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 
-void print_it(Utilities::MPI::MinMaxAvg &result)
+void
+print_it(Utilities::MPI::MinMaxAvg &result)
 {
   deallog << "sum: " << result.sum
           << " avg: " << result.avg
@@ -29,7 +30,8 @@ void print_it(Utilities::MPI::MinMaxAvg &result)
           << std::endl;
 }
 
-void test()
+void
+test()
 {
   Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
@@ -76,7 +78,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

@@ -24,7 +24,8 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // create a 1x2 block matrix with
   // non-quadratic blocks so as to make them
@@ -69,7 +70,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

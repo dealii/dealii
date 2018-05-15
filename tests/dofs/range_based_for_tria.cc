@@ -28,7 +28,8 @@
 
 
 template <int dim>
-void check()
+void
+check()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -69,7 +70,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

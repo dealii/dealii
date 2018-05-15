@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void check1 ()
+void
+check1 ()
 {
   ScalarFunctionFromFunctionObject<dim>
   object (&Point<dim>::norm);
@@ -41,7 +42,8 @@ void check1 ()
 
 
 template <int dim>
-void check2 ()
+void
+check2 ()
 {
   Point<dim> q;
   for (unsigned int d=0; d<dim; ++d)
@@ -66,7 +68,8 @@ void check2 ()
 }
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

@@ -21,7 +21,8 @@
 #include <deal.II/base/utilities.h>
 
 
-void test ()
+void
+test ()
 {
   // test an empty string -- should yield a list of zero elements with
   // any delimiter
@@ -48,7 +49,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

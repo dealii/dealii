@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -60,7 +61,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

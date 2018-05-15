@@ -27,7 +27,8 @@
 #include<deal.II/numerics/fe_field_function.h>
 #include<deal.II/numerics/vector_tools.h>
 
-void create_reference_triangulation (Triangulation<3> &tria)
+void
+create_reference_triangulation (Triangulation<3> &tria)
 {
   std::vector<unsigned int> repetitions (3, 1);
 
@@ -35,7 +36,8 @@ void create_reference_triangulation (Triangulation<3> &tria)
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions, Point<3> (-1.0, 0.0, 0.0), Point<3> (1.0, 1.0, 1.0));
 }
 
-void create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
   std::vector<CellData<3> > cells (2);
 
@@ -173,7 +175,8 @@ void create_triangulation (Triangulation<3> &tria, const bool face_orientation, 
   tria.create_triangulation (vertices, cells, SubCellData ());
 }
 
-void evaluate (const FE_Nedelec<3> &fe, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref, const DoFHandler<3> &dof_handler, const Vector<double> &u)
+void
+evaluate (const FE_Nedelec<3> &fe, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref, const DoFHandler<3> &dof_handler, const Vector<double> &u)
 {
   const FEValuesExtractors::Vector component (0);
   const QGauss<3> quadrature (2);
@@ -199,13 +202,15 @@ void evaluate (const FE_Nedelec<3> &fe, const DoFHandler<3> &dof_handler_ref, co
     }
 }
 
-void set_reference_solution (Vector<double> &vector)
+void
+set_reference_solution (Vector<double> &vector)
 {
   for (unsigned int i = 0; i < vector.size (); ++i)
     vector (i) = 1.0;
 }
 
-void set_solution (Vector<double> &vector, const DoFHandler<3> &dof_handler, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref)
+void
+set_solution (Vector<double> &vector, const DoFHandler<3> &dof_handler, const DoFHandler<3> &dof_handler_ref, const Vector<double> &u_ref)
 {
   ConstraintMatrix constraints;
 
@@ -216,7 +221,8 @@ void set_solution (Vector<double> &vector, const DoFHandler<3> &dof_handler, con
   VectorTools::project (dof_handler, constraints, QGauss<3> (2), fe_field_function, vector);
 }
 
-void run (const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+run (const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
   Triangulation<3> tria_ref;
 

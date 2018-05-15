@@ -31,7 +31,8 @@ struct X
     tls_data (42)
   {}
 
-  int f ()
+  int
+  f ()
   {
     // access TLS data and have it
     // converted to the right data type
@@ -42,7 +43,8 @@ struct X
 };
 
 
-void test ()
+void
+test ()
 {
   X x;
   Threads::Thread<int> t;
@@ -55,7 +57,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

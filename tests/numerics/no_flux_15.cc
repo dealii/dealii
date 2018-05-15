@@ -61,7 +61,8 @@ check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.get_file_stream().precision(8);

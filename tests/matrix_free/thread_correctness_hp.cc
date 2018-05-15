@@ -21,7 +21,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "create_mesh.h"
 #include "matrix_vector_common.h"
@@ -65,8 +66,9 @@ public:
 #undef CALL_METHOD
   }
 
-  void vmult (Vector<Number>       &dst,
-              const Vector<Number> &src) const
+  void
+  vmult (Vector<Number>       &dst,
+         const Vector<Number> &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTestHP<dim,Number>::local_apply, this, dst, src);
@@ -79,7 +81,8 @@ private:
 
 
 template <int dim, typename number>
-void do_test (const unsigned int parallel_option)
+void
+do_test (const unsigned int parallel_option)
 {
   Triangulation<dim> tria;
   create_mesh (tria);
@@ -206,7 +209,8 @@ void do_test (const unsigned int parallel_option)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   // use more threads than usual to stress components a bit more
   MultithreadInfo::set_thread_limit(7);

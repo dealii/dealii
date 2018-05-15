@@ -29,8 +29,9 @@
 
 
 template <int dim, int spacedim>
-void check(DataOutBase::VtkFlags flags,
-           std::ostream &out)
+void
+check(DataOutBase::VtkFlags flags,
+      std::ostream &out)
 {
   const unsigned int np = 4;
 
@@ -50,7 +51,8 @@ void check(DataOutBase::VtkFlags flags,
 
 
 template <int dim, int spacedim>
-void check_all(std::ostream &log)
+void
+check_all(std::ostream &log)
 {
 #if SEPARATE_FILES == 0
   std::ostream &out = log;
@@ -72,7 +74,8 @@ void check_all(std::ostream &log)
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   check_all<1,1>(logfile);

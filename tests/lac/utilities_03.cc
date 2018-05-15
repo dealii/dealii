@@ -68,7 +68,8 @@ x * Cheb2(3,L(ev)) / Cheb2(3,L(aL));
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/utilities.h>
 
-double cheb2(const unsigned int d, const double x)
+double
+cheb2(const unsigned int d, const double x)
 {
   if (d == 0)
     {
@@ -156,7 +157,8 @@ check(const int degree, const bool scale = false, const double a_L = -0.1, const
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(6);

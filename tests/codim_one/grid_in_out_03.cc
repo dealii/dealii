@@ -26,10 +26,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
   logfile << " Tria<" << dim << "," << spacedim << ">: "
           << std::endl;
@@ -54,7 +56,8 @@ void test(std::string filename)
   ptria.write_flags(logfile);
 }
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

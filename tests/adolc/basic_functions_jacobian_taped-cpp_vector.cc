@@ -28,7 +28,8 @@
 
 #include <math.h>
 
-void test_reset_vector_values (const bool reset_values, const int tape_index)
+void
+test_reset_vector_values (const bool reset_values, const int tape_index)
 {
   const unsigned int m = 5;  // Dependents
   const unsigned int n = 10; // Independents
@@ -105,7 +106,8 @@ void test_reset_vector_values (const bool reset_values, const int tape_index)
   J = nullptr;
 }
 
-int main(void)
+int
+main(void)
 {
   initlog();
 

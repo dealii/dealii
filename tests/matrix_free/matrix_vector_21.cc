@@ -84,8 +84,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (parallel::distributed::BlockVector<Number>       &dst,
-              const parallel::distributed::BlockVector<Number> &src) const
+  void
+  vmult (parallel::distributed::BlockVector<Number>       &dst,
+         const parallel::distributed::BlockVector<Number> &src) const
   {
     for (unsigned int i=0; i<dst.size(); ++i)
       dst[i] = 0;
@@ -106,7 +107,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
 
@@ -250,7 +252,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);

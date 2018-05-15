@@ -27,7 +27,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 
-void test (const unsigned int n)
+void
+test (const unsigned int n)
 {
   // Create some random full matrices in the
   // data structures of a sparse matrix

@@ -170,7 +170,8 @@ check (const unsigned int level,
 }
 
 template <int dim>
-void loop ()
+void
+loop ()
 {
   QGauss<dim> gauss((dim<3) ? 5 : 3);
 
@@ -211,7 +212,8 @@ void loop ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

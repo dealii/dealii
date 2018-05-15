@@ -82,8 +82,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (LinearAlgebra::distributed::BlockVector<Number>       &dst,
-              const LinearAlgebra::distributed::BlockVector<Number> &src) const
+  void
+  vmult (LinearAlgebra::distributed::BlockVector<Number>       &dst,
+         const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     dst = 0;
     const std::function<void(const MatrixFree<dim,Number> &,
@@ -103,7 +104,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
 
@@ -260,7 +262,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

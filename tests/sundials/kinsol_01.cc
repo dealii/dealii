@@ -27,7 +27,8 @@
  * F(u) = 0 , where f_i(u) = u_i^2 - i^2,  0 <= i < N
  *
  */
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

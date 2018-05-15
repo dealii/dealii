@@ -23,8 +23,9 @@
 #include <vector>
 
 
-void test (Vector<std::complex<double> > &v,
-           Vector<std::complex<double> > &w)
+void
+test (Vector<std::complex<double> > &v,
+      Vector<std::complex<double> > &w)
 {
   // set only certain elements of each
   // vector, but disjoint sets of elements
@@ -44,7 +45,8 @@ void test (Vector<std::complex<double> > &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

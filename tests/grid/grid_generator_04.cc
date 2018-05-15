@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(false, true));
@@ -96,7 +97,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

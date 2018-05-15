@@ -20,7 +20,8 @@
 
 #include <deal.II/base/index_set.h>
 
-void test (IndexSet &index_set, unsigned int n)
+void
+test (IndexSet &index_set, unsigned int n)
 {
   deallog << "n=" << n;
 
@@ -35,7 +36,8 @@ void test (IndexSet &index_set, unsigned int n)
   deallog << std::endl;
 }
 
-void test()
+void
+test()
 {
   IndexSet index_set (20);
   index_set.add_range (2,5);
@@ -59,7 +61,8 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

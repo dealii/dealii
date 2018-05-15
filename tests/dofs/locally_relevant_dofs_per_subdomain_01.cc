@@ -34,8 +34,9 @@
 
 
 template <int dim, int spacedim>
-void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
-                 const char                                *filename_)
+void
+write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
+            const char                                *filename_)
 {
   DataOut<dim> data_out;
   data_out.attach_triangulation (tria);
@@ -57,7 +58,8 @@ void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim>
   triangulation (MPI_COMM_WORLD,
@@ -90,7 +92,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

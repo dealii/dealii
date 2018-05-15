@@ -39,7 +39,8 @@ static constexpr int n_cols = 4;
 
 
 template <typename number>
-void make_square_matrix (FullMatrix<number> &m)
+void
+make_square_matrix (FullMatrix<number> &m)
 {
   m.reinit (n_rows, n_rows);
   for (unsigned int i=0; i<n_rows; ++i)
@@ -50,7 +51,8 @@ void make_square_matrix (FullMatrix<number> &m)
 
 
 template <typename number>
-void make_matrix (FullMatrix<number> &m)
+void
+make_matrix (FullMatrix<number> &m)
 {
   m.reinit (n_rows, n_cols);
   for (unsigned int i=0; i<n_rows; ++i)
@@ -60,7 +62,8 @@ void make_matrix (FullMatrix<number> &m)
 
 
 template <typename number>
-void make_complex_square_matrix (FullMatrix<std::complex<number> > &m)
+void
+make_complex_square_matrix (FullMatrix<std::complex<number> > &m)
 {
   m.reinit (n_rows, n_rows);
   for (unsigned int i=0; i<n_rows; ++i)
@@ -70,7 +73,8 @@ void make_complex_square_matrix (FullMatrix<std::complex<number> > &m)
 
 
 template <typename number>
-void make_complex_matrix (FullMatrix<std::complex<number> > &m)
+void
+make_complex_matrix (FullMatrix<std::complex<number> > &m)
 {
   m.reinit (n_rows, n_cols);
   for (unsigned int i=0; i<n_rows; ++i)
@@ -80,7 +84,8 @@ void make_complex_matrix (FullMatrix<std::complex<number> > &m)
 
 
 template <typename number>
-void make_domain_vector (Vector<number> &v)
+void
+make_domain_vector (Vector<number> &v)
 {
   v.reinit (n_cols);
   for (unsigned int i=0; i<n_cols; ++i)
@@ -90,7 +95,8 @@ void make_domain_vector (Vector<number> &v)
 
 
 template <typename number>
-void make_range_vector (Vector<number> &v)
+void
+make_range_vector (Vector<number> &v)
 {
   v.reinit (n_rows);
   for (unsigned int i=0; i<n_rows; ++i)
@@ -100,7 +106,8 @@ void make_range_vector (Vector<number> &v)
 
 
 template <typename number>
-void make_complex_domain_vector (Vector<std::complex<number> > &v)
+void
+make_complex_domain_vector (Vector<std::complex<number> > &v)
 {
   v.reinit (n_cols);
   for (unsigned int i=0; i<n_cols; ++i)
@@ -111,7 +118,8 @@ void make_complex_domain_vector (Vector<std::complex<number> > &v)
 
 
 template <typename number>
-void make_complex_range_vector (Vector<std::complex<number> > &v)
+void
+make_complex_range_vector (Vector<std::complex<number> > &v)
 {
   v.reinit (n_rows);
   for (unsigned int i=0; i<n_rows; ++i)

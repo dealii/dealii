@@ -41,7 +41,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   const unsigned int dim = 3;
 
@@ -228,7 +229,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision (3);

@@ -21,7 +21,8 @@
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
 
-void test (const unsigned int chunk_size)
+void
+test (const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
 
@@ -56,7 +57,8 @@ void test (const unsigned int chunk_size)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

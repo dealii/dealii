@@ -23,7 +23,8 @@ const unsigned int N=10;
 unsigned int check_point = 0;
 
 template <typename number>
-void print (const Vector<number> &v)
+void
+print (const Vector<number> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     deallog << v(i) << '\t';
@@ -31,13 +32,15 @@ void print (const Vector<number> &v)
 }
 
 template <typename T>
-void fill( T &a)
+void
+fill( T &a)
 {
   for (unsigned int i=0; i<a.size(); ++i)
     a(i) = i;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

@@ -22,7 +22,8 @@
 #include <deal.II/base/utilities.h>
 
 
-void test ()
+void
+test ()
 {
   // verify the documented behavior of eating trailing delimiters
   {
@@ -61,7 +62,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

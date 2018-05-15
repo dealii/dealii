@@ -58,7 +58,8 @@ private:
   std::string s_s = "bye bye";
 };
 
-int main ()
+int
+main ()
 {
   initlog();
 

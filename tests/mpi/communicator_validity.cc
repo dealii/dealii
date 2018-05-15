@@ -29,7 +29,8 @@
 #include <deal.II/fe/fe_dgq.h>
 
 template <typename VectorType>
-void do_test(MPI_Comm communicator)
+void
+do_test(MPI_Comm communicator)
 {
   const int dim = 2;
   parallel::distributed::Triangulation<dim> tria(communicator);
@@ -53,7 +54,8 @@ void do_test(MPI_Comm communicator)
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

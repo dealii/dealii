@@ -21,7 +21,8 @@
 #include <deal.II/lac/vector.h>
 
 template <int dim>
-void test_select(double f1, double f2)
+void
+test_select(double f1, double f2)
 {
   Tensor<2,dim> t;
   unsigned int k = 0;
@@ -41,7 +42,8 @@ void test_select(double f1, double f2)
 }
 
 
-int main ()
+int
+main ()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

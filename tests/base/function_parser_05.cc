@@ -6,7 +6,8 @@
 
 // simple function parser example (this is the basis for the example code in the documentation)
 
-void test1()
+void
+test1()
 {
   // set up problem:
   std::string variables = "x,y";
@@ -31,7 +32,8 @@ void test1()
 }
 
 
-void test2()
+void
+test2()
 {
   // Define some constants that will be used by the function parser
   std::map<std::string,double> constants;
@@ -73,7 +75,8 @@ void test2()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

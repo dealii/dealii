@@ -27,9 +27,11 @@
 
 
 
-template <int dim> Table<dim,types::material_id> material_ids();
+template <int dim> Table<dim,types::material_id>
+material_ids();
 
-template <> Table<1,types::material_id> material_ids<1>()
+template <> Table<1,types::material_id> material_ids<1>
+()
 {
   Table<1,types::material_id> t(2);
   for (unsigned int i=0; i<2; ++i)
@@ -38,7 +40,8 @@ template <> Table<1,types::material_id> material_ids<1>()
 }
 
 
-template <> Table<2,types::material_id> material_ids<2>()
+template <> Table<2,types::material_id> material_ids<2>
+()
 {
   Table<2,types::material_id> t(2,3);
   for (unsigned int i=0; i<2; ++i)
@@ -50,7 +53,8 @@ template <> Table<2,types::material_id> material_ids<2>()
 }
 
 
-template <> Table<3,types::material_id> material_ids<3>()
+template <> Table<3,types::material_id> material_ids<3>
+()
 {
   Table<3,types::material_id> t(2,3,4);
   for (unsigned int i=0; i<2; ++i)
@@ -66,7 +70,8 @@ template <> Table<3,types::material_id> material_ids<3>()
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -122,7 +127,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -118,11 +118,14 @@ namespace StokesClass
       /**
          * Matrix vector product with this preconditioner object.
          */
-      void vmult (LinearAlgebra::distributed::BlockVector<double>       &dst,
-                  const LinearAlgebra::distributed::BlockVector<double> &src) const;
+      void
+      vmult (LinearAlgebra::distributed::BlockVector<double>       &dst,
+             const LinearAlgebra::distributed::BlockVector<double> &src) const;
 
-      unsigned int n_iterations_A() const;
-      unsigned int n_iterations_S() const;
+      unsigned int
+      n_iterations_A() const;
+      unsigned int
+      n_iterations_S() const;
 
     private:
       /**
@@ -269,11 +272,13 @@ namespace StokesClass
   {
   public:
     Viscosity (const Sinker<dim> &sink);
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+    virtual double
+    value (const Point<dim> &p,
+           const unsigned int component = 0) const;
+    virtual void
+    value_list (const std::vector<Point<dim> > &points,
+                std::vector<double>            &values,
+                const unsigned int              component = 0) const;
 
     Sinker<dim> sinker;
   };
@@ -283,8 +288,9 @@ namespace StokesClass
     sinker = sink;
   }
   template <int dim>
-  double Viscosity<dim>::value (const Point<dim> &p,
-                                const unsigned int /*component*/) const
+  double
+  Viscosity<dim>::value (const Point<dim> &p,
+                         const unsigned int /*component*/) const
   {
     double Chi = 1.0;
     for (unsigned int s=0; s<sinker.n_sinkers; ++s)
@@ -297,9 +303,10 @@ namespace StokesClass
     return (sinker.mu_max - sinker.mu_min)*(1-Chi) + sinker.mu_min;
   }
   template <int dim>
-  void Viscosity<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
+  void
+  Viscosity<dim>::value_list (const std::vector<Point<dim> > &points,
+                              std::vector<double>            &values,
+                              const unsigned int              component) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch (values.size(), points.size()));
@@ -316,8 +323,9 @@ namespace StokesClass
   public:
     RightHandSide (const Sinker<dim> &sink);
     Sinker<dim> sinker;
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
   template <int dim>
   RightHandSide<dim>::RightHandSide(const Sinker<dim> &sink)
@@ -359,8 +367,9 @@ namespace StokesClass
   {
   public:
     ExactSolution_BoundaryValues () : Function<dim>(dim+1) {}
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
   template <int dim>
   void
@@ -378,8 +387,9 @@ namespace StokesClass
   {
   public:
     ExactSolution_BoundaryValues_u () : Function<dim>(dim) {}
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
   template <int dim>
   void
@@ -401,18 +411,23 @@ namespace StokesClass
   public:
     StokesOperator ()
       : MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::BlockVector<number> > () {}
-    void clear ();
-    void evaluate_2_x_viscosity(const Viscosity<dim> &viscosity_function);
-    virtual void compute_diagonal ();
+    void
+    clear ();
+    void
+    evaluate_2_x_viscosity(const Viscosity<dim> &viscosity_function);
+    virtual void
+    compute_diagonal ();
 
   private:
-    virtual void apply_add (LinearAlgebra::distributed::BlockVector<number> &dst,
-                            const LinearAlgebra::distributed::BlockVector<number> &src) const;
+    virtual void
+    apply_add (LinearAlgebra::distributed::BlockVector<number> &dst,
+               const LinearAlgebra::distributed::BlockVector<number> &src) const;
 
-    void local_apply (const dealii::MatrixFree<dim, number> &data,
-                      LinearAlgebra::distributed::BlockVector<number> &dst,
-                      const LinearAlgebra::distributed::BlockVector<number> &src,
-                      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void
+    local_apply (const dealii::MatrixFree<dim, number> &data,
+                 LinearAlgebra::distributed::BlockVector<number> &dst,
+                 const LinearAlgebra::distributed::BlockVector<number> &src,
+                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     Table<2, VectorizedArray<number> > viscosity_x_2;
   };
@@ -453,10 +468,11 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   StokesOperator<dim,degree_v,number>
-  ::local_apply (const dealii::MatrixFree<dim, number>                 &data,
-                 LinearAlgebra::distributed::BlockVector<number>       &dst,
-                 const LinearAlgebra::distributed::BlockVector<number> &src,
-                 const std::pair<unsigned int, unsigned int>           &cell_range) const
+  ::
+  local_apply (const dealii::MatrixFree<dim, number>                 &data,
+               LinearAlgebra::distributed::BlockVector<number>       &dst,
+               const LinearAlgebra::distributed::BlockVector<number> &src,
+               const std::pair<unsigned int, unsigned int>           &cell_range) const
   {
     typedef VectorizedArray<number> vector_t;
     FEEvaluation<dim,degree_v,degree_v+1,dim,number> velocity (data, 0);
@@ -496,8 +512,9 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   StokesOperator<dim,degree_v,number>
-  ::apply_add (LinearAlgebra::distributed::BlockVector<number> &dst,
-               const LinearAlgebra::distributed::BlockVector<number> &src) const
+  ::
+  apply_add (LinearAlgebra::distributed::BlockVector<number> &dst,
+             const LinearAlgebra::distributed::BlockVector<number> &src) const
   {
     MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::BlockVector<number> >::
     data->cell_loop(&StokesOperator::local_apply, this, dst, src);
@@ -505,7 +522,8 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   StokesOperator<dim,degree_v,number>
-  ::compute_diagonal ()
+  ::
+  compute_diagonal ()
   {
     Assert(false, ExcNotImplemented());
   }
@@ -518,23 +536,29 @@ namespace StokesClass
   public:
     MassMatrixOperator ()
       : MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number> >() {}
-    void clear ();
-    void evaluate_1_over_viscosity(const Viscosity<dim> &viscosity_function);
-    virtual void compute_diagonal ();
+    void
+    clear ();
+    void
+    evaluate_1_over_viscosity(const Viscosity<dim> &viscosity_function);
+    virtual void
+    compute_diagonal ();
 
   private:
-    virtual void apply_add (LinearAlgebra::distributed::Vector<number> &dst,
-                            const LinearAlgebra::distributed::Vector<number> &src) const;
+    virtual void
+    apply_add (LinearAlgebra::distributed::Vector<number> &dst,
+               const LinearAlgebra::distributed::Vector<number> &src) const;
 
-    void local_apply (const dealii::MatrixFree<dim, number> &data,
-                      LinearAlgebra::distributed::Vector<number> &dst,
-                      const LinearAlgebra::distributed::Vector<number> &src,
-                      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void
+    local_apply (const dealii::MatrixFree<dim, number> &data,
+                 LinearAlgebra::distributed::Vector<number> &dst,
+                 const LinearAlgebra::distributed::Vector<number> &src,
+                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
-    void local_compute_diagonal (const MatrixFree<dim,number>                     &data,
-                                 LinearAlgebra::distributed::Vector<number>  &dst,
-                                 const unsigned int                               &dummy,
-                                 const std::pair<unsigned int,unsigned int>       &cell_range) const;
+    void
+    local_compute_diagonal (const MatrixFree<dim,number>                     &data,
+                            LinearAlgebra::distributed::Vector<number>  &dst,
+                            const unsigned int                               &dummy,
+                            const std::pair<unsigned int,unsigned int>       &cell_range) const;
 
     Table<2, VectorizedArray<number> > one_over_viscosity;
   };
@@ -573,10 +597,11 @@ namespace StokesClass
   template <int dim, int degree_p, typename number>
   void
   MassMatrixOperator<dim,degree_p,number>
-  ::local_apply (const dealii::MatrixFree<dim, number>                 &data,
-                 LinearAlgebra::distributed::Vector<number>       &dst,
-                 const LinearAlgebra::distributed::Vector<number> &src,
-                 const std::pair<unsigned int, unsigned int>           &cell_range) const
+  ::
+  local_apply (const dealii::MatrixFree<dim, number>                 &data,
+               LinearAlgebra::distributed::Vector<number>       &dst,
+               const LinearAlgebra::distributed::Vector<number> &src,
+               const std::pair<unsigned int, unsigned int>           &cell_range) const
   {
     FEEvaluation<dim,degree_p,degree_p+2,1,number> pressure (data);
 
@@ -598,8 +623,9 @@ namespace StokesClass
   template <int dim, int degree_p, typename number>
   void
   MassMatrixOperator<dim,degree_p,number>
-  ::apply_add (LinearAlgebra::distributed::Vector<number> &dst,
-               const LinearAlgebra::distributed::Vector<number> &src) const
+  ::
+  apply_add (LinearAlgebra::distributed::Vector<number> &dst,
+             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     MatrixFreeOperators::Base<dim,LinearAlgebra::distributed::Vector<number> >::
     data->cell_loop(&MassMatrixOperator::local_apply, this, dst, src);
@@ -607,7 +633,8 @@ namespace StokesClass
   template <int dim, int degree_p, typename number>
   void
   MassMatrixOperator<dim,degree_p,number>
-  ::compute_diagonal ()
+  ::
+  compute_diagonal ()
   {
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
@@ -641,10 +668,11 @@ namespace StokesClass
   template <int dim, int degree_p, typename number>
   void
   MassMatrixOperator<dim,degree_p,number>
-  ::local_compute_diagonal (const MatrixFree<dim,number>                     &data,
-                            LinearAlgebra::distributed::Vector<number>  &dst,
-                            const unsigned int &,
-                            const std::pair<unsigned int,unsigned int>       &cell_range) const
+  ::
+  local_compute_diagonal (const MatrixFree<dim,number>                     &data,
+                          LinearAlgebra::distributed::Vector<number>  &dst,
+                          const unsigned int &,
+                          const std::pair<unsigned int,unsigned int>       &cell_range) const
   {
     FEEvaluation<dim,degree_p,degree_p+2,1,number> pressure (data, 0);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
@@ -680,23 +708,29 @@ namespace StokesClass
   public:
     ABlockOperator ()
       : MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<number> >() {}
-    void clear ();
-    void evaluate_2_x_viscosity(const Viscosity<dim> &viscosity_function);
-    virtual void compute_diagonal ();
+    void
+    clear ();
+    void
+    evaluate_2_x_viscosity(const Viscosity<dim> &viscosity_function);
+    virtual void
+    compute_diagonal ();
 
   private:
-    virtual void apply_add (LinearAlgebra::distributed::Vector<number> &dst,
-                            const LinearAlgebra::distributed::Vector<number> &src) const;
+    virtual void
+    apply_add (LinearAlgebra::distributed::Vector<number> &dst,
+               const LinearAlgebra::distributed::Vector<number> &src) const;
 
-    void local_apply (const dealii::MatrixFree<dim, number> &data,
-                      LinearAlgebra::distributed::Vector<number> &dst,
-                      const LinearAlgebra::distributed::Vector<number> &src,
-                      const std::pair<unsigned int, unsigned int> &cell_range) const;
+    void
+    local_apply (const dealii::MatrixFree<dim, number> &data,
+                 LinearAlgebra::distributed::Vector<number> &dst,
+                 const LinearAlgebra::distributed::Vector<number> &src,
+                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
-    void local_compute_diagonal (const MatrixFree<dim,number>                     &data,
-                                 LinearAlgebra::distributed::Vector<number>  &dst,
-                                 const unsigned int                               &dummy,
-                                 const std::pair<unsigned int,unsigned int>       &cell_range) const;
+    void
+    local_compute_diagonal (const MatrixFree<dim,number>                     &data,
+                            LinearAlgebra::distributed::Vector<number>  &dst,
+                            const unsigned int                               &dummy,
+                            const std::pair<unsigned int,unsigned int>       &cell_range) const;
 
     Table<2, VectorizedArray<number> > viscosity_x_2;
   };
@@ -737,10 +771,11 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   ABlockOperator<dim,degree_v,number>
-  ::local_apply (const dealii::MatrixFree<dim, number>                 &data,
-                 LinearAlgebra::distributed::Vector<number>       &dst,
-                 const LinearAlgebra::distributed::Vector<number> &src,
-                 const std::pair<unsigned int, unsigned int>           &cell_range) const
+  ::
+  local_apply (const dealii::MatrixFree<dim, number>                 &data,
+               LinearAlgebra::distributed::Vector<number>       &dst,
+               const LinearAlgebra::distributed::Vector<number> &src,
+               const std::pair<unsigned int, unsigned int>           &cell_range) const
   {
     FEEvaluation<dim,degree_v,degree_v+1,dim,number> velocity (data);
 
@@ -764,8 +799,9 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   ABlockOperator<dim,degree_v,number>
-  ::apply_add (LinearAlgebra::distributed::Vector<number> &dst,
-               const LinearAlgebra::distributed::Vector<number> &src) const
+  ::
+  apply_add (LinearAlgebra::distributed::Vector<number> &dst,
+             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     MatrixFreeOperators::Base<dim,LinearAlgebra::distributed::Vector<number> >::
     data->cell_loop(&ABlockOperator::local_apply, this, dst, src);
@@ -773,7 +809,8 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   ABlockOperator<dim,degree_v,number>
-  ::compute_diagonal ()
+  ::
+  compute_diagonal ()
   {
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<LinearAlgebra::distributed::Vector<number> >());
@@ -798,10 +835,11 @@ namespace StokesClass
   template <int dim, int degree_v, typename number>
   void
   ABlockOperator<dim,degree_v,number>
-  ::local_compute_diagonal (const MatrixFree<dim,number>                     &data,
-                            LinearAlgebra::distributed::Vector<number>  &dst,
-                            const unsigned int &,
-                            const std::pair<unsigned int,unsigned int>       &cell_range) const
+  ::
+  local_compute_diagonal (const MatrixFree<dim,number>                     &data,
+                          LinearAlgebra::distributed::Vector<number>  &dst,
+                          const unsigned int &,
+                          const std::pair<unsigned int,unsigned int>       &cell_range) const
   {
     FEEvaluation<dim,degree_v,degree_v+1,dim,number> velocity (data, 0);
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
@@ -839,14 +877,20 @@ namespace StokesClass
   public:
     StokesProblem ();
 
-    void run ();
+    void
+    run ();
 
   private:
-    void make_grid (const unsigned int ref = 4);
-    void create_sinker (const unsigned int n_sinkers, const double visc_jump);
-    void setup_system ();
-    void assemble_rhs ();
-    void solve ();
+    void
+    make_grid (const unsigned int ref = 4);
+    void
+    create_sinker (const unsigned int n_sinkers, const double visc_jump);
+    void
+    setup_system ();
+    void
+    assemble_rhs ();
+    void
+    solve ();
 
     typedef LinearAlgebra::distributed::Vector<double> vector_t;
     typedef LinearAlgebra::distributed::BlockVector<double> block_vector_t;
@@ -902,7 +946,8 @@ namespace StokesClass
   {}
 
   template <int dim>
-  void StokesProblem<dim>::create_sinker(const unsigned int n_sinkers, const double visc_jump)
+  void
+  StokesProblem<dim>::create_sinker(const unsigned int n_sinkers, const double visc_jump)
   {
     sinker.problem_dim = dim;
     sinker.n_sinkers = n_sinkers;
@@ -933,7 +978,8 @@ namespace StokesClass
 
 
   template <int dim>
-  void StokesProblem<dim>::make_grid(const unsigned int ref)
+  void
+  StokesProblem<dim>::make_grid(const unsigned int ref)
   {
     GridGenerator::hyper_cube (triangulation, 0, 1);
     triangulation.refine_global (ref);
@@ -941,7 +987,8 @@ namespace StokesClass
 
 
   template <int dim>
-  void StokesProblem<dim>::setup_system ()
+  void
+  StokesProblem<dim>::setup_system ()
   {
     dof_handler_u.clear();
     dof_handler_u.distribute_dofs(fe_u);
@@ -1061,7 +1108,8 @@ namespace StokesClass
 
 
   template <int dim>
-  void StokesProblem<dim>::assemble_rhs ()
+  void
+  StokesProblem<dim>::assemble_rhs ()
   {
     system_rhs = 0.0;
 
@@ -1145,7 +1193,8 @@ namespace StokesClass
   }
 
   template <int dim>
-  void StokesProblem<dim>::solve ()
+  void
+  StokesProblem<dim>::solve ()
   {
     const double solver_tolerance = 1e-6*system_rhs.l2_norm();
     const unsigned int n_cheap_stokes_solver_steps = 1000;
@@ -1277,7 +1326,8 @@ namespace StokesClass
 
 
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run ()
   {
     deallog << "Sinker problem in " << dim << "D." << std::endl;
 
@@ -1324,7 +1374,8 @@ namespace StokesClass
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();

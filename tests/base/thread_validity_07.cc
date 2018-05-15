@@ -23,7 +23,8 @@
 #include <deal.II/base/thread_management.h>
 
 
-void worker ()
+void
+worker ()
 {
   deallog << "Worker thread is starting." << std::endl;
   sleep (3);
@@ -32,7 +33,8 @@ void worker ()
 
 Threads::Thread<> worker_thread;
 
-void waiter (int i)
+void
+waiter (int i)
 {
   worker_thread.join ();
 
@@ -43,7 +45,8 @@ void waiter (int i)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

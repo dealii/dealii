@@ -21,7 +21,8 @@
 #include <deal.II/base/aligned_vector.h>
 
 
-void test()
+void
+test()
 {
   typedef AlignedVector<unsigned int> VEC;
 
@@ -55,7 +56,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

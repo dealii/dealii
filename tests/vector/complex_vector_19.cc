@@ -22,7 +22,8 @@
 #include <vector>
 
 
-void test (Vector<std::complex<double> > &v)
+void
+test (Vector<std::complex<double> > &v)
 {
   // set some elements of the vector
   double norm = 0;
@@ -42,7 +43,8 @@ void test (Vector<std::complex<double> > &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

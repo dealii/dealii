@@ -25,7 +25,8 @@
 
 
 template <int M, int N, int type, bool add>
-void test()
+void
+test()
 {
   deallog << "Test " << M << " x " << N << std::endl;
   AlignedVector<double> shape(M*N);
@@ -96,7 +97,8 @@ void test()
   deallog << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

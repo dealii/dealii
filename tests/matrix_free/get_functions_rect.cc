@@ -24,16 +24,18 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "get_functions_common.h"
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void sub_test (const DoFHandler<dim> &dof,
-               const ConstraintMatrix &constraints,
-               MatrixFree<dim,number> &mf_data,
-               Vector<number> &solution)
+void
+sub_test (const DoFHandler<dim> &dof,
+          const ConstraintMatrix &constraints,
+          MatrixFree<dim,number> &mf_data,
+          Vector<number> &solution)
 {
   deallog << "Test with fe_degree " << fe_degree
           << ", n_q_points_1d: " << (n_q_points_1d) << std::endl;
@@ -50,7 +52,8 @@ void sub_test (const DoFHandler<dim> &dof,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
   const SphericalManifold<dim> manifold;

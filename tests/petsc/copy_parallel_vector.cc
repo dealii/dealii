@@ -25,7 +25,8 @@
 #include <deal.II/lac/vector.h>
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   using namespace dealii;
 

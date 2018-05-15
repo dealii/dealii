@@ -23,7 +23,8 @@
 
 
 
-void merge_check ()
+void
+merge_check ()
 {
   deallog << "Checking ConstraintMatrix::merge with localized lines" << std::endl;
 
@@ -106,7 +107,8 @@ void merge_check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

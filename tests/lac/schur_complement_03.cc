@@ -59,12 +59,17 @@ namespace Step22
   {
   public:
     StokesProblem (const unsigned int degree);
-    void run ();
+    void
+    run ();
   private:
-    void setup_dofs ();
-    void assemble_system ();
-    void solve ();
-    void refine_mesh ();
+    void
+    setup_dofs ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    refine_mesh ();
     const unsigned int   degree;
     Triangulation<dim>   triangulation;
     FESystem<dim>        fe;
@@ -81,10 +86,12 @@ namespace Step22
   {
   public:
     BoundaryValues () : Function<dim>(dim+1) {}
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
 
   template <int dim>
@@ -113,10 +120,12 @@ namespace Step22
   {
   public:
     RightHandSide () : Function<dim>(dim+1) {}
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
 
   template <int dim>
@@ -147,7 +156,8 @@ namespace Step22
   {}
 
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  void
+  StokesProblem<dim>::setup_dofs ()
   {
     system_matrix.clear ();
     dof_handler.distribute_dofs (fe);
@@ -200,7 +210,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::assemble_system ()
+  void
+  StokesProblem<dim>::assemble_system ()
   {
     system_matrix=0;
     system_rhs=0;
@@ -270,7 +281,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::solve ()
+  void
+  StokesProblem<dim>::solve ()
   {
     // Linear operators
     const auto A  = linear_operator(system_matrix.block(0,0));
@@ -342,7 +354,8 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run ()
   {
     {
       std::vector<unsigned int> subdivisions (dim, 1);
@@ -380,7 +393,8 @@ namespace Step22
       }
   }
 }
-int main ()
+int
+main ()
 {
   initlog();
   deallog.depth_file(1);

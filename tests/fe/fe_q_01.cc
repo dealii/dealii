@@ -21,7 +21,8 @@
 
 #include <deal.II/fe/fe_q.h>
 
-int main()
+int
+main()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();

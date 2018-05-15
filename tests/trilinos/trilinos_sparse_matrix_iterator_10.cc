@@ -26,7 +26,8 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
@@ -48,7 +49,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -21,7 +21,8 @@
 
 
 
-void test()
+void
+test()
 {
   unsigned int double_size = 2;
   unsigned int float_size = 10;
@@ -55,7 +56,8 @@ void test()
   double_vector.print(deallog.get_file_stream());
 }
 
-int main()
+int
+main()
 {
   initlog();
   test();

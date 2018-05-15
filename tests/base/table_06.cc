@@ -33,7 +33,8 @@ class FunctionBase
 public:
   ~FunctionBase() {}
 
-  virtual void do_test() = 0;
+  virtual void
+  do_test() = 0;
 };
 
 class Function
@@ -59,7 +60,8 @@ public:
     deallog << "Destruct with size " << vec.size() << std::endl;
   }
 
-  virtual void do_test()
+  virtual void
+  do_test()
   {
     vec.resize(size_++);
     deallog << "Resize vector to " << vec.size() << std::endl;
@@ -70,7 +72,8 @@ private:
   std::vector<unsigned int> vec;
 };
 
-int main()
+int
+main()
 {
   initlog();
   dealii::Table<2,Function> table;

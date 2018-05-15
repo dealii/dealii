@@ -28,8 +28,9 @@
 using namespace std;
 
 template <int dim, class PolynomialType>
-void check_point (const Point<dim>     &x,
-                  const PolynomialType &p)
+void
+check_point (const Point<dim>     &x,
+             const PolynomialType &p)
 {
   const unsigned int n = p.n();
   std::vector<Tensor<1,dim> > values(n);
@@ -56,7 +57,8 @@ void check_point (const Point<dim>     &x,
 
 
 template <int dim>
-void check_bdm ()
+void
+check_bdm ()
 {
   Point<dim> x;
 
@@ -77,7 +79,8 @@ void check_bdm ()
 }
 
 template <int dim>
-void check_rt ()
+void
+check_rt ()
 {
   Point<dim> x;
 
@@ -97,7 +100,8 @@ void check_rt ()
   check_point(x, p3);
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(0);

@@ -45,7 +45,8 @@
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
   Triangulation<dim> tr2 (Triangulation<dim>::limit_level_difference_at_vertices);
@@ -114,7 +115,8 @@ void test(std::ostream & /*out*/)
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

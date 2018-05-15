@@ -41,8 +41,9 @@ public:
             ExcNotImplemented());
   }
 
-  virtual double value (const dealii::Point<dim> &p,
-                        const unsigned int component = 0) const
+  virtual double
+  value (const dealii::Point<dim> &p,
+         const unsigned int component = 0) const
   {
     double l2_inverse = std::numeric_limits<double>::max();
 
@@ -60,7 +61,8 @@ private:
 };
 
 
-int main ()
+int
+main ()
 {
   const int dim = 2;
 

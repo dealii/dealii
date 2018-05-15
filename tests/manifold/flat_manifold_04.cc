@@ -34,7 +34,8 @@
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref, const MappingQ<dim> &mapping)
+void
+test(unsigned int ref, const MappingQ<dim> &mapping)
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -84,7 +85,8 @@ void test(unsigned int ref, const MappingQ<dim> &mapping)
 
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

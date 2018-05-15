@@ -32,7 +32,8 @@
 
 
 template <int dim>
-void check_values(const Function<dim> &f)
+void
+check_values(const Function<dim> &f)
 {
   Point<dim> p;
   for (unsigned int i=0; i<dim; ++i)
@@ -42,7 +43,8 @@ void check_values(const Function<dim> &f)
 }
 
 template <int dim>
-void check_value_list(const Function<dim> &f)
+void
+check_value_list(const Function<dim> &f)
 {
   const unsigned int max_points = 3;
   std::vector< Point<dim> >  point_vector(max_points);
@@ -61,7 +63,8 @@ void check_value_list(const Function<dim> &f)
 }
 
 template <int dim>
-void check_vector_value_list(const Function<dim> &f)
+void
+check_vector_value_list(const Function<dim> &f)
 {
   const unsigned int max_points = 3;
   std::vector< Point<dim> >  point_vector(max_points);
@@ -80,7 +83,8 @@ void check_vector_value_list(const Function<dim> &f)
 }
 
 template <int dim>
-void check_gradients(const Function<dim> &f)
+void
+check_gradients(const Function<dim> &f)
 {
   Point<dim> p;
   for (unsigned int i=0; i<dim; ++i)
@@ -96,7 +100,8 @@ void check_gradients(const Function<dim> &f)
 }
 
 template <int dim>
-void check_gradient_list(const Function<dim> &f)
+void
+check_gradient_list(const Function<dim> &f)
 {
   const unsigned int max_points = 3;
   std::vector< Point<dim> >  point_vector(max_points);
@@ -115,7 +120,8 @@ void check_gradient_list(const Function<dim> &f)
 }
 
 template <int dim>
-void check_vector_gradient_list(const Function<dim> &f)
+void
+check_vector_gradient_list(const Function<dim> &f)
 {
   const unsigned int max_points = 3;
   std::vector< Point<dim> >  point_vector(max_points);
@@ -135,7 +141,8 @@ void check_vector_gradient_list(const Function<dim> &f)
 }
 
 template <int dim>
-void check_laplacian(const Function<dim> &f)
+void
+check_laplacian(const Function<dim> &f)
 {
   Point<dim> p;
   for (unsigned int i=0; i<dim; ++i)
@@ -145,7 +152,8 @@ void check_laplacian(const Function<dim> &f)
 }
 
 template <int dim>
-void check_laplacian_list(const Function<dim> &f)
+void
+check_laplacian_list(const Function<dim> &f)
 {
   const unsigned int max_points = 3;
   std::vector< Point<dim> >  point_vector(max_points);
@@ -163,7 +171,8 @@ void check_laplacian_list(const Function<dim> &f)
             ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
 

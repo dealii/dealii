@@ -34,10 +34,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(unsigned int degree)
+void
+test(unsigned int degree)
 {
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
@@ -79,7 +81,8 @@ void test(unsigned int degree)
 
 }
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

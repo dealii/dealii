@@ -53,7 +53,8 @@ public:
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize (Archive &ar, const unsigned int version)
   {
     deallog << "Serializing object number "
             << object_number
@@ -61,7 +62,8 @@ public:
             << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator == (const C &) const
   {
     return true;
   }
@@ -75,12 +77,14 @@ struct P
 {
   C *c;
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int)
+  void
+  serialize (Archive &ar, const unsigned int)
   {
     ar &c;
   }
 
-  bool operator == (const P &p) const
+  bool
+  operator == (const P &p) const
   {
     // there is no useful operation we
     // can do here for the purposes of
@@ -92,7 +96,8 @@ struct P
 
 
 
-void test ()
+void
+test ()
 {
   {
     C *c = new C();
@@ -125,7 +130,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

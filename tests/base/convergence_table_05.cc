@@ -25,7 +25,8 @@
 // test the method evaluate_convergence_rates with key column given by
 // unsigned long long int
 
-int main ()
+int
+main ()
 {
   initlog();
 

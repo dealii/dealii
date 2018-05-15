@@ -68,10 +68,12 @@ namespace Step39
 
     InteriorPenaltyProblem(const FiniteElement<dim> &fe);
 
-    void run(unsigned int n_steps);
+    void
+    run(unsigned int n_steps);
 
   private:
-    void setup_system ();
+    void
+    setup_system ();
 
     parallel::distributed::Triangulation<dim>        triangulation;
     const MappingQGeneric<dim>      mapping;
@@ -186,7 +188,8 @@ namespace Step39
 
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   using namespace dealii;
   using namespace Step39;

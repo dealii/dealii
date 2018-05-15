@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (unsigned int p=0; p<6-dim; ++p)
     test_with_wrong_face_orientation (FE_DGQ<dim>(p), p);

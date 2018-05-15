@@ -23,7 +23,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v)
+void
+test (PETScWrappers::MPI::Vector &v)
 {
   v.reinit (MPI_COMM_WORLD, 13, 13, true);
 
@@ -34,7 +35,8 @@ void test (PETScWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

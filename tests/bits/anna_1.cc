@@ -44,12 +44,16 @@ class SystemTest
 {
 public:
   SystemTest ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void shape_to_components ();
-  void check_numbering ();
+  void
+  make_grid_and_dofs ();
+  void
+  shape_to_components ();
+  void
+  check_numbering ();
 
 
   Triangulation<dim>     triangulation;
@@ -68,7 +72,8 @@ SystemTest<dim>::SystemTest () :
 
 
 template <int dim>
-void SystemTest<dim>::make_grid_and_dofs ()
+void
+SystemTest<dim>::make_grid_and_dofs ()
 {
 
   GridGenerator::hyper_cube (triangulation, -1, 1);
@@ -85,7 +90,8 @@ void SystemTest<dim>::make_grid_and_dofs ()
 }
 
 template <int dim>
-void SystemTest<dim>::shape_to_components ()
+void
+SystemTest<dim>::shape_to_components ()
 {
   // testing, if the shape function
   // with index i is of type Nedelec:
@@ -100,7 +106,8 @@ void SystemTest<dim>::shape_to_components ()
 
 
 template <int dim>
-void SystemTest<dim>::check_numbering ()
+void
+SystemTest<dim>::check_numbering ()
 {
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
@@ -142,7 +149,8 @@ void SystemTest<dim>::check_numbering ()
 
 
 template <int dim>
-void SystemTest<dim>::run ()
+void
+SystemTest<dim>::run ()
 {
   make_grid_and_dofs ();
   shape_to_components ();
@@ -151,7 +159,8 @@ void SystemTest<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

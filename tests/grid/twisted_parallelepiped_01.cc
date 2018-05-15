@@ -31,7 +31,8 @@
  */
 
 template <int dim>
-void check_parallelepiped (std::ostream &logfile)
+void
+check_parallelepiped (std::ostream &logfile)
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
@@ -74,7 +75,8 @@ void check_parallelepiped (std::ostream &logfile)
     }
 }
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

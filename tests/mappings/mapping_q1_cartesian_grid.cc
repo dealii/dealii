@@ -52,7 +52,8 @@ public:
   }
 
 private:
-  void make_grid()
+  void
+  make_grid()
   {
     if (refine_case == 1)
       {
@@ -92,7 +93,8 @@ private:
       }
   }
 
-  void test_mapping()
+  void
+  test_mapping()
   {
     const double tol = 1e-8;
     const MappingQGeneric<dim> mapping(1);
@@ -148,7 +150,8 @@ private:
   const unsigned int      refine_case;
 };
 
-int main(/*int argc, char *argv[]*/)
+int
+main(/*int argc, char *argv[]*/)
 {
   initlog();
 

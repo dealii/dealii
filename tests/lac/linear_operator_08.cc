@@ -179,7 +179,8 @@ public:
     AdditionalData () {}
   };
 
-  virtual ~PreconditionBlockIdentity ()
+  virtual
+  ~PreconditionBlockIdentity ()
   {}
 
   void
@@ -218,7 +219,8 @@ public:
 // PreconditionBlockSSOR
 // SparseBlockVanka
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);

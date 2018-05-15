@@ -19,7 +19,8 @@
 #include <deal.II/base/parameter_handler.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 

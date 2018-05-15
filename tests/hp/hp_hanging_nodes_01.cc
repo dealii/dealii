@@ -53,7 +53,8 @@
 // unrefined element to create the constraints for this configuration.
 
 template <int dim>
-int generate_grid (Triangulation<dim> &tria)
+int
+generate_grid (Triangulation<dim> &tria)
 {
   Point<dim> p1,
         p2;
@@ -78,7 +79,8 @@ int generate_grid (Triangulation<dim> &tria)
 
 
 template <int dim>
-void test_constraints (hp::FECollection<dim> &fe_coll)
+void
+test_constraints (hp::FECollection<dim> &fe_coll)
 {
   Triangulation<dim> tria;
 
@@ -120,7 +122,8 @@ void test_constraints (hp::FECollection<dim> &fe_coll)
 
 
 template <int dim>
-void test_constraints_old (FiniteElement<dim> &fe)
+void
+test_constraints_old (FiniteElement<dim> &fe)
 {
   Triangulation<dim> tria;
 
@@ -152,7 +155,8 @@ void test_constraints_old (FiniteElement<dim> &fe)
   constraint_matrix.print (deallog.get_file_stream ());
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

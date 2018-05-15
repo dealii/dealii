@@ -27,7 +27,8 @@
 using namespace dealii;
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim>    triangulation;
   FE_TraceQ<dim>         fe(2);
@@ -45,7 +46,8 @@ void test()
   deallog << "Success, dim = " << dim << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

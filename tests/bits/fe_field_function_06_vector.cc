@@ -42,8 +42,9 @@ class F : public Function<dim>
 {
 public:
   F() : Function<dim>(2) {}
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double> &v) const
   {
     v = 0;
     v[0] = p.square();
@@ -53,7 +54,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const SphericalManifold<dim> boundary_description;
 
@@ -115,7 +117,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

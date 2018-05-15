@@ -45,13 +45,18 @@ class Step4
 {
 public:
   Step4 ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid ();
-  void setup_system();
-  void assemble_system ();
-  void solve ();
+  void
+  make_grid ();
+  void
+  setup_system();
+  void
+  assemble_system ();
+  void
+  solve ();
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -71,8 +76,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
@@ -83,16 +89,18 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
 
 
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-                                  const unsigned int /*component*/) const
+double
+RightHandSide<dim>::value (const Point<dim> &p,
+                           const unsigned int /*component*/) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -104,8 +112,9 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-                                   const unsigned int /*component*/) const
+double
+BoundaryValues<dim>::value (const Point<dim> &p,
+                            const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -121,7 +130,8 @@ Step4<dim>::Step4 ()
 
 
 template <int dim>
-void Step4<dim>::make_grid ()
+void
+Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (6);
@@ -130,7 +140,8 @@ void Step4<dim>::make_grid ()
 
 
 template <int dim>
-void Step4<dim>::setup_system ()
+void
+Step4<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -152,7 +163,8 @@ void Step4<dim>::setup_system ()
 
 
 template <int dim>
-void Step4<dim>::assemble_system ()
+void
+Step4<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula(fe.degree+1);
 
@@ -204,7 +216,8 @@ void Step4<dim>::assemble_system ()
 
 
 template <int dim>
-void Step4<dim>::solve ()
+void
+Step4<dim>::solve ()
 {
   // Compute 'reference' solution with direct solver
   {
@@ -256,7 +269,8 @@ void Step4<dim>::solve ()
 
 
 template <int dim>
-void Step4<dim>::run()
+void
+Step4<dim>::run()
 {
   make_grid();
   setup_system();
@@ -265,7 +279,8 @@ void Step4<dim>::run()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -21,7 +21,8 @@
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn (unsigned int n)
 {
   for (unsigned int i=0 ; i<n ; ++i)
     {
@@ -100,7 +101,8 @@ test_timer(Timer &t)
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();

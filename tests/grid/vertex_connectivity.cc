@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // First check connectivity of plain mesh
   Triangulation<dim> tria;
@@ -43,7 +44,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

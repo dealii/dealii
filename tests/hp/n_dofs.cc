@@ -39,7 +39,8 @@
 
 
 template <int dim>
-void test (const FiniteElement<dim> &fe)
+void
+test (const FiniteElement<dim> &fe)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -90,7 +91,8 @@ void test (const FiniteElement<dim> &fe)
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

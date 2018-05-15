@@ -32,7 +32,8 @@ public:
     add_parameter("A point", p);
   };
 
-  void log_info()
+  void
+  log_info()
   {
     deallog << "My type: " << boost::core::demangle(typeid(*this).name()) << std::endl
             << "p: " << p << std::endl;
@@ -43,7 +44,8 @@ private:
 };
 
 
-int main ()
+int
+main ()
 {
   initlog();
   Test<1> a;

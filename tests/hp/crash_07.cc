@@ -43,7 +43,8 @@ char logname[] = "output";
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

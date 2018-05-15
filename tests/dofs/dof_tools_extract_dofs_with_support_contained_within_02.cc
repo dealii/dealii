@@ -46,7 +46,8 @@ pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 }
 
 
-std::string output_name(const unsigned int flag, const unsigned int subdomain)
+std::string
+output_name(const unsigned int flag, const unsigned int subdomain)
 {
   return "output" + Utilities::int_to_string(flag) + "_" +
          Utilities::int_to_string(subdomain) +
@@ -55,7 +56,8 @@ std::string output_name(const unsigned int flag, const unsigned int subdomain)
 
 
 template <int dim>
-void test (const unsigned int flag)
+void
+test (const unsigned int flag)
 {
   // Setup system
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
@@ -166,7 +168,8 @@ void test (const unsigned int flag)
   dh.clear();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

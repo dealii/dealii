@@ -52,8 +52,9 @@ private:
 
 public:
 
-  Real value (const ROL::Vector<Real> &x,
-              Real                    &tol)
+  Real
+  value (const ROL::Vector<Real> &x,
+         Real                    &tol)
   {
     Assert (x.dimension()==2,
             ExcInternalError());
@@ -61,9 +62,10 @@ public:
     return x.dot(x);
   }
 
-  void gradient (ROL::Vector<Real>       &g,
-                 const ROL::Vector<Real> &x,
-                 Real                    &tol)
+  void
+  gradient (ROL::Vector<Real>       &g,
+            const ROL::Vector<Real> &x,
+            Real                    &tol)
   {
     Teuchos::RCP<const VectorType> xp = this->get_rcp_to_VectorType(x);
     Teuchos::RCP<VectorType> gp = this->get_rcp_to_VectorType(g);
@@ -74,8 +76,9 @@ public:
 
 };
 
-void test (const double x,
-           const double y)
+void
+test (const double x,
+      const double y)
 {
   typedef double RealT;
 
@@ -105,7 +108,8 @@ void test (const double x,
   std::cout << (*xg)[0] << " " << (*xg)[1] << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   try
     {

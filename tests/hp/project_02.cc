@@ -40,8 +40,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int = 0) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int = 0) const
   {
     double s = 1;
     for (unsigned int i=0; i<dim; ++i)
@@ -52,7 +53,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // create 2 triangulations with the
   // same coarse grid, and refine
@@ -95,7 +97,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

@@ -76,7 +76,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void FESystem::declare_parameters(ParameterHandler &prm)
+    void
+    FESystem::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Finite element system");
       {
@@ -89,7 +90,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void FESystem::parse_parameters(ParameterHandler &prm)
+    void
+    FESystem::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Finite element system");
       {
@@ -108,7 +110,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void Geometry::declare_parameters(ParameterHandler &prm)
+    void
+    Geometry::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Geometry");
       {
@@ -124,7 +127,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void Geometry::parse_parameters(ParameterHandler &prm)
+    void
+    Geometry::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Geometry");
       {
@@ -143,7 +147,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void Materials::declare_parameters(ParameterHandler &prm)
+    void
+    Materials::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Material properties");
       {
@@ -156,7 +161,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void Materials::parse_parameters(ParameterHandler &prm)
+    void
+    Materials::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Material properties");
       {
@@ -178,7 +184,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void LinearSolver::declare_parameters(ParameterHandler &prm)
+    void
+    LinearSolver::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Linear solver");
       {
@@ -203,7 +210,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void LinearSolver::parse_parameters(ParameterHandler &prm)
+    void
+    LinearSolver::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Linear solver");
       {
@@ -226,7 +234,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void NonlinearSolver::declare_parameters(ParameterHandler &prm)
+    void
+    NonlinearSolver::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Nonlinear solver");
       {
@@ -242,7 +251,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void NonlinearSolver::parse_parameters(ParameterHandler &prm)
+    void
+    NonlinearSolver::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Nonlinear solver");
       {
@@ -261,7 +271,8 @@ namespace Step44
       void
       parse_parameters(ParameterHandler &prm);
     };
-    void Time::declare_parameters(ParameterHandler &prm)
+    void
+    Time::declare_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Time");
       {
@@ -274,7 +285,8 @@ namespace Step44
       }
       prm.leave_subsection();
     }
-    void Time::parse_parameters(ParameterHandler &prm)
+    void
+    Time::parse_parameters(ParameterHandler &prm)
     {
       prm.enter_subsection("Time");
       {
@@ -303,7 +315,8 @@ namespace Step44
       prm.parse_input(input_file);
       parse_parameters(prm);
     }
-    void AllParameters::declare_parameters(ParameterHandler &prm)
+    void
+    AllParameters::declare_parameters(ParameterHandler &prm)
     {
       FESystem::declare_parameters(prm);
       Geometry::declare_parameters(prm);
@@ -312,7 +325,8 @@ namespace Step44
       NonlinearSolver::declare_parameters(prm);
       Time::declare_parameters(prm);
     }
-    void AllParameters::parse_parameters(ParameterHandler &prm)
+    void
+    AllParameters::parse_parameters(ParameterHandler &prm)
     {
       FESystem::parse_parameters(prm);
       Geometry::parse_parameters(prm);
@@ -333,25 +347,31 @@ namespace Step44
       time_end(time_end),
       delta_t(delta_t)
     {}
-    virtual ~Time()
+    virtual
+    ~Time()
     {}
-    double current() const
+    double
+    current() const
     {
       return time_current;
     }
-    double end() const
+    double
+    end() const
     {
       return time_end;
     }
-    double get_delta_t() const
+    double
+    get_delta_t() const
     {
       return delta_t;
     }
-    unsigned int get_timestep() const
+    unsigned int
+    get_timestep() const
     {
       return timestep;
     }
-    void increment()
+    void
+    increment()
     {
       time_current += delta_t;
       ++timestep;
@@ -381,9 +401,10 @@ namespace Step44
     }
     ~Material_Compressible_Neo_Hook_Three_Field()
     {}
-    void update_material_data(const Tensor<2, dim> &F_in,
-                              const double p_tilde_in,
-                              const double J_tilde_in)
+    void
+    update_material_data(const Tensor<2, dim> &F_in,
+                         const double p_tilde_in,
+                         const double J_tilde_in)
     {
       F = F_in;
       det_F = determinant(F);
@@ -393,7 +414,8 @@ namespace Step44
       J_tilde = J_tilde_in;
       Assert(det_F > 0, ExcInternalError());
     }
-    SymmetricTensor<2, dim> get_tau() const
+    SymmetricTensor<2, dim>
+    get_tau() const
     {
       // Zero strain --> zero stress
       if (std::abs(det_F-1.0) > 1e-9)
@@ -423,7 +445,8 @@ namespace Step44
 
       return Physics::Transformations::Contravariant::push_forward(get_S_iso() + get_S_vol(), F);
     }
-    SymmetricTensor<4, dim> get_Jc() const
+    SymmetricTensor<4, dim>
+    get_Jc() const
     {
       // Zero strain --> zero stress
       if (std::abs(det_F-1.0) > 1e-9)
@@ -453,23 +476,28 @@ namespace Step44
 
       return Physics::Transformations::Contravariant::push_forward(get_H_vol() + get_H_iso(), F);
     }
-    double get_dPsi_vol_dJ() const
+    double
+    get_dPsi_vol_dJ() const
     {
       return (kappa / 2.0) * (J_tilde - 1.0 / J_tilde);
     }
-    double get_d2Psi_vol_dJ2() const
+    double
+    get_d2Psi_vol_dJ2() const
     {
       return ( (kappa / 2.0) * (1.0 + 1.0 / (J_tilde * J_tilde)));
     }
-    double get_det_F() const
+    double
+    get_det_F() const
     {
       return det_F;
     }
-    double get_p_tilde() const
+    double
+    get_p_tilde() const
     {
       return p_tilde;
     }
-    double get_J_tilde() const
+    double
+    get_J_tilde() const
     {
       return J_tilde;
     }
@@ -481,22 +509,26 @@ namespace Step44
     double det_F;
     Tensor<2, dim> F;
     SymmetricTensor<2, dim> C_inv;
-    SymmetricTensor<2, dim> get_S_vol() const
+    SymmetricTensor<2, dim>
+    get_S_vol() const
     {
       // See Wriggers2008 equ 3.304 (3.126 == one field)
       return p_tilde * det_F * C_inv;
     }
-    SymmetricTensor<2, dim> get_S_iso() const
+    SymmetricTensor<2, dim>
+    get_S_iso() const
     {
       // Expansion of stress definition via chain rule
       return get_S_bar()*Physics::Elasticity::StandardTensors<dim>::Dev_P(F);
     }
-    SymmetricTensor<2, dim> get_S_bar() const
+    SymmetricTensor<2, dim>
+    get_S_bar() const
     {
       // Derived from energy function
       return 2.0 * c_1 * Physics::Elasticity::StandardTensors<dim>::I;
     }
-    SymmetricTensor<4, dim> get_H_vol() const
+    SymmetricTensor<4, dim>
+    get_H_vol() const
     {
       const SymmetricTensor<4, dim> C_inv_x_C_inv
         = outer_product(C_inv,C_inv);
@@ -504,7 +536,8 @@ namespace Step44
              * ( C_inv_x_C_inv
                  + (2.0 * Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(F)) );
     }
-    SymmetricTensor<4, dim> get_H_iso() const
+    SymmetricTensor<4, dim>
+    get_H_iso() const
     {
       // See Wriggers2008 (equ 3.253 == one field)
       const SymmetricTensor<2,dim> C = Physics::Elasticity::Kinematics::C(F);
@@ -530,33 +563,39 @@ namespace Step44
              + Physics::Elasticity::StandardTensors<dim>::Dev_P_T(F) * H_bar
              * Physics::Elasticity::StandardTensors<dim>::Dev_P(F);
     }
-    SymmetricTensor<4, dim> get_H_bar() const
+    SymmetricTensor<4, dim>
+    get_H_bar() const
     {
       return SymmetricTensor<4, dim>();
     }
 
     //=== ALTERNATIVE IMPLEMENTATION ===
-    SymmetricTensor<2, dim> get_tau_vol() const
+    SymmetricTensor<2, dim>
+    get_tau_vol() const
     {
       return p_tilde * det_F * Physics::Elasticity::StandardTensors<dim>::I;
     }
-    SymmetricTensor<2, dim> get_tau_iso() const
+    SymmetricTensor<2, dim>
+    get_tau_iso() const
     {
       return Physics::Elasticity::StandardTensors<dim>::dev_P * get_tau_bar();
     }
-    SymmetricTensor<2, dim> get_tau_bar() const
+    SymmetricTensor<2, dim>
+    get_tau_bar() const
     {
       const Tensor<2,dim> F_iso = Physics::Elasticity::Kinematics::F_iso(F);
       const SymmetricTensor<2,dim> b_bar = Physics::Elasticity::Kinematics::b(F_iso);
       return 2.0 * c_1 * b_bar;
     }
-    SymmetricTensor<4, dim> get_Jc_vol() const
+    SymmetricTensor<4, dim>
+    get_Jc_vol() const
     {
       return p_tilde * det_F
              * ( Physics::Elasticity::StandardTensors<dim>::IxI
                  - (2.0 * Physics::Elasticity::StandardTensors<dim>::S) );
     }
-    SymmetricTensor<4, dim> get_Jc_iso() const
+    SymmetricTensor<4, dim>
+    get_Jc_iso() const
     {
       const SymmetricTensor<2, dim> tau_bar = get_tau_bar();
       const SymmetricTensor<2, dim> tau_iso = get_tau_iso();
@@ -573,7 +612,8 @@ namespace Step44
              + Physics::Elasticity::StandardTensors<dim>::dev_P * c_bar
              * Physics::Elasticity::StandardTensors<dim>::dev_P;
     }
-    SymmetricTensor<4, dim> get_c_bar() const
+    SymmetricTensor<4, dim>
+    get_c_bar() const
     {
       return SymmetricTensor<4, dim>();
     }
@@ -590,17 +630,20 @@ namespace Step44
       dPsi_vol_dJ(0.0),
       Jc(SymmetricTensor<4, dim>())
     {}
-    virtual ~PointHistory()
+    virtual
+    ~PointHistory()
     {}
-    void setup_lqp (const Parameters::AllParameters &parameters)
+    void
+    setup_lqp (const Parameters::AllParameters &parameters)
     {
       material.reset(new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
                      parameters.nu));
       update_values(Tensor<2, dim>(), 0.0, 1.0);
     }
-    void update_values (const Tensor<2, dim> &Grad_u_n,
-                        const double p_tilde,
-                        const double J_tilde)
+    void
+    update_values (const Tensor<2, dim> &Grad_u_n,
+                   const double p_tilde,
+                   const double J_tilde)
     {
       const Tensor<2, dim> F = Physics::Elasticity::Kinematics::F(Grad_u_n);
       material->update_material_data(F, p_tilde, J_tilde);
@@ -610,35 +653,43 @@ namespace Step44
       dPsi_vol_dJ = material->get_dPsi_vol_dJ();
       d2Psi_vol_dJ2 = material->get_d2Psi_vol_dJ2();
     }
-    double get_J_tilde() const
+    double
+    get_J_tilde() const
     {
       return material->get_J_tilde();
     }
-    double get_det_F() const
+    double
+    get_det_F() const
     {
       return material->get_det_F();
     }
-    const Tensor<2, dim> &get_F_inv() const
+    const Tensor<2, dim> &
+    get_F_inv() const
     {
       return F_inv;
     }
-    double get_p_tilde() const
+    double
+    get_p_tilde() const
     {
       return material->get_p_tilde();
     }
-    const SymmetricTensor<2, dim> &get_tau() const
+    const SymmetricTensor<2, dim> &
+    get_tau() const
     {
       return tau;
     }
-    double get_dPsi_vol_dJ() const
+    double
+    get_dPsi_vol_dJ() const
     {
       return dPsi_vol_dJ;
     }
-    double get_d2Psi_vol_dJ2() const
+    double
+    get_d2Psi_vol_dJ2() const
     {
       return d2Psi_vol_dJ2;
     }
-    const SymmetricTensor<4, dim> &get_Jc() const
+    const SymmetricTensor<4, dim> &
+    get_Jc() const
     {
       return Jc;
     }
@@ -764,14 +815,16 @@ namespace Step44
         :
         norm(1.0), u(1.0), p(1.0), J(1.0)
       {}
-      void reset()
+      void
+      reset()
       {
         norm = 1.0;
         u = 1.0;
         p = 1.0;
         J = 1.0;
       }
-      void normalise(const Errors &rhs)
+      void
+      normalise(const Errors &rhs)
       {
         if (rhs.norm != 0.0)
           norm /= rhs.norm;
@@ -834,7 +887,8 @@ namespace Step44
     dof_handler_ref.clear();
   }
   template <int dim>
-  void Solid<dim>::run()
+  void
+  Solid<dim>::run()
   {
     make_grid();
     system_setup();
@@ -888,7 +942,8 @@ namespace Step44
       cell_matrix(dofs_per_cell, dofs_per_cell),
       local_dof_indices(dofs_per_cell)
     {}
-    void reset()
+    void
+    reset()
     {
       cell_matrix = 0.0;
     }
@@ -922,7 +977,8 @@ namespace Step44
       grad_Nx(rhs.grad_Nx),
       symm_grad_Nx(rhs.symm_grad_Nx)
     {}
-    void reset()
+    void
+    reset()
     {
       const unsigned int n_q_points = Nx.size();
       const unsigned int n_dofs_per_cell = Nx[0].size();
@@ -952,7 +1008,8 @@ namespace Step44
       cell_rhs(dofs_per_cell),
       local_dof_indices(dofs_per_cell)
     {}
-    void reset()
+    void
+    reset()
     {
       cell_rhs = 0.0;
     }
@@ -987,7 +1044,8 @@ namespace Step44
       Nx(rhs.Nx),
       symm_grad_Nx(rhs.symm_grad_Nx)
     {}
-    void reset()
+    void
+    reset()
     {
       const unsigned int n_q_points      = Nx.size();
       const unsigned int n_dofs_per_cell = Nx[0].size();
@@ -1035,19 +1093,22 @@ namespace Step44
       B(n_J, n_u),
       C(n_p, n_u)
     {}
-    void reset()
+    void
+    reset()
     {}
   };
   template <int dim>
   struct Solid<dim>::ScratchData_SC
   {
-    void reset()
+    void
+    reset()
     {}
   };
   template <int dim>
   struct Solid<dim>::PerTaskData_UQPH
   {
-    void reset()
+    void
+    reset()
     {}
   };
   template <int dim>
@@ -1079,7 +1140,8 @@ namespace Step44
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags())
     {}
-    void reset()
+    void
+    reset()
     {
       const unsigned int n_q_points = solution_grads_u_total.size();
       for (unsigned int q = 0; q < n_q_points; ++q)
@@ -1091,7 +1153,8 @@ namespace Step44
     }
   };
   template <int dim>
-  void Solid<dim>::make_grid()
+  void
+  Solid<dim>::make_grid()
   {
     GridGenerator::hyper_rectangle(triangulation,
                                    (dim==3 ? Point<dim>(0.0, 0.0, 0.0) : Point<dim>(0.0, 0.0)),
@@ -1127,7 +1190,8 @@ namespace Step44
         }
   }
   template <int dim>
-  void Solid<dim>::system_setup()
+  void
+  Solid<dim>::system_setup()
   {
     timer.enter_subsection("Setup system");
     std::vector<unsigned int> block_component(n_components, u_dof); // Displacement
@@ -1205,7 +1269,8 @@ namespace Step44
       }
   }
   template <int dim>
-  void Solid<dim>::setup_qph()
+  void
+  Solid<dim>::setup_qph()
   {
     pcout << "    Setting up quadrature point data..." << std::endl;
     quadrature_point_history.initialize(triangulation.begin_active(),
@@ -1222,7 +1287,8 @@ namespace Step44
       }
   }
   template <int dim>
-  void Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
+  void
+  Solid<dim>::update_qph_incremental(const BlockVector<double> &solution_delta)
   {
     timer.enter_subsection("Update QPH data");
     pcout << " UQPH " << std::flush;
@@ -1326,7 +1392,8 @@ namespace Step44
                  ExcMessage("No convergence in nonlinear solver!"));
   }
   template <int dim>
-  void Solid<dim>::print_conv_header()
+  void
+  Solid<dim>::print_conv_header()
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
@@ -1341,7 +1408,8 @@ namespace Step44
     pcout << std::endl;
   }
   template <int dim>
-  void Solid<dim>::print_conv_footer()
+  void
+  Solid<dim>::print_conv_footer()
   {
     static const unsigned int l_width = 155;
     for (unsigned int i = 0; i < l_width; ++i)
@@ -1407,7 +1475,8 @@ namespace Step44
                           compute_vol_current() / vol_reference);
   }
   template <int dim>
-  void Solid<dim>::get_error_residual(Errors &error_residual)
+  void
+  Solid<dim>::get_error_residual(Errors &error_residual)
   {
     BlockVector<double> error_res(dofs_per_block);
     for (unsigned int i = 0; i < dof_handler_ref.n_dofs(); ++i)
@@ -1419,8 +1488,9 @@ namespace Step44
     error_residual.J = error_res.block(J_dof).l2_norm();
   }
   template <int dim>
-  void Solid<dim>::get_error_update(const BlockVector<double> &newton_update,
-                                    Errors &error_update)
+  void
+  Solid<dim>::get_error_update(const BlockVector<double> &newton_update,
+                               Errors &error_update)
   {
     BlockVector<double> error_ud(dofs_per_block);
     for (unsigned int i = 0; i < dof_handler_ref.n_dofs(); ++i)
@@ -1440,7 +1510,8 @@ namespace Step44
     return solution_total;
   }
   template <int dim>
-  void Solid<dim>::assemble_system_tangent()
+  void
+  Solid<dim>::assemble_system_tangent()
   {
     timer.enter_subsection("Assemble tangent matrix");
     pcout << " ASM_K " << std::flush;
@@ -1465,7 +1536,8 @@ namespace Step44
     timer.leave_subsection();
   }
   template <int dim>
-  void Solid<dim>::copy_local_to_global_K(const PerTaskData_K &data)
+  void
+  Solid<dim>::copy_local_to_global_K(const PerTaskData_K &data)
   {
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -1559,7 +1631,8 @@ namespace Step44
         data.cell_matrix(i, j) = data.cell_matrix(j, i);
   }
   template <int dim>
-  void Solid<dim>::assemble_system_rhs()
+  void
+  Solid<dim>::assemble_system_rhs()
   {
     timer.enter_subsection("Assemble system right-hand side");
     pcout << " ASM_R " << std::flush;
@@ -1587,7 +1660,8 @@ namespace Step44
     timer.leave_subsection();
   }
   template <int dim>
-  void Solid<dim>::copy_local_to_global_rhs(const PerTaskData_RHS &data)
+  void
+  Solid<dim>::copy_local_to_global_rhs(const PerTaskData_RHS &data)
   {
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       system_rhs(data.local_dof_indices[i]) += data.cell_rhs(i);
@@ -1688,7 +1762,8 @@ namespace Step44
         }
   }
   template <int dim>
-  void Solid<dim>::make_constraints(const int &it_nr)
+  void
+  Solid<dim>::make_constraints(const int &it_nr)
   {
     pcout << " CST " << std::flush;
     if (it_nr > 1)
@@ -1820,7 +1895,8 @@ namespace Step44
     constraints.close();
   }
   template <int dim>
-  void Solid<dim>::assemble_sc()
+  void
+  Solid<dim>::assemble_sc()
   {
     timer.enter_subsection("Perform static condensation");
     pcout << " ASM_SC " << std::flush;
@@ -1838,7 +1914,8 @@ namespace Step44
     timer.leave_subsection();
   }
   template <int dim>
-  void Solid<dim>::copy_local_to_global_sc(const PerTaskData_SC &data)
+  void
+  Solid<dim>::copy_local_to_global_sc(const PerTaskData_SC &data)
   {
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
       for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -2031,7 +2108,8 @@ namespace Step44
     return std::make_pair(lin_it, lin_res);
   }
   template <int dim>
-  void Solid<dim>::output_results() const
+  void
+  Solid<dim>::output_results() const
   {
     DataOut<dim> data_out;
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -2058,7 +2136,8 @@ namespace Step44
     data_out.write_vtk(output);
   }
 }
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

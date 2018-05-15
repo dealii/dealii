@@ -36,14 +36,16 @@
 #define PRECISION 8
 
 
-Point<2> stretch_coordinates (const Point<2> p)
+Point<2>
+stretch_coordinates (const Point<2> p)
 {
   return Point<2>(2*p(0), p(1));
 }
 
 
 
-Point<2> tilt_coordinates (const Point<2> p)
+Point<2>
+tilt_coordinates (const Point<2> p)
 {
   return Point<2>(p(0)+p(1), p(1));
 }

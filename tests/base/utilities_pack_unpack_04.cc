@@ -28,7 +28,8 @@
 
 
 template <typename T, int N>
-void check (const T (&object)[N])
+void
+check (const T (&object)[N])
 {
   const std::vector<char> buffer = Utilities::pack (object);
   T unpacked[N];
@@ -50,7 +51,8 @@ void check (const T (&object)[N])
 }
 
 
-void test()
+void
+test()
 {
   // try a small array that is packed by just using memcpy
   double x[3] = { 1, 2, 3 };
@@ -67,7 +69,8 @@ void test()
   deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

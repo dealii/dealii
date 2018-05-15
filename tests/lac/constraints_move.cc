@@ -18,7 +18,8 @@
 #include <deal.II/lac/constraint_matrix.h>
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

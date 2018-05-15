@@ -24,7 +24,8 @@
 
 
 template <int dim>
-void do_test(const unsigned int size)
+void
+do_test(const unsigned int size)
 {
   deallog << "Testing dim=" << dim << ", degree=" << size << std::endl;
   FullMatrix<double> mass(size, size);
@@ -82,7 +83,8 @@ void do_test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

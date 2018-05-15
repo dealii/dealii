@@ -35,7 +35,8 @@
 using namespace dealii;
 
 template <class DOFINFO, typename MatrixType>
-void test(DOFINFO &info, MeshWorker::Assembler::MGMatrixSimple<MatrixType> &ass)
+void
+test(DOFINFO &info, MeshWorker::Assembler::MGMatrixSimple<MatrixType> &ass)
 {
   ass.initialize_info(info, false);
   deallog << "No faces" << std::endl;
@@ -46,7 +47,8 @@ void test(DOFINFO &info, MeshWorker::Assembler::MGMatrixSimple<MatrixType> &ass)
   info.print_debug(deallog);
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

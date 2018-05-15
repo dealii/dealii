@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void check (const FiniteElement<dim> &fe)
+void
+check (const FiniteElement<dim> &fe)
 {
   for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
        face++)
@@ -43,7 +44,8 @@ void check (const FiniteElement<dim> &fe)
 #define check_el(fe) { deallog << #fe << std::endl; check(fe); }
 
 template <int dim>
-void check ()
+void
+check ()
 {
   deallog << "************ dim = " << dim << std::endl;
   check_el (FE_Q<dim>(1));
@@ -71,7 +73,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

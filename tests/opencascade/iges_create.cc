@@ -25,7 +25,8 @@
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main ()
 {
   // Create a bspline passing through the points
   std::vector<Point<3> > pts;

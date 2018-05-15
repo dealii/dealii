@@ -32,7 +32,8 @@ struct CopyData {};
 using namespace MeshWorker;
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_cube(tria);
@@ -121,7 +122,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   MultithreadInfo::set_thread_limit(1); // to make output deterministic

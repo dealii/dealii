@@ -20,7 +20,8 @@
 #include <deal.II/base/quadrature.h>
 #include <boost/serialization/vector.hpp>
 
-void test ()
+void
+test ()
 {
   const unsigned int dim = 2;
   unsigned int n_copies = 3;
@@ -48,7 +49,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

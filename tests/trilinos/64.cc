@@ -30,7 +30,8 @@
 
 
 template <typename MatrixType>
-void test (MatrixType &m)
+void
+test (MatrixType &m)
 {
   m.set(0,0,1.);
   m.compress(VectorOperation::insert);
@@ -44,7 +45,8 @@ void test (MatrixType &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

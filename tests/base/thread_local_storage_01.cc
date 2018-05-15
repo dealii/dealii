@@ -38,9 +38,11 @@ struct X
 
 Threads::ThreadLocalStorage<X> *tls_data;
 
-static std::atomic<int> counter(0);
+static std::atomic<int>
+counter(0);
 
-void execute (int i)
+void
+execute (int i)
 {
   tls_data->get().i = i;
 
@@ -58,7 +60,8 @@ void execute (int i)
 }
 
 
-void test ()
+void
+test ()
 {
   // create a thread local storage object
   tls_data = new Threads::ThreadLocalStorage<X>();
@@ -99,7 +102,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

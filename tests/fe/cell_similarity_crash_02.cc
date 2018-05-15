@@ -32,7 +32,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -55,7 +56,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision (4);

@@ -20,7 +20,8 @@
 
 #include <deal.II/base/utilities.h>
 
-void check(const std::string in, const std::string from, const std::string to, std::string out)
+void
+check(const std::string in, const std::string from, const std::string to, std::string out)
 {
   std::string result = Utilities::replace_in_string(in, from, to);
   if (result != out)
@@ -35,7 +36,8 @@ void check(const std::string in, const std::string from, const std::string to, s
 }
 
 
-void test ()
+void
+test ()
 {
   check("wie geht es dir?","dir","euch","wie geht es euch?");
   check("empty from","","abc","empty from");
@@ -51,7 +53,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -27,7 +27,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);

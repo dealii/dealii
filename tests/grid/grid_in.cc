@@ -27,11 +27,13 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test1 ()
+void
+test1 ()
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -46,7 +48,8 @@ void test1 ()
 
 
 template <int dim>
-void test2 ()
+void
+test2 ()
 {
   // read a much larger grid (30k
   // cells). with the old grid
@@ -93,7 +96,8 @@ void test2 ()
 
 
 template <int dim>
-void test3 ()
+void
+test3 ()
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -107,8 +111,9 @@ void test3 ()
 
 
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file (const std::string name,
+            typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridIn<dim> gi;
@@ -129,14 +134,16 @@ void check_file (const std::string name,
           << std::endl;
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
   check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::ucd);
   check_file<2> (std::string(SOURCE_DIR "/grid_in/2d"), GridIn<2>::xda);
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

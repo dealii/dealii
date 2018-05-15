@@ -30,9 +30,10 @@
 
 
 template <int dim>
-void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-                    const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                    void *data)
+void
+pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
+               const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+               void *data)
 {
   static int some_number = cell->index();
   deallog << "packing cell " << cell->id() << " with data=" << some_number << " status=";
@@ -60,9 +61,10 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
 }
 
 template <int dim>
-void unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
-                      const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
-                      const void *data)
+void
+unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
+                 const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
+                 const void *data)
 {
   const int *intdata = reinterpret_cast<const int *>(data);
 
@@ -86,7 +88,8 @@ void unpack_function (const typename parallel::distributed::Triangulation<dim,di
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -149,7 +152,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

@@ -32,16 +32,18 @@
 
 
 template <int dim>
-void create_triangulation(const unsigned int,
-                          Triangulation<dim> &)
+void
+create_triangulation(const unsigned int,
+                     Triangulation<dim> &)
 {
   Assert(false, ExcNotImplemented());
 }
 
 
 template <>
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<2> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<2> &tria)
 {
   switch (case_no)
     {
@@ -104,8 +106,9 @@ void create_triangulation(const unsigned int case_no,
 
 
 template <>
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<3> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<3> &tria)
 {
   switch (case_no)
     {
@@ -174,7 +177,8 @@ void create_triangulation(const unsigned int case_no,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   for (unsigned int case_no=0; case_no<4; ++case_no)
@@ -202,7 +206,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (PRECISION);

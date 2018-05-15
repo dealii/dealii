@@ -48,8 +48,9 @@ public:
     q(q)
   {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component = 0) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component = 0) const
   {
     Assert ((component == 0) && (this->n_components == 1),
             ExcInternalError());
@@ -60,7 +61,8 @@ public:
     return val;
   }
 
-  VectorizedArray<double> value(const Point<dim, VectorizedArray<double> > &p_vec) const
+  VectorizedArray<double>
+  value(const Point<dim, VectorizedArray<double> > &p_vec) const
   {
     VectorizedArray<double> res = make_vectorized_array (0.);
     Point<dim> p;
@@ -83,7 +85,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
   F<dim> function(3,1);
@@ -246,7 +249,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

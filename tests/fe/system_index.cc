@@ -121,7 +121,8 @@ check_fe(const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_DGQ<dim> co(0);
   FE_Q<dim> q1(1);

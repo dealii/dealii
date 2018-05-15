@@ -42,7 +42,8 @@ const double right[] =
 
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

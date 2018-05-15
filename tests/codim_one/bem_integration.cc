@@ -52,7 +52,8 @@
 
 using namespace std;
 
-ofstream logfile("output");
+ofstream
+logfile("output");
 
 
 template <int dim>
@@ -63,22 +64,26 @@ public:
   LaplaceKernelIntegration();
   ~LaplaceKernelIntegration();
 
-  void run();
+  void
+  run();
 
-  void compute_SD_integral_on_cell(vector<double> &dst,
-                                   typename DoFHandler<dim,dim+1>::active_cell_iterator &cell,
-                                   const Point<dim+1> &point);
+  void
+  compute_SD_integral_on_cell(vector<double> &dst,
+                              typename DoFHandler<dim,dim+1>::active_cell_iterator &cell,
+                              const Point<dim+1> &point);
 
 private:
-  double term_S(const Tensor<1,3> &r,
-                const Tensor<1,3> &a1,
-                const Tensor<1,3> &a2,
-                const Tensor<1,3> &n,
-                const double &rn_c);
+  double
+  term_S(const Tensor<1,3> &r,
+         const Tensor<1,3> &a1,
+         const Tensor<1,3> &a2,
+         const Tensor<1,3> &n,
+         const double &rn_c);
 
-  double term_D(const Tensor<1,3> &r,
-                const Tensor<1,3> &a1,
-                const Tensor<1,3> &a2);
+  double
+  term_D(const Tensor<1,3> &r,
+         const Tensor<1,3> &a1,
+         const Tensor<1,3> &a2);
 
   SmartPointer<FEValues<dim,dim+1> > fe_values;
 };
@@ -208,7 +213,8 @@ integration(Point<3> point)
 
 
 
-int main()
+int
+main()
 {
 
   deallog.attach(logfile);

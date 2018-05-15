@@ -23,8 +23,9 @@
 #include <vector>
 
 
-void test (Vector<double> &v,
-           Vector<float> &w)
+void
+test (Vector<double> &v,
+      Vector<float> &w)
 {
   // set only certain elements of each
   // vector
@@ -45,7 +46,8 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

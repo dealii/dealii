@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   PETScWrappers::SparseMatrix m(5,5,5);
   m.set (0,0,1);
@@ -41,7 +42,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

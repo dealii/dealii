@@ -30,7 +30,8 @@
 using vector_t = typename dealii::Vector<double>;
 
 
-double compute (vector_t &G, const vector_t &X)
+double
+compute (vector_t &G, const vector_t &X)
 {
   AssertThrow (X.size() == 2 && G.size() == 2,
                ExcInternalError());
@@ -43,9 +44,10 @@ double compute (vector_t &G, const vector_t &X)
 
 
 
-void check_value (const double x,
-                  const double y,
-                  const double tol)
+void
+check_value (const double x,
+             const double y,
+             const double tol)
 {
   vector_t X;
 
@@ -76,7 +78,8 @@ void check_value (const double x,
   X.print(deallog);
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

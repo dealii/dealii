@@ -39,7 +39,8 @@
 using namespace std;
 
 template <int dim>
-void check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
+void
+check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -68,7 +69,8 @@ void check_fe(FiniteElement<dim> &fe, ComponentMask &component_mask)
 }
 
 template <int dim>
-void check()
+void
+check()
 {
   //All primitive
   {
@@ -103,7 +105,8 @@ void check()
   }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   initlog();
 

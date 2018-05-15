@@ -22,7 +22,8 @@
 #include <deal.II/base/aligned_vector.h>
 
 template <typename Number>
-void test ()
+void
+test ()
 {
   const unsigned int n_chunks = 50000;
   const unsigned int n_vectors = VectorizedArray<Number>::n_array_elements;
@@ -46,7 +47,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

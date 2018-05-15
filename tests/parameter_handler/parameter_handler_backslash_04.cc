@@ -24,7 +24,8 @@
  *                     c
  */
 
-int main ()
+int
+main ()
 {
   initlog();
 

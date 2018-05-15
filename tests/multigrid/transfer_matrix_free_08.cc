@@ -32,7 +32,8 @@
 
 
 template <int dim, typename Number>
-void check(const FiniteElement<dim> &fe)
+void
+check(const FiniteElement<dim> &fe)
 {
   deallog << "FE: " << fe.get_name() << std::endl;
 
@@ -94,7 +95,8 @@ void check(const FiniteElement<dim> &fe)
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   // no threading in this test...
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);

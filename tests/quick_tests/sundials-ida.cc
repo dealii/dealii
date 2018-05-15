@@ -133,7 +133,8 @@ public:
     };
   }
 
-  void run()
+  void
+  run()
   {
     y[1] = kappa;
     time_stepper.solve_dae(y,y_dot);
@@ -150,7 +151,8 @@ private:
 };
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

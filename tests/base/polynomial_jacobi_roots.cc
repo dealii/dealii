@@ -25,7 +25,8 @@
 using namespace Polynomials;
 
 
-int main()
+int
+main()
 {
   initlog();
 

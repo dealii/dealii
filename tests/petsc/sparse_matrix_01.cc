@@ -23,7 +23,8 @@
 #include <vector>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int s = 10;
   PETScWrappers::SparseMatrix m(s,s,s);
@@ -67,7 +68,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -31,7 +31,8 @@ DeclException5 (ExcEl, int, int, double, double,double,
                 << arg3 << " != " << arg4 << " delta=" << arg5);
 
 template <typename NumberType>
-void test(const unsigned int m, const unsigned int n, const unsigned int k, const NumberType eps)
+void
+test(const unsigned int m, const unsigned int n, const unsigned int k, const NumberType eps)
 {
   deallog << m << " " << n << " " << k << " " << std::endl;
   FullMatrix<NumberType> A(k, m), B(k, n), C(m, n), D(k,k);
@@ -99,7 +100,8 @@ void test(const unsigned int m, const unsigned int n, const unsigned int k, cons
 
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

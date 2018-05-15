@@ -64,24 +64,28 @@ namespace Step37
   public:
     Coefficient ()  : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
     template <typename number>
-    number value (const Point<dim,number> &p,
-                  const unsigned int component = 0) const;
+    number
+    value (const Point<dim,number> &p,
+           const unsigned int component = 0) const;
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+    virtual void
+    value_list (const std::vector<Point<dim> > &points,
+                std::vector<double>            &values,
+                const unsigned int              component = 0) const;
   };
 
 
 
   template <int dim>
   template <typename number>
-  number Coefficient<dim>::value (const Point<dim,number> &p,
-                                  const unsigned int /*component*/) const
+  number
+  Coefficient<dim>::value (const Point<dim,number> &p,
+                           const unsigned int /*component*/) const
   {
     return 1. / (0.05 + 2.*p.square());
   }
@@ -89,8 +93,9 @@ namespace Step37
 
 
   template <int dim>
-  double Coefficient<dim>::value (const Point<dim> &p,
-                                  const unsigned int component) const
+  double
+  Coefficient<dim>::value (const Point<dim> &p,
+                           const unsigned int component) const
   {
     return value<double>(p,component);
   }
@@ -98,9 +103,10 @@ namespace Step37
 
 
   template <int dim>
-  void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                     std::vector<double>            &values,
-                                     const unsigned int              component) const
+  void
+  Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                                std::vector<double>            &values,
+                                const unsigned int              component) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch (values.size(), points.size()));
@@ -122,35 +128,47 @@ namespace Step37
   public:
     LaplaceOperator ();
 
-    void clear();
+    void
+    clear();
 
-    void reinit (const DoFHandler<dim>  &dof_handler,
-                 const ConstraintMatrix &constraints,
-                 const unsigned int      level = numbers::invalid_unsigned_int);
+    void
+    reinit (const DoFHandler<dim>  &dof_handler,
+            const ConstraintMatrix &constraints,
+            const unsigned int      level = numbers::invalid_unsigned_int);
 
-    unsigned int m () const;
-    unsigned int n () const;
+    unsigned int
+    m () const;
+    unsigned int
+    n () const;
 
-    void vmult (Vector<double> &dst,
+    void
+    vmult (Vector<double> &dst,
+           const Vector<double> &src) const;
+    void
+    Tvmult (Vector<double> &dst,
+            const Vector<double> &src) const;
+    void
+    vmult_add (Vector<double> &dst,
+               const Vector<double> &src) const;
+    void
+    Tvmult_add (Vector<double> &dst,
                 const Vector<double> &src) const;
-    void Tvmult (Vector<double> &dst,
-                 const Vector<double> &src) const;
-    void vmult_add (Vector<double> &dst,
-                    const Vector<double> &src) const;
-    void Tvmult_add (Vector<double> &dst,
-                     const Vector<double> &src) const;
 
-    number el (const unsigned int row,
-               const unsigned int col) const;
-    void set_diagonal (const Vector<number> &diagonal);
+    number
+    el (const unsigned int row,
+        const unsigned int col) const;
+    void
+    set_diagonal (const Vector<number> &diagonal);
 
   private:
-    void local_apply (const MatrixFree<dim,number>    &data,
-                      Vector<double>                      &dst,
-                      const Vector<double>                &src,
-                      const std::pair<unsigned int,unsigned int> &cell_range) const;
+    void
+    local_apply (const MatrixFree<dim,number>    &data,
+                 Vector<double>                      &dst,
+                 const Vector<double>                &src,
+                 const std::pair<unsigned int,unsigned int> &cell_range) const;
 
-    void evaluate_coefficient(const Coefficient<dim> &function);
+    void
+    evaluate_coefficient(const Coefficient<dim> &function);
 
     MatrixFree<dim,number>      data;
     AlignedVector<VectorizedArray<number> > coefficient;
@@ -347,14 +365,20 @@ namespace Step37
   {
   public:
     LaplaceProblem ();
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void assemble_multigrid ();
-    void solve ();
-    void output_results (const unsigned int cycle) const;
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    assemble_multigrid ();
+    void
+    solve ();
+    void
+    output_results (const unsigned int cycle) const;
 
     typedef LaplaceOperator<dim,degree_finite_element,double> SystemMatrixType;
     typedef LaplaceOperator<dim,degree_finite_element,float>  LevelMatrixType;
@@ -387,7 +411,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     system_matrix.clear();
     mg_matrices.clear_elements();
@@ -441,7 +466,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     QGauss<dim>  quadrature_formula(fe.degree+1);
     FEValues<dim> fe_values (fe, quadrature_formula,
@@ -475,7 +501,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_multigrid ()
+  void
+  LaplaceProblem<dim>::assemble_multigrid ()
   {
     coarse_matrix = 0;
     QGauss<dim>  quadrature_formula(fe.degree+1);
@@ -549,7 +576,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     MGTransferPrebuilt<Vector<double> > mg_transfer;
     mg_transfer.build_matrices(dof_handler);
@@ -590,7 +618,8 @@ namespace Step37
 
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<3; ++cycle)
       {
@@ -613,7 +642,8 @@ namespace Step37
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (3);

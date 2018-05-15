@@ -21,7 +21,8 @@
 #include <deal.II/base/vectorization.h>
 #include <deal.II/base/aligned_vector.h>
 
-void test ()
+void
+test ()
 {
   typedef VectorizedArray<double> vector_t;
   const unsigned int n_vectors = VectorizedArray<double>::n_array_elements;
@@ -106,7 +107,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

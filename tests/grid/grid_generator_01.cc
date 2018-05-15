@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   Point<dim> p1;
   p1[0] = 2.;
@@ -182,7 +183,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

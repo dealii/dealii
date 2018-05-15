@@ -17,7 +17,8 @@
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

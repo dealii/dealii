@@ -31,7 +31,8 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);

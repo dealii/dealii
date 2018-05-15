@@ -22,7 +22,8 @@
 #include <boost/core/demangle.hpp>
 
 template <typename Container>
-void test()
+void
+test()
 {
   Container table(3, 4);
 
@@ -57,7 +58,8 @@ void test()
   deallog << "begin + 5 position:   " << it3->row() << ", " << it3->column() << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

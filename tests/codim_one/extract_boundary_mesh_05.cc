@@ -31,7 +31,8 @@
 using namespace std;
 
 
-void test ()
+void
+test ()
 {
   const unsigned int dim=2;
 
@@ -69,7 +70,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
 
   ofstream logfile("output");

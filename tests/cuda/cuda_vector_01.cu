@@ -23,7 +23,8 @@
 #include <fstream>
 #include <iostream>
 
-void test()
+void
+test()
 {
   const unsigned int size = 100;
   LinearAlgebra::CUDAWrappers::Vector<double> a;
@@ -105,7 +106,8 @@ void test()
     AssertThrow(read_write_3[i] == 0.,ExcMessage("Problem in operator =."));
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);

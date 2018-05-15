@@ -22,7 +22,8 @@
 
 #include <fstream>
 
-int main ()
+int
+main ()
 {
   std::ofstream geo("file.geo");
 

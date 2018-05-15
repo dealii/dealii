@@ -20,7 +20,8 @@
 #include <deal.II/base/tensor.h>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int dim=3;
 
@@ -34,7 +35,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

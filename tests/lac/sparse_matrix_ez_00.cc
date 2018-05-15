@@ -22,7 +22,8 @@
 
 #define NUMBER double
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   SparseMatrixEZ<NUMBER> m_ez(5,5,3);
 

@@ -45,10 +45,12 @@ class TestFunction: public Function<2>
 {
 public:
   TestFunction() {}
-  virtual ~TestFunction() {}
+  virtual
+  ~TestFunction() {}
 
-  virtual double value(const Point<2> &p,
-                       const unsigned int component) const;
+  virtual double
+  value(const Point<2> &p,
+        const unsigned int component) const;
 };
 
 
@@ -63,7 +65,8 @@ TestFunction::value(const Point<2> &p,
 
 
 
-void make_grid (Triangulation<2> &triangulation)
+void
+make_grid (Triangulation<2> &triangulation)
 {
   GridGenerator::hyper_cube (triangulation);
 
@@ -90,13 +93,14 @@ void make_grid (Triangulation<2> &triangulation)
 
 
 template <int dim>
-void test(const Triangulation<dim> &tria,
-          const Mapping<dim> &mapping,
-          const FiniteElement<dim> &fe1,
-          const std::string &fe_string1,
-          const FiniteElement<dim> &fe2,
-          const std::string &fe_string2,
-          const unsigned int testcase)
+void
+test(const Triangulation<dim> &tria,
+     const Mapping<dim> &mapping,
+     const FiniteElement<dim> &fe1,
+     const std::string &fe_string1,
+     const FiniteElement<dim> &fe2,
+     const std::string &fe_string2,
+     const unsigned int testcase)
 {
   DoFHandler<dim> dof_handler1 (tria);
   DoFHandler<dim> dof_handler2 (tria);
@@ -186,7 +190,8 @@ void test(const Triangulation<dim> &tria,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -26,13 +26,15 @@
 
 struct Evaluation
 {
-  VectorizedArray<double> get_value(const unsigned int index) const
+  VectorizedArray<double>
+  get_value(const unsigned int index) const
   {
     return values[index];
   }
 
-  void submit_value(const VectorizedArray<double> val,
-                    const unsigned int index)
+  void
+  submit_value(const VectorizedArray<double> val,
+               const unsigned int index)
   {
     if (is_cartesian)
       values[index] = val * cartesian_weight * jac_weight[index];
@@ -48,7 +50,8 @@ struct Evaluation
 };
 
 
-void initialize(Evaluation &eval)
+void
+initialize(Evaluation &eval)
 {
   eval.is_cartesian = true;
   eval.cartesian_weight = random_value<double>();
@@ -59,7 +62,8 @@ void initialize(Evaluation &eval)
 }
 
 
-void test()
+void
+test()
 {
   Evaluation current, old;
   initialize(current);
@@ -90,7 +94,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);

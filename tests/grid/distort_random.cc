@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test1 (const bool keep_boundary)
+void
+test1 (const bool keep_boundary)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -40,7 +41,8 @@ void test1 (const bool keep_boundary)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.get_file_stream() << std::setprecision(4);

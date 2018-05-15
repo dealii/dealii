@@ -26,10 +26,12 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   create_mesh (tria);
@@ -111,7 +113,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
   MPILogInitAll log;

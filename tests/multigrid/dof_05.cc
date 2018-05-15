@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void check()
+void
+check()
 {
   // need cubic polynomials that have two dofs on lines
   FE_Q<dim> fe(3);
@@ -42,7 +43,8 @@ void check()
   deallog << dim << "D OK" << std::endl;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();

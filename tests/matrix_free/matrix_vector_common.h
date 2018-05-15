@@ -43,15 +43,17 @@
 
 // forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree>
-void test ();
+void
+test ();
 
 
 
 
 template <int dim, int fe_degree, typename number, int n_q_points_1d>
-void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints,
-              const unsigned int     parallel_option = 0)
+void
+do_test (const DoFHandler<dim> &dof,
+         const ConstraintMatrix &constraints,
+         const unsigned int     parallel_option = 0)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -157,7 +159,8 @@ void do_test (const DoFHandler<dim> &dof,
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);

@@ -21,14 +21,16 @@
 #include <deal.II/base/geometry_info.h>
 
 
-double rand_2 ()
+double
+rand_2 ()
 {
   return random_value<double>()*4-2.;
 }
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // Output normal directions for each face
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
@@ -84,7 +86,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

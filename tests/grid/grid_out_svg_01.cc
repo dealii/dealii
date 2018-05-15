@@ -25,7 +25,8 @@
 
 using namespace dealii;
 
-Triangulation<2,2> create_grid()
+Triangulation<2,2>
+create_grid()
 {
   Triangulation<2,2> triangulation;
 
@@ -62,7 +63,8 @@ Triangulation<2,2> create_grid()
   return triangulation;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

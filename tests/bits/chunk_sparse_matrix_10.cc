@@ -21,7 +21,8 @@
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
 
-void test (const unsigned int chunk_size)
+void
+test (const unsigned int chunk_size)
 {
   ChunkSparsityPattern sp (5,5,3,chunk_size);
   for (unsigned int i=0; i<5; ++i)
@@ -60,7 +61,8 @@ void test (const unsigned int chunk_size)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

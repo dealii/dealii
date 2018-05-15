@@ -23,7 +23,8 @@
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   {
     const unsigned int n_properties_per_particle = 3;
@@ -80,7 +81,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

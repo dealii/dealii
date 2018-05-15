@@ -81,7 +81,8 @@ namespace Matrices
 
 
 
-void check ()
+void
+check ()
 {
   // check for q=1,2
   for (unsigned int q=1; q<=2; ++q)
@@ -114,7 +115,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

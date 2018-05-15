@@ -25,7 +25,8 @@
 #include "simplex.h"
 
 
-int main()
+int
+main()
 {
   initlog();
 

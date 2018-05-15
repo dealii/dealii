@@ -29,7 +29,8 @@
 #include <deal.II/base/thread_management.h>
 
 
-int test (int i)
+int
+test (int i)
 {
   int k = 1;
   for (unsigned int j=0; j<100000000; ++j)
@@ -40,7 +41,8 @@ int test (int i)
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

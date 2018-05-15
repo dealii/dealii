@@ -22,7 +22,8 @@
 
 
 template <typename Number>
-void check (const Number &a, const Number &b)
+void
+check (const Number &a, const Number &b)
 {
   AssertThrow((numbers::values_are_equal(a,b)) == (a == b), ExcMessage("Comparator is incorrect."));
   AssertThrow((numbers::values_are_not_equal(a,b)) == (a != b), ExcMessage("Comparator is incorrect."));
@@ -36,7 +37,8 @@ void check (const Number &a, const Number &b)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

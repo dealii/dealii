@@ -25,8 +25,9 @@
 #include <vector>
 
 
-void test (LinearAlgebra::distributed::Vector<double> &v,
-           LinearAlgebra::distributed::Vector<double> &w)
+void
+test (LinearAlgebra::distributed::Vector<double> &v,
+      LinearAlgebra::distributed::Vector<double> &w)
 {
   TrilinosWrappers::SparseMatrix m(v.size(),w.size(),w.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -65,7 +66,8 @@ void test (LinearAlgebra::distributed::Vector<double> &v,
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

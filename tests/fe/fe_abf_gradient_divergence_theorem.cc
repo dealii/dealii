@@ -39,7 +39,8 @@
 
 
 template <int dim>
-Tensor<1,dim> ones ()
+Tensor<1,dim>
+ones ()
 {
   Tensor<1,dim> result;
   for (unsigned int i=0; i<dim; ++i)
@@ -48,9 +49,10 @@ Tensor<1,dim> ones ()
 }
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe,
-           const double tolerance)
+void
+test (const Triangulation<dim> &tr,
+      const FiniteElement<dim> &fe,
+      const double tolerance)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -137,7 +139,8 @@ void test (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_hyper_cube(const double tolerance)
+void
+test_hyper_cube(const double tolerance)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube (tr);
@@ -155,7 +158,8 @@ void test_hyper_cube(const double tolerance)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (3);

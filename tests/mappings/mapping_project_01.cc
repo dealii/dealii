@@ -25,7 +25,8 @@
 #include <iostream>
 
 using namespace dealii;
-void dim2_grid ()
+void
+dim2_grid ()
 {
   Triangulation<2> triangulation;
 
@@ -52,7 +53,8 @@ void dim2_grid ()
                <<mapping.project_real_point_to_unit_point_on_face(cell, face, testp)<<std::endl;
       }
 }
-void dim3_grid ()
+void
+dim3_grid ()
 {
   Triangulation<3> triangulation;
 
@@ -79,7 +81,8 @@ void dim3_grid ()
                <<mapping.project_real_point_to_unit_point_on_face(cell, face, testp)<<std::endl;
       }
 }
-void dim3_parallelepiped_grid ()
+void
+dim3_parallelepiped_grid ()
 {
   Triangulation<3> triangulation;
 
@@ -109,7 +112,8 @@ void dim3_parallelepiped_grid ()
                <<mapping.project_real_point_to_unit_point_on_face(cell, face, testp)<<std::endl;
       }
 }
-int main ()
+int
+main ()
 {
 
   initlog();

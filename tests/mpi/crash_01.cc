@@ -35,7 +35,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim>
   triangulation (MPI_COMM_WORLD,
@@ -55,7 +56,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

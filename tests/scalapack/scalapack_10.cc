@@ -32,7 +32,8 @@
 
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void
+test(const unsigned int size, const unsigned int block_size)
 {
   const std::string filename ("scalapack_10_test.h5");
 
@@ -72,7 +73,8 @@ void test(const unsigned int size, const unsigned int block_size)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

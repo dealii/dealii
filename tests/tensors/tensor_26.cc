@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void test_tensor ()
+void
+test_tensor ()
 {
   // a real tensor
   Tensor<1,dim,double> t;
@@ -52,7 +53,8 @@ void test_tensor ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -22,7 +22,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test (bool have_set)
+void
+test (bool have_set)
 {
   const int size = 100000000;
   const int my_start = size/3;
@@ -43,7 +44,8 @@ void test (bool have_set)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

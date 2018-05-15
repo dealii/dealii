@@ -22,7 +22,8 @@
 #include <deal.II/base/function_cspline.h>
 
 template <int dim>
-void check()
+void
+check()
 {
   const unsigned int n_points = 10;
   std::vector<double> x(n_points), y(n_points);
@@ -68,7 +69,8 @@ void check()
   deallog << "OK"<< std::endl;
 }
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

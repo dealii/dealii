@@ -25,17 +25,20 @@ struct ScratchData
 {};
 
 
-void foo (const std::vector<unsigned int>::iterator,
-          ScratchData &,
-          unsigned int &)
+void
+foo (const std::vector<unsigned int>::iterator,
+     ScratchData &,
+     unsigned int &)
 {
 }
 
-void bar (const unsigned int &)
+void
+bar (const unsigned int &)
 {
 }
 
-void test ()
+void
+test ()
 {
   std::vector<unsigned int> v;
   for (unsigned int i=0; i<20; ++i)
@@ -60,7 +63,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

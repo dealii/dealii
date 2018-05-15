@@ -30,8 +30,9 @@
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const hp::FECollection<dim> &fe)
+void
+test (const Triangulation<dim> &tr,
+      const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -55,7 +56,8 @@ void test (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -73,7 +75,8 @@ void test_hyper_cube()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

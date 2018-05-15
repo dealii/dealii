@@ -37,7 +37,8 @@
 
 
 template <int dim>
-void check (const Triangulation<dim> &tria)
+void
+check (const Triangulation<dim> &tria)
 {
   MappingC1<dim> mapping;
 
@@ -94,7 +95,8 @@ void check (const Triangulation<dim> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

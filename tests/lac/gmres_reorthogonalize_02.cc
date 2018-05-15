@@ -26,7 +26,8 @@
 
 
 template <typename number>
-void test ()
+void
+test ()
 {
   const unsigned int n = 200;
   Vector<number> rhs(n), sol(n);
@@ -55,7 +56,8 @@ void test ()
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void test1 ()
+void
+test1 ()
 {
   // test 1: hypercube
   if (true)
@@ -60,7 +61,8 @@ void test1 ()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

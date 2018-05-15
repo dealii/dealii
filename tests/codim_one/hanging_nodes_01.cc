@@ -33,7 +33,8 @@
 #include <deal.II/lac/constraint_matrix.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

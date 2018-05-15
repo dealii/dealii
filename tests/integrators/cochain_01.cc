@@ -56,7 +56,8 @@ using namespace LocalIntegrators;
 const bool debugging = false;
 
 template <int dim>
-void cell_matrix(
+void
+cell_matrix(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim,dim> &info)
 {
@@ -221,7 +222,8 @@ test_cochain(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     }
 }
 
-void run2d (unsigned int degree)
+void
+run2d (unsigned int degree)
 {
   std::ostringstream prefix;
   prefix << "d2-p" << degree;
@@ -259,7 +261,8 @@ void run2d (unsigned int degree)
 }
 
 
-void run3d (unsigned int degree)
+void
+run3d (unsigned int degree)
 {
   std::ostringstream prefix;
   prefix << "d3-p" << degree;
@@ -294,7 +297,8 @@ void run3d (unsigned int degree)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

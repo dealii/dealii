@@ -34,7 +34,8 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/mapping_q.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
 class Identity : public Function<dim>
@@ -47,14 +48,16 @@ public:
   }
 
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return p(component);
   }
 
-  virtual void vector_value(const Point<dim> &p,
-                            Vector< double > &values) const
+  virtual void
+  vector_value(const Point<dim> &p,
+               Vector< double > &values) const
   {
     for (unsigned int i=0; i<dim; i++)
       values(i) = p(i);
@@ -62,7 +65,8 @@ public:
 };
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

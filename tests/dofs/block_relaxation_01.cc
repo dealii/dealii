@@ -149,7 +149,8 @@ check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -32,7 +32,8 @@ public:
     FullMatrix<double>(size1,size2)
   {}
 
-  double el(unsigned int i, unsigned int j) const
+  double
+  el(unsigned int i, unsigned int j) const
   {
     return this->operator()(i,j);
   }
@@ -95,7 +96,8 @@ check()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

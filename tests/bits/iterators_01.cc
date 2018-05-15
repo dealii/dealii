@@ -26,7 +26,8 @@
 #include <deal.II/particles/particle_iterator.h>
 #include "../tests.h"
 
-int main ()
+int
+main ()
 {
   initlog();
 

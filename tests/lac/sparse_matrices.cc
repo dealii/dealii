@@ -205,7 +205,8 @@ check_iterator (const MatrixType &A)
 }
 
 
-void check_ez_iterator()
+void
+check_ez_iterator()
 {
   SparseMatrixEZ<float> m (6, 6, 0);
 
@@ -228,7 +229,8 @@ void check_ez_iterator()
 }
 
 
-void check_conjugate(std::ostream &out)
+void
+check_conjugate(std::ostream &out)
 {
   SparseMatrixEZ<double> B(3,2);
   SparseMatrixEZ<float>  A1(2,2);
@@ -269,7 +271,8 @@ void check_conjugate(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile << std::setprecision(3);

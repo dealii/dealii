@@ -24,7 +24,8 @@
 #include <deal.II/lac/eigen.h>
 #include <deal.II/lac/precondition.h>
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

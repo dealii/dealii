@@ -61,7 +61,8 @@ pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
 
 
 template <int dim>
-void test (const bool left = true)
+void
+test (const bool left = true)
 {
 
   // Setup system
@@ -132,7 +133,8 @@ void test (const bool left = true)
   dh.clear();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

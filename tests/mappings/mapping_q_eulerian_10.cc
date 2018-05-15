@@ -32,7 +32,8 @@
 #include<deal.II/numerics/vector_tools.h>
 
 template<int dim, int spacedim>
-void test()
+void
+test()
 {
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_cube (tria);
@@ -60,7 +61,8 @@ void test()
 }
 
 using namespace dealii;
-int main()
+int
+main()
 {
   initlog();
   test<1,1>();

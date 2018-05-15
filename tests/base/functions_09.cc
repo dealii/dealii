@@ -25,7 +25,8 @@
 template <int rank, int dim>
 struct FillTensor
 {
-  static void fill_tensor(Tensor<rank, dim> &tensor, int base)
+  static void
+  fill_tensor(Tensor<rank, dim> &tensor, int base)
   {
     for (int i = 0; i < dim; ++i)
       FillTensor<rank-1,dim>::fill_tensor(tensor[i], 10 * base + i);
@@ -35,7 +36,8 @@ struct FillTensor
 template <int dim>
 struct FillTensor<1, dim>
 {
-  static void fill_tensor(Tensor<1, dim> &tensor, int base)
+  static void
+  fill_tensor(Tensor<1, dim> &tensor, int base)
   {
     for (int i = 0; i < dim; ++i)
       tensor[i] = 10 * base + i;
@@ -48,7 +50,8 @@ struct FillTensor<1, dim>
 template <int rank, int dim>
 struct PrintTensor
 {
-  static void print_tensor(const Tensor<rank, dim> &tensor)
+  static void
+  print_tensor(const Tensor<rank, dim> &tensor)
   {
     for (int i = 0; i < dim; ++i)
       {
@@ -61,7 +64,8 @@ struct PrintTensor
 template <int dim>
 struct PrintTensor<1, dim>
 {
-  static void print_tensor(const Tensor<1, dim> &tensor)
+  static void
+  print_tensor(const Tensor<1, dim> &tensor)
   {
     for (int i = 0; i < dim; ++i)
       deallog << tensor[i] << " ";
@@ -71,7 +75,8 @@ struct PrintTensor<1, dim>
 
 
 template <int rank, int dim>
-void check ()
+void
+check ()
 {
   deallog << "ConstantTensorFunction<"
           << rank << ", " << dim << ">:" << std::endl;
@@ -125,7 +130,8 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

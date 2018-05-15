@@ -52,14 +52,16 @@
 
 
 template <int dim>
-void test ();
+void
+test ();
 
 
 
 
 template <int dim>
-void do_check (const Triangulation<dim> &triangulation,
-               const hp::FECollection<dim> &fe)
+void
+do_check (const Triangulation<dim> &triangulation,
+          const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim>        dof_handler(triangulation);
 
@@ -84,7 +86,8 @@ void do_check (const Triangulation<dim> &triangulation,
 
 // check on a uniformly refined mesh
 template <int dim>
-void test_no_hanging_nodes (const hp::FECollection<dim> &fe)
+void
+test_no_hanging_nodes (const hp::FECollection<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -97,7 +100,8 @@ void test_no_hanging_nodes (const hp::FECollection<dim> &fe)
 
 // same test as above, but this time with a mesh that has hanging nodes
 template <int dim>
-void test_with_hanging_nodes (const hp::FECollection<dim> &fe)
+void
+test_with_hanging_nodes (const hp::FECollection<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -113,7 +117,8 @@ void test_with_hanging_nodes (const hp::FECollection<dim> &fe)
 // like the previous function, but refine the mesh a number of times randomly
 // (a quarter of all cells is refined in each step)
 template <int dim>
-void test_with_hanging_nodes_random (const hp::FECollection<dim> &fe)
+void
+test_with_hanging_nodes_random (const hp::FECollection<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -136,7 +141,8 @@ void test_with_hanging_nodes_random (const hp::FECollection<dim> &fe)
 
 
 template <int dim>
-void test_with_hanging_nodes_random_aniso (const hp::FECollection<dim> &fe)
+void
+test_with_hanging_nodes_random_aniso (const hp::FECollection<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -169,7 +175,8 @@ void test_with_hanging_nodes_random_aniso (const hp::FECollection<dim> &fe)
 // each. this also cycles through all possibilities of coarser or finer cell
 // having face_orientation==false
 template <int dim>
-void test_with_wrong_face_orientation (const hp::FECollection<dim> &fe)
+void
+test_with_wrong_face_orientation (const hp::FECollection<dim> &fe)
 {
   if (dim != 3)
     return;
@@ -195,7 +202,8 @@ void test_with_wrong_face_orientation (const hp::FECollection<dim> &fe)
 // elements. this tests the case of the sign_change thingy in
 // fe_poly_tensor.cc
 template <int dim>
-void test_with_2d_deformed_mesh (const hp::FECollection<dim> &fe)
+void
+test_with_2d_deformed_mesh (const hp::FECollection<dim> &fe)
 {
   if (dim != 2)
     return;
@@ -243,7 +251,8 @@ void test_with_2d_deformed_mesh (const hp::FECollection<dim> &fe)
 // same as test_with_2d_deformed_mesh, but refine each element in turn. this
 // makes sure we also check the sign_change thingy for refined cells
 template <int dim>
-void test_with_2d_deformed_refined_mesh (const hp::FECollection<dim> &fe)
+void
+test_with_2d_deformed_refined_mesh (const hp::FECollection<dim> &fe)
 {
   if (dim != 2)
     return;
@@ -311,9 +320,10 @@ void test_with_2d_deformed_refined_mesh (const hp::FECollection<dim> &fe)
 // should yield zero error) and then applying constraints still yields zero
 // error. we do so with every pair of finite elements given
 template <int dim>
-void test_interpolation_base (const hp::FECollection<dim>     &fe,
-                              const std::vector<unsigned int> &polynomial_degrees,
-                              const bool                       do_refine)
+void
+test_interpolation_base (const hp::FECollection<dim>     &fe,
+                         const std::vector<unsigned int> &polynomial_degrees,
+                         const bool                       do_refine)
 {
   // create a mesh like this (viewed
   // from top, if in 3d):
@@ -447,8 +457,9 @@ void test_interpolation_base (const hp::FECollection<dim>     &fe,
 
 
 template <int dim>
-void test_interpolation (const hp::FECollection<dim>     &fe,
-                         const std::vector<unsigned int> &polynomial_degrees)
+void
+test_interpolation (const hp::FECollection<dim>     &fe,
+                    const std::vector<unsigned int> &polynomial_degrees)
 {
   test_interpolation_base (fe, polynomial_degrees, false);
   test_interpolation_base (fe, polynomial_degrees, true);
@@ -456,7 +467,8 @@ void test_interpolation (const hp::FECollection<dim>     &fe,
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (7);

@@ -25,7 +25,8 @@
 #include <iostream>
 #include <vector>
 
-void print(TrilinosWrappers::MPI::Vector &v)
+void
+print(TrilinosWrappers::MPI::Vector &v)
 {
   deallog << "size= " << v.size()
           << " el(0)= " << v(0)
@@ -33,7 +34,8 @@ void print(TrilinosWrappers::MPI::Vector &v)
 }
 
 
-void test ()
+void
+test ()
 {
   TrilinosWrappers::MPI::Vector v;
   v.reinit(complete_index_set(5), MPI_COMM_WORLD);
@@ -66,7 +68,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

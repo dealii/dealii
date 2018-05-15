@@ -24,7 +24,8 @@
 #include <deal.II/numerics/data_out_stack.h>
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

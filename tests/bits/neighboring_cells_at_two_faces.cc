@@ -42,7 +42,8 @@
 // not a, as it should. Simply looking at the identity of the neighboring cell
 // is not enough, we have to look at the (index of the) face instead.
 
-void create_grid (Triangulation<2> &tria)
+void
+create_grid (Triangulation<2> &tria)
 {
   const unsigned int n_points=5;
 
@@ -79,7 +80,8 @@ void create_grid (Triangulation<2> &tria)
 }
 
 
-void check_neighbors (const Triangulation<2> &tria)
+void
+check_neighbors (const Triangulation<2> &tria)
 {
   Triangulation<2>::cell_iterator cell = tria.begin();
   for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
@@ -95,7 +97,8 @@ void check_neighbors (const Triangulation<2> &tria)
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -25,7 +25,8 @@
 #include <deal.II/base/quadrature.h>
 
 template <int dim>
-void test_fe(const char *name)
+void
+test_fe(const char *name)
 {
   std::unique_ptr<FiniteElement<dim> > fe = FETools::get_fe_by_name<dim, dim>(std::string(name));
 

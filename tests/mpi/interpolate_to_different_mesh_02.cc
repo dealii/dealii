@@ -42,12 +42,17 @@ class SeventhProblem
 public:
   SeventhProblem (unsigned int prob_number);
   ~SeventhProblem ();
-  void run (unsigned int cycle);
+  void
+  run (unsigned int cycle);
 private:
-  void setup_system ();
-  void setup_second_system ();
-  void assemble_system ();
-  void solve ();
+  void
+  setup_system ();
+  void
+  setup_second_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
   MPI_Comm mpi_communicator;
   parallel::distributed::Triangulation<2>::Settings settings;
   parallel::distributed::Triangulation<dim> triangulation;
@@ -102,7 +107,8 @@ SeventhProblem<dim>::~SeventhProblem ()
 }
 
 template <int dim>
-void SeventhProblem<dim>::setup_system ()
+void
+SeventhProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
   locally_owned_dofs = dof_handler.locally_owned_dofs ();
@@ -134,7 +140,8 @@ void SeventhProblem<dim>::setup_system ()
 }
 
 template <int dim>
-void SeventhProblem<dim>::setup_second_system ()
+void
+SeventhProblem<dim>::setup_second_system ()
 {
   second_dof_handler.distribute_dofs (fe);
   second_locally_owned_dofs = second_dof_handler.locally_owned_dofs ();
@@ -147,7 +154,8 @@ void SeventhProblem<dim>::setup_second_system ()
 }
 
 template <int dim>
-void SeventhProblem<dim>::assemble_system ()
+void
+SeventhProblem<dim>::assemble_system ()
 {
   const QGauss<dim> quadrature_formula(3);
   FEValues<dim> fe_values (fe, quadrature_formula,
@@ -199,7 +207,8 @@ void SeventhProblem<dim>::assemble_system ()
   system_rhs.compress (VectorOperation::add);
 }
 template <int dim>
-void SeventhProblem<dim>::solve ()
+void
+SeventhProblem<dim>::solve ()
 {
   LA::MPI::Vector
   completely_distributed_solution (locally_owned_dofs, mpi_communicator);
@@ -217,7 +226,8 @@ void SeventhProblem<dim>::solve ()
 }
 
 template <int dim>
-void SeventhProblem<dim>::run (unsigned int cycle)
+void
+SeventhProblem<dim>::run (unsigned int cycle)
 {
   if (cycle == 0)
     {
@@ -270,7 +280,8 @@ void SeventhProblem<dim>::run (unsigned int cycle)
     }
 }
 
-void seventh_grid()
+void
+seventh_grid()
 {
 
   ConditionalOStream           pcout(deallog.get_file_stream(),
@@ -289,7 +300,8 @@ void seventh_grid()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

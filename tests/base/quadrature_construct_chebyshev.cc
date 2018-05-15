@@ -38,7 +38,8 @@ construct_quadrature()
   deallog << "QGaussLobattoChebyshev<" << dim << ">: OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

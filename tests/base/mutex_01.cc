@@ -25,7 +25,8 @@
 Threads::Mutex mutex;
 
 
-void test ()
+void
+test ()
 {
   // get the mutex, but note that it is first
   // held by main() which will therefore
@@ -35,7 +36,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -86,7 +86,8 @@ show_values(FiniteElement<dim> &fe,
 
 
 template <int dim>
-void show_values()
+void
+show_values()
 {
   FE_Q<dim> q1(1);
   show_values(q1, "Q1");

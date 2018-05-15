@@ -26,7 +26,8 @@
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (2);

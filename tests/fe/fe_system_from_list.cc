@@ -60,7 +60,8 @@ private:
     const std::vector<const FiniteElement<dim>*> data;
     VectorElementDestroyer (const std::vector<const FiniteElement<dim>*> &pointers);
     ~VectorElementDestroyer (); // destructor to delete the pointers
-    const std::vector<const FiniteElement<dim>*> &get_data () const;
+    const std::vector<const FiniteElement<dim>*> &
+    get_data () const;
   };
 
   static std::vector<const FiniteElement<dim>*>

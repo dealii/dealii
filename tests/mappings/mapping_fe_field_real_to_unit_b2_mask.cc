@@ -40,7 +40,8 @@ using namespace dealii;
 
 
 template <int dim, int spacedim>
-void test_real_to_unit_cell()
+void
+test_real_to_unit_cell()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
@@ -123,7 +124,8 @@ void test_real_to_unit_cell()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

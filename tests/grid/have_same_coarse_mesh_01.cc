@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // create 3 triangulations
   Triangulation<dim> tria[3];
@@ -66,7 +67,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

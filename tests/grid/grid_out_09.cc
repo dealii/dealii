@@ -28,10 +28,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void test ()
+void
+test ()
 {
   Triangulation<1,3> tria;
 
@@ -85,7 +87,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

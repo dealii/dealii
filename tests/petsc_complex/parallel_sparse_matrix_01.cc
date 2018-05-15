@@ -50,7 +50,8 @@
 using namespace dealii;
 
 template <int dim>
-void test (const unsigned int poly_degree = 1)
+void
+test (const unsigned int poly_degree = 1)
 {
 
   MPI_Comm mpi_communicator (MPI_COMM_WORLD);
@@ -188,7 +189,8 @@ void test (const unsigned int poly_degree = 1)
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
 

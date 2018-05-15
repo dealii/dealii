@@ -36,7 +36,8 @@ struct X
 Threads::ThreadLocalStorage<X> tls_data;
 
 
-void execute (Threads::Mutex &m)
+void
+execute (Threads::Mutex &m)
 {
   // check correct default initialization
   bool exists;
@@ -64,7 +65,8 @@ void execute (Threads::Mutex &m)
 }
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 10;
   Threads::Mutex m[N];
@@ -95,7 +97,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

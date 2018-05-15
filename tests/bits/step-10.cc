@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -43,7 +44,8 @@ const long double pi = 3.141592653589793238462643;
 
 
 template <int dim>
-void gnuplot_output()
+void
+gnuplot_output()
 {
   deallog << "Output of grids into gnuplot files:" << std::endl
           << "===================================" << std::endl;
@@ -79,7 +81,8 @@ void gnuplot_output()
 }
 
 template <int dim>
-void compute_pi_by_area ()
+void
+compute_pi_by_area ()
 {
   deallog << "Computation of Pi by the area:" << std::endl
           << "==============================" << std::endl;
@@ -143,7 +146,8 @@ void compute_pi_by_area ()
 
 
 template <int dim>
-void compute_pi_by_perimeter ()
+void
+compute_pi_by_perimeter ()
 {
   deallog << "Computation of Pi by the perimeter:" << std::endl
           << "===================================" << std::endl;
@@ -204,7 +208,8 @@ void compute_pi_by_perimeter ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(6);
   logfile << std::setprecision(6);

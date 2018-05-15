@@ -35,7 +35,8 @@
 
 
 template <int dim>
-std::vector<types::global_dof_index> get_conflict_indices(
+std::vector<types::global_dof_index>
+get_conflict_indices(
   const typename DoFHandler<dim>::active_cell_iterator &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
@@ -46,7 +47,8 @@ std::vector<types::global_dof_index> get_conflict_indices(
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_shell (triangulation,
@@ -93,7 +95,8 @@ void check ()
   deallog<<"OK"<<std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
 

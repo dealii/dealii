@@ -29,7 +29,8 @@
 
 
 template <int dim>
-Point<dim> warp (const Point<dim> &p)
+Point<dim>
+warp (const Point<dim> &p)
 {
   Point<dim> q = p;
   q[dim-1] *= 10;
@@ -44,14 +45,16 @@ Point<dim> warp (const Point<dim> &p)
 
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim> &tria)
+void
+save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

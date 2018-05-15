@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -60,12 +61,15 @@ namespace Evaluation
   class EvaluationBase
   {
   public:
-    virtual ~EvaluationBase ();
+    virtual
+    ~EvaluationBase ();
 
-    void set_refinement_cycle (const unsigned int refinement_cycle);
+    void
+    set_refinement_cycle (const unsigned int refinement_cycle);
 
-    virtual void operator () (const hp::DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const = 0;
+    virtual void
+    operator () (const hp::DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const = 0;
   protected:
     unsigned int refinement_cycle;
   };
@@ -93,8 +97,9 @@ namespace Evaluation
     PointValueEvaluation (const Point<dim>   &evaluation_point,
                           TableHandler       &results_table);
 
-    virtual void operator () (const hp::DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const;
+    virtual void
+    operator () (const hp::DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const;
 
     DeclException1 (ExcEvaluationPointNotFound,
                     Point<dim>,
@@ -160,8 +165,9 @@ namespace Evaluation
     SolutionOutput (const std::string                         &output_name_base,
                     const DataOutBase::OutputFormat  output_format);
 
-    virtual void operator () (const hp::DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const;
+    virtual void
+    operator () (const hp::DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const;
   private:
     const std::string                         output_name_base;
     const DataOutBase::OutputFormat output_format;
@@ -212,12 +218,17 @@ namespace LaplaceSolver
   {
   public:
     Base (Triangulation<dim> &coarse_grid);
-    virtual ~Base ();
+    virtual
+    ~Base ();
 
-    virtual void solve_problem () = 0;
-    virtual void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-    virtual void refine_grid () = 0;
-    virtual unsigned int n_dofs () const = 0;
+    virtual void
+    solve_problem () = 0;
+    virtual void
+    postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
+    virtual void
+    refine_grid () = 0;
+    virtual unsigned int
+    n_dofs () const = 0;
 
   protected:
     const SmartPointer<Triangulation<dim> > triangulation;
@@ -267,14 +278,16 @@ namespace LaplaceSolver
     Vector<double>                                 solution;
     const SmartPointer<const Function<dim> >       boundary_values;
 
-    virtual void assemble_rhs (Vector<double> &rhs) const = 0;
+    virtual void
+    assemble_rhs (Vector<double> &rhs) const = 0;
 
   private:
     struct LinearSystem
     {
       LinearSystem (const hp::DoFHandler<dim> &dof_handler);
 
-      void solve (Vector<double> &solution) const;
+      void
+      solve (Vector<double> &solution) const;
 
       ConstraintMatrix     hanging_node_constraints;
       SparsityPattern      sparsity_pattern;
@@ -494,7 +507,8 @@ namespace LaplaceSolver
                   const Function<dim>      &boundary_values);
   protected:
     const SmartPointer<const Function<dim> > rhs_function;
-    virtual void assemble_rhs (Vector<double> &rhs) const;
+    virtual void
+    assemble_rhs (Vector<double> &rhs) const;
   };
 
 
@@ -564,7 +578,8 @@ namespace LaplaceSolver
                       const Function<dim>      &rhs_function,
                       const Function<dim>      &boundary_values);
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
   };
 
 
@@ -603,7 +618,8 @@ namespace LaplaceSolver
                      const Function<dim>      &rhs_function,
                      const Function<dim>      &boundary_values);
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
   };
 
 
@@ -651,8 +667,9 @@ class Solution : public Function<dim>
 public:
   Solution () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -676,8 +693,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -743,7 +761,8 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 
 
 template <int dim>
-void solve_problem (const std::string &solver_name)
+void
+solve_problem (const std::string &solver_name)
 {
   const std::string header = "Running tests with \"" + solver_name +
                              "\" refinement criterion:";
@@ -794,7 +813,8 @@ void solve_problem (const std::string &solver_name)
 
 
 
-int main ()
+int
+main ()
 {
   try
     {

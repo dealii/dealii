@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test (const unsigned int size)
+void
+test (const unsigned int size)
 {
   AssertThrow (size>2, ExcInternalError());
   const unsigned int smaller = size - 2;
@@ -64,7 +65,8 @@ void test (const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

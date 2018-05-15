@@ -36,7 +36,8 @@
 // Call this function with a system consisting of several copies of
 // the SAME element
 template <int dim>
-void vector_values(const FiniteElement<dim> &fe)
+void
+vector_values(const FiniteElement<dim> &fe)
 {
   Assert(fe.n_base_elements() == 1, ExcNotImplemented());
   deallog.push(fe.get_name());
@@ -84,7 +85,8 @@ void vector_values(const FiniteElement<dim> &fe)
 }
 
 template <int dim>
-void test_vectors()
+void
+test_vectors()
 {
   FE_Q<dim> q1(1);
 
@@ -93,7 +95,8 @@ void test_vectors()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

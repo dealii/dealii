@@ -20,7 +20,8 @@
 #include <deal.II/base/table.h>
 #include <boost/serialization/vector.hpp>
 
-void test ()
+void
+test ()
 {
   unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1;
   TableIndices<5> indices1(index1, index2, index3, index4, index5);
@@ -61,7 +62,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

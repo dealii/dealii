@@ -29,7 +29,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 template <int dim>
-void Test()
+void
+Test()
 {
   // A parameter handler
   ParameterHandler prm;
@@ -90,7 +91,8 @@ void Test()
   prm.log_parameters(deallog);
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

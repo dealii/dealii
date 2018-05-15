@@ -50,7 +50,8 @@ class diffusionMechanics
 public:
   diffusionMechanics (const unsigned int mech_degree, const unsigned int diff_degree);
   ~diffusionMechanics();
-  void run ();
+  void
+  run ();
 
   //Input lengths of rectangular prism
   double alen, blen, clen;
@@ -65,9 +66,12 @@ private:
   cell_is_in_omega1_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
   static bool
   cell_is_in_omega2_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
-  void set_active_fe_indices ();
-  void setup_dofs ();
-  void setup_system();
+  void
+  set_active_fe_indices ();
+  void
+  setup_dofs ();
+  void
+  setup_system();
 
   const unsigned int   mech_degree;
   const unsigned int   diff_degree;
@@ -124,7 +128,8 @@ class InitialConditions: public Function<dim>
 {
 public:
   InitialConditions (): Function<dim>(totalDOF) {}
-  void vector_value (const Point<dim>   &p, Vector<double>   &values) const
+  void
+  vector_value (const Point<dim>   &p, Vector<double>   &values) const
   {
     Assert (values.size() == totalDOF, ExcDimensionMismatch (values.size(), totalDOF));
     values(totalDOF-4)=0; // u=0
@@ -179,7 +184,8 @@ diffusionMechanics<dim>::setup_dofs()
 
 //Setup
 template <int dim>
-void diffusionMechanics<dim>::setup_system()
+void
+diffusionMechanics<dim>::setup_system()
 {
   dof_handler.distribute_dofs (fe_collection);
   sparsity_pattern.reinit (dof_handler.n_dofs(), dof_handler.n_dofs(), dof_handler.max_couplings_between_dofs());
@@ -197,7 +203,8 @@ void diffusionMechanics<dim>::setup_system()
 
 //Run
 template <int dim>
-void diffusionMechanics<dim>::run ()
+void
+diffusionMechanics<dim>::run ()
 {
 
   //subdivided_hyper
@@ -229,7 +236,8 @@ void diffusionMechanics<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision (3);

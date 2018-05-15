@@ -62,14 +62,16 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     return std::exp(-point.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> res = point;
     Assert (point.norm() > 0,
@@ -81,7 +83,8 @@ public:
 
 
 template <int dim>
-void test3()
+void
+test3()
 {
   deallog << "FEValues.get_function_values()"<<std::endl;
   deallog << "for same underlying FEs: f(qp) * N_{fe}(qp) == N_{pou}(qp)"<<std::endl;
@@ -147,7 +150,8 @@ void test3()
 }
 
 template <int dim>
-void plot_shape_function()
+void
+plot_shape_function()
 {
   Triangulation<dim> triangulation;
   DoFHandler<dim> dof_handler(triangulation);
@@ -198,7 +202,8 @@ void plot_shape_function()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

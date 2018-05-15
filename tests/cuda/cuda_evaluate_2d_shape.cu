@@ -31,8 +31,9 @@
 namespace CUDA = LinearAlgebra::CUDAWrappers;
 
 template <int M, int N, int type, bool add, bool dof_to_quad>
-__global__ void evaluate_tensor_product(double *dst,
-                                        double *src)
+__global__ void
+evaluate_tensor_product(double *dst,
+                        double *src)
 {
   CUDAWrappers::internal::EvaluatorTensorProduct<
   CUDAWrappers::internal::evaluate_general,2,M-1,N,double> evaluator;
@@ -52,7 +53,8 @@ __global__ void evaluate_tensor_product(double *dst,
 }
 
 template <int M, int N, int type, bool add>
-void test()
+void
+test()
 {
   deallog << "Test " << M << " x " << N << std::endl;
   LinearAlgebra::ReadWriteVector<double> shape_host(M*N);
@@ -167,7 +169,8 @@ void test()
   deallog << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

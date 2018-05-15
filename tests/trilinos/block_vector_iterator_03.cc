@@ -27,8 +27,9 @@
 #include <utility>
 
 template <typename number>
-bool operator == (const TrilinosWrappers::MPI::BlockVector &v1,
-                  const TrilinosWrappers::MPI::BlockVector &v2)
+bool
+operator == (const TrilinosWrappers::MPI::BlockVector &v1,
+             const TrilinosWrappers::MPI::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -39,7 +40,8 @@ bool operator == (const TrilinosWrappers::MPI::BlockVector &v1,
 }
 
 
-void test ()
+void
+test ()
 {
   std::vector<IndexSet> ivector(4);
   ivector[0] = complete_index_set(2);
@@ -228,7 +230,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

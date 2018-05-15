@@ -24,7 +24,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 
 
-void test ()
+void
+test ()
 {
   IndexSet set_my(100);
   IndexSet set_ghost(100);
@@ -75,7 +76,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

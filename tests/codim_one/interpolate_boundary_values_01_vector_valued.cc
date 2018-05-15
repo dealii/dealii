@@ -29,7 +29,8 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
 class X : public Function<dim>
@@ -37,8 +38,9 @@ class X : public Function<dim>
 public:
   X() : Function<dim>(dim) {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return p[component];
   }
@@ -46,7 +48,8 @@ public:
 
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim> gi;
@@ -93,7 +96,8 @@ void test(std::string filename)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

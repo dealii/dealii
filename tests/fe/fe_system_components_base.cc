@@ -33,7 +33,8 @@
 #include <iomanip>
 
 template <int dim>
-void test(const bool renumber = false)
+void
+test(const bool renumber = false)
 {
   Triangulation<dim> triangulation;
   FESystem<dim> fe_basis(FE_Q<dim>(2), dim, FE_Q<dim>(1),1);

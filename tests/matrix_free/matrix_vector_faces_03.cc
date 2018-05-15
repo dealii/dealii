@@ -25,13 +25,15 @@
 #include "create_mesh.h"
 #include <deal.II/grid/grid_tools.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   create_mesh (tria);

@@ -24,13 +24,15 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "get_functions_common.h"
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);

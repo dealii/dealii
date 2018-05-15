@@ -21,7 +21,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 
 
-int main()
+int
+main()
 {
   initlog();
 

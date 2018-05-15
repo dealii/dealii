@@ -28,7 +28,8 @@
 // on vector
 
 // vector elements
-void test_vector (PETScWrappers::MPI::Vector &v)
+void
+test_vector (PETScWrappers::MPI::Vector &v)
 {
   deallog << "Check vector access" << std::endl;
 
@@ -55,7 +56,8 @@ void test_vector (PETScWrappers::MPI::Vector &v)
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile ("output");
   dealii::deallog.attach (logfile);

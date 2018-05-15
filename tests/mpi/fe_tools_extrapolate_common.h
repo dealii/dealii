@@ -47,8 +47,9 @@ public:
     : Function<dim>(), degree(deg)
   {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const
   {
     double return_value = 0.;
     for (unsigned int d=0; d<dim; ++d)
@@ -63,7 +64,8 @@ private:
 
 
 template <int dim>
-parallel::distributed::Triangulation<dim> *make_tria ()
+parallel::distributed::Triangulation<dim> *
+make_tria ()
 {
   parallel::distributed::Triangulation<dim> *tria = new parallel::distributed::Triangulation<dim>(MPI_COMM_WORLD);
   typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell;
@@ -85,8 +87,9 @@ parallel::distributed::Triangulation<dim> *make_tria ()
 
 
 template <int dim>
-DoFHandler<dim> *make_dof_handler (const parallel::distributed::Triangulation<dim> &tria,
-                                   const FiniteElement<dim> &fe)
+DoFHandler<dim> *
+make_dof_handler (const parallel::distributed::Triangulation<dim> &tria,
+                  const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> *dof_handler = new DoFHandler<dim>(tria);
   dof_handler->distribute_dofs (fe);

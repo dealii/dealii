@@ -30,7 +30,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   // the following element has more
   // components than blocks
@@ -62,7 +63,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

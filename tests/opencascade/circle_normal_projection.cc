@@ -41,7 +41,8 @@
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

@@ -40,7 +40,8 @@
 
 
 template <int dim>
-double f (const Point<dim> &p)
+double
+f (const Point<dim> &p)
 {
   return p[0];
 }
@@ -48,7 +49,8 @@ double f (const Point<dim> &p)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -116,7 +118,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

@@ -42,7 +42,8 @@
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
 
@@ -164,7 +165,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   test<2,9>();

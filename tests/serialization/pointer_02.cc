@@ -56,7 +56,8 @@ public:
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize (Archive &ar, const unsigned int version)
   {
     deallog << "Serializing object number "
             << object_number
@@ -64,7 +65,8 @@ public:
             << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator == (const C &) const
   {
     return true;
   }
@@ -74,7 +76,8 @@ private:
 };
 
 
-void test ()
+void
+test ()
 {
   C *backup;
   {
@@ -103,7 +106,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

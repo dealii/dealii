@@ -24,7 +24,8 @@
 #include <deal.II/base/thread_management.h>
 
 
-void test (int i)
+void
+test (int i)
 {
   sleep (1);
   deallog << "Task " << i << " finished!" << std::endl;
@@ -33,7 +34,8 @@ void test (int i)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

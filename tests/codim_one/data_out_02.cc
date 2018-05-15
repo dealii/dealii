@@ -33,10 +33,12 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

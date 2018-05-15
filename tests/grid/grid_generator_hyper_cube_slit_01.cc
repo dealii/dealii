@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "dim = " << dim << std::endl;
   Triangulation<dim> tr;
@@ -49,7 +50,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   test<2>();

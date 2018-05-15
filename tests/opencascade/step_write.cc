@@ -26,7 +26,8 @@
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main ()
 {
   TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/wigley.step", 1.0);
   write_STEP(sh, "tmp.step");

@@ -23,7 +23,8 @@
 #include <deal.II/sundials/kinsol.h>
 
 
-int main()
+int
+main()
 {
   initlog();
 

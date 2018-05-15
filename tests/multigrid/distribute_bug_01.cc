@@ -32,7 +32,8 @@
 using namespace dealii;
 
 template <int dim>
-void print(parallel::distributed::Triangulation<dim> &tr)
+void
+print(parallel::distributed::Triangulation<dim> &tr)
 {
   deallog << "*****" << std::endl;
   for (typename parallel::distributed::Triangulation<dim>::cell_iterator cell = tr.begin();
@@ -47,7 +48,8 @@ void print(parallel::distributed::Triangulation<dim> &tr)
 
 
 template <int dim>
-void do_test ()
+void
+do_test ()
 {
   FE_Q<dim> fe(1);
   deallog << "Testing " << fe.get_name() << std::endl << std::endl;
@@ -88,7 +90,8 @@ void do_test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll log;

@@ -32,10 +32,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void check_file ()
+void
+check_file ()
 {
   Triangulation<1> tria;
   GridIn<1> gi;
@@ -56,7 +58,8 @@ void check_file ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

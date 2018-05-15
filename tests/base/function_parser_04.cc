@@ -42,9 +42,10 @@ struct copy_data
 };
 
 
-void assemble(const std::vector<int>::iterator &it,
-              scratch_data &scratch,
-              copy_data &data)
+void
+assemble(const std::vector<int>::iterator &it,
+         scratch_data &scratch,
+         copy_data &data)
 {
   double s = *it;
   double value = fp.value(Point<2>(s, 2.5));
@@ -54,13 +55,15 @@ void assemble(const std::vector<int>::iterator &it,
   data.value = (std::abs(1.0+s*2.5 - value) < 1e-10)?1:0;
 }
 
-void copy(int &value, const copy_data &data)
+void
+copy(int &value, const copy_data &data)
 {
   value += data.value;
 }
 
 
-void test2()
+void
+test2()
 {
   std::map<std::string, double> constants;
   constants["c"]=1.0;
@@ -84,7 +87,8 @@ void test2()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

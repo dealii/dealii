@@ -25,7 +25,8 @@
 #include <tuple>
 
 template <int dim>
-void test(const unsigned int &size)
+void
+test(const unsigned int &size)
 {
   std::vector<Point<dim> > points(size);
   auto a_pair = std::make_pair(1, 3.14);
@@ -57,7 +58,8 @@ void test(const unsigned int &size)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

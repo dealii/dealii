@@ -21,7 +21,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
@@ -57,7 +58,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

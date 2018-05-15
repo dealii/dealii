@@ -25,7 +25,8 @@
 
 
 
-void test()
+void
+test()
 {
   const unsigned int m=2;
   const unsigned int n=3;
@@ -52,7 +53,8 @@ void test()
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

@@ -25,7 +25,8 @@ Threads::Mutex mutex;
 unsigned int n_running;
 unsigned int n_max_running;
 
-void a_task ()
+void
+a_task ()
 {
   mutex.acquire();
   n_running++;
@@ -42,7 +43,8 @@ void a_task ()
 }
 
 
-void test()
+void
+test()
 {
   Threads::TaskGroup<> tg;
 
@@ -65,7 +67,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

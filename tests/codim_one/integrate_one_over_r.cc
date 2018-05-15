@@ -33,9 +33,11 @@
 
 using namespace std;
 
-ofstream logfile("output");
+ofstream
+logfile("output");
 
-int main()
+int
+main()
 {
   deallog.attach(logfile);
   deallog<< std::fixed;

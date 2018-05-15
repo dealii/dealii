@@ -39,7 +39,8 @@
 
 using namespace dealii;
 
-void test (const double R)
+void
+test (const double R)
 {
   const unsigned int dim = 3;
   const unsigned int global_mesh_refinement_steps = 4;
@@ -91,7 +92,8 @@ void test (const double R)
 
 using namespace dealii;
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
   test(15);

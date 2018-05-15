@@ -19,7 +19,8 @@
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

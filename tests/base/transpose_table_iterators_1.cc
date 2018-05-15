@@ -21,7 +21,8 @@
 
 #include <numeric>
 
-int main()
+int
+main()
 {
   initlog();
 

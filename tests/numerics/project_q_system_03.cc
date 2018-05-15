@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (unsigned int p=1; p<5-dim; ++p)
     test_with_wrong_face_orientation (FESystem<dim>(FE_Q<dim>(p), 1,

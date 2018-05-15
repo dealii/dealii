@@ -47,7 +47,8 @@ class Ref : public Function<dim>
 public:
   Ref() : Function<dim>(2*dim) {}
 
-  void vector_value (const Point<dim> &p, Vector<double> &values) const
+  void
+  vector_value (const Point<dim> &p, Vector<double> &values) const
   {
     switch (dim)
       {
@@ -73,7 +74,8 @@ public:
 
 
 template <int dim>
-void test(VectorTools::NormType norm, double value)
+void
+test(VectorTools::NormType norm, double value)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -126,7 +128,8 @@ void test(VectorTools::NormType norm, double value)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << dim << " dimensions, Hdiv_seminorm:" << std::endl;
   double true_value = 0;
@@ -147,7 +150,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   test<2>();

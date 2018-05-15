@@ -72,10 +72,13 @@ class LaplaceMatrix : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   LaplaceMatrix();
-  virtual void cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
-  virtual void boundary(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
-  virtual void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-                    MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const;
+  virtual void
+  cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const;
+  virtual void
+  face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+       MeshWorker::IntegrationInfo<dim> &info1, MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 
@@ -87,7 +90,8 @@ LaplaceMatrix<dim>::LaplaceMatrix()
 
 
 template <int dim>
-void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
+void
+LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info) const
 {
   AssertDimension (dinfo.n_matrices(), 1);
   Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0));
@@ -95,8 +99,9 @@ void LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::Integ
 
 
 template <int dim>
-void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> & /*dinfo*/,
-                                  typename MeshWorker::IntegrationInfo<dim> & /*info*/) const
+void
+LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> & /*dinfo*/,
+                             typename MeshWorker::IntegrationInfo<dim> & /*info*/) const
 {
 //  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
 //  Laplace::nitsche_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0),
@@ -105,7 +110,8 @@ void LaplaceMatrix<dim>::boundary(MeshWorker::DoFInfo<dim> & /*dinfo*/,
 
 
 template <int dim>
-void LaplaceMatrix<dim>::face(
+void
+LaplaceMatrix<dim>::face(
   MeshWorker::DoFInfo<dim> & /*dinfo1*/, MeshWorker::DoFInfo<dim> & /*dinfo2*/,
   MeshWorker::IntegrationInfo<dim> & /*info1*/, MeshWorker::IntegrationInfo<dim> & /*info2*/) const
 {
@@ -121,15 +127,22 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem (const unsigned int deg);
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void assemble_multigrid (bool use_mw);
-  void solve (bool use_mw);
-  void refine_grid (const std::string &reftype);
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  assemble_multigrid (bool use_mw);
+  void
+  solve (bool use_mw);
+  void
+  refine_grid (const std::string &reftype);
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -160,19 +173,22 @@ class Coefficient : public Function<dim>
 public:
   Coefficient () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double>            &values,
+              const unsigned int              component = 0) const;
 };
 
 
 
 template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int) const
+double
+Coefficient<dim>::value (const Point<dim> &p,
+                         const unsigned int) const
 {
 //  if (p.square() < 0.5*0.5)
 //    return 20;
@@ -183,9 +199,10 @@ double Coefficient<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
+void
+Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                              std::vector<double>            &values,
+                              const unsigned int              component) const
 {
   const unsigned int n_points = points.size();
 
@@ -213,7 +230,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs (fe);
@@ -279,7 +297,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void
+LaplaceProblem<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(degree+1);
 
@@ -334,7 +353,8 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_multigrid (bool use_mw)
+void
+LaplaceProblem<dim>::assemble_multigrid (bool use_mw)
 {
   deallog << "assemble_multigrid " << (use_mw ? "(mesh_worker)":"") << std::endl;
 
@@ -463,7 +483,8 @@ void LaplaceProblem<dim>::assemble_multigrid (bool use_mw)
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve (bool use_mw)
+void
+LaplaceProblem<dim>::solve (bool use_mw)
 {
   MGTransferPrebuilt<Vector<double> > mg_transfer(mg_constrained_dofs);
   mg_transfer.build_matrices(mg_dof_handler);
@@ -513,7 +534,8 @@ void LaplaceProblem<dim>::solve (bool use_mw)
 
 
 template <int dim>
-void LaplaceProblem<dim>::refine_grid (const std::string &reftype)
+void
+LaplaceProblem<dim>::refine_grid (const std::string &reftype)
 {
   bool cell_refined = false;
   if (reftype == "center" || !cell_refined)
@@ -549,7 +571,8 @@ void LaplaceProblem<dim>::refine_grid (const std::string &reftype)
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void
+LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   DataOut<dim> data_out;
 
@@ -568,7 +591,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
@@ -615,7 +639,8 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

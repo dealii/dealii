@@ -56,7 +56,8 @@ using namespace dealii;
 
 
 template <int dim>
-bool cell_is_patch_level_1 (const typename Triangulation<dim>::cell_iterator &cell)
+bool
+cell_is_patch_level_1 (const typename Triangulation<dim>::cell_iterator &cell)
 {
   Assert (cell->active() == false, ExcInternalError());
 
@@ -69,7 +70,8 @@ bool cell_is_patch_level_1 (const typename Triangulation<dim>::cell_iterator &ce
 }
 
 
-void test ()
+void
+test ()
 {
   Triangulation<2> triangulation (Triangulation<2>::maximum_smoothing);
   GridGenerator::hyper_cube (triangulation);
@@ -129,7 +131,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

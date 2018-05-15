@@ -23,7 +23,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   TrilinosWrappers::MPI::BlockVector v;
   v.reinit(2);
@@ -77,7 +78,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -22,13 +22,15 @@
 #include "../tests.h"
 #include <deal.II/base/std_cxx14/algorithm.h>
 
-constexpr bool comp (const int &a, const int &b)
+constexpr bool
+comp (const int &a, const int &b)
 {
   return b<a;
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

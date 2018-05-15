@@ -36,7 +36,8 @@
 
 
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_rectangle(tr, Point<dim>(), Point<dim>(1,1,1), true);
@@ -64,7 +65,8 @@ void test_hyper_cube()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

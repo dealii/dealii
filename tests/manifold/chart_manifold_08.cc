@@ -22,7 +22,8 @@
 #include <deal.II/grid/manifold.h>
 
 
-Tensor<1,3> periodicity(static_cast<Tensor<1,3> >(Point<3>(0,2*numbers::PI,0)));
+Tensor<1,3>
+periodicity(static_cast<Tensor<1,3> >(Point<3>(0,2*numbers::PI,0)));
 
 class MyCylinderManifold : public ChartManifold<2,3,3>
 {
@@ -101,8 +102,9 @@ public:
 
 
 
-void test_direction (const Point<3> &x1,
-                     const Point<3> &x2)
+void
+test_direction (const Point<3> &x1,
+                const Point<3> &x2)
 {
   static MyCylinderManifold manifold;
 
@@ -114,7 +116,8 @@ void test_direction (const Point<3> &x1,
 }
 
 
-void test()
+void
+test()
 {
   MyCylinderManifold manifold;
 
@@ -135,7 +138,8 @@ void test()
                                                           /*z  =*/-1)));
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

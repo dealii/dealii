@@ -37,7 +37,8 @@ namespace DoFToolsEx
 {
   /// transfers solution between differently refined grids
   template <int dim, class InVector, class OutVector>
-  void transfer(const DoFHandler<dim> &source_dof, const InVector &source_vector, const DoFHandler<dim> &target_dof, OutVector &target_vector);
+  void
+  transfer(const DoFHandler<dim> &source_dof, const InVector &source_vector, const DoFHandler<dim> &target_dof, OutVector &target_vector);
 }
 
 /**
@@ -89,14 +90,16 @@ class TestFunction : public Function<2>
 {
 public:
   TestFunction() : Function<2>() {}
-  virtual double value(const Point<2> &p,
-                       const unsigned int) const
+  virtual double
+  value(const Point<2> &p,
+        const unsigned int) const
   {
     return std::sin(3.14159*p(0))*std::sin(3.14159*p(1));
   }
 };
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

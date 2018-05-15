@@ -72,17 +72,25 @@ namespace Step40
     LaplaceProblem ();
     ~LaplaceProblem ();
 
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void get_point_value (const Point<dim> point, const int proc,
-                          Vector<PetscScalar> &value) const;
-    void check_periodicity (const unsigned int cycle) const;
-    void output_results (const unsigned int cycle) const;
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    refine_grid ();
+    void
+    get_point_value (const Point<dim> point, const int proc,
+                     Vector<PetscScalar> &value) const;
+    void
+    check_periodicity (const unsigned int cycle) const;
+    void
+    output_results (const unsigned int cycle) const;
 
     MPI_Comm mpi_communicator;
 
@@ -129,7 +137,8 @@ namespace Step40
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
 
@@ -179,7 +188,8 @@ namespace Step40
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     const QGauss<dim>  quadrature_formula(3);
 
@@ -247,7 +257,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     PETScWrappers::MPI::Vector
     completely_distributed_solution (mpi_communicator,
@@ -278,7 +289,8 @@ namespace Step40
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void
+  LaplaceProblem<dim>::refine_grid ()
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
@@ -323,7 +335,8 @@ namespace Step40
   {}
 
   template <>
-  void LaplaceProblem<2>::check_periodicity(const unsigned int cycle) const
+  void
+  LaplaceProblem<2>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 2;
     for (unsigned int i = 0; i<cycle; i++)
@@ -365,7 +378,8 @@ namespace Step40
   }
 
   template <>
-  void LaplaceProblem<3>::check_periodicity(const unsigned int cycle) const
+  void
+  LaplaceProblem<3>::check_periodicity(const unsigned int cycle) const
   {
     unsigned int n_points = 2;
     for (unsigned int i = 0; i<cycle; i++)
@@ -431,7 +445,8 @@ namespace Step40
 
   //only needed for graphical output
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   {
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -470,7 +485,8 @@ namespace Step40
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     pcout << std::endl<< "Testing for dim="<<dim<<std::endl;
 
@@ -523,7 +539,8 @@ namespace Step40
   }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   try
     {

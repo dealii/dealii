@@ -39,7 +39,8 @@
 
 
 template <int spacedim>
-void test()
+void
+test()
 {
   // create a triangulation that spans the disjoint interval [0,1] \union [2,3]
   Triangulation<1,spacedim> triangulation_1;
@@ -87,7 +88,8 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

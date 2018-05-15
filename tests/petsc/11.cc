@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test (PETScWrappers::MPI::Vector &v)
+void
+test (PETScWrappers::MPI::Vector &v)
 {
   // set only certain elements of the vector
   for (unsigned int i=0; i<v.size(); i+=1+i)
@@ -37,7 +38,8 @@ void test (PETScWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

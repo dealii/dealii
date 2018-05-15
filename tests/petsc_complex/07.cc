@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test (PETScWrappers::SparseMatrix &m)
+void
+test (PETScWrappers::SparseMatrix &m)
 {
   // first set a few entries. count how many entries we have
   for (unsigned int i=0; i<m.m(); ++i)
@@ -40,7 +41,8 @@ void test (PETScWrappers::SparseMatrix &m)
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
   deallog.depth_console(0);

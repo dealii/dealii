@@ -22,7 +22,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 
-void test1()
+void
+test1()
 {
   const int dim=2, spacedim=2+1;
 
@@ -75,7 +76,8 @@ void test1()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

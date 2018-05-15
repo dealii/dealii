@@ -26,13 +26,15 @@ class foo
 public:
   foo (const unsigned int a) : vec(1, a) {}
   foo (const foo &bar) : vec(bar.vec) {}
-  foo &operator= (const foo &bar)
+  foo &
+  operator= (const foo &bar)
   {
     vec = bar.vec;
     return *this;
   }
 
-  unsigned int element() const
+  unsigned int
+  element() const
   {
     return vec[0];
   }
@@ -41,7 +43,8 @@ private:
   AlignedVector<unsigned int> vec;
 };
 
-void test ()
+void
+test ()
 {
   AlignedVector<foo> vec;
   vec.push_back(foo(3));
@@ -56,7 +59,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

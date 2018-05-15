@@ -29,11 +29,13 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   create_mesh (tria);
@@ -97,7 +99,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog << std::setprecision (3);

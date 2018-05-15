@@ -21,7 +21,8 @@
 #include <deal.II/lac/block_vector.h>
 
 
-void test ()
+void
+test ()
 {
   BlockVector<double> v(2,1);
   v(0) = 1;
@@ -76,7 +77,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

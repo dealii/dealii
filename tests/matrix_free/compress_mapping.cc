@@ -32,12 +32,14 @@
 
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "General mesh" << std::endl;
   Triangulation<dim> tria;
@@ -94,7 +96,8 @@ void test ()
 
 
 template <int dim>
-void test_cube ()
+void
+test_cube ()
 {
   deallog << "Hyper cube" << std::endl;
   Triangulation<dim> tria;
@@ -131,7 +134,8 @@ void test_cube ()
 
 
 template <int dim>
-void test_parallelogram ()
+void
+test_parallelogram ()
 {
   deallog << "Parallelogram" << std::endl;
   Triangulation<dim> tria;
@@ -174,7 +178,8 @@ void test_parallelogram ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

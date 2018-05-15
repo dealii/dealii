@@ -28,7 +28,8 @@
 #include <deal.II/grid/grid_tools_cache.h>
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "Testing " << dim << ", " << spacedim << std::endl;
   // The hypercube is [a,b]^spacedim
@@ -90,7 +91,8 @@ void test()
   deallog << "Test: OK " << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
   test<1,1> ();

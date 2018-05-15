@@ -24,7 +24,8 @@
 #include <deal.II/grid/grid_out.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -37,7 +38,8 @@ std::ofstream logfile("output");
 // testcase=2:
 // create two cubes; translate them so that exactly one vertices overlaps
 template <int dim>
-void test (const int testcase)
+void
+test (const int testcase)
 {
   Triangulation<dim> tria_1, tria_2, tria_3;
   GridGenerator::hyper_cube(tria_1);
@@ -76,7 +78,8 @@ void test (const int testcase)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

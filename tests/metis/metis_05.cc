@@ -36,7 +36,8 @@
 
 
 template <int dim>
-void test (const bool with_weighting, const bool write_to_vtk = false)
+void
+test (const bool with_weighting, const bool write_to_vtk = false)
 {
   deallog << "Dimension = " << dim << std::endl;
   deallog << "With weighting = " << std::boolalpha << with_weighting << std::endl;
@@ -111,7 +112,8 @@ void test (const bool with_weighting, const bool write_to_vtk = false)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

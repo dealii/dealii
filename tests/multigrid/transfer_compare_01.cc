@@ -114,7 +114,8 @@ reinit_vector_by_blocks (
 
 
 template <int dim>
-void check_block(const FiniteElement<dim> &fe)
+void
+check_block(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
   std::vector<bool> selected(fe.n_blocks(), true);
@@ -268,7 +269,8 @@ void check_block(const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

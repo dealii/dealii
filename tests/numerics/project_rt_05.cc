@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   if (dim != 1)
     // this is interesting also in 3d, but is

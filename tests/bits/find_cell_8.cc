@@ -29,7 +29,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 
-void create_coarse_grid(Triangulation<2> &coarse_grid)
+void
+create_coarse_grid(Triangulation<2> &coarse_grid)
 {
 
   static const Point<2> vertices_1[]
@@ -69,7 +70,8 @@ void create_coarse_grid(Triangulation<2> &coarse_grid)
 }
 
 
-void check (Triangulation<2> &tria)
+void
+check (Triangulation<2> &tria)
 {
   Point<2> p (0.99, 1./2.);
 
@@ -86,7 +88,8 @@ void check (Triangulation<2> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

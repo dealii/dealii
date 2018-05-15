@@ -62,14 +62,16 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     return std::exp(-point.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> res = point;
     Assert (point.norm() > 0,
@@ -80,7 +82,8 @@ public:
 };
 
 template <int dim>
-void test1()
+void
+test1()
 {
   deallog << "FEValues.shape_value()"<<std::endl;
   deallog << "for same underlying FEs: f(qp) * N_{fe}(qp) == N_{pou}(qp)"<<std::endl;
@@ -121,7 +124,8 @@ void test1()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

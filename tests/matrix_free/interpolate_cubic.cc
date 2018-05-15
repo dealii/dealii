@@ -33,7 +33,8 @@ template <int dim>
 class CompareFunction : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int ) const
+  virtual double
+  value (const Point<dim> &p, const unsigned int ) const
   {
     double value = 1.;
     for (unsigned int d=0; d<dim; ++d)
@@ -42,7 +43,8 @@ public:
           value += (1.3 + 0.9 * d * (e+1) - 1.4 * (d+1) * (e-1.) * f) * p[d] * p[e] * p[f];
     return value;
   }
-  virtual Tensor<1,dim> gradient (const Point<dim> &p, const unsigned int ) const
+  virtual Tensor<1,dim>
+  gradient (const Point<dim> &p, const unsigned int ) const
   {
     Tensor<1,dim> grad;
     for (unsigned int d=0; d<dim; ++d)
@@ -55,7 +57,8 @@ public:
           }
     return grad;
   }
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p, const unsigned int ) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p, const unsigned int ) const
   {
     SymmetricTensor<2,dim> hess;
     for (unsigned int d=0; d<dim; ++d)
@@ -73,7 +76,8 @@ public:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   if (fe_degree < 3)
     return;

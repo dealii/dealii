@@ -28,7 +28,8 @@
 #include<deal.II/numerics/fe_field_function.h>
 #include<deal.II/numerics/vector_tools.h>
 
-void create_reference_triangulation (Triangulation<3> &tria)
+void
+create_reference_triangulation (Triangulation<3> &tria)
 {
   std::vector<unsigned int> repetitions (3, 1);
 
@@ -36,7 +37,8 @@ void create_reference_triangulation (Triangulation<3> &tria)
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions, Point<3> (-1.0, 0.0, 0.0), Point<3> (1.0, 1.0, 1.0));
 }
 
-void create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+create_triangulation (Triangulation<3> &tria, const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
   std::vector<CellData<3> > cells (2);
 
@@ -174,7 +176,8 @@ void create_triangulation (Triangulation<3> &tria, const bool face_orientation, 
   tria.create_triangulation (vertices, cells, SubCellData ());
 }
 
-void evaluate (const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
+void
+evaluate (const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
 {
   const FEValuesExtractors::Vector component (0);
   const Quadrature<3> quadrature(Point<3>(0.5, 0.5, 0.5));
@@ -191,7 +194,8 @@ void evaluate (const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
     }
 }
 
-void run (const bool face_orientation, const bool face_flip, const bool face_rotation)
+void
+run (const bool face_orientation, const bool face_flip, const bool face_rotation)
 {
 //  Triangulation<3> tria_ref;
 //  create_reference_triangulation (tria_ref);
@@ -209,7 +213,8 @@ void run (const bool face_orientation, const bool face_flip, const bool face_rot
   evaluate (fe, dof_handler);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -46,8 +46,9 @@ class MyFunction : public Function<dim>
 public:
   MyFunction () : Function<dim>() {};
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int) const
   {
     double f=0.25 + 2 * p[0];
     if (dim>1)
@@ -60,7 +61,8 @@ public:
 
 
 template <int dim>
-void transfer(std::ostream &out)
+void
+transfer(std::ostream &out)
 {
   MyFunction<dim> function;
   Triangulation<dim> tria;
@@ -226,7 +228,8 @@ void transfer(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

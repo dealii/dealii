@@ -31,9 +31,10 @@
 
 
 template <typename number>
-void print_formatted (const FullMatrix<number> &A,
-                      const unsigned int        precision,
-                      const unsigned int        width)
+void
+print_formatted (const FullMatrix<number> &A,
+                 const unsigned int        precision,
+                 const unsigned int        width)
 {
   for (unsigned int i=0; i<A.m(); ++i)
     {
@@ -54,7 +55,8 @@ void print_formatted (const FullMatrix<number> &A,
 
 
 template <int dim>
-void test_embedding (const FiniteElement<dim> &fe)
+void
+test_embedding (const FiniteElement<dim> &fe)
 {
   const std::string refine_case_names[8]=
   {
@@ -96,9 +98,10 @@ void test_embedding (const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void test_projection (const FiniteElement<dim> &fe1,
-                      const FiniteElement<dim> &fe2,
-                      std::ostream &out)
+void
+test_projection (const FiniteElement<dim> &fe1,
+                 const FiniteElement<dim> &fe2,
+                 std::ostream &out)
 {
   out << fe1.get_name() << " -> "
       << fe2.get_name() << std::endl;
@@ -118,7 +121,8 @@ void test_projection (const FiniteElement<dim> &fe1,
 
 
 template <int dim>
-void test_projection (std::ostream &out)
+void
+test_projection (std::ostream &out)
 {
   FE_DGQ<dim> q0(0);
   FE_DGQ<dim> q1(1);
@@ -165,7 +169,8 @@ void test_projection (std::ostream &out)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

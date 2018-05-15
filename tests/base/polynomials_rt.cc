@@ -26,7 +26,8 @@
 using namespace std;
 
 template <int dim>
-void plot(const PolynomialsRaviartThomas<dim> &poly)
+void
+plot(const PolynomialsRaviartThomas<dim> &poly)
 {
   QTrapez<1> base_quadrature;
   QIterated<dim> quadrature(base_quadrature, poly.degree()+3);
@@ -53,7 +54,8 @@ void plot(const PolynomialsRaviartThomas<dim> &poly)
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   AssertThrow (BlockMask(12, false).size() == 12, ExcInternalError());
   AssertThrow (BlockMask().size() == 0, ExcInternalError());
@@ -36,7 +37,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

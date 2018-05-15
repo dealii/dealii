@@ -21,11 +21,13 @@
 
 #include <deal.II/base/thread_management.h>
 
-void execute ()
+void
+execute ()
 {}
 
 
-void test ()
+void
+test ()
 {
   // use a default constructed object
   Threads::Thread<> t;
@@ -39,7 +41,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

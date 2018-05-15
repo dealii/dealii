@@ -23,8 +23,9 @@
 #include <vector>
 
 
-void test (Vector<std::complex<double> > &v,
-           Vector<std::complex<float> > &w)
+void
+test (Vector<std::complex<double> > &v,
+      Vector<std::complex<float> > &w)
 {
   // set only certain elements of each
   // vector
@@ -45,7 +46,8 @@ void test (Vector<std::complex<double> > &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

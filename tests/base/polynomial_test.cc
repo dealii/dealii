@@ -30,8 +30,9 @@ using namespace Polynomials;
 
 
 template <int dim, class PolynomialType>
-void check_poly(const Point<dim>     &x,
-                const PolynomialType &p)
+void
+check_poly(const Point<dim>     &x,
+           const PolynomialType &p)
 {
   const unsigned int n = p.n();
   const double eps = 5.0e-15;
@@ -164,7 +165,8 @@ check_dimensions (const std::vector<Polynomial<double> > &p)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(2);

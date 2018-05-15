@@ -41,14 +41,16 @@
 
 
 template <int dim>
-void test ();
+void
+test ();
 
 
 
 
 template <int dim>
-void do_check (const FiniteElement<dim> &coarse_fe,
-               const FiniteElement<dim> &fine_fe)
+void
+do_check (const FiniteElement<dim> &coarse_fe,
+          const FiniteElement<dim> &fine_fe)
 {
   FullMatrix<double> injection_1 (fine_fe.dofs_per_cell,
                                   coarse_fe.dofs_per_cell);
@@ -117,7 +119,8 @@ void do_check (const FiniteElement<dim> &coarse_fe,
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   deallog << std::setprecision (6);

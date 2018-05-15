@@ -34,7 +34,8 @@
 
 
 template <int dim>
-Point<dim> rotate_to_y (const Point<dim> &p)
+Point<dim>
+rotate_to_y (const Point<dim> &p)
 {
   if (dim == 2)
     return Point<dim> (-p[1], p[0]);
@@ -42,18 +43,21 @@ Point<dim> rotate_to_y (const Point<dim> &p)
     return Point<dim> (-p[1], p[0], p[2]);
 }
 
-void set_manifold(Triangulation<2> &triangulation)
+void
+set_manifold(Triangulation<2> &triangulation)
 {
 }
 
-void set_manifold(Triangulation<3> &triangulation)
+void
+set_manifold(Triangulation<3> &triangulation)
 {
   static const CylindricalManifold<3> boundary (1);
   triangulation.set_manifold (0, boundary);
 }
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::cylinder (triangulation);
@@ -71,7 +75,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

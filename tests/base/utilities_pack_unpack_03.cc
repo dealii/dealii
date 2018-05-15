@@ -32,13 +32,15 @@ struct X
   int k;
   double d;
 
-  bool operator != (const X &x) const
+  bool
+  operator != (const X &x) const
   {
     return i!=x.i || k!=x.k || d!=x.d;
   }
 
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int)
+  void
+  serialize(Archive &ar, const unsigned int)
   {
     ar   &i &k &d;
   }
@@ -47,7 +49,8 @@ struct X
 
 
 template <typename T>
-void check (const T &object)
+void
+check (const T &object)
 {
   const std::vector<char> buffer = Utilities::pack (object);
   if (buffer.size() != sizeof(object))
@@ -70,7 +73,8 @@ void check (const T &object)
 }
 
 
-void test()
+void
+test()
 {
   deallog << "std::array:" << std::endl;
   check (std::array<int,3> {{1,2,3}});
@@ -80,7 +84,8 @@ void test()
   check (1.);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

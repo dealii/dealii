@@ -28,7 +28,8 @@
 
 
 template <int dim, int spacedim>
-void test (const Point<spacedim> &p)
+void
+test (const Point<spacedim> &p)
 {
   deallog << "dim: " << dim << ", spacedim: "
           << spacedim << std::endl;
@@ -62,7 +63,8 @@ void test (const Point<spacedim> &p)
 };
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test<2,2> (Point<2>(.2,.2));

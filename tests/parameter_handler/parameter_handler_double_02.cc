@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void test(const std::string &desc)
+void
+test(const std::string &desc)
 {
   deallog << desc << " -> ";
   std::unique_ptr<dealii::Patterns::Double> c = Patterns::Double::create(desc);
@@ -33,7 +34,8 @@ void test(const std::string &desc)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

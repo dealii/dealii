@@ -47,9 +47,10 @@ public:
 
   LaplaceOperator() {};
 
-  void initialize (const Mapping<dim> &mapping,
-                   const DoFHandler<dim> &dof_handler,
-                   const unsigned int level = numbers::invalid_unsigned_int)
+  void
+  initialize (const Mapping<dim> &mapping,
+              const DoFHandler<dim> &dof_handler,
+              const unsigned int level = numbers::invalid_unsigned_int)
   {
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
@@ -65,7 +66,8 @@ public:
     data.reinit (mapping, dof_handler, constraints, quad, addit_data);
   }
 
-  void compute_diagonal_by_face(parallel::distributed::Vector<number> &result) const
+  void
+  compute_diagonal_by_face(parallel::distributed::Vector<number> &result) const
   {
     int dummy;
     result = 0;
@@ -76,7 +78,8 @@ public:
 
   }
 
-  void compute_diagonal_by_cell(parallel::distributed::Vector<number> &result) const
+  void
+  compute_diagonal_by_cell(parallel::distributed::Vector<number> &result) const
   {
     int dummy;
     result.zero_out_ghosts();
@@ -291,7 +294,8 @@ private:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                  dealii::Triangulation<dim>::none,parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
@@ -337,7 +341,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
   mpi_initlog();

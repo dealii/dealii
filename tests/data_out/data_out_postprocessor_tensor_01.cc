@@ -61,14 +61,20 @@ namespace Step8
   public:
     ElasticProblem ();
     ~ElasticProblem ();
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    refine_grid ();
+    void
+    output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
     DoFHandler<dim>      dof_handler;
@@ -87,8 +93,9 @@ namespace Step8
 
 
   template <int dim>
-  void right_hand_side (const std::vector<Point<dim> > &points,
-                        std::vector<Tensor<1, dim> >   &values)
+  void
+  right_hand_side (const std::vector<Point<dim> > &points,
+                   std::vector<Tensor<1, dim> >   &values)
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch (values.size(), points.size()));
@@ -137,7 +144,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::setup_system ()
+  void
+  ElasticProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     hanging_node_constraints.clear ();
@@ -161,7 +169,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::assemble_system ()
+  void
+  ElasticProblem<dim>::assemble_system ()
   {
     QGauss<dim>  quadrature_formula(2);
 
@@ -274,7 +283,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::solve ()
+  void
+  ElasticProblem<dim>::solve ()
   {
     SolverControl           solver_control (1000, 1e-12);
     SolverCG<>              cg (solver_control);
@@ -291,7 +301,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::refine_grid ()
+  void
+  ElasticProblem<dim>::refine_grid ()
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -345,7 +356,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  ElasticProblem<dim>::output_results (const unsigned int cycle) const
   {
     std::string filename = "solution-";
     filename += ('0' + cycle);
@@ -373,7 +385,8 @@ namespace Step8
 
 
   template <int dim>
-  void ElasticProblem<dim>::run ()
+  void
+  ElasticProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<1; ++cycle)
       {
@@ -405,7 +418,8 @@ namespace Step8
 }
 
 
-int main ()
+int
+main ()
 {
   initlog ();
 

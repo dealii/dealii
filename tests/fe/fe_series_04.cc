@@ -61,13 +61,15 @@ public:
     Function<dim>(1)
   {}
 
-  virtual double value(const dealii::Point<dim> &point,
-                       const unsigned int component = 0 ) const;
+  virtual double
+  value(const dealii::Point<dim> &point,
+        const unsigned int component = 0 ) const;
 };
 
 template <int dim>
-double LegendreFunction<dim>::value(const Point<dim> &point,
-                                    const unsigned int ) const
+double
+LegendreFunction<dim>::value(const Point<dim> &point,
+                             const unsigned int ) const
 {
   Assert(dim==1,
          dealii::ExcNotImplemented());
@@ -78,8 +80,9 @@ double LegendreFunction<dim>::value(const Point<dim> &point,
 
 
 template <int dim>
-void test(const LegendreFunction<dim> &func,
-          const unsigned int poly_degree)
+void
+test(const LegendreFunction<dim> &func,
+     const unsigned int poly_degree)
 {
   Triangulation<dim> triangulation;
   hp::DoFHandler<dim> dof_handler(triangulation);
@@ -147,7 +150,8 @@ void test(const LegendreFunction<dim> &func,
  * Small test to first output Legendre coefficients from GSL at -1,0,1
  * and then check that they are orthonormal
  */
-void test_legendre_orthonormal(const unsigned int N)
+void
+test_legendre_orthonormal(const unsigned int N)
 {
   const unsigned int dim = 1;
   deallog << "Pl @ -1;0;1"<<std::endl;
@@ -185,7 +189,8 @@ void test_legendre_orthonormal(const unsigned int N)
   deallog << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   const int dim = 1;
 

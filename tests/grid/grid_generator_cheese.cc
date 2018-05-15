@@ -23,7 +23,8 @@
 
 
 
-void dim_2(std::ostream &os)
+void
+dim_2(std::ostream &os)
 {
   const unsigned int d=2;
   Triangulation<d> tr;
@@ -37,7 +38,8 @@ void dim_2(std::ostream &os)
   gout.write_vtk(tr, os);
 }
 
-void dim_3(std::ostream &os)
+void
+dim_3(std::ostream &os)
 {
   const unsigned int d=3;
   Triangulation<d> tr;
@@ -53,7 +55,8 @@ void dim_3(std::ostream &os)
 }
 
 
-int main()
+int
+main()
 {
   initlog(true);
   std::ostream &logfile = deallog.get_file_stream();

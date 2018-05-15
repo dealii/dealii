@@ -33,7 +33,8 @@
 #include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);

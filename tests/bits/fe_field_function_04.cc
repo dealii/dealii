@@ -36,8 +36,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     return p.square();
   }
@@ -45,7 +46,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const SphericalManifold<dim> boundary_description;
 
@@ -97,7 +99,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

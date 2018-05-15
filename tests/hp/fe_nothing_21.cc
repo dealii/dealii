@@ -38,7 +38,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim>       triangulation;
   GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
@@ -71,7 +72,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

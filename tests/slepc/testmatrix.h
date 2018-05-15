@@ -24,16 +24,19 @@ public:
    * Generate the matrix structure.
    */
   template <typename SP>
-  void diag_structure(SP &structure) const;
+  void
+  diag_structure(SP &structure) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void diag(MatrixType &) const;
+  void
+  diag(MatrixType &) const;
 
   template <typename number>
-  void gnuplot_print(std::ostream &, const Vector<number> &) const;
+  void
+  gnuplot_print(std::ostream &, const Vector<number> &) const;
 
 private:
   /**
@@ -126,13 +129,15 @@ public:
    * Generate the matrix structure.
    */
   template <typename SP>
-  void three_point_structure(SP &structure) const;
+  void
+  three_point_structure(SP &structure) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void three_point(MatrixType &) const;
+  void
+  three_point(MatrixType &) const;
 
 private:
   /**

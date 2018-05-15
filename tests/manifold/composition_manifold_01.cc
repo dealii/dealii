@@ -24,7 +24,8 @@
 #include <deal.II/grid/composition_manifold.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

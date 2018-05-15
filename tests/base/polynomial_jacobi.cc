@@ -22,7 +22,8 @@
 using namespace Polynomials;
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.precision(10);

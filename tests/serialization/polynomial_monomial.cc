@@ -21,7 +21,8 @@
 #include <boost/serialization/vector.hpp>
 
 
-void test ()
+void
+test ()
 {
   unsigned int n1 = 3;
   double coefficient1 = 5.;
@@ -37,7 +38,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

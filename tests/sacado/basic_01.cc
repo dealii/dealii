@@ -28,7 +28,8 @@
 
 // The function to differentiate
 template <typename NumberType>
-NumberType f(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+f(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return z*(x + z*y + x*y);
 }
@@ -42,7 +43,8 @@ df(const double &x, const double &y, const double &z,
   df_dy = z*(z + x);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

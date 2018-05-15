@@ -42,10 +42,11 @@ struct Geom_parameters
   std::vector<double> radius;
 };
 
-void concentric_disks(Triangulation<2>          &tria,
-                      const double               s,
-                      const std::vector<double> &x,
-                      Geom_parameters           &gp)
+void
+concentric_disks(Triangulation<2>          &tria,
+                 const double               s,
+                 const std::vector<double> &x,
+                 Geom_parameters           &gp)
 {
   double r = x[0], d = 0.5 * x[0],
          q = 1.0 / sqrt(2.0); // q: corner points factor
@@ -262,9 +263,10 @@ void concentric_disks(Triangulation<2>          &tria,
   // --------------------------------------------------------------------------------
 }
 
-void concentric_disks(Triangulation<2> &tria,
-                      std::vector<double> x,
-                      Geom_parameters &gp)
+void
+concentric_disks(Triangulation<2> &tria,
+                 std::vector<double> x,
+                 Geom_parameters &gp)
 {
   concentric_disks(tria, 0.0, x, gp);
 }
@@ -276,10 +278,12 @@ class Mygrid
 {
 public:
   Mygrid(unsigned int r);
-  void run();
+  void
+  run();
 
 private:
-  void make_grid();
+  void
+  make_grid();
 
   Geom_parameters gp;
   std::vector<PolarManifold<dim>> balls;
@@ -294,7 +298,8 @@ Mygrid<dim>::Mygrid(unsigned int r)
 {}
 
 template <int dim>
-void Mygrid<dim>::make_grid()
+void
+Mygrid<dim>::make_grid()
 {
   const double s = 0.1;
   std::vector<double> x {1.0, 1.5, 2.0, 2.5, 3.0};
@@ -321,12 +326,14 @@ void Mygrid<dim>::make_grid()
 }
 
 template <int dim>
-void Mygrid<dim>::run()
+void
+Mygrid<dim>::run()
 {
   make_grid();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

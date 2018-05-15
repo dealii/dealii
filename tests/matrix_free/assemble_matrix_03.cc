@@ -33,7 +33,8 @@
 #include <deal.II/base/work_stream.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 namespace Assembly
@@ -80,9 +81,10 @@ namespace Assembly
 
 // compute matrix with (\nabla v, \nabla u) + (v, 10 * u)
 template <int dim, int fe_degree>
-void assemble_on_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                       Assembly::Scratch::Data<dim,fe_degree> &data,
-                       unsigned int &)
+void
+assemble_on_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                  Assembly::Scratch::Data<dim,fe_degree> &data,
+                  unsigned int &)
 {
   const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
   const unsigned int   n_q_points    = data.fe_values.get_quadrature().size();
@@ -135,12 +137,14 @@ void assemble_on_cell (const typename DoFHandler<dim>::active_cell_iterator &cel
 }
 
 
-void copy_data_local_to_global (const unsigned int &)
+void
+copy_data_local_to_global (const unsigned int &)
 {}
 
 
 template <int dim, int fe_degree>
-void do_test (const DoFHandler<dim> &dof)
+void
+do_test (const DoFHandler<dim> &dof)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -160,7 +164,8 @@ void do_test (const DoFHandler<dim> &dof)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
@@ -187,7 +192,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

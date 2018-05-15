@@ -69,7 +69,8 @@ test ()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   initlog();
   test<2>();

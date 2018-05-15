@@ -154,7 +154,8 @@ check(const FiniteElement<dim, spacedim> &fe,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.depth_file (1);

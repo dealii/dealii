@@ -26,7 +26,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // create two different FullMatrix objects and add entries randomly to it.
   // Multiply them via FullMatrix::mmult(..), go through each row and column,
@@ -102,7 +103,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

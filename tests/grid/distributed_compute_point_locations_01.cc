@@ -30,7 +30,8 @@
 using namespace dealii;
 
 template <int dim>
-void test_compute_pt_loc(unsigned int n_points)
+void
+test_compute_pt_loc(unsigned int n_points)
 {
   MPI_Comm mpi_communicator = MPI_COMM_WORLD;
   deallog << "Testing for dim = " << dim << std::endl;
@@ -125,7 +126,8 @@ void test_compute_pt_loc(unsigned int n_points)
   deallog << "Test finished" << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

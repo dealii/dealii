@@ -60,8 +60,9 @@ public:
     q(q)
   {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component = 0) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component = 0) const
   {
     Assert ((component == 0) && (this->n_components == 1),
             ExcInternalError());
@@ -72,7 +73,8 @@ public:
     return val;
   }
 
-  VectorizedArray<double> value(const Point<dim, VectorizedArray<double>> &p_vec) const
+  VectorizedArray<double>
+  value(const Point<dim, VectorizedArray<double>> &p_vec) const
   {
     VectorizedArray<double> res = make_vectorized_array (0.);
     Point<dim> p;
@@ -97,9 +99,10 @@ struct QData
 
 
 template <typename VectorType, int dim>
-void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int        p)
+void
+do_project (const parallel::distributed::Triangulation<dim> &triangulation,
+            const FiniteElement<dim> &fe,
+            const unsigned int        p)
 {
   AssertThrow(fe.n_components() ==1,
               ExcNotImplemented());
@@ -215,8 +218,9 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
 // of polynomial degree p has normal components of degree p-1 and therefore
 // can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <typename VectorType, int dim>
-void test_no_hanging_nodes (const FiniteElement<dim> &fe,
-                            const unsigned int        p)
+void
+test_no_hanging_nodes (const FiniteElement<dim> &fe,
+                       const unsigned int        p)
 {
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (triangulation);
@@ -229,8 +233,9 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 
 // same test as above, but this time with a mesh that has hanging nodes
 template <typename VectorType, int dim>
-void test_with_hanging_nodes (const FiniteElement<dim> &fe,
-                              const unsigned int        p)
+void
+test_with_hanging_nodes (const FiniteElement<dim> &fe,
+                         const unsigned int        p)
 {
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (triangulation);

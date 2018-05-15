@@ -41,13 +41,15 @@ using namespace dealii;
 using namespace LocalIntegrators::Maxwell;
 
 template <int dim>
-void make_grid(Triangulation<dim> &tr)
+void
+make_grid(Triangulation<dim> &tr)
 {
   GridGenerator::subdivided_hyper_cube(tr, 1, -1., 1.);
 }
 
 template <int dim>
-void TestMaxwellCurl(Triangulation<dim> &tr)
+void
+TestMaxwellCurl(Triangulation<dim> &tr)
 {
   int element_order = 1;
   int quadrature_order = 3;
@@ -93,7 +95,8 @@ void TestMaxwellCurl(Triangulation<dim> &tr)
   dof_handler.clear();
 }
 
-int main()
+int
+main()
 {
   initlog();
 

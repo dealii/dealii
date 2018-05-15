@@ -31,8 +31,9 @@
 
 using namespace OpenCASCADE;
 
-void remove_iges_header(const std::string &in_filename,
-                        const std::string &out_filename)
+void
+remove_iges_header(const std::string &in_filename,
+                   const std::string &out_filename)
 {
   std::ifstream in(in_filename);
   std::ofstream out(out_filename);
@@ -46,7 +47,8 @@ void remove_iges_header(const std::string &in_filename,
 }
 
 template<int spacedim>
-void test()
+void
+test()
 {
   deallog << "Testing <2," << spacedim << ">" << std::endl;
 
@@ -99,7 +101,8 @@ void test()
   cat_file("edge31_noheader.iges");
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

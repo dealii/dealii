@@ -23,7 +23,8 @@
 #include <iomanip>
 
 
-void test ()
+void
+test ()
 {
   {
     Particles::PropertyPool pool(1);
@@ -42,7 +43,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test();

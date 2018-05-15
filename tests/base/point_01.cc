@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Point<dim> p;
   for (unsigned int i=0; i<dim; ++i)
@@ -33,7 +34,8 @@ void check ()
   deallog << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

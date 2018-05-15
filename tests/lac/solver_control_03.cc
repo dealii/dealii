@@ -61,7 +61,8 @@ check_solve (SolverControl       &solver_control,
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);

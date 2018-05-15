@@ -27,7 +27,8 @@
 
 
 template <typename number>
-void test (unsigned int variant, unsigned int min_convergence_steps)
+void
+test (unsigned int variant, unsigned int min_convergence_steps)
 {
   const unsigned int n = 64;
   Vector<number> rhs(n), sol(n);
@@ -86,7 +87,8 @@ void test (unsigned int variant, unsigned int min_convergence_steps)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   initlog();
 

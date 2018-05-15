@@ -25,7 +25,8 @@
 
 // Build the one dimensional discrete Laplacian for n intervals
 template <typename number>
-void test_laplacian(unsigned int n)
+void
+test_laplacian(unsigned int n)
 {
   TridiagonalMatrix<number> M(n-1, true);
   for (unsigned int i=0; i<n-2; ++i)
@@ -42,7 +43,8 @@ void test_laplacian(unsigned int n)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

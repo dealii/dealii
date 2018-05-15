@@ -45,7 +45,8 @@ public:
     :Function<dim,std::complex<double> >(dim)
   {}
 
-  std::complex<double> value (const Point<dim> &p, const unsigned int c) const
+  std::complex<double>
+  value (const Point<dim> &p, const unsigned int c) const
   {
     if (c==0)
       return p[0]+p[1]+((dim==3)?p[2]:0.0);
@@ -61,7 +62,8 @@ public:
 
 
 template <int dim>
-void test(VectorTools::NormType norm, double value)
+void
+test(VectorTools::NormType norm, double value)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -93,7 +95,8 @@ void test(VectorTools::NormType norm, double value)
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "Hdiv_seminorm:" << std::endl;
   // sqrt(\int (div f)^2 = sqrt(\int (1+2y)^2)
@@ -109,7 +112,8 @@ void test()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   test<2>();

@@ -28,7 +28,8 @@
 #include <deal.II/dofs/dof_renumbering.h>
 
 template<int dim>
-void test()
+void
+test()
 {
   const unsigned int this_mpi_process =
     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -64,7 +65,8 @@ void test()
     deallog << "OK for " << dim << "d" << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

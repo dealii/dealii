@@ -54,10 +54,12 @@ private:
   typedef typename parallel::distributed::Triangulation<dim> TypeTria;
 public:
   TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option = dealii::Triangulation<dim>::none);
-  void run(std::vector<unsigned int> &n_cell,
-           std::set<Location<dim> > &position_list);
+  void
+  run(std::vector<unsigned int> &n_cell,
+      std::set<Location<dim> > &position_list);
 private:
-  void write_vtu(const unsigned int counter) const;
+  void
+  write_vtu(const unsigned int counter) const;
 
   const MPI_Comm mpi_communicator;
   TypeTria triangulation;
@@ -77,7 +79,8 @@ public:
   {}
 
   inline
-  bool operator<(const Location<dim> &op) const
+  bool
+  operator<(const Location<dim> &op) const
   {
     for (unsigned int d=0; d<dim; ++d)
       {
@@ -91,7 +94,8 @@ public:
   }
 };
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, /* int max_num_threads */ 1);
   const bool I_am_host = (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0);
@@ -199,8 +203,9 @@ TriaTest<dim>::TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing
 }
 
 template <int dim>
-void TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
-                        std::set<Location<dim> > &position_list)
+void
+TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
+                   std::set<Location<dim> > &position_list)
 {
   n_cell.clear();
   position_list.clear();
@@ -271,7 +276,8 @@ void TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
 }
 
 template <int dim>
-void TriaTest<dim>::write_vtu(const unsigned int counter) const
+void
+TriaTest<dim>::write_vtu(const unsigned int counter) const
 {
 #ifdef WRITE_VTU
   // save refine flag

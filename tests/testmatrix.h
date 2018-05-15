@@ -25,34 +25,40 @@ public:
    * Generate the matrix structure.
    */
   template <typename SP>
-  void five_point_structure(SP &structure) const;
+  void
+  five_point_structure(SP &structure) const;
 
   /**
    * Generate the matrix structure.
    */
   template <typename SP>
-  void nine_point_structure(SP &structure) const;
+  void
+  nine_point_structure(SP &structure) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void five_point(MatrixType &, bool nonsymmetric = false) const;
+  void
+  five_point(MatrixType &, bool nonsymmetric = false) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void nine_point(MatrixType &, bool nonsymmetric = false) const;
+  void
+  nine_point(MatrixType &, bool nonsymmetric = false) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void upwind(MatrixType &, bool back = false) const;
+  void
+  upwind(MatrixType &, bool back = false) const;
 
   template <typename number>
-  void gnuplot_print(std::ostream &, const Vector<number> &) const;
+  void
+  gnuplot_print(std::ostream &, const Vector<number> &) const;
 
 private:
   /**

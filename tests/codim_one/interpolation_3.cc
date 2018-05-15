@@ -40,12 +40,14 @@
 #include <string>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 // Test interpolation on system of finite elements.
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
 
   Triangulation<dim, spacedim> triangulation;
@@ -83,7 +85,8 @@ void test(std::string filename)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

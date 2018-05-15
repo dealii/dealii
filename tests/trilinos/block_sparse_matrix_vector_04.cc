@@ -26,7 +26,8 @@
 #include <vector>
 
 
-void test (const unsigned int size_1, const unsigned int size_2)
+void
+test (const unsigned int size_1, const unsigned int size_2)
 {
   TrilinosWrappers::SparseMatrix m(size_1, size_2, size_2);
   for (unsigned int i=0; i<m.m(); ++i)
@@ -73,7 +74,8 @@ void test (const unsigned int size_1, const unsigned int size_2)
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

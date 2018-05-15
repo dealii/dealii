@@ -20,9 +20,10 @@
 #include <deal.II/grid/manifold.h>
 
 
-Point<3> periodicity (/*r=*/0,
-                            /*phi=*/2*numbers::PI,
-                            /*z=*/0);
+Point<3>
+periodicity (/*r=*/0,
+                   /*phi=*/2*numbers::PI,
+                   /*z=*/0);
 
 class MyCylinderManifold : public ChartManifold<2,3,3>
 {
@@ -102,8 +103,9 @@ public:
 
 
 
-void test_direction (const Point<3> &x1,
-                     const Point<3> &x2)
+void
+test_direction (const Point<3> &x1,
+                const Point<3> &x2)
 {
   static MyCylinderManifold manifold;
 
@@ -115,7 +117,8 @@ void test_direction (const Point<3> &x1,
 }
 
 
-void test()
+void
+test()
 {
   MyCylinderManifold manifold;
 
@@ -161,7 +164,8 @@ void test()
                                                           /*z  =*/1)));
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -19,7 +19,8 @@
 
 #include <vector>
 
-void test()
+void
+test()
 {
   ConstraintMatrix constraints;
 
@@ -48,7 +49,8 @@ void test()
     deallog<<"Index: "<<indices[i]<<std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

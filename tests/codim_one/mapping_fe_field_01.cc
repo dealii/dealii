@@ -42,9 +42,10 @@
 #include <deal.II/fe/mapping_fe_field.h>
 
 template <int dim, int spacedim>
-void test(const unsigned int refs,
-          const unsigned int degree,
-          const unsigned int subdivisions)
+void
+test(const unsigned int refs,
+     const unsigned int degree,
+     const unsigned int subdivisions)
 {
 
   const unsigned int id = degree+10*refs+100*subdivisions;
@@ -118,7 +119,8 @@ void test(const unsigned int refs,
   triangulation.reset_manifold(0);
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

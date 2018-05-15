@@ -43,11 +43,14 @@ class SystemTest
 {
 public:
   SystemTest ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void check ();
+  void
+  make_grid_and_dofs ();
+  void
+  check ();
 
 
   Triangulation<dim>     triangulation;
@@ -66,7 +69,8 @@ SystemTest<dim>::SystemTest () :
 
 
 template <int dim>
-void SystemTest<dim>::make_grid_and_dofs ()
+void
+SystemTest<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (0);
@@ -83,7 +87,8 @@ void SystemTest<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void SystemTest<dim>::check ()
+void
+SystemTest<dim>::check ()
 {
   for (unsigned int c=0; c<fe.n_components(); ++c)
     {
@@ -109,7 +114,8 @@ void SystemTest<dim>::check ()
 
 
 template <int dim>
-void SystemTest<dim>::run ()
+void
+SystemTest<dim>::run ()
 {
   deallog << "************* " << dim << "D *************" << std::endl;
   make_grid_and_dofs ();
@@ -124,7 +130,8 @@ void SystemTest<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

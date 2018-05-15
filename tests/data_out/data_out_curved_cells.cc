@@ -55,9 +55,10 @@ using namespace dealii;
 
 
 // this is copied from GridGenerator
-void laplace_solve (const SparseMatrix<double> &S,
-                    const std::map<unsigned int,double> &m,
-                    Vector<double> &u)
+void
+laplace_solve (const SparseMatrix<double> &S,
+               const std::map<unsigned int,double> &m,
+               Vector<double> &u)
 {
   const unsigned int n_dofs=S.n();
   FilteredMatrix<Vector<double> > SF (S);
@@ -79,7 +80,8 @@ void laplace_solve (const SparseMatrix<double> &S,
 
 // create a rinf grid and compute a MappingQEuler to represent the inner
 // boundary
-void curved_grid (std::ofstream &out)
+void
+curved_grid (std::ofstream &out)
 {
   // number of cells in radial and
   // circumferential direction
@@ -244,7 +246,8 @@ void curved_grid (std::ofstream &out)
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

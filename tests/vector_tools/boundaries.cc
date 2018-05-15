@@ -44,14 +44,16 @@ class MySquareFunction : public Function<dim>
 public:
   MySquareFunction () : Function<dim>(2) {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return 100*(component+1)*p.square()*std::sin(p.square());
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     for (unsigned int d=0; d<this->n_components; ++d) values(d) = value(p,d);
   }
@@ -67,7 +69,8 @@ boundary_q (const DoFHandler<dim> &)
 }
 
 
-void write_map (const std::map<types::global_dof_index,double> &bv)
+void
+write_map (const std::map<types::global_dof_index,double> &bv)
 {
   for (std::map<types::global_dof_index,double>::const_iterator
        i=bv.begin(); i!=bv.end(); ++i)
@@ -163,7 +166,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (2);

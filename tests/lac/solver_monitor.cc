@@ -32,9 +32,10 @@
 #include <deal.II/lac/precondition.h>
 
 
-SolverControl::State monitor_norm (const unsigned int    iteration,
-                                   const double          check_value,
-                                   const Vector<double> &current_iterate)
+SolverControl::State
+monitor_norm (const unsigned int    iteration,
+              const double          check_value,
+              const Vector<double> &current_iterate)
 {
   deallog << "   -- " << iteration << ' ' << check_value << std::endl;
   deallog << "   Norm=" << current_iterate.l2_norm() << std::endl;
@@ -42,9 +43,10 @@ SolverControl::State monitor_norm (const unsigned int    iteration,
 }
 
 
-SolverControl::State monitor_mean (const unsigned int    iteration,
-                                   const double          check_value,
-                                   const Vector<double> &current_iterate)
+SolverControl::State
+monitor_mean (const unsigned int    iteration,
+              const double          check_value,
+              const Vector<double> &current_iterate)
 {
   deallog << "   Mean=" << current_iterate.mean_value() << std::endl;
   return SolverControl::success;
@@ -72,7 +74,8 @@ check_solve (SolverType         &solver,
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

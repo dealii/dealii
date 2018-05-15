@@ -198,7 +198,8 @@ check_quadratures (const std::vector<Quadrature<dim>*> &quadratures)
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

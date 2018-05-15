@@ -23,7 +23,8 @@
 
 #include <vector>
 
-void test()
+void
+test()
 {
   IndexSet is(8);
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -82,7 +83,8 @@ void test()
   deallog << "OK" <<std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

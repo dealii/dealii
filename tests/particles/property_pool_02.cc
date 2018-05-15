@@ -23,7 +23,8 @@
 #include <iomanip>
 
 
-void test ()
+void
+test ()
 {
   {
     const unsigned int n_properties = 3;
@@ -51,7 +52,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test();

@@ -31,7 +31,8 @@
 #include <iostream>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation, -1,0);
@@ -75,7 +76,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

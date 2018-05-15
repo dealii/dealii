@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   parallel::shared::Triangulation<dim>
   triangulation (MPI_COMM_WORLD,
@@ -52,7 +53,8 @@ void test ()
           << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

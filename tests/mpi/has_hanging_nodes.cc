@@ -67,8 +67,9 @@ using namespace dealii;
 //#define DISTRIBUTED
 
 template <int dim>
-void test_int(const unsigned int n_global = 0,
-              const unsigned int n_local = 0)
+void
+test_int(const unsigned int n_global = 0,
+         const unsigned int n_local = 0)
 {
 
   MPI_Comm mpi_communicator (MPI_COMM_WORLD);
@@ -135,7 +136,8 @@ void test_int(const unsigned int n_global = 0,
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
 

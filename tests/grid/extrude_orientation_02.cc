@@ -27,7 +27,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 
-void test()
+void
+test()
 {
   Triangulation<2> tr;
   GridGenerator::hyper_ball (tr);
@@ -62,7 +63,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

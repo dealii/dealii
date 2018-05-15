@@ -75,8 +75,9 @@ reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
 }
 
 template <int dim>
-void initialize (const DoFHandler<dim> &dof,
-                 Vector<double> &u)
+void
+initialize (const DoFHandler<dim> &dof,
+            Vector<double> &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -94,8 +95,9 @@ void initialize (const DoFHandler<dim> &dof,
 
 
 template <int dim>
-void initialize (const DoFHandler<dim> &dof,
-                 MGLevelObject<Vector<double> > &u)
+void
+initialize (const DoFHandler<dim> &dof,
+            MGLevelObject<Vector<double> > &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -109,8 +111,9 @@ void initialize (const DoFHandler<dim> &dof,
 
 
 template <int dim>
-void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
-                 const Vector<double> &u, const Vector<double> &v)
+void
+print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
+            const Vector<double> &u, const Vector<double> &v)
 {
   Vector<double> diff;
   diff.reinit (u);
@@ -131,7 +134,8 @@ void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
 }
 
 template <int dim>
-void print(const DoFHandler<dim> &dof, std::vector<std::vector<bool> > &interface_dofs)
+void
+print(const DoFHandler<dim> &dof, std::vector<std::vector<bool> > &interface_dofs)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<unsigned int> dof_indices(dofs_per_cell);
@@ -156,14 +160,20 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem (const unsigned int deg);
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void test ();
-  void test_renumber ();
-  void test_interface_dofs ();
-  void refine_local ();
+  void
+  setup_system ();
+  void
+  test ();
+  void
+  test_renumber ();
+  void
+  test_interface_dofs ();
+  void
+  refine_local ();
 
   Triangulation<dim>   triangulation;
   FESystem<dim>            fe;
@@ -196,7 +206,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int deg) :
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs (fe);
@@ -262,7 +273,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::test_interface_dofs ()
+void
+LaplaceProblem<dim>::test_interface_dofs ()
 {
   std::vector<std::vector<bool> > interface_dofs;
   std::vector<std::vector<bool> > boundary_interface_dofs;
@@ -288,7 +300,8 @@ void LaplaceProblem<dim>::test_interface_dofs ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::test_renumber ()
+void
+LaplaceProblem<dim>::test_renumber ()
 {
   std::vector<std::vector<bool> > v(triangulation.n_levels());
   for (unsigned int l=0; l<triangulation.n_levels(); ++l)
@@ -320,7 +333,8 @@ void LaplaceProblem<dim>::test_renumber ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::test ()
+void
+LaplaceProblem<dim>::test ()
 {
   typename FunctionMap<dim>::type      dirichlet_boundary;
   Functions::ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
@@ -419,7 +433,8 @@ void LaplaceProblem<dim>::test ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::refine_local ()
+void
+LaplaceProblem<dim>::refine_local ()
 {
   bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
@@ -455,7 +470,8 @@ void LaplaceProblem<dim>::refine_local ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<7; ++cycle)
     {
@@ -473,7 +489,8 @@ void LaplaceProblem<dim>::run ()
     };
 }
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision(4);

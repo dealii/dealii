@@ -22,7 +22,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 template <int dim, int spacedim1, int spacedim2>
-void test()
+void
+test()
 {
   deallog << "Testing <" << dim << "," << spacedim1
           << "> VS <" << dim << "," << spacedim2
@@ -38,7 +39,8 @@ void test()
   go.write_msh(tria2, deallog.get_file_stream());
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<1,1,1>();

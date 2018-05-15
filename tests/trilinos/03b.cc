@@ -28,7 +28,8 @@
 #include <iostream>
 
 
-void test (TrilinosWrappers::SparseMatrix &m)
+void
+test (TrilinosWrappers::SparseMatrix &m)
 {
   // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
@@ -69,7 +70,8 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

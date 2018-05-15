@@ -32,7 +32,8 @@
 #include <deal.II/grid/tria.h>
 
 template <int dim>
-std::vector<types::global_dof_index> get_conflict_indices_cfem(
+std::vector<types::global_dof_index>
+get_conflict_indices_cfem(
   typename DoFHandler<dim>::active_cell_iterator const &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
@@ -42,7 +43,8 @@ std::vector<types::global_dof_index> get_conflict_indices_cfem(
 }
 
 template <int dim>
-void check()
+void
+check()
 {
   deallog << "dim=" << dim <<  std::endl;
 
@@ -82,7 +84,8 @@ void check()
     deallog << coloring[color].size() << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog<<std::setprecision(4);

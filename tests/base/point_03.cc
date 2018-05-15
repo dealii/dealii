@@ -22,7 +22,8 @@
 
 
 template <int dim, typename number>
-void check ()
+void
+check ()
 {
   VectorizedArray<number> distance_vec;
   Point<dim, VectorizedArray<number>> p1_vec, p2_vec;
@@ -55,7 +56,8 @@ void check ()
   deallog << "Ok" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

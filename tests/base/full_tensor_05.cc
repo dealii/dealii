@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Tensor<4,dim> t;
   for (unsigned int i=0; i<dim; ++i)
@@ -73,7 +74,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

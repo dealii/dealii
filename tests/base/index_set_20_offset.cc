@@ -21,10 +21,11 @@
 
 #include <deal.II/base/index_set.h>
 
-void testor(IndexSet &a,
-            IndexSet &other,
-            unsigned int offset,
-            bool verbose)
+void
+testor(IndexSet &a,
+       IndexSet &other,
+       unsigned int offset,
+       bool verbose)
 {
   IndexSet merged(a);
 
@@ -53,7 +54,8 @@ void testor(IndexSet &a,
 
 
 
-void test()
+void
+test()
 {
   const int size = 10;
 
@@ -83,7 +85,8 @@ void test()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

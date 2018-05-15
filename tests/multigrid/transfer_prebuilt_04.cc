@@ -31,7 +31,8 @@
 
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> fe(1);
 
@@ -96,7 +97,8 @@ void check()
     }
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   mpi_initlog();

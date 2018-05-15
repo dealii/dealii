@@ -67,14 +67,16 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     return std::exp(-point.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> res = point;
     Assert (point.norm() > 0,
@@ -83,8 +85,9 @@ public:
     return res;
   }
 
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                          const unsigned int component=0) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p,
+           const unsigned int component=0) const
   {
     Tensor<1,dim> dir = p;
     const double r = dir.norm();
@@ -115,17 +118,18 @@ public:
  * @param h_s1  hessian of 1st component of FE_System
  */
 template <int dim>
-void check_consistency(const Point<dim>    &p,
-                       const Function<dim> &func,
-                       const double        &v_e,
-                       const Tensor<1,dim> &g_e,
-                       const Tensor<2,dim> &h_e,
-                       const double        &v_s0,
-                       const Tensor<1,dim> &g_s0,
-                       const Tensor<2,dim> &h_s0,
-                       const double        &v_s1,
-                       const Tensor<1,dim> &g_s1,
-                       const Tensor<2,dim> &h_s1)
+void
+check_consistency(const Point<dim>    &p,
+                  const Function<dim> &func,
+                  const double        &v_e,
+                  const Tensor<1,dim> &g_e,
+                  const Tensor<2,dim> &h_e,
+                  const double        &v_s0,
+                  const Tensor<1,dim> &g_s0,
+                  const Tensor<2,dim> &h_s0,
+                  const double        &v_s1,
+                  const Tensor<1,dim> &g_s1,
+                  const Tensor<2,dim> &h_s1)
 {
   const double                 v_f = func.value(p);
   const Tensor<1,dim>          g_f = func.gradient(p);
@@ -157,11 +161,12 @@ void check_consistency(const Point<dim>    &p,
 }
 
 template <int dim>
-void test(const FiniteElement<dim> &fe1,
-          const FiniteElement<dim> &fe2,
-          const Quadrature<dim>    &volume_quad,
-          const Quadrature<dim-1>  &face_quad,
-          const bool                distort)
+void
+test(const FiniteElement<dim> &fe1,
+     const FiniteElement<dim> &fe2,
+     const Quadrature<dim>    &volume_quad,
+     const Quadrature<dim-1>  &face_quad,
+     const bool                distort)
 {
   Triangulation<dim> triangulation;
   DoFHandler<dim> dof_handler_enriched(triangulation);
@@ -267,7 +272,8 @@ void test(const FiniteElement<dim> &fe1,
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

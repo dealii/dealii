@@ -28,7 +28,8 @@
 #include <iostream>
 
 template <int dim>
-Point<dim> point(double x=0, double y=0, double z=0)
+Point<dim>
+point(double x=0, double y=0, double z=0)
 {
   Point<dim> p;
   if (dim>0) p[0] = x;
@@ -41,7 +42,8 @@ Point<dim> point(double x=0, double y=0, double z=0)
 // The simplest test case is to create a parallelepiped grid with a
 // number of subdivisions and output the result.
 template <int dim, int spacedim>
-void check (bool subdivide)
+void
+check (bool subdivide)
 {
   deallog << "dim " << dim << " spacedim " << spacedim << std::endl;
 
@@ -95,7 +97,8 @@ void check (bool subdivide)
   grid_out.write_gnuplot (triangulation, deallog.get_file_stream());
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

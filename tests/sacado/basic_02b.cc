@@ -39,12 +39,14 @@ f(const NumberType &x, const NumberType &y, const NumberType2 &z)
   return z*(x*x*x + z*y*y + 0.5*x*y*y);
 }
 template <typename NumberType>
-NumberType g(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+g(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return std::sin(x*z)*std::cos(y/z);
 }
 template <typename NumberType>
-NumberType h(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+h(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return x*x*y*y*z;
 }
@@ -101,7 +103,8 @@ d2h(const double &x, const double &y, const double &z,
   d2h_dy_dy = 2*x*x*z;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

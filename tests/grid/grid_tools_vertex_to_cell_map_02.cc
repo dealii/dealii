@@ -24,9 +24,11 @@
 
 #include <vector>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
-void test()
+void
+test()
 {
   Triangulation<3> tria;
   Point<3> a(0.,0.,0.);
@@ -65,7 +67,8 @@ void test()
   AssertThrow(histogram[8]==1, ExcMessage("Wrong cell distribution"));
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);

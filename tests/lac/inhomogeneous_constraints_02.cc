@@ -49,11 +49,13 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
-void test(bool use_inhomogeneity_for_rhs)
+void
+test(bool use_inhomogeneity_for_rhs)
 {
   ConstraintMatrix cm;
 
@@ -96,7 +98,8 @@ void test(bool use_inhomogeneity_for_rhs)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

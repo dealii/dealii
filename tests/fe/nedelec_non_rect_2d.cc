@@ -77,16 +77,19 @@ namespace polytest
   {
   public:
     SimplePolynomial() : Function<dim>(2) {}
-    void vector_value_list (const std::vector<Point<dim> > &points,
-                            std::vector<Vector<double> >   &values) const;
+    void
+    vector_value_list (const std::vector<Point<dim> > &points,
+                       std::vector<Vector<double> >   &values) const;
 
-    void rhs_value_list (const std::vector<Point<dim> > &points,
-                         std::vector<Vector<double> >   &values) const;
+    void
+    rhs_value_list (const std::vector<Point<dim> > &points,
+                    std::vector<Vector<double> >   &values) const;
 
   };
   template <int dim>
-  void SimplePolynomial<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                                 std::vector<Vector<double> >   &values) const
+  void
+  SimplePolynomial<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                            std::vector<Vector<double> >   &values) const
   {
     Assert (dim == 2, ExcNotImplemented());
     Assert (values.size() == points.size(),
@@ -103,8 +106,9 @@ namespace polytest
   }
 
   template <int dim>
-  void SimplePolynomial<dim>::rhs_value_list (const std::vector<Point<dim> > &points,
-                                              std::vector<Vector<double> >   &values) const
+  void
+  SimplePolynomial<dim>::rhs_value_list (const std::vector<Point<dim> > &points,
+                                         std::vector<Vector<double> >   &values) const
   {
     Assert (dim == 2, ExcNotImplemented());
     Assert (values.size() == points.size(),
@@ -127,14 +131,19 @@ namespace polytest
     polytest(unsigned int degree);
     ~polytest ();
 
-    void run();
+    void
+    run();
 
   private:
-    void setup_system();
-    void assemble_system();
-    void solve();
+    void
+    setup_system();
+    void
+    assemble_system();
+    void
+    solve();
 
-    void output_error();
+    void
+    output_error();
 
     unsigned int p_order;
     unsigned int quad_order;
@@ -166,7 +175,8 @@ namespace polytest
   }
 
   template <int dim>
-  void polytest<dim>::setup_system()
+  void
+  polytest<dim>::setup_system()
   {
     dof_handler.distribute_dofs (fe);
     solution.reinit (dof_handler.n_dofs());
@@ -192,7 +202,8 @@ namespace polytest
   }
 
   template <int dim>
-  void polytest<dim>::assemble_system()
+  void
+  polytest<dim>::assemble_system()
   {
     const QGauss<dim> test_quad(quad_order);
     FEValues<dim> fe_values_test (fe, test_quad,
@@ -266,7 +277,8 @@ namespace polytest
   }
 
   template <int dim>
-  void polytest<dim>::solve()
+  void
+  polytest<dim>::solve()
   {
     SparseDirectUMFPACK direct;
     direct.initialize(system_matrix);
@@ -276,7 +288,8 @@ namespace polytest
   }
 
   template <int dim>
-  void polytest<dim>::output_error()
+  void
+  polytest<dim>::output_error()
   {
     SimplePolynomial<dim> exact_solution;
     Vector<double> diff_per_cell(tria.n_active_cells());
@@ -288,7 +301,8 @@ namespace polytest
   }
 
   template <int dim>
-  void polytest<dim>::run()
+  void
+  polytest<dim>::run()
   {
     GridGenerator::hyper_cube (tria, -1.2, 1.3);
     // REFINE
@@ -303,7 +317,8 @@ namespace polytest
     output_error();
   }
 }
-int main ()
+int
+main ()
 {
   const unsigned int dim(2);
 

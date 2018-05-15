@@ -22,7 +22,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check ()
 {
 
   ParameterHandler prm;
@@ -102,7 +103,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

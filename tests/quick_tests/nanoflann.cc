@@ -22,7 +22,8 @@
 using namespace dealii;
 
 
-int main ()
+int
+main ()
 {
   KDTree<2> kdtree;
 

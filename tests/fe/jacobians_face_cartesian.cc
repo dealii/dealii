@@ -27,7 +27,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);

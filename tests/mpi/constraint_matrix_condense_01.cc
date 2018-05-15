@@ -28,7 +28,8 @@
 #include <deal.II/fe/fe_q.h>
 
 
-void test ()
+void
+test ()
 {
   MPI_Comm mpi_communicator (MPI_COMM_WORLD);
   parallel::distributed::Triangulation<3> triangulation(mpi_communicator);
@@ -75,7 +76,8 @@ void test ()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

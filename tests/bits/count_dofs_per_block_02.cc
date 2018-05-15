@@ -38,7 +38,8 @@
 
 
 
-void print (const std::vector<types::global_dof_index> &v)
+void
+print (const std::vector<types::global_dof_index> &v)
 {
   deallog << v.size();
   for (unsigned int i=0; i<v.size(); ++i)
@@ -126,7 +127,8 @@ check ()
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile << std::setprecision (2);

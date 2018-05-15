@@ -31,7 +31,8 @@
 #include <deal.II/differentiation/ad.h>
 #include <Sacado.hpp>
 
-int main()
+int
+main()
 {
   initlog();
 

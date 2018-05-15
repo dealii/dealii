@@ -75,13 +75,17 @@ class ImposeBC
 public:
   ImposeBC();
   ~ImposeBC();
-  void run ();
+  void
+  run ();
 
 private:
 
-  void get_ready ();
-  void test_extract_boundary_DoFs ();
-  void test_interpolate_BC ();
+  void
+  get_ready ();
+  void
+  test_extract_boundary_DoFs ();
+  void
+  test_interpolate_BC ();
 
   Triangulation<dim>   triangulation;
 
@@ -105,8 +109,9 @@ class BoundaryFunction : public Function<dim>
 public:
   BoundaryFunction ();
 
-  virtual void vector_value (const Point<dim>   &p,
-                             Vector<double> &values) const;
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double> &values) const;
 
 };
 
@@ -119,8 +124,9 @@ BoundaryFunction<dim>::BoundaryFunction () :
 
 template <int dim>
 inline
-void BoundaryFunction<dim>::vector_value (const Point<dim> &,
-                                          Vector<double> &values) const
+void
+BoundaryFunction<dim>::vector_value (const Point<dim> &,
+                                     Vector<double> &values) const
 {
 
   Assert (values.size() == dim+1,
@@ -152,7 +158,8 @@ ImposeBC<dim>::~ImposeBC()
 
 
 template <int dim>
-void ImposeBC<dim>::get_ready ()
+void
+ImposeBC<dim>::get_ready ()
 {
   dof_handler.distribute_dofs (fe);
   std::vector<types::global_dof_index>  dofs_per_comp (fe.n_components());
@@ -170,7 +177,8 @@ void ImposeBC<dim>::get_ready ()
 
 
 template <int dim>
-void ImposeBC<dim>::test_extract_boundary_DoFs ()
+void
+ImposeBC<dim>::test_extract_boundary_DoFs ()
 {
 
   std::map<types::global_dof_index,double> boundary_values;
@@ -199,7 +207,8 @@ void ImposeBC<dim>::test_extract_boundary_DoFs ()
 
 
 template <int dim>
-void ImposeBC<dim>::test_interpolate_BC ()
+void
+ImposeBC<dim>::test_interpolate_BC ()
 {
 
   std::map<types::global_dof_index,double> boundary_values;
@@ -253,7 +262,8 @@ void ImposeBC<dim>::test_interpolate_BC ()
 
 
 template <int dim>
-void ImposeBC<dim>::run ()
+void
+ImposeBC<dim>::run ()
 {
   GridGenerator::hyper_cube(triangulation, -1,1);
   triangulation.refine_global (1);
@@ -281,7 +291,8 @@ void ImposeBC<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   try
     {

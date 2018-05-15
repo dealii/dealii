@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   std::vector<bool> v(12,false);
   v[3] = true;
@@ -69,7 +70,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

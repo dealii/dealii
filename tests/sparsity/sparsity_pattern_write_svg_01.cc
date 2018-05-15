@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/lac/sparsity_pattern.h>
 
-int main ()
+int
+main ()
 {
   initlog();
 

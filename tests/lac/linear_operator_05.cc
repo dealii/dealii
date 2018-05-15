@@ -24,21 +24,25 @@
 class MyMatrix1
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
-  void vmult(Vector<double> &, const Vector<double> &) const
+  void
+  vmult(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix1::vmult" << std::endl;
   }
 
-  void Tvmult(Vector<double> &, const Vector<double> &) const
+  void
+  Tvmult(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix1::Tvmult" << std::endl;
   }
@@ -48,31 +52,37 @@ public:
 class MyMatrix2
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
-  void vmult(Vector<double> &, const Vector<double> &) const
+  void
+  vmult(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix2::vmult" << std::endl;
   }
 
-  void Tvmult(Vector<double> &, const Vector<double> &) const
+  void
+  Tvmult(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix2::Tvmult" << std::endl;
   }
 
-  void vmult_add(Vector<double> &, const Vector<double> &) const
+  void
+  vmult_add(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix2::vmult_add" << std::endl;
   }
 
-  void Tvmult_add(Vector<double> &, const Vector<double> &) const
+  void
+  Tvmult_add(Vector<double> &, const Vector<double> &) const
   {
     deallog << "MyMatrix2::Tvmult_add" << std::endl;
   }
@@ -81,35 +91,41 @@ public:
 class MyMatrix3
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
   template <typename OutVector, typename InVector>
-  void vmult(OutVector &, const InVector &) const
+  void
+  vmult(OutVector &, const InVector &) const
   {
     deallog << "MyMatrix3::vmult" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void Tvmult(OutVector &, const InVector &) const
+  void
+  Tvmult(OutVector &, const InVector &) const
   {
     deallog << "MyMatrix3::Tvmult" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void vmult_add(OutVector &, const InVector &) const
+  void
+  vmult_add(OutVector &, const InVector &) const
   {
     deallog << "MyMatrix3::vmult_add" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void Tvmult_add(OutVector &, const InVector &) const
+  void
+  Tvmult_add(OutVector &, const InVector &) const
   {
     deallog << "MyMatrix3::Tvmult_add" << std::endl;
   }
@@ -118,35 +134,41 @@ public:
 class MyMatrix4
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
   template <typename OutVector, typename InVector>
-  void vmult(OutVector &, const InVector &, bool = true) const
+  void
+  vmult(OutVector &, const InVector &, bool = true) const
   {
     deallog << "MyMatrix4::vmult" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void Tvmult(OutVector &, const InVector &, bool = true) const
+  void
+  Tvmult(OutVector &, const InVector &, bool = true) const
   {
     deallog << "MyMatrix4::Tvmult" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void vmult_add(OutVector &, const InVector &, bool = true) const
+  void
+  vmult_add(OutVector &, const InVector &, bool = true) const
   {
     deallog << "MyMatrix4::vmult_add" << std::endl;
   }
 
   template <typename OutVector, typename InVector>
-  void Tvmult_add(OutVector &, const InVector &, bool = true) const
+  void
+  Tvmult_add(OutVector &, const InVector &, bool = true) const
   {
     deallog << "MyMatrix4::Tvmult_add" << std::endl;
   }
@@ -155,35 +177,41 @@ public:
 class MyMatrix5
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
   template <typename number>
-  void vmult(Vector<number> &, const Vector<number> &, bool = true) const
+  void
+  vmult(Vector<number> &, const Vector<number> &, bool = true) const
   {
     deallog << "MyMatrix5::vmult" << std::endl;
   }
 
   template <typename number>
-  void Tvmult(Vector<number> &, const Vector<number> &, bool = true) const
+  void
+  Tvmult(Vector<number> &, const Vector<number> &, bool = true) const
   {
     deallog << "MyMatrix5::Tvmult" << std::endl;
   }
 
   template <typename number>
-  void vmult_add(Vector<number> &, const Vector<number> &, bool = true) const
+  void
+  vmult_add(Vector<number> &, const Vector<number> &, bool = true) const
   {
     deallog << "MyMatrix5::vmult_add" << std::endl;
   }
 
   template <typename number>
-  void Tvmult_add(Vector<number> &, const Vector<number> &, bool = true) const
+  void
+  Tvmult_add(Vector<number> &, const Vector<number> &, bool = true) const
   {
     deallog << "MyMatrix5::Tvmult_add" << std::endl;
   }
@@ -192,29 +220,34 @@ public:
 class MyMatrix6
 {
 public:
-  size_t m() const
+  size_t
+  m() const
   {
     return 1;
   };
-  size_t n() const
+  size_t
+  n() const
   {
     return 1;
   };
 
   template <typename number, typename number2>
-  void vmult(Vector<number> &, const Vector<number2> &, bool = true) const
+  void
+  vmult(Vector<number> &, const Vector<number2> &, bool = true) const
   {
     deallog << "MyMatrix6::vmult" << std::endl;
   }
 
   template <typename number, typename number2>
-  void Tvmult(Vector<number> &, const Vector<number2> &, bool = true) const
+  void
+  Tvmult(Vector<number> &, const Vector<number2> &, bool = true) const
   {
     deallog << "MyMatrix6::Tvmult" << std::endl;
   }
 
   template <typename number, typename number2>
-  void vmult_add(Vector<number> &, const Vector<number2> &, bool = true) const
+  void
+  vmult_add(Vector<number> &, const Vector<number2> &, bool = true) const
   {
     deallog << "MyMatrix6::vmult_add" << std::endl;
   }
@@ -222,7 +255,8 @@ public:
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);

@@ -23,7 +23,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v)
+void
+test (PETScWrappers::MPI::Vector &v)
 {
   // set some elements of the vector
   PetscScalar norm = 0;
@@ -44,7 +45,8 @@ void test (PETScWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

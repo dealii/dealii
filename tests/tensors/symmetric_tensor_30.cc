@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void check_2 ()
+void
+check_2 ()
 {
   using namespace dealii;
   Testing::rand(true, 42);
@@ -56,7 +57,8 @@ void check_2 ()
 }
 
 template <int dim>
-void check_4 ()
+void
+check_4 ()
 {
   using namespace dealii;
   Testing::rand(true, 42);
@@ -96,7 +98,8 @@ void check_4 ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

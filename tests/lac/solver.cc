@@ -70,7 +70,8 @@ check_Tsolve (SolverType         &solver,
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

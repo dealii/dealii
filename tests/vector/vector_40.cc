@@ -22,9 +22,10 @@
 #include <vector>
 
 
-void test (Vector<double> &v,
-           Vector<double> &w,
-           Vector<double> &x)
+void
+test (Vector<double> &v,
+      Vector<double> &w,
+      Vector<double> &x)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -52,7 +53,8 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -138,7 +138,8 @@ test (unsigned int degree)
   compare_shapes(rt1, rtn1, N);
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

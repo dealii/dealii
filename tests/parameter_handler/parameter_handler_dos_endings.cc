@@ -23,7 +23,8 @@
 
 using namespace dealii;
 
-void test ()
+void
+test ()
 {
   ParameterHandler foo;
   foo.enter_subsection("bar");
@@ -51,7 +52,8 @@ void test ()
   foo.leave_subsection();
 }
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.depth_console(0);

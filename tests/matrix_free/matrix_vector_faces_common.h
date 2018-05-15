@@ -52,7 +52,8 @@
 
 // forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree>
-void test ();
+void
+test ();
 
 
 
@@ -66,8 +67,9 @@ public:
     data(data)
   {}
 
-  void vmult(VectorType &dst,
-             const VectorType &src) const
+  void
+  vmult(VectorType &dst,
+        const VectorType &src) const
   {
     dst = 0;
     data.loop (&MatrixFreeTest::local_apply,
@@ -77,10 +79,11 @@ public:
   }
 
 private:
-  void local_apply (const MatrixFree<dim,number> &data,
-                    VectorType                   &dst,
-                    const VectorType             &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const
+  void
+  local_apply (const MatrixFree<dim,number> &data,
+               VectorType                   &dst,
+               const VectorType             &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> phi (data);
 
@@ -96,10 +99,11 @@ private:
       }
   }
 
-  void local_apply_face (const MatrixFree<dim,number> &data,
-                         VectorType                   &dst,
-                         const VectorType             &src,
-                         const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_face (const MatrixFree<dim,number> &data,
+                    VectorType                   &dst,
+                    const VectorType             &src,
+                    const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval(data,true);
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval_neighbor(data,false);
@@ -142,10 +146,11 @@ private:
   }
 
 
-  void local_apply_boundary_face (const MatrixFree<dim,number> &data,
-                                  VectorType                   &dst,
-                                  const VectorType             &src,
-                                  const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_boundary_face (const MatrixFree<dim,number> &data,
+                             VectorType                   &dst,
+                             const VectorType             &src,
+                             const std::pair<unsigned int,unsigned int> &face_range) const
   {
 
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval(data, true);
@@ -194,8 +199,9 @@ public:
     start_vector_component(start_vector_component)
   {}
 
-  void vmult(VectorType &dst,
-             const VectorType &src) const
+  void
+  vmult(VectorType &dst,
+        const VectorType &src) const
   {
     if (!zero_within_loop)
       dst = 0;
@@ -207,8 +213,9 @@ public:
                MatrixFree<dim,number>::DataAccessOnFaces::gradients);
   }
 
-  void vmult_add(VectorType &dst,
-                 const VectorType &src) const
+  void
+  vmult_add(VectorType &dst,
+            const VectorType &src) const
   {
     data.loop (&MatrixFreeVariant::local_apply,
                &MatrixFreeVariant::local_apply_face,
@@ -219,10 +226,11 @@ public:
   }
 
 private:
-  void local_apply (const MatrixFree<dim,number> &data,
-                    VectorType                   &dst,
-                    const VectorType             &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const
+  void
+  local_apply (const MatrixFree<dim,number> &data,
+               VectorType                   &dst,
+               const VectorType             &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> phi (data, 0, 0, start_vector_component);
 
@@ -236,10 +244,11 @@ private:
       }
   }
 
-  void local_apply_face (const MatrixFree<dim,number> &data,
-                         VectorType                   &dst,
-                         const VectorType             &src,
-                         const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_face (const MatrixFree<dim,number> &data,
+                    VectorType                   &dst,
+                    const VectorType             &src,
+                    const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval(data,true, 0, 0, start_vector_component);
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval_neighbor(data,false, 0, 0, start_vector_component);
@@ -278,10 +287,11 @@ private:
       }
   }
 
-  void local_apply_boundary_face (const MatrixFree<dim,number> &data,
-                                  VectorType                   &dst,
-                                  const VectorType             &src,
-                                  const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_boundary_face (const MatrixFree<dim,number> &data,
+                             VectorType                   &dst,
+                             const VectorType             &src,
+                             const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval(data, true, 0, 0, start_vector_component);
     typedef typename FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number>::value_type value_type;
@@ -358,8 +368,9 @@ public:
       advection[d] = 0.4 + 0.12 * d;
   }
 
-  void vmult(VectorType &dst,
-             const VectorType &src) const
+  void
+  vmult(VectorType &dst,
+        const VectorType &src) const
   {
     if (!zero_within_loop)
       dst = 0;
@@ -371,8 +382,9 @@ public:
                MatrixFree<dim,number>::DataAccessOnFaces::values);
   }
 
-  void vmult_add(VectorType &dst,
-                 const VectorType &src) const
+  void
+  vmult_add(VectorType &dst,
+            const VectorType &src) const
   {
     data.loop (&MatrixFreeAdvection::local_apply,
                &MatrixFreeAdvection::local_apply_face,
@@ -383,10 +395,11 @@ public:
   }
 
 private:
-  void local_apply (const MatrixFree<dim,number> &data,
-                    VectorType                   &dst,
-                    const VectorType             &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const
+  void
+  local_apply (const MatrixFree<dim,number> &data,
+               VectorType                   &dst,
+               const VectorType             &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> phi (data, 0, 0, start_vector_component);
 
@@ -400,10 +413,11 @@ private:
       }
   }
 
-  void local_apply_face (const MatrixFree<dim,number> &data,
-                         VectorType                   &dst,
-                         const VectorType             &src,
-                         const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_face (const MatrixFree<dim,number> &data,
+                    VectorType                   &dst,
+                    const VectorType             &src,
+                    const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> phi_m(data,true, 0, 0, start_vector_component);
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> phi_p(data,false, 0, 0, start_vector_component);
@@ -434,10 +448,11 @@ private:
       }
   }
 
-  void local_apply_boundary_face (const MatrixFree<dim,number>    &data,
-                                  VectorType                      &dst,
-                                  const VectorType                &src,
-                                  const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_boundary_face (const MatrixFree<dim,number>    &data,
+                             VectorType                      &dst,
+                             const VectorType                &src,
+                             const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number> fe_eval(data, true, 0, 0, start_vector_component);
     typedef typename FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,number>::value_type value_type;
@@ -477,20 +492,24 @@ template <int dim>
 class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
-  void cell(MeshWorker::DoFInfo<dim> &dinfo,
-            typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1,
-            MeshWorker::DoFInfo<dim> &dinfo2,
-            typename MeshWorker::IntegrationInfo<dim> &info1,
-            typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo,
+       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo,
+           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       typename MeshWorker::IntegrationInfo<dim> &info1,
+       typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 
 
 template <int dim>
-void MatrixIntegrator<dim>::cell(
+void
+MatrixIntegrator<dim>::cell(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -500,7 +519,8 @@ void MatrixIntegrator<dim>::cell(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::face(
+void
+MatrixIntegrator<dim>::face(
   MeshWorker::DoFInfo<dim> &dinfo1,
   MeshWorker::DoFInfo<dim> &dinfo2,
   typename MeshWorker::IntegrationInfo<dim> &info1,
@@ -525,7 +545,8 @@ void MatrixIntegrator<dim>::face(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::boundary(
+void
+MatrixIntegrator<dim>::boundary(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -540,9 +561,10 @@ void MatrixIntegrator<dim>::boundary(
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof,
-              const ConstraintMatrix &constraints,
-              const bool              also_test_parallel = false)
+void
+do_test (const DoFHandler<dim>  &dof,
+         const ConstraintMatrix &constraints,
+         const bool              also_test_parallel = false)
 {
   if (types_are_equal<number,float>::value == true)
     deallog.push("float");
@@ -635,12 +657,14 @@ void do_test (const DoFHandler<dim>  &dof,
 
 
 #ifdef DEAL_II_WITH_MPI
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
   mpi_initlog();
 #else
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 #endif

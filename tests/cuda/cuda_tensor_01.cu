@@ -21,7 +21,8 @@
 #include <fstream>
 #include <iomanip>
 
-void test_cpu()
+void
+test_cpu()
 {
   double a[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
   const unsigned int dim=3;
@@ -42,8 +43,9 @@ void test_cpu()
   deallog.pop();
 }
 
-__global__ void init_kernel(Tensor<2,3> *t,
-                            const unsigned int N)
+__global__ void
+init_kernel(Tensor<2,3> *t,
+            const unsigned int N)
 {
   const unsigned int i = threadIdx.y;
   const unsigned int j = threadIdx.x;
@@ -51,13 +53,15 @@ __global__ void init_kernel(Tensor<2,3> *t,
     (*t)[i][j] = j + i*N + 1.;
 }
 
-__global__ void norm_kernel(Tensor<2,3> *t, double *norm)
+__global__ void
+norm_kernel(Tensor<2,3> *t, double *norm)
 {
   if (threadIdx.x == 0)
     *norm = t->norm_square();
 }
 
-void test_gpu()
+void
+test_gpu()
 {
   const unsigned int dim=3;
   double *norm_dev;
@@ -91,7 +95,8 @@ void test_gpu()
   deallog << norm_host << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);

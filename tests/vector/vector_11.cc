@@ -21,7 +21,8 @@
 #include <deal.II/lac/vector.h>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   // set only certain elements of the vector
   for (unsigned int i=0; i<v.size(); i+=1+i)
@@ -36,7 +37,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

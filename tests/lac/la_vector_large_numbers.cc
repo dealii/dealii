@@ -21,7 +21,8 @@
 
 
 
-void check_large_numbers()
+void
+check_large_numbers()
 {
   LinearAlgebra::Vector<float> v(10);
   v(0) = 1e13;
@@ -62,7 +63,8 @@ void check_large_numbers()
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

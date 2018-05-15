@@ -23,13 +23,15 @@
 #include <deal.II/fe/fe_dgq.h>
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 
 template <int dim, int fe_degree, typename number>
-void sub_test()
+void
+sub_test()
 {
   Triangulation<dim> tria;
   create_mesh (tria);
@@ -145,7 +147,8 @@ void sub_test()
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   deallog << "Test doubles" << std::endl;
   sub_test<dim,fe_degree,double>();

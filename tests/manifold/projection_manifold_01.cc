@@ -42,7 +42,8 @@ public:
     return p;
   }
 
-  std::unique_ptr<Manifold<dim,spacedim> > clone() const override
+  std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override
   {
     return std_cxx14::make_unique<MyManifold<dim,spacedim> >();
   }
@@ -50,7 +51,8 @@ public:
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref=1)
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -67,7 +69,8 @@ void test(unsigned int ref=1)
   deallog << "p2(0.2): " << p2 << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -52,13 +52,15 @@ class ImposedDisplacement : public Function<dim>
 {
 public:
   ImposedDisplacement() : Function<dim> (dim) { }
-  virtual void vector_value(const Point<dim> &p,
-                            Vector<double> &value) const;
+  virtual void
+  vector_value(const Point<dim> &p,
+               Vector<double> &value) const;
 };
 
 template <>
-void ImposedDisplacement<2>::vector_value(const Point<2> &p,
-                                          Vector<double> &value) const
+void
+ImposedDisplacement<2>::vector_value(const Point<2> &p,
+                                     Vector<double> &value) const
 {
   double radius = 1 + (sqrt(5)-1)*p(0);
   double angle  = 0.5*numbers::PI*(1-p(1));
@@ -76,13 +78,18 @@ public:
   MappingTest (unsigned int degree);
   ~MappingTest ();
 
-  void run_test();
-  void graphical_output();
+  void
+  run_test();
+  void
+  graphical_output();
 
 private:
-  double compute_area();
-  void explicitly_move_mesh();
-  void write_tria_to_eps(std::string id);
+  double
+  compute_area();
+  void
+  explicitly_move_mesh();
+  void
+  write_tria_to_eps(std::string id);
 
   Triangulation<dim>     triangulation;
   DoFHandler<dim>        dof_handler;
@@ -118,7 +125,8 @@ MappingTest<dim>::~MappingTest ()
 // .... COMPUTE AREA
 
 template <int dim>
-double MappingTest<dim>::compute_area ()
+double
+MappingTest<dim>::compute_area ()
 {
   QGauss<dim>  quadrature_formula(degree+1);
 
@@ -148,7 +156,8 @@ double MappingTest<dim>::compute_area ()
 // .... RUN TEST
 
 template <int dim>
-void MappingTest<dim>::run_test ()
+void
+MappingTest<dim>::run_test ()
 {
   GridGenerator::hyper_cube (triangulation,0, 1);
 
@@ -190,7 +199,8 @@ void MappingTest<dim>::run_test ()
 // .... EXPLICITLY MOVE MESH
 
 template <int dim>
-void MappingTest<dim>::explicitly_move_mesh ()
+void
+MappingTest<dim>::explicitly_move_mesh ()
 {
   std::vector<bool> moved (triangulation.n_vertices(),false);
   unsigned int vpc = GeometryInfo<dim>::vertices_per_cell;
@@ -222,7 +232,8 @@ void MappingTest<dim>::explicitly_move_mesh ()
 // .... GRAPHICAL OUTPUT
 
 template <int dim>
-void MappingTest<dim>::graphical_output ()
+void
+MappingTest<dim>::graphical_output ()
 {
   GridGenerator::hyper_cube (triangulation,0, 1);
   triangulation.refine_global(4);
@@ -239,7 +250,8 @@ void MappingTest<dim>::graphical_output ()
 
 // .... MAIN
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(2);

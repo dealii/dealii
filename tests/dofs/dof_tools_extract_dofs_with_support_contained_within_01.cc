@@ -41,7 +41,8 @@ pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 }
 
 template <int dim>
-void test (const unsigned int flag)
+void
+test (const unsigned int flag)
 {
 
   // Setup system
@@ -112,7 +113,8 @@ void test (const unsigned int flag)
   dh.clear();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

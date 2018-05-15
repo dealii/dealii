@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void plot_FE_FaceQ_shape_functions()
+void
+plot_FE_FaceQ_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 

@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << Utilities::fixed_power<dim> (2) << std::endl;
   deallog << Utilities::fixed_power<dim> (-2) << std::endl;
@@ -34,7 +35,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

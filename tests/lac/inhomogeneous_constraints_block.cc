@@ -44,7 +44,8 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
@@ -55,14 +56,20 @@ public:
   AdvectionProblem ();
   ~AdvectionProblem ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void test_equality ();
-  void assemble_reference ();
-  void assemble_test_1 ();
-  void assemble_test_2 ();
+  void
+  setup_system ();
+  void
+  test_equality ();
+  void
+  assemble_reference ();
+  void
+  assemble_test_1 ();
+  void
+  assemble_test_2 ();
 
   Triangulation<dim>        triangulation;
 
@@ -88,8 +95,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -121,7 +129,8 @@ AdvectionProblem<dim>::~AdvectionProblem ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::setup_system ()
+void
+AdvectionProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -181,7 +190,8 @@ void AdvectionProblem<dim>::setup_system ()
 // test whether we are equal with the
 // standard matrix and right hand side
 template <int dim>
-void AdvectionProblem<dim>::test_equality ()
+void
+AdvectionProblem<dim>::test_equality ()
 {
   // need to manually go through the
   // matrix, since we can have different
@@ -245,7 +255,8 @@ void AdvectionProblem<dim>::test_equality ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_reference ()
+void
+AdvectionProblem<dim>::assemble_reference ()
 {
   reference_matrix = 0;
   reference_rhs = 0;
@@ -327,7 +338,8 @@ void AdvectionProblem<dim>::assemble_reference ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_test_1 ()
+void
+AdvectionProblem<dim>::assemble_test_1 ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -401,7 +413,8 @@ void AdvectionProblem<dim>::assemble_test_1 ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::assemble_test_2 ()
+void
+AdvectionProblem<dim>::assemble_test_2 ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -471,7 +484,8 @@ void AdvectionProblem<dim>::assemble_test_2 ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::run ()
+void
+AdvectionProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (4-dim);
@@ -514,7 +528,8 @@ void AdvectionProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

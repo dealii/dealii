@@ -29,7 +29,8 @@
 
 
 template <int dim, int spacedim>
-void test_real_to_unit_cell()
+void
+test_real_to_unit_cell()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 

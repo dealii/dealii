@@ -125,19 +125,25 @@ namespace Step50
   {
   public:
     LaplaceProblem (const unsigned int deg);
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
+    void
+    setup_system ();
 
     template <class IteratorType>
-    void assemble_cell (const IteratorType &cell,
-                        ScratchData<dim> &scratch_data,
-                        CopyData &copy_data);
+    void
+    assemble_cell (const IteratorType &cell,
+                   ScratchData<dim> &scratch_data,
+                   CopyData &copy_data);
 
-    void assemble_system_and_multigrid ();
-    void solve ();
-    void refine_grid ();
+    void
+    assemble_system_and_multigrid ();
+    void
+    solve ();
+    void
+    refine_grid ();
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -170,19 +176,22 @@ namespace Step50
   public:
     Coefficient () : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+    virtual void
+    value_list (const std::vector<Point<dim> > &points,
+                std::vector<double>            &values,
+                const unsigned int              component = 0) const;
   };
 
 
 
   template <int dim>
-  double Coefficient<dim>::value (const Point<dim> &p,
-                                  const unsigned int) const
+  double
+  Coefficient<dim>::value (const Point<dim> &p,
+                           const unsigned int) const
   {
     if (p.square() < 0.5*0.5)
       return 5;
@@ -193,9 +202,10 @@ namespace Step50
 
 
   template <int dim>
-  void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                     std::vector<double>            &values,
-                                     const unsigned int              component) const
+  void
+  Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                                std::vector<double>            &values,
+                                const unsigned int              component) const
   {
     (void)component;
     const unsigned int n_points = points.size();
@@ -227,7 +237,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs ();
@@ -298,9 +309,10 @@ namespace Step50
 
   template <int dim>
   template <class IteratorType>
-  void LaplaceProblem<dim>::assemble_cell(const IteratorType &cell,
-                                          ScratchData<dim> &scratch_data,
-                                          CopyData &copy_data)
+  void
+  LaplaceProblem<dim>::assemble_cell(const IteratorType &cell,
+                                     ScratchData<dim> &scratch_data,
+                                     CopyData &copy_data)
   {
     const unsigned int level = cell->level();
     copy_data.level = level;
@@ -341,7 +353,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system_and_multigrid ()
+  void
+  LaplaceProblem<dim>::assemble_system_and_multigrid ()
   {
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
     for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
@@ -423,7 +436,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(mg_dof_handler);
@@ -470,7 +484,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void
+  LaplaceProblem<dim>::refine_grid ()
   {
     for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active(); cell != triangulation.end(); ++cell)
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -481,7 +496,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<3; ++cycle)
       {
@@ -518,7 +534,8 @@ namespace Step50
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog(true);

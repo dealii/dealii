@@ -37,17 +37,23 @@
 
 // declare these global in order to reduce time needed upon construction of
 // these objects which is considerable
-FE_DGQ<3> fe(1);
-QGauss<2> quadrature(3);
-MappingQ<3> mapping(2);
-FEFaceValues<3> fe_face_values1 (mapping, fe, quadrature,
-                                 update_quadrature_points | update_JxW_values |
-                                 update_normal_vectors);
-FESubfaceValues<3> fe_face_values2 (mapping, fe, quadrature,
-                                    update_quadrature_points | update_JxW_values |
-                                    update_normal_vectors);
+FE_DGQ<3>
+fe(1);
+QGauss<2>
+quadrature(3);
+MappingQ<3>
+mapping(2);
+FEFaceValues<3>
+fe_face_values1 (mapping, fe, quadrature,
+                 update_quadrature_points | update_JxW_values |
+                 update_normal_vectors);
+FESubfaceValues<3>
+fe_face_values2 (mapping, fe, quadrature,
+                 update_quadrature_points | update_JxW_values |
+                 update_normal_vectors);
 
-void check_this (Triangulation<3> &tria)
+void
+check_this (Triangulation<3> &tria)
 {
 
   DoFHandler<3> dof_handler (tria);
@@ -94,7 +100,8 @@ void check_this (Triangulation<3> &tria)
 // perform the usual check, i.e. first refine a single cell (anisotropically),
 // then global refinement, then global coarsening. For each step, check, that
 // quadrature points both on faces and neighboring subfaces match.
-void check (Triangulation<3> &tria_org)
+void
+check (Triangulation<3> &tria_org)
 {
   for (unsigned int c=0; c<tria_org.n_active_cells(); ++c)
     for (unsigned int i=1; i<8; ++i)
@@ -131,7 +138,8 @@ void check (Triangulation<3> &tria_org)
 // perform an additional check: simulate an isotropic refinement of a given cell
 // via several anisotropic refinements. Then, perform the usual checks. This
 // went wrong at some time, so check that it works now.
-void check2 (Triangulation<3> &orig_tria)
+void
+check2 (Triangulation<3> &orig_tria)
 {
   for (unsigned int i=0; i<orig_tria.n_active_cells(); ++i)
     {
@@ -176,7 +184,8 @@ void check2 (Triangulation<3> &orig_tria)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

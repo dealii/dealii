@@ -21,7 +21,8 @@
 #include <deal.II/base/index_set.h>
 
 
-void test ()
+void
+test ()
 {
   IndexSet index_set (10);
 
@@ -59,7 +60,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

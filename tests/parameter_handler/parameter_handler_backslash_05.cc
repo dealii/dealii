@@ -29,7 +29,8 @@
  * This should *not* be parsed as 'Function_1 = a, b, c'.
  */
 
-int main ()
+int
+main ()
 {
   initlog();
 

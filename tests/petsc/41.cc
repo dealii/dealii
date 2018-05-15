@@ -23,8 +23,9 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test (PETScWrappers::MPI::Vector &v,
+      PETScWrappers::MPI::Vector &w)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     {
@@ -49,7 +50,8 @@ void test (PETScWrappers::MPI::Vector &v,
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -25,7 +25,8 @@
 
 
 template <typename number>
-void check_norms ()
+void
+check_norms ()
 {
   for (unsigned int test=0; test<20; ++test)
     {
@@ -44,7 +45,8 @@ void check_norms ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

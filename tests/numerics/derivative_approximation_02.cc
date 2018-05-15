@@ -45,15 +45,17 @@ class MyFunction : public Function<dim>
 public:
   MyFunction () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int) const
   {
     return sin(p[0]*a)*cos(p[1]*b);
   }
 };
 
 template <int dim>
-void exact_gradient(Point<dim> &p, Tensor<1,dim> &grad)
+void
+exact_gradient(Point<dim> &p, Tensor<1,dim> &grad)
 {
   double x=p[0],y=p[1];
 
@@ -62,7 +64,8 @@ void exact_gradient(Point<dim> &p, Tensor<1,dim> &grad)
 }
 
 template <int dim>
-void exact_second(Point<dim> &p, Tensor<2,dim> &sec)
+void
+exact_second(Point<dim> &p, Tensor<2,dim> &sec)
 {
   double x=p[0],y=p[1];
 
@@ -73,7 +76,8 @@ void exact_second(Point<dim> &p, Tensor<2,dim> &sec)
 }
 
 template <int dim>
-void exact_third(Point<dim> &p, Tensor<3,dim> &third)
+void
+exact_third(Point<dim> &p, Tensor<3,dim> &third)
 {
   double x=p[0],y=p[1];
   // array of function and its derivatives
@@ -139,7 +143,8 @@ void exact_third(Point<dim> &p, Tensor<3,dim> &third)
 
 
 template <int dim>
-void derivatives()
+void
+derivatives()
 {
   MyFunction<dim> function;
   Triangulation<dim> tria;
@@ -239,7 +244,8 @@ void derivatives()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -24,7 +24,8 @@
 #include <vector>
 
 template <class VectorType>
-void test (VectorType &v)
+void
+test (VectorType &v)
 {
   // set some elements of the vector
   unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -42,7 +43,8 @@ void test (VectorType &v)
   deallog << "OK" << std::endl;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   mpi_initlog();

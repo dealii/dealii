@@ -20,7 +20,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -58,7 +59,8 @@ class ExactSolution: public Function<dim>
 {
 public:
   ExactSolution () {}
-  virtual double value (const Point<dim> &p, const unsigned int) const
+  virtual double
+  value (const Point<dim> &p, const unsigned int) const
   {
     return p (0);
   }
@@ -66,7 +68,8 @@ public:
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim>     triangulation;
   hp::FECollection<dim>      fe;
@@ -106,7 +109,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   try
     {

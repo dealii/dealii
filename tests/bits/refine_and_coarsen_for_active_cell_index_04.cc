@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void check (const Triangulation<dim> &tria)
+void
+check (const Triangulation<dim> &tria)
 {
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
@@ -43,7 +44,8 @@ void check (const Triangulation<dim> &tria)
 
 
 
-void do_refine (Triangulation<1> &tria)
+void
+do_refine (Triangulation<1> &tria)
 {
   tria.refine_global (2);
   tria.begin_active()->set_refine_flag();
@@ -51,7 +53,8 @@ void do_refine (Triangulation<1> &tria)
 }
 
 
-void do_refine (Triangulation<2> &tria)
+void
+do_refine (Triangulation<2> &tria)
 {
   const int dim = 2;
 
@@ -65,7 +68,8 @@ void do_refine (Triangulation<2> &tria)
 }
 
 
-void do_refine (Triangulation<3> &tria)
+void
+do_refine (Triangulation<3> &tria)
 {
   const int dim = 3;
 
@@ -88,7 +92,8 @@ void do_refine (Triangulation<3> &tria)
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -126,7 +131,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

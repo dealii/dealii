@@ -26,7 +26,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::Vector &v)
+void
+test (TrilinosWrappers::MPI::Vector &v)
 {
   // set only certain elements of the
   // vector.
@@ -62,7 +63,8 @@ void test (TrilinosWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

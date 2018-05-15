@@ -271,7 +271,8 @@ plot_face_shape_functions(
 
 
 template <>
-void plot_face_shape_functions (Mapping<1> &, FiniteElement<1> &, const char *, UpdateFlags)
+void
+plot_face_shape_functions (Mapping<1> &, FiniteElement<1> &, const char *, UpdateFlags)
 {}
 
 
@@ -371,9 +372,10 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
 
 
 template <int dim>
-void test_compute_functions (const Mapping<dim> &mapping,
-                             const FiniteElement<dim> &fe,
-                             const char *)
+void
+test_compute_functions (const Mapping<dim> &mapping,
+                        const FiniteElement<dim> &fe,
+                        const char *)
 {
   // generate a grid with only one
   // cell, which furthermore has the

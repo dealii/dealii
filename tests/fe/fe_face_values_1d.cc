@@ -136,7 +136,8 @@ plot_subfaces(Mapping<dim> &mapping,
 
 
 template <int dim>
-void mapping_test()
+void
+mapping_test()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -173,7 +174,8 @@ void mapping_test()
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION);

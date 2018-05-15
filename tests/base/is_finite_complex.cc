@@ -23,7 +23,8 @@
 
 
 template <typename T>
-void check ()
+void
+check ()
 {
   using namespace numbers;
 
@@ -61,7 +62,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

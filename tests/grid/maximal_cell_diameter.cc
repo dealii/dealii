@@ -23,12 +23,14 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
 template <int dim>
-void test1 ()
+void
+test1 ()
 {
   // test 1: hypercube
   if (true)
@@ -73,7 +75,8 @@ void test1 ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);

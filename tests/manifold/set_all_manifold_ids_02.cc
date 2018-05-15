@@ -27,7 +27,8 @@
 #include <deal.II/grid/grid_out.h>
 
 template <int dim, int spacedim>
-void print_info(Triangulation<dim,spacedim> &tria)
+void
+print_info(Triangulation<dim,spacedim> &tria)
 {
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 
@@ -51,7 +52,8 @@ void print_info(Triangulation<dim,spacedim> &tria)
 
 // Helper function
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -66,7 +68,8 @@ void test()
   print_info(tria);
 }
 
-int main ()
+int
+main ()
 {
   initlog(true);
 

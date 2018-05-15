@@ -26,11 +26,13 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -38,7 +40,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);

@@ -27,7 +27,8 @@
 #include <deal.II/lac/vector.h>
 
 
-void test(Utilities::CUDA::Handle &cuda_handle)
+void
+test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Create the matrix on the host.
   dealii::SparsityPattern sparsity_pattern;
@@ -94,7 +95,8 @@ void test(Utilities::CUDA::Handle &cuda_handle)
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

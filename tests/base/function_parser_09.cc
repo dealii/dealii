@@ -23,7 +23,8 @@
 #include <deal.II/base/function_parser.h>
 
 
-double eval(const std::string &exp)
+double
+eval(const std::string &exp)
 {
   std::string variables = "x,y";
   std::map<std::string,double> constants;
@@ -39,7 +40,8 @@ double eval(const std::string &exp)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

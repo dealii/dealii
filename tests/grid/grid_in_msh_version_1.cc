@@ -30,12 +30,14 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file (const std::string name,
+            typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -53,14 +55,16 @@ void check_file (const std::string name,
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
   check_file<2> (std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v1"), GridIn<2>::msh);
   check_file<2> (std::string(SOURCE_DIR "/grid_in_msh_version_1/input_v2"), GridIn<2>::msh);
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (5);
   logfile << std::setprecision (5);

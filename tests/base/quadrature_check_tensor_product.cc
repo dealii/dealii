@@ -180,7 +180,8 @@ fill_quadrature_vector(std::vector<Quadrature<dim> > &quadratures,
   quadrature_names.push_back("QTelles");
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::boolalpha;

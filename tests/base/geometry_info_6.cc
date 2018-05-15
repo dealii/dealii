@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "Checking in " << dim << "d" << std::endl;
 
@@ -131,7 +132,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

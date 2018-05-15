@@ -22,7 +22,8 @@ char logname[] = "output";
 #include <deal.II/fe/fe_q_iso_q1.h>
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << std::setprecision (6);
   for (unsigned int i=1; i<4; ++i)

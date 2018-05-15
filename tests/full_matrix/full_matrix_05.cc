@@ -20,7 +20,8 @@
 
 #include <deal.II/lac/full_matrix.h>
 
-void test ()
+void
+test ()
 {
   // create a matrix with known
   // elements

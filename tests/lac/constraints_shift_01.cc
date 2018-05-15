@@ -25,7 +25,8 @@
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
   const int size = 20;
 
@@ -65,7 +66,8 @@ void test()
   vec.print(deallog.get_file_stream(), 3, true, false);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

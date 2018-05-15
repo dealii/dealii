@@ -52,7 +52,8 @@
 #include <vector>
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

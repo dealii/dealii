@@ -25,7 +25,8 @@
 #include <boost/archive/text_iarchive.hpp>
 
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   {
     Point<spacedim> position;
@@ -73,7 +74,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

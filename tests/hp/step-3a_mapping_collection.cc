@@ -50,7 +50,8 @@
 #include <deal.II/numerics/data_out.h>
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -59,13 +60,18 @@ class LaplaceProblem
 public:
   LaplaceProblem ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void assemble_system ();
-  void solve ();
-  void output_results () const;
+  void
+  make_grid_and_dofs ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  output_results () const;
 
   Triangulation<2>     triangulation;
   hp::FECollection<2>              fe;
@@ -91,7 +97,8 @@ LaplaceProblem::LaplaceProblem () :
 
 
 
-void LaplaceProblem::make_grid_and_dofs ()
+void
+LaplaceProblem::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (2);
@@ -149,7 +156,8 @@ void LaplaceProblem::make_grid_and_dofs ()
 
 
 
-void LaplaceProblem::assemble_system ()
+void
+LaplaceProblem::assemble_system ()
 {
   hp::QCollection<2>  quadrature_formula(QGauss<2>(6));
   hp::FEValues<2> x_fe_values (fe, quadrature_formula,
@@ -228,7 +236,8 @@ void LaplaceProblem::assemble_system ()
 
 
 
-void LaplaceProblem::solve ()
+void
+LaplaceProblem::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -243,7 +252,8 @@ void LaplaceProblem::solve ()
 
 
 
-void LaplaceProblem::output_results () const
+void
+LaplaceProblem::output_results () const
 {
   DataOut<2,hp::DoFHandler<2> > data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -255,7 +265,8 @@ void LaplaceProblem::output_results () const
 
 
 
-void LaplaceProblem::run ()
+void
+LaplaceProblem::run ()
 {
   FE_Q<2> fe_1 (1),
        fe_2 (2),
@@ -280,7 +291,8 @@ void LaplaceProblem::run ()
 
 
 
-int main ()
+int
+main ()
 {
   logfile.precision(6);
 

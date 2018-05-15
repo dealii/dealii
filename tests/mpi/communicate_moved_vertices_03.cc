@@ -23,7 +23,8 @@
 #include <deal.II/distributed/tria.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "Testing " << Utilities::int_to_string(dim,1) << "D" << std::endl;
 
@@ -89,7 +90,8 @@ void test()
   deallog << Utilities::int_to_string(dim,1) << "D OK" << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   MPILogInitAll log;

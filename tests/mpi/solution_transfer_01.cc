@@ -46,7 +46,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<2> tria(MPI_COMM_WORLD,
                                                typename Triangulation<2>::MeshSmoothing
@@ -97,7 +98,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

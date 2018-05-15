@@ -18,7 +18,8 @@
 
 #include <deal.II/base/vectorization.h>
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname);

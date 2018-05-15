@@ -26,13 +26,15 @@ namespace LA
 }
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (unsigned int p=1; p<7-dim; ++p)
     test_with_hanging_nodes<LA::MPI::Vector> (FE_Q<dim>(p), p);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

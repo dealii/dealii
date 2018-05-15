@@ -80,7 +80,8 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim> > &patches)
 
 
 template <int dim, int spacedim>
-void check()
+void
+check()
 {
   const unsigned int np = 4;
 
@@ -149,7 +150,8 @@ void check()
 
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   initlog();
 

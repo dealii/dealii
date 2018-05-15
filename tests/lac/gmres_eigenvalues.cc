@@ -23,7 +23,8 @@
 #include <deal.II/lac/precondition.h>
 
 template <class NUMBER>
-void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
+void
+output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -34,7 +35,8 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
 }
 
 template <typename number>
-void test (unsigned int variant)
+void
+test (unsigned int variant)
 {
   const unsigned int n = variant < 3 ? 64 : 20;
   Vector<number> rhs(n), sol(n);
@@ -108,7 +110,8 @@ void test (unsigned int variant)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(10);

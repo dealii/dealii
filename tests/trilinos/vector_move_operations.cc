@@ -24,7 +24,8 @@
     deallog << var[i] << " ";                              \
   deallog << std::endl;
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

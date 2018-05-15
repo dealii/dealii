@@ -24,7 +24,8 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   BlockSparsityPattern bsp (2,2);
   for (unsigned int i=0; i<2; ++i)
@@ -51,7 +52,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

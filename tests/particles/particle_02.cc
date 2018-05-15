@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   {
     Point<2> position;
@@ -63,7 +64,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test<2>();
