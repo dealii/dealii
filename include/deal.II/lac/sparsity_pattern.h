@@ -150,7 +150,11 @@ namespace SparsityPatternIterators
     size_type index () const;
 
     /**
-     * Return global index in sparsity pattern.
+     * This function returns the how-many'th entry within the entire sparsity
+     * pattern the current iterator points to. While the order of entries in
+     * a sparsity pattern is generally not important, this function allows
+     * indexing entries of the sparsity pattern using a linear index.
+     *
      * This function can only be called for entries for which is_valid_entry()
      * is true.
      */
