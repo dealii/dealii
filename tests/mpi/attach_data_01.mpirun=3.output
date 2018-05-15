@@ -4,7 +4,7 @@ DEAL:0::myid=0 cellid=0_1:0 refining
 DEAL:0::myid=0 cellid=0_1:1
 DEAL:0::myid=0 cellid=0_1:2
 DEAL:0::myid=0 cellid=0_1:3
-DEAL:0::offset=4
+DEAL:0::handle=0
 DEAL:0::packing cell 0_1:0 with data=0 status=REFINE
 DEAL:0::packing cell 0_1:1 with data=1 status=PERSIST
 DEAL:0::packing cell 0_1:2 with data=2 status=PERSIST
@@ -24,7 +24,7 @@ DEAL:1::myid=1 cellid=2_1:0
 DEAL:1::myid=1 cellid=2_1:1
 DEAL:1::myid=1 cellid=2_1:2
 DEAL:1::myid=1 cellid=2_1:3
-DEAL:1::offset=4
+DEAL:1::handle=0
 DEAL:1::packing cell 1_1:0 with data=0 status=PERSIST
 DEAL:1::packing cell 1_1:1 with data=1 status=PERSIST
 DEAL:1::packing cell 1_1:2 with data=2 status=PERSIST
@@ -49,7 +49,7 @@ DEAL:2::myid=2 cellid=3_1:0 coarsening
 DEAL:2::myid=2 cellid=3_1:1 coarsening
 DEAL:2::myid=2 cellid=3_1:2 coarsening
 DEAL:2::myid=2 cellid=3_1:3 coarsening
-DEAL:2::offset=4
+DEAL:2::handle=0
 DEAL:2::packing cell 3_0: with data=0 status=COARSEN
 DEAL:2::cells after: 16
 DEAL:2::unpacking cell 2_1:0 with data=4 status=PERSIST

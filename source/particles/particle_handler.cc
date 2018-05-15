@@ -40,7 +40,7 @@ namespace Particles
     size_callback(),
     store_callback(),
     load_callback(),
-    data_offset(numbers::invalid_unsigned_int)
+    handle(numbers::invalid_unsigned_int)
   {}
 
 
@@ -61,7 +61,7 @@ namespace Particles
     size_callback(),
     store_callback(),
     load_callback(),
-    data_offset(numbers::invalid_unsigned_int)
+    handle(numbers::invalid_unsigned_int)
   {}
 
 
@@ -922,7 +922,7 @@ namespace Particles
                                                     :
                                                     std::pow(2,dim));
 
-        data_offset = non_const_triangulation->register_data_attach(transfer_size_per_cell,callback_function);
+        handle = non_const_triangulation->register_data_attach(transfer_size_per_cell,callback_function);
       }
   }
 
@@ -968,11 +968,11 @@ namespace Particles
         // space for the data in case a cell is coarsened
         const std::size_t transfer_size_per_cell = sizeof (unsigned int) +
                                                    (size_per_particle * global_max_particles_per_cell);
-        data_offset = non_const_triangulation->register_data_attach(transfer_size_per_cell,callback_function);
+        handle = non_const_triangulation->register_data_attach(transfer_size_per_cell,callback_function);
       }
 
     // Check if something was stored and load it
-    if (data_offset != numbers::invalid_unsigned_int)
+    if (handle != numbers::invalid_unsigned_int)
       {
         const std::function<void(const typename Triangulation<dim,spacedim>::cell_iterator &,
                                  const typename Triangulation<dim,spacedim>::CellStatus,
@@ -983,11 +983,11 @@ namespace Particles
                       std::placeholders::_2,
                       std::placeholders::_3);
 
-        non_const_triangulation->notify_ready_to_unpack(data_offset,callback_function);
+        non_const_triangulation->notify_ready_to_unpack(handle,callback_function);
 
-        // Reset offset and update global number of particles. The number
+        // Reset handle and update global number of particles. The number
         // can change because of discarded or newly generated particles
-        data_offset = numbers::invalid_unsigned_int;
+        handle = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
   }

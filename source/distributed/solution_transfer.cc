@@ -47,7 +47,7 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer (const DoFHandlerType &dof)
       :
       dof_handler(&dof, typeid(*this).name()),
-      offset (numbers::invalid_unsigned_int)
+      handle (numbers::invalid_unsigned_int)
     {
       Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
                (&dof_handler->get_triangulation()) != nullptr),
@@ -80,7 +80,7 @@ namespace parallel
             (&dof_handler->get_triangulation())));
       Assert (tria != nullptr, ExcInternalError());
 
-      offset
+      handle
         = tria->register_data_attach(size,
                                      std::bind(&SolutionTransfer<dim, VectorType,
                                                DoFHandlerType>::pack_callback,
@@ -161,7 +161,7 @@ namespace parallel
             (&dof_handler->get_triangulation())));
       Assert (tria != nullptr, ExcInternalError());
 
-      tria->notify_ready_to_unpack(offset,
+      tria->notify_ready_to_unpack(handle,
                                    std::bind(&SolutionTransfer<dim, VectorType,
                                              DoFHandlerType>::unpack_callback,
                                              this,

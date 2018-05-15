@@ -552,11 +552,11 @@ namespace
   attach_mesh_data_recursively (const typename internal::p4est::types<dim>::tree &tree,
                                 const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
                                 const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                                const std::map<unsigned int, typename std::function<
+                                const std::vector< std::pair<unsigned int, typename std::function<
                                 void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator,
                                      typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
                                      void *)
-                                > > &pack_callbacks)
+                                > > > &pack_callbacks)
   {
     int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
                                &p4est_cell,
@@ -803,7 +803,7 @@ namespace
                               const typename Triangulation<dim,spacedim>::cell_iterator &dealii_cell,
                               const typename Triangulation<dim,spacedim>::cell_iterator &parent_cell,
                               const typename internal::p4est::types<dim>::quadrant &p4est_cell,
-                              const unsigned int handle,
+                              const unsigned int offset,
                               const typename std::function<
                               void(typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator, typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus, void *)
                               > &unpack_callback)
@@ -850,7 +850,7 @@ namespace
                                                       dealii_cell->child(c),
                                                       dealii_cell,
                                                       p4est_child[c],
-                                                      handle,
+                                                      offset,
                                                       unpack_callback);
           }
       }
@@ -863,7 +863,7 @@ namespace
               sc_array_index (const_cast<sc_array_t *>(&tree.quadrants), idx)
             );
 
-        void *ptr = static_cast<char *>(q->p.user_data) + handle;
+        void *ptr = static_cast<char *>(q->p.user_data) + offset;
         typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus
         status = * static_cast<
                  typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *
@@ -3226,18 +3226,30 @@ namespace parallel
                                                    const CellStatus,
                                                    void *)> &pack_callback)
     {
+#ifdef DEBUG
       Assert(size>0, ExcMessage("register_data_attach(), size==0"));
-      Assert(cell_attached_data.pack_callbacks.size()==cell_attached_data.n_attached_datas,
-             ExcMessage("register_data_attach(), not all data has been unpacked last time?"));
 
-      const unsigned int current_buffer_positition = cell_attached_data.cumulative_fixed_data_size+sizeof(CellStatus);
+      unsigned int remaining_callback_counter = 0;
+      for (auto it : cell_attached_data.pack_callbacks)
+        if (std::get<0>(it) != numbers::invalid_unsigned_int)
+          ++remaining_callback_counter;
+
+      Assert(remaining_callback_counter==cell_attached_data.n_attached_datas,
+             ExcMessage("register_data_attach(), not all data has been unpacked last time?"));
+#endif
+
+      // add new pair with offset and pack_callback
+      cell_attached_data.pack_callbacks.push_back(
+        std::make_pair(cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
+                       pack_callback)
+      );
+
+      // increase counters
       ++cell_attached_data.n_attached_datas;
       cell_attached_data.cumulative_fixed_data_size += size;
-      cell_attached_data.pack_callbacks[current_buffer_positition] = pack_callback;
 
-      // use the offset as the handle that callers receive and later hand back
-      // to notify_ready_to_unpack()
-      return current_buffer_positition;
+      // return the position of the callback in the register vector as a handle
+      return cell_attached_data.pack_callbacks.size() - 1;
     }
 
 
@@ -3250,13 +3262,15 @@ namespace parallel
                                                       const CellStatus,
                                                       const void *)> &unpack_callback)
     {
-      Assert (handle >= sizeof(CellStatus),
-              ExcMessage ("Invalid offset."));
-      Assert (handle < cell_attached_data.cumulative_fixed_data_size + sizeof(CellStatus),
-              ExcMessage ("Invalid offset."));
+      Assert (handle < cell_attached_data.pack_callbacks.size(),
+              ExcMessage ("Invalid handle."));
       Assert (cell_attached_data.n_attached_datas > 0,
               ExcMessage ("The notify_ready_to_unpack() has already been called "
                           "once for each registered callback."));
+
+      const unsigned int offset = std::get<0> (cell_attached_data.pack_callbacks[handle]);
+      // check if unpack function has been previously called
+      Assert (offset!=dealii::numbers::invalid_unsigned_int, ExcInternalError());
 
       // Recurse over p4est and hand the caller the data back
       for (typename Triangulation<dim, spacedim>::cell_iterator
@@ -3282,24 +3296,21 @@ namespace parallel
                                                      cell,
                                                      cell,
                                                      p4est_coarse_cell,
-                                                     handle,
+                                                     offset,
                                                      unpack_callback);
         }
 
       --cell_attached_data.n_attached_datas;
       if (cell_attached_data.n_attached_deserialize > 0)
-        {
-          --cell_attached_data.n_attached_deserialize;
+        --cell_attached_data.n_attached_deserialize;
 
-          // Remove the entry that corresponds to the handle that was
-          // passed to the current function. Double check that such an
-          // entry really existed.
-          const unsigned int n_elements_removed
-            = cell_attached_data.pack_callbacks.erase (handle);
-          (void)n_elements_removed;
-          Assert (n_elements_removed == 1,
-                  ExcInternalError());
-        }
+      // deregister corresponding pack_callback function
+      // first reset with invalid entries to preserve ambiguity of handles,
+      // then free memory when all were unpacked (see below)
+      std::get<0> (cell_attached_data.pack_callbacks[handle]) // offset value
+        = dealii::numbers::invalid_unsigned_int;
+      std::get<1> (cell_attached_data.pack_callbacks[handle]) // pack_callback function
+        = typename CellAttachedData::pack_callback_t ();
 
       // important: only remove data if we are not in the deserialization
       // process. There, each SolutionTransfer registers and unpacks before
