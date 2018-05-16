@@ -1276,6 +1276,8 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 {
   Assert(level < this->get_triangulation().n_global_levels(),
          ExcMessage("invalid level in locally_owned_mg_dofs"));
+  Assert (mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+          ExcMessage("The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
   return mg_number_cache[level].locally_owned_dofs;
 }
 
@@ -1303,7 +1305,10 @@ template <int dim, int spacedim>
 const std::vector<IndexSet> &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned int level) const
 {
-  Assert(level < this->get_triangulation().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+  Assert(level < this->get_triangulation().n_global_levels(),
+         ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+  Assert(mg_number_cache.size() == this->get_triangulation().n_global_levels(),
+         ExcMessage("The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
   return mg_number_cache[level].locally_owned_dofs_per_processor;
 }
 
