@@ -43,35 +43,44 @@ namespace internal
   struct MFWorkerInterface
   {
   public:
-    virtual ~MFWorkerInterface() {}
+    virtual
+    ~MFWorkerInterface() {}
 
     /// Starts the communication for the update ghost values operation
-    virtual void vector_update_ghosts_start() = 0;
+    virtual void
+    vector_update_ghosts_start() = 0;
 
     /// Finishes the communication for the update ghost values operation
-    virtual void vector_update_ghosts_finish() = 0;
+    virtual void
+    vector_update_ghosts_finish() = 0;
 
     /// Starts the communication for the vector compress operation
-    virtual void vector_compress_start() = 0;
+    virtual void
+    vector_compress_start() = 0;
 
     /// Finishes the communication for the vector compress operation
-    virtual void vector_compress_finish() = 0;
+    virtual void
+    vector_compress_finish() = 0;
 
     /// Zeros part of the vector accroding to a given range as stored in
     /// DoFInfo
-    virtual void zero_dst_vector_range(const unsigned int range_index) = 0;
+    virtual void
+    zero_dst_vector_range(const unsigned int range_index) = 0;
 
     /// Runs the cell work specified by MatrixFree::loop or
     /// MatrixFree::cell_loop
-    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range) = 0;
+    virtual void
+    cell(const std::pair<unsigned int,unsigned int> &cell_range) = 0;
 
     /// Runs the body of the work on interior faces specified by
     /// MatrixFree::loop
-    virtual void face(const std::pair<unsigned int,unsigned int> &face_range) = 0;
+    virtual void
+    face(const std::pair<unsigned int,unsigned int> &face_range) = 0;
 
     /// Runs the body of the work on boundary faces specified by
     /// MatrixFree::loop
-    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range) = 0;
+    virtual void
+    boundary(const std::pair<unsigned int,unsigned int> &face_range) = 0;
   };
 
 
@@ -109,21 +118,24 @@ namespace internal
        * Clears all the data fields and resets them
        * to zero.
        */
-      void clear ();
+      void
+      clear ();
 
       /**
        * Runs the matrix-free loop.
        */
-      void loop(MFWorkerInterface &worker) const;
+      void
+      loop(MFWorkerInterface &worker) const;
 
       /**
        * Determines the position of cells with ghosts for distributed-memory
        * calculations.
        */
-      void collect_boundary_cells (const unsigned int n_active_cells,
-                                   const unsigned int n_active_and_ghost_cells,
-                                   const unsigned int vectorization_length,
-                                   std::vector<unsigned int> &boundary_cells);
+      void
+      collect_boundary_cells (const unsigned int n_active_cells,
+                              const unsigned int n_active_and_ghost_cells,
+                              const unsigned int vectorization_length,
+                              std::vector<unsigned int> &boundary_cells);
 
       /**
        * Sets up the blocks for running the cell loop based on the options
@@ -198,7 +210,8 @@ namespace internal
        * computed based on the number of hardware threads on the system and
        * the number of macro cells that we should work on.
        */
-      void guess_block_size (const unsigned int dofs_per_cell);
+      void
+      guess_block_size (const unsigned int dofs_per_cell);
 
       /**
        * This method goes through all cells that have been filled into @p
@@ -380,20 +393,23 @@ namespace internal
       /**
        * Creates a task graph from a connectivity structure.
        */
-      void create_flow_graph();
+      void
+      create_flow_graph();
 
       /**
        * Returns the memory consumption of the class.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Prints minimum, average, and maximal memory consumption over the MPI
        * processes.
        */
       template <typename StreamType>
-      void print_memory_statistics (StreamType &out,
-                                    std::size_t data_length) const;
+      void
+      print_memory_statistics (StreamType &out,
+                               std::size_t data_length) const;
 
       /**
        * Number of physical cells in the mesh, not cell batches after

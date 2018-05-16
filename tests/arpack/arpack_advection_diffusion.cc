@@ -71,12 +71,16 @@ class EigenvalueProblem
 {
 public:
   EigenvalueProblem (unsigned int n_eigenvalues);
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void assemble_system ();
-  void solve ();
+  void
+  make_grid_and_dofs ();
+  void
+  assemble_system ();
+  void
+  solve ();
 
   Triangulation<dim> triangulation;
   FE_Q<dim>          fe;
@@ -107,7 +111,8 @@ EigenvalueProblem<dim>::EigenvalueProblem (unsigned int n_eigenvalues)
 
 
 template <int dim>
-void EigenvalueProblem<dim>::make_grid_and_dofs ()
+void
+EigenvalueProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (5);
@@ -140,7 +145,8 @@ void EigenvalueProblem<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void EigenvalueProblem<dim>::assemble_system ()
+void
+EigenvalueProblem<dim>::assemble_system ()
 {
   QGauss<dim>   quadrature_formula(2);
 
@@ -209,7 +215,8 @@ void EigenvalueProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void EigenvalueProblem<dim>::solve ()
+void
+EigenvalueProblem<dim>::solve ()
 {
   SolverControl solver_control (dof_handler.n_dofs(), 1e-10);
   SparseDirectUMFPACK inverse;
@@ -282,7 +289,8 @@ void EigenvalueProblem<dim>::solve ()
   }
 }
 
-bool my_compare(std::complex<double> a, std::complex<double> b)
+bool
+my_compare(std::complex<double> a, std::complex<double> b)
 {
   if (a.imag()==0.)
     return a.imag() < a.imag();
@@ -291,7 +299,8 @@ bool my_compare(std::complex<double> a, std::complex<double> b)
 }
 
 template <int dim>
-void EigenvalueProblem<dim>::run ()
+void
+EigenvalueProblem<dim>::run ()
 {
   make_grid_and_dofs ();
 
@@ -308,7 +317,8 @@ void EigenvalueProblem<dim>::run ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
 
   try

@@ -73,11 +73,15 @@ class Deal2PeriodicBug
 
 public:
   Deal2PeriodicBug();
-  void run();
+  void
+  run();
 private:
-  void makeGrid();
-  void make_periodicity_constraints();
-  void setup_system();
+  void
+  makeGrid();
+  void
+  make_periodicity_constraints();
+  void
+  setup_system();
 
   Triangulation<2>     triangulation;
   FE_Q<2>              fe;
@@ -90,13 +94,15 @@ Deal2PeriodicBug::Deal2PeriodicBug()
 {}
 
 
-void Deal2PeriodicBug::run()
+void
+Deal2PeriodicBug::run()
 {
   makeGrid();
   setup_system();
 }
 
-void Deal2PeriodicBug::make_periodicity_constraints()
+void
+Deal2PeriodicBug::make_periodicity_constraints()
 {
   std::vector<bool> mask(1);
   mask[0] = true;
@@ -111,7 +117,8 @@ void Deal2PeriodicBug::make_periodicity_constraints()
   DoFTools::make_periodicity_constraints(dof_handler, 2, 0, 0, constraints, cmask);
 }
 
-void Deal2PeriodicBug::setup_system()
+void
+Deal2PeriodicBug::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
@@ -125,7 +132,8 @@ void Deal2PeriodicBug::setup_system()
   constraints.close();
 }
 
-void Deal2PeriodicBug::makeGrid()
+void
+Deal2PeriodicBug::makeGrid()
 {
   deallog<< "Constructing the grid..." <<std::endl;
   const Point<2> p1(0,0), p2(1,1);
@@ -151,7 +159,8 @@ void Deal2PeriodicBug::makeGrid()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

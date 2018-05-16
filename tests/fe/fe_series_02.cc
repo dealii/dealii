@@ -47,10 +47,12 @@ public:
     coefficients(coefficients)
   {}
 
-  virtual double value(const dealii::Point<dim> &point,
-                       const unsigned int component = 0 ) const;
+  virtual double
+  value(const dealii::Point<dim> &point,
+        const unsigned int component = 0 ) const;
 
-  const std::vector<double> &get_coefficients() const
+  const std::vector<double> &
+  get_coefficients() const
   {
     return coefficients;
   }
@@ -61,8 +63,9 @@ private:
 };
 
 template <int dim>
-double LegendreFunction<dim>::value(const dealii::Point<dim> &point,
-                                    const unsigned int ) const
+double
+LegendreFunction<dim>::value(const dealii::Point<dim> &point,
+                             const unsigned int ) const
 {
   Assert(dim==1,
          dealii::ExcNotImplemented());
@@ -82,8 +85,9 @@ double LegendreFunction<dim>::value(const dealii::Point<dim> &point,
 }
 
 template <int dim>
-void test(const LegendreFunction<dim> &func,
-          const unsigned int poly_degree)
+void
+test(const LegendreFunction<dim> &func,
+     const unsigned int poly_degree)
 {
   Triangulation<dim> triangulation;
   hp::DoFHandler<dim> dof_handler(triangulation);
@@ -142,7 +146,8 @@ void test(const LegendreFunction<dim> &func,
   dof_handler.clear();
 }
 
-int main ()
+int
+main ()
 {
   const int dim = 1;
 

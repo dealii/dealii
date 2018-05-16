@@ -26,7 +26,8 @@
 
 //TODO:[WB] find test that is less sensitive to floating point accuracy
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

@@ -69,15 +69,17 @@ public:
       origin(origin)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     Tensor<1,dim> d = point-origin;
     return std::exp(-d.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> d = point -origin;
     Assert (d.norm() > 0,
@@ -86,8 +88,9 @@ public:
     return d;
   }
 
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                          const unsigned int component=0) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p,
+           const unsigned int component=0) const
   {
     Tensor<1,dim> dir = p - origin;
     const double r = dir.norm();
@@ -121,25 +124,26 @@ private:
  * @param h_s1  hessian of 1st component of FE_System
  */
 template <int dim>
-void check_consistency(const Point<dim>    &p,
-                       const Function<dim> &func1,
-                       const Function<dim> &func2,
-                       const Function<dim> &func3,
-                       const double        &v_e,
-                       const Tensor<1,dim> &g_e,
-                       const Tensor<2,dim> &h_e,
-                       const double        &v_s0,
-                       const Tensor<1,dim> &g_s0,
-                       const Tensor<2,dim> &h_s0,
-                       const double        &v_s1,
-                       const Tensor<1,dim> &g_s1,
-                       const Tensor<2,dim> &h_s1,
-                       const double        &v_s2,
-                       const Tensor<1,dim> &g_s2,
-                       const Tensor<2,dim> &h_s2,
-                       const double        &v_s3,
-                       const Tensor<1,dim> &g_s3,
-                       const Tensor<2,dim> &h_s3)
+void
+check_consistency(const Point<dim>    &p,
+                  const Function<dim> &func1,
+                  const Function<dim> &func2,
+                  const Function<dim> &func3,
+                  const double        &v_e,
+                  const Tensor<1,dim> &g_e,
+                  const Tensor<2,dim> &h_e,
+                  const double        &v_s0,
+                  const Tensor<1,dim> &g_s0,
+                  const Tensor<2,dim> &h_s0,
+                  const double        &v_s1,
+                  const Tensor<1,dim> &g_s1,
+                  const Tensor<2,dim> &h_s1,
+                  const double        &v_s2,
+                  const Tensor<1,dim> &g_s2,
+                  const Tensor<2,dim> &h_s2,
+                  const double        &v_s3,
+                  const Tensor<1,dim> &g_s3,
+                  const Tensor<2,dim> &h_s3)
 {
   const double                 v_f1 = func1.value(p);
   const Tensor<1,dim>          g_f1 = func1.gradient(p);
@@ -194,12 +198,13 @@ void check_consistency(const Point<dim>    &p,
  * {fe_en1,1}, {fe_en2,2} => 3 functions
  */
 template <int dim>
-void test(const FiniteElement<dim> &fe_base,
-          const FiniteElement<dim> &fe_en1,
-          const FiniteElement<dim> &fe_en2,
-          const Quadrature<dim>    &volume_quad,
-          const Quadrature<dim-1>  &face_quad,
-          const bool                distort)
+void
+test(const FiniteElement<dim> &fe_base,
+     const FiniteElement<dim> &fe_en1,
+     const FiniteElement<dim> &fe_en2,
+     const Quadrature<dim>    &volume_quad,
+     const Quadrature<dim-1>  &face_quad,
+     const bool                distort)
 {
   Triangulation<dim> triangulation;
   DoFHandler<dim> dof_handler_enriched(triangulation);
@@ -358,7 +363,8 @@ void test(const FiniteElement<dim> &fe_base,
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

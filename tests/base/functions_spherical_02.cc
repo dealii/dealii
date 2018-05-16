@@ -54,16 +54,18 @@ public:
       origin(origin)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0) const
   {
     Tensor<1,dim> dist = point-origin;
     const double r = dist.norm();
     return r*dist[0];
   }
 
-  virtual Tensor< 1, dim> gradient (const Point<dim > &p,
-                                    const unsigned int component=0) const
+  virtual Tensor< 1, dim>
+  gradient (const Point<dim > &p,
+            const unsigned int component=0) const
   {
     Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
@@ -83,8 +85,9 @@ public:
     return res;
   }
 
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                          const unsigned int component=0) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p,
+           const unsigned int component=0) const
   {
     const Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
@@ -127,14 +130,16 @@ public:
   {}
 
 private:
-  virtual double svalue(const std::array<double, dim> &sp,
-                        const unsigned int) const
+  virtual double
+  svalue(const std::array<double, dim> &sp,
+         const unsigned int) const
   {
     return sp[0]*sp[0]*std::cos(sp[1])*std::sin(sp[2]);
   }
 
-  virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
-                                            const unsigned int) const
+  virtual std::array<double, dim>
+  sgradient(const std::array<double, dim> &sp,
+            const unsigned int) const
   {
     std::array<double, dim> res;
     const double r     = sp[0];
@@ -146,8 +151,9 @@ private:
     return res;
   }
 
-  virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
-                                          const unsigned int) const
+  virtual std::array<double, 6>
+  shessian (const std::array<double, dim> &sp,
+            const unsigned int) const
   {
     std::array<double, 6> res;
     const double r = sp[0];
@@ -165,7 +171,8 @@ private:
 };
 
 template <int dim>
-void check()
+void
+check()
 {
   Point<dim> center;
   center[1] = 2.0;
@@ -213,7 +220,8 @@ void check()
   deallog << "OK"<< std::endl;
 }
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

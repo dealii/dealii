@@ -43,7 +43,8 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/operators.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -53,14 +54,16 @@ class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Ve
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MatrixType &matrix)
+  void
+  initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   level,
-                           LinearAlgebra::distributed::Vector<double> &dst,
-                           const LinearAlgebra::distributed::Vector<double> &src) const
+  virtual void
+  operator() (const unsigned int   level,
+              LinearAlgebra::distributed::Vector<double> &dst,
+              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver_coarse (solver_control);
@@ -74,7 +77,8 @@ public:
 using namespace dealii::MatrixFreeOperators;
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof)
+void
+do_test (const DoFHandler<dim>  &dof)
 {
   if (std::is_same<number,float>::value == true)
     {
@@ -210,7 +214,8 @@ void do_test (const DoFHandler<dim>  &dof)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   for (unsigned int i=5; i<7; ++i)
     {
@@ -231,7 +236,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 

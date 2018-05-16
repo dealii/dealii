@@ -116,8 +116,9 @@ public:
 
   }
 
-  void vmult  ( dealii::PETScWrappers::MPI::Vector         &dst,
-                const dealii::PETScWrappers::MPI::Vector   &src) const
+  void
+  vmult  ( dealii::PETScWrappers::MPI::Vector         &dst,
+           const dealii::PETScWrappers::MPI::Vector   &src) const
   {
     ;
     solver.solve(matrix, dst, src,preconditioner);
@@ -131,7 +132,8 @@ private:
 
 };
 
-void test ()
+void
+test ()
 {
   const unsigned int global_mesh_refinement_steps = 5;
   const unsigned int number_of_eigenvalues        = 4;
@@ -391,7 +393,8 @@ void test ()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile,/*do not print job id*/false);

@@ -24,7 +24,8 @@
 using namespace dealii;
 using namespace Patterns::Tools;
 
-int main()
+int
+main()
 {
   initlog();
 

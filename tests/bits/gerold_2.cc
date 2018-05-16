@@ -38,14 +38,16 @@ template <int dim>
 class LaplaceProblem
 {
 public:
-  void run ();
+  void
+  run ();
 private:
   Triangulation<dim>   triangulation;
 };
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
@@ -64,7 +66,8 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

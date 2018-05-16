@@ -25,7 +25,8 @@
 
 //index=18466 line_index=652 lines_cache[line_index]=919940456 lines.size()=21
 
-void test ()
+void
+test ()
 {
   IndexSet rel;
   std::ifstream f(SOURCE_DIR "/constraints_01/is.23");
@@ -55,7 +56,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

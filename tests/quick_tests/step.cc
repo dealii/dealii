@@ -52,12 +52,16 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem (const unsigned int mapping_degree);
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_and_solve ();
-  void solve ();
+  void
+  setup_system ();
+  void
+  assemble_and_solve ();
+  void
+  solve ();
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -94,7 +98,8 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
   solution.reinit (dof_handler.n_dofs());
@@ -130,7 +135,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_and_solve ()
+void
+LaplaceProblem<dim>::assemble_and_solve ()
 {
 
   const unsigned int gauss_degree
@@ -175,7 +181,8 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -190,7 +197,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   GridGenerator::hyper_ball (triangulation);
   static const SphericalManifold<dim> boundary;
@@ -214,7 +222,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   try
     {

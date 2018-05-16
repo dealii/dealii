@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -70,7 +71,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

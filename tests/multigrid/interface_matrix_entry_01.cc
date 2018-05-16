@@ -49,7 +49,8 @@
 using namespace dealii;
 
 template <int dim>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,Triangulation<dim>::
                                                  limit_level_difference_at_vertices,
@@ -115,7 +116,8 @@ void test ()
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

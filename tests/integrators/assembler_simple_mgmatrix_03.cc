@@ -39,7 +39,8 @@
 using namespace dealii;
 
 template <typename number>
-void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
+void
+fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
 {
   for (unsigned int k=0; k<results.n_matrices(); ++k)
     {
@@ -57,7 +58,8 @@ void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
 
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -113,7 +115,8 @@ void test(FiniteElement<dim> &fe)
   matrix[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int s = 10;
   PETScWrappers::MPI::Vector  v(MPI_COMM_WORLD, s, s);
@@ -65,7 +66,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);

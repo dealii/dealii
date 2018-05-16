@@ -71,7 +71,8 @@ const double eps = 1e-10;
 
 const unsigned int fe_degree = 1;
 
-void test ()
+void
+test ()
 {
   const unsigned int global_mesh_refinement_steps = 5;
 
@@ -256,7 +257,8 @@ void test ()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile,/*do not print job id*/false);

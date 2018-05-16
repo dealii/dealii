@@ -24,7 +24,8 @@
 
 
 template <typename number>
-void check ()
+void
+check ()
 {
   for (unsigned int test=0; test<5; ++test)
     {
@@ -62,7 +63,8 @@ void check ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(8);

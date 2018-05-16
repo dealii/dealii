@@ -62,52 +62,60 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ExceptionBase () noexcept override;
+  virtual
+  ~ExceptionBase () noexcept override;
 
   /**
    * Copy operator. This operator is deleted since exception objects
    * are not copyable.
    */
-  ExceptionBase operator= (const ExceptionBase &) = delete;
+  ExceptionBase
+  operator= (const ExceptionBase &) = delete;
 
   /**
    * Set the file name and line of where the exception appeared as well as the
    * violated condition and the name of the exception as a char pointer. This
    * function also populates the stacktrace.
    */
-  void set_fields (const char *file,
-                   const int   line,
-                   const char *function,
-                   const char *cond,
-                   const char *exc_name);
+  void
+  set_fields (const char *file,
+              const int   line,
+              const char *function,
+              const char *cond,
+              const char *exc_name);
 
 
   /**
    * Override the standard function that returns the description of the error.
    */
-  virtual const char *what() const noexcept override;
+  virtual const char *
+  what() const noexcept override;
 
   /**
    * Get exception name.
    */
-  const char *get_exc_name() const;
+  const char *
+  get_exc_name() const;
 
   /**
    * Print out the general part of the error information.
    */
-  void print_exc_data (std::ostream &out) const;
+  void
+  print_exc_data (std::ostream &out) const;
 
   /**
    * Print more specific information about the exception which occurred.
    * Overload this function in your own exception classes.
    */
-  virtual void print_info (std::ostream &out) const;
+  virtual void
+  print_info (std::ostream &out) const;
 
   /**
    * Print a stacktrace, if one has been recorded previously, to the given
    * stream.
    */
-  void print_stack_trace (std::ostream &out) const;
+  void
+  print_stack_trace (std::ostream &out) const;
 
 protected:
   /**
@@ -158,7 +166,8 @@ private:
   /**
    * Internal function that generates the c_string. Called by what().
    */
-  void generate_message() const;
+  void
+  generate_message() const;
 
   /**
    * A pointer to the c_string that will be printed by what(). It is populated
@@ -922,7 +931,8 @@ namespace StandardExceptions
   public:
     ExcMPI (const int error_code);
 
-    virtual void print_info (std::ostream &out) const override;
+    virtual void
+    print_info (std::ostream &out) const override;
 
     const int error_code;
   };
@@ -958,7 +968,8 @@ namespace deal_II_exceptions
    *
    * @see Exceptions
    */
-  void set_additional_assert_output (const char *const p);
+  void
+  set_additional_assert_output (const char *const p);
 
   /**
    * Calling this function disables printing a stacktrace along with the other
@@ -970,7 +981,8 @@ namespace deal_II_exceptions
    *
    * @see Exceptions
    */
-  void suppress_stacktrace_in_exceptions ();
+  void
+  suppress_stacktrace_in_exceptions ();
 
   /**
    * Calling this function switches off the use of <tt>std::abort()</tt> when
@@ -985,7 +997,8 @@ namespace deal_II_exceptions
    *
    * @see Exceptions
    */
-  void disable_abort_on_exception ();
+  void
+  disable_abort_on_exception ();
 
   /**
    * The functions in this namespace are in connection with the Assert and
@@ -1006,7 +1019,8 @@ namespace deal_II_exceptions
      * throws @p exc instead.
      */
     [[noreturn]]
-    void abort (const ExceptionBase &exc);
+    void
+    abort (const ExceptionBase &exc);
 
     /**
      * An enum describing how to treat an exception in issue_error.
@@ -1047,13 +1061,14 @@ namespace deal_II_exceptions
      */
     template <class ExceptionType>
     [[noreturn]]
-    void issue_error_noreturn (ExceptionHandling  handling,
-                               const char       *file,
-                               int               line,
-                               const char       *function,
-                               const char       *cond,
-                               const char       *exc_name,
-                               ExceptionType     e)
+    void
+    issue_error_noreturn (ExceptionHandling  handling,
+                          const char       *file,
+                          int               line,
+                          const char       *function,
+                          const char       *cond,
+                          const char       *exc_name,
+                          ExceptionType     e)
     {
       // Fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
@@ -1088,13 +1103,14 @@ namespace deal_II_exceptions
      * issue_error_noreturn().
      */
     template <class ExceptionType>
-    void issue_error_nothrow (ExceptionHandling,
-                              const char    *file,
-                              int            line,
-                              const char    *function,
-                              const char    *cond,
-                              const char    *exc_name,
-                              ExceptionType  e) noexcept
+    void
+    issue_error_nothrow (ExceptionHandling,
+                         const char    *file,
+                         int            line,
+                         const char    *function,
+                         const char    *cond,
+                         const char    *exc_name,
+                         ExceptionType  e) noexcept
     {
       static_assert(std::is_base_of<ExceptionBase, ExceptionType>::value,
       "The provided exception must inherit from ExceptionBase.");
@@ -1109,13 +1125,15 @@ namespace deal_II_exceptions
      * Return a string given an error code. This is similar to the cudaGetErrorString
      * function but there is no equivalent function for cuSPARSE.
      */
-    std::string get_cusparse_error_string(const cusparseStatus_t error_code);
+    std::string
+    get_cusparse_error_string(const cusparseStatus_t error_code);
 
     /**
      * Return a string given an error code. This is similar to the cudaGetErrorString
      * function but there is no equivalent function for cuSOLVER.
      */
-    std::string get_cusolver_error_string(const cusolverStatus_t error_code);
+    std::string
+    get_cusolver_error_string(const cusolverStatus_t error_code);
 #endif
   } /*namespace internals*/
 

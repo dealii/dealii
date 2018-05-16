@@ -28,7 +28,8 @@ std::string input = "set test_1 = 1\n"
 
 
 
-void check (const char *p)
+void
+check (const char *p)
 {
   ParameterHandler prm;
   prm.declare_entry ("test_1", "0",
@@ -65,7 +66,8 @@ void check (const char *p)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

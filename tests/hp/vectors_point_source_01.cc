@@ -90,7 +90,8 @@ check ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   logfile.precision (4);

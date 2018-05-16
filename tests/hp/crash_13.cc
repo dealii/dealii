@@ -26,7 +26,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::FECollection<dim> fe;
   fe.push_back (FESystem<dim>(FE_Q<dim>(1), 1,

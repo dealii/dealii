@@ -113,7 +113,8 @@ public:
   /**
    * Convert a tensor to a point.
    */
-  explicit Point (const Tensor<1,dim,Number> &);
+  explicit
+  Point (const Tensor<1,dim,Number> &);
 
   /**
    * Constructor for one dimensional points. This function is only implemented
@@ -121,7 +122,8 @@ public:
    * <tt>dim!=1</tt> as it would leave some components of the point
    * coordinates uninitialized.
    */
-  explicit Point (const Number x);
+  explicit
+  Point (const Number x);
 
   /**
    * Constructor for two dimensional points. This function is only implemented
@@ -149,17 +151,20 @@ public:
    * that is zero in all coordinates except for a single 1 in the <tt>i</tt>th
    * coordinate.
    */
-  static Point<dim,Number> unit_vector(const unsigned int i);
+  static Point<dim,Number>
+  unit_vector(const unsigned int i);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
    */
-  Number operator () (const unsigned int index) const;
+  Number
+  operator () (const unsigned int index) const;
 
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
    */
-  Number &operator () (const unsigned int index);
+  Number &
+  operator () (const unsigned int index);
 
   /*
    * @name Addition and subtraction of points.
@@ -169,7 +174,8 @@ public:
   /**
    * Add an offset given as Tensor<1,dim,Number> to a point.
    */
-  Point<dim,Number> operator + (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number>
+  operator + (const Tensor<1,dim,Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -178,7 +184,8 @@ public:
    * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
    * rather than as a Point@<dim@>.
    */
-  Tensor<1,dim,Number> operator - (const Point<dim,Number> &) const;
+  Tensor<1,dim,Number>
+  operator - (const Point<dim,Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -186,12 +193,14 @@ public:
    * documentation of this class, the result is then naturally returned as a
    * Point@<dim@> object rather than as a Tensor@<1,dim@>.
    */
-  Point<dim,Number> operator - (const Tensor<1,dim,Number> &) const;
+  Point<dim,Number>
+  operator - (const Tensor<1,dim,Number> &) const;
 
   /**
    * The opposite vector.
    */
-  Point<dim,Number> operator - () const;
+  Point<dim,Number>
+  operator - () const;
 
   /**
    * @}
@@ -221,7 +230,8 @@ public:
   /**
    * Return the scalar product of the vectors representing two points.
    */
-  Number operator * (const Tensor<1,dim,Number> &p) const;
+  Number
+  operator * (const Tensor<1,dim,Number> &p) const;
 
   /**
    * Return the scalar product of this point vector with itself, i.e. the
@@ -233,20 +243,23 @@ public:
    * Tensor<rank,dim,Number>::norm_square() which returns the square of the
    * Frobenius norm.
    */
-  typename numbers::NumberTraits<Number>::real_type square () const;
+  typename numbers::NumberTraits<Number>::real_type
+  square () const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>, i.e. the <tt>l_2</tt> norm of the difference between the
    * vectors representing the two points.
    */
-  typename numbers::NumberTraits<Number>::real_type distance (const Point<dim,Number> &p) const;
+  typename numbers::NumberTraits<Number>::real_type
+  distance (const Point<dim,Number> &p) const;
 
   /**
    * Return the squared Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>.
    */
-  typename numbers::NumberTraits<Number>::real_type distance_square (const Point<dim,Number> &p) const;
+  typename numbers::NumberTraits<Number>::real_type
+  distance_square (const Point<dim,Number> &p) const;
 
   /**
    * @}
@@ -257,7 +270,8 @@ public:
    * of serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 };
 
 /*------------------------------- Inline functions: Point ---------------------------*/
@@ -549,8 +563,9 @@ operator * (const OtherNumber        factor,
  */
 template <int dim, typename Number>
 inline
-std::ostream &operator << (std::ostream            &out,
-                           const Point<dim,Number> &p)
+std::ostream &
+operator << (std::ostream            &out,
+             const Point<dim,Number> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
@@ -567,8 +582,9 @@ std::ostream &operator << (std::ostream            &out,
  */
 template <int dim, typename Number>
 inline
-std::istream &operator >> (std::istream      &in,
-                           Point<dim,Number> &p)
+std::istream &
+operator >> (std::istream      &in,
+             Point<dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     in >> p[i];
@@ -586,8 +602,9 @@ std::istream &operator >> (std::istream      &in,
  */
 template <typename Number>
 inline
-std::ostream &operator << (std::ostream &out,
-                           const Point<1,Number> &p)
+std::ostream &
+operator << (std::ostream &out,
+             const Point<1,Number> &p)
 {
   out << p[0];
 

@@ -59,7 +59,8 @@ reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
 
 
 template <int dim>
-void refine_mesh (Triangulation<dim> &triangulation)
+void
+refine_mesh (Triangulation<dim> &triangulation)
 {
   bool cell_refined = false;
   for (typename Triangulation<dim>::active_cell_iterator
@@ -92,8 +93,9 @@ void refine_mesh (Triangulation<dim> &triangulation)
 }
 
 template <int dim>
-void initialize (const DoFHandler<dim> &dof,
-                 Vector<double> &u)
+void
+initialize (const DoFHandler<dim> &dof,
+            Vector<double> &u)
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -109,8 +111,9 @@ void initialize (const DoFHandler<dim> &dof,
 }
 
 template <int dim>
-void initialize (const DoFHandler<dim> &dof,
-                 MGLevelObject<Vector<double> > &u)
+void
+initialize (const DoFHandler<dim> &dof,
+            MGLevelObject<Vector<double> > &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   const unsigned int dofs_per_face = dof.get_fe().dofs_per_face;
@@ -144,8 +147,9 @@ void initialize (const DoFHandler<dim> &dof,
 }
 
 template <int dim>
-void print (const DoFHandler<dim> &dof,
-            MGLevelObject<Vector<double> > &u)
+void
+print (const DoFHandler<dim> &dof,
+       MGLevelObject<Vector<double> > &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
@@ -165,8 +169,9 @@ void print (const DoFHandler<dim> &dof,
 }
 
 template <int dim>
-void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
-                 const Vector<double> &u, const Vector<double> &v)
+void
+print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
+            const Vector<double> &u, const Vector<double> &v)
 {
   Vector<double> diff;
   diff.reinit (u);
@@ -187,7 +192,8 @@ void print_diff (const DoFHandler<dim> &dof_1, const DoFHandler<dim> &dof_2,
 }
 
 template <int dim>
-void check_simple(const FiniteElement<dim> &fe)
+void
+check_simple(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -266,7 +272,8 @@ void check_simple(const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

@@ -100,40 +100,46 @@ public:
    * complex preconditioners.
    */
   template <typename MatrixType>
-  void initialize (const MatrixType     &matrix,
-                   const AdditionalData &additional_data = AdditionalData());
+  void
+  initialize (const MatrixType     &matrix,
+              const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is the identity, this function
    * is the same as vmult().
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply preconditioner, adding to the previous value.
    */
   template <class VectorType>
-  void vmult_add (VectorType &, const VectorType &) const;
+  void
+  vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner, adding. Since this is the identity, this
    * function is the same as vmult_add().
    */
   template <class VectorType>
-  void Tvmult_add (VectorType &, const VectorType &) const;
+  void
+  Tvmult_add (VectorType &, const VectorType &) const;
 
   /**
    * This function is only present to provide the interface of a
    * preconditioner to be handed to a smoother.  This does nothing.
    */
-  void clear () {}
+  void
+  clear () {}
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
@@ -142,7 +148,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
@@ -151,7 +158,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 private:
   /**
@@ -215,7 +223,8 @@ public:
   /**
    * Change the relaxation parameter.
    */
-  void initialize (const AdditionalData &parameters);
+  void
+  initialize (const AdditionalData &parameters);
 
   /**
    * Change the relaxation parameter in a way consistent with other
@@ -223,39 +232,45 @@ public:
    * compatibility with more complex preconditioners.
    */
   template <typename MatrixType>
-  void initialize (const MatrixType     &matrix,
-                   const AdditionalData &parameters);
+  void
+  initialize (const MatrixType     &matrix,
+              const AdditionalData &parameters);
 
   /**
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is the identity, this function
    * is the same as vmult().
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
   template <class VectorType>
-  void vmult_add (VectorType &, const VectorType &) const;
+  void
+  vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner, adding. Since this is the identity, this
    * function is the same as vmult_add().
    */
   template <class VectorType>
-  void Tvmult_add (VectorType &, const VectorType &) const;
+  void
+  Tvmult_add (VectorType &, const VectorType &) const;
 
   /**
    * This function is only present to provide the interface of a
    * preconditioner to be handed to a smoother.  This does nothing.
    */
-  void clear () {}
+  void
+  clear () {}
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
@@ -264,7 +279,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
@@ -273,7 +289,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 private:
   /**
@@ -355,8 +372,9 @@ public:
    * Execute preconditioning. Calls the function passed to the constructor of
    * this object with the two arguments given here.
    */
-  void vmult (VectorType       &dst,
-              const VectorType &src) const;
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const;
 
 private:
   /**
@@ -411,25 +429,29 @@ public:
    * the preconditioner object. The relaxation parameter should be larger than
    * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
-  void initialize (const MatrixType     &A,
-                   const AdditionalData &parameters = AdditionalData());
+  void
+  initialize (const MatrixType     &A,
+              const AdditionalData &parameters = AdditionalData());
 
   /**
    * Release the matrix and reset its pointer.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 protected:
   /**
@@ -485,26 +507,30 @@ public:
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is a symmetric preconditioner,
    * this function is the same as vmult().
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Perform one step of the preconditioned Richardson iteration.
    */
   template <class VectorType>
-  void step (VectorType &x, const VectorType &rhs) const;
+  void
+  step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template <class VectorType>
-  void Tstep (VectorType &x, const VectorType &rhs) const;
+  void
+  Tstep (VectorType &x, const VectorType &rhs) const;
 };
 
 
@@ -567,25 +593,29 @@ public:
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner.
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Perform one step of the preconditioned Richardson iteration.
    */
   template <class VectorType>
-  void step (VectorType &x, const VectorType &rhs) const;
+  void
+  step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template <class VectorType>
-  void Tstep (VectorType &x, const VectorType &rhs) const;
+  void
+  Tstep (VectorType &x, const VectorType &rhs) const;
 };
 
 
@@ -642,34 +672,39 @@ public:
    * the preconditioner object. The relaxation parameter should be larger than
    * zero and smaller than 2 for numerical reasons. It defaults to 1.
    */
-  void initialize (const MatrixType &A,
-                   const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
+  void
+  initialize (const MatrixType &A,
+              const typename BaseClass::AdditionalData &parameters = typename BaseClass::AdditionalData());
 
   /**
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is a symmetric preconditioner,
    * this function is the same as vmult().
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
 
 
   /**
    * Perform one step of the preconditioned Richardson iteration
    */
   template <class VectorType>
-  void step (VectorType &x, const VectorType &rhs) const;
+  void
+  step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
   template <class VectorType>
-  void Tstep (VectorType &x, const VectorType &rhs) const;
+  void
+  Tstep (VectorType &x, const VectorType &rhs) const;
 
 private:
   /**
@@ -767,11 +802,12 @@ public:
    * The relaxation parameter should be larger than zero and smaller than 2
    * for numerical reasons. It defaults to 1.
    */
-  void initialize (const MatrixType             &A,
-                   const std::vector<size_type> &permutation,
-                   const std::vector<size_type> &inverse_permutation,
-                   const typename PreconditionRelaxation<MatrixType>::AdditionalData &
-                   parameters = typename PreconditionRelaxation<MatrixType>::AdditionalData());
+  void
+  initialize (const MatrixType             &A,
+              const std::vector<size_type> &permutation,
+              const std::vector<size_type> &inverse_permutation,
+              const typename PreconditionRelaxation<MatrixType>::AdditionalData &
+              parameters = typename PreconditionRelaxation<MatrixType>::AdditionalData());
 
   /**
    * Initialize matrix and relaxation parameter. The matrix is just stored in
@@ -783,20 +819,23 @@ public:
    * After this function is called the preconditioner is ready to be used
    * (using the <code>vmult</code> function of derived classes).
    */
-  void initialize (const MatrixType &A,
-                   const AdditionalData &additional_data);
+  void
+  initialize (const MatrixType &A,
+              const AdditionalData &additional_data);
 
   /**
    * Apply preconditioner.
    */
   template <class VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner.
    */
   template <class VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
 private:
   /**
    * Storage for the permutation vector.
@@ -1012,51 +1051,59 @@ public:
    * matrix weighted by its diagonal using a modified CG iteration in case the
    * given number of iterations is positive.
    */
-  void initialize (const MatrixType     &matrix,
-                   const AdditionalData &additional_data = AdditionalData());
+  void
+  initialize (const MatrixType     &matrix,
+              const AdditionalData &additional_data = AdditionalData());
 
   /**
    * Compute the action of the preconditioner on <tt>src</tt>, storing the
    * result in <tt>dst</tt>.
    */
-  void vmult (VectorType       &dst,
-              const VectorType &src) const;
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const;
 
   /**
    * Compute the action of the transposed preconditioner on <tt>src</tt>,
    * storing the result in <tt>dst</tt>.
    */
-  void Tvmult (VectorType       &dst,
-               const VectorType &src) const;
+  void
+  Tvmult (VectorType       &dst,
+          const VectorType &src) const;
 
   /**
    * Perform one step of the preconditioned Richardson iteration.
    */
-  void step (VectorType       &dst,
-             const VectorType &src) const;
+  void
+  step (VectorType       &dst,
+        const VectorType &src) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
-  void Tstep (VectorType       &dst,
-              const VectorType &src) const;
+  void
+  Tstep (VectorType       &dst,
+         const VectorType &src) const;
 
   /**
    * Resets the preconditioner.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 private:
 
@@ -1113,8 +1160,9 @@ private:
    * Runs the inner loop of the Chebyshev preconditioner that is the same for
    * vmult() and step() methods.
    */
-  void do_chebyshev_loop(VectorType       &dst,
-                         const VectorType &src) const;
+  void
+  do_chebyshev_loop(VectorType       &dst,
+                    const VectorType &src) const;
 
   /**
    * Runs the inner loop of the Chebyshev preconditioner that is the same for
@@ -1122,8 +1170,9 @@ private:
    * to provide both vmult() and Tvmult() in case only one variant is
    * requested in subsequent calls.
    */
-  void do_transpose_chebyshev_loop(VectorType       &dst,
-                                   const VectorType &src) const;
+  void
+  do_transpose_chebyshev_loop(VectorType       &dst,
+                              const VectorType &src) const;
 
   /**
    * Initializes the factors theta and delta based on an eigenvalue
@@ -1131,7 +1180,8 @@ private:
    * in AdditionalData, no computation is performed and the information given
    * by the user is used.
    */
-  void estimate_eigenvalues(const VectorType &src) const;
+  void
+  estimate_eigenvalues(const VectorType &src) const;
 };
 
 
@@ -1902,7 +1952,8 @@ namespace internal
     }
 
     template <typename VectorType>
-    void set_initial_guess(VectorType &vector)
+    void
+    set_initial_guess(VectorType &vector)
     {
       vector = 1./std::sqrt(static_cast<double>(vector.size()));
       if (vector.locally_owned_elements().is_element(0))
@@ -1910,7 +1961,8 @@ namespace internal
     }
 
     template <typename Number>
-    void set_initial_guess(::dealii::Vector<Number> &vector)
+    void
+    set_initial_guess(::dealii::Vector<Number> &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -1924,7 +1976,8 @@ namespace internal
     }
 
     template <typename Number>
-    void set_initial_guess(::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
+    void
+    set_initial_guess(::dealii::LinearAlgebra::distributed::Vector<Number> &vector)
     {
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
@@ -1945,7 +1998,8 @@ namespace internal
     struct EigenvalueTracker
     {
     public:
-      void slot(const std::vector<double> &eigenvalues)
+      void
+      slot(const std::vector<double> &eigenvalues)
       {
         values = eigenvalues;
       }
@@ -2134,8 +2188,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::do_chebyshev_loop(VectorType       &dst,
-                    const VectorType &src) const
+::
+do_chebyshev_loop(VectorType       &dst,
+                  const VectorType &src) const
 {
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
@@ -2160,8 +2215,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::do_transpose_chebyshev_loop(VectorType       &dst,
-                              const VectorType &src) const
+::
+do_transpose_chebyshev_loop(VectorType       &dst,
+                            const VectorType &src) const
 {
   double rhok  = delta / theta,  sigma = theta / delta;
   for (unsigned int k=0; k<data.degree; ++k)
@@ -2181,8 +2237,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::vmult (VectorType       &dst,
-         const VectorType &src) const
+::
+vmult (VectorType       &dst,
+       const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
   if (eigenvalues_are_initialized == false)
@@ -2200,8 +2257,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::Tvmult (VectorType       &dst,
-          const VectorType &src) const
+::
+Tvmult (VectorType       &dst,
+        const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
   if (eigenvalues_are_initialized == false)
@@ -2219,8 +2277,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::step (VectorType       &dst,
-        const VectorType &src) const
+::
+step (VectorType       &dst,
+      const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
   if (eigenvalues_are_initialized == false)
@@ -2239,8 +2298,9 @@ template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
 void
 PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
-::Tstep (VectorType       &dst,
-         const VectorType &src) const
+::
+Tstep (VectorType       &dst,
+       const VectorType &src) const
 {
   Threads::Mutex::ScopedLock lock(mutex);
   if (eigenvalues_are_initialized == false)

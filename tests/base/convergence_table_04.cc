@@ -29,7 +29,8 @@
 // data generated from a run of step-7 with Q2 elements for 1D, 2D and Q1
 // elements for 3D
 
-int main ()
+int
+main ()
 {
   initlog();
 

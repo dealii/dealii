@@ -79,65 +79,75 @@ public:
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const override;
 
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
-  virtual std::unique_ptr<FiniteElement<dim,dim> > clone() const override;
-
-  /**
-  * This element is vector-valued so this function will
-  * throw an exception.
-  */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim>  &p) const override;
-
-  /**
-  * Not implemented.
-  */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim>  &p,
-                                        const unsigned int component) const override;
+  virtual std::unique_ptr<FiniteElement<dim,dim> >
+  clone() const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
-  virtual Tensor<1,dim> shape_grad (const unsigned int i,
-                                    const Point<dim>  &p) const override;
+  virtual double
+  shape_value (const unsigned int i,
+               const Point<dim>  &p) const override;
 
   /**
   * Not implemented.
   */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim>  &p,
-                                              const unsigned int component) const override;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim>  &p,
+                         const unsigned int component) const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int i,
-                                         const Point<dim>  &p) const override;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int i,
+              const Point<dim>  &p) const override;
 
   /**
   * Not implemented.
   */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim>  &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim>  &p,
+                        const unsigned int component) const override;
+
+  /**
+  * This element is vector-valued so this function will
+  * throw an exception.
+  */
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int i,
+                   const Point<dim>  &p) const override;
+
+  /**
+  * Not implemented.
+  */
+  virtual Tensor<2,dim>
+  shape_grad_grad_component (const unsigned int i,
+                             const Point<dim>  &p,
+                             const unsigned int component) const override;
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed only
    * for the reference cell. Make sure, that #mapping_type is set by the
    * derived class, such that this function can operate correctly.
    */
-  UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags
+  update_once (const UpdateFlags flags) const;
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed in
    * each cell cell. Make sure, that #mapping_type is set by the derived
    * class, such that this function can operate correctly.
    */
-  UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags
+  update_each (const UpdateFlags flags) const;
 
 protected:
   /**
@@ -383,7 +393,8 @@ private:
   * 2 = face (which is a cell in 2D)
   * 3 = cell
   */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
   /**
    * Internal storage for all required integrated Legendre polynomials.
@@ -394,28 +405,32 @@ private:
   * Internal function to populate the internal array of integrated Legendre
   * polynomials.
   */
-  void create_polynomials (const unsigned int degree);
+  void
+  create_polynomials (const unsigned int degree);
 
   /**
   * Returns the number of DoFs in the basis set.
   */
-  unsigned int compute_num_dofs (const unsigned int degree) const;
+  unsigned int
+  compute_num_dofs (const unsigned int degree) const;
 
   /**
   * Populates cell-dependent edge-based shape functions on the given
   * InternalData object.
   */
-  void fill_edge_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                        const Quadrature<dim>                                &quadrature,
-                        const InternalData                                   &fedata) const;
+  void
+  fill_edge_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                   const Quadrature<dim>                                &quadrature,
+                   const InternalData                                   &fedata) const;
 
   /**
   * Populates the cell-dependent face-based shape functions on the given
   * InternalData object.
   */
-  void fill_face_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                        const Quadrature<dim>                                &quadrature,
-                        const InternalData                                   &fedata) const;
+  void
+  fill_face_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
+                   const Quadrature<dim>                                &quadrature,
+                   const InternalData                                   &fedata) const;
 };
 
 

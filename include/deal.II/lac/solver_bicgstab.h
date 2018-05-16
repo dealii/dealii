@@ -173,7 +173,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverBicgstab () override;
+  virtual
+  ~SolverBicgstab () override;
 
   /**
    * Solve primal problem only.
@@ -235,17 +236,19 @@ protected:
    * Computation of the stopping criterion.
    */
   template <typename MatrixType>
-  double criterion (const MatrixType &A, const VectorType &x, const VectorType &b);
+  double
+  criterion (const MatrixType &A, const VectorType &x, const VectorType &b);
 
   /**
    * Interface for derived class.  This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
    * for graphical output of the convergence history.
    */
-  virtual void print_vectors(const unsigned int step,
-                             const VectorType   &x,
-                             const VectorType   &r,
-                             const VectorType   &d) const;
+  virtual void
+  print_vectors(const unsigned int step,
+                const VectorType   &x,
+                const VectorType   &r,
+                const VectorType   &d) const;
 
   /**
    * Additional parameters.
@@ -257,7 +260,8 @@ private:
    * Everything before the iteration loop.
    */
   template <typename MatrixType>
-  SolverControl::State start(const MatrixType &A);
+  SolverControl::State
+  start(const MatrixType &A);
 
   /**
    * A structure returned by the iterate() function representing what it found

@@ -29,17 +29,20 @@
 
 // The functions to differentiate
 template <typename NumberType>
-NumberType f(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+f(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return z*(x + z*y + x*y);
 }
 template <typename NumberType>
-NumberType g(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+g(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return std::sin(x*z)*std::cos(y/z);
 }
 template <typename NumberType>
-NumberType h(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+h(const NumberType &x, const NumberType &y, const NumberType &z)
 {
   return x*y*z;
 }
@@ -67,7 +70,8 @@ dh(const double &x, const double &y, const double &z,
   dh_dy = x*z;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

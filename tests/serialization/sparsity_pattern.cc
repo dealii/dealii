@@ -21,7 +21,8 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N1 = 5;
   SparsityPattern sp1((N1-1)*(N1-1), (N1-1)*(N1-1), 5);
@@ -41,7 +42,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

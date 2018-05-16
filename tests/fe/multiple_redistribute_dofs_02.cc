@@ -36,7 +36,8 @@
 using namespace dealii;
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "Testing for dim = " << dim
           << ", spacedim = " << spacedim <<  std::endl;
@@ -60,7 +61,8 @@ void test()
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

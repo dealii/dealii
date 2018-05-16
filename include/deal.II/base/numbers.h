@@ -160,7 +160,8 @@ namespace numbers
    * function <code>std::isnan</code>.
    */
   DEAL_II_DEPRECATED
-  bool is_nan (const double x);
+  bool
+  is_nan (const double x);
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.
@@ -171,19 +172,22 @@ namespace numbers
    * double</code>, this function may return <code>false</code> even if the
    * number is finite with respect to type <code>long double</code>.
    */
-  bool is_finite (const double x);
+  bool
+  is_finite (const double x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool is_finite (const std::complex<double> &x);
+  bool
+  is_finite (const std::complex<double> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
    */
-  bool is_finite (const std::complex<float> &x);
+  bool
+  is_finite (const std::complex<float> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
@@ -193,7 +197,8 @@ namespace numbers
    * numbers that are infinite in terms of <code>double</code>, but finite
    * with respect to <code>long double</code>.
    */
-  bool is_finite (const std::complex<long double> &x);
+  bool
+  is_finite (const std::complex<long double> &x);
 
   /**
    * Return whether two numbers are equal to one another.
@@ -327,7 +332,8 @@ namespace numbers
      */
     static
     DEAL_II_CUDA_HOST_DEV
-    const number &conjugate (const number &x);
+    const number &
+    conjugate (const number &x);
 
     /**
      * Return the square of the absolute value of the given number. Since the
@@ -338,13 +344,15 @@ namespace numbers
      */
     static
     DEAL_II_CUDA_HOST_DEV
-    real_type abs_square (const number &x);
+    real_type
+    abs_square (const number &x);
 
     /**
      * Return the absolute value of a number.
      */
     static
-    real_type abs (const number &x);
+    real_type
+    abs (const number &x);
   };
 
 
@@ -376,7 +384,8 @@ namespace numbers
      * Return the complex-conjugate of the given number.
      */
     static
-    std::complex<number> conjugate (const std::complex<number> &x);
+    std::complex<number>
+    conjugate (const std::complex<number> &x);
 
     /**
      * Return the square of the absolute value of the given number. Since this
@@ -385,31 +394,36 @@ namespace numbers
      * complex conjugate.
      */
     static
-    real_type abs_square (const std::complex<number> &x);
+    real_type
+    abs_square (const std::complex<number> &x);
 
 
     /**
      * Return the absolute value of a complex number.
      */
     static
-    real_type abs (const std::complex<number> &x);
+    real_type
+    abs (const std::complex<number> &x);
   };
 
   // --------------- inline and template functions ---------------- //
 
-  inline bool is_nan (const double x)
+  inline bool
+  is_nan (const double x)
   {
     return std::isnan(x);
   }
 
-  inline bool is_finite (const double x)
+  inline bool
+  is_finite (const double x)
   {
     return std::isfinite(x);
   }
 
 
 
-  inline bool is_finite (const std::complex<double> &x)
+  inline bool
+  is_finite (const std::complex<double> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -420,7 +434,8 @@ namespace numbers
 
 
 
-  inline bool is_finite (const std::complex<float> &x)
+  inline bool
+  is_finite (const std::complex<float> &x)
   {
     // Check complex numbers for infinity
     // by testing real and imaginary part
@@ -431,7 +446,8 @@ namespace numbers
 
 
 
-  inline bool is_finite (const std::complex<long double> &x)
+  inline bool
+  is_finite (const std::complex<long double> &x)
   {
     // Same for std::complex<long double>
     return ( is_finite (x.real())
@@ -529,17 +545,20 @@ namespace internal
     // Source: https://stackoverflow.com/a/16944130
   private:
     template<typename T>
-    static void f(T);
+    static void
+    f(T);
 
     template<typename F, typename T>
-    static constexpr auto test(int) ->
+    static constexpr auto
+    test(int) ->
     decltype(f(static_cast<T>(std::declval<F>())),true)
     {
       return true;
     }
 
     template<typename F, typename T>
-    static constexpr auto test(...) -> bool
+    static constexpr auto
+    test(...) -> bool
     {
       return false;
     }
@@ -562,7 +581,8 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static DEAL_II_CUDA_HOST_DEV const T &value (const T &t)
+    static DEAL_II_CUDA_HOST_DEV const T &
+    value (const T &t)
     {
       return t;
     }
@@ -621,19 +641,22 @@ namespace internal
   template <typename T>
   struct NumberType<std::complex<T> >
   {
-    static const std::complex<T> &value (const std::complex<T> &t)
+    static const std::complex<T> &
+    value (const std::complex<T> &t)
     {
       return t;
     }
 
-    static std::complex<T> value (const T &t)
+    static std::complex<T>
+    value (const T &t)
     {
       return std::complex<T>(t);
     }
 
     // Facilitate cast from complex<double> to complex<float>
     template <typename U>
-    static std::complex<T> value (const std::complex<U> &t)
+    static std::complex<T>
+    value (const std::complex<U> &t)
     {
       return std::complex<T>(
                NumberType<T>::value(t.real()),

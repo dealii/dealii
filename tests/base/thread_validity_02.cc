@@ -31,18 +31,21 @@ struct X
   int i;
 private:
   X(const X &);
-  X &operator= (const X &);
+  X &
+  operator= (const X &);
 };
 
 
-void execute (const X &x)
+void
+execute (const X &x)
 {
   AssertThrow (x.i == 42, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
 
-void test ()
+void
+test ()
 {
   const X x(42);
   Threads::Thread<void> t = Threads::new_thread (&execute,x);
@@ -52,7 +55,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

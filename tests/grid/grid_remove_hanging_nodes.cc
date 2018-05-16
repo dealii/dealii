@@ -25,9 +25,11 @@
 
 #include <iostream>
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
-void check_remove_hanging_nodes ()
+void
+check_remove_hanging_nodes ()
 {
   Point<2> corners[2];
 
@@ -54,7 +56,8 @@ void check_remove_hanging_nodes ()
   tria.clear ();
 }
 
-int main ()
+int
+main ()
 {
   check_remove_hanging_nodes();
 }

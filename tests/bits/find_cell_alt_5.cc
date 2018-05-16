@@ -30,7 +30,8 @@
 #include <deal.II/fe/mapping_q1.h>
 
 
-void check (Triangulation<3> &tria)
+void
+check (Triangulation<3> &tria)
 {
   MappingQGeneric<3> map(1);
   Point<3> p (0.75,0.75,0.75);
@@ -49,7 +50,8 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

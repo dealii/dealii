@@ -37,7 +37,8 @@
 using namespace std;
 
 template <int dim>
-void check_simple(const FiniteElement<dim> &fe)
+void
+check_simple(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -61,7 +62,8 @@ void check_simple(const FiniteElement<dim> &fe)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

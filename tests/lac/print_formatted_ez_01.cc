@@ -22,7 +22,8 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

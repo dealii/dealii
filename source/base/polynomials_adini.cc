@@ -146,7 +146,8 @@ PolynomialsAdini::compute (const Point<2> &unit_point,
   return;
 }
 
-double PolynomialsAdini::compute_value (const unsigned int i, const Point<2> &p) const
+double
+PolynomialsAdini::compute_value (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -164,7 +165,8 @@ double PolynomialsAdini::compute_value (const unsigned int i, const Point<2> &p)
          coef(11,i)*x*y*y*y;
 }
 
-Tensor<1,2> PolynomialsAdini::compute_grad (const unsigned int i, const Point<2> &p) const
+Tensor<1,2>
+PolynomialsAdini::compute_grad (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -197,7 +199,8 @@ Tensor<1,2> PolynomialsAdini::compute_grad (const unsigned int i, const Point<2>
   return tensor;
 }
 
-Tensor<2,2> PolynomialsAdini::compute_grad_grad (const unsigned int i, const Point<2> &p) const
+Tensor<2,2>
+PolynomialsAdini::compute_grad_grad (const unsigned int i, const Point<2> &p) const
 {
   const double x = p(0);
   const double y = p(1);

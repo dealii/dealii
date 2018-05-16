@@ -30,7 +30,8 @@
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -50,7 +51,8 @@ void test(std::ostream & /*out*/)
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   deal_II_exceptions::disable_abort_on_exception();
 

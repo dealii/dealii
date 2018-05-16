@@ -32,7 +32,8 @@
 
 
 template <typename NumberType>
-void test()
+void
+test()
 {
   const std::string filename ("scalapack_10_test.h5");
 
@@ -123,7 +124,8 @@ void test()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

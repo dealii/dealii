@@ -40,7 +40,8 @@ public:
   * Apply preconditioner.
   */
   template <typename VectorType>
-  void vmult (VectorType &, const VectorType &) const;
+  void
+  vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -50,12 +51,14 @@ public:
    * vmult().
    */
   template <typename VectorType>
-  void Tvmult (VectorType &, const VectorType &) const;
+  void
+  Tvmult (VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
   template <typename VectorType>
-  void vmult_add (VectorType &, const VectorType &) const;
+  void
+  vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose
@@ -65,7 +68,8 @@ public:
    * vmult_add().
    */
   template <typename VectorType>
-  void Tvmult_add (VectorType &, const VectorType &) const;
+  void
+  Tvmult_add (VectorType &, const VectorType &) const;
 
 private:
   number factor;
@@ -118,8 +122,9 @@ ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 //----------------------------------------------------------------------//
 
 template <typename MatrixType, class RELAX>
-void check_smoother(const MGLevelObject<MatrixType> &m,
-                    const MGLevelObject<RELAX> &r)
+void
+check_smoother(const MGLevelObject<MatrixType> &m,
+               const MGLevelObject<RELAX> &r)
 {
   GrowingVectorMemory<BlockVector<double> > mem;
   MGSmootherBlock<MatrixType, RELAX, double> smoother;
@@ -176,7 +181,8 @@ void check_smoother(const MGLevelObject<MatrixType> &m,
     }
 }
 
-void check()
+void
+check()
 {
   ScalingMatrix<double> s1(-1.);
   ScalingMatrix<double> s2(2.);
@@ -203,7 +209,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

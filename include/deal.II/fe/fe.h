@@ -683,7 +683,8 @@ public:
     /**
      * Destructor. Made virtual to allow polymorphism.
      */
-    virtual ~InternalDataBase () = default;
+    virtual
+    ~InternalDataBase () = default;
 
     /**
      * A set of update flags specifying the kind of information that an
@@ -704,7 +705,8 @@ public:
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t
+    memory_consumption () const;
   };
 
 public:
@@ -768,7 +770,8 @@ public:
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~FiniteElement () override = default;
+  virtual
+  ~FiniteElement () override = default;
 
   /**
    * Creates information for creating a FESystem with this class as
@@ -806,7 +809,8 @@ public:
    * Systems of elements have their own naming convention, see the FESystem
    * class.
    */
-  virtual std::string get_name () const = 0;
+  virtual std::string
+  get_name () const = 0;
 
   /**
    * This operator returns a reference to the present object if the argument
@@ -829,7 +833,8 @@ public:
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
    */
-  const FiniteElement<dim,spacedim> &operator[] (const unsigned int fe_index) const;
+  const FiniteElement<dim,spacedim> &
+  operator[] (const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
@@ -856,8 +861,9 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value (const unsigned int  i,
-                              const Point<dim>   &p) const;
+  virtual double
+  shape_value (const unsigned int  i,
+               const Point<dim>   &p) const;
 
   /**
    * Just like for shape_value(), but this function will be called when the
@@ -865,9 +871,10 @@ public:
    * this function should return the value of the @p component-th vector
    * component of the @p ith shape function at point @p p.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim>   &p,
-                                        const unsigned int component) const;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim>   &p,
+                         const unsigned int component) const;
 
   /**
    * Return the gradient of the @p ith shape function at the point @p p. @p p
@@ -890,8 +897,9 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int  i,
+              const Point<dim>   &p) const;
 
   /**
    * Just like for shape_grad(), but this function will be called when the
@@ -899,9 +907,10 @@ public:
    * this function should return the gradient of the @p component-th vector
    * component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim>   &p,
-                                              const unsigned int component) const;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim>   &p,
+                        const unsigned int component) const;
 
   /**
    * Return the tensor of second derivatives of the @p ith shape function at
@@ -924,8 +933,9 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim>   &p) const;
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int  i,
+                   const Point<dim>   &p) const;
 
   /**
    * Just like for shape_grad_grad(), but this function will be called when
@@ -933,9 +943,10 @@ public:
    * case, this function should return the gradient of the @p component-th
    * vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim>   &p,
-                                                   const unsigned int component) const;
+  virtual Tensor<2,dim>
+  shape_grad_grad_component (const unsigned int i,
+                             const Point<dim>   &p,
+                             const unsigned int component) const;
 
   /**
    * Return the tensor of third derivatives of the @p ith shape function at
@@ -958,8 +969,9 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const;
 
   /**
    * Just like for shape_3rd_derivative(), but this function will be called
@@ -967,9 +979,10 @@ public:
    * that case, this function should return the gradient of the @p component-
    * th vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const;
+  virtual Tensor<3,dim>
+  shape_3rd_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const;
 
   /**
    * Return the tensor of fourth derivatives of the @p ith shape function at
@@ -992,8 +1005,9 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+  virtual Tensor<4,dim>
+  shape_4th_derivative (const unsigned int  i,
+                        const Point<dim>   &p) const;
 
   /**
    * Just like for shape_4th_derivative(), but this function will be called
@@ -1001,9 +1015,10 @@ public:
    * that case, this function should return the gradient of the @p component-
    * th vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const;
+  virtual Tensor<4,dim>
+  shape_4th_derivative_component (const unsigned int i,
+                                  const Point<dim>   &p,
+                                  const unsigned int component) const;
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index. The
@@ -1014,8 +1029,9 @@ public:
    * A default implementation is provided in this base class which always
    * returns @p true. This is the safe way to go.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const;
 
   //@}
   /**
@@ -1096,7 +1112,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool prolongation_is_implemented () const;
+  bool
+  prolongation_is_implemented () const;
 
   /**
    * Return whether this element implements its prolongation matrices for
@@ -1113,7 +1130,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool isotropic_prolongation_is_implemented () const;
+  bool
+  isotropic_prolongation_is_implemented () const;
 
   /**
    * Return whether this element implements its restriction matrices. The
@@ -1136,7 +1154,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool restriction_is_implemented () const;
+  bool
+  restriction_is_implemented () const;
 
   /**
    * Return whether this element implements its restriction matrices for
@@ -1153,7 +1172,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool isotropic_restriction_is_implemented () const;
+  bool
+  isotropic_restriction_is_implemented () const;
 
 
   /**
@@ -1164,7 +1184,8 @@ public:
    * The index must be between zero and the number of shape functions of this
    * element.
    */
-  bool restriction_is_additive (const unsigned int index) const;
+  bool
+  restriction_is_additive (const unsigned int index) const;
 
   /**
    * Return a read only reference to the matrix that describes the constraints
@@ -1177,7 +1198,8 @@ public:
    * function to check up front whether this function will succeed or generate
    * the exception.
    */
-  const FullMatrix<double> &constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
+  const FullMatrix<double> &
+  constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
   /**
    * Return whether this element implements its hanging node constraints. The
@@ -1194,7 +1216,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool constraints_are_implemented (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
+  bool
+  constraints_are_implemented (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
 
   /**
@@ -1218,7 +1241,8 @@ public:
    * assumption is that a finite element does not provide hp capable face
    * interpolation, and the default implementation therefore returns @p false.
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool
+  hp_constraints_are_implemented () const;
 
 
   /**
@@ -1363,12 +1387,14 @@ public:
    *  anyway.
    */
   virtual
-  bool operator == (const FiniteElement<dim,spacedim> &fe) const;
+  bool
+  operator == (const FiniteElement<dim,spacedim> &fe) const;
 
   /**
    * Non-equality comparison operator. Defined in terms of the equality comparison operator.
    */
-  bool operator != (const FiniteElement<dim,spacedim> &) const;
+  bool
+  operator != (const FiniteElement<dim,spacedim> &) const;
 
   /**
    * @name Index computations
@@ -1416,8 +1442,9 @@ public:
    * This is the opposite operation from the system_to_component_index()
    * function.
    */
-  unsigned int component_to_system_index(const unsigned int component,
-                                         const unsigned int index) const;
+  unsigned int
+  component_to_system_index(const unsigned int component,
+                            const unsigned int index) const;
 
   /**
    * Same as system_to_component_index(), but do it for shape functions and
@@ -1439,10 +1466,11 @@ public:
    * face_rotation. In 2D and 1D there is no need for permutation and
    * consequently an exception is thrown.
    */
-  unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-                                                           const bool face_orientation,
-                                                           const bool face_flip,
-                                                           const bool face_rotation) const;
+  unsigned int
+  adjust_quad_dof_index_for_face_orientation (const unsigned int index,
+                                              const bool face_orientation,
+                                              const bool face_flip,
+                                              const bool face_rotation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1499,11 +1527,12 @@ public:
    * freedom actually represent.
    */
   virtual
-  unsigned int face_to_cell_index (const unsigned int face_dof_index,
-                                   const unsigned int face,
-                                   const bool face_orientation = true,
-                                   const bool face_flip        = false,
-                                   const bool face_rotation    = false) const;
+  unsigned int
+  face_to_cell_index (const unsigned int face_dof_index,
+                      const unsigned int face,
+                      const bool face_orientation = true,
+                      const bool face_flip        = false,
+                      const bool face_rotation    = false) const;
 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
@@ -1512,8 +1541,9 @@ public:
    * if the line has non-standard line_orientation. In 2D and 1D there is no
    * need for permutation, so the given index is simply returned.
    */
-  unsigned int adjust_line_dof_index_for_line_orientation (const unsigned int index,
-                                                           const bool line_orientation) const;
+  unsigned int
+  adjust_line_dof_index_for_line_orientation (const unsigned int index,
+                                              const bool line_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p
@@ -1555,7 +1585,8 @@ public:
    * Since this is an extremely common operation, the result is cached and
    * returned by this function.
    */
-  bool is_primitive () const;
+  bool
+  is_primitive () const;
 
   /**
    * Return whether the @p ith shape function is primitive in the sense that
@@ -1581,7 +1612,8 @@ public:
    * still one, although the number of components of the finite element is
    * equal to the multiplicity.
    */
-  unsigned int n_base_elements () const;
+  unsigned int
+  n_base_elements () const;
 
   /**
    * Access to base element objects. If the element is atomic, then
@@ -1725,7 +1757,8 @@ public:
    * Given a base element number, return the first block of a BlockVector it
    * would generate.
    */
-  types::global_dof_index first_block_of_base (const unsigned int b) const;
+  types::global_dof_index
+  first_block_of_base (const unsigned int b) const;
 
   /**
    * For each vector component, return which base element implements this
@@ -1994,7 +2027,8 @@ public:
    * has_support_points() is false, but an FESystem containing an FE_Nothing
    * among other elements will return true.
    */
-  bool has_support_points () const;
+  bool
+  has_support_points () const;
 
   /**
    * Return the position of the support point of the @p indexth shape
@@ -2049,7 +2083,8 @@ public:
    * For more information, see the documentation for the has_support_points()
    * function.
    */
-  bool has_face_support_points () const;
+  bool
+  has_face_support_points () const;
 
   /**
    * The function corresponding to the unit_support_point() function, but for
@@ -2083,7 +2118,8 @@ public:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  bool has_generalized_support_points () const;
+  bool
+  has_generalized_support_points () const;
 
   /**
    * Return the equivalent to get_generalized_support_points(), except
@@ -2252,7 +2288,8 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t
+  memory_consumption () const;
 
   /**
    * Exception
@@ -2357,8 +2394,9 @@ protected:
    * @param isotropic_prolongation_only only the prolongation matrices
    * required for isotropic refinement are reinited to the right size.
    */
-  void reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
-                                                    const bool isotropic_prolongation_only=false);
+  void
+  reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
+                                               const bool isotropic_prolongation_only=false);
 
   /**
    * Vector of projection matrices. See get_restriction_matrix() above. The

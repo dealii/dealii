@@ -21,8 +21,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-std::ostream &operator << (std::ostream &out,
-                           const ComponentMask &mask)
+std::ostream &
+operator << (std::ostream &out,
+             const ComponentMask &mask)
 {
   if (mask.component_mask.size() == 0)
     out << "[all components selected]";

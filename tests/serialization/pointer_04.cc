@@ -55,7 +55,8 @@ public:
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize (Archive &ar, const unsigned int version)
   {
     deallog << "Serializing object number "
             << object_number
@@ -63,7 +64,8 @@ public:
             << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator == (const C &) const
   {
     return true;
   }
@@ -74,14 +76,16 @@ private:
 
 
 template <typename T>
-bool compare (const std::pair<T *,T *> &t1,
-              const std::pair<T *,T *> &t2)
+bool
+compare (const std::pair<T *,T *> &t1,
+         const std::pair<T *,T *> &t2)
 {
   return (*t1.first == *t2.first) && (*t1.second == *t2.second);
 }
 
 
-void test ()
+void
+test ()
 {
   {
     C c;
@@ -109,7 +113,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

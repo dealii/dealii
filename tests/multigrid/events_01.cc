@@ -82,21 +82,29 @@ namespace Step50
   {
   public:
     LaplaceProblem (const unsigned int deg);
-    void run ();
+    void
+    run ();
 
   private:
     typedef LA::MPI::SparseMatrix matrix_t;
     typedef LA::MPI::Vector vector_t;
 
-    void setup_system ();
-    void assemble_system ();
-    void assemble_multigrid ();
-    void vcycle (const MGCoarseGridBase<vector_t> &coarse_grid_solver);
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    assemble_multigrid ();
+    void
+    vcycle (const MGCoarseGridBase<vector_t> &coarse_grid_solver);
 
-    void solve ();
+    void
+    solve ();
 
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void
+    refine_grid ();
+    void
+    output_results (const unsigned int cycle) const;
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -134,7 +142,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
@@ -190,7 +199,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     const QGauss<dim>  quadrature_formula(degree+1);
 
@@ -242,7 +252,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_multigrid ()
+  void
+  LaplaceProblem<dim>::assemble_multigrid ()
   {
     QGauss<dim>  quadrature_formula(1+degree);
 
@@ -350,9 +361,10 @@ namespace Step50
       precondition_amg.initialize(coarse_matrix, additional_data);
     }
 
-    virtual void operator() (const unsigned int,
-                             VECTOR &dst,
-                             const VECTOR &src) const
+    virtual void
+    operator() (const unsigned int,
+                VECTOR &dst,
+                const VECTOR &src) const
     {
       ++count;
       precondition_amg.vmult(dst, src);
@@ -365,7 +377,8 @@ namespace Step50
   };
 
   template <int dim>
-  void LaplaceProblem<dim>::vcycle (const MGCoarseGridBase<vector_t> &coarse_grid_solver)
+  void
+  LaplaceProblem<dim>::vcycle (const MGCoarseGridBase<vector_t> &coarse_grid_solver)
   {
     MGTransferPrebuilt<vector_t> mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(mg_dof_handler);
@@ -455,7 +468,8 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     matrix_t &coarse_matrix = mg_matrices[0];
     SolverControl coarse_solver_control (1000, 1e-8, false, false);
@@ -476,7 +490,8 @@ namespace Step50
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void
+  LaplaceProblem<dim>::refine_grid ()
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -501,13 +516,15 @@ namespace Step50
 
 
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   {
   }
 
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<3; ++cycle)
       {
@@ -547,7 +564,8 @@ namespace Step50
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog(true);

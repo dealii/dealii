@@ -87,9 +87,10 @@ public:
    * is used on face <tt>face_no</tt>. For further details, see the general
    * doc for this class.
    */
-  static void project_to_face (const SubQuadrature &quadrature,
-                               const unsigned int      face_no,
-                               std::vector<Point<dim> > &q_points);
+  static void
+  project_to_face (const SubQuadrature &quadrature,
+                   const unsigned int      face_no,
+                   std::vector<Point<dim> > &q_points);
 
   /**
    * Compute the cell quadrature formula corresponding to using
@@ -109,11 +110,12 @@ public:
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    */
-  static void project_to_subface (const SubQuadrature       &quadrature,
-                                  const unsigned int         face_no,
-                                  const unsigned int         subface_no,
-                                  std::vector<Point<dim> >  &q_points,
-                                  const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
+  static void
+  project_to_subface (const SubQuadrature       &quadrature,
+                      const unsigned int         face_no,
+                      const unsigned int         subface_no,
+                      std::vector<Point<dim> >  &q_points,
+                      const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
 
   /**
    * Compute the cell quadrature formula corresponding to using
@@ -231,7 +233,8 @@ public:
      * carry this function around for consistency with the other static
      * functions.
      */
-    static DataSetDescriptor cell ();
+    static DataSetDescriptor
+    cell ();
 
     /**
      * Static function to generate an offset object for a given face of a cell
@@ -302,7 +305,8 @@ private:
    * This function is necessary for projecting a 2d quadrature rule onto the
    * faces of a 3d cube, since there we need both orientations.
    */
-  static Quadrature<2> reflect (const Quadrature<2> &q);
+  static Quadrature<2>
+  reflect (const Quadrature<2> &q);
 
   /**
    * Given a quadrature object in 2d, rotate all quadrature points by @p
@@ -313,8 +317,9 @@ private:
    * faces of a 3d cube, since there we need all rotations to account for
    * face_flip and face_rotation of non-standard faces.
    */
-  static Quadrature<2> rotate (const Quadrature<2> &q,
-                               const unsigned int n_times);
+  static Quadrature<2>
+  rotate (const Quadrature<2> &q,
+          const unsigned int n_times);
 };
 
 /*@}*/

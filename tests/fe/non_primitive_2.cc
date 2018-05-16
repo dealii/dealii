@@ -254,7 +254,8 @@ test (const unsigned int p)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << "Degree 0: " << std::endl;

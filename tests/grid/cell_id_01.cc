@@ -33,7 +33,8 @@
 
 
 template <class TRIA>
-void check (TRIA &tr)
+void
+check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
                                endc = tr.end();
@@ -47,7 +48,8 @@ void check (TRIA &tr)
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   // Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

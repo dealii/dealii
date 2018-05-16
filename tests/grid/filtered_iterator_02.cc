@@ -38,7 +38,8 @@ DeclException2 (ExcNumberMismatch,
 typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
 
 template <typename Iterator>
-bool level_equal_to_3 (const Iterator c)
+bool
+level_equal_to_3 (const Iterator c)
 {
   return (static_cast<unsigned int>(c->level()) == 3);
 }
@@ -46,14 +47,16 @@ bool level_equal_to_3 (const Iterator c)
 
 
 template <typename Iterator>
-bool level_equal_to (const Iterator     c,
-                     const unsigned int level)
+bool
+level_equal_to (const Iterator     c,
+                const unsigned int level)
 {
   return (static_cast<unsigned int>(c->level()) == level);
 }
 
 
-void test ()
+void
+test ()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -213,7 +216,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.get_file_stream() << std::setprecision(4);

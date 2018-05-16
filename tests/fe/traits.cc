@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void check (const FiniteElement<dim> &fe)
+void
+check (const FiniteElement<dim> &fe)
 {
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -70,7 +71,8 @@ void check (const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   // check usual Lagrange elements
   for (unsigned int p=1; p<3; ++p)
@@ -117,7 +119,8 @@ void check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

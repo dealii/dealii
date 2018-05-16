@@ -52,7 +52,8 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
@@ -108,21 +109,31 @@ public:
   LaplaceProblem ();
   ~LaplaceProblem ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void test_equality ();
-  void assemble_reference ();
-  void assemble_test ();
-  void solve ();
-  void create_coarse_grid ();
-  void postprocess ();
+  void
+  setup_system ();
+  void
+  test_equality ();
+  void
+  assemble_reference ();
+  void
+  assemble_test ();
+  void
+  solve ();
+  void
+  create_coarse_grid ();
+  void
+  postprocess ();
 
-  void local_assemble (const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> &cell,
-                       Assembly::Scratch::Data<dim>  &scratch,
-                       Assembly::Copy::Data          &data);
-  void copy_local_to_global (const Assembly::Copy::Data &data);
+  void
+  local_assemble (const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> &cell,
+                  Assembly::Scratch::Data<dim>  &scratch,
+                  Assembly::Copy::Data          &data);
+  void
+  copy_local_to_global (const Assembly::Copy::Data &data);
 
   std::vector<types::global_dof_index>
   get_conflict_indices (FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> const &cell) const;
@@ -152,8 +163,9 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -175,8 +187,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -224,7 +237,8 @@ get_conflict_indices (FilteredIterator<typename DoFHandler<dim>::active_cell_ite
 }
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   reference_matrix.clear();
   test_matrix.clear();
@@ -337,7 +351,8 @@ LaplaceProblem<dim>::copy_local_to_global (const Assembly::Copy::Data &data)
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_reference ()
+void
+LaplaceProblem<dim>::assemble_reference ()
 {
   reference_matrix = 0;
   reference_rhs = 0;
@@ -359,7 +374,8 @@ void LaplaceProblem<dim>::assemble_reference ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_test ()
+void
+LaplaceProblem<dim>::assemble_test ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -394,7 +410,8 @@ void LaplaceProblem<dim>::assemble_test ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::postprocess ()
+void
+LaplaceProblem<dim>::postprocess ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   for (unsigned int i=0; i<estimated_error_per_cell.size(); ++i)
@@ -410,7 +427,8 @@ void LaplaceProblem<dim>::postprocess ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -432,7 +450,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

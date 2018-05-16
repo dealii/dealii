@@ -605,8 +605,9 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
 
 template <typename number>
 template <typename number2>
-void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
-                                      const Vector<number2> &src) const
+void
+SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
+                                 const Vector<number2> &src) const
 {
   dst = 0;
 

@@ -40,7 +40,8 @@
 
 
 template <int dim>
-void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
+void
+test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
 {
   // Vector DG elements
   fe_datas.push_back(new FE_DGRaviartThomas<dim>(0));
@@ -87,14 +88,16 @@ void test_2d_3d (std::vector<FiniteElement<dim> *> &fe_datas)
 
 
 
-void test_2d_3d (std::vector<FiniteElement<1> *> &fe_datas)
+void
+test_2d_3d (std::vector<FiniteElement<1> *> &fe_datas)
 {}
 
 
 
 
 template <int dim>
-void test_fe_datas()
+void
+test_fe_datas()
 {
   std::vector<FiniteElement<dim> *> fe_datas;
   fe_datas.push_back(new FE_Q<dim> (1));
@@ -274,7 +277,8 @@ void test_fe_datas()
     delete fe_datas[i];
 }
 
-int main()
+int
+main()
 {
   initlog();
 

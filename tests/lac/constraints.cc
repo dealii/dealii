@@ -33,10 +33,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
-void make_tria (Triangulation<3> &tria, int step)
+void
+make_tria (Triangulation<3> &tria, int step)
 {
   switch (step)
     {
@@ -245,7 +247,8 @@ void make_tria (Triangulation<3> &tria, int step)
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

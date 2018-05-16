@@ -40,12 +40,15 @@ namespace mg
   class SparseMatrixCollection : public Subscriptor
   {
   public:
-    void resize(const unsigned int minlevel, const unsigned  int maxlevel);
+    void
+    resize(const unsigned int minlevel, const unsigned  int maxlevel);
 
     template <typename DoFHandlerType>
-    void reinit(const DoFHandlerType &dof_handler);
+    void
+    reinit(const DoFHandlerType &dof_handler);
 
-    void set_zero();
+    void
+    set_zero();
 
     MGLevelObject<SparsityPattern> sparsity;
     MGLevelObject<SparsityPattern> sparsity_edge;

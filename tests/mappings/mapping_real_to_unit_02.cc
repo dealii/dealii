@@ -34,7 +34,8 @@
 
 
 template <int dim>
-void test2()
+void
+test2()
 {
   const SphericalManifold<dim> boundary_description;
 

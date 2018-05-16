@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   // test for an initialized mask
   AssertThrow (BlockMask(12,false).represents_n_blocks(12) == true,
@@ -44,7 +45,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

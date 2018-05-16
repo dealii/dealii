@@ -21,7 +21,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -37,7 +38,8 @@ std::ofstream logfile("output");
 #include <deal.II/base/function_lib.h>
 
 
-void output_double_number(double input,const std::string &text)
+void
+output_double_number(double input,const std::string &text)
 {
   deallog<<text<< input<<std::endl;
 }
@@ -78,8 +80,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (Vector<Number>       &dst,
-              const Vector<Number> &src) const
+  void
+  vmult (Vector<Number>       &dst,
+         const Vector<Number> &src) const
   {
     dst = 0;
     const std::function<void(const MatrixFree<dim,Number> &,
@@ -97,8 +100,9 @@ private:
 
 
 template <int dim, int fe_degree>
-void test (const FiniteElement<dim> &fe,
-           const unsigned int n_iterations)
+void
+test (const FiniteElement<dim> &fe,
+      const unsigned int n_iterations)
 {
   typedef double number;
 
@@ -146,7 +150,8 @@ void test (const FiniteElement<dim> &fe,
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

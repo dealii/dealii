@@ -249,7 +249,8 @@ public:
    * exactly, but it can get you closer if you use finite elements of higher
    * polynomial degree.
    */
-  virtual void build_patches (const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches (const unsigned int n_subdivisions = 0);
 
   /**
    * Same as above, except that the additional first parameter defines a
@@ -282,16 +283,18 @@ public:
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
-                              const unsigned int n_subdivisions = 0,
-                              const CurvedCellRegion curved_region = curved_boundary);
+  virtual void
+  build_patches (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
+                 const unsigned int n_subdivisions = 0,
+                 const CurvedCellRegion curved_region = curved_boundary);
 
   /**
    * Return the first cell which we want output for. The default
    * implementation returns the first active cell, but you might want to
    * return other cells in a derived class.
    */
-  virtual cell_iterator first_cell ();
+  virtual cell_iterator
+  first_cell ();
 
   /**
    * Return the next cell after @p cell which we want output for.  If there
@@ -304,7 +307,8 @@ public:
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
    */
-  virtual cell_iterator next_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_cell (const cell_iterator &cell);
 
 private:
 
@@ -313,14 +317,16 @@ private:
    * pair that is locally owned. If this object operates on a non-distributed
    * triangulation, the result equals what first_cell() returns.
    */
-  virtual cell_iterator first_locally_owned_cell ();
+  virtual cell_iterator
+  first_locally_owned_cell ();
 
   /**
    * Return the next cell produced by the next_cell() function that is locally
    * owned. If this object operates on a non-distributed triangulation, the
    * result equals what first_cell() returns.
    */
-  virtual cell_iterator next_locally_owned_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_locally_owned_cell (const cell_iterator &cell);
 
   /**
    * Build one patch. This function is called in a WorkStream context.

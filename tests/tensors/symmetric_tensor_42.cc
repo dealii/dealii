@@ -23,20 +23,23 @@
 #include<complex>
 
 template <int dim, int rank,  typename NumberType>
-void test_constructor ()
+void
+test_constructor ()
 {
   const SymmetricTensor<rank,dim,NumberType> t1;
 }
 
 template <int dim, int rank, typename NumberType, typename OtherNumberType>
-void test_initializer ()
+void
+test_initializer ()
 {
   const SymmetricTensor<rank,dim,OtherNumberType> t1;
   const SymmetricTensor<rank,dim,NumberType> t2 (t1);
 }
 
 template <int rank, typename NumberType, typename OtherNumberType>
-void test ()
+void
+test ()
 {
   deallog << "constructor" << std::endl;
   test_constructor<1,rank,NumberType> ();
@@ -50,7 +53,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

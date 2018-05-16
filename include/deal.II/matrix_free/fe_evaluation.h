@@ -103,7 +103,8 @@ public:
    * @deprecated Use get_mapping_data_index_offset() instead.
    */
   DEAL_II_DEPRECATED
-  unsigned int get_cell_data_number() const;
+  unsigned int
+  get_cell_data_number() const;
 
   /**
    * Return the index offset within the geometry fields for the cell the @p
@@ -113,7 +114,8 @@ public:
    * that combines a coefficient with the geometry for lower memory transfer
    * as the available data fields.
    */
-  unsigned int get_mapping_data_index_offset() const;
+  unsigned int
+  get_mapping_data_index_offset() const;
 
   /**
    * Return the type of the cell the @p reinit() function has been called for.
@@ -121,7 +123,8 @@ public:
    * considerable data compression), @p affine for cells with affine mappings,
    * and @p general for general cells without any compressed storage applied.
    */
-  internal::MatrixFreeFunctions::GeometryType get_cell_type() const;
+  internal::MatrixFreeFunctions::GeometryType
+  get_cell_type() const;
 
   /**
    * Return a reference to the ShapeInfo object currently in use.
@@ -168,8 +171,9 @@ public:
    * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void read_dof_values (const VectorType  &src,
-                        const unsigned int first_index = 0);
+  void
+  read_dof_values (const VectorType  &src,
+                   const unsigned int first_index = 0);
 
   /**
    * For the vector @p src, read out the values on the degrees of freedom of
@@ -200,8 +204,9 @@ public:
    * @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void read_dof_values_plain (const VectorType  &src,
-                              const unsigned int first_index = 0);
+  void
+  read_dof_values_plain (const VectorType  &src,
+                         const unsigned int first_index = 0);
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -227,8 +232,9 @@ public:
    * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void distribute_local_to_global (VectorType        &dst,
-                                   const unsigned int first_index = 0) const;
+  void
+  distribute_local_to_global (VectorType        &dst,
+                              const unsigned int first_index = 0) const;
 
   /**
    * Takes the values stored internally on dof values of the current cell and
@@ -257,8 +263,9 @@ public:
    * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
   template <typename VectorType>
-  void set_dof_values (VectorType        &dst,
-                       const unsigned int first_index = 0) const;
+  void
+  set_dof_values (VectorType        &dst,
+                  const unsigned int first_index = 0) const;
 
   //@}
 
@@ -282,7 +289,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  value_type get_dof_value (const unsigned int dof) const;
+  value_type
+  get_dof_value (const unsigned int dof) const;
 
   /**
    * Write a value to the field containing the degrees of freedom with
@@ -294,8 +302,9 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  void submit_dof_value (const value_type   val_in,
-                         const unsigned int dof);
+  void
+  submit_dof_value (const value_type   val_in,
+                    const unsigned int dof);
 
   /**
    * Return the value of a finite element function at quadrature point number
@@ -308,7 +317,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  value_type get_value (const unsigned int q_point) const;
+  value_type
+  get_value (const unsigned int q_point) const;
 
   /**
    * Write a value to the field containing the values on quadrature points
@@ -321,8 +331,9 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  void submit_value (const value_type   val_in,
-                     const unsigned int q_point);
+  void
+  submit_value (const value_type   val_in,
+                const unsigned int q_point);
 
   /**
    * Return the gradient of a finite element function at quadrature point
@@ -333,7 +344,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  gradient_type get_gradient (const unsigned int q_point) const;
+  gradient_type
+  get_gradient (const unsigned int q_point) const;
 
   /**
    * Return the derivative of a finite element function at quadrature point
@@ -348,7 +360,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  value_type get_normal_derivative (const unsigned int q_point) const;
+  value_type
+  get_normal_derivative (const unsigned int q_point) const;
 
   /**
    * Write a contribution that is tested by the gradient to the field
@@ -362,8 +375,9 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  void submit_gradient(const gradient_type grad_in,
-                       const unsigned int  q_point);
+  void
+  submit_gradient(const gradient_type grad_in,
+                  const unsigned int  q_point);
 
   /**
    * Write a contribution that is tested by the gradient to the field
@@ -382,8 +396,9 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  void submit_normal_derivative(const value_type    grad_in,
-                                const unsigned int  q_point);
+  void
+  submit_normal_derivative(const value_type    grad_in,
+                           const unsigned int  q_point);
 
   /**
    * Return the Hessian of a finite element function at quadrature point
@@ -406,7 +421,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  gradient_type get_hessian_diagonal (const unsigned int q_point) const;
+  gradient_type
+  get_hessian_diagonal (const unsigned int q_point) const;
 
   /**
    * Return the Laplacian (i.e., the trace of the Hessian) of a finite
@@ -418,7 +434,8 @@ public:
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
-  value_type get_laplacian (const unsigned int q_point) const;
+  value_type
+  get_laplacian (const unsigned int q_point) const;
 
 #ifdef DOXYGEN
   // doxygen does not anyhow mention functions coming from partial template
@@ -428,17 +445,20 @@ public:
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_divergence()
    * @note Only available for n_components_==dim.
    */
-  VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
+  VectorizedArray<Number>
+  get_divergence (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_symmetric_gradient()
    * @note Only available for n_components_==dim.
    */
-  SymmetricTensor<2, dim, VectorizedArray<Number> > get_symmetric_gradient (const unsigned int q_point) const;
+  SymmetricTensor<2, dim, VectorizedArray<Number> >
+  get_symmetric_gradient (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::get_curl()
    * @note Only available for n_components_==dim.
    */
-  Tensor<1,(dim==2?1:dim), VectorizedArray<Number> > get_curl (const unsigned int q_point) const;
+  Tensor<1,(dim==2?1:dim), VectorizedArray<Number> >
+  get_curl (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_divergence()
    * @note Only available for n_components_==dim.
@@ -448,7 +468,8 @@ public:
    * used. Usually, the contribution of a potential call to this function must
    * be added into the diagonal of the contribution for submit_gradient().
    */
-  void submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
+  void
+  submit_divergence (const VectorizedArray<Number> div_in, const unsigned int q_point);
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_symmetric_gradient()
    * @note Only available for n_components_==dim.
@@ -459,7 +480,8 @@ public:
    * be added to the respective entries of the rank-2 tensor for
    * submit_gradient().
    */
-  void submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
+  void
+  submit_symmetric_gradient (const SymmetricTensor<2, dim, VectorizedArray<Number> > grad_in, const unsigned int q_point);
 
   /** @copydoc FEEvaluationAccess<dim,dim,Number,is_face>::submit_curl()
    * @note Only available for n_components_==dim.
@@ -470,7 +492,8 @@ public:
    * be added to the respective entries of the rank-2 tensor for
    * submit_gradient().
    */
-  void submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
+  void
+  submit_curl (const Tensor<1, dim==2?1:dim, VectorizedArray<Number> > curl_in, const unsigned int q_point);
 
 #endif
 
@@ -490,13 +513,15 @@ public:
    * the user needs to make sure that it is not used in any computation
    * explicitly, like when summing the results of several cells.
    */
-  value_type integrate_value () const;
+  value_type
+  integrate_value () const;
 
   /**
    * Return the determinant of the Jacobian from the unit to the real cell
    * times the quadrature weight.
    */
-  VectorizedArray<Number> JxW(const unsigned int q_index) const;
+  VectorizedArray<Number>
+  JxW(const unsigned int q_index) const;
 
   /**
    * Fills the JxW values currently used into the given array.
@@ -551,7 +576,8 @@ public:
    * used in this class. In general, it is safer to use the get_dof_value()
    * function instead.
    */
-  const VectorizedArray<Number> *begin_dof_values () const;
+  const VectorizedArray<Number> *
+  begin_dof_values () const;
 
   /**
    * Return a read and write pointer to the first field of the dof values.
@@ -561,7 +587,8 @@ public:
    * structures used in this class. In general, it is safer to use the
    * get_dof_value() function instead.
    */
-  VectorizedArray<Number> *begin_dof_values ();
+  VectorizedArray<Number> *
+  begin_dof_values ();
 
   /**
    * Return a read-only pointer to the first field of function values on
@@ -573,7 +600,8 @@ public:
    * applied manually. In general, it is safer to use the get_value() function
    * instead, which does all the transformation internally.
    */
-  const VectorizedArray<Number> *begin_values () const;
+  const VectorizedArray<Number> *
+  begin_values () const;
 
   /**
    * Return a read and write pointer to the first field of function values on
@@ -585,7 +613,8 @@ public:
    * applied manually. In general, it is safer to use the get_value() function
    * instead, which does all the transformation internally.
    */
-  VectorizedArray<Number> *begin_values ();
+  VectorizedArray<Number> *
+  begin_values ();
 
   /**
    * Return a read-only pointer to the first field of function gradients on
@@ -598,7 +627,8 @@ public:
    * manually. In general, it is safer to use the get_gradient() function
    * instead, which does all the transformation internally.
    */
-  const VectorizedArray<Number> *begin_gradients () const;
+  const VectorizedArray<Number> *
+  begin_gradients () const;
 
   /**
    * Return a read and write pointer to the first field of function gradients
@@ -611,7 +641,8 @@ public:
    * manually. In general, it is safer to use the get_gradient() function
    * instead, which does all the transformation internally.
    */
-  VectorizedArray<Number> *begin_gradients ();
+  VectorizedArray<Number> *
+  begin_gradients ();
 
   /**
    * Return a read-only pointer to the first field of function hessians on
@@ -625,7 +656,8 @@ public:
    * general, it is safer to use the get_laplacian() or get_hessian()
    * functions instead, which does all the transformation internally.
    */
-  const VectorizedArray<Number> *begin_hessians () const;
+  const VectorizedArray<Number> *
+  begin_hessians () const;
 
   /**
    * Return a read and write pointer to the first field of function hessians
@@ -639,7 +671,8 @@ public:
    * general, it is safer to use the get_laplacian() or get_hessian()
    * functions instead, which does all the transformation internally.
    */
-  VectorizedArray<Number> *begin_hessians ();
+  VectorizedArray<Number> *
+  begin_hessians ();
 
   /**
    * Return the numbering of local degrees of freedom within the evaluation
@@ -734,7 +767,8 @@ protected:
    * evaluation based on FEValues will be deep-copied in order to allow for
    * using in parallel with threads.
    */
-  FEEvaluationBase &operator = (const FEEvaluationBase &other);
+  FEEvaluationBase &
+  operator = (const FEEvaluationBase &other);
 
   /**
    * A unified function to read from and write into vectors based on the given
@@ -1036,7 +1070,8 @@ private:
    * Sets the pointers for values, gradients, hessians to the central
    * scratch_data_array.
    */
-  void set_data_pointers();
+  void
+  set_data_pointers();
 
   /**
    * Make other FEEvaluationBase as well as FEEvaluation objects friends.
@@ -1103,7 +1138,8 @@ protected:
   /**
    * Copy assignment operator
    */
-  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
+  FEEvaluationAccess &
+  operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1131,44 +1167,53 @@ public:
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_dof_value()
    */
-  value_type get_dof_value (const unsigned int dof) const;
+  value_type
+  get_dof_value (const unsigned int dof) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_dof_value()
    */
-  void submit_dof_value (const value_type   val_in,
-                         const unsigned int dof);
+  void
+  submit_dof_value (const value_type   val_in,
+                    const unsigned int dof);
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_value()
    */
-  value_type get_value (const unsigned int q_point) const;
+  value_type
+  get_value (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
-  void submit_value (const value_type   val_in,
-                     const unsigned int q_point);
+  void
+  submit_value (const value_type   val_in,
+                const unsigned int q_point);
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_value()
    */
-  void submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
-                     const unsigned int q_point);
+  void
+  submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+                const unsigned int q_point);
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_gradient()
    */
-  gradient_type get_gradient (const unsigned int q_point) const;
+  gradient_type
+  get_gradient (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
-  value_type get_normal_derivative (const unsigned int q_point) const;
+  value_type
+  get_normal_derivative (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_gradient()
    */
-  void submit_gradient(const gradient_type grad_in,
-                       const unsigned int  q_point);
+  void
+  submit_gradient(const gradient_type grad_in,
+                  const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::submit_normal_derivative()
    */
-  void submit_normal_derivative(const value_type grad_in,
-                                const unsigned int  q_point);
+  void
+  submit_normal_derivative(const value_type grad_in,
+                           const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian()
    */
@@ -1177,15 +1222,18 @@ public:
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_hessian_diagonal()
    */
-  gradient_type get_hessian_diagonal (const unsigned int q_point) const;
+  gradient_type
+  get_hessian_diagonal (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_laplacian()
    */
-  value_type get_laplacian (const unsigned int q_point) const;
+  value_type
+  get_laplacian (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::integrate_value()
    */
-  value_type integrate_value () const;
+  value_type
+  integrate_value () const;
 
 protected:
   /**
@@ -1223,7 +1271,8 @@ protected:
   /**
    * Copy assignment operator
    */
-  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
+  FEEvaluationAccess &
+  operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1252,13 +1301,15 @@ public:
 
   /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_gradient()
    */
-  gradient_type get_gradient (const unsigned int q_point) const;
+  gradient_type
+  get_gradient (const unsigned int q_point) const;
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
    * point number @p q_point after a call to @p evaluate(...,true,...).
    */
-  VectorizedArray<Number> get_divergence (const unsigned int q_point) const;
+  VectorizedArray<Number>
+  get_divergence (const unsigned int q_point) const;
 
   /**
    * Return the symmetric gradient of a vector-valued finite element at
@@ -1283,12 +1334,14 @@ public:
 
   /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::get_hessian_diagonal()
    */
-  gradient_type get_hessian_diagonal (const unsigned int q_point) const;
+  gradient_type
+  get_hessian_diagonal (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,dim,Number,is_face>::submit_gradient()
    */
-  void submit_gradient(const gradient_type grad_in,
-                       const unsigned int  q_point);
+  void
+  submit_gradient(const gradient_type grad_in,
+                  const unsigned int  q_point);
 
   /**
    * Write a contribution that is tested by the gradient to the field
@@ -1298,8 +1351,9 @@ public:
    * coincide with the dimension for some dimensions, but not all. To allow
    * for dimension-independent programming, this function can be used instead.
    */
-  void submit_gradient(const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > > grad_in,
-                       const unsigned int q_point);
+  void
+  submit_gradient(const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > > grad_in,
+                  const unsigned int q_point);
 
   /**
    * Write a contribution that is tested by the divergence to the field
@@ -1309,8 +1363,9 @@ public:
    * tested by all basis function gradients on the current cell and integrated
    * over.
    */
-  void submit_divergence (const VectorizedArray<Number> div_in,
-                          const unsigned int q_point);
+  void
+  submit_divergence (const VectorizedArray<Number> div_in,
+                     const unsigned int q_point);
 
   /**
    * Write a contribution that is tested by the symmetric gradient to the field
@@ -1320,15 +1375,17 @@ public:
    * symmetric gradient which is tested by all basis function symmetric gradients on the current
    * cell and integrated over.
    */
-  void submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> > grad_in,
-                                 const unsigned int      q_point);
+  void
+  submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> > grad_in,
+                            const unsigned int      q_point);
 
   /**
    * Write the components of a curl containing the values on quadrature point
    * @p q_point. Access to the same data field as through @p get_gradient.
    */
-  void submit_curl (const Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl_in,
-                    const unsigned int q_point);
+  void
+  submit_curl (const Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl_in,
+               const unsigned int q_point);
 
 protected:
   /**
@@ -1366,7 +1423,8 @@ protected:
   /**
    * Copy assignment operator
    */
-  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
+  FEEvaluationAccess &
+  operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -1393,54 +1451,65 @@ public:
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_dof_value()
    */
-  value_type get_dof_value (const unsigned int dof) const;
+  value_type
+  get_dof_value (const unsigned int dof) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_dof_value()
    */
-  void submit_dof_value (const value_type   val_in,
-                         const unsigned int dof);
+  void
+  submit_dof_value (const value_type   val_in,
+                    const unsigned int dof);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_value()
    */
-  value_type get_value (const unsigned int q_point) const;
+  value_type
+  get_value (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
-  void submit_value (const value_type   val_in,
-                     const unsigned int q_point);
+  void
+  submit_value (const value_type   val_in,
+                const unsigned int q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_value()
    */
-  void submit_value (const gradient_type   val_in,
-                     const unsigned int q_point);
+  void
+  submit_value (const gradient_type   val_in,
+                const unsigned int q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_gradient()
    */
-  gradient_type get_gradient (const unsigned int q_point) const;
+  gradient_type
+  get_gradient (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<dim,1,Number,is_face>::get_normal_derivative()
    */
-  value_type get_normal_derivative (const unsigned int q_point) const;
+  value_type
+  get_normal_derivative (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
-  void submit_gradient(const gradient_type grad_in,
-                       const unsigned int  q_point);
+  void
+  submit_gradient(const gradient_type grad_in,
+                  const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_gradient()
    */
-  void submit_gradient(const value_type   grad_in,
-                       const unsigned int q_point);
+  void
+  submit_gradient(const value_type   grad_in,
+                  const unsigned int q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
-  void submit_normal_derivative(const value_type grad_in,
-                                const unsigned int  q_point);
+  void
+  submit_normal_derivative(const value_type grad_in,
+                           const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::submit_normal_derivative()
    */
-  void submit_normal_derivative(const gradient_type grad_in,
-                                const unsigned int  q_point);
+  void
+  submit_normal_derivative(const gradient_type grad_in,
+                           const unsigned int  q_point);
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian()
    */
@@ -1449,15 +1518,18 @@ public:
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_hessian_diagonal()
    */
-  gradient_type get_hessian_diagonal (const unsigned int q_point) const;
+  gradient_type
+  get_hessian_diagonal (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::get_laplacian()
    */
-  value_type get_laplacian (const unsigned int q_point) const;
+  value_type
+  get_laplacian (const unsigned int q_point) const;
 
   /** @copydoc FEEvaluationBase<1,1,Number,is_face>::integrate_value()
    */
-  value_type integrate_value () const;
+  value_type
+  integrate_value () const;
 
 protected:
   /**
@@ -1495,7 +1567,8 @@ protected:
   /**
    * Copy assignment operator
    */
-  FEEvaluationAccess &operator= (const FEEvaluationAccess &other);
+  FEEvaluationAccess &
+  operator= (const FEEvaluationAccess &other);
 };
 
 
@@ -2221,7 +2294,8 @@ public:
    * evaluation based on FEValues will be deep-copied in order to allow for
    * using in parallel with threads.
    */
-  FEEvaluation &operator= (const FEEvaluation &other);
+  FEEvaluation &
+  operator= (const FEEvaluation &other);
 
   /**
    * Initialize the operation pointer to the current cell batch index. Unlike
@@ -2231,7 +2305,8 @@ public:
    * all data is pre-computed in @p matrix_free, and only a few indices have
    * to be set appropriately.
    */
-  void reinit (const unsigned int cell_batch_index);
+  void
+  reinit (const unsigned int cell_batch_index);
 
   /**
    * Initialize the data to the current cell using a TriaIterator object as
@@ -2246,7 +2321,8 @@ public:
    * MatrixFree).
    */
   template <typename DoFHandlerType, bool level_dof_access>
-  void reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell);
+  void
+  reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell);
 
   /**
    * Initialize the data to the current cell using a TriaIterator object as
@@ -2258,7 +2334,8 @@ public:
    * can <b>not</b> read from vectors because no DoFHandler information is
    * available.
    */
-  void reinit (const typename Triangulation<dim>::cell_iterator &cell);
+  void
+  reinit (const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
    * Evaluate the function values, the gradients, and the Hessians of the
@@ -2269,9 +2346,10 @@ public:
    * get_laplacian give useful information (unless these values have been set
    * manually).
    */
-  void evaluate (const bool evaluate_values,
-                 const bool evaluate_gradients,
-                 const bool evaluate_hessians = false);
+  void
+  evaluate (const bool evaluate_values,
+            const bool evaluate_gradients,
+            const bool evaluate_hessians = false);
 
   /**
    * Evaluate the function values, the gradients, and the Hessians of the
@@ -2285,10 +2363,11 @@ public:
    * functions @p get_value(), @p get_gradient() or @p get_laplacian give
    * useful information (unless these values have been set manually).
    */
-  void evaluate (const VectorizedArray<Number> *values_array,
-                 const bool                     evaluate_values,
-                 const bool                     evaluate_gradients,
-                 const bool                     evaluate_hessians = false);
+  void
+  evaluate (const VectorizedArray<Number> *values_array,
+            const bool                     evaluate_values,
+            const bool                     evaluate_gradients,
+            const bool                     evaluate_hessians = false);
 
   /**
    * Read from the input vector and evaluates the function values, the
@@ -2304,10 +2383,11 @@ public:
    * evaluate(), but might internally use some additional optimizations.
    */
   template <typename VectorType>
-  void gather_evaluate (const VectorType &input_vector,
-                        const bool        evaluate_values,
-                        const bool        evaluate_gradients,
-                        const bool        evaluate_hessians = false);
+  void
+  gather_evaluate (const VectorType &input_vector,
+                   const bool        evaluate_values,
+                   const bool        evaluate_gradients,
+                   const bool        evaluate_hessians = false);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2319,8 +2399,9 @@ public:
    * @p dof_values (that is usually written into the result vector by the
    * distribute_local_to_global() or set_dof_values() methods).
    */
-  void integrate (const bool integrate_values,
-                  const bool integrate_gradients);
+  void
+  integrate (const bool integrate_values,
+             const bool integrate_gradients);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2333,9 +2414,10 @@ public:
    * whose previous results is overwritten, rather than writing it on the
    * internal data structures behind begin_dof_values().
    */
-  void integrate (const bool               integrate_values,
-                  const bool               integrate_gradients,
-                  VectorizedArray<Number> *values_array);
+  void
+  integrate (const bool               integrate_values,
+             const bool               integrate_gradients,
+             VectorizedArray<Number> *values_array);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2351,9 +2433,10 @@ public:
    * some additional optimizations.
    */
   template <typename VectorType>
-  void integrate_scatter (const bool  integrate_values,
-                          const bool  integrate_gradients,
-                          VectorType &output_vector);
+  void
+  integrate_scatter (const bool  integrate_values,
+                     const bool  integrate_gradients,
+                     VectorType &output_vector);
 
   /**
    * Return the q-th quadrature point in real coordinates stored in
@@ -2392,8 +2475,9 @@ private:
    * Checks if the template arguments regarding degree of the element
    * corresponds to the actual element used at initialization.
    */
-  void check_template_arguments(const unsigned int fe_no,
-                                const unsigned int first_selected_component);
+  void
+  check_template_arguments(const unsigned int fe_no,
+                           const unsigned int first_selected_component);
 };
 
 
@@ -2559,7 +2643,8 @@ public:
    * @p matrix_free, and only a few indices and pointers have to be set
    * appropriately.
    */
-  void reinit (const unsigned int face_batch_number);
+  void
+  reinit (const unsigned int face_batch_number);
 
   /**
    * As opposed to the reinit() method from the base class, this reinit()
@@ -2568,8 +2653,9 @@ public:
    * numbering of the faces because it needs to copy the data associated with
    * the faces to the cells in this call.
    */
-  void reinit(const unsigned int cell_batch_number,
-              const unsigned int face_number);
+  void
+  reinit(const unsigned int cell_batch_number,
+         const unsigned int face_number);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -2581,8 +2667,9 @@ public:
    * useful information (unless these values have been set manually by
    * accessing the internal data pointers).
    */
-  void evaluate (const bool evaluate_values,
-                 const bool evaluate_gradients);
+  void
+  evaluate (const bool evaluate_values,
+            const bool evaluate_gradients);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -2596,9 +2683,10 @@ public:
    * get_normal_derivative() give useful information (unless these values have
    * been set manually).
    */
-  void evaluate (const VectorizedArray<Number> *values_array,
-                 const bool                     evaluate_values,
-                 const bool                     evaluate_gradients);
+  void
+  evaluate (const VectorizedArray<Number> *values_array,
+            const bool                     evaluate_values,
+            const bool                     evaluate_gradients);
 
   /**
    * Reads from the input vector and evaluates the function values, the
@@ -2612,9 +2700,10 @@ public:
    * evaluate(), but might internally use some additional optimizations.
    */
   template <typename VectorType>
-  void gather_evaluate (const VectorType &input_vector,
-                        const bool        evaluate_values,
-                        const bool        evaluate_gradients);
+  void
+  gather_evaluate (const VectorType &input_vector,
+                   const bool        evaluate_values,
+                   const bool        evaluate_gradients);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2625,8 +2714,9 @@ public:
    * `dof_values` (that is usually written into the result vector by the
    * distribute_local_to_global() or set_dof_values() methods).
    */
-  void integrate (const bool integrate_values,
-                  const bool integrate_gradients);
+  void
+  integrate (const bool integrate_values,
+             const bool integrate_gradients);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2636,9 +2726,10 @@ public:
    * values or gradients. As opposed to the other integrate() method, this
    * call stores the result of the testing in the given array `values_array`.
    */
-  void integrate (const bool               integrate_values,
-                  const bool               integrate_gradients,
-                  VectorizedArray<Number> *values_array);
+  void
+  integrate (const bool               integrate_values,
+             const bool               integrate_gradients,
+             VectorizedArray<Number> *values_array);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2652,9 +2743,10 @@ public:
    * optimizations.
    */
   template <typename VectorType>
-  void integrate_scatter (const bool  integrate_values,
-                          const bool  integrate_gradients,
-                          VectorType &output_vector);
+  void
+  integrate_scatter (const bool  integrate_values,
+                     const bool  integrate_gradients,
+                     VectorType &output_vector);
 
   /**
    * Returns the q-th quadrature point on the face in real coordinates stored
@@ -2695,9 +2787,10 @@ protected:
    * re-indexing on quadrature points. Called at the end of evaluate() and at
    * the beginning of integrate().
    */
-  void adjust_for_face_orientation(const bool integrate,
-                                   const bool values,
-                                   const bool gradients);
+  void
+  adjust_for_face_orientation(const bool integrate,
+                              const bool values,
+                              const bool gradients);
 };
 
 
@@ -2737,13 +2830,14 @@ namespace internal
 template <int dim, int n_components_, typename Number, bool is_face>
 inline
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::FEEvaluationBase (const MatrixFree<dim,Number> &data_in,
-                    const unsigned int dof_no,
-                    const unsigned int first_selected_component,
-                    const unsigned int quad_no_in,
-                    const unsigned int fe_degree,
-                    const unsigned int n_q_points,
-                    const bool is_interior_face)
+::
+FEEvaluationBase (const MatrixFree<dim,Number> &data_in,
+                  const unsigned int dof_no,
+                  const unsigned int first_selected_component,
+                  const unsigned int quad_no_in,
+                  const unsigned int fe_degree,
+                  const unsigned int n_q_points,
+                  const bool is_interior_face)
   :
   scratch_data_array (data_in.acquire_scratch_data()),
   quad_no            (quad_no_in),
@@ -2830,12 +2924,13 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <int n_components_other>
 inline
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::FEEvaluationBase (const Mapping<dim>       &mapping,
-                    const FiniteElement<dim> &fe,
-                    const Quadrature<1>      &quadrature,
-                    const UpdateFlags         update_flags,
-                    const unsigned int        first_selected_component,
-                    const FEEvaluationBase<dim,n_components_other,Number> *other)
+::
+FEEvaluationBase (const Mapping<dim>       &mapping,
+                  const FiniteElement<dim> &fe,
+                  const Quadrature<1>      &quadrature,
+                  const UpdateFlags         update_flags,
+                  const unsigned int        first_selected_component,
+                  const FEEvaluationBase<dim,n_components_other,Number> *other)
   :
   scratch_data_array (new AlignedVector<VectorizedArray<Number> >()),
   quad_no            (numbers::invalid_unsigned_int),
@@ -2897,7 +2992,8 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 template <int dim, int n_components_, typename Number, bool is_face>
 inline
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number,is_face> &other)
+::
+FEEvaluationBase (const FEEvaluationBase<dim,n_components_,Number,is_face> &other)
   :
   scratch_data_array (other.matrix_info == nullptr ?
                       new AlignedVector<VectorizedArray<Number> >() :
@@ -3045,7 +3141,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::set_data_pointers()
+::
+set_data_pointers()
 {
   Assert(scratch_data_array != nullptr, ExcInternalError());
 
@@ -3085,7 +3182,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 unsigned int
 FEEvaluationBase<dim,n_components_,Number, is_face>
-::get_cell_data_number () const
+::
+get_cell_data_number () const
 {
   return get_mapping_data_index_offset();
 }
@@ -3096,7 +3194,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 unsigned int
 FEEvaluationBase<dim,n_components_,Number, is_face>
-::get_mapping_data_index_offset () const
+::
+get_mapping_data_index_offset () const
 {
   if (matrix_info == 0)
     return 0;
@@ -3135,7 +3234,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
+::
+fill_JxW_values(AlignedVector<VectorizedArray<Number> > &JxW_values) const
 {
   AssertDimension(JxW_values.size(), n_quadrature_points);
   Assert (J_value != nullptr, ExcNotInitialized());
@@ -3156,7 +3256,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,dim,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_normal_vector(const unsigned int q_index) const
+::
+get_normal_vector(const unsigned int q_index) const
 {
   AssertIndexRange(q_index, n_quadrature_points);
   Assert(normal_vectors != nullptr, ExcMessage("Did not call reinit()!"));
@@ -3190,7 +3291,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<2,dim,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::inverse_jacobian(const unsigned int q_index) const
+::
+inverse_jacobian(const unsigned int q_index) const
 {
   AssertIndexRange(q_index, n_quadrature_points);
   Assert (this->jacobian != nullptr, ExcNotImplemented());
@@ -3206,7 +3308,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 VectorizedArray<Number>
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_cell_data(const AlignedVector<VectorizedArray<Number> > &array) const
+::
+read_cell_data(const AlignedVector<VectorizedArray<Number> > &array) const
 {
   Assert(matrix_info != nullptr, ExcNotImplemented());
   AssertDimension(array.size(), matrix_info->get_task_info().cell_partition_data.back());
@@ -3261,8 +3364,9 @@ namespace internal
   // MatrixFree
   template <typename VectorType>
   inline
-  void check_vector_compatibility (const VectorType                             &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo &dof_info)
+  void
+  check_vector_compatibility (const VectorType                             &vec,
+                              const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     (void) vec;
     (void) dof_info;
@@ -3273,8 +3377,9 @@ namespace internal
 
   template <typename Number>
   inline
-  void check_vector_compatibility (const LinearAlgebra::distributed::Vector<Number> &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo     &dof_info)
+  void
+  check_vector_compatibility (const LinearAlgebra::distributed::Vector<Number> &vec,
+                              const internal::MatrixFreeFunctions::DoFInfo     &dof_info)
   {
     (void) vec;
     (void) dof_info;
@@ -3290,19 +3395,21 @@ namespace internal
   struct VectorReader
   {
     template <typename VectorType>
-    void process_dof (const unsigned int  index,
-                      VectorType         &vec,
-                      Number             &res) const
+    void
+    process_dof (const unsigned int  index,
+                 VectorType         &vec,
+                 Number             &res) const
     {
       res = vector_access (vec, index);
     }
 
     template <typename VectorType>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,true>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,true>) const
     {
       dealii::vectorized_load_and_transpose(dofs_per_cell, vec.begin(),
                                             dof_indices, dof_values);
@@ -3310,11 +3417,12 @@ namespace internal
 
 
     template <typename VectorType>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,false>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,false>) const
     {
       for (unsigned int d=0; d<dofs_per_cell; ++d)
         for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
@@ -3324,11 +3432,12 @@ namespace internal
     // variant where VectorType::value_type is the same as Number -> can call
     // gather
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, true>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, true>) const
     {
       res.gather(vec.begin()+constant_offset, indices);
     }
@@ -3336,46 +3445,52 @@ namespace internal
     // variant where VectorType::value_type is not the same as Number -> must
     // manually load the data
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, false>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         res[v] = vector_access(vec, indices[v]+constant_offset);
     }
 
     template <typename VectorType>
-    void process_dof_global (const types::global_dof_index index,
-                             VectorType         &vec,
-                             Number             &res) const
+    void
+    process_dof_global (const types::global_dof_index index,
+                        VectorType         &vec,
+                        Number             &res) const
     {
       res = const_cast<const VectorType &>(vec)(index);
     }
 
-    void pre_constraints (const Number &,
-                          Number       &res) const
+    void
+    pre_constraints (const Number &,
+                     Number       &res) const
     {
       res = Number();
     }
 
     template <typename VectorType>
-    void process_constraint (const unsigned int index,
-                             const Number       weight,
-                             VectorType        &vec,
-                             Number            &res) const
+    void
+    process_constraint (const unsigned int index,
+                        const Number       weight,
+                        VectorType        &vec,
+                        Number            &res) const
     {
       res += weight * vector_access (vec, index);
     }
 
-    void post_constraints (const Number &sum,
-                           Number       &write_pos) const
+    void
+    post_constraints (const Number &sum,
+                      Number       &write_pos) const
     {
       write_pos = sum;
     }
 
-    void process_empty (VectorizedArray<Number> &res) const
+    void
+    process_empty (VectorizedArray<Number> &res) const
     {
       res = VectorizedArray<Number>();
     }
@@ -3386,30 +3501,33 @@ namespace internal
   struct VectorDistributorLocalToGlobal
   {
     template <typename VectorType>
-    void process_dof (const unsigned int  index,
-                      VectorType         &vec,
-                      Number             &res) const
+    void
+    process_dof (const unsigned int  index,
+                 VectorType         &vec,
+                 Number             &res) const
     {
       vector_access (vec, index) += res;
     }
 
     template <typename VectorType>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,true>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,true>) const
     {
       vectorized_transpose_and_store(true, dofs_per_cell, dof_values,
                                      dof_indices, vec.begin());
     }
 
     template <typename VectorType>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,false>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,false>) const
     {
       for (unsigned int d=0; d<dofs_per_cell; ++d)
         for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
@@ -3419,11 +3537,12 @@ namespace internal
     // variant where VectorType::value_type is the same as Number -> can call
     // scatter
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, true>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, true>) const
     {
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
@@ -3440,45 +3559,51 @@ namespace internal
     // variant where VectorType::value_type is not the same as Number -> must
     // manually append all data
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, false>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         vector_access(vec, indices[v]+constant_offset) += res[v];
     }
 
     template <typename VectorType>
-    void process_dof_global (const types::global_dof_index index,
-                             VectorType         &vec,
-                             Number             &res) const
+    void
+    process_dof_global (const types::global_dof_index index,
+                        VectorType         &vec,
+                        Number             &res) const
     {
       vec(index) += res;
     }
 
-    void pre_constraints (const Number &input,
-                          Number       &res) const
+    void
+    pre_constraints (const Number &input,
+                     Number       &res) const
     {
       res = input;
     }
 
     template <typename VectorType>
-    void process_constraint (const unsigned int index,
-                             const Number       weight,
-                             VectorType        &vec,
-                             Number            &res) const
+    void
+    process_constraint (const unsigned int index,
+                        const Number       weight,
+                        VectorType        &vec,
+                        Number            &res) const
     {
       vector_access (vec, index) += weight * res;
     }
 
-    void post_constraints (const Number &,
-                           Number &) const
+    void
+    post_constraints (const Number &,
+                      Number &) const
     {
     }
 
-    void process_empty (VectorizedArray<Number> &) const
+    void
+    process_empty (VectorizedArray<Number> &) const
     {
     }
   };
@@ -3489,30 +3614,33 @@ namespace internal
   struct VectorSetter
   {
     template <typename VectorType>
-    void process_dof (const unsigned int  index,
-                      VectorType         &vec,
-                      Number             &res) const
+    void
+    process_dof (const unsigned int  index,
+                 VectorType         &vec,
+                 Number             &res) const
     {
       vector_access (vec, index) = res;
     }
 
     template <typename VectorType>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,true>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,true>) const
     {
       vectorized_transpose_and_store(false, dofs_per_cell, dof_values,
                                      dof_indices, vec.begin());
     }
 
     template <typename VectorType, bool booltype>
-    void process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
-                                            const unsigned int *dof_indices,
-                                            VectorType         &vec,
-                                            VectorizedArray<Number> *dof_values,
-                                            std::integral_constant<bool,false>) const
+    void
+    process_dofs_vectorized_transpose (const unsigned int  dofs_per_cell,
+                                       const unsigned int *dof_indices,
+                                       VectorType         &vec,
+                                       VectorizedArray<Number> *dof_values,
+                                       std::integral_constant<bool,false>) const
     {
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
@@ -3520,53 +3648,60 @@ namespace internal
     }
 
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, true>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, true>) const
     {
       res.scatter(indices, vec.begin()+constant_offset);
     }
 
     template <typename VectorType>
-    void process_dof_gather (const unsigned int      *indices,
-                             VectorType              &vec,
-                             const unsigned int       constant_offset,
-                             VectorizedArray<Number> &res,
-                             std::integral_constant<bool, false>) const
+    void
+    process_dof_gather (const unsigned int      *indices,
+                        VectorType              &vec,
+                        const unsigned int       constant_offset,
+                        VectorizedArray<Number> &res,
+                        std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         vector_access(vec, indices[v]+constant_offset) = res[v];
     }
 
     template <typename VectorType>
-    void process_dof_global (const types::global_dof_index index,
-                             VectorType         &vec,
-                             Number             &res) const
+    void
+    process_dof_global (const types::global_dof_index index,
+                        VectorType         &vec,
+                        Number             &res) const
     {
       vec(index) = res;
     }
 
-    void pre_constraints (const Number &,
-                          Number &) const
+    void
+    pre_constraints (const Number &,
+                     Number &) const
     {
     }
 
     template <typename VectorType>
-    void process_constraint (const unsigned int,
-                             const Number,
-                             VectorType &,
-                             Number &) const
+    void
+    process_constraint (const unsigned int,
+                        const Number,
+                        VectorType &,
+                        Number &) const
     {
     }
 
-    void post_constraints (const Number &,
-                           Number &) const
+    void
+    post_constraints (const Number &,
+                      Number &) const
     {
     }
 
-    void process_empty (VectorizedArray<Number> &) const
+    void
+    process_empty (VectorizedArray<Number> &) const
     {
     }
   };
@@ -3582,8 +3717,9 @@ namespace internal
   {
     typedef typename VectorType::BlockType BaseVectorType;
 
-    static BaseVectorType *get_vector_component (VectorType &vec,
-                                                 const unsigned int component)
+    static BaseVectorType *
+    get_vector_component (VectorType &vec,
+                          const unsigned int component)
     {
       AssertIndexRange (component, vec.n_blocks());
       return &vec.block(component);
@@ -3595,8 +3731,9 @@ namespace internal
   {
     typedef VectorType BaseVectorType;
 
-    static BaseVectorType *get_vector_component (VectorType &vec,
-                                                 const unsigned int component)
+    static BaseVectorType *
+    get_vector_component (VectorType &vec,
+                          const unsigned int component)
     {
       // FEEvaluation allows to combine several vectors from a scalar
       // FiniteElement into a "vector-valued" FEEvaluation object with
@@ -3620,8 +3757,9 @@ namespace internal
   {
     typedef VectorType BaseVectorType;
 
-    static BaseVectorType *get_vector_component (std::vector<VectorType> &vec,
-                                                 const unsigned int component)
+    static BaseVectorType *
+    get_vector_component (std::vector<VectorType> &vec,
+                          const unsigned int component)
     {
       AssertIndexRange (component, vec.size());
       return &vec[component];
@@ -3633,8 +3771,9 @@ namespace internal
   {
     typedef VectorType BaseVectorType;
 
-    static BaseVectorType *get_vector_component (std::vector<VectorType *> &vec,
-                                                 const unsigned int component)
+    static BaseVectorType *
+    get_vector_component (std::vector<VectorType *> &vec,
+                          const unsigned int component)
     {
       AssertIndexRange (component, vec.size());
       return vec[component];
@@ -3649,9 +3788,10 @@ template <typename VectorType, typename VectorOperation>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_write_operation (const VectorOperation &operation,
-                        VectorType            *src[],
-                        const bool             apply_constraints) const
+::
+read_write_operation (const VectorOperation &operation,
+                      VectorType            *src[],
+                      const bool             apply_constraints) const
 {
   // Case 1: No MatrixFree object given, simple case because we do not need to
   // process constraints and need not care about vectorization -> go to
@@ -3961,8 +4101,9 @@ template <typename VectorType, typename VectorOperation>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_write_operation_global (const VectorOperation &operation,
-                               VectorType            *src[]) const
+::
+read_write_operation_global (const VectorOperation &operation,
+                             VectorType            *src[]) const
 {
   Assert (!local_dof_indices.empty(), ExcNotInitialized());
 
@@ -3985,8 +4126,9 @@ template <typename VectorType, typename VectorOperation>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_write_operation_contiguous (const VectorOperation &operation,
-                                   VectorType            *src[]) const
+::
+read_write_operation_contiguous (const VectorOperation &operation,
+                                 VectorType            *src[]) const
 {
   // This functions processes the functions read_dof_values,
   // distribute_local_to_global, and set_dof_values with the same code for
@@ -4053,8 +4195,9 @@ template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_dof_values (const VectorType  &src,
-                   const unsigned int first_index)
+::
+read_dof_values (const VectorType  &src,
+                 const unsigned int first_index)
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
@@ -4078,8 +4221,9 @@ template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::read_dof_values_plain (const VectorType  &src,
-                         const unsigned int first_index)
+::
+read_dof_values_plain (const VectorType  &src,
+                       const unsigned int first_index)
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
@@ -4103,8 +4247,9 @@ template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::distribute_local_to_global (VectorType        &dst,
-                              const unsigned int first_index) const
+::
+distribute_local_to_global (VectorType        &dst,
+                            const unsigned int first_index) const
 {
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -4127,8 +4272,9 @@ template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::set_dof_values (VectorType        &dst,
-                  const unsigned int first_index) const
+::
+set_dof_values (VectorType        &dst,
+                const unsigned int first_index) const
 {
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -4284,7 +4430,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_dof_value (const unsigned int dof) const
+::
+get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   Tensor<1,n_components_,VectorizedArray<Number> > return_value;
@@ -4299,7 +4446,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_value (const unsigned int q_point) const
+::
+get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -4316,7 +4464,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_gradient (const unsigned int q_point) const
+::
+get_gradient (const unsigned int q_point) const
 {
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -4358,7 +4507,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_normal_derivative (const unsigned int q_point) const
+::
+get_normal_derivative (const unsigned int q_point) const
 {
   AssertIndexRange (q_point, this->n_quadrature_points);
   Assert (this->gradients_quad_initialized==true,
@@ -4450,7 +4600,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,Tensor<2,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_hessian (const unsigned int q_point) const
+::
+get_hessian (const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
@@ -4573,7 +4724,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_hessian_diagonal (const unsigned int q_point) const
+::
+get_hessian_diagonal (const unsigned int q_point) const
 {
   Assert(!is_face, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
@@ -4652,7 +4804,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::get_laplacian (const unsigned int q_point) const
+::
+get_laplacian (const unsigned int q_point) const
 {
   Assert (is_face == false, ExcNotImplemented());
   Assert (this->hessians_quad_initialized==true,
@@ -4677,8 +4830,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::submit_dof_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
-                    const unsigned int dof)
+::
+submit_dof_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
+                  const unsigned int dof)
 {
 #ifdef DEBUG
   this->dof_values_initialized = true;
@@ -4694,8 +4848,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::submit_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
-                const unsigned int q_point)
+::
+submit_value (const Tensor<1,n_components_,VectorizedArray<Number> > val_in,
+              const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -4724,9 +4879,10 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::submit_gradient (const Tensor<1,n_components_,
-                   Tensor<1,dim,VectorizedArray<Number> > >grad_in,
-                   const unsigned int q_point)
+::
+submit_gradient (const Tensor<1,n_components_,
+                 Tensor<1,dim,VectorizedArray<Number> > >grad_in,
+                 const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -4769,8 +4925,9 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::submit_normal_derivative (const Tensor<1,n_components_,VectorizedArray<Number> > grad_in,
-                            const unsigned int q_point)
+::
+submit_normal_derivative (const Tensor<1,n_components_,VectorizedArray<Number> > grad_in,
+                          const unsigned int q_point)
 {
 #ifdef DEBUG
   AssertIndexRange (q_point, this->n_quadrature_points);
@@ -4811,7 +4968,8 @@ template <int dim, int n_components_, typename Number, bool is_face>
 inline
 Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number,is_face>
-::integrate_value () const
+::
+integrate_value () const
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -4836,13 +4994,14 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
 template <int dim, int n_components_, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,n_components_,Number,is_face>
-::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int dof_no,
-                      const unsigned int first_selected_component,
-                      const unsigned int quad_no_in,
-                      const unsigned int fe_degree,
-                      const unsigned int n_q_points,
-                      const bool         is_interior_face)
+::
+FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
+                    const unsigned int dof_no,
+                    const unsigned int first_selected_component,
+                    const unsigned int quad_no_in,
+                    const unsigned int fe_degree,
+                    const unsigned int n_q_points,
+                    const bool         is_interior_face)
   :
   FEEvaluationBase <dim,n_components_,Number,is_face>
   (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
@@ -4855,12 +5014,13 @@ template <int dim, int n_components_, typename Number, bool is_face>
 template <int n_components_other>
 inline
 FEEvaluationAccess<dim,n_components_,Number,is_face>
-::FEEvaluationAccess (const Mapping<dim>       &mapping,
-                      const FiniteElement<dim> &fe,
-                      const Quadrature<1>      &quadrature,
-                      const UpdateFlags         update_flags,
-                      const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
+::
+FEEvaluationAccess (const Mapping<dim>       &mapping,
+                    const FiniteElement<dim> &fe,
+                    const Quadrature<1>      &quadrature,
+                    const UpdateFlags         update_flags,
+                    const unsigned int        first_selected_component,
+                    const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
   FEEvaluationBase <dim,n_components_,Number,is_face>(mapping, fe, quadrature, update_flags,
                                                       first_selected_component, other)
@@ -4871,7 +5031,8 @@ FEEvaluationAccess<dim,n_components_,Number,is_face>
 template <int dim, int n_components_, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,n_components_,Number,is_face>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,n_components_,Number,is_face> &other)
+::
+FEEvaluationAccess (const FEEvaluationAccess<dim,n_components_,Number,is_face> &other)
   :
   FEEvaluationBase <dim,n_components_,Number,is_face>(other)
 {}
@@ -4896,13 +5057,14 @@ FEEvaluationAccess<dim,n_components_,Number,is_face>
 template <int dim, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,1,Number,is_face>
-::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int dof_no,
-                      const unsigned int first_selected_component,
-                      const unsigned int quad_no_in,
-                      const unsigned int fe_degree,
-                      const unsigned int n_q_points,
-                      const bool         is_interior_face)
+::
+FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
+                    const unsigned int dof_no,
+                    const unsigned int first_selected_component,
+                    const unsigned int quad_no_in,
+                    const unsigned int fe_degree,
+                    const unsigned int n_q_points,
+                    const bool         is_interior_face)
   :
   FEEvaluationBase <dim,1,Number,is_face>
   (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
@@ -4915,12 +5077,13 @@ template <int dim, typename Number, bool is_face>
 template <int n_components_other>
 inline
 FEEvaluationAccess<dim,1,Number,is_face>
-::FEEvaluationAccess (const Mapping<dim>       &mapping,
-                      const FiniteElement<dim> &fe,
-                      const Quadrature<1>      &quadrature,
-                      const UpdateFlags         update_flags,
-                      const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
+::
+FEEvaluationAccess (const Mapping<dim>       &mapping,
+                    const FiniteElement<dim> &fe,
+                    const Quadrature<1>      &quadrature,
+                    const UpdateFlags         update_flags,
+                    const unsigned int        first_selected_component,
+                    const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
   FEEvaluationBase <dim,1,Number,is_face> (mapping, fe, quadrature, update_flags,
                                            first_selected_component, other)
@@ -4931,7 +5094,8 @@ FEEvaluationAccess<dim,1,Number,is_face>
 template <int dim, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,1,Number,is_face>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number,is_face> &other)
+::
+FEEvaluationAccess (const FEEvaluationAccess<dim,1,Number,is_face> &other)
   :
   FEEvaluationBase <dim,1,Number,is_face>(other)
 {}
@@ -4954,7 +5118,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_dof_value (const unsigned int dof) const
+::
+get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   return this->values_dofs[0][dof];
@@ -4966,7 +5131,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_value (const unsigned int q_point) const
+::
+get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -4980,7 +5146,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_normal_derivative (const unsigned int q_point) const
+::
+get_normal_derivative (const unsigned int q_point) const
 {
   return BaseClass::get_normal_derivative(q_point)[0];
 }
@@ -4991,7 +5158,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_gradient (const unsigned int q_point) const
+::
+get_gradient (const unsigned int q_point) const
 {
   // could use the base class gradient, but that involves too many expensive
   // initialization operations on tensors
@@ -5032,7 +5200,8 @@ template <int dim, typename Number, bool is_face>
 inline
 Tensor<2,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_hessian (const unsigned int q_point) const
+::
+get_hessian (const unsigned int q_point) const
 {
   return BaseClass::get_hessian(q_point)[0];
 }
@@ -5043,7 +5212,8 @@ template <int dim, typename Number, bool is_face>
 inline
 Tensor<1,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_hessian_diagonal (const unsigned int q_point) const
+::
+get_hessian_diagonal (const unsigned int q_point) const
 {
   return BaseClass::get_hessian_diagonal(q_point)[0];
 }
@@ -5054,7 +5224,8 @@ template <int dim, typename Number, bool is_face>
 inline
 VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number,is_face>
-::get_laplacian (const unsigned int q_point) const
+::
+get_laplacian (const unsigned int q_point) const
 {
   return BaseClass::get_laplacian(q_point)[0];
 }
@@ -5065,8 +5236,9 @@ template <int dim, typename Number, bool is_face>
 inline
 void DEAL_II_ALWAYS_INLINE
 FEEvaluationAccess<dim,1,Number,is_face>
-::submit_dof_value (const VectorizedArray<Number> val_in,
-                    const unsigned int dof)
+::
+submit_dof_value (const VectorizedArray<Number> val_in,
+                  const unsigned int dof)
 {
 #ifdef DEBUG
   this->dof_values_initialized = true;
@@ -5081,8 +5253,9 @@ template <int dim, typename Number, bool is_face>
 inline
 void DEAL_II_ALWAYS_INLINE
 FEEvaluationAccess<dim,1,Number,is_face>
-::submit_value (const VectorizedArray<Number> val_in,
-                const unsigned int q_index)
+::
+submit_value (const VectorizedArray<Number> val_in,
+              const unsigned int q_index)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5107,8 +5280,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,1,Number,is_face>
-::submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
-                const unsigned int q_point)
+::
+submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+              const unsigned int q_point)
 {
   submit_value(val_in[0], q_point);
 }
@@ -5119,8 +5293,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,1,Number,is_face>
-::submit_normal_derivative (const VectorizedArray<Number> grad_in,
-                            const unsigned int q_point)
+::
+submit_normal_derivative (const VectorizedArray<Number> grad_in,
+                          const unsigned int q_point)
 {
   Tensor<1,1,VectorizedArray<Number> > grad;
   grad[0] = grad_in;
@@ -5133,8 +5308,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,1,Number,is_face>
-::submit_gradient (const Tensor<1,dim,VectorizedArray<Number> > grad_in,
-                   const unsigned int q_index)
+::
+submit_gradient (const Tensor<1,dim,VectorizedArray<Number> > grad_in,
+                 const unsigned int q_index)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5178,7 +5354,8 @@ template <int dim, typename Number, bool is_face>
 inline
 VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number,is_face>
-::integrate_value () const
+::
+integrate_value () const
 {
   return BaseClass::integrate_value()[0];
 }
@@ -5192,13 +5369,14 @@ FEEvaluationAccess<dim,1,Number,is_face>
 template <int dim, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,dim,Number,is_face>
-::FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
-                      const unsigned int dof_no,
-                      const unsigned int first_selected_component,
-                      const unsigned int quad_no_in,
-                      const unsigned int fe_degree,
-                      const unsigned int n_q_points,
-                      const bool         is_interior_face)
+::
+FEEvaluationAccess (const MatrixFree<dim,Number> &data_in,
+                    const unsigned int dof_no,
+                    const unsigned int first_selected_component,
+                    const unsigned int quad_no_in,
+                    const unsigned int fe_degree,
+                    const unsigned int n_q_points,
+                    const bool         is_interior_face)
   :
   FEEvaluationBase <dim,dim,Number,is_face>
   (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
@@ -5211,12 +5389,13 @@ template <int dim, typename Number, bool is_face>
 template <int n_components_other>
 inline
 FEEvaluationAccess<dim,dim,Number,is_face>
-::FEEvaluationAccess (const Mapping<dim>       &mapping,
-                      const FiniteElement<dim> &fe,
-                      const Quadrature<1>      &quadrature,
-                      const UpdateFlags         update_flags,
-                      const unsigned int        first_selected_component,
-                      const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
+::
+FEEvaluationAccess (const Mapping<dim>       &mapping,
+                    const FiniteElement<dim> &fe,
+                    const Quadrature<1>      &quadrature,
+                    const UpdateFlags         update_flags,
+                    const unsigned int        first_selected_component,
+                    const FEEvaluationBase<dim,n_components_other,Number,is_face> *other)
   :
   FEEvaluationBase <dim,dim,Number,is_face> (mapping, fe, quadrature, update_flags,
                                              first_selected_component, other)
@@ -5227,7 +5406,8 @@ FEEvaluationAccess<dim,dim,Number,is_face>
 template <int dim, typename Number, bool is_face>
 inline
 FEEvaluationAccess<dim,dim,Number,is_face>
-::FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number,is_face> &other)
+::
+FEEvaluationAccess (const FEEvaluationAccess<dim,dim,Number,is_face> &other)
   :
   FEEvaluationBase <dim,dim,Number,is_face>(other)
 {}
@@ -5250,7 +5430,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<2,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_gradient (const unsigned int q_point) const
+::
+get_gradient (const unsigned int q_point) const
 {
   return BaseClass::get_gradient (q_point);
 }
@@ -5261,7 +5442,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_divergence (const unsigned int q_point) const
+::
+get_divergence (const unsigned int q_point) const
 {
   Assert (this->gradients_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -5301,7 +5483,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 SymmetricTensor<2,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_symmetric_gradient (const unsigned int q_point) const
+::
+get_symmetric_gradient (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
@@ -5337,7 +5520,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,(dim==2?1:dim),VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_curl (const unsigned int q_point) const
+::
+get_curl (const unsigned int q_point) const
 {
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
@@ -5368,7 +5552,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<2,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_hessian_diagonal (const unsigned int q_point) const
+::
+get_hessian_diagonal (const unsigned int q_point) const
 {
   return BaseClass::get_hessian_diagonal (q_point);
 }
@@ -5379,7 +5564,8 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<3,dim,VectorizedArray<Number> >
 FEEvaluationAccess<dim,dim,Number,is_face>
-::get_hessian (const unsigned int q_point) const
+::
+get_hessian (const unsigned int q_point) const
 {
   Assert (this->hessians_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -5393,8 +5579,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,dim,Number,is_face>
-::submit_gradient (const Tensor<2,dim,VectorizedArray<Number> > grad_in,
-                   const unsigned int q_point)
+::
+submit_gradient (const Tensor<2,dim,VectorizedArray<Number> > grad_in,
+                 const unsigned int q_point)
 {
   BaseClass::submit_gradient (grad_in, q_point);
 }
@@ -5405,9 +5592,10 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,dim,Number,is_face>
-::submit_gradient (const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > >
-                   grad_in,
-                   const unsigned int q_point)
+::
+submit_gradient (const Tensor<1,dim,Tensor<1,dim,VectorizedArray<Number> > >
+                 grad_in,
+                 const unsigned int q_point)
 {
   BaseClass::submit_gradient(grad_in, q_point);
 }
@@ -5418,8 +5606,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,dim,Number,is_face>
-::submit_divergence (const VectorizedArray<Number> div_in,
-                     const unsigned int q_point)
+::
+submit_divergence (const VectorizedArray<Number> div_in,
+                   const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5467,9 +5656,10 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,dim,Number,is_face>
-::submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> >
-                            sym_grad,
-                            const unsigned int q_point)
+::
+submit_symmetric_gradient(const SymmetricTensor<2,dim,VectorizedArray<Number> >
+                          sym_grad,
+                          const unsigned int q_point)
 {
   // could have used base class operator, but that involves some overhead
   // which is inefficient. it is nice to have the symmetric tensor because
@@ -5535,8 +5725,9 @@ template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<dim,dim,Number,is_face>
-::submit_curl (const Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl,
-               const unsigned int q_point)
+::
+submit_curl (const Tensor<1,dim==2?1:dim,VectorizedArray<Number> > curl,
+             const unsigned int q_point)
 {
   Tensor<2,dim,VectorizedArray<Number> > grad;
   switch (dim)
@@ -5570,13 +5761,14 @@ FEEvaluationAccess<dim,dim,Number,is_face>
 template <typename Number, bool is_face>
 inline
 FEEvaluationAccess<1,1,Number,is_face>
-::FEEvaluationAccess (const MatrixFree<1,Number> &data_in,
-                      const unsigned int dof_no,
-                      const unsigned int first_selected_component,
-                      const unsigned int quad_no_in,
-                      const unsigned int fe_degree,
-                      const unsigned int n_q_points,
-                      const bool         is_interior_face)
+::
+FEEvaluationAccess (const MatrixFree<1,Number> &data_in,
+                    const unsigned int dof_no,
+                    const unsigned int first_selected_component,
+                    const unsigned int quad_no_in,
+                    const unsigned int fe_degree,
+                    const unsigned int n_q_points,
+                    const bool         is_interior_face)
   :
   FEEvaluationBase <1,1,Number,is_face>
   (data_in, dof_no, first_selected_component, quad_no_in, fe_degree, n_q_points,
@@ -5589,12 +5781,13 @@ template <typename Number, bool is_face>
 template <int n_components_other>
 inline
 FEEvaluationAccess<1,1,Number,is_face>
-::FEEvaluationAccess (const Mapping<1>       &mapping,
-                      const FiniteElement<1> &fe,
-                      const Quadrature<1>    &quadrature,
-                      const UpdateFlags       update_flags,
-                      const unsigned int      first_selected_component,
-                      const FEEvaluationBase<1,n_components_other,Number,is_face> *other)
+::
+FEEvaluationAccess (const Mapping<1>       &mapping,
+                    const FiniteElement<1> &fe,
+                    const Quadrature<1>    &quadrature,
+                    const UpdateFlags       update_flags,
+                    const unsigned int      first_selected_component,
+                    const FEEvaluationBase<1,n_components_other,Number,is_face> *other)
   :
   FEEvaluationBase <1,1,Number,is_face> (mapping, fe, quadrature, update_flags,
                                          first_selected_component, other)
@@ -5605,7 +5798,8 @@ FEEvaluationAccess<1,1,Number,is_face>
 template <typename Number, bool is_face>
 inline
 FEEvaluationAccess<1,1,Number,is_face>
-::FEEvaluationAccess (const FEEvaluationAccess<1,1,Number,is_face> &other)
+::
+FEEvaluationAccess (const FEEvaluationAccess<1,1,Number,is_face> &other)
   :
   FEEvaluationBase <1,1,Number,is_face>(other)
 {}
@@ -5628,7 +5822,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number,is_face>
-::get_dof_value (const unsigned int dof) const
+::
+get_dof_value (const unsigned int dof) const
 {
   AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   return this->values_dofs[0][dof];
@@ -5640,7 +5835,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number,is_face>
-::get_value (const unsigned int q_point) const
+::
+get_value (const unsigned int q_point) const
 {
   Assert (this->values_quad_initialized==true,
           internal::ExcAccessToUninitializedField());
@@ -5654,7 +5850,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,1,VectorizedArray<Number> >
 FEEvaluationAccess<1,1,Number,is_face>
-::get_gradient (const unsigned int q_point) const
+::
+get_gradient (const unsigned int q_point) const
 {
   // could use the base class gradient, but that involves too many inefficient
   // initialization operations on tensors
@@ -5679,7 +5876,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number,is_face>
-::get_normal_derivative (const unsigned int q_point) const
+::
+get_normal_derivative (const unsigned int q_point) const
 {
   return BaseClass::get_normal_derivative(q_point)[0];
 }
@@ -5690,7 +5888,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<2,1,VectorizedArray<Number> >
 FEEvaluationAccess<1,1,Number,is_face>
-::get_hessian (const unsigned int q_point) const
+::
+get_hessian (const unsigned int q_point) const
 {
   return BaseClass::get_hessian(q_point)[0];
 }
@@ -5701,7 +5900,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 Tensor<1,1,VectorizedArray<Number> >
 FEEvaluationAccess<1,1,Number,is_face>
-::get_hessian_diagonal (const unsigned int q_point) const
+::
+get_hessian_diagonal (const unsigned int q_point) const
 {
   return BaseClass::get_hessian_diagonal(q_point)[0];
 }
@@ -5712,7 +5912,8 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number,is_face>
-::get_laplacian (const unsigned int q_point) const
+::
+get_laplacian (const unsigned int q_point) const
 {
   return BaseClass::get_laplacian(q_point)[0];
 }
@@ -5723,8 +5924,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void DEAL_II_ALWAYS_INLINE
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_dof_value (const VectorizedArray<Number> val_in,
-                    const unsigned int dof)
+::
+submit_dof_value (const VectorizedArray<Number> val_in,
+                  const unsigned int dof)
 {
 #ifdef DEBUG
   this->dof_values_initialized = true;
@@ -5739,8 +5941,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_value (const VectorizedArray<Number> val_in,
-                const unsigned int q_point)
+::
+submit_value (const VectorizedArray<Number> val_in,
+              const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5765,8 +5968,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
-                const unsigned int q_point)
+::
+submit_value (const Tensor<1,1,VectorizedArray<Number> > val_in,
+              const unsigned int q_point)
 {
   submit_value(val_in[0], q_point);
 }
@@ -5777,8 +5981,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_gradient (const Tensor<1,1,VectorizedArray<Number> > grad_in,
-                   const unsigned int q_point)
+::
+submit_gradient (const Tensor<1,1,VectorizedArray<Number> > grad_in,
+                 const unsigned int q_point)
 {
   submit_gradient(grad_in[0], q_point);
 }
@@ -5789,8 +5994,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_gradient (const VectorizedArray<Number> grad_in,
-                   const unsigned int q_point)
+::
+submit_gradient (const VectorizedArray<Number> grad_in,
+                 const unsigned int q_point)
 {
 #ifdef DEBUG
   Assert (this->cell != numbers::invalid_unsigned_int, ExcNotInitialized());
@@ -5814,8 +6020,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_normal_derivative (const VectorizedArray<Number> grad_in,
-                            const unsigned int q_point)
+::
+submit_normal_derivative (const VectorizedArray<Number> grad_in,
+                          const unsigned int q_point)
 {
   Tensor<1,1,VectorizedArray<Number> > grad;
   grad[0] = grad_in;
@@ -5828,8 +6035,9 @@ template <typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE
 void
 FEEvaluationAccess<1,1,Number,is_face>
-::submit_normal_derivative (const Tensor<1,1,VectorizedArray<Number> > grad_in,
-                            const unsigned int q_point)
+::
+submit_normal_derivative (const Tensor<1,1,VectorizedArray<Number> > grad_in,
+                          const unsigned int q_point)
 {
   BaseClass::submit_normal_derivative(grad_in, q_point);
 }
@@ -5840,7 +6048,8 @@ template <typename Number, bool is_face>
 inline
 VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number,is_face>
-::integrate_value () const
+::
+integrate_value () const
 {
   return BaseClass::integrate_value()[0];
 }
@@ -5855,10 +6064,11 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const MatrixFree<dim,Number> &data_in,
-                const unsigned int fe_no,
-                const unsigned int quad_no,
-                const unsigned int first_selected_component)
+::
+FEEvaluation (const MatrixFree<dim,Number> &data_in,
+              const unsigned int fe_no,
+              const unsigned int quad_no,
+              const unsigned int first_selected_component)
   :
   BaseClass (data_in, fe_no, first_selected_component, quad_no, fe_degree, static_n_q_points),
   dofs_per_component (this->data->dofs_per_component_on_cell),
@@ -5874,11 +6084,12 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const Mapping<dim>       &mapping,
-                const FiniteElement<dim> &fe,
-                const Quadrature<1>      &quadrature,
-                const UpdateFlags         update_flags,
-                const unsigned int        first_selected_component)
+::
+FEEvaluation (const Mapping<dim>       &mapping,
+              const FiniteElement<dim> &fe,
+              const Quadrature<1>      &quadrature,
+              const UpdateFlags         update_flags,
+              const unsigned int        first_selected_component)
   :
   BaseClass (mapping, fe, quadrature, update_flags,
              first_selected_component,
@@ -5896,10 +6107,11 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const FiniteElement<dim> &fe,
-                const Quadrature<1>      &quadrature,
-                const UpdateFlags         update_flags,
-                const unsigned int        first_selected_component)
+::
+FEEvaluation (const FiniteElement<dim> &fe,
+              const Quadrature<1>      &quadrature,
+              const UpdateFlags         update_flags,
+              const unsigned int        first_selected_component)
   :
   BaseClass (StaticMappingQ1<dim>::mapping, fe, quadrature, update_flags,
              first_selected_component,
@@ -5918,9 +6130,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 template <int n_components_other>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const FiniteElement<dim> &fe,
-                const FEEvaluationBase<dim,n_components_other,Number> &other,
-                const unsigned int        first_selected_component)
+::
+FEEvaluation (const FiniteElement<dim> &fe,
+              const FEEvaluationBase<dim,n_components_other,Number> &other,
+              const unsigned int        first_selected_component)
   :
   BaseClass (other.mapped_geometry->get_fe_values().get_mapping(),
              fe, other.mapped_geometry->get_quadrature(),
@@ -5939,7 +6152,8 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEEvaluation (const FEEvaluation &other)
+::
+FEEvaluation (const FEEvaluation &other)
   :
   BaseClass (other),
   dofs_per_component (this->data->dofs_per_component_on_cell),
@@ -5970,8 +6184,9 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::check_template_arguments(const unsigned int dof_no,
-                           const unsigned int first_selected_component)
+::
+check_template_arguments(const unsigned int dof_no,
+                         const unsigned int first_selected_component)
 {
   (void)dof_no;
   (void)first_selected_component;
@@ -6112,7 +6327,8 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::reinit (const unsigned int cell_index)
+::
+reinit (const unsigned int cell_index)
 {
   Assert (this->mapped_geometry == nullptr,
           ExcMessage("FEEvaluation was initialized without a matrix-free object."
@@ -6145,7 +6361,8 @@ template <typename DoFHandlerType, bool level_dof_access>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
+::
+reinit (const TriaIterator<DoFCellAccessor<DoFHandlerType,level_dof_access> > &cell)
 {
   Assert(this->matrix_info == nullptr,
          ExcMessage("Cannot use initialization from cell iterator if "
@@ -6168,7 +6385,8 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::reinit (const typename Triangulation<dim>::cell_iterator &cell)
+::
+reinit (const typename Triangulation<dim>::cell_iterator &cell)
 {
   Assert(this->matrix_info == 0,
          ExcMessage("Cannot use initialization from cell iterator if "
@@ -6186,7 +6404,8 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 Point<dim,VectorizedArray<Number> >
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::quadrature_point (const unsigned int q) const
+::
+quadrature_point (const unsigned int q) const
 {
   if (this->matrix_info == nullptr)
     {
@@ -6243,9 +6462,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::evaluate (const bool evaluate_values,
-            const bool evaluate_gradients,
-            const bool evaluate_hessians)
+::
+evaluate (const bool evaluate_values,
+          const bool evaluate_gradients,
+          const bool evaluate_hessians)
 {
   Assert (this->dof_values_initialized == true,
           internal::ExcAccessToUninitializedField());
@@ -6259,10 +6479,11 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::evaluate (const VectorizedArray<Number> *values_array,
-            const bool evaluate_values,
-            const bool evaluate_gradients,
-            const bool evaluate_hessians)
+::
+evaluate (const VectorizedArray<Number> *values_array,
+          const bool evaluate_values,
+          const bool evaluate_gradients,
+          const bool evaluate_hessians)
 {
   SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, VectorizedArray<Number> >
   ::evaluate (*this->data, const_cast<VectorizedArray<Number>*>(values_array),
@@ -6288,10 +6509,11 @@ template <typename VectorType>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::gather_evaluate (const VectorType &input_vector,
-                   const bool        evaluate_values,
-                   const bool        evaluate_gradients,
-                   const bool        evaluate_hessians)
+::
+gather_evaluate (const VectorType &input_vector,
+                 const bool        evaluate_values,
+                 const bool        evaluate_gradients,
+                 const bool        evaluate_hessians)
 {
   this->read_dof_values(input_vector);
   evaluate(this->begin_dof_values(), evaluate_values, evaluate_gradients,
@@ -6305,8 +6527,9 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::integrate (const bool integrate_values,
-             const bool integrate_gradients)
+::
+integrate (const bool integrate_values,
+           const bool integrate_gradients)
 {
   integrate(integrate_values, integrate_gradients, this->values_dofs[0]);
 
@@ -6322,9 +6545,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::integrate (const bool               integrate_values,
-             const bool               integrate_gradients,
-             VectorizedArray<Number> *values_array)
+::
+integrate (const bool               integrate_values,
+           const bool               integrate_gradients,
+           VectorizedArray<Number> *values_array)
 {
   if (integrate_values == true)
     Assert (this->values_quad_submitted == true,
@@ -6353,9 +6577,10 @@ template <typename VectorType>
 inline
 void
 FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::integrate_scatter (const bool  integrate_values,
-                     const bool  integrate_gradients,
-                     VectorType &destination)
+::
+integrate_scatter (const bool  integrate_values,
+                   const bool  integrate_gradients,
+                   VectorType &destination)
 {
   integrate(integrate_values, integrate_gradients, this->begin_dof_values());
   this->distribute_local_to_global(destination);
@@ -6371,11 +6596,12 @@ template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::FEFaceEvaluation (const MatrixFree<dim,Number> &matrix_free,
-                    const bool                    is_interior_face,
-                    const unsigned int            dof_no,
-                    const unsigned int            quad_no,
-                    const unsigned int            first_selected_component)
+::
+FEFaceEvaluation (const MatrixFree<dim,Number> &matrix_free,
+                  const bool                    is_interior_face,
+                  const unsigned int            dof_no,
+                  const unsigned int            quad_no,
+                  const unsigned int            first_selected_component)
   :
   BaseClass(matrix_free, dof_no, first_selected_component, quad_no, fe_degree,
             static_n_q_points, is_interior_face),
@@ -6391,7 +6617,8 @@ template <int dim, int fe_degree, int n_q_points_1d, int n_components_,
           typename Number>
 inline
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::~FEFaceEvaluation ()
+::
+~FEFaceEvaluation ()
 {}
 
 
@@ -6400,7 +6627,8 @@ template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::reinit (const unsigned int face_index)
+::
+reinit (const unsigned int face_index)
 {
   Assert (this->mapped_geometry == nullptr,
           ExcMessage("FEEvaluation was initialized without a matrix-free object."
@@ -6461,8 +6689,9 @@ template <int dim, int fe_degree, int n_q_points_1d, int n_components_, typename
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::reinit (const unsigned int cell_index,
-          const unsigned int face_number)
+::
+reinit (const unsigned int cell_index,
+        const unsigned int face_number)
 {
   Assert(this->quad_no < this->matrix_info->get_mapping_info().face_data_by_cells.size(),
          ExcMessage("You must set MatrixFree::AdditionalData::mapping_update_flags_faces_by_cells to use the present reinit method."));
@@ -6514,8 +6743,9 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components,
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number>
-::evaluate (const bool evaluate_values,
-            const bool evaluate_gradients)
+::
+evaluate (const bool evaluate_values,
+          const bool evaluate_gradients)
 {
   Assert(this->dof_values_initialized, ExcNotInitialized());
 
@@ -6529,9 +6759,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components,
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number>
-::evaluate (const VectorizedArray<Number> *values_array,
-            const bool evaluate_values,
-            const bool evaluate_gradients)
+::
+evaluate (const VectorizedArray<Number> *values_array,
+          const bool evaluate_values,
+          const bool evaluate_gradients)
 {
   if (!(evaluate_values + evaluate_gradients))
     return;
@@ -6594,8 +6825,9 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components,
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number>
-::integrate (const bool integrate_values,
-             const bool integrate_gradients)
+::
+integrate (const bool integrate_values,
+           const bool integrate_gradients)
 {
   integrate(integrate_values, integrate_gradients, this->values_dofs[0]);
 
@@ -6611,9 +6843,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components,
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number>
-::integrate (const bool integrate_values,
-             const bool integrate_gradients,
-             VectorizedArray<Number> *values_array)
+::
+integrate (const bool integrate_values,
+           const bool integrate_gradients,
+           VectorizedArray<Number> *values_array)
 {
   if (!(integrate_values + integrate_gradients))
     return;
@@ -6665,9 +6898,10 @@ template <typename VectorType>
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::gather_evaluate (const VectorType &input_vector,
-                   const bool        evaluate_values,
-                   const bool        evaluate_gradients)
+::
+gather_evaluate (const VectorType &input_vector,
+                 const bool        evaluate_values,
+                 const bool        evaluate_gradients)
 {
   const unsigned int side = this->face_no%2;
   const unsigned int dofs_per_face = fe_degree > -1 ?
@@ -6794,9 +7028,10 @@ template <typename VectorType>
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::integrate_scatter (const bool  integrate_values,
-                     const bool  integrate_gradients,
-                     VectorType &destination)
+::
+integrate_scatter (const bool  integrate_values,
+                   const bool  integrate_gradients,
+                   VectorType &destination)
 {
   const unsigned int side = this->face_no%2;
   const unsigned int dofs_per_face = fe_degree > -1 ?
@@ -6916,9 +7151,10 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components,
 inline
 void
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components,Number>
-::adjust_for_face_orientation(const bool integrate,
-                              const bool values,
-                              const bool gradients)
+::
+adjust_for_face_orientation(const bool integrate,
+                            const bool values,
+                            const bool gradients)
 {
   VectorizedArray<Number> *tmp_values = this->scratch_data;
   const unsigned int *orientations =
@@ -6958,7 +7194,8 @@ template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
 inline
 Point<dim,VectorizedArray<Number> >
 FEFaceEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
-::quadrature_point (const unsigned int q) const
+::
+quadrature_point (const unsigned int q) const
 {
   AssertIndexRange (q, n_q_points);
   if (this->dof_access_index < 2)

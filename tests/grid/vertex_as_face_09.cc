@@ -28,7 +28,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   Triangulation<2,2> volume_mesh;
   GridGenerator::hyper_cube (volume_mesh);
@@ -44,7 +45,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

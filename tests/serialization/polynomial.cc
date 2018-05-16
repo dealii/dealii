@@ -21,7 +21,8 @@
 #include <deal.II/base/polynomial.h>
 
 
-void test ()
+void
+test ()
 {
   double c1[3] = {1., 2., 3.};
   std::vector<double> coefficients1(c1, &c1[3]);
@@ -41,7 +42,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

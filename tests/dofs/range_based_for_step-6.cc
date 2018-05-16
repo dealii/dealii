@@ -63,14 +63,20 @@ public:
   Step6 ();
   ~Step6 ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  refine_grid ();
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
 
@@ -95,19 +101,22 @@ class Coefficient : public Function<dim>
 public:
   Coefficient () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double>            &values,
+              const unsigned int              component = 0) const;
 };
 
 
 
 template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int) const
+double
+Coefficient<dim>::value (const Point<dim> &p,
+                         const unsigned int) const
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -118,9 +127,10 @@ double Coefficient<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
+void
+Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                              std::vector<double>            &values,
+                              const unsigned int              component) const
 {
   const unsigned int n_points = points.size();
 
@@ -160,7 +170,8 @@ Step6<dim>::~Step6 ()
 
 
 template <int dim>
-void Step6<dim>::setup_system ()
+void
+Step6<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -195,7 +206,8 @@ void Step6<dim>::setup_system ()
 
 
 template <int dim>
-void Step6<dim>::assemble_system ()
+void
+Step6<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(3);
 
@@ -251,7 +263,8 @@ void Step6<dim>::assemble_system ()
 
 
 template <int dim>
-void Step6<dim>::solve ()
+void
+Step6<dim>::solve ()
 {
   SolverControl      solver_control (1000, 1e-12);
   SolverCG<>         solver (solver_control);
@@ -268,7 +281,8 @@ void Step6<dim>::solve ()
 
 
 template <int dim>
-void Step6<dim>::refine_grid ()
+void
+Step6<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -288,7 +302,8 @@ void Step6<dim>::refine_grid ()
 
 
 template <int dim>
-void Step6<dim>::output_results (const unsigned int cycle) const
+void
+Step6<dim>::output_results (const unsigned int cycle) const
 {
   Assert (cycle < 10, ExcNotImplemented());
 
@@ -305,7 +320,8 @@ void Step6<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void Step6<dim>::run ()
+void
+Step6<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -341,7 +357,8 @@ void Step6<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (3);

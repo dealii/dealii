@@ -25,8 +25,9 @@
 #include <deal.II/lac/full_matrix.h>
 
 
-void test (const unsigned int M,
-           const unsigned int N)
+void
+test (const unsigned int M,
+      const unsigned int N)
 {
   SparsityPattern sp (M,N);
 
@@ -45,7 +46,8 @@ void test (const unsigned int M,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

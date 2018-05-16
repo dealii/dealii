@@ -39,7 +39,8 @@ plot2d([f,fs(0),fs(1),fs(2),fs(3)],[x,0,1]);
 
 using namespace dealii;
 
-void test_1d ()
+void
+test_1d ()
 {
   const unsigned int N   =4;
   // exact values obtained by Maxima:
@@ -86,7 +87,8 @@ void test_1d ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

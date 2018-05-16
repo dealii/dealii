@@ -23,9 +23,10 @@
 #include <vector>
 
 
-void test (Vector<double> &v,
-           Vector<double> &w,
-           Vector<double> &x)
+void
+test (Vector<double> &v,
+      Vector<double> &w,
+      Vector<double> &x)
 {
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -64,7 +65,8 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

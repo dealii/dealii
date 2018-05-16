@@ -253,8 +253,9 @@ enum UpdateFlags
  */
 template <class StreamType>
 inline
-StreamType &operator << (StreamType &s,
-                         const UpdateFlags u)
+StreamType &
+operator << (StreamType &s,
+             const UpdateFlags u)
 {
   s << " UpdateFlags|";
   if (u & update_values)                                  s << "values|";
@@ -415,14 +416,16 @@ namespace internal
       /**
        * Initialize all vectors to correct size.
        */
-      void initialize (const unsigned int n_quadrature_points,
-                       const UpdateFlags  flags);
+      void
+      initialize (const unsigned int n_quadrature_points,
+                  const UpdateFlags  flags);
 
       /**
        * Compute and return an estimate for the memory consumption (in bytes)
        * of this object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Store an array of weights times the Jacobi determinant at the
@@ -519,15 +522,17 @@ namespace internal
       /**
        * Initialize all vectors to correct size.
        */
-      void initialize (const unsigned int        n_quadrature_points,
-                       const FiniteElement<dim,spacedim> &fe,
-                       const UpdateFlags         flags);
+      void
+      initialize (const unsigned int        n_quadrature_points,
+                  const FiniteElement<dim,spacedim> &fe,
+                  const UpdateFlags         flags);
 
       /**
        * Compute and return an estimate for the memory consumption (in bytes)
        * of this object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Storage type for shape values. Each row in the matrix denotes the

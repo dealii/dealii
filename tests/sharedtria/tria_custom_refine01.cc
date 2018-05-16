@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void mypartition(parallel::shared::Triangulation<dim> &tria)
+void
+mypartition(parallel::shared::Triangulation<dim> &tria)
 {
   const unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
@@ -47,7 +48,8 @@ void mypartition(parallel::shared::Triangulation<dim> &tria)
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
                                                    (Triangulation<dim>::limit_level_difference_at_vertices), true,
@@ -70,7 +72,8 @@ void test()
       deallog << "(" << cell->id().to_string() << "," << cell->subdomain_id() << ")" << std::endl;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

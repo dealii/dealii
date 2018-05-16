@@ -80,7 +80,8 @@ public:
    * Copy operator. Like the copy constructor, this may be called for objects
    * with empty blocks only.
    */
-  BlockSparseMatrixEZ &operator = (const BlockSparseMatrixEZ<Number> &);
+  BlockSparseMatrixEZ &
+  operator = (const BlockSparseMatrixEZ<Number> &);
 
   /**
    * This operator assigns a scalar to a matrix. Since this does usually not
@@ -90,13 +91,15 @@ public:
    * allow for the obvious notation <tt>matrix=0</tt>, which sets all elements
    * of the matrix to zero, but keep the sparsity pattern previously used.
    */
-  BlockSparseMatrixEZ &operator = (const double d);
+  BlockSparseMatrixEZ &
+  operator = (const double d);
 
 
   /**
    * Set matrix to zero dimensions and release memory.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Initialize to given block numbers.  After this operation, the matrix will
@@ -105,15 +108,17 @@ public:
    * blocks, collect_sizes() must be called to update internal data
    * structures.
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_cols);
+  void
+  reinit (const unsigned int n_block_rows,
+          const unsigned int n_block_cols);
   /**
    * This function collects the sizes of the sub-objects and stores them in
    * internal arrays, in order to be able to relay global indices into the
    * matrix to indices into the subobjects. You *must* call this function each
    * time after you have changed the size of the sub-objects.
    */
-  void collect_sizes ();
+  void
+  collect_sizes ();
 
   /**
    * Access the block with the given coordinates.
@@ -134,12 +139,14 @@ public:
   /**
    * Return the number of blocks in a column.
    */
-  unsigned int n_block_rows () const;
+  unsigned int
+  n_block_rows () const;
 
   /**
    * Return the number of blocks in a row.
    */
-  unsigned int n_block_cols () const;
+  unsigned int
+  n_block_cols () const;
 
   /**
    * Return whether the object is empty. It is empty if no memory is
@@ -147,7 +154,8 @@ public:
    * function is just the concatenation of the respective call to all sub-
    * matrices.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
@@ -155,7 +163,8 @@ public:
    * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
    * times n().
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
@@ -163,24 +172,27 @@ public:
    * matrix blocks of this matrix. Recall that the matrix is of size m() times
    * n().
    */
-  size_type n () const;
+  size_type
+  n () const;
 
   /**
    * Set the element <tt>(i,j)</tt> to @p value.  Throws an error if the entry
    * does not exist or if <tt>value</tt> is not a finite number. Still, it is
    * allowed to store zero values in non-existent fields.
    */
-  void set (const size_type i,
-            const size_type j,
-            const Number value);
+  void
+  set (const size_type i,
+       const size_type j,
+       const Number value);
 
   /**
    * Add @p value to the element <tt>(i,j)</tt>.  Throws an error if the entry
    * does not exist or if <tt>value</tt> is not a finite number. Still, it is
    * allowed to store zero values in non-existent fields.
    */
-  void add (const size_type i, const size_type j,
-            const Number value);
+  void
+  add (const size_type i, const size_type j,
+       const Number value);
 
 
   /**
@@ -188,8 +200,9 @@ public:
    * matrix.
    */
   template <typename somenumber>
-  void vmult (BlockVector<somenumber>       &dst,
-              const BlockVector<somenumber> &src) const;
+  void
+  vmult (BlockVector<somenumber>       &dst,
+         const BlockVector<somenumber> &src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -197,16 +210,18 @@ public:
    * matrix.
    */
   template <typename somenumber>
-  void Tvmult (BlockVector<somenumber>       &dst,
-               const BlockVector<somenumber> &src) const;
+  void
+  Tvmult (BlockVector<somenumber>       &dst,
+          const BlockVector<somenumber> &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
    * this matrix.
    */
   template <typename somenumber>
-  void vmult_add (BlockVector<somenumber>       &dst,
-                  const BlockVector<somenumber> &src) const;
+  void
+  vmult_add (BlockVector<somenumber>       &dst,
+             const BlockVector<somenumber> &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M^T*src$ to $dst$ with $M$
@@ -214,8 +229,9 @@ public:
    * the transposed matrix.
    */
   template <typename somenumber>
-  void Tvmult_add (BlockVector<somenumber>       &dst,
-                   const BlockVector<somenumber> &src) const;
+  void
+  Tvmult_add (BlockVector<somenumber>       &dst,
+              const BlockVector<somenumber> &src) const;
 
 
   /**
@@ -224,7 +240,8 @@ public:
    * relation of allocated and used entries is shown.
    */
   template <class StreamType>
-  void print_statistics (StreamType &s, bool full = false);
+  void
+  print_statistics (StreamType &s, bool full = false);
 
 private:
   /**

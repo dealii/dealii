@@ -27,7 +27,8 @@
 #include <deal.II/fe/fe_nedelec.h>
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
@@ -39,7 +40,8 @@ int main()
   struct MyFE : FE_Nedelec<3>
   {
     MyFE () : FE_Nedelec<3>(0) {};
-    virtual bool hp_constraints_are_implemented () const
+    virtual bool
+    hp_constraints_are_implemented () const
     {
       return false;
     }

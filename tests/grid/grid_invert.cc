@@ -22,10 +22,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim>
-void test (bool second_case=false)
+void
+test (bool second_case=false)
 {
   std::vector<Point<dim> > vertices(GeometryInfo<dim>::vertices_per_cell);
   vertices[1](1)=1;
@@ -69,7 +71,8 @@ void test (bool second_case=false)
   grid_out.write_ucd (tria, logfile);
 }
 
-int main ()
+int
+main ()
 {
   test<2> ();
   test<3> (false);

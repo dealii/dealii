@@ -21,7 +21,8 @@
 #include <deal.II/base/array_view.h>
 
 
-void test ()
+void
+test ()
 {
   std::vector<int> arr1 = {0,1,2,3,4,5,6,7,8,9};
   ArrayView<int> view1 (arr1);
@@ -72,7 +73,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

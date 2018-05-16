@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test ()
+void
+test ()
 {
   PETScWrappers::SparseMatrix m(10,10,10);
   for (unsigned int i=0; i<m.m(); ++i)
@@ -59,7 +60,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

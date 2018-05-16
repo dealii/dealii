@@ -67,16 +67,24 @@ public:
   LaplaceProblem ();
   ~LaplaceProblem ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void create_coarse_grid ();
-  void refine_grid ();
-  void estimate_smoothness (Vector<float> &smoothness_indicators) const;
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  create_coarse_grid ();
+  void
+  refine_grid ();
+  void
+  estimate_smoothness (Vector<float> &smoothness_indicators) const;
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
 
@@ -104,8 +112,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -143,7 +152,8 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   distr.reset();
   distr.start();
@@ -193,7 +203,8 @@ void LaplaceProblem<dim>::setup_system ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void
+LaplaceProblem<dim>::assemble_system ()
 {
   hp::FEValues<dim> hp_fe_values (fe_collection,
                                   quadrature_collection,
@@ -265,7 +276,8 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (system_rhs.size(),
                                           1e-8*system_rhs.l2_norm());
@@ -464,7 +476,8 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 
 
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void
+LaplaceProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   KellyErrorEstimator<dim>::estimate (dof_handler,
@@ -519,7 +532,8 @@ void LaplaceProblem<dim>::refine_grid ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void
+LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   Assert (cycle < 10, ExcNotImplemented());
 
@@ -574,7 +588,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 template <>
-void LaplaceProblem<2>::create_coarse_grid ()
+void
+LaplaceProblem<2>::create_coarse_grid ()
 {
   const unsigned int dim = 2;
 
@@ -648,7 +663,8 @@ void LaplaceProblem<2>::create_coarse_grid ()
 
 
 template <>
-void LaplaceProblem<3>::create_coarse_grid ()
+void
+LaplaceProblem<3>::create_coarse_grid ()
 {
   const unsigned int dim = 3;
 
@@ -823,7 +839,8 @@ void LaplaceProblem<3>::create_coarse_grid ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<30; ++cycle)
     {
@@ -865,7 +882,8 @@ void LaplaceProblem<dim>::run ()
     }
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

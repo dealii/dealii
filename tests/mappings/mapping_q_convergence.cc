@@ -52,8 +52,9 @@
 using namespace dealii;
 // Like FESeries::linear_regression. Included here so that this test can also
 // be run with older versions of deal.II.
-double regression_slope(const std::vector<double> &x,
-                        const std::vector<double> &y)
+double
+regression_slope(const std::vector<double> &x,
+                 const std::vector<double> &y)
 {
   FullMatrix<double> K(2,2), invK(2,2);
   Vector<double>     X(2), B(2);
@@ -94,7 +95,8 @@ double regression_slope(const std::vector<double> &x,
 }
 
 
-double zvalue (const double x, const double y)
+double
+zvalue (const double x, const double y)
 {
   double xh = x * 5., yh = y * 5.;
   return (xh * exp(-xh*xh - yh*yh)) / 10.;
@@ -104,13 +106,17 @@ template <int dim>
 class Geometry: public ChartManifold<dim>
 {
 public:
-  virtual Point<dim> pull_back(const Point<dim> &space_point) const override;
-  virtual Point<dim> push_forward(const Point<dim> &chart_point) const override;
-  virtual std::unique_ptr<Manifold<dim> >clone() const override;
+  virtual Point<dim>
+  pull_back(const Point<dim> &space_point) const override;
+  virtual Point<dim>
+  push_forward(const Point<dim> &chart_point) const override;
+  virtual std::unique_ptr<Manifold<dim> >
+  clone() const override;
 };
 
 template <int dim>
-Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
+Point<dim>
+Geometry<dim>::pull_back(const Point<dim> &space_point) const
 {
   const double d = space_point[dim - 1];
   const double z = zvalue(space_point[0], dim == 3 ? space_point[1] : 0);
@@ -130,7 +136,8 @@ Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
 }
 
 template <int dim>
-Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
+Point<dim>
+Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 {
   const double d_hat = chart_point[dim - 1];
   const double z = zvalue(chart_point[0], dim == 3 ? chart_point[1] : 0);
@@ -161,7 +168,8 @@ template <int dim>
 class TranscendentalManufacturedSolution : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int /*component*/) const
+  virtual double
+  value (const Point<dim> &p, const unsigned int /*component*/) const
   {
     return std::cos(p[0]) + 2.0*std::sin(2*p[1]);
   }
@@ -171,7 +179,8 @@ public:
 
 
 template <int dim>
-void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
+void
+create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometry)
 {
   GridGenerator::hyper_cube (triangulation, -1.0, 1.0);
   GridTools::transform (std::bind(&Geometry<dim>::push_forward,
@@ -188,7 +197,8 @@ void create_tria(Triangulation<dim> &triangulation, const Geometry<dim> &geometr
 
 
 template <int dim>
-void test(const FiniteElement<dim> &fe)
+void
+test(const FiniteElement<dim> &fe)
 {
   Geometry<dim> geometry;
   TranscendentalManufacturedSolution<dim> fe_function;
@@ -246,7 +256,8 @@ void test(const FiniteElement<dim> &fe)
     }
 }
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (5);

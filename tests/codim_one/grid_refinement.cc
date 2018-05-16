@@ -29,10 +29,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
   SphericalManifold<dim, spacedim> boundary;
   Triangulation<dim, spacedim> tria;
@@ -52,7 +54,8 @@ void test(std::string filename)
     }
 }
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

@@ -42,8 +42,9 @@ class MyFunction : public Function<dim>
 public:
   MyFunction () : Function<dim>() {};
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int) const
   {
     double ret_value=sin(p[0]*4)*cos(p[1]*4);
     if (dim==3)
@@ -54,7 +55,8 @@ public:
 
 
 template <int dim>
-void transfer(std::ostream &out)
+void
+transfer(std::ostream &out)
 {
   MyFunction<dim> function;
   Triangulation<dim> tria(Triangulation<dim>::allow_anisotropic_smoothing);
@@ -124,7 +126,8 @@ void transfer(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision (4);

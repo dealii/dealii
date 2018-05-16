@@ -21,8 +21,9 @@
 // FE_Q_Bubbles<dim>::interpolate(...)
 
 template <int dim>
-void check_q_bubbles(const Function<dim> &f,
-                     const unsigned int degree)
+void
+check_q_bubbles(const Function<dim> &f,
+                const unsigned int degree)
 {
   FE_Q_Bubbles<dim> fe(degree);
   deallog << fe.get_name() << ' ';
@@ -36,7 +37,8 @@ void check_q_bubbles(const Function<dim> &f,
   deallog << " value " << difference(fe,dofs,f) << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

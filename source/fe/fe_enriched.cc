@@ -369,8 +369,9 @@ FE_Enriched<dim,spacedim>::get_data (const UpdateFlags      flags,
 
 
 template <int dim, int spacedim>
-void FE_Enriched<dim,spacedim>::initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                                            const std::vector<unsigned int> &multiplicities)
+void
+FE_Enriched<dim,spacedim>::initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                                       const std::vector<unsigned int> &multiplicities)
 {
   Assert (fes.size() == multiplicities.size(),
           ExcDimensionMismatch (fes.size(), multiplicities.size()) );

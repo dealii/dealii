@@ -37,7 +37,8 @@
 using namespace dealii;
 
 template <int dim>
-void test_compute_pt_loc(unsigned int n_points)
+void
+test_compute_pt_loc(unsigned int n_points)
 {
   deallog << "Testing for dim = " << dim << std::endl;
   deallog << "Testing on: " << n_points << " points." << std::endl;
@@ -96,7 +97,8 @@ void test_compute_pt_loc(unsigned int n_points)
   deallog << "Test finished" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -220,24 +220,27 @@ public:
    * After this function is called the preconditioner is ready to be used
    * (using the <code>vmult</code> function of derived classes).
    */
-  void initialize (const SparseMatrix<number> &M,
-                   const AdditionalData       &additional_data);
+  void
+  initialize (const SparseMatrix<number> &M,
+              const AdditionalData       &additional_data);
 
   /**
    * Do the preconditioning. This function takes the residual in @p src and
    * returns the resulting update vector in @p dst.
    */
   template <typename number2>
-  void vmult (Vector<number2>       &dst,
-              const Vector<number2> &src) const;
+  void
+  vmult (Vector<number2>       &dst,
+         const Vector<number2> &src) const;
 
   /**
    * Apply transpose preconditioner. This function takes the residual in @p
    * src  and returns the resulting update vector in @p dst.
    */
   template <typename number2>
-  void Tvmult (Vector<number2>       &dst,
-               const Vector<number2> &src) const;
+  void
+  Tvmult (Vector<number2>       &dst,
+          const Vector<number2> &src) const;
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
@@ -246,7 +249,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
@@ -255,7 +259,8 @@ public:
    * @note This function should only be called if the preconditioner has been
    * initialized.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 protected:
   /**
@@ -280,15 +285,17 @@ protected:
    * pointer
    */
   template <typename number2>
-  void apply_preconditioner (Vector<number2>         &dst,
-                             const Vector<number2>   &src,
-                             const std::vector<bool> *const dof_mask = nullptr) const;
+  void
+  apply_preconditioner (Vector<number2>         &dst,
+                        const Vector<number2>   &src,
+                        const std::vector<bool> *const dof_mask = nullptr) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**
@@ -331,7 +338,8 @@ private:
   /**
    * Compute the inverses of all selected diagonal elements.
    */
-  void compute_inverses ();
+  void
+  compute_inverses ();
 
   /**
    * Compute the inverses at positions in the range <tt>[begin,end)</tt>. In
@@ -339,8 +347,9 @@ private:
    * with the whole range, but in multithreaded mode, several copies of this
    * function are spawned.
    */
-  void compute_inverses (const size_type begin,
-                         const size_type end);
+  void
+  compute_inverses (const size_type begin,
+                    const size_type end);
 
   /**
    * Compute the inverse of the block located at position @p row. Since the
@@ -349,8 +358,9 @@ private:
    * the vector makes the process significantly faster than in the case where
    * this function re-creates it each time.
    */
-  void compute_inverse (const size_type         row,
-                        std::vector<size_type> &local_indices);
+  void
+  compute_inverse (const size_type         row,
+                   std::vector<size_type> &local_indices);
 
   /**
    * Make the derived class a friend. This seems silly, but is actually
@@ -541,14 +551,16 @@ public:
    * Apply the preconditioner.
    */
   template <typename number2>
-  void vmult (Vector<number2>       &dst,
-              const Vector<number2> &src) const;
+  void
+  vmult (Vector<number2>       &dst,
+         const Vector<number2> &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**
@@ -569,9 +581,10 @@ private:
    * Compute the contents of the field @p dof_masks. This function is called
    * from the constructor.
    */
-  void compute_dof_masks (const SparseMatrix<number> &M,
-                          const std::vector<bool>    &selected,
-                          const BlockingStrategy      blocking_strategy);
+  void
+  compute_dof_masks (const SparseMatrix<number> &M,
+                     const std::vector<bool>    &selected,
+                     const BlockingStrategy      blocking_strategy);
 };
 
 /*@}*/

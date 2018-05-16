@@ -26,7 +26,8 @@
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main ()
 {
   TopoDS_Shape sh = read_IGES(SOURCE_DIR "/iges_files/wigley.iges");
   write_IGES(sh, "tmp.iges");

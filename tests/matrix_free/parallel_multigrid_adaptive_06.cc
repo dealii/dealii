@@ -58,7 +58,8 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -77,66 +78,77 @@ public:
   {
   }
 
-  void  initialize (std::shared_ptr<const MatrixFree<dim,value_type>> data)
+  void
+  initialize (std::shared_ptr<const MatrixFree<dim,value_type>> data)
   {
     laplace.initialize(data);
   }
 
-  void  initialize (std::shared_ptr<const MatrixFree<dim,value_type>> data, const MGConstrainedDoFs &mg_constrained_dofs,
-                    const unsigned int level)
+  void
+  initialize (std::shared_ptr<const MatrixFree<dim,value_type>> data, const MGConstrainedDoFs &mg_constrained_dofs,
+              const unsigned int level)
   {
     laplace.initialize(data, mg_constrained_dofs, level);
   }
 
-  void  vmult_interface_down (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  vmult_interface_down (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.vmult_interface_down(dst.block(b), src.block(b));
   }
 
-  void  vmult_interface_up (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  vmult_interface_up (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.vmult_interface_up(dst.block(b), src.block(b));
   }
 
-  void  vmult (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  vmult (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.vmult(dst.block(b), src.block(b));
   }
 
-  void  Tvmult (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  Tvmult (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.Tvmult(dst.block(b), src.block(b));
   }
 
-  void  vmult_add (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  vmult_add (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.vmult_add(dst.block(b), src.block(b));
   }
 
-  void  Tvmult_add (BlockVectorType &dst, const BlockVectorType &src) const
+  void
+  Tvmult_add (BlockVectorType &dst, const BlockVectorType &src) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.Tvmult_add(dst.block(b), src.block(b));
   }
 
-  void precondition_Jacobi (BlockVectorType &dst, const BlockVectorType &src, const value_type omega) const
+  void
+  precondition_Jacobi (BlockVectorType &dst, const BlockVectorType &src, const value_type omega) const
   {
     for (unsigned int b = 0; b < src.n_blocks(); ++b)
       laplace.precondition_Jacobi(dst.block(b), src.block(b), omega);
   }
 
-  void compute_diagonal ()
+  void
+  compute_diagonal ()
   {
     laplace.compute_diagonal ();
   }
 
 
-  virtual void clear()
+  virtual void
+  clear()
   {
     laplace.clear();
   }
@@ -155,14 +167,16 @@ class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Bl
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MatrixType &matrix)
+  void
+  initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   level,
-                           LinearAlgebra::distributed::BlockVector<Number> &dst,
-                           const LinearAlgebra::distributed::BlockVector<Number> &src) const
+  virtual void
+  operator() (const unsigned int   level,
+              LinearAlgebra::distributed::BlockVector<Number> &dst,
+              const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
     SolverCG<LinearAlgebra::distributed::BlockVector<Number> > solver_coarse (solver_control);
@@ -175,7 +189,8 @@ public:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof, const unsigned int nb)
+void
+do_test (const DoFHandler<dim>  &dof, const unsigned int nb)
 {
   if (types_are_equal<number,float>::value == true)
     {
@@ -333,7 +348,8 @@ void do_test (const DoFHandler<dim>  &dof, const unsigned int nb)
 
 
 template <int dim, int fe_degree>
-void test (const unsigned int nbands = 1)
+void
+test (const unsigned int nbands = 1)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                  Triangulation<dim>::limit_level_difference_at_vertices,
@@ -363,7 +379,8 @@ void test (const unsigned int nbands = 1)
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 

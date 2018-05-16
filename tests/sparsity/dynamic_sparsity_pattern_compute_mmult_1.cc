@@ -24,7 +24,8 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   // create different (dynamic) sparsity pattern and add entries at
   // destinct locations. Check if mmultiplication creates entries at the right
@@ -89,7 +90,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

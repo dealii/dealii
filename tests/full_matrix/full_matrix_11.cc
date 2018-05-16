@@ -23,7 +23,8 @@
 
 
 template <typename Number>
-void test()
+void
+test()
 {
   FullMatrix<Number> A(76, 2), B(76, 3), C(2, 3), D(2, 3);
   for (unsigned int i=0; i<A.m(); ++i)
@@ -46,7 +47,8 @@ void test()
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

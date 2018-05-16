@@ -114,9 +114,12 @@ struct periodicity_tests
   int comm_rank, comm_size;
   parallel::distributed::Triangulation<dim> the_grid;
 
-  void refine_grid(const unsigned);
-  void write_grid();
-  void check_periodicity();
+  void
+  refine_grid(const unsigned);
+  void
+  write_grid();
+  void
+  check_periodicity();
 };
 
 template <int dim>
@@ -145,7 +148,8 @@ periodicity_tests<dim>::periodicity_tests()
 }
 
 template <int dim>
-void periodicity_tests<dim>::refine_grid(const unsigned n)
+void
+periodicity_tests<dim>::refine_grid(const unsigned n)
 {
   if (n != 0 && refn_cycle == 0)
     {
@@ -177,7 +181,8 @@ void periodicity_tests<dim>::refine_grid(const unsigned n)
 }
 
 template <int dim>
-void periodicity_tests<dim>::write_grid()
+void
+periodicity_tests<dim>::write_grid()
 {
   GridOut Grid1_Out;
   GridOutFlags::Svg svg_flags(
@@ -211,7 +216,8 @@ void periodicity_tests<dim>::write_grid()
 }
 
 template <int dim>
-void periodicity_tests<dim>::check_periodicity()
+void
+periodicity_tests<dim>::check_periodicity()
 {
   typedef std::pair<cell_iterator, unsigned> cell_face_pair;
   typedef typename std::map<cell_face_pair, cell_face_pair>::iterator cell_face_map_it;
@@ -287,7 +293,8 @@ void periodicity_tests<dim>::check_periodicity()
     }
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   try
     {

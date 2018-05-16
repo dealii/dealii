@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   MappingQ<dim> mapping(2);
   deallog << "Cloning..." << std::endl;
@@ -39,7 +40,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

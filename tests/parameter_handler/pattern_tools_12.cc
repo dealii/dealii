@@ -23,7 +23,8 @@
 using dealii::Patterns::Tools::to_string;
 using dealii::Patterns::Tools::to_value;
 
-int main()
+int
+main()
 {
   initlog();
 

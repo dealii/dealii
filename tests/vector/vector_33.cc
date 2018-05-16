@@ -22,7 +22,8 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   // set some elements of the vector
   double sum = 0;
@@ -43,7 +44,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

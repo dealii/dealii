@@ -27,7 +27,8 @@ Threads::Mutex mutex;
 int spin_lock = 0;
 
 
-int worker ()
+int
+worker ()
 {
   sleep (1);
   return 42;
@@ -35,7 +36,8 @@ int worker ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

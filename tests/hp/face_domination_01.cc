@@ -38,7 +38,8 @@
 
 const unsigned int dim=2;
 
-void print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
+void
+print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
 {
   deallog << "DoFs on cell=" << cell << ": ";
 
@@ -50,7 +51,8 @@ void print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

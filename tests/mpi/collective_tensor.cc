@@ -21,7 +21,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
-void test()
+void
+test()
 {
   Assert( Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
@@ -91,7 +92,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

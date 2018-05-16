@@ -38,7 +38,8 @@
 
 
 template <int dim>
-void run()
+void
+run()
 {
   Triangulation<dim> triangulation;
 
@@ -138,7 +139,8 @@ void run()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   logfile.precision (4);

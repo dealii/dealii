@@ -39,22 +39,25 @@ unsigned int chunk_size = 1;
 
 
 // reinitialize sparsity patterns for 5-point star
-void do_reinit (SparsityPattern &sp)
+void
+do_reinit (SparsityPattern &sp)
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5);
 }
 
 
 
-void do_reinit (ChunkSparsityPattern &sp)
+void
+do_reinit (ChunkSparsityPattern &sp)
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), 5, chunk_size);
 }
 
 
 
-void do_reinit (DynamicSparsityPattern &sp,
-                const IndexSet &index_set = IndexSet())
+void
+do_reinit (DynamicSparsityPattern &sp,
+           const IndexSet &index_set = IndexSet())
 {
   sp.reinit((N-1)*(N-1), (N-1)*(N-1), index_set);
 }
@@ -63,7 +66,8 @@ void do_reinit (DynamicSparsityPattern &sp,
 
 
 template <typename SP>
-void build_sparsity (SP &sparsity_pattern)
+void
+build_sparsity (SP &sparsity_pattern)
 {
   // generate usual 5-point sparsity pattern
   do_reinit (sparsity_pattern);
@@ -80,7 +84,8 @@ void build_sparsity (SP &sparsity_pattern)
 
 
 template <typename SP>
-void row_length ()
+void
+row_length ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -108,7 +113,8 @@ void global_index ()
 
 
 template <typename SP>
-void print_gnuplot ()
+void
+print_gnuplot ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -121,7 +127,8 @@ void print_gnuplot ()
 
 
 template <typename SP>
-void print ()
+void
+print ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -134,7 +141,8 @@ void print ()
 
 
 template <typename SP>
-void copy_with_offdiagonals_check (SP &sp2)
+void
+copy_with_offdiagonals_check (SP &sp2)
 {
   deallog << sp2.n_rows() << " " << sp2.n_cols() << " "
           << sp2.bandwidth() << " " << sp2.n_nonzero_elements()
@@ -147,7 +155,8 @@ void copy_with_offdiagonals_check (SP &sp2)
 
 
 template <typename SP>
-void copy_with_offdiagonals_1 ()
+void
+copy_with_offdiagonals_1 ()
 {
   SparsityPattern sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -165,7 +174,8 @@ void copy_with_offdiagonals_1 ()
 
 
 template <>
-void copy_with_offdiagonals_1<ChunkSparsityPattern> ()
+void copy_with_offdiagonals_1<ChunkSparsityPattern>
+()
 {
   // this sparsity pattern doesn't have this
   // function
@@ -175,7 +185,8 @@ void copy_with_offdiagonals_1<ChunkSparsityPattern> ()
 
 
 template <>
-void copy_with_offdiagonals_1<DynamicSparsityPattern> ()
+void copy_with_offdiagonals_1<DynamicSparsityPattern>
+()
 {
   // this sparsity pattern doesn't have this
   // function
@@ -185,7 +196,8 @@ void copy_with_offdiagonals_1<DynamicSparsityPattern> ()
 
 
 template <typename SP>
-void copy_with_offdiagonals_2 ()
+void
+copy_with_offdiagonals_2 ()
 {
   SparsityPattern sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -208,7 +220,8 @@ void copy_with_offdiagonals_2 ()
 
 
 template <>
-void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
+void copy_with_offdiagonals_2<ChunkSparsityPattern>
+()
 {
   // this sparsity pattern doesn't have this
   // function
@@ -218,7 +231,8 @@ void copy_with_offdiagonals_2<ChunkSparsityPattern> ()
 
 
 template <>
-void copy_with_offdiagonals_2<DynamicSparsityPattern> ()
+void copy_with_offdiagonals_2<DynamicSparsityPattern>
+()
 {
   // this sparsity pattern doesn't have this
   // function
@@ -289,7 +303,8 @@ do_copy_from (const FullMatrix<double> &sparsity,
 
 
 template <typename SP>
-void copy_from_1 ()
+void
+copy_from_1 ()
 {
   SparsityPattern sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -344,7 +359,8 @@ void copy_from_1 ()
 
 
 template <typename SP, typename CSP>
-void copy_from_2 ()
+void
+copy_from_2 ()
 {
   CSP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -385,7 +401,8 @@ void copy_from_2 ()
 
 
 template <typename SP>
-void copy_from_4 ()
+void
+copy_from_4 ()
 {
   const unsigned int M = (N-1)*(N-1);
   FullMatrix<double> sparsity_pattern(M,M);
@@ -430,7 +447,8 @@ void copy_from_4 ()
 
 
 template <typename SP>
-void matrix_position ()
+void
+matrix_position ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -456,7 +474,8 @@ void matrix_position ()
 
 
 template <>
-void matrix_position<ChunkSparsityPattern> ()
+void matrix_position<ChunkSparsityPattern>
+()
 {
   // this class doesn't have that function
   deallog << "OK" << std::endl;
@@ -465,7 +484,8 @@ void matrix_position<ChunkSparsityPattern> ()
 
 
 template <>
-void matrix_position<DynamicSparsityPattern> ()
+void matrix_position<DynamicSparsityPattern>
+()
 {
   // this class doesn't have that function
   deallog << "OK" << std::endl;
@@ -474,7 +494,8 @@ void matrix_position<DynamicSparsityPattern> ()
 
 
 template <typename SP>
-void block_read_write ()
+void
+block_read_write ()
 {
   SP sparsity_pattern;
   build_sparsity (sparsity_pattern);
@@ -508,7 +529,8 @@ void block_read_write ()
 
 
 template <>
-void block_read_write<DynamicSparsityPattern> ()
+void block_read_write<DynamicSparsityPattern>
+()
 {
   // not implemented for this sparsity
   // pattern
@@ -518,7 +540,8 @@ void block_read_write<DynamicSparsityPattern> ()
 
 
 template <typename SP>
-void test_index_set (const bool contiguous)
+void
+test_index_set (const bool contiguous)
 {
   SP sp1, sp2;
 

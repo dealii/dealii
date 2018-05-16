@@ -23,7 +23,8 @@
 using namespace dealii;
 
 template <typename VectorType>
-void test (const VectorType &given_vector)
+void
+test (const VectorType &given_vector)
 {
   Teuchos::RCP<VectorType> given_vector_rcp (new VectorType(given_vector));
 
@@ -55,7 +56,8 @@ void test (const VectorType &given_vector)
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   deallog.depth_console(10);
 

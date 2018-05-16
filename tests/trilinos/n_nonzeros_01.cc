@@ -23,7 +23,8 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // create an empty sparsity pattern
   TrilinosWrappers::SparsityPattern sparsity(4,5,1);
@@ -38,7 +39,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

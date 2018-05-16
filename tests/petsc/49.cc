@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v)
+void
+test (PETScWrappers::MPI::Vector &v)
 {
   Vector<PetscScalar> w (v.size());
 
@@ -46,7 +47,8 @@ void test (PETScWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

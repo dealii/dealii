@@ -98,11 +98,12 @@ namespace SparsityTools
    * methods you will want to partition the mesh, not the matrix. This can be
    * done by calling @p GridTools::partition_triangulation.
    */
-  void partition (const SparsityPattern     &sparsity_pattern,
-                  const unsigned int         n_partitions,
-                  std::vector<unsigned int> &partition_indices,
-                  const Partitioner partitioner = Partitioner::metis
-                 );
+  void
+  partition (const SparsityPattern     &sparsity_pattern,
+             const unsigned int         n_partitions,
+             std::vector<unsigned int> &partition_indices,
+             const Partitioner partitioner = Partitioner::metis
+            );
 
 
   /**
@@ -115,12 +116,13 @@ namespace SparsityTools
    * into consideration. If not then the size of this vector must equal to the
    * number of active cells in the triangulation.
    */
-  void partition (const SparsityPattern           &sparsity_pattern,
-                  const std::vector<unsigned int> &cell_weights,
-                  const unsigned int               n_partitions,
-                  std::vector<unsigned int>       &partition_indices,
-                  const Partitioner                partitioner = Partitioner::metis
-                 );
+  void
+  partition (const SparsityPattern           &sparsity_pattern,
+             const std::vector<unsigned int> &cell_weights,
+             const unsigned int               n_partitions,
+             std::vector<unsigned int>       &partition_indices,
+             const Partitioner                partitioner = Partitioner::metis
+            );
 
   /**
    * Using a coloring algorithm provided by ZOLTAN to color nodes whose
@@ -154,8 +156,9 @@ namespace SparsityTools
    * GraphColoring::make_graph_coloring() which is tailored to graph
    * coloring arising in shared-memory parallel assembly of matrices.
    */
-  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
-                                       std::vector<unsigned int> &color_indices);
+  unsigned int
+  color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                          std::vector<unsigned int> &color_indices);
 
   /**
    * For a given sparsity pattern, compute a re-enumeration of row/column

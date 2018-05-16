@@ -22,7 +22,8 @@
 #include <numeric>
 #include "simplex.h"
 
-void test(int n)
+void
+test(int n)
 {
   const unsigned int dim = 2;
 
@@ -74,7 +75,8 @@ void test(int n)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   test(5);

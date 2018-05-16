@@ -56,11 +56,14 @@ namespace LinearAdvectionTest
   {
   public:
     AdvectionProblem();
-    void run();
+    void
+    run();
 
   private:
-    void setup_system();
-    void assemble_system();
+    void
+    setup_system();
+    void
+    assemble_system();
     void calculate_flux_terms
     (const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false> > &current_cell,
      FEFaceValues<dim> &current_face_values,
@@ -100,7 +103,8 @@ namespace LinearAdvectionTest
   }
 
   template <int dim>
-  void AdvectionProblem<dim>::setup_system()
+  void
+  AdvectionProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
     locally_owned_dofs = dof_handler.locally_owned_dofs();
@@ -197,7 +201,8 @@ namespace LinearAdvectionTest
 
 
   template <int dim>
-  void AdvectionProblem<dim>::assemble_system()
+  void
+  AdvectionProblem<dim>::assemble_system()
   {
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     FullMatrix<double> current_to_current_flux(dofs_per_cell, dofs_per_cell);
@@ -300,14 +305,16 @@ namespace LinearAdvectionTest
 
 
   template <int dim>
-  void AdvectionProblem<dim>::run()
+  void
+  AdvectionProblem<dim>::run()
   {
     setup_system();
     assemble_system();
   }
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   using namespace dealii;
   initlog();

@@ -34,7 +34,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "Dimension = " << dim << std::endl;
 
@@ -79,7 +80,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

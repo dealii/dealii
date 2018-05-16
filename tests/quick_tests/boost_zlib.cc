@@ -25,7 +25,8 @@
 using namespace dealii;
 
 template <int dim>
-void test(const unsigned int &size)
+void
+test(const unsigned int &size)
 {
   std::vector<Point<dim> > points(size);
 
@@ -51,7 +52,8 @@ void test(const unsigned int &size)
   AssertThrow(ok, ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   test<1>(10);
   test<2>(10);

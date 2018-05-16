@@ -45,10 +45,12 @@ public:
   {
   }
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const;
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const;
 
-  const Table<dim,double> &get_coefficients() const
+  const Table<dim,double> &
+  get_coefficients() const
   {
     return coefficients;
   }
@@ -59,8 +61,9 @@ private:
 
 // copy-paste from fe_series.cc
 template <int dim>
-double Lh(const Point<dim>  &x_q,
-          const TableIndices<dim> &indices)
+double
+Lh(const Point<dim>  &x_q,
+   const TableIndices<dim> &indices)
 {
   double res = 1.0;
   for (unsigned int d = 0; d < dim; d++)
@@ -76,8 +79,9 @@ double Lh(const Point<dim>  &x_q,
 }
 
 template <>
-double LegendreFunction<2>::value(const dealii::Point<2> &point,
-                                  const unsigned int ) const
+double
+LegendreFunction<2>::value(const dealii::Point<2> &point,
+                           const unsigned int ) const
 {
   double f = 0.0;
 
@@ -89,8 +93,9 @@ double LegendreFunction<2>::value(const dealii::Point<2> &point,
 }
 
 template <>
-double LegendreFunction<3>::value(const dealii::Point<3> &point,
-                                  const unsigned int ) const
+double
+LegendreFunction<3>::value(const dealii::Point<3> &point,
+                           const unsigned int ) const
 {
   double f = 0.0;
 
@@ -102,7 +107,8 @@ double LegendreFunction<3>::value(const dealii::Point<3> &point,
   return f;
 }
 
-void print(const Table<2,double> &coeff)
+void
+print(const Table<2,double> &coeff)
 {
   for (unsigned int i = 0; i < coeff.size(0); i++)
     for (unsigned int j = 0; j < coeff.size(1); j++)
@@ -110,7 +116,8 @@ void print(const Table<2,double> &coeff)
   deallog << std::endl;
 }
 
-void print(const Table<3,double> &coeff)
+void
+print(const Table<3,double> &coeff)
 {
   for (unsigned int i = 0; i < coeff.size(0); i++)
     for (unsigned int j = 0; j < coeff.size(1); j++)
@@ -119,12 +126,14 @@ void print(const Table<3,double> &coeff)
   deallog << std::endl;
 }
 
-void resize(Table<2,double> &coeff, const unsigned int N)
+void
+resize(Table<2,double> &coeff, const unsigned int N)
 {
   coeff.reinit(N,N);
 }
 
-void resize(Table<3,double> &coeff, const unsigned int N)
+void
+resize(Table<3,double> &coeff, const unsigned int N)
 {
   TableIndices<3> size;
   for (unsigned int d=0; d<3; d++)
@@ -135,8 +144,9 @@ void resize(Table<3,double> &coeff, const unsigned int N)
 
 
 template <int dim>
-void test(const LegendreFunction<dim> &func,
-          const unsigned int poly_degree)
+void
+test(const LegendreFunction<dim> &func,
+     const unsigned int poly_degree)
 {
   const unsigned int max_poly = poly_degree+3;
   deallog <<"-----------------------------------"<<std::endl;
@@ -196,7 +206,8 @@ void test(const LegendreFunction<dim> &func,
   dof_handler.clear();
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile,/*do not print job id*/false);

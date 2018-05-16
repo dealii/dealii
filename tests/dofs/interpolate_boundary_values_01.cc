@@ -48,8 +48,9 @@ class VectorBoundaryValues :  public Function<dim>
 {
 public:
   VectorBoundaryValues ();
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &values) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &values) const;
 };
 
 template <int dim>
@@ -59,8 +60,9 @@ VectorBoundaryValues<dim>::VectorBoundaryValues () :
 
 template <int dim>
 inline
-void VectorBoundaryValues<dim>::vector_value (const Point<dim> &,
-                                              Vector<double>   &values) const
+void
+VectorBoundaryValues<dim>::vector_value (const Point<dim> &,
+                                         Vector<double>   &values) const
 {
   Assert (values.size() == dim+1,
           ExcDimensionMismatch (values.size(), dim+1));
@@ -76,10 +78,13 @@ class FindBug
 {
 public:
   FindBug ();
-  void run ();
+  void
+  run ();
 private:
-  void make_grid_and_dofs ();
-  void dirichlet_conditions ();
+  void
+  make_grid_and_dofs ();
+  void
+  dirichlet_conditions ();
 
   Triangulation<dim>     triangulation;
   FESystem<dim>              fe;
@@ -100,7 +105,8 @@ FindBug<dim>::FindBug () :
 
 
 template <int dim>
-void FindBug<dim>::make_grid_and_dofs ()
+void
+FindBug<dim>::make_grid_and_dofs ()
 {
 
   GridGenerator::hyper_cube (triangulation);
@@ -127,7 +133,8 @@ void FindBug<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void FindBug<dim>::dirichlet_conditions ()
+void
+FindBug<dim>::dirichlet_conditions ()
 {
   std::map<types::global_dof_index,double> dirichlet_dofs;
   std::vector<bool> component_mask(dim+1, false);
@@ -193,7 +200,8 @@ void FindBug<dim>::dirichlet_conditions ()
 
 
 template <int dim>
-void FindBug<dim>::run ()
+void
+FindBug<dim>::run ()
 {
   make_grid_and_dofs ();
   dirichlet_conditions ();
@@ -201,7 +209,8 @@ void FindBug<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

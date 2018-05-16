@@ -142,20 +142,23 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
   /**
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree () const;
 
   /**
    * Always returns @p true because the default implementation of functions in
    * this class preserves vertex locations.
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -291,75 +294,87 @@ public:
      * compute the mapping and its derivatives at this location, but have
      * already sized all internal arrays correctly.
      */
-    void compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
+    void
+    compute_shape_function_values (const std::vector<Point<dim> > &unit_points);
 
 
     /**
      * Shape function at quadrature point. Shape functions are in tensor
      * product order, so vertices must be reordered to obtain transformation.
      */
-    const double &shape (const unsigned int qpoint,
-                         const unsigned int shape_nr) const;
+    const double &
+    shape (const unsigned int qpoint,
+           const unsigned int shape_nr) const;
 
     /**
      * Shape function at quadrature point. See above.
      */
-    double &shape (const unsigned int qpoint,
-                   const unsigned int shape_nr);
+    double &
+    shape (const unsigned int qpoint,
+           const unsigned int shape_nr);
 
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    const Tensor<1,dim> &derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr) const;
+    const Tensor<1,dim> &
+    derivative (const unsigned int qpoint,
+                const unsigned int shape_nr) const;
 
     /**
      * Gradient of shape function in quadrature point. See above.
      */
-    Tensor<1,dim> &derivative (const unsigned int qpoint,
-                               const unsigned int shape_nr);
+    Tensor<1,dim> &
+    derivative (const unsigned int qpoint,
+                const unsigned int shape_nr);
 
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    const Tensor<2,dim> &second_derivative (const unsigned int qpoint,
-                                            const unsigned int shape_nr) const;
+    const Tensor<2,dim> &
+    second_derivative (const unsigned int qpoint,
+                       const unsigned int shape_nr) const;
 
     /**
      * Second derivative of shape function in quadrature point. See above.
      */
-    Tensor<2,dim> &second_derivative (const unsigned int qpoint,
-                                      const unsigned int shape_nr);
+    Tensor<2,dim> &
+    second_derivative (const unsigned int qpoint,
+                       const unsigned int shape_nr);
 
     /**
      * third derivative of shape function in quadrature point. See above.
      */
-    const Tensor<3,dim> &third_derivative (const unsigned int qpoint,
-                                           const unsigned int shape_nr) const;
+    const Tensor<3,dim> &
+    third_derivative (const unsigned int qpoint,
+                      const unsigned int shape_nr) const;
 
     /**
      * third derivative of shape function in quadrature point. See above.
      */
-    Tensor<3,dim> &third_derivative (const unsigned int qpoint,
-                                     const unsigned int shape_nr);
+    Tensor<3,dim> &
+    third_derivative (const unsigned int qpoint,
+                      const unsigned int shape_nr);
 
     /**
      * fourth derivative of shape function in quadrature point. See above.
      */
-    const Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
-                                            const unsigned int shape_nr) const;
+    const Tensor<4,dim> &
+    fourth_derivative (const unsigned int qpoint,
+                       const unsigned int shape_nr) const;
 
     /**
      * fourth derivative of shape function in quadrature point. See above.
      */
-    Tensor<4,dim> &fourth_derivative (const unsigned int qpoint,
-                                      const unsigned int shape_nr);
+    Tensor<4,dim> &
+    fourth_derivative (const unsigned int qpoint,
+                       const unsigned int shape_nr);
 
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Values of shape functions. Access by function @p shape.

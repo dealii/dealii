@@ -28,7 +28,8 @@
 
 
 
-int main ()
+int
+main ()
 {
   const unsigned int dim=3;
   Point<dim> origin;

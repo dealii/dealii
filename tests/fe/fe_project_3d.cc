@@ -168,13 +168,17 @@ class VectorFunction : public Function<dim>
 {
 public:
   VectorFunction() : Function<dim>(dim) {}
-  virtual double value (const Point<dim> &p, const unsigned int component) const;
-  virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
-  virtual Tensor< 1, dim >  gradient (const Point< dim > &p, const unsigned int component=0) const;
+  virtual double
+  value (const Point<dim> &p, const unsigned int component) const;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const;
+  virtual Tensor< 1, dim >
+  gradient (const Point< dim > &p, const unsigned int component=0) const;
 };
 
 template <>
-double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
+double
+VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   Assert (component < 3, ExcIndexRange (component, 0, 2));
 
@@ -196,14 +200,16 @@ double VectorFunction<3>::value(const Point<3> &p, const unsigned int component)
 }
 
 template <int dim>
-void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
+void
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
 template <>
-Tensor<1, 3> VectorFunction<3>::gradient(const Point<3> &p, const unsigned int component) const
+Tensor<1, 3>
+VectorFunction<3>::gradient(const Point<3> &p, const unsigned int component) const
 {
   const double PI = numbers::PI;
   Tensor<1, 3> val;
@@ -230,7 +236,8 @@ Tensor<1, 3> VectorFunction<3>::gradient(const Point<3> &p, const unsigned int c
   return val;
 }
 
-void create_tria(Triangulation<3> &triangulation, const Point<3> *vertices_parallelograms)
+void
+create_tria(Triangulation<3> &triangulation, const Point<3> *vertices_parallelograms)
 {
   const std::vector<Point<3> > vertices (&vertices_parallelograms[0],
                                          &vertices_parallelograms[n_vertices]);
@@ -263,7 +270,8 @@ void create_tria(Triangulation<3> &triangulation, const Point<3> *vertices_paral
 }
 
 template <int dim>
-void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Point<dim> *vertices_parallelograms)
+void
+test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Point<dim> *vertices_parallelograms)
 {
   deallog << "dim: " << dim << "\t" << fe.get_name() << std::endl;
   deallog << "DoFs\t\t||u-u_h||_1\tcurl(u_h)\ttangentials\tcurl(curl(u_h))\tcurl_curl_traces\tdiv(u_h)\tboundary_flux" << std::endl;
@@ -396,7 +404,8 @@ void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Po
     }
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(7);

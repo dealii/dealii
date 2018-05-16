@@ -26,8 +26,9 @@
 
 
 template <int dim, int spacedim>
-void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
-                const char                                *filename)
+void
+write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
+           const char                                *filename)
 {
   deallog << "Checksum: "
           << tria.get_checksum ()
@@ -62,7 +63,8 @@ void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
 
 
 template <int dim>
-void assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
+void
+assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
   Assert (a.n_active_cells() == b.n_active_cells(),
           ExcInternalError());

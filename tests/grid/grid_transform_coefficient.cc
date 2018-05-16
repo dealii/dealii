@@ -32,15 +32,17 @@ template <int dim>
 class Coefficient : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     return (p[0]>0 ? 10 : 1);
   }
 };
 
 
-int main ()
+int
+main ()
 {
   const unsigned int dim=2;
   Point<dim> origin;

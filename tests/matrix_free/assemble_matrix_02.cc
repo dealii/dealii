@@ -31,13 +31,15 @@
 #include <deal.II/fe/mapping_q.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 const unsigned int degree_p = 1;
 
 template <int dim>
-void do_test (const DoFHandler<dim> &dof)
+void
+do_test (const DoFHandler<dim> &dof)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
@@ -172,7 +174,8 @@ void do_test (const DoFHandler<dim> &dof)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
@@ -200,7 +203,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

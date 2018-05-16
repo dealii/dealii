@@ -29,7 +29,8 @@ using namespace dealii;
 
 
 template <int N, int dim>
-void check (const double (&array)[N], const Point<dim> (&point))
+void
+check (const double (&array)[N], const Point<dim> (&point))
 {
   std::vector<char> buffer;
 
@@ -62,7 +63,8 @@ void check (const double (&array)[N], const Point<dim> (&point))
 }
 
 
-void test()
+void
+test()
 {
   // try small arrays that are packed by just using memcpy
   Point<3> p1 = random_point<3>();
@@ -81,7 +83,8 @@ void test()
   deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

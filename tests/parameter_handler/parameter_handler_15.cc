@@ -22,7 +22,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *content, double &v1, double &v2)
+void
+check (const char *content, double &v1, double &v2)
 {
   ParameterHandler foo;
   foo.enter_subsection("bar");
@@ -44,7 +45,8 @@ void check (const char *content, double &v1, double &v2)
   v2 = foo.get_double("val2");
 }
 
-void test(std::string content)
+void
+test(std::string content)
 {
   double v1,v2;
   check((content+"\n").c_str(),v1,v2);
@@ -55,7 +57,8 @@ void test(std::string content)
   Assert(v2==v4, ExcInternalError());
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

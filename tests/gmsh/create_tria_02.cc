@@ -26,7 +26,8 @@
 #include <deal.II/opencascade/utilities.h>
 #include <deal.II/opencascade/boundary_lib.h>
 
-int main ()
+int
+main ()
 {
   initlog();
 

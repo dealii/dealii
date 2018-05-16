@@ -26,7 +26,8 @@
 
 
 template <typename T, typename U, typename CompareType>
-void check()
+void
+check()
 {
   AssertThrow (typeid(T() * U()) == typeid(CompareType),
                ExcInternalError());
@@ -35,7 +36,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

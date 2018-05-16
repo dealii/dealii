@@ -53,7 +53,8 @@ namespace Algorithms
      * identifier to it. The result of this function should be stored for
      * later use.
      */
-    static Event assign (const char *name);
+    static Event
+    assign (const char *name);
 
     /**
      * If you forgot to store the result of assign, here is how to retrieve it
@@ -69,45 +70,53 @@ namespace Algorithms
     /**
      * Clear all flags
      */
-    void clear();
+    void
+    clear();
 
     /**
      * Set all flags
      */
-    void all();
+    void
+    all();
 
     /**
      * Add the flags of the other event
      */
-    Event &operator += (const Event &event);
+    Event &
+    operator += (const Event &event);
 
     /**
      * Clear the flags of the other event
      */
-    Event &operator -= (const Event &event);
+    Event &
+    operator -= (const Event &event);
 
     /**
      * Test whether all the flags set in the other Event are also set in this
      * one.
      */
-    bool test (const Event &event) const;
+    bool
+    test (const Event &event) const;
 
     /**
      * Return <tt>true</tt> if any event is set.
      */
-    bool any () const;
+    bool
+    any () const;
 
     /**
      * List the flags to a stream.
      */
     template <class OS>
-    void print (OS &os) const;
+    void
+    print (OS &os) const;
 
     /**
      * List all assigned events.
      */
     template <class OS>
-    static void print_assigned (OS &os);
+    static void
+    print_assigned (OS &os);
 
   private:
     /**
@@ -221,7 +230,8 @@ namespace Algorithms
 
 
   inline
-  Event &Event::operator += (const Event &event)
+  Event &
+  Event::operator += (const Event &event)
   {
     all_true |= event.all_true;
     if (all_true) return *this;
@@ -236,7 +246,8 @@ namespace Algorithms
 
 
   inline
-  Event &Event::operator -= (const Event &event)
+  Event &
+  Event::operator -= (const Event &event)
   {
     if (!event.any()) return *this;
 
@@ -288,7 +299,8 @@ namespace Algorithms
    * @relatesalso Event
    */
   template <class OS>
-  OS &operator << (OS &o, const Event &e)
+  OS &
+  operator << (OS &o, const Event &e)
   {
     e.print(o);
     return o;

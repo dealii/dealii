@@ -69,13 +69,18 @@ namespace Step40
     LaplaceProblem ();
     ~LaplaceProblem ();
 
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    refine_grid ();
 
     MPI_Comm mpi_communicator;
 
@@ -130,7 +135,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
 
@@ -174,7 +180,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     const QGauss<dim>  quadrature_formula(3);
     hp::QCollection<dim> q_collection;
@@ -250,7 +257,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     PETScWrappers::MPI::Vector
     completely_distributed_solution (mpi_communicator,
@@ -289,7 +297,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void
+  LaplaceProblem<dim>::refine_grid ()
   {
     triangulation.refine_global (1);
   }
@@ -298,7 +307,8 @@ namespace Step40
 
 
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     const unsigned int n_cycles = 2;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
@@ -342,7 +352,8 @@ namespace Step40
 }
 
 
-int test_mpi ()
+int
+test_mpi ()
 {
 
   try
@@ -387,7 +398,8 @@ int test_mpi ()
 
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

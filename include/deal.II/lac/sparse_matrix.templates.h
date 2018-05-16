@@ -495,14 +495,15 @@ namespace internal
     template <typename number,
               typename InVector,
               typename OutVector>
-    void vmult_on_subrange (const size_type    begin_row,
-                            const size_type    end_row,
-                            const number      *values,
-                            const std::size_t  *rowstart,
-                            const size_type   *colnums,
-                            const InVector    &src,
-                            OutVector         &dst,
-                            const bool         add)
+    void
+    vmult_on_subrange (const size_type    begin_row,
+                       const size_type    end_row,
+                       const number      *values,
+                       const std::size_t  *rowstart,
+                       const size_type   *colnums,
+                       const InVector    &src,
+                       OutVector         &dst,
+                       const bool         add)
     {
       const number    *val_ptr    = &values[rowstart[begin_row]];
       const size_type *colnum_ptr = &colnums[rowstart[begin_row]];
@@ -1365,7 +1366,8 @@ namespace
   // assert that the matrix has no zeros on the diagonal. this is important
   // for preconditioners such as Jacobi or SSOR
   template <typename number>
-  void AssertNoZerosOnDiagonal (const SparseMatrix<number> &matrix)
+  void
+  AssertNoZerosOnDiagonal (const SparseMatrix<number> &matrix)
   {
 #ifdef DEBUG
     for (typename SparseMatrix<number>::size_type row=0; row<matrix.m(); ++row)
@@ -1892,12 +1894,13 @@ SparseMatrix<number>::get_sparsity_pattern () const
 
 
 template <typename number>
-void SparseMatrix<number>::print_formatted (std::ostream &out,
-                                            const unsigned int precision,
-                                            const bool scientific,
-                                            const unsigned int width_,
-                                            const char *zero_string,
-                                            const double denominator) const
+void
+SparseMatrix<number>::print_formatted (std::ostream &out,
+                                       const unsigned int precision,
+                                       const bool scientific,
+                                       const unsigned int width_,
+                                       const char *zero_string,
+                                       const double denominator) const
 {
   Assert (cols != nullptr, ExcNotInitialized());
   Assert (val != nullptr, ExcNotInitialized());
@@ -1940,8 +1943,9 @@ void SparseMatrix<number>::print_formatted (std::ostream &out,
 
 
 template <typename number>
-void SparseMatrix<number>::print_pattern (std::ostream &out,
-                                          const double threshold) const
+void
+SparseMatrix<number>::print_pattern (std::ostream &out,
+                                     const double threshold) const
 {
   Assert (cols != nullptr, ExcNotInitialized());
   Assert (val != nullptr, ExcNotInitialized());

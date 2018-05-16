@@ -76,12 +76,14 @@ namespace BlockMatrixIterators
     /**
      * Block row of the element represented by this object.
      */
-    unsigned int block_row() const;
+    unsigned int
+    block_row() const;
 
     /**
      * Block column of the element represented by this object.
      */
-    unsigned int block_column() const;
+    unsigned int
+    block_column() const;
 
   protected:
     /**
@@ -149,22 +151,26 @@ namespace BlockMatrixIterators
     /**
      * Row number of the element represented by this object.
      */
-    size_type row() const;
+    size_type
+    row() const;
 
     /**
      * Column number of the element represented by this object.
      */
-    size_type column() const;
+    size_type
+    column() const;
 
     /**
      * Value of the entry at the current position.
      */
-    value_type value() const;
+    value_type
+    value() const;
 
     /**
      * Set new value.
      */
-    void set_value(value_type newval) const;
+    void
+    set_value(value_type newval) const;
 
   protected:
     /**
@@ -180,12 +186,14 @@ namespace BlockMatrixIterators
     /**
      * Move ahead one element.
      */
-    void advance ();
+    void
+    advance ();
 
     /**
      * Compare this accessor with another one for equality.
      */
-    bool operator == (const Accessor &a) const;
+    bool
+    operator == (const Accessor &a) const;
 
     template <typename> friend class MatrixIterator;
     friend class Accessor<BlockMatrixType, true>;
@@ -236,17 +244,20 @@ namespace BlockMatrixIterators
     /**
      * Row number of the element represented by this object.
      */
-    size_type row() const;
+    size_type
+    row() const;
 
     /**
      * Column number of the element represented by this object.
      */
-    size_type column() const;
+    size_type
+    column() const;
 
     /**
      * Value of the entry at the current position.
      */
-    value_type value() const;
+    value_type
+    value() const;
   protected:
     /**
      * The matrix accessed.
@@ -261,12 +272,14 @@ namespace BlockMatrixIterators
     /**
      * Move ahead one element.
      */
-    void advance ();
+    void
+    advance ();
 
     /**
      * Compare this accessor with another one for equality.
      */
-    bool operator == (const Accessor &a) const;
+    bool
+    operator == (const Accessor &a) const;
 
     /**
      * Let the iterator class be a friend.
@@ -417,35 +430,40 @@ public:
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
 
   /**
    * Return the number of blocks in a column. Returns zero if no sparsity
    * pattern is presently associated to this matrix.
    */
-  unsigned int n_block_rows () const;
+  unsigned int
+  n_block_rows () const;
 
   /**
    * Return the number of blocks in a row. Returns zero if no sparsity pattern
    * is presently associated to this matrix.
    */
-  unsigned int n_block_cols () const;
+  unsigned int
+  n_block_cols () const;
 
   /**
    * Set the element <tt>(i,j)</tt> to <tt>value</tt>. Throws an error if the
    * entry does not exist or if <tt>value</tt> is not a finite number. Still,
    * it is allowed to store zero values in non-existent fields.
    */
-  void set (const size_type i,
-            const size_type j,
-            const value_type value);
+  void
+  set (const size_type i,
+       const size_type j,
+       const value_type value);
 
   /**
    * Set all elements given in a FullMatrix into the sparse matrix locations
@@ -463,9 +481,10 @@ public:
    * treated.
    */
   template <typename number>
-  void set (const std::vector<size_type> &indices,
-            const FullMatrix<number>     &full_matrix,
-            const bool                    elide_zero_values = false);
+  void
+  set (const std::vector<size_type> &indices,
+       const FullMatrix<number>     &full_matrix,
+       const bool                    elide_zero_values = false);
 
   /**
    * Same function as before, but now including the possibility to use
@@ -473,10 +492,11 @@ public:
    * and columns, respectively.
    */
   template <typename number>
-  void set (const std::vector<size_type> &row_indices,
-            const std::vector<size_type> &col_indices,
-            const FullMatrix<number>     &full_matrix,
-            const bool                    elide_zero_values = false);
+  void
+  set (const std::vector<size_type> &row_indices,
+       const std::vector<size_type> &col_indices,
+       const FullMatrix<number>     &full_matrix,
+       const bool                    elide_zero_values = false);
 
   /**
    * Set several elements in the specified row of the matrix with column
@@ -489,10 +509,11 @@ public:
    * treated.
    */
   template <typename number>
-  void set (const size_type row,
-            const std::vector<size_type> &col_indices,
-            const std::vector<number>    &values,
-            const bool                    elide_zero_values = false);
+  void
+  set (const size_type row,
+       const std::vector<size_type> &col_indices,
+       const std::vector<number>    &values,
+       const bool                    elide_zero_values = false);
 
   /**
    * Set several elements to values given by <tt>values</tt> in a given row in
@@ -504,20 +525,22 @@ public:
    * inserted/replaced.
    */
   template <typename number>
-  void set (const size_type  row,
-            const size_type  n_cols,
-            const size_type *col_indices,
-            const number    *values,
-            const bool       elide_zero_values = false);
+  void
+  set (const size_type  row,
+       const size_type  n_cols,
+       const size_type *col_indices,
+       const number    *values,
+       const bool       elide_zero_values = false);
 
   /**
    * Add <tt>value</tt> to the element (<i>i,j</i>).  Throws an error if the
    * entry does not exist or if <tt>value</tt> is not a finite number. Still,
    * it is allowed to store zero values in non-existent fields.
    */
-  void add (const size_type i,
-            const size_type j,
-            const value_type value);
+  void
+  add (const size_type i,
+       const size_type j,
+       const value_type value);
 
   /**
    * Add all elements given in a FullMatrix<double> into sparse matrix
@@ -534,9 +557,10 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const std::vector<size_type> &indices,
-            const FullMatrix<number>     &full_matrix,
-            const bool                    elide_zero_values = true);
+  void
+  add (const std::vector<size_type> &indices,
+       const FullMatrix<number>     &full_matrix,
+       const bool                    elide_zero_values = true);
 
   /**
    * Same function as before, but now including the possibility to use
@@ -544,10 +568,11 @@ public:
    * and columns, respectively.
    */
   template <typename number>
-  void add (const std::vector<size_type> &row_indices,
-            const std::vector<size_type> &col_indices,
-            const FullMatrix<number>     &full_matrix,
-            const bool                    elide_zero_values = true);
+  void
+  add (const std::vector<size_type> &row_indices,
+       const std::vector<size_type> &col_indices,
+       const FullMatrix<number>     &full_matrix,
+       const bool                    elide_zero_values = true);
 
   /**
    * Set several elements in the specified row of the matrix with column
@@ -559,10 +584,11 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const size_type row,
-            const std::vector<size_type> &col_indices,
-            const std::vector<number>    &values,
-            const bool                    elide_zero_values = true);
+  void
+  add (const size_type row,
+       const std::vector<size_type> &col_indices,
+       const std::vector<number>    &values,
+       const bool                    elide_zero_values = true);
 
   /**
    * Add an array of values given by <tt>values</tt> in the given global
@@ -574,12 +600,13 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number>
-  void add (const size_type  row,
-            const size_type  n_cols,
-            const size_type *col_indices,
-            const number    *values,
-            const bool       elide_zero_values = true,
-            const bool       col_indices_are_sorted = false);
+  void
+  add (const size_type  row,
+       const size_type  n_cols,
+       const size_type *col_indices,
+       const number    *values,
+       const bool       elide_zero_values = true,
+       const bool       col_indices_are_sorted = false);
 
   /**
    * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
@@ -592,8 +619,9 @@ public:
    * Some sparse matrix formats require <tt>matrix</tt> to be based on the
    * same sparsity pattern as the calling matrix.
    */
-  void add (const value_type                   factor,
-            const BlockMatrixBase<MatrixType> &matrix);
+  void
+  add (const value_type                   factor,
+       const BlockMatrixBase<MatrixType> &matrix);
 
   /**
    * Return the value of the entry (i,j).  This may be an expensive operation
@@ -601,8 +629,9 @@ public:
    * avoid abuse, this function throws an exception if the wanted element does
    * not exist in the matrix.
    */
-  value_type operator () (const size_type i,
-                          const size_type j) const;
+  value_type
+  operator () (const size_type i,
+               const size_type j) const;
 
   /**
    * This function is mostly like operator()() in that it returns the value of
@@ -612,8 +641,9 @@ public:
    * note that it is simple to write algorithms that are slow compared to an
    * optimal solution, since the sparsity of the matrix is not used.
    */
-  value_type el (const size_type i,
-                 const size_type j) const;
+  value_type
+  el (const size_type i,
+      const size_type j) const;
 
   /**
    * Return the main diagonal element in the <i>i</i>th row. This function
@@ -625,7 +655,8 @@ public:
    * each row and access therefore does not involve searching for the right
    * column number.
    */
-  value_type diag_element (const size_type i) const;
+  value_type
+  diag_element (const size_type i) const;
 
   /**
    * Call the compress() function on all the subblocks of the matrix.
@@ -635,25 +666,29 @@ public:
    * @ref GlossCompress "Compressing distributed objects"
    * for more information.
    */
-  void compress (::dealii::VectorOperation::values operation);
+  void
+  compress (::dealii::VectorOperation::values operation);
 
   /**
    * Multiply the entire matrix by a fixed factor.
    */
-  BlockMatrixBase &operator *= (const value_type factor);
+  BlockMatrixBase &
+  operator *= (const value_type factor);
 
   /**
    * Divide the entire matrix by a fixed factor.
    */
-  BlockMatrixBase &operator /= (const value_type factor);
+  BlockMatrixBase &
+  operator /= (const value_type factor);
 
   /**
    * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
    * this matrix.
    */
   template <class BlockVectorType>
-  void vmult_add (BlockVectorType       &dst,
-                  const BlockVectorType &src) const;
+  void
+  vmult_add (BlockVectorType       &dst,
+             const BlockVectorType &src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add <i>M<sup>T</sup>src</i> to
@@ -661,8 +696,9 @@ public:
    * as vmult_add() but takes the transposed matrix.
    */
   template <class BlockVectorType>
-  void Tvmult_add (BlockVectorType       &dst,
-                   const BlockVectorType &src) const;
+  void
+  Tvmult_add (BlockVectorType       &dst,
+              const BlockVectorType &src) const;
 
   /**
    * Return the norm of the vector <i>v</i> with respect to the norm induced
@@ -692,9 +728,10 @@ public:
    * Compute the residual <i>r=b-Ax</i>. Write the residual into <tt>dst</tt>.
    */
   template <class BlockVectorType>
-  value_type residual (BlockVectorType       &dst,
-                       const BlockVectorType &x,
-                       const BlockVectorType &b) const;
+  value_type
+  residual (BlockVectorType       &dst,
+            const BlockVectorType &x,
+            const BlockVectorType &b) const;
 
   /**
    * Print the matrix to the given stream, using the format <tt>(line,col)
@@ -702,64 +739,76 @@ public:
    * flag outputs the sparsity pattern in a different style according to the
    * underlying sparse matrix type.
    */
-  void print (std::ostream &out,
-              const bool    alternative_output = false) const;
+  void
+  print (std::ostream &out,
+         const bool    alternative_output = false) const;
 
   /**
    * Iterator starting at the first entry.
    */
-  iterator begin ();
+  iterator
+  begin ();
 
   /**
    * Final iterator.
    */
-  iterator end ();
+  iterator
+  end ();
 
   /**
    * Iterator starting at the first entry of row <tt>r</tt>.
    */
-  iterator begin (const size_type r);
+  iterator
+  begin (const size_type r);
 
   /**
    * Final iterator of row <tt>r</tt>.
    */
-  iterator end (const size_type r);
+  iterator
+  end (const size_type r);
   /**
    * Iterator starting at the first entry.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin () const;
 
   /**
    * Final iterator.
    */
-  const_iterator end () const;
+  const_iterator
+  end () const;
 
   /**
    * Iterator starting at the first entry of row <tt>r</tt>.
    */
-  const_iterator begin (const size_type r) const;
+  const_iterator
+  begin (const size_type r) const;
 
   /**
    * Final iterator of row <tt>r</tt>.
    */
-  const_iterator end (const size_type r) const;
+  const_iterator
+  end (const size_type r) const;
 
   /**
    * Return a reference to the underlying BlockIndices data of the rows.
    */
-  const BlockIndices &get_row_indices () const;
+  const BlockIndices &
+  get_row_indices () const;
 
   /**
    * Return a reference to the underlying BlockIndices data of the columns.
    */
-  const BlockIndices &get_column_indices () const;
+  const BlockIndices &
+  get_column_indices () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object. Note that only the memory reserved on the current processor is
    * returned in case this is called in an MPI-based program.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * @addtogroup Exceptions
@@ -794,7 +843,8 @@ protected:
    * additional structures. A derived class can make it public again, if it is
    * sufficient.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Index arrays for rows and columns.
@@ -825,7 +875,8 @@ protected:
    * the block sizes, and for these the function needs to be publicly
    * available. These classes therefore export this function.
    */
-  void collect_sizes ();
+  void
+  collect_sizes ();
 
   /**
    * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
@@ -838,8 +889,9 @@ protected:
    * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType>
-  void vmult_block_block (BlockVectorType       &dst,
-                          const BlockVectorType &src) const;
+  void
+  vmult_block_block (BlockVectorType       &dst,
+                     const BlockVectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -853,8 +905,9 @@ protected:
    */
   template <class BlockVectorType,
             class VectorType>
-  void vmult_block_nonblock (BlockVectorType          &dst,
-                             const VectorType &src) const;
+  void
+  vmult_block_nonblock (BlockVectorType          &dst,
+                        const VectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -868,8 +921,9 @@ protected:
    */
   template <class BlockVectorType,
             class VectorType>
-  void vmult_nonblock_block (VectorType    &dst,
-                             const BlockVectorType &src) const;
+  void
+  vmult_nonblock_block (VectorType    &dst,
+                        const BlockVectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -882,8 +936,9 @@ protected:
    * template arguments can be derived by the compiler.
    */
   template <class VectorType>
-  void vmult_nonblock_nonblock (VectorType       &dst,
-                                const VectorType &src) const;
+  void
+  vmult_nonblock_nonblock (VectorType       &dst,
+                           const VectorType &src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -897,8 +952,9 @@ protected:
    * template arguments can be derived by the compiler.
    */
   template <class BlockVectorType>
-  void Tvmult_block_block (BlockVectorType       &dst,
-                           const BlockVectorType &src) const;
+  void
+  Tvmult_block_block (BlockVectorType       &dst,
+                      const BlockVectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -912,8 +968,9 @@ protected:
    */
   template <class BlockVectorType,
             class VectorType>
-  void Tvmult_block_nonblock (BlockVectorType  &dst,
-                              const VectorType &src) const;
+  void
+  Tvmult_block_nonblock (BlockVectorType  &dst,
+                         const VectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -927,8 +984,9 @@ protected:
    */
   template <class BlockVectorType,
             class VectorType>
-  void Tvmult_nonblock_block (VectorType    &dst,
-                              const BlockVectorType &src) const;
+  void
+  Tvmult_nonblock_block (VectorType    &dst,
+                         const BlockVectorType &src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
@@ -941,8 +999,9 @@ protected:
    * template arguments can be derived by the compiler.
    */
   template <class VectorType>
-  void Tvmult_nonblock_nonblock (VectorType       &dst,
-                                 const VectorType &src) const;
+  void
+  Tvmult_nonblock_nonblock (VectorType       &dst,
+                            const VectorType &src) const;
 
 
 protected:
@@ -953,13 +1012,15 @@ protected:
    * routine prepares adding of elements by notifying all blocks. Called by
    * all internal routines before adding elements.
    */
-  void prepare_add_operation();
+  void
+  prepare_add_operation();
 
   /**
    * Notifies all blocks to let them prepare for setting elements, see
    * prepare_add_operation().
    */
-  void prepare_set_operation();
+  void
+  prepare_set_operation();
 
 
 private:
@@ -1007,7 +1068,8 @@ private:
      * are just scratch objects that are resized at the beginning of their
      * use, so there is no point actually copying anything.
      */
-    TemporaryData &operator = (const TemporaryData &)
+    TemporaryData &
+    operator = (const TemporaryData &)
     {
       return *this;
     }

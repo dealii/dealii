@@ -28,7 +28,8 @@
 
 #define PRECISION 2
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::fixed;

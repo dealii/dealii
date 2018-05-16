@@ -23,7 +23,8 @@
 #include <deal.II/base/thread_management.h>
 
 
-void test (int i)
+void
+test (int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
   sleep (1);
@@ -37,7 +38,8 @@ void test (int i)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

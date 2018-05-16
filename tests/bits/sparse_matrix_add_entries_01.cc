@@ -25,7 +25,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // set up sparse matrix
   SparsityPattern sp (5,5,3);
@@ -95,7 +96,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

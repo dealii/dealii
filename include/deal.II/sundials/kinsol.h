@@ -313,7 +313,8 @@ namespace SUNDIALS
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
-      void add_parameters(ParameterHandler &prm)
+      void
+      add_parameters(ParameterHandler &prm)
       {
         static std::string strategy_str("newton");
         prm.add_parameter("Solution strategy", strategy_str,
@@ -464,7 +465,8 @@ namespace SUNDIALS
      * to converge. KINSOL uses the content of `initial_guess_and_solution` as
      * initial guess, and stores the final solution in the same vector.
      */
-    unsigned int solve(VectorType &initial_guess_and_solution);
+    unsigned int
+    solve(VectorType &initial_guess_and_solution);
 
     /**
      * A function object that users need to supply and that is intended to
@@ -626,7 +628,8 @@ namespace SUNDIALS
      * std::function above to trigger an assert if they are not
      * implemented.
      */
-    void set_functions_to_trigger_an_assert();
+    void
+    set_functions_to_trigger_an_assert();
 
     /**
      * KINSOL configuration data.

@@ -31,7 +31,8 @@ namespace LinearAlgebra
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  float atomicAdd_wrapper(float *address, float val)
+    inline __device__  float
+    atomicAdd_wrapper(float *address, float val)
     {
       return atomicAdd(address,val);
     }
@@ -43,7 +44,8 @@ namespace LinearAlgebra
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__ double atomicAdd_wrapper(double *address, double val)
+    inline __device__ double
+    atomicAdd_wrapper(double *address, double val)
     {
       // Use native instruction for CUDA 8 on Pascal or newer architecture
 #if  __CUDACC_VER_MAJOR__  >= 8 && ( !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600 )
@@ -72,7 +74,8 @@ namespace LinearAlgebra
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  float atomicMax_wrapper(float *address, float val)
+    inline __device__  float
+    atomicMax_wrapper(float *address, float val)
     {
       int *address_as_int = reinterpret_cast<int *>(address);
       int old = *address_as_int, assumed;
@@ -94,7 +97,8 @@ namespace LinearAlgebra
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  double atomicMax_wrapper(double *address, double val)
+    inline __device__  double
+    atomicMax_wrapper(double *address, double val)
     {
       unsigned long long int *address_as_ull =
         reinterpret_cast<unsigned long long int *>(address);

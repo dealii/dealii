@@ -29,7 +29,8 @@ using namespace std;
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
@@ -46,7 +47,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   ofstream logfile("output");
   deallog.attach(logfile);

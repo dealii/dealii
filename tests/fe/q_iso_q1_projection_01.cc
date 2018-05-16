@@ -26,7 +26,8 @@ char logname[] = "output";
 #include "deformed_projection.h"
 #include <deal.II/fe/fe_q_iso_q1.h>
 
-void test ()
+void
+test ()
 {
   FESystem<2> fe (FE_Q_iso_Q1<2>(3), 2);
   const std::array<unsigned int,3> min_convergence_steps = {{13,13,13}};

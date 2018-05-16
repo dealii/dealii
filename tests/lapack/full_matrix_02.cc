@@ -74,7 +74,8 @@ test(const unsigned int size, const bool nonsymmetric)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

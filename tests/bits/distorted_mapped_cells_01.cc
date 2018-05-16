@@ -26,7 +26,8 @@
 #include <deal.II/grid/tria.h>
 
 
-void test()
+void
+test()
 {
   const int dim = 2;
   // create a dummy triangulation with no extension and set the geometry

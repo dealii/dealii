@@ -132,7 +132,8 @@ class QuadraticTimeCircle
 public:
   QuadraticTimeCircle(const unsigned int n_global_refines);
 
-  void run();
+  void
+  run();
 
   const unsigned int n_global_refines;
 
@@ -141,7 +142,8 @@ public:
   hp::FECollection<dim> finite_elements;
   hp::DoFHandler<dim> dof_handler;
 
-  void setup_dofs();
+  void
+  setup_dofs();
 };
 
 
@@ -172,7 +174,8 @@ QuadraticTimeCircle<dim>::QuadraticTimeCircle(const unsigned int n_global_refine
 
 
 template <int dim>
-void QuadraticTimeCircle<dim>::setup_dofs()
+void
+QuadraticTimeCircle<dim>::setup_dofs()
 {
   deallog << "Number of cells: " << triangulation.n_active_cells() << std::endl;
 
@@ -192,14 +195,16 @@ void QuadraticTimeCircle<dim>::setup_dofs()
 
 
 template <int dim>
-void QuadraticTimeCircle<dim>::run()
+void
+QuadraticTimeCircle<dim>::run()
 {
   setup_dofs();
 }
 
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

@@ -164,9 +164,10 @@ namespace internal
   // generic copy function of two different vectors -> need to access each
   // individual entry
   template <typename T, typename V>
-  void copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &copy_indices,
-                    const T &src,
-                    V &dst)
+  void
+  copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &copy_indices,
+               const T &src,
+               V &dst)
   {
     // we should have i->second == i->first, therefore we can use the same
     // function for both copying to mg as well as copying from mg
@@ -178,9 +179,10 @@ namespace internal
 
   // specialized copy function for the same vector
   template <typename T>
-  void copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &,
-                    const T &src,
-                    T &dst)
+  void
+  copy_vector (const std::vector<std::pair<types::global_dof_index,types::global_dof_index> > &,
+               const T &src,
+               T &dst)
   {
     dst = src;
   }

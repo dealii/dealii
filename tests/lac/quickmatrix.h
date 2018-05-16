@@ -20,7 +20,8 @@ public:
    * Matrix-vector-product.
    */
   template <typename number2>
-  void vmult(Vector<number2> &, const Vector<number2> &) const;
+  void
+  vmult(Vector<number2> &, const Vector<number2> &) const;
 protected:
   const unsigned int nx;
   const unsigned int ny;

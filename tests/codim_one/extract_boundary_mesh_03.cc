@@ -36,10 +36,11 @@ using namespace std;
 
 
 template <int s_dim, int spacedim>
-void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
-                               map< typename Triangulation<s_dim,spacedim>::cell_iterator,
-                               typename Triangulation<s_dim+1,spacedim>::face_iterator >
-                               &surface_to_volume_mapping)
+void
+test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
+                          map< typename Triangulation<s_dim,spacedim>::cell_iterator,
+                          typename Triangulation<s_dim+1,spacedim>::face_iterator >
+                          &surface_to_volume_mapping)
 {
   typename Triangulation<s_dim,spacedim>::active_cell_iterator
   cell = boundary_mesh.begin_active(),
@@ -79,14 +80,16 @@ void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mes
 }
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim> &tria)
+void
+save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main ()
 {
 
   ofstream logfile("output");

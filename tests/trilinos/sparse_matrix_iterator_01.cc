@@ -23,7 +23,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   TrilinosWrappers::SparseMatrix m(5U,5U,5U);
   m.set (0,0,1);
@@ -42,7 +43,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

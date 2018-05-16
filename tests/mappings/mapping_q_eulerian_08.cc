@@ -77,8 +77,9 @@ public:
     Function<dim>(dim)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return (0.1 + 2.*component) + (0.2 + 3.*component) * p[component];
   }
@@ -105,7 +106,8 @@ public:
 
 
 template <int dim, int fe_degree=2, int n_q_points=fe_degree+1, typename NumberType=double, typename LevelNumberType=NumberType>
-void test (const unsigned int n_ref = 0)
+void
+test (const unsigned int n_ref = 0)
 {
   Displacement<dim> displacement_function;
   const unsigned int euler_fe_degree=2;
@@ -309,7 +311,8 @@ void test (const unsigned int n_ref = 0)
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

@@ -22,7 +22,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_common.h"
 #include <deal.II/multigrid/mg_tools.h>
@@ -32,7 +33,8 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria(Triangulation<dim>:: limit_level_difference_at_vertices);

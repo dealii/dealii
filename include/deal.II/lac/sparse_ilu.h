@@ -99,8 +99,9 @@ public:
    * After this function is called the preconditioner is ready to be used.
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData &parameters = AdditionalData());
+  void
+  initialize (const SparseMatrix<somenumber> &matrix,
+              const AdditionalData &parameters = AdditionalData());
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -109,8 +110,9 @@ public:
    * The initialize() function needs to be called before.
    */
   template <typename somenumber>
-  void vmult (Vector<somenumber>       &dst,
-              const Vector<somenumber> &src) const;
+  void
+  vmult (Vector<somenumber>       &dst,
+         const Vector<somenumber> &src) const;
 
 
   /**
@@ -120,15 +122,17 @@ public:
    * The initialize() function needs to be called before.
    */
   template <typename somenumber>
-  void Tvmult (Vector<somenumber>       &dst,
-               const Vector<somenumber> &src) const;
+  void
+  Tvmult (Vector<somenumber>       &dst,
+          const Vector<somenumber> &src) const;
 
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const override;
+  std::size_t
+  memory_consumption () const override;
 
   /**
    * @addtogroup Exceptions

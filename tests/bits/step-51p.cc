@@ -20,7 +20,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -101,18 +102,21 @@ namespace Step51
   public:
     Solution () : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
+    virtual Tensor<1,dim>
+    gradient (const Point<dim>   &p,
+              const unsigned int  component = 0) const;
   };
 
 
 
   template <int dim>
-  double Solution<dim>::value (const Point<dim>   &p,
-                               const unsigned int) const
+  double
+  Solution<dim>::value (const Point<dim>   &p,
+                        const unsigned int) const
   {
     double return_value = 0;
     for (unsigned int i=0; i<this->n_source_centers; ++i)
@@ -129,8 +133,9 @@ namespace Step51
 
 
   template <int dim>
-  Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-                                         const unsigned int) const
+  Tensor<1,dim>
+  Solution<dim>::gradient (const Point<dim>   &p,
+                           const unsigned int) const
   {
     Tensor<1,dim> return_value;
 
@@ -157,13 +162,15 @@ namespace Step51
   public:
     SolutionAndGradient () : Function<dim>(dim+1) {}
 
-    virtual void vector_value (const Point<dim>   &p,
-                               Vector<double>     &v) const;
+    virtual void
+    vector_value (const Point<dim>   &p,
+                  Vector<double>     &v) const;
   };
 
   template <int dim>
-  void SolutionAndGradient<dim>::vector_value (const Point<dim> &p,
-                                               Vector<double>   &v) const
+  void
+  SolutionAndGradient<dim>::vector_value (const Point<dim> &p,
+                                          Vector<double>   &v) const
   {
     AssertDimension(v.size(), dim+1);
     Solution<dim> solution;
@@ -181,7 +188,8 @@ namespace Step51
   public:
     ConvectionVelocity() : TensorFunction<1,dim>() {}
 
-    virtual Tensor<1,dim> value (const Point<dim> &p) const;
+    virtual Tensor<1,dim>
+    value (const Point<dim> &p) const;
   };
 
 
@@ -220,8 +228,9 @@ namespace Step51
   public:
     RightHandSide () : Function<dim>() {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
   private:
     const ConvectionVelocity<dim> convection_velocity;
@@ -229,8 +238,9 @@ namespace Step51
 
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim>   &p,
-                                    const unsigned int) const
+  double
+  RightHandSide<dim>::value (const Point<dim>   &p,
+                             const unsigned int) const
   {
     Tensor<1,dim> convection = convection_velocity.value(p);
     double return_value = 0;
@@ -256,31 +266,41 @@ namespace Step51
   {
   public:
     HDG (const unsigned int degree);
-    void run ();
+    void
+    run ();
 
   private:
 
-    void setup_system ();
-    void assemble_system (const bool reconstruct_trace = false);
-    void solve ();
-    void postprocess ();
-    void refine_grid (const unsigned int cylce);
-    void output_results (const unsigned int cycle);
+    void
+    setup_system ();
+    void
+    assemble_system (const bool reconstruct_trace = false);
+    void
+    solve ();
+    void
+    postprocess ();
+    void
+    refine_grid (const unsigned int cylce);
+    void
+    output_results (const unsigned int cycle);
 
     struct PerTaskData;
     struct ScratchData;
 
     struct PostProcessScratchData;
 
-    void assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                   ScratchData &scratch,
-                                   PerTaskData &task_data);
+    void
+    assemble_system_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                              ScratchData &scratch,
+                              PerTaskData &task_data);
 
-    void copy_local_to_global(const PerTaskData &data);
+    void
+    copy_local_to_global(const PerTaskData &data);
 
-    void postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                               PostProcessScratchData &scratch,
-                               unsigned int &empty_data);
+    void
+    postprocess_one_cell (const typename DoFHandler<dim>::active_cell_iterator &cell,
+                          PostProcessScratchData &scratch,
+                          unsigned int &empty_data);
 
 
     Triangulation<dim>   triangulation;
@@ -738,7 +758,8 @@ namespace Step51
 
 
   template <int dim>
-  void HDG<dim>::copy_local_to_global(const PerTaskData &data)
+  void
+  HDG<dim>::copy_local_to_global(const PerTaskData &data)
   {
     if (data.trace_reconstruct == false)
       constraints.distribute_local_to_global (data.cell_matrix,
@@ -750,7 +771,8 @@ namespace Step51
 
 
   template <int dim>
-  void HDG<dim>::solve ()
+  void
+  HDG<dim>::solve ()
   {
     SolverControl solver_control (system_matrix.m()*10,
                                   1e-12*system_rhs.l2_norm());
@@ -901,7 +923,8 @@ namespace Step51
 
 
   template <int dim>
-  void HDG<dim>::output_results (const unsigned int cycle)
+  void
+  HDG<dim>::output_results (const unsigned int cycle)
   {
     // not included in test
   }
@@ -909,7 +932,8 @@ namespace Step51
 
 
   template <int dim>
-  void HDG<dim>::refine_grid (const unsigned int cycle)
+  void
+  HDG<dim>::refine_grid (const unsigned int cycle)
   {
     // only global refinement
     triangulation.clear();
@@ -930,7 +954,8 @@ namespace Step51
 
 
   template <int dim>
-  void HDG<dim>::run ()
+  void
+  HDG<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<11-3*dim; ++cycle)
       {
@@ -963,7 +988,8 @@ namespace Step51
 
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(6);
   logfile << std::setprecision(6);

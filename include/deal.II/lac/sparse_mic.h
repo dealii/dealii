@@ -61,13 +61,15 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SparseMIC() override;
+  virtual
+  ~SparseMIC() override;
 
   /**
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Make the @p AdditionalData type in the base class accessible to this
@@ -95,8 +97,9 @@ public:
    * After this function is called the preconditioner is ready to be used.
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData &parameters = AdditionalData());
+  void
+  initialize (const SparseMatrix<somenumber> &matrix,
+              const AdditionalData &parameters = AdditionalData());
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -105,8 +108,9 @@ public:
    * Call @p initialize before calling this function.
    */
   template <typename somenumber>
-  void vmult (Vector<somenumber>       &dst,
-              const Vector<somenumber> &src) const;
+  void
+  vmult (Vector<somenumber>       &dst,
+         const Vector<somenumber> &src) const;
 
   /**
    * Apply the transpose of the incomplete decomposition, i.e. do one forward-
@@ -118,14 +122,16 @@ public:
    *
    */
   template <typename somenumber>
-  void Tvmult (Vector<somenumber>       &dst,
-               const Vector<somenumber> &src) const;
+  void
+  Tvmult (Vector<somenumber>       &dst,
+          const Vector<somenumber> &src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const override;
+  std::size_t
+  memory_consumption () const override;
 
   /**
    * @addtogroup Exceptions
@@ -171,7 +177,8 @@ private:
   /**
    * Compute the row-th "inner sum".
    */
-  number get_rowsum (const size_type row) const;
+  number
+  get_rowsum (const size_type row) const;
 };
 
 /*@}*/

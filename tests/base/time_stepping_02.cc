@@ -21,7 +21,8 @@
 #include <deal.II/base/time_stepping.h>
 #include <deal.II/lac/vector.h>
 
-Vector<double> f(double const t, Vector<double> const &y)
+Vector<double>
+f(double const t, Vector<double> const &y)
 {
   Vector<double> values(y);
   for (unsigned int i=0; i<values.size(); ++i)
@@ -30,14 +31,16 @@ Vector<double> f(double const t, Vector<double> const &y)
   return values;
 }
 
-double my(double const t)
+double
+my(double const t)
 {
   return t;
 }
 
-void test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
-          std::function<Vector<double> (double const, Vector<double> const &)> f,
-          std::function<double (double const)> my)
+void
+test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
+     std::function<Vector<double> (double const, Vector<double> const &)> f,
+     std::function<double (double const)> my)
 {
   double initial_time = 0.0, final_time = 1.0;
   double time_step = 0.1;
@@ -61,7 +64,8 @@ void test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
   deallog<<n_time_steps<<std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

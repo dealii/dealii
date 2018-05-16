@@ -66,8 +66,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (VectorType       &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const
   {
     dst = 0;
     const std::function<void(const MatrixFree<dim,typename VectorType::value_type> &,

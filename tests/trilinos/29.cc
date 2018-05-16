@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::Vector &v)
+void
+test (TrilinosWrappers::MPI::Vector &v)
 {
   v.reinit (complete_index_set(13), MPI_COMM_WORLD);
 
@@ -35,7 +36,8 @@ void test (TrilinosWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

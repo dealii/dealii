@@ -22,8 +22,9 @@
 #include <iostream>
 
 
-void test (const unsigned int size,
-           const bool         reinit_square)
+void
+test (const unsigned int size,
+      const bool         reinit_square)
 {
   // this test can not currently work with matrices smaller than
   // 1\times2.
@@ -86,7 +87,8 @@ void test (const unsigned int size,
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

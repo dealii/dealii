@@ -31,28 +31,35 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number=double> class SymmetricTensor;
 
 template <int dim, typename Number>
-SymmetricTensor<2,dim,Number> unit_symmetric_tensor ();
+SymmetricTensor<2,dim,Number>
+unit_symmetric_tensor ();
 
 template <int dim, typename Number>
-SymmetricTensor<4,dim,Number> deviator_tensor ();
+SymmetricTensor<4,dim,Number>
+deviator_tensor ();
 
 template <int dim, typename Number>
-SymmetricTensor<4,dim,Number> identity_tensor ();
+SymmetricTensor<4,dim,Number>
+identity_tensor ();
 
 template <int dim, typename Number>
-SymmetricTensor<2,dim,Number> invert (const SymmetricTensor<2,dim,Number> &);
+SymmetricTensor<2,dim,Number>
+invert (const SymmetricTensor<2,dim,Number> &);
 
 template <int dim, typename Number>
-SymmetricTensor<4,dim,Number> invert (const SymmetricTensor<4,dim,Number> &);
+SymmetricTensor<4,dim,Number>
+invert (const SymmetricTensor<4,dim,Number> &);
 
 template <int dim2, typename Number> Number
 trace (const SymmetricTensor<2,dim2,Number> &);
 
 template <int dim, typename Number>
-SymmetricTensor<2,dim,Number> deviator (const SymmetricTensor<2,dim,Number> &);
+SymmetricTensor<2,dim,Number>
+deviator (const SymmetricTensor<2,dim,Number> &);
 
 template <int dim, typename Number>
-Number determinant (const SymmetricTensor<2,dim,Number> &);
+Number
+determinant (const SymmetricTensor<2,dim,Number> &);
 
 
 
@@ -85,9 +92,10 @@ namespace internal
      * invalid state.
      */
     inline
-    TableIndices<2> merge (const TableIndices<2> &previous_indices,
-                           const unsigned int     new_index,
-                           const unsigned int     position)
+    TableIndices<2>
+    merge (const TableIndices<2> &previous_indices,
+           const unsigned int     new_index,
+           const unsigned int     position)
     {
       Assert (position < 2, ExcIndexRange (position, 0, 2));
 
@@ -106,9 +114,10 @@ namespace internal
      * invalid state.
      */
     inline
-    TableIndices<4> merge (const TableIndices<4> &previous_indices,
-                           const unsigned int     new_index,
-                           const unsigned int     position)
+    TableIndices<4>
+    merge (const TableIndices<4> &previous_indices,
+           const unsigned int     new_index,
+           const unsigned int     position)
     {
       Assert (position < 4, ExcIndexRange (position, 0, 4));
 
@@ -352,12 +361,14 @@ namespace internal
       /**
        * Index operator.
        */
-      Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i);
+      Accessor<rank,dim,constness,P-1,Number>
+      operator [] (const unsigned int i);
 
       /**
        * Index operator.
        */
-      Accessor<rank,dim,constness,P-1,Number> operator [] (const unsigned int i) const;
+      Accessor<rank,dim,constness,P-1,Number>
+      operator [] (const unsigned int i) const;
 
     private:
       /**
@@ -440,12 +451,14 @@ namespace internal
       /**
        * Index operator.
        */
-      reference operator [] (const unsigned int);
+      reference
+      operator [] (const unsigned int);
 
       /**
        * Index operator.
        */
-      reference operator [] (const unsigned int) const;
+      reference
+      operator [] (const unsigned int) const;
 
     private:
       /**
@@ -640,7 +653,8 @@ public:
    * @p Number.
    */
   template <typename OtherNumber>
-  SymmetricTensor &operator = (const SymmetricTensor<rank_,dim,OtherNumber> &rhs);
+  SymmetricTensor &
+  operator = (const SymmetricTensor<rank_,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
@@ -648,7 +662,8 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  SymmetricTensor &operator = (const Number &d);
+  SymmetricTensor &
+  operator = (const Number &d);
 
   /**
    * Convert the present symmetric tensor into a full tensor with the same
@@ -659,42 +674,49 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  bool operator == (const SymmetricTensor &) const;
+  bool
+  operator == (const SymmetricTensor &) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  bool operator != (const SymmetricTensor &) const;
+  bool
+  operator != (const SymmetricTensor &) const;
 
   /**
    * Add another tensor.
    */
   template <typename OtherNumber>
-  SymmetricTensor &operator += (const SymmetricTensor<rank_,dim,OtherNumber> &);
+  SymmetricTensor &
+  operator += (const SymmetricTensor<rank_,dim,OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
   template <typename OtherNumber>
-  SymmetricTensor &operator -= (const SymmetricTensor<rank_,dim,OtherNumber> &);
+  SymmetricTensor &
+  operator -= (const SymmetricTensor<rank_,dim,OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    */
   template <typename OtherNumber>
-  SymmetricTensor &operator *= (const OtherNumber &factor);
+  SymmetricTensor &
+  operator *= (const OtherNumber &factor);
 
   /**
    * Scale the tensor by <tt>1/factor</tt>.
    */
   template <typename OtherNumber>
-  SymmetricTensor &operator /= (const OtherNumber &factor);
+  SymmetricTensor &
+  operator /= (const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
    */
-  SymmetricTensor   operator - () const;
+  SymmetricTensor
+  operator - () const;
 
   /**
    * Product between the present symmetric tensor and a tensor of rank 2. For
@@ -735,12 +757,14 @@ public:
   /**
    * Return a read-write reference to the indicated element.
    */
-  Number &operator() (const TableIndices<rank_> &indices);
+  Number &
+  operator() (const TableIndices<rank_> &indices);
 
   /**
    * Return a @p const reference to the value referred to by the argument.
    */
-  const Number &operator() (const TableIndices<rank_> &indices) const;
+  const Number &
+  operator() (const TableIndices<rank_> &indices) const;
 
   /**
    * Access the elements of a row of this symmetric tensor. This function is
@@ -832,20 +856,23 @@ public:
    * and indeed the state where all elements have a zero value is the state
    * right after construction of such an object.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption ();
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version);
+  void
+  serialize(Archive &ar, const unsigned int version);
 
 private:
   /**
@@ -874,23 +901,28 @@ private:
    * Make a few more functions friends.
    */
   template <int dim2, typename Number2>
-  friend Number2 trace (const SymmetricTensor<2,dim2,Number2> &d);
+  friend Number2
+  trace (const SymmetricTensor<2,dim2,Number2> &d);
 
   template <int dim2, typename Number2>
-  friend Number2 determinant (const SymmetricTensor<2,dim2,Number2> &t);
+  friend Number2
+  determinant (const SymmetricTensor<2,dim2,Number2> &t);
 
   template <int dim2, typename Number2>
   friend SymmetricTensor<2,dim2,Number2>
   deviator (const SymmetricTensor<2,dim2,Number2> &t);
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<2,dim2,Number2> unit_symmetric_tensor ();
+  friend SymmetricTensor<2,dim2,Number2>
+  unit_symmetric_tensor ();
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<4,dim2,Number2> deviator_tensor ();
+  friend SymmetricTensor<4,dim2,Number2>
+  deviator_tensor ();
 
   template <int dim2, typename Number2>
-  friend SymmetricTensor<4,dim2,Number2> identity_tensor ();
+  friend SymmetricTensor<4,dim2,Number2>
+  identity_tensor ();
 
 
   /**
@@ -2614,7 +2646,8 @@ operator-(const Tensor<rank_, dim, Number> &left,
  */
 template <int dim, typename Number>
 inline
-Number determinant (const SymmetricTensor<2,dim,Number> &t)
+Number
+determinant (const SymmetricTensor<2,dim,Number> &t)
 {
   switch (dim)
     {
@@ -2653,7 +2686,8 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
  */
 template <int dim, typename Number>
 inline
-Number third_invariant (const SymmetricTensor<2,dim,Number> &t)
+Number
+third_invariant (const SymmetricTensor<2,dim,Number> &t)
 {
   return determinant (t);
 }
@@ -2668,7 +2702,8 @@ Number third_invariant (const SymmetricTensor<2,dim,Number> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
-Number trace (const SymmetricTensor<2,dim,Number> &d)
+Number
+trace (const SymmetricTensor<2,dim,Number> &d)
 {
   Number t = d.data[0];
   for (unsigned int i=1; i<dim; ++i)
@@ -2688,7 +2723,8 @@ Number trace (const SymmetricTensor<2,dim,Number> &d)
  */
 template <int dim, typename Number>
 inline
-Number first_invariant (const SymmetricTensor<2,dim,Number> &t)
+Number
+first_invariant (const SymmetricTensor<2,dim,Number> &t)
 {
   return trace (t);
 }
@@ -2708,7 +2744,8 @@ Number first_invariant (const SymmetricTensor<2,dim,Number> &t)
  */
 template <typename Number>
 inline
-Number second_invariant (const SymmetricTensor<2,1,Number> &)
+Number
+second_invariant (const SymmetricTensor<2,1,Number> &)
 {
   return internal::NumberType<Number>::value(0.0);
 }
@@ -2737,7 +2774,8 @@ Number second_invariant (const SymmetricTensor<2,1,Number> &)
  */
 template <typename Number>
 inline
-Number second_invariant (const SymmetricTensor<2,2,Number> &t)
+Number
+second_invariant (const SymmetricTensor<2,2,Number> &t)
 {
   return t[0][0]*t[1][1] - t[0][1]*t[0][1];
 }
@@ -2755,7 +2793,8 @@ Number second_invariant (const SymmetricTensor<2,2,Number> &t)
  */
 template <typename Number>
 inline
-Number second_invariant (const SymmetricTensor<2,3,Number> &t)
+Number
+second_invariant (const SymmetricTensor<2,3,Number> &t)
 {
   return (t[0][0]*t[1][1] + t[1][1]*t[2][2] + t[2][2]*t[0][0]
           - t[0][1]*t[0][1] - t[0][2]*t[0][2] - t[1][2]*t[1][2]);
@@ -3034,8 +3073,9 @@ namespace internal
       struct SortEigenValuesVectors
       {
         typedef std::pair<Number, Tensor<1,dim,Number> > EigValsVecs;
-        bool operator() (const EigValsVecs &lhs,
-                         const EigValsVecs &rhs)
+        bool
+        operator() (const EigValsVecs &lhs,
+                    const EigValsVecs &rhs)
         {
           return lhs.first > rhs.first;
         }
@@ -4040,8 +4080,9 @@ operator * (const SymmetricTensor<rank_1, dim, Number> &src1s,
  */
 template <int dim, typename Number>
 inline
-std::ostream &operator << (std::ostream &out,
-                           const SymmetricTensor<2,dim,Number> &t)
+std::ostream &
+operator << (std::ostream &out,
+             const SymmetricTensor<2,dim,Number> &t)
 {
   //make our lives a bit simpler by outputting
   //the tensor through the operator for the
@@ -4068,8 +4109,9 @@ std::ostream &operator << (std::ostream &out,
  */
 template <int dim, typename Number>
 inline
-std::ostream &operator << (std::ostream &out,
-                           const SymmetricTensor<4,dim,Number> &t)
+std::ostream &
+operator << (std::ostream &out,
+             const SymmetricTensor<4,dim,Number> &t)
 {
   //make our lives a bit simpler by outputting
   //the tensor through the operator for the

@@ -22,7 +22,8 @@
 #include "simplex.h"
 
 template<int dim>
-void test(int n)
+void
+test(int n)
 {
   QSimplex<dim> quad(QIterated<dim>(QTrapez<1>(), n));
 
@@ -48,7 +49,8 @@ void test(int n)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

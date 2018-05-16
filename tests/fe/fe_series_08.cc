@@ -24,7 +24,8 @@
 using namespace dealii;
 
 
-void test ()
+void
+test ()
 {
   const double k_in = numbers::PI;
   const double b_in = std::sqrt(2.);
@@ -48,7 +49,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

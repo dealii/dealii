@@ -26,7 +26,8 @@
 #define PRECISION 2
 
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 
 #include <deal.II/grid/grid_generator.h>
@@ -70,13 +71,16 @@ public:
     Function<dim> (n_components)
   {}
 
-  virtual ~TestMap1 () {}
+  virtual
+  ~TestMap1 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -91,8 +95,9 @@ TestMap1<dim>::value (const Point<dim>   &/*p*/,
 
 
 template <int dim>
-void TestMap1<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestMap1<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -116,13 +121,16 @@ public:
     phi (ph)
   {}
 
-  virtual ~TestDef1 () {}
+  virtual
+  ~TestDef1 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -146,8 +154,9 @@ TestDef1<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef1<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef1<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -171,13 +180,16 @@ public:
     scale (sc)
   {}
 
-  virtual ~TestDef2 () {}
+  virtual
+  ~TestDef2 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -197,8 +209,9 @@ TestDef2<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef2<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef2<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -223,13 +236,16 @@ public:
     scale (sc)
   {}
 
-  virtual ~TestDef3 () {}
+  virtual
+  ~TestDef3 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -248,8 +264,9 @@ TestDef3<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef3<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef3<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -263,9 +280,10 @@ void TestDef3<dim>::vector_value (const Point<dim> &p,
  * Integrate the function value over the element.
  */
 
-double EvaluateArea (Mapping<2> &mapping,
-                     DoFHandler<2> *dof_handler,
-                     Vector<double> &solution)
+double
+EvaluateArea (Mapping<2> &mapping,
+              DoFHandler<2> *dof_handler,
+              Vector<double> &solution)
 {
   // Use a high order quadrature.
   QGauss<2> quad (6);
@@ -304,7 +322,8 @@ double EvaluateArea (Mapping<2> &mapping,
 }
 
 
-int main (int /*argc*/, char **/*argv*/)
+int
+main (int /*argc*/, char **/*argv*/)
 {
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);

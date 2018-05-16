@@ -22,7 +22,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_common.h"
 #include <deal.II/hp/dof_handler.h>
@@ -39,10 +40,11 @@ public:
     data (data_in)
   {};
 
-  void local_apply(const MatrixFree<dim,Number> &data,
-                   Vector<Number> &dst,
-                   const Vector<Number> &src,
-                   const std::pair<unsigned int,unsigned int> &cell_range) const
+  void
+  local_apply(const MatrixFree<dim,Number> &data,
+              Vector<Number> &dst,
+              const Vector<Number> &src,
+              const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     // ask MatrixFree for cell_range for different orders
     std::pair<unsigned int,unsigned int> subrange_deg =
@@ -76,8 +78,9 @@ public:
                                                   subrange_deg);
   }
 
-  void vmult (Vector<Number>       &dst,
-              const Vector<Number> &src) const
+  void
+  vmult (Vector<Number>       &dst,
+         const Vector<Number> &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTestHP<dim,Number>::local_apply, this, dst, src);
@@ -90,7 +93,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   if (fe_degree > 1)
     return;

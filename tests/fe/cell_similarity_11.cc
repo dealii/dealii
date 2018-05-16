@@ -42,7 +42,8 @@
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr)
+void
+test (const Triangulation<dim> &tr)
 {
   FE_Q<dim> fe(2);
   deallog << "FE=" << fe.get_name() << std::endl;
@@ -94,7 +95,8 @@ void test (const Triangulation<dim> &tr)
 
 
 
-void test()
+void
+test()
 {
   // Create a mesh where the cell in the center uses a Q1 mapping but one cell
   // on the boundary uses a Q3 mapping from a hyper ball. The radius is
@@ -119,7 +121,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (8);

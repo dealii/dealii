@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void plot(const PolynomialsRT_Bubbles<dim> &poly)
+void
+plot(const PolynomialsRT_Bubbles<dim> &poly)
 {
   QTrapez<1> base_quadrature;
   QIterated<dim> quadrature(base_quadrature, poly.degree()+2);
@@ -53,7 +54,8 @@ void plot(const PolynomialsRT_Bubbles<dim> &poly)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

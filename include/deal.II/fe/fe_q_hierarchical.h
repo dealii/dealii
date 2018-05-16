@@ -551,7 +551,8 @@ public:
    * returns <tt>FE_Q_Hierarchical<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -561,8 +562,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * @name Functions to support hp
@@ -577,21 +579,24 @@ public:
    * the degree of the element), as it implements the complete set of
    * functions necessary for hp capability.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return the matrix interpolating from the given finite element to the
    * present one. Interpolation only between FE_Q_Hierarchical is supported.
    */
-  virtual void get_interpolation_matrix(const FiniteElement< dim> &source,
-                                        FullMatrix< double > &matrix) const override;
+  virtual void
+  get_interpolation_matrix(const FiniteElement< dim> &source,
+                           FullMatrix< double > &matrix) const override;
 
   /**
    * Embedding matrix between grids. Only isotropic refinement is supported.
    */
   virtual const
-  FullMatrix<double> &get_prolongation_matrix  (const unsigned int child,
-                                                const RefinementCase<dim> &refinement_case = RefinementCase< dim >::isotropic_refinement) const override;
+  FullMatrix<double> &
+  get_prolongation_matrix  (const unsigned int child,
+                            const RefinementCase<dim> &refinement_case = RefinementCase< dim >::isotropic_refinement) const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -639,7 +644,8 @@ public:
    * from a given element, then they must throw an exception of type
    * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
    */
-  virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source, FullMatrix<double> &matrix) const override;
+  virtual void
+  get_face_interpolation_matrix (const FiniteElement<dim> &source, FullMatrix<double> &matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the subface
@@ -652,7 +658,8 @@ public:
    * from a given element, then they must throw an exception of type
    * <tt>ExcInterpolationNotImplemented</tt>.
    */
-  virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source, const unsigned int subface, FullMatrix<double> &matrix) const override;
+  virtual void
+  get_subface_interpolation_matrix (const FiniteElement<dim> &source, const unsigned int subface, FullMatrix<double> &matrix) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -675,14 +682,16 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   /**
    * For a finite element of degree @p sub_degree < @p degree, we return a
    * vector which maps the numbering on an FE of degree @p sub_degree into the
    * numbering on this element.
    */
-  std::vector<unsigned int> get_embedding_dofs (const unsigned int sub_degree) const;
+  std::vector<unsigned int>
+  get_embedding_dofs (const unsigned int sub_degree) const;
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -700,7 +709,8 @@ private:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * The numbering of the degrees of freedom in continuous finite elements is
@@ -730,7 +740,8 @@ private:
    * finite element.
    */
   static
-  std::vector<unsigned int> hierarchic_to_fe_q_hierarchical_numbering (
+  std::vector<unsigned int>
+  hierarchic_to_fe_q_hierarchical_numbering (
     const FiniteElementData<dim> &fe);
 
   /**
@@ -744,32 +755,37 @@ private:
    * Initialize two auxiliary fields that will be used in setting up the
    * various matrices in the constructor.
    */
-  void build_dofs_cell (std::vector<FullMatrix<double> > &dofs_cell,
-                        std::vector<FullMatrix<double> > &dofs_subcell) const;
+  void
+  build_dofs_cell (std::vector<FullMatrix<double> > &dofs_cell,
+                   std::vector<FullMatrix<double> > &dofs_subcell) const;
 
   /**
    * Initialize the hanging node constraints matrices. Called from the
    * constructor.
    */
-  void initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell);
+  void
+  initialize_constraints (const std::vector<FullMatrix<double> > &dofs_subcell);
 
   /**
    * Initialize the embedding matrices. Called from the constructor.
    */
-  void initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
-                                             const std::vector<FullMatrix<double> > &dofs_subcell);
+  void
+  initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &dofs_cell,
+                                        const std::vector<FullMatrix<double> > &dofs_subcell);
 
   /**
    * Initialize the @p generalized_support_points field of the FiniteElement class.
    * Called from the constructor.
    */
-  void initialize_generalized_support_points ();
+  void
+  initialize_generalized_support_points ();
 
   /**
    * Initialize the @p generalized_face_support_points field of the FiniteElement
    * class. Called from the constructor.
    */
-  void initialize_generalized_face_support_points ();
+  void
+  initialize_generalized_face_support_points ();
 
   /**
    * Mapping from lexicographic to shape function numbering on first face.
@@ -790,7 +806,8 @@ private:
 /* -------------- declaration of explicit specializations ------------- */
 
 template <>
-void FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ();
+void
+FE_Q_Hierarchical<1>::initialize_generalized_face_support_points ();
 
 template <>
 bool

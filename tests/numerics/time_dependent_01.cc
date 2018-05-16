@@ -24,7 +24,8 @@
 #include <algorithm>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 std::vector<bool> end_sweep_flags;
@@ -39,21 +40,24 @@ public:
     time_step_number (time_step_number)
   {}
 
-  virtual void end_sweep ()
+  virtual void
+  end_sweep ()
   {
     static Threads::Mutex mutex;
     Threads::Mutex::ScopedLock lock(mutex);
     end_sweep_flags[time_step_number] = true;
   }
 
-  virtual void solve_primal_problem () {}
+  virtual void
+  solve_primal_problem () {}
 
 private:
   const unsigned int time_step_number;
 };
 
 
-void test ()
+void
+test ()
 {
   // create time steps, more than there are likely threads on current machines
   TimeDependent td (TimeDependent::TimeSteppingData(0,0),
@@ -74,7 +78,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);

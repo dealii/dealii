@@ -107,29 +107,34 @@ public:
    * This function will also clear the local() indices.
    */
   template <int dim, int spacedim>
-  void initialize(const DoFHandler<dim, spacedim> &, bool levels_only = false, bool active_only = false);
+  void
+  initialize(const DoFHandler<dim, spacedim> &, bool levels_only = false, bool active_only = false);
 
   /**
    * @brief Initialize block structure on cells and compute renumbering
    * between cell dofs and block cell dofs.
    */
   template <int dim, int spacedim>
-  void initialize_local(const DoFHandler<dim, spacedim> &);
+  void
+  initialize_local(const DoFHandler<dim, spacedim> &);
 
   /**
    * Access the BlockIndices structure of the global system.
    */
-  const BlockIndices &global() const;
+  const BlockIndices &
+  global() const;
 
   /**
    * Access BlockIndices for the local system on a cell.
    */
-  const BlockIndices &local() const;
+  const BlockIndices &
+  local() const;
 
   /**
    * Access the BlockIndices structure of a level in the multilevel hierarchy.
    */
-  const BlockIndices &level(unsigned int level) const;
+  const BlockIndices &
+  level(unsigned int level) const;
 
   /**
    * Return the index after local renumbering.
@@ -140,17 +145,20 @@ public:
    * forth. The function then outputs the index in the standard local
    * numbering of DoFAccessor.
    */
-  types::global_dof_index renumber (const unsigned int i) const;
+  types::global_dof_index
+  renumber (const unsigned int i) const;
 
   /**
    * The number of base elements.
    */
-  unsigned int n_base_elements() const;
+  unsigned int
+  n_base_elements() const;
 
   /**
    * Return the base element of this index.
    */
-  unsigned int base_element (const unsigned int i) const;
+  unsigned int
+  base_element (const unsigned int i) const;
 
   /**
    * Write a summary of the block structure to the stream.
@@ -163,15 +171,17 @@ public:
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize (Archive &ar,
-                  const unsigned int /*version*/);
+  void
+  serialize (Archive &ar,
+             const unsigned int /*version*/);
 
 private:
   /**
@@ -230,7 +240,8 @@ BlockInfo::level (const unsigned int l) const
 
 
 inline
-types::global_dof_index BlockInfo::renumber (const unsigned int i) const
+types::global_dof_index
+BlockInfo::renumber (const unsigned int i) const
 {
   AssertIndexRange(i, static_cast<unsigned int>(local_renumbering.size()));
   return local_renumbering[i];
@@ -300,8 +311,9 @@ BlockInfo::memory_consumption () const
 
 
 template <class Archive>
-void BlockInfo::serialize (Archive &ar,
-                           const unsigned int /*version*/)
+void
+BlockInfo::serialize (Archive &ar,
+                      const unsigned int /*version*/)
 {
   ar &bi_global;
   ar &levels;

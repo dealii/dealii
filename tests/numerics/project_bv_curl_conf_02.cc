@@ -28,14 +28,16 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/numerics/vector_tools.h>
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 template <int dim>
 class BoundaryFunction: public Function<dim>
 {
 public:
   BoundaryFunction ();
-  virtual void vector_value (const Point<dim> &p, Vector<double> &values) const;
+  virtual void
+  vector_value (const Point<dim> &p, Vector<double> &values) const;
 };
 
 template <int dim>
@@ -44,15 +46,17 @@ BoundaryFunction<dim>::BoundaryFunction (): Function<dim> (dim)
 }
 
 template <int dim>
-void BoundaryFunction<dim>::vector_value (const Point<dim> &,
-                                          Vector<double> &values) const
+void
+BoundaryFunction<dim>::vector_value (const Point<dim> &,
+                                     Vector<double> &values) const
 {
   for (unsigned int d = 0; d < dim; ++d)
     values (d) = d + 1.0;
 }
 
 template <int dim>
-void test_boundary_values (const FiniteElement<dim> &fe, ConstraintMatrix &constraints)
+void
+test_boundary_values (const FiniteElement<dim> &fe, ConstraintMatrix &constraints)
 {
   Triangulation<dim> triangulation;
   GridGenerator::subdivided_hyper_cube (triangulation, 2);
@@ -65,7 +69,8 @@ void test_boundary_values (const FiniteElement<dim> &fe, ConstraintMatrix &const
 }
 
 template <int dim>
-void test(unsigned order)
+void
+test(unsigned order)
 {
   deallog << "dim:" << dim << " order:" << order << "\t";
 
@@ -115,7 +120,8 @@ void test(unsigned order)
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   deallog.attach (logfile);

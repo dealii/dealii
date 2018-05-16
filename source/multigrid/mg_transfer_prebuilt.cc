@@ -75,7 +75,8 @@ void MGTransferPrebuilt<VectorType>::initialize_constraints
 
 
 template <typename VectorType>
-void MGTransferPrebuilt<VectorType>::clear ()
+void
+MGTransferPrebuilt<VectorType>::clear ()
 {
   MGLevelGlobalTransfer<VectorType>::clear();
   prolongation_matrices.resize(0);
@@ -86,9 +87,10 @@ void MGTransferPrebuilt<VectorType>::clear ()
 
 
 template <typename VectorType>
-void MGTransferPrebuilt<VectorType>::prolongate (const unsigned int to_level,
-                                                 VectorType        &dst,
-                                                 const VectorType  &src) const
+void
+MGTransferPrebuilt<VectorType>::prolongate (const unsigned int to_level,
+                                            VectorType        &dst,
+                                            const VectorType  &src) const
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -99,9 +101,10 @@ void MGTransferPrebuilt<VectorType>::prolongate (const unsigned int to_level,
 
 
 template <typename VectorType>
-void MGTransferPrebuilt<VectorType>::restrict_and_add (const unsigned int from_level,
-                                                       VectorType        &dst,
-                                                       const VectorType  &src) const
+void
+MGTransferPrebuilt<VectorType>::restrict_and_add (const unsigned int from_level,
+                                                  VectorType        &dst,
+                                                  const VectorType  &src) const
 {
   Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
           ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
@@ -117,9 +120,10 @@ namespace
    * Helper function for build_matrices. Checks for identity constrained dofs
    * and replace with the indices of the dofs to which they are constrained
    */
-  void replace (const MGConstrainedDoFs              *mg_constrained_dofs,
-                const unsigned int                   level,
-                std::vector<types::global_dof_index> &dof_indices)
+  void
+  replace (const MGConstrainedDoFs              *mg_constrained_dofs,
+           const unsigned int                   level,
+           std::vector<types::global_dof_index> &dof_indices)
   {
     if (mg_constrained_dofs != nullptr &&
         mg_constrained_dofs->get_level_constraint_matrix(level).n_constraints() > 0)

@@ -153,7 +153,8 @@ check_sine(unsigned int nquad)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

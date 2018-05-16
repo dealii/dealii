@@ -37,7 +37,8 @@
 
 
 template <typename NumberType>
-void test(const unsigned int size_1, const unsigned int size_2, const unsigned int block_size, const NumberType tol)
+void
+test(const unsigned int size_1, const unsigned int size_2, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -82,7 +83,8 @@ void test(const unsigned int size_1, const unsigned int size_2, const unsigned i
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);

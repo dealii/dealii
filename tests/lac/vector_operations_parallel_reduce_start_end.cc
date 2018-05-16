@@ -24,7 +24,8 @@
 
 
 template <typename Number>
-void check ()
+void
+check ()
 {
   for (unsigned int test=0; test<5; ++test)
     {
@@ -70,7 +71,8 @@ void check ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

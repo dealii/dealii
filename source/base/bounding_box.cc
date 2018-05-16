@@ -17,7 +17,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int spacedim, typename Number>
-bool BoundingBox<spacedim,Number>::point_inside (const Point<spacedim, Number> &p) const
+bool
+BoundingBox<spacedim,Number>::point_inside (const Point<spacedim, Number> &p) const
 {
   for (unsigned int i=0; i < spacedim; ++i)
     {
@@ -34,7 +35,8 @@ bool BoundingBox<spacedim,Number>::point_inside (const Point<spacedim, Number> &
 }
 
 template <int spacedim, typename Number>
-void BoundingBox<spacedim,Number>::merge_with(const BoundingBox<spacedim,Number> &other_bbox)
+void
+BoundingBox<spacedim,Number>::merge_with(const BoundingBox<spacedim,Number> &other_bbox)
 {
   for (unsigned int i=0; i < spacedim; ++i)
     {
@@ -44,7 +46,8 @@ void BoundingBox<spacedim,Number>::merge_with(const BoundingBox<spacedim,Number>
 }
 
 template <int spacedim, typename Number>
-NeighborType BoundingBox < spacedim,Number >::get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const
+NeighborType BoundingBox < spacedim,Number >::
+get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const
 {
   if (spacedim == 1)
     {
@@ -124,13 +127,15 @@ NeighborType BoundingBox < spacedim,Number >::get_neighbor_type (const BoundingB
 }
 
 template <int spacedim, typename Number>
-const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &BoundingBox<spacedim,Number>::get_boundary_points () const
+const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &
+                                                            BoundingBox<spacedim,Number>::get_boundary_points () const
 {
   return this->boundary_points;
 }
 
 template <int spacedim, typename Number>
-double BoundingBox<spacedim,Number>::volume() const
+double
+BoundingBox<spacedim,Number>::volume() const
 {
   double vol = 1.0;
   for (unsigned int i=0; i < spacedim; ++i)

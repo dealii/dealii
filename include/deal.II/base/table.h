@@ -186,7 +186,8 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      Accessor<N,T,C,P-1> operator [] (const size_type i) const;
+      Accessor<N,T,C,P-1>
+      operator [] (const size_type i) const;
 
       /**
        * Exception for range check. Do not use global exception since this way
@@ -289,23 +290,27 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      reference operator [] (const size_type) const;
+      reference
+      operator [] (const size_type) const;
 
       /**
        * Return the length of one row, i.e. the number of elements
        * corresponding to the last index of the table object.
        */
-      size_type size () const;
+      size_type
+      size () const;
 
       /**
        * Return an iterator to the first element of this row.
        */
-      iterator begin () const;
+      iterator
+      begin () const;
 
       /**
        * Return an iterator to the element past the end of this row.
        */
-      iterator end () const;
+      iterator
+      end () const;
 
     private:
       /**
@@ -464,7 +469,8 @@ public:
    * this one, the compiler will happily generate a predefined copy operator
    * which is not what we want.
    */
-  TableBase<N,T> &operator = (const TableBase<N,T> &src);
+  TableBase<N,T> &
+  operator = (const TableBase<N,T> &src);
 
   /**
    * Copy operator. Copy all elements of <tt>src</tt> into the array. The size
@@ -474,24 +480,28 @@ public:
    * <tt>T</tt>.
    */
   template <typename T2>
-  TableBase<N,T> &operator = (const TableBase<N,T2> &src);
+  TableBase<N,T> &
+  operator = (const TableBase<N,T2> &src);
 
   /**
    * Move assignment operator. Transfer all elements of <tt>src</tt> into the
    * table.
    */
-  TableBase<N,T> &operator = (TableBase<N,T> &&src) noexcept;
+  TableBase<N,T> &
+  operator = (TableBase<N,T> &&src) noexcept;
 
   /**
    * Test for equality of two tables.
    */
-  bool operator == (const TableBase<N,T> &T2)  const;
+  bool
+  operator == (const TableBase<N,T> &T2)  const;
 
   /**
    * Set all entries to their default value (i.e. copy them over with default
    * constructed objects). Do not change the size of the table, though.
    */
-  void reset_values ();
+  void
+  reset_values ();
 
   /**
    * Set the dimensions of this object to the sizes given in the first
@@ -501,30 +511,35 @@ public:
    * default constructed object for the element type. Otherwise the
    * memory is left in an uninitialized or otherwise undefined state.
    */
-  void reinit (const TableIndices<N> &new_size,
-               const bool             omit_default_initialization = false);
+  void
+  reinit (const TableIndices<N> &new_size,
+          const bool             omit_default_initialization = false);
 
   /**
    * Size of the table in direction <tt>i</tt>.
    */
-  size_type size (const unsigned int i) const;
+  size_type
+  size (const unsigned int i) const;
 
   /**
    * Return the sizes of this object in each direction.
    */
-  const TableIndices<N> &size () const;
+  const TableIndices<N> &
+  size () const;
 
   /**
    * Return the number of elements stored in this object, which is the product
    * of the extensions in each dimension.
    */
-  size_type n_elements () const;
+  size_type
+  n_elements () const;
 
   /**
    * Return whether the object is empty, i.e. one of the directions is zero.
    * This is equivalent to <tt>n_elements()==0</tt>.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Fill this table (which is assumed to already have the correct size) from
@@ -563,13 +578,15 @@ public:
    * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
-  void fill (InputIterator entries,
-             const bool      C_style_indexing = true);
+  void
+  fill (InputIterator entries,
+        const bool      C_style_indexing = true);
 
   /**
    * Fill all table entries with the same value.
    */
-  void fill (const T &value);
+  void
+  fill (const T &value);
 
   /**
    * Return a read-write reference to the indicated element.
@@ -599,27 +616,31 @@ public:
    * that simply calls <tt>u.swap(v)</tt>, again in analogy to standard
    * functions.
    */
-  void swap (TableBase<N,T> &v);
+  void
+  swap (TableBase<N,T> &v);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
    * of serialization.
    */
   template <class Archive>
-  void serialize (Archive &ar, const unsigned int version);
+  void
+  serialize (Archive &ar, const unsigned int version);
 
 protected:
   /**
    * Return the position of the indicated element within the array of elements
    * stored one after the other. This function does no index checking.
    */
-  size_type position (const TableIndices<N> &indices) const;
+  size_type
+  position (const TableIndices<N> &indices) const;
 
   /**
    * Return a read-write reference to the indicated element.
@@ -627,7 +648,8 @@ protected:
    * This function does no bounds checking and is only to be used internally
    * and in functions already checked.
    */
-  typename AlignedVector<T>::reference el (const TableIndices<N> &indices);
+  typename AlignedVector<T>::reference
+  el (const TableIndices<N> &indices);
 
   /**
    * Return the value of the indicated element as a read-only reference.
@@ -639,7 +661,8 @@ protected:
    * value since this object may hold data types that may be large, and we
    * don't know here whether copying is expensive or not.
    */
-  typename AlignedVector<T>::const_reference el (const TableIndices<N> &indices) const;
+  typename AlignedVector<T>::const_reference
+  el (const TableIndices<N> &indices) const;
 
 protected:
   /**
@@ -878,9 +901,10 @@ public:
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
    */
-  void reinit (const size_type size1,
-               const size_type size2,
-               const bool         omit_default_initialization = false);
+  void
+  reinit (const size_type size1,
+          const size_type size2,
+          const bool         omit_default_initialization = false);
 
   using TableBase<2,T>::reinit;
 
@@ -942,13 +966,15 @@ public:
    * Number of rows. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  size_type n_rows () const;
+  size_type
+  n_rows () const;
 
   /**
    * Number of columns. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  size_type n_cols () const;
+  size_type
+  n_cols () const;
 
 protected:
   /**
@@ -961,8 +987,9 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::reference el (const size_type i,
-                                           const size_type j);
+  typename AlignedVector<T>::reference
+  el (const size_type i,
+      const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -978,8 +1005,9 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::const_reference el (const size_type i,
-                                                 const size_type j) const;
+  typename AlignedVector<T>::const_reference
+  el (const size_type i,
+      const size_type j) const;
 };
 
 
@@ -1088,9 +1116,10 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j,
-                                                          const size_type k) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k) const;
 
 
   /**
@@ -1099,21 +1128,24 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j,
-                                                    const size_type k);
+  typename AlignedVector<T>::reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k);
 
   /**
    * Make the corresponding operator () from the TableBase base class
    * available also in this class.
    */
-  typename AlignedVector<T>::reference operator () (const TableIndices<3> &indices);
+  typename AlignedVector<T>::reference
+  operator () (const TableIndices<3> &indices);
 
   /**
    * Make the corresponding operator () from the TableBase base class
    * available also in this class.
    */
-  typename AlignedVector<T>::const_reference operator () (const TableIndices<3> &indices) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const TableIndices<3> &indices) const;
 };
 
 
@@ -1176,10 +1208,11 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j,
-                                                          const size_type k,
-                                                          const size_type l) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l) const;
 
 
   /**
@@ -1188,10 +1221,11 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j,
-                                                    const size_type k,
-                                                    const size_type l);
+  typename AlignedVector<T>::reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1270,11 +1304,12 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j,
-                                                          const size_type k,
-                                                          const size_type l,
-                                                          const size_type m) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1282,11 +1317,12 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j,
-                                                    const size_type k,
-                                                    const size_type l,
-                                                    const size_type m);
+  typename AlignedVector<T>::reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1365,12 +1401,13 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j,
-                                                          const size_type k,
-                                                          const size_type l,
-                                                          const size_type m,
-                                                          const size_type n) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m,
+               const size_type n) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1378,12 +1415,13 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j,
-                                                    const size_type k,
-                                                    const size_type l,
-                                                    const size_type m,
-                                                    const size_type n);
+  typename AlignedVector<T>::reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m,
+               const size_type n);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1462,13 +1500,14 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j,
-                                                          const size_type k,
-                                                          const size_type l,
-                                                          const size_type m,
-                                                          const size_type n,
-                                                          const size_type o) const;
+  typename AlignedVector<T>::const_reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m,
+               const size_type n,
+               const size_type o) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1476,13 +1515,14 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j,
-                                                    const size_type k,
-                                                    const size_type l,
-                                                    const size_type m,
-                                                    const size_type n,
-                                                    const size_type o);
+  typename AlignedVector<T>::reference
+  operator () (const size_type i,
+               const size_type j,
+               const size_type k,
+               const size_type l,
+               const size_type m,
+               const size_type n,
+               const size_type o);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1558,7 +1598,8 @@ namespace TransposeTableIterators
      * Get a constant reference to the value of the element represented by
      * this object.
      */
-    const T &value() const;
+    const T &
+    value() const;
 
     /**
      * Numerical type of the row and column indices of the TransposeTable.
@@ -1568,12 +1609,14 @@ namespace TransposeTableIterators
     /**
      * Access the row of the current entry.
      */
-    size_type row() const;
+    size_type
+    row() const;
 
     /**
      * Access the column of the current entry.
      */
-    size_type column() const;
+    size_type
+    column() const;
 
   protected:
     /**
@@ -1627,13 +1670,15 @@ namespace TransposeTableIterators
      * Assignment operator. This assigns a new value to the table entry at the
      * current row and column coordinates.
      */
-    const Accessor<T, false> &operator = (const T &) const;
+    const Accessor<T, false> &
+    operator = (const T &) const;
 
     /**
      * Move assignment operator. This assigns a new value to the table entry at the
      * current row and column coordinates.
      */
-    const Accessor<T, false> &operator = (T &&) const;
+    const Accessor<T, false> &
+    operator = (T &&) const;
 
     /**
      * Since we overload value() we have to explicitly use the base class
@@ -1645,7 +1690,8 @@ namespace TransposeTableIterators
      * Get a reference to the value of the element represented by
      * this object.
      */
-    T &value() const;
+    T &
+    value() const;
   };
 
   /**
@@ -1761,9 +1807,10 @@ public:
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
    */
-  void reinit (const size_type size1,
-               const size_type size2,
-               const bool      omit_default_initialization = false);
+  void
+  reinit (const size_type size1,
+          const size_type size2,
+          const bool      omit_default_initialization = false);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1771,8 +1818,9 @@ public:
    *
    * This version of the function only allows read access.
    */
-  const_reference operator () (const size_type i,
-                               const size_type j) const;
+  const_reference
+  operator () (const size_type i,
+               const size_type j) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1780,40 +1828,47 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  reference operator () (const size_type i,
-                         const size_type j);
+  reference
+  operator () (const size_type i,
+               const size_type j);
 
   /**
    * Number of rows. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  size_type n_rows () const;
+  size_type
+  n_rows () const;
 
   /**
    * Number of columns. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  size_type n_cols () const;
+  size_type
+  n_cols () const;
 
   /**
    * Return an iterator pointing to the first entry.
    */
-  iterator begin ();
+  iterator
+  begin ();
 
   /**
    * Return a constant iterator pointing to the first entry.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin () const;
 
   /**
    * Return an iterator pointing to one past the last entry.
    */
-  iterator end ();
+  iterator
+  end ();
 
   /**
    * Return a constant iterator pointing to one past the last entry.
    */
-  const_iterator end () const;
+  const_iterator
+  end () const;
 
 protected:
   /**
@@ -1826,8 +1881,9 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  reference el (const size_type i,
-                const size_type j);
+  reference
+  el (const size_type i,
+      const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -1843,8 +1899,9 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  const_reference el (const size_type i,
-                      const size_type j) const;
+  const_reference
+  el (const size_type i,
+      const size_type j) const;
 
   /**
    * Make the AccessorBase class a friend so that it may directly index into
@@ -2226,8 +2283,9 @@ namespace internal
   namespace TableImplementation
   {
     template <typename InputIterator, typename T>
-    void fill_Fortran_style (InputIterator  entries,
-                             TableBase<1,T>  &table)
+    void
+    fill_Fortran_style (InputIterator  entries,
+                        TableBase<1,T>  &table)
     {
       using size_type = typename TableBase<1,T>::size_type;
       for (size_type i=0; i<table.size()[0]; ++i)
@@ -2236,8 +2294,9 @@ namespace internal
 
 
     template <typename InputIterator, typename T>
-    void fill_Fortran_style (InputIterator  entries,
-                             TableBase<2,T>  &table)
+    void
+    fill_Fortran_style (InputIterator  entries,
+                        TableBase<2,T>  &table)
     {
       using size_type = typename TableBase<2,T>::size_type;
       for (size_type j=0; j<table.size()[1]; ++j)
@@ -2247,8 +2306,9 @@ namespace internal
 
 
     template <typename InputIterator, typename T>
-    void fill_Fortran_style (InputIterator  entries,
-                             TableBase<3,T>  &table)
+    void
+    fill_Fortran_style (InputIterator  entries,
+                        TableBase<3,T>  &table)
     {
       using size_type = typename TableBase<3,T>::size_type;
       for (size_type k=0; k<table.size()[2]; ++k)
@@ -2259,8 +2319,9 @@ namespace internal
 
 
     template <typename InputIterator, typename T, int N>
-    void fill_Fortran_style (InputIterator,
-                             TableBase<N,T> &)
+    void
+    fill_Fortran_style (InputIterator,
+                        TableBase<N,T> &)
     {
       Assert (false, ExcNotImplemented());
     }
@@ -3532,7 +3593,8 @@ Table<7,T>::operator () (const TableIndices<7> &indices)
  */
 template <int N, typename T>
 inline
-void swap (TableBase<N,T> &u, TableBase<N,T> &v)
+void
+swap (TableBase<N,T> &u, TableBase<N,T> &v)
 {
   u.swap (v);
 }

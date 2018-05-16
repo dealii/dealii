@@ -63,7 +63,8 @@ Subscriptor::~Subscriptor ()
 }
 
 
-void Subscriptor::check_no_subscribers () const noexcept
+void
+Subscriptor::check_no_subscribers () const noexcept
 {
   // Check whether there are still subscriptions to this object. If so, output
   // the actual name of the class to which this object belongs, i.e. the most
@@ -126,7 +127,8 @@ void Subscriptor::check_no_subscribers () const noexcept
 
 
 
-Subscriptor &Subscriptor::operator = (const Subscriptor &s)
+Subscriptor &
+Subscriptor::operator = (const Subscriptor &s)
 {
   check_no_subscribers();
   object_info = s.object_info;
@@ -135,7 +137,8 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 
 
 
-Subscriptor &Subscriptor::operator = (Subscriptor &&s) noexcept
+Subscriptor &
+Subscriptor::operator = (Subscriptor &&s) noexcept
 {
   check_no_subscribers();
   s.check_no_subscribers();
@@ -202,14 +205,16 @@ Subscriptor::unsubscribe(const char *id) const
 
 
 
-unsigned int Subscriptor::n_subscriptions () const
+unsigned int
+Subscriptor::n_subscriptions () const
 {
   return counter;
 }
 
 
 
-void Subscriptor::list_subscribers () const
+void
+Subscriptor::list_subscribers () const
 {
 #ifndef DEAL_II_WITH_THREADS
   for (map_iterator it = counter_map.begin();

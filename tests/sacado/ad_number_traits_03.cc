@@ -29,16 +29,18 @@ using namespace dealii;
 namespace AD = Differentiation::AD;
 
 template <typename Number>
-Number func(const Number &a, const Number &b, const Number &c)
+Number
+func(const Number &a, const Number &b, const Number &c)
 {
   const Number r = c*std::log(b+1.)/std::sin(a);
   return r;
 }
 
 template <typename Number>
-void print(const Number &r, const Number &drda, const Number &drdb,
-           const Number &d2rda2, const Number &d2rdb2,
-           const Number &d2rdadb, const Number &d2rdbda)
+void
+print(const Number &r, const Number &drda, const Number &drdb,
+      const Number &d2rda2, const Number &d2rdb2,
+      const Number &d2rdadb, const Number &d2rdbda)
 {
   deallog
       << "        r = "  << r
@@ -57,7 +59,8 @@ void print(const Number &r, const Number &drda, const Number &drdb,
       << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

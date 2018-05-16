@@ -27,7 +27,8 @@
 using namespace dealii;
 
 template <int dim>
-void test(const bool apply_constrains, const unsigned int hp)
+void
+test(const bool apply_constrains, const unsigned int hp)
 {
   Triangulation<dim>   triangulation;
   {
@@ -117,7 +118,8 @@ void test(const bool apply_constrains, const unsigned int hp)
     }
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

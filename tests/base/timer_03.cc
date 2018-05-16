@@ -21,7 +21,8 @@
 // compute the ratio of two measurements and compare to
 // the expected value.
 
-void compare (double t1, double t2, double ratio)
+void
+compare (double t1, double t2, double ratio)
 {
   double r = t2/t1;
   double d = std::fabs(r-ratio) / ratio;
@@ -37,7 +38,8 @@ void compare (double t1, double t2, double ratio)
     }
 }
 
-void match(double v1, double v2)
+void
+match(double v1, double v2)
 {
   double eps = 1.0e-6;
   if (std::fabs(v1-v2)<eps)
@@ -53,7 +55,8 @@ void match(double v1, double v2)
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn (unsigned int n)
 {
   for (unsigned int i=0 ; i<n ; ++i)
     {
@@ -65,7 +68,8 @@ void burn (unsigned int n)
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

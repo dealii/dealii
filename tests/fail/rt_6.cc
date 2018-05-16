@@ -35,7 +35,8 @@
 
 
 template <int dim>
-Point<dim> transform (const Point<dim> p)
+Point<dim>
+transform (const Point<dim> p)
 {
   switch (dim)
     {
@@ -55,8 +56,9 @@ Point<dim> transform (const Point<dim> p)
 
 
 template <int dim>
-void check_element (const Triangulation<dim> &tr,
-                    const FiniteElement<dim> &fe)
+void
+check_element (const Triangulation<dim> &tr,
+               const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof_handler(tr);
   dof_handler.distribute_dofs (fe);
@@ -121,7 +123,8 @@ void check_element (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // make a coarse triangulation as a
   // hypercube. if in more than 1d,

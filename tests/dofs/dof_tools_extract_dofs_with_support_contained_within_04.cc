@@ -39,7 +39,8 @@
 #include <set>
 
 
-std::string output_name(const unsigned int subdomain)
+std::string
+output_name(const unsigned int subdomain)
 {
   return "output_" +
          Utilities::int_to_string(subdomain) +
@@ -66,7 +67,8 @@ pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
 
   // Setup system
@@ -309,7 +311,8 @@ void test ()
   dh.clear();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile,/*do not print job id*/false);

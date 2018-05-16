@@ -44,14 +44,16 @@ class MyFunction : public Function<dim>
 public:
   MyFunction () : Function<dim>(1) {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return p(0)*p(0)+2.0*p(0)*p(1);
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     values(0) = value(p,0);
   }
@@ -65,8 +67,9 @@ class MyNormalDerivative : public Function<dim>
 public:
   MyNormalDerivative () : Function<dim>(1) {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     double val = 0.0;
     if (std::abs(p(1)-1.0)<1e-5)
@@ -76,8 +79,9 @@ public:
     return val;
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     values(0) = value(p,0);
   }
@@ -96,7 +100,8 @@ get_q_face ()
 
 
 template <int dim, int spacedim>
-void make_mesh (Triangulation<dim,spacedim> &tria)
+void
+make_mesh (Triangulation<dim,spacedim> &tria)
 {
   // two faces of a hyper_cube
   Triangulation<spacedim,spacedim> volume_mesh;
@@ -175,7 +180,8 @@ check ()
 }
 
 
-int main ()
+int
+main ()
 {
   // do not run multithreaded estimate() because that would break the order of the
   // function evaluations that we log above

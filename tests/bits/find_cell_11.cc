@@ -43,7 +43,8 @@
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
   Triangulation<2> tr;
   GridGenerator::hyper_cube(tr);
@@ -65,7 +66,8 @@ void test()
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

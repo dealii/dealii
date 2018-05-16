@@ -24,8 +24,9 @@
 #include <functional>
 
 template <typename number>
-bool operator == (const BlockVector<number> &v1,
-                  const BlockVector<number> &v2)
+bool
+operator == (const BlockVector<number> &v1,
+             const BlockVector<number> &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -36,7 +37,8 @@ bool operator == (const BlockVector<number> &v1,
 }
 
 
-void test ()
+void
+test ()
 {
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
@@ -317,7 +319,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

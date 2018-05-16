@@ -50,8 +50,9 @@ namespace SUNDIALS
   namespace
   {
     template<typename VectorType>
-    int t_dae_residual(realtype tt, N_Vector yy, N_Vector yp,
-                       N_Vector rr, void *user_data)
+    int
+    t_dae_residual(realtype tt, N_Vector yy, N_Vector yp,
+                   N_Vector rr, void *user_data)
     {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -78,13 +79,14 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_dae_lsetup(IDAMem IDA_mem,
-                     N_Vector yy,
-                     N_Vector yp,
-                     N_Vector resp,
-                     N_Vector tmp1,
-                     N_Vector tmp2,
-                     N_Vector tmp3)
+    int
+    t_dae_lsetup(IDAMem IDA_mem,
+                 N_Vector yy,
+                 N_Vector yp,
+                 N_Vector resp,
+                 N_Vector tmp1,
+                 N_Vector tmp2,
+                 N_Vector tmp3)
     {
       (void) tmp1;
       (void) tmp2;
@@ -112,12 +114,13 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_dae_solve(IDAMem IDA_mem,
-                    N_Vector b,
-                    N_Vector weight,
-                    N_Vector yy,
-                    N_Vector yp,
-                    N_Vector resp)
+    int
+    t_dae_solve(IDAMem IDA_mem,
+                N_Vector b,
+                N_Vector weight,
+                N_Vector yy,
+                N_Vector yp,
+                N_Vector resp)
     {
       (void) weight;
       (void) yy;
@@ -176,8 +179,9 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  unsigned int IDA<VectorType>::solve_dae(VectorType &solution,
-                                          VectorType &solution_dot)
+  unsigned int
+  IDA<VectorType>::solve_dae(VectorType &solution,
+                             VectorType &solution_dot)
   {
 
     unsigned int system_size = solution.size();
@@ -277,10 +281,11 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  void IDA<VectorType>::reset(const double &current_time,
-                              const double &current_time_step,
-                              VectorType &solution,
-                              VectorType &solution_dot)
+  void
+  IDA<VectorType>::reset(const double &current_time,
+                         const double &current_time_step,
+                         VectorType &solution,
+                         VectorType &solution_dot)
   {
 
     unsigned int system_size;
@@ -445,7 +450,8 @@ namespace SUNDIALS
   }
 
   template<typename VectorType>
-  void IDA<VectorType>::set_functions_to_trigger_an_assert()
+  void
+  IDA<VectorType>::set_functions_to_trigger_an_assert()
   {
 
     reinit_vector = [](VectorType &)

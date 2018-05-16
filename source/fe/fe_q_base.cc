@@ -60,7 +60,8 @@ namespace internal
       template <>
       inline
       std::vector<unsigned int>
-      face_lexicographic_to_hierarchic_numbering<1> (const unsigned int)
+      face_lexicographic_to_hierarchic_numbering<1>
+      (const unsigned int)
       {
         return std::vector<unsigned int>();
       }
@@ -117,8 +118,9 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
    */
   template <int spacedim>
   static
-  void initialize_constraints (const std::vector<Point<1> > &,
-                               FE_Q_Base<PolynomialType,1,spacedim> &)
+  void
+  initialize_constraints (const std::vector<Point<1> > &,
+                          FE_Q_Base<PolynomialType,1,spacedim> &)
   {
     // no constraints in 1d
   }
@@ -126,8 +128,9 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
 
   template <int spacedim>
   static
-  void initialize_constraints (const std::vector<Point<1> > &/*points*/,
-                               FE_Q_Base<PolynomialType,2,spacedim> &fe)
+  void
+  initialize_constraints (const std::vector<Point<1> > &/*points*/,
+                          FE_Q_Base<PolynomialType,2,spacedim> &fe)
   {
     const unsigned int dim = 2;
 
@@ -233,8 +236,9 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
 
   template <int spacedim>
   static
-  void initialize_constraints (const std::vector<Point<1> > &/*points*/,
-                               FE_Q_Base<PolynomialType,3,spacedim> &fe)
+  void
+  initialize_constraints (const std::vector<Point<1> > &/*points*/,
+                          FE_Q_Base<PolynomialType,3,spacedim> &fe)
   {
     const unsigned int dim = 3;
 
@@ -1171,8 +1175,9 @@ FE_Q_Base<PolynomialType,dim,spacedim>::initialize_constraints
 template <class PolynomialType, int dim, int spacedim>
 const FullMatrix<double> &
 FE_Q_Base<PolynomialType,dim,spacedim>
-::get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case) const
+::
+get_prolongation_matrix (const unsigned int child,
+                         const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
@@ -1365,8 +1370,9 @@ FE_Q_Base<PolynomialType,dim,spacedim>
 template <class PolynomialType, int dim, int spacedim>
 const FullMatrix<double> &
 FE_Q_Base<PolynomialType,dim,spacedim>
-::get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case) const
+::
+get_restriction_matrix (const unsigned int child,
+                        const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));

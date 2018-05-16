@@ -22,7 +22,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr1;
 
@@ -60,7 +61,8 @@ void test()
       << std::endl;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

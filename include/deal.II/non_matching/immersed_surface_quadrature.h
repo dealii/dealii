@@ -106,19 +106,22 @@ namespace NonMatching
      * @note This function should only be used during construction of the
      * quadrature formula.
      */
-    void push_back(const Point<dim> &point,
-                   const double weight,
-                   const Tensor<1, dim> &normal);
+    void
+    push_back(const Point<dim> &point,
+              const double weight,
+              const Tensor<1, dim> &normal);
 
     /**
      * Return a reference to the <tt>i</tt>th surface normal.
      */
-    const Tensor<1,dim> &normal_vector(const unsigned int i) const;
+    const Tensor<1,dim> &
+    normal_vector(const unsigned int i) const;
 
     /**
      * Return a reference to the whole %vector of normals.
      */
-    const std::vector<Tensor<1,dim>> &get_normal_vectors() const;
+    const std::vector<Tensor<1,dim>> &
+                                  get_normal_vectors() const;
 
   protected:
 

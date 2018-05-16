@@ -30,7 +30,8 @@ using namespace dealii;
 namespace AD = Differentiation::AD;
 
 template<typename NumberTraitsType>
-void print_info ()
+void
+print_info ()
 {
   deallog
       << "type_code: "
@@ -48,7 +49,8 @@ void print_info ()
   deallog << "is_tapeless_ad_number: " << AD::is_tapeless_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

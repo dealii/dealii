@@ -332,7 +332,8 @@ test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

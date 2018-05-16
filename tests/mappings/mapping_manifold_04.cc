@@ -31,7 +31,8 @@
 #include <deal.II/fe/fe_values.h>
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;
 

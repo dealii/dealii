@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   typename hp::DoFHandler<dim>::active_cell_iterator invalid_1;
 
@@ -38,7 +39,8 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -29,7 +29,8 @@
 #include "../tests.h"
 
 template <typename Number>
-void test()
+void
+test()
 {
   deallog << "SymmetricTensor<2, 1> is trivially copyable: "
           << boost::has_trivial_copy<SymmetricTensor<2, 1, Number> >::value
@@ -52,7 +53,8 @@ void test()
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

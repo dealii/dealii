@@ -21,7 +21,8 @@
 #include <iostream>
 
 
-void test (PETScWrappers::SparseMatrix &m)
+void
+test (PETScWrappers::SparseMatrix &m)
 {
   AssertThrow (m.m() == 5, ExcInternalError());
   AssertThrow (m.n() == 5, ExcInternalError());
@@ -30,7 +31,8 @@ void test (PETScWrappers::SparseMatrix &m)
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
   deallog.depth_console(0);

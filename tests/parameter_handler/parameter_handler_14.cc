@@ -22,7 +22,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check ()
 {
   std::string input = "subsection bar\n"
                       "  set value = 1.0\n"
@@ -49,7 +50,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -22,8 +22,9 @@
 
 namespace dealii
 {
-  bool compare (const TableHandler &t1,
-                const TableHandler &t2)
+  bool
+  compare (const TableHandler &t1,
+           const TableHandler &t2)
   {
     std::ostringstream o1, o2;
     t1.write_tex (o1);
@@ -36,7 +37,8 @@ namespace dealii
 }
 
 
-void test ()
+void
+test ()
 {
   TableHandler t1, t2;
   std::string keys[4] = { "key1", "key2", "key3", "key4" };
@@ -55,7 +57,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

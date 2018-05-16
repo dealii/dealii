@@ -60,17 +60,25 @@ namespace Step22
   {
   public:
     StokesProblem (const unsigned int degree);
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_dofs ();
-    void assemble_system ();
-    void solve ();
-    void get_point_value (const Point<dim> point, const int proc,
-                          Vector<double> &value) const;
-    void check_periodicity(const unsigned int cycle) const;
-    void output_results (const unsigned int refinement_cycle) const;
-    void refine_mesh ();
+    void
+    setup_dofs ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    get_point_value (const Point<dim> point, const int proc,
+                     Vector<double> &value) const;
+    void
+    check_periodicity(const unsigned int cycle) const;
+    void
+    output_results (const unsigned int refinement_cycle) const;
+    void
+    refine_mesh ();
 
     const unsigned int   degree;
 
@@ -102,11 +110,13 @@ namespace Step22
   public:
     BoundaryValues () : Function<dim>(dim+1) {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
   };
 
 
@@ -142,11 +152,13 @@ namespace Step22
   public:
     RightHandSide () : Function<dim>(dim+1) {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const;
+    virtual double
+    value (const Point<dim>   &p,
+           const unsigned int  component = 0) const;
 
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &value) const;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<double>   &value) const;
 
   };
 
@@ -182,8 +194,9 @@ namespace Step22
                    const IndexSet       &locally_owned,
                    const MPI_Comm       &mpi_communicator);
 
-    void vmult (TrilinosWrappers::MPI::Vector       &dst,
-                const TrilinosWrappers::MPI::Vector &src) const;
+    void
+    vmult (TrilinosWrappers::MPI::Vector       &dst,
+           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
     const SmartPointer<const Matrix> matrix;
@@ -236,8 +249,9 @@ namespace Step22
                       const IndexSet &relevant_pres,
                       const MPI_Comm &mpi_communicator);
 
-    void vmult (TrilinosWrappers::MPI::Vector       &dst,
-                const TrilinosWrappers::MPI::Vector &src) const;
+    void
+    vmult (TrilinosWrappers::MPI::Vector       &dst,
+           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
     const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> system_matrix;
@@ -301,7 +315,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  void
+  StokesProblem<dim>::setup_dofs ()
   {
     dof_handler.distribute_dofs (fe);
 
@@ -397,7 +412,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::assemble_system ()
+  void
+  StokesProblem<dim>::assemble_system ()
   {
     system_matrix=0.;
     system_rhs=0.;
@@ -493,7 +509,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::solve ()
+  void
+  StokesProblem<dim>::solve ()
   {
     TrilinosWrappers::PreconditionJacobi A_preconditioner;
     A_preconditioner.initialize(system_matrix.block(0,0));
@@ -579,11 +596,13 @@ namespace Step22
   }
 
   template <int dim>
-  void StokesProblem<dim>::check_periodicity (const unsigned int cycle) const
+  void
+  StokesProblem<dim>::check_periodicity (const unsigned int cycle) const
   {}
 
   template <>
-  void StokesProblem<2>::check_periodicity (const unsigned int cycle) const
+  void
+  StokesProblem<2>::check_periodicity (const unsigned int cycle) const
   {
     unsigned int n_points = 4;
     for (unsigned int i = 0; i<cycle; i++)
@@ -707,7 +726,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run ()
   {
     Point<dim> center;
     const double inner_radius = .5;
@@ -771,7 +791,8 @@ namespace Step22
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   try
     {

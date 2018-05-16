@@ -22,7 +22,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

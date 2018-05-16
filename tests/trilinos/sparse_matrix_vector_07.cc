@@ -25,9 +25,10 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::Vector &v,
-           TrilinosWrappers::MPI::Vector &w,
-           TrilinosWrappers::MPI::Vector &x)
+void
+test (TrilinosWrappers::MPI::Vector &v,
+      TrilinosWrappers::MPI::Vector &w,
+      TrilinosWrappers::MPI::Vector &x)
 {
   TrilinosWrappers::SparseMatrix m(v.size(),v.size(),v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -67,7 +68,8 @@ void test (TrilinosWrappers::MPI::Vector &v,
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

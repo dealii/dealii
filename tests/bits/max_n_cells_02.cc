@@ -31,7 +31,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << dim << "d:"
           << std::endl;
@@ -58,7 +59,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

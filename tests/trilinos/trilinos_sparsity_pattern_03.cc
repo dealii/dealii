@@ -21,7 +21,8 @@
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -71,7 +72,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

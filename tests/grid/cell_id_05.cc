@@ -27,7 +27,8 @@
 #include <deal.II/grid/cell_id.h>
 
 template <int spacedim>
-void test(const unsigned int &ref)
+void
+test(const unsigned int &ref)
 {
 
 
@@ -59,7 +60,8 @@ void test(const unsigned int &ref)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

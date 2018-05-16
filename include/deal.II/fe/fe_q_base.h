@@ -92,8 +92,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Projection from a fine grid space onto a coarse grid space. Overrides the
@@ -190,11 +191,12 @@ public:
    * dofs_per_cell.
    */
   virtual
-  unsigned int face_to_cell_index (const unsigned int face_dof_index,
-                                   const unsigned int face,
-                                   const bool face_orientation = true,
-                                   const bool face_flip        = false,
-                                   const bool face_rotation    = false) const override;
+  unsigned int
+  face_to_cell_index (const unsigned int face_dof_index,
+                      const unsigned int face,
+                      const bool face_orientation = true,
+                      const bool face_flip        = false,
+                      const bool face_rotation    = false) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -216,7 +218,8 @@ public:
    * of the element), as it implements the complete set of functions necessary
    * for hp capability.
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -285,38 +288,44 @@ protected:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Perform the initialization of the element based on 1D support points,
    * i.e., sets renumbering, initializes unit support points, initializes
    * constraints as well as restriction and prolongation matrices.
    */
-  void initialize (const std::vector<Point<1> > &support_points_1d);
+  void
+  initialize (const std::vector<Point<1> > &support_points_1d);
 
   /**
    * Initialize the hanging node constraints matrices. Called from
    * initialize().
    */
-  void initialize_constraints (const std::vector<Point<1> > &points);
+  void
+  initialize_constraints (const std::vector<Point<1> > &points);
 
   /**
    * Initialize the @p unit_support_points field of the FiniteElement class.
    * Called from initialize().
    */
-  void initialize_unit_support_points (const std::vector<Point<1> > &points);
+  void
+  initialize_unit_support_points (const std::vector<Point<1> > &points);
 
   /**
    * Initialize the @p unit_face_support_points field of the FiniteElement
    * class. Called from initialize().
    */
-  void initialize_unit_face_support_points (const std::vector<Point<1> > &points);
+  void
+  initialize_unit_face_support_points (const std::vector<Point<1> > &points);
 
   /**
    * Initialize the @p adjust_quad_dof_index_for_face_orientation_table field
    * of the FiniteElement class. Called from initialize().
    */
-  void initialize_quad_dof_index_permutation ();
+  void
+  initialize_quad_dof_index_permutation ();
 
   /**
    * Forward declaration of a class into which we put significant parts of the

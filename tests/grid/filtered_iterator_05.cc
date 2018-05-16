@@ -41,7 +41,8 @@ test()
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<2>();

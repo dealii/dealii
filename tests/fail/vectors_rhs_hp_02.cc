@@ -48,14 +48,16 @@ class MySquareFunction : public Function<dim>
 public:
   MySquareFunction () : Function<dim>(dim) {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const
   {
     return (component+1)*p.square();
   }
 
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
+  virtual void
+  vector_value (const Point<dim>   &p,
+                Vector<double>     &values) const
   {
     for (unsigned int d=0; d<dim; ++d)
       values(d) = value(p,d);
@@ -114,7 +116,8 @@ check ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   logfile.precision (4);

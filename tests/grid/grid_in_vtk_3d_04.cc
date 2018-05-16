@@ -28,12 +28,14 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file (const std::string name,
+            typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria;
   GridIn<dim> gi;
@@ -59,13 +61,15 @@ void check_file (const std::string name,
                 << std::endl;
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
   check_file<3> (std::string(SOURCE_DIR "/grid_in_vtk_3d_04.vtk"), GridIn<3>::vtk);
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

@@ -23,7 +23,8 @@
  */
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

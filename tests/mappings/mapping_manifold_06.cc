@@ -28,7 +28,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   std::ostream &out = deallog.get_file_stream();
 

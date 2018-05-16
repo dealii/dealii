@@ -21,7 +21,8 @@
 
 #include <vector>
 
-void test()
+void
+test()
 {
   unsigned int size(10);
   std::vector<types::global_dof_index> indices(size);
@@ -71,7 +72,8 @@ void test()
     deallog << float_values[i] << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test();

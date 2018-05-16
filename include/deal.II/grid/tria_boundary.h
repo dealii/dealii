@@ -89,12 +89,14 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~Boundary () override = default;
+  virtual
+  ~Boundary () override = default;
 
   /**
    * Clone this Boundary.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Return intermediate points on a line spaced according to the interior
@@ -256,7 +258,8 @@ public:
   /**
    * Clone this Boundary.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Let the new point be the arithmetic mean of the two vertices of the line.

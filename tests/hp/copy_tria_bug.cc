@@ -33,7 +33,8 @@ using namespace dealii;
 
 
 template <int dim>
-void test1()
+void
+test1()
 {
   Triangulation<dim> tr1;
   hp::DoFHandler<dim> dofh(tr1);
@@ -48,7 +49,8 @@ void test1()
 
 }
 
-int main()
+int
+main()
 {
   initlog();
 

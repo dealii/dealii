@@ -83,24 +83,28 @@ namespace internal
        * Copy operator. Simply copy all members of the referenced
        * object to the current object.
        */
-      NumberCache &operator= (const NumberCache &) = default;
+      NumberCache &
+      operator= (const NumberCache &) = default;
 
       /**
        * Move assignment operator. Simply move all members of the referenced
        * object to the current object.
        */
-      NumberCache &operator= (NumberCache &&) = default;
+      NumberCache &
+      operator= (NumberCache &&) = default;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * This function resets all the stored information.
        */
-      void clear ();
+      void
+      clear ();
 
       /**
        * Total number of dofs, accumulated over all processors that may
@@ -156,8 +160,9 @@ namespace internal
        * purpose of serialization
        */
       template <class Archive>
-      void serialize (Archive &ar,
-                      const unsigned int version);
+      void
+      serialize (Archive &ar,
+                 const unsigned int version);
     };
 
 

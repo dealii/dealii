@@ -51,10 +51,11 @@ public:
 
   LaplaceOperator() {};
 
-  void initialize (const Mapping<dim> &mapping,
-                   const DoFHandler<dim> &dof_handler,
-                   const std::set<types::boundary_id> &dirichlet_boundaries,
-                   const unsigned int level = numbers::invalid_unsigned_int)
+  void
+  initialize (const Mapping<dim> &mapping,
+              const DoFHandler<dim> &dof_handler,
+              const std::set<types::boundary_id> &dirichlet_boundaries,
+              const unsigned int level = numbers::invalid_unsigned_int)
   {
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
@@ -107,28 +108,32 @@ public:
     compute_inverse_diagonal();
   }
 
-  void vmult(LinearAlgebra::distributed::Vector<number> &dst,
+  void
+  vmult(LinearAlgebra::distributed::Vector<number> &dst,
+        const LinearAlgebra::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
+         const LinearAlgebra::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult_add(LinearAlgebra::distributed::Vector<number> &dst,
              const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    dst = 0;
     vmult_add(dst, src);
   }
 
-  void Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
-              const LinearAlgebra::distributed::Vector<number> &src) const
-  {
-    dst = 0;
-    vmult_add(dst, src);
-  }
-
-  void Tvmult_add(LinearAlgebra::distributed::Vector<number> &dst,
-                  const LinearAlgebra::distributed::Vector<number> &src) const
-  {
-    vmult_add(dst, src);
-  }
-
-  void vmult_add(LinearAlgebra::distributed::Vector<number> &dst,
-                 const LinearAlgebra::distributed::Vector<number> &src) const
+  void
+  vmult_add(LinearAlgebra::distributed::Vector<number> &dst,
+            const LinearAlgebra::distributed::Vector<number> &src) const
   {
     data.cell_loop (&LaplaceOperator::local_apply,
                     this, dst, src);
@@ -139,17 +144,20 @@ public:
       dst.local_element(constrained_dofs[i]) += src.local_element(constrained_dofs[i]);
   }
 
-  types::global_dof_index m() const
+  types::global_dof_index
+  m() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  types::global_dof_index n() const
+  types::global_dof_index
+  n() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  number el (const unsigned int row,  const unsigned int col) const
+  number
+  el (const unsigned int row,  const unsigned int col) const
   {
     AssertThrow(false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
@@ -283,14 +291,16 @@ class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Ve
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MatrixType &matrix)
+  void
+  initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   level,
-                           LinearAlgebra::distributed::Vector<Number> &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const
+  virtual void
+  operator() (const unsigned int   level,
+              LinearAlgebra::distributed::Vector<Number> &dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
     SolverCG<LinearAlgebra::distributed::Vector<Number> > solver_coarse (solver_control);
@@ -304,7 +314,8 @@ public:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof)
+void
+do_test (const DoFHandler<dim>  &dof)
 {
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
@@ -389,7 +400,8 @@ void do_test (const DoFHandler<dim>  &dof)
 
 
 template <int dim, int fe_degree, typename number>
-void test ()
+void
+test ()
 {
   for (unsigned int i=5; i<7; ++i)
     {
@@ -410,7 +422,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 

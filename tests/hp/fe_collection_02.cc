@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // test things with a collection of
   // primitive elements
@@ -55,7 +56,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

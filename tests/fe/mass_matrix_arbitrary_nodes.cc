@@ -32,7 +32,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   deallog << dim << 'D' << std::endl;
   for (unsigned int q_points=1; q_points<7-dim; ++q_points)
@@ -77,7 +78,8 @@ void check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

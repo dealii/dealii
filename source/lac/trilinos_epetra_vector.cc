@@ -61,9 +61,10 @@ namespace LinearAlgebra
 
 
 
-    void Vector::reinit(const IndexSet &parallel_partitioner,
-                        const MPI_Comm &communicator,
-                        const bool      omit_zeroing_entries)
+    void
+    Vector::reinit(const IndexSet &parallel_partitioner,
+                   const MPI_Comm &communicator,
+                   const bool      omit_zeroing_entries)
     {
       Epetra_Map input_map = parallel_partitioner.make_trilinos_map(communicator,false);
       if (vector->Map().SameAs(input_map)==false)
@@ -78,8 +79,9 @@ namespace LinearAlgebra
 
 
 
-    void Vector::reinit(const VectorSpaceVector<double> &V,
-                        const bool omit_zeroing_entries)
+    void
+    Vector::reinit(const VectorSpaceVector<double> &V,
+                   const bool omit_zeroing_entries)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr, ExcVectorTypeNotCompatible());
@@ -93,7 +95,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator= (const Vector &V)
+    Vector &
+    Vector::operator= (const Vector &V)
     {
       // Distinguish three cases:
       //  - First case: both vectors have the same layout.
@@ -120,7 +123,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator= (const double s)
+    Vector &
+    Vector::operator= (const double s)
     {
       Assert(s==0., ExcMessage("Only 0 can be assigned to a vector."));
 
@@ -133,9 +137,10 @@ namespace LinearAlgebra
 
 
 
-    void Vector::import(const ReadWriteVector<double>                  &V,
-                        VectorOperation::values                         operation,
-                        std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+    void
+    Vector::import(const ReadWriteVector<double>                  &V,
+                   VectorOperation::values                         operation,
+                   std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwsie, use the
       // one given.
@@ -175,7 +180,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator*= (const double factor)
+    Vector &
+    Vector::operator*= (const double factor)
     {
       AssertIsFinite(factor);
       vector->Scale(factor);
@@ -185,7 +191,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator/= (const double factor)
+    Vector &
+    Vector::operator/= (const double factor)
     {
       AssertIsFinite(factor);
       Assert(factor!=0., ExcZero());
@@ -196,7 +203,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator+= (const VectorSpaceVector<double> &V)
+    Vector &
+    Vector::operator+= (const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr, ExcVectorTypeNotCompatible());
@@ -242,7 +250,8 @@ namespace LinearAlgebra
 
 
 
-    Vector &Vector::operator-= (const VectorSpaceVector<double> &V)
+    Vector &
+    Vector::operator-= (const VectorSpaceVector<double> &V)
     {
       this->add(-1.,V);
 
@@ -251,7 +260,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::operator* (const VectorSpaceVector<double> &V) const
+    double
+    Vector::operator* (const VectorSpaceVector<double> &V) const
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
@@ -274,7 +284,8 @@ namespace LinearAlgebra
 
 
 
-    void Vector::add(const double a)
+    void
+    Vector::add(const double a)
     {
       AssertIsFinite(a);
       const unsigned local_size(vector->MyLength());
@@ -284,7 +295,8 @@ namespace LinearAlgebra
 
 
 
-    void Vector::add(const double a, const VectorSpaceVector<double> &V)
+    void
+    Vector::add(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
@@ -303,8 +315,9 @@ namespace LinearAlgebra
 
 
 
-    void Vector::add(const double a, const VectorSpaceVector<double> &V,
-                     const double b, const VectorSpaceVector<double> &W)
+    void
+    Vector::add(const double a, const VectorSpaceVector<double> &V,
+                const double b, const VectorSpaceVector<double> &W)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
@@ -332,8 +345,9 @@ namespace LinearAlgebra
 
 
 
-    void Vector::sadd(const double s, const double a,
-                      const VectorSpaceVector<double> &V)
+    void
+    Vector::sadd(const double s, const double a,
+                 const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
@@ -349,7 +363,8 @@ namespace LinearAlgebra
 
 
 
-    void Vector::scale(const VectorSpaceVector<double> &scaling_factors)
+    void
+    Vector::scale(const VectorSpaceVector<double> &scaling_factors)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&scaling_factors)!=nullptr,
@@ -369,7 +384,8 @@ namespace LinearAlgebra
 
 
 
-    void Vector::equ(const double a, const VectorSpaceVector<double> &V)
+    void
+    Vector::equ(const double a, const VectorSpaceVector<double> &V)
     {
       // Check that casting will work.
       Assert(dynamic_cast<const Vector *>(&V)!=nullptr,
@@ -391,7 +407,8 @@ namespace LinearAlgebra
 
 
 
-    bool Vector::all_zero() const
+    bool
+    Vector::all_zero() const
     {
       // get a representation of the vector and
       // loop over all the elements
@@ -420,7 +437,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::mean_value() const
+    double
+    Vector::mean_value() const
     {
       double mean_value(0.);
 
@@ -433,7 +451,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::l1_norm() const
+    double
+    Vector::l1_norm() const
     {
       double norm(0.);
       int ierr = vector->Norm1(&norm);
@@ -445,7 +464,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::l2_norm() const
+    double
+    Vector::l2_norm() const
     {
       double norm(0.);
       int ierr = vector->Norm2(&norm);
@@ -457,7 +477,8 @@ namespace LinearAlgebra
 
 
 
-    double Vector::linfty_norm() const
+    double
+    Vector::linfty_norm() const
     {
       double norm(0.);
       int ierr = vector->NormInf(&norm);
@@ -469,9 +490,10 @@ namespace LinearAlgebra
 
 
 
-    double Vector::add_and_dot(const double a,
-                               const VectorSpaceVector<double> &V,
-                               const VectorSpaceVector<double> &W)
+    double
+    Vector::add_and_dot(const double a,
+                        const VectorSpaceVector<double> &V,
+                        const VectorSpaceVector<double> &W)
     {
       this->add(a, V);
 
@@ -480,7 +502,8 @@ namespace LinearAlgebra
 
 
 
-    Vector::size_type Vector::size() const
+    Vector::size_type
+    Vector::size() const
     {
 #ifndef DEAL_II_WITH_64BIT_INDICES
       return vector->GlobalLength();
@@ -491,7 +514,8 @@ namespace LinearAlgebra
 
 
 
-    MPI_Comm Vector::get_mpi_communicator() const
+    MPI_Comm
+    Vector::get_mpi_communicator() const
     {
       const Epetra_MpiComm *epetra_comm
         = dynamic_cast<const Epetra_MpiComm *>(&(vector->Comm()));
@@ -531,24 +555,27 @@ namespace LinearAlgebra
 
 
 
-    const Epetra_FEVector &Vector::trilinos_vector() const
+    const Epetra_FEVector &
+    Vector::trilinos_vector() const
     {
       return *vector;
     }
 
 
 
-    Epetra_FEVector &Vector::trilinos_vector()
+    Epetra_FEVector &
+    Vector::trilinos_vector()
     {
       return *vector;
     }
 
 
 
-    void Vector::print(std::ostream &out,
-                       const unsigned int precision,
-                       const bool scientific,
-                       const bool across) const
+    void
+    Vector::print(std::ostream &out,
+                  const unsigned int precision,
+                  const bool scientific,
+                  const bool across) const
     {
       AssertThrow(out, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
@@ -582,7 +609,8 @@ namespace LinearAlgebra
 
 
 
-    std::size_t Vector::memory_consumption() const
+    std::size_t
+    Vector::memory_consumption() const
     {
       return sizeof(*this)
              + vector->MyLength()*(sizeof(double)+
@@ -591,8 +619,9 @@ namespace LinearAlgebra
 
 
 
-    void Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                            const MPI_Comm &mpi_comm)
+    void
+    Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
+                                       const MPI_Comm &mpi_comm)
     {
       source_stored_elements = source_index_set;
       epetra_comm_pattern = std::make_shared<CommunicationPattern>

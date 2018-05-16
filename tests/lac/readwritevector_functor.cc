@@ -24,13 +24,15 @@
 
 struct Functor
 {
-  void operator() (double &value) const
+  void
+  operator() (double &value) const
   {
     value *= 2.;
   }
 };
 
-void test()
+void
+test()
 {
   const unsigned int size = 25;
   LinearAlgebra::ReadWriteVector<double> vector(size);
@@ -43,7 +45,8 @@ void test()
     deallog << vector[i] << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test();

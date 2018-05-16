@@ -31,7 +31,8 @@ DeclException3(DifferentComponent,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (double r = 0.1; r < 10; r+= 0.35)
     for (double theta = 0; theta < 2*numbers::PI; theta+= numbers::PI/3.)
@@ -53,7 +54,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

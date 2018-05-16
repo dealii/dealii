@@ -50,17 +50,20 @@ namespace Particles
      * Dereferencing operator, returns a reference to an accessor. Usage is thus
      * like <tt>(*i).get_id ();</tt>
      */
-    const ParticleAccessor<dim,spacedim> &operator * () const;
+    const ParticleAccessor<dim,spacedim> &
+    operator * () const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim,spacedim> &operator * ();
+    ParticleAccessor<dim,spacedim> &
+    operator * ();
 
     /**
      * Assignment operator.
      */
-    ParticleIterator &operator = (const ParticleIterator &);
+    ParticleIterator &
+    operator = (const ParticleIterator &);
 
     /**
      * Dereferencing operator, returns a pointer of the particle pointed to. Usage
@@ -68,50 +71,58 @@ namespace Particles
      *
      * There is a @p const and a non-@p const version.
      */
-    const ParticleAccessor<dim,spacedim> *operator -> () const;
+    const ParticleAccessor<dim,spacedim> *
+    operator -> () const;
 
     /**
      * Dereferencing operator, non-@p const version.
      */
-    ParticleAccessor<dim,spacedim> *operator -> ();
+    ParticleAccessor<dim,spacedim> *
+    operator -> ();
 
     /**
      * Compare for equality.
      */
-    bool operator == (const ParticleIterator<dim,spacedim> &) const;
+    bool
+    operator == (const ParticleIterator<dim,spacedim> &) const;
 
     /**
      * Compare for inequality.
      */
-    bool operator != (const ParticleIterator<dim,spacedim> &) const;
+    bool
+    operator != (const ParticleIterator<dim,spacedim> &) const;
 
     /**
      * Prefix <tt>++</tt> operator: <tt>++iterator</tt>. This operator advances
      * the iterator to the next element and returns a reference to
      * <tt>*this</tt>.
      */
-    ParticleIterator &operator ++ ();
+    ParticleIterator &
+    operator ++ ();
 
     /**
      * Postfix <tt>++</tt> operator: <tt>iterator++</tt>. This operator advances
      * the iterator to the next element, but returns an iterator to the element
      * previously pointed to.
      */
-    ParticleIterator operator ++ (int);
+    ParticleIterator
+    operator ++ (int);
 
     /**
      * Prefix <tt>--</tt> operator: <tt>--iterator</tt>. This operator moves
      * the iterator to the previous element and returns a reference to
      * <tt>*this</tt>.
      */
-    ParticleIterator &operator -- ();
+    ParticleIterator &
+    operator -- ();
 
     /**
      * Postfix <tt>--</tt> operator: <tt>iterator--</tt>. This operator moves
      * the iterator to the previous element, but returns an iterator to the element
      * previously pointed to.
      */
-    ParticleIterator operator -- (int);
+    ParticleIterator
+    operator -- (int);
 
     /**
      * Mark the class as bidirectional iterator and declare some typedefs which

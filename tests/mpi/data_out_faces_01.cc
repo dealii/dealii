@@ -51,10 +51,13 @@ namespace pdd
   public:
     PDDProblem ();
     ~PDDProblem ();
-    void run ();
+    void
+    run ();
   private:
-    void setup_system ();
-    void output_results ();
+    void
+    setup_system ();
+    void
+    output_results ();
 
     MPI_Comm mpi_communicator;
     parallel::distributed::Triangulation<dim>   triangulation;
@@ -89,7 +92,8 @@ namespace pdd
   // @sect4{PDDProblem::setup_system}
 
   template <int dim>
-  void PDDProblem<dim>::setup_system ()
+  void
+  PDDProblem<dim>::setup_system ()
   {
 
     // Initialize the mesh
@@ -121,7 +125,8 @@ namespace pdd
 
   // Generate the outputs
   template <int dim>
-  void PDDProblem<dim>::output_results ()
+  void
+  PDDProblem<dim>::output_results ()
   {
 
     // First generate an output for the cells
@@ -155,7 +160,8 @@ namespace pdd
   // @sect4{PDDProblem::run}
 
   template <int dim>
-  void PDDProblem<dim>::run ()
+  void
+  PDDProblem<dim>::run ()
   {
     setup_system ();
     output_results ();
@@ -163,7 +169,8 @@ namespace pdd
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

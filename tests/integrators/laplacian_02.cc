@@ -33,7 +33,8 @@ using namespace LocalIntegrators::Laplace;
 
 
 template <int dim>
-void test_boundary(const FiniteElement<dim> &fe, bool diff=false)
+void
+test_boundary(const FiniteElement<dim> &fe, bool diff=false)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -66,7 +67,8 @@ void test_boundary(const FiniteElement<dim> &fe, bool diff=false)
 
 
 template <int dim>
-void test_face(const FiniteElement<dim> &fe, bool diff=false)
+void
+test_face(const FiniteElement<dim> &fe, bool diff=false)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -138,7 +140,8 @@ test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

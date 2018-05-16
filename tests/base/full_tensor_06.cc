@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   const double lambda = 5,
                mu     = 7;
@@ -78,7 +79,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

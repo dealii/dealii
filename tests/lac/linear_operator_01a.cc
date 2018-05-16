@@ -34,31 +34,37 @@ struct LeftVector
   typedef std::complex<double> value_type;
   value_type value;
 
-  LeftVector &operator = (value_type new_value)
+  LeftVector &
+  operator = (value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  LeftVector &operator *= (value_type scale)
+  LeftVector &
+  operator *= (value_type scale)
   {
     value *= scale;
     return *this;
   }
-  LeftVector &operator /= (value_type scale)
+  LeftVector &
+  operator /= (value_type scale)
   {
     value /= scale;
     return *this;
   }
-  LeftVector &operator += (const LeftVector &u)
+  LeftVector &
+  operator += (const LeftVector &u)
   {
     value += u.value;
     return *this;
   }
-  int size() const
+  int
+  size() const
   {
     return 1;
   }
-  std::size_t memory_consumption () const
+  std::size_t
+  memory_consumption () const
   {
     return 1;
   }
@@ -69,37 +75,44 @@ struct RightVector
   typedef std::complex<double> value_type;
   value_type value;
 
-  RightVector &operator = (value_type new_value)
+  RightVector &
+  operator = (value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  RightVector &operator *= (value_type scale)
+  RightVector &
+  operator *= (value_type scale)
   {
     value *= scale;
     return *this;
   }
-  RightVector &operator /= (value_type scale)
+  RightVector &
+  operator /= (value_type scale)
   {
     value /= scale;
     return *this;
   }
-  RightVector &operator += (const RightVector &u)
+  RightVector &
+  operator += (const RightVector &u)
   {
     value += u.value;
     return *this;
   }
-  int size() const
+  int
+  size() const
   {
     return 1;
   }
-  std::size_t memory_consumption () const
+  std::size_t
+  memory_consumption () const
   {
     return 1;
   }
 };
 
-int main()
+int
+main()
 {
   initlog();
 

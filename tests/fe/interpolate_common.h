@@ -29,7 +29,8 @@
 // then the error should be zero
 
 template <int dim>
-double difference(
+double
+difference(
   const FiniteElement<dim> &fe,
   const std::vector<double> dofs,
   const Function<dim> &function)
@@ -52,7 +53,8 @@ double difference(
 }
 
 template <int dim>
-double vector_difference(
+double
+vector_difference(
   const FiniteElement<dim> &fe,
   const std::vector<double> dofs,
   const Function<dim> &function,
@@ -91,8 +93,9 @@ public:
   Q1WedgeFunction() : Function<dim> (COMP)
   {}
 
-  double value (const Point<dim>   &p,
-                const unsigned int c) const
+  double
+  value (const Point<dim>   &p,
+         const unsigned int c) const
   {
     double result = 1.;
     for (unsigned int d=0; d<dim; ++d)
@@ -101,9 +104,10 @@ public:
     return result;
   }
 
-  void value_list (const std::vector<Point<dim> > &points,
-                   std::vector<double>            &values,
-                   const unsigned int c) const
+  void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double>            &values,
+              const unsigned int c) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
@@ -119,8 +123,9 @@ public:
       }
   }
 
-  void vector_value_list (const std::vector<Point<dim> > &points,
-                          std::vector<Vector<double> >   &values) const
+  void
+  vector_value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Vector<double> >   &values) const
   {
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));

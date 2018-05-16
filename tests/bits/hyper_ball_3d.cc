@@ -30,7 +30,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision (2);

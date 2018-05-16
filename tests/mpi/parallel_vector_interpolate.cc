@@ -32,7 +32,8 @@
 #include <vector>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int dim = 2;
 
@@ -73,7 +74,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

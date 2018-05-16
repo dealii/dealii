@@ -140,7 +140,8 @@ namespace CUDAWrappers
      */
     MatrixFree();
 
-    unsigned int get_padding_length() const;
+    unsigned int
+    get_padding_length() const;
 
     /**
      * Extracts the information needed to perform loops over cells. The
@@ -149,48 +150,56 @@ namespace CUDAWrappers
      * unit to real cell, and the finite element underlying the DoFHandler
      * together with the quadrature formula describe the local operations.
      */
-    void reinit(const Mapping<dim> &mapping,
-                const DoFHandler<dim> &dof_handler,
-                const ConstraintMatrix &constraints,
-                const Quadrature<1> &quad,
-                const AdditionalData additional_data = AdditionalData());
+    void
+    reinit(const Mapping<dim> &mapping,
+           const DoFHandler<dim> &dof_handler,
+           const ConstraintMatrix &constraints,
+           const Quadrature<1> &quad,
+           const AdditionalData additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
      */
-    void reinit(const DoFHandler<dim> &dof_handler,
-                const ConstraintMatrix &constraints,
-                const Quadrature<1> &quad,
-                const AdditionalData AdditionalData = AdditionalData());
+    void
+    reinit(const DoFHandler<dim> &dof_handler,
+           const ConstraintMatrix &constraints,
+           const Quadrature<1> &quad,
+           const AdditionalData AdditionalData = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
      */
-    Data get_data(unsigned int color) const;
+    Data
+    get_data(unsigned int color) const;
 
     /**
      * This method runs the loop over all cells and apply the local operation on
      * each element in parallel. @p func is a functor which is appplied on each color.
      */
     template <typename functor>
-    void cell_loop(const functor &func,
-                   const CUDAVector<Number> &src,
-                   CUDAVector<Number> &dst) const;
+    void
+    cell_loop(const functor &func,
+              const CUDAVector<Number> &src,
+              CUDAVector<Number> &dst) const;
 
-    void copy_constrained_values(const CUDAVector<Number> &src,
-                                 CUDAVector<Number> &dst) const;
+    void
+    copy_constrained_values(const CUDAVector<Number> &src,
+                            CUDAVector<Number> &dst) const;
 
-    void set_constrained_values(const Number val, CUDAVector<Number> &dst) const;
+    void
+    set_constrained_values(const Number val, CUDAVector<Number> &dst) const;
 
     /**
      * Free all the memory allocated.
      */
-    void free();
+    void
+    free();
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
      */
-    std::size_t memory_consumption() const;
+    std::size_t
+    memory_consumption() const;
 
   private:
     /**
@@ -275,8 +284,9 @@ namespace CUDAWrappers
   template <int dim, typename Number>
   struct SharedData
   {
-    __device__ SharedData(Number *vd,
-                          Number *gq[dim])
+    __device__
+    SharedData(Number *vd,
+               Number *gq[dim])
       :
       values(vd)
     {
@@ -293,8 +303,9 @@ namespace CUDAWrappers
   // This function determines the number of cells per block, possibly at compile
   // time
   // TODO this function should be rewritten using meta-programming
-  __host__ __device__ constexpr unsigned int cells_per_block_shmem(int dim,
-      int fe_degree)
+  __host__ __device__ constexpr unsigned int
+  cells_per_block_shmem(int dim,
+                        int fe_degree)
   {
     return dim==2 ? (fe_degree==1 ? 32 :
                      fe_degree==2 ? 8 :

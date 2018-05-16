@@ -26,8 +26,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  double laplacian (const Point<dim> &p,
-                    const unsigned int c) const
+  double
+  laplacian (const Point<dim> &p,
+             const unsigned int c) const
   {
     Assert (c == 0, ExcInternalError());
     return p.norm();
@@ -36,7 +37,8 @@ public:
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   std::vector<Point<dim> > points;
   for (unsigned int i=0; i<10; ++i)
@@ -61,7 +63,8 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

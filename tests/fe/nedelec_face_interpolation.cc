@@ -34,7 +34,8 @@
 using namespace dealii;
 
 template <int dim>
-void test (unsigned p1, unsigned p2)
+void
+test (unsigned p1, unsigned p2)
 {
   // create a mesh like this (viewed
   // from top, if in 3d):
@@ -92,7 +93,8 @@ void test (unsigned p1, unsigned p2)
     deallog << "Failed" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

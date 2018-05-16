@@ -22,7 +22,8 @@
 #include <vector>
 #include <list>
 
-void test ()
+void
+test ()
 {
   deallog.push("BlockIndices");
 
@@ -180,7 +181,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

@@ -134,7 +134,8 @@ public:
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -190,7 +191,8 @@ public:
    * returns <tt>FE_Bernstein<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -204,13 +206,15 @@ protected:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * This function renumbers Bernstein basis functions from hierarchic to
    * lexicographic numbering.
    */
-  TensorProductPolynomials<dim> renumber_bases(const unsigned int degree);
+  TensorProductPolynomials<dim>
+  renumber_bases(const unsigned int degree);
 };
 
 

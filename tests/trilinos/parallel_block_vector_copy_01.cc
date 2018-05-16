@@ -24,7 +24,8 @@
 #include <iostream>
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   typedef BlockVector<double> BlockVectorLocal;
   typedef TrilinosWrappers::MPI::BlockVector BlockVector;

@@ -20,7 +20,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -101,8 +102,9 @@ public:
   }
 
 
-  void vmult (VectorType &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType &dst,
+         const VectorType &src) const
   {
     dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,VectorType>::local_apply,
@@ -116,7 +118,8 @@ private:
 
 
 template <int dim>
-void test (const unsigned int fe_degree)
+void
+test (const unsigned int fe_degree)
 {
   SphericalManifold<dim> manifold;
   Triangulation<dim>   triangulation;
@@ -320,7 +323,8 @@ void test (const unsigned int fe_degree)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

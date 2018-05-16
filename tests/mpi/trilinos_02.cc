@@ -24,12 +24,14 @@
 #include <iostream>
 #include <vector>
 
-void check(TrilinosWrappers::MPI::Vector &v, bool ghost)
+void
+check(TrilinosWrappers::MPI::Vector &v, bool ghost)
 {
   Assert(v.has_ghost_elements()==ghost, ExcMessage("wrong ghost elements"));
 }
 
-void test ()
+void
+test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
@@ -80,7 +82,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

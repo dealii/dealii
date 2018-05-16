@@ -28,7 +28,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   std::vector<bool> v(12, false);
   ComponentMask     m(12, false);
@@ -41,7 +42,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

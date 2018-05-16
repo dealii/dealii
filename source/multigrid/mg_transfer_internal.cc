@@ -57,12 +57,13 @@ namespace internal
 
 
     template <int dim, int spacedim>
-    void fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,
-                           const MGConstrainedDoFs                                                                 *mg_constrained_dofs,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine,
-                           const bool skip_interface_dofs)
+    void
+    fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,
+                      const MGConstrainedDoFs                                                                 *mg_constrained_dofs,
+                      std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
+                      std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
+                      std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine,
+                      const bool skip_interface_dofs)
     {
       // Now we are filling the variables copy_indices*, which are essentially
       // maps from global to mgdof for each level stored as a std::vector of
@@ -364,12 +365,13 @@ namespace internal
     // puts the indices on the given child cell in lexicographic ordering with
     // respect to the collection of all child cells as seen from the parent
     template <int dim>
-    void add_child_indices(const unsigned int child,
-                           const unsigned int fe_shift_1d,
-                           const unsigned int fe_degree,
-                           const std::vector<unsigned int> &lexicographic_numbering,
-                           const std::vector<types::global_dof_index> &local_dof_indices,
-                           types::global_dof_index *target_indices)
+    void
+    add_child_indices(const unsigned int child,
+                      const unsigned int fe_shift_1d,
+                      const unsigned int fe_degree,
+                      const std::vector<unsigned int> &lexicographic_numbering,
+                      const std::vector<types::global_dof_index> &local_dof_indices,
+                      types::global_dof_index *target_indices)
     {
       const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
       const unsigned int shift =
@@ -393,8 +395,9 @@ namespace internal
     }
 
     template <int dim, typename Number>
-    void setup_element_info(ElementInfo<Number> &elem_info,const FiniteElement<1> &fe,
-                            const dealii::DoFHandler<dim> &mg_dof)
+    void
+    setup_element_info(ElementInfo<Number> &elem_info,const FiniteElement<1> &fe,
+                       const dealii::DoFHandler<dim> &mg_dof)
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
       elem_info.n_components = mg_dof.get_fe().element_multiplicity(0);
@@ -451,9 +454,10 @@ namespace internal
        * Helper function for setup_transfer. Checks for identity constrained dofs
        * and replace with the indices of the dofs to which they are constrained
        */
-      void replace (const MGConstrainedDoFs              *mg_constrained_dofs,
-                    const unsigned int                   level,
-                    std::vector<types::global_dof_index> &dof_indices)
+      void
+      replace (const MGConstrainedDoFs              *mg_constrained_dofs,
+               const unsigned int                   level,
+               std::vector<types::global_dof_index> &dof_indices)
       {
         if (mg_constrained_dofs != nullptr &&
             mg_constrained_dofs->get_level_constraint_matrix(level).n_constraints() > 0)
@@ -470,16 +474,17 @@ namespace internal
     // Sets up most of the internal data structures of the MGTransferMatrixFree
     // class
     template <int dim, typename Number>
-    void setup_transfer(const dealii::DoFHandler<dim>                                       &mg_dof,
-                        const MGConstrainedDoFs                                             *mg_constrained_dofs,
-                        ElementInfo<Number>                                                 &elem_info,
-                        std::vector<std::vector<unsigned int> >                             &level_dof_indices,
-                        std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
-                        std::vector<unsigned int>                                           &n_owned_level_cells,
-                        std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
-                        std::vector<std::vector<Number> >                                   &weights_on_refined,
-                        std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
-                        MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector)
+    void
+    setup_transfer(const dealii::DoFHandler<dim>                                       &mg_dof,
+                   const MGConstrainedDoFs                                             *mg_constrained_dofs,
+                   ElementInfo<Number>                                                 &elem_info,
+                   std::vector<std::vector<unsigned int> >                             &level_dof_indices,
+                   std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
+                   std::vector<unsigned int>                                           &n_owned_level_cells,
+                   std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
+                   std::vector<std::vector<Number> >                                   &weights_on_refined,
+                   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
+                   MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector)
     {
       level_dof_indices.clear();
       parent_child_connect.clear();

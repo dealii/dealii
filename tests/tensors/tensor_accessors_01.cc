@@ -25,7 +25,8 @@
   deallog << std::endl;
 
 
-int main()
+int
+main()
 {
   initlog();
 

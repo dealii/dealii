@@ -23,7 +23,8 @@
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 

@@ -50,7 +50,8 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
 protected:
 
@@ -104,17 +105,21 @@ protected:
 
 #ifndef DOXYGEN
 
-template <> void MappingC1<1>::MappingC1Generic::add_line_support_points (
+template <> void
+MappingC1<1>::MappingC1Generic::add_line_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;
-template <> void MappingC1<2>::MappingC1Generic::add_line_support_points (
+template <> void
+MappingC1<2>::MappingC1Generic::add_line_support_points (
   const Triangulation<2>::cell_iterator &cell,
   std::vector<Point<2> > &a) const;
 
-template <> void MappingC1<1>::MappingC1Generic::add_quad_support_points (
+template <> void
+MappingC1<1>::MappingC1Generic::add_quad_support_points (
   const Triangulation<1>::cell_iterator &,
   std::vector<Point<1> > &) const;
-template <> void MappingC1<2>::MappingC1Generic::add_quad_support_points (
+template <> void
+MappingC1<2>::MappingC1Generic::add_quad_support_points (
   const Triangulation<2>::cell_iterator &,
   std::vector<Point<2> > &) const;
 

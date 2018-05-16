@@ -27,8 +27,9 @@
 using namespace Polynomials;
 
 
-void check_interpolation (const std::vector<Polynomial<double> > &p,
-                          const std::vector<Point<1> > &x)
+void
+check_interpolation (const std::vector<Polynomial<double> > &p,
+                     const std::vector<Point<1> > &x)
 {
   for (unsigned int i=0; i<p.size(); ++i)
     {
@@ -56,7 +57,8 @@ void check_interpolation (const std::vector<Polynomial<double> > &p,
 
 
 
-void check_constant (const std::vector<Polynomial<double> > &p)
+void
+check_constant (const std::vector<Polynomial<double> > &p)
 {
   // check whether the sum of all polynomials in
   // the basis gives one for a given point
@@ -108,7 +110,8 @@ check_lge (unsigned int n)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

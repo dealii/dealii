@@ -24,7 +24,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 
-void test ()
+void
+test ()
 {
   // make sure that is_serial_vector< dealii::Vector<Number> > is working
   Assert (is_serial_vector< dealii::Vector<double> >::value == true,
@@ -90,7 +91,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -29,7 +29,8 @@
 
 #include <deal.II/fe/mapping_q1.h>
 
-bool inside(Triangulation<3> &tria, Point<3> &p)
+bool
+inside(Triangulation<3> &tria, Point<3> &p)
 {
 
   for (Triangulation<3>::cell_iterator cell = tria.begin(0);
@@ -40,7 +41,8 @@ bool inside(Triangulation<3> &tria, Point<3> &p)
   return false;
 }
 
-void check2 ()
+void
+check2 ()
 {
   Triangulation<3> tria;
   GridIn<3> gridIn;
@@ -65,7 +67,8 @@ void check2 ()
   GridTools::find_active_cell_around_point(tria, p2); //triggered exception
 }
 
-void check1 ()
+void
+check1 ()
 {
   Triangulation<3> tria;
   GridGenerator::hyper_cube (tria);
@@ -93,7 +96,8 @@ void check1 ()
     }
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

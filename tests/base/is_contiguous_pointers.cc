@@ -20,7 +20,8 @@
 
 #include <deal.II/base/array_view.h>
 
-void test ()
+void
+test ()
 {
   constexpr int *p = nullptr;
   constexpr int *q = nullptr;
@@ -36,7 +37,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

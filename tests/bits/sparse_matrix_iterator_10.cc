@@ -25,7 +25,8 @@
 #include <deal.II/lac/sparse_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
@@ -47,7 +48,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

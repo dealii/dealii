@@ -54,8 +54,9 @@ public:
     Function<dim>(dim)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return p[component]*std::exp(-2.*std::abs(p[component]));
   }
@@ -63,7 +64,8 @@ public:
 
 
 template <int dim, int fe_degree=2, int n_q_points=fe_degree+1, typename NumberType=double>
-void test ()
+void
+test ()
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (mpi_communicator);
@@ -192,7 +194,8 @@ void test ()
 
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

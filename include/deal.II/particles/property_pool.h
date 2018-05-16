@@ -63,31 +63,36 @@ namespace Particles
      * of memory. If the number of properties is zero this will return an
      * invalid handle.
      */
-    Handle allocate_properties_array ();
+    Handle
+    allocate_properties_array ();
 
     /**
      * Mark the properties corresponding to the handle @p handle as
      * deleted. Calling this function more than once for the same
      * handle causes undefined behavior.
      */
-    void deallocate_properties_array (const Handle handle);
+    void
+    deallocate_properties_array (const Handle handle);
 
     /**
      * Return an ArrayView to the properties that correspond to the given
      * handle @p handle.
      */
-    ArrayView<double> get_properties (const Handle handle);
+    ArrayView<double>
+    get_properties (const Handle handle);
 
     /**
      * Reserve the dynamic memory needed for storing the properties of
      * @p size particles.
      */
-    void reserve(const std::size_t size);
+    void
+    reserve(const std::size_t size);
 
     /**
      * Return how many properties are stored per slot in the pool.
      */
-    unsigned int n_properties_per_slot() const;
+    unsigned int
+    n_properties_per_slot() const;
 
   private:
     /**

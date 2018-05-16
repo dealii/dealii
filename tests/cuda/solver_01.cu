@@ -27,7 +27,8 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
-void test(Utilities::CUDA::Handle &cuda_handle)
+void
+test(Utilities::CUDA::Handle &cuda_handle)
 {
   // Build the sparse matrix on the host
   const unsigned int problem_size = 10;
@@ -67,7 +68,8 @@ void test(Utilities::CUDA::Handle &cuda_handle)
     AssertThrow(std::fabs(rw_vector[i] - sol_host[i])<1e-8, ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

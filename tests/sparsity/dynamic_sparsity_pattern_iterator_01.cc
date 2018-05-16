@@ -21,7 +21,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   DynamicSparsityPattern sp (5,5);
   for (unsigned int i=0; i<5; ++i)
@@ -39,7 +40,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

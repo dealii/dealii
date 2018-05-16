@@ -23,7 +23,8 @@
 
 using namespace dealii;
 
-std::vector<std::string> split_string(const std::string &text, const char delim='|')
+std::vector<std::string>
+split_string(const std::string &text, const char delim='|')
 {
   std::vector<std::string> result;
   std::string word;
@@ -35,10 +36,11 @@ std::vector<std::string> split_string(const std::string &text, const char delim=
 }
 
 
-void test_function(const std::string &original_text,
-                   const unsigned int width,
-                   const char delimiter,
-                   const std::string &result)
+void
+test_function(const std::string &original_text,
+              const unsigned int width,
+              const char delimiter,
+              const std::string &result)
 {
   std::vector<std::string> res_vec
     = Utilities::break_text_into_lines (original_text, width, delimiter);
@@ -60,7 +62,8 @@ void test_function(const std::string &original_text,
 }
 
 
-void test ()
+void
+test ()
 {
   test_function("test", 80, ' ', "test");
   test_function("test it", 80, ' ', "test it");
@@ -80,7 +83,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

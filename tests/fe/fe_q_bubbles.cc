@@ -79,8 +79,9 @@ BubbleFunction<dim>::BubbleFunction (unsigned int degree,
 {}
 
 template <int dim>
-double BubbleFunction<dim>::value (const Point<dim> &p,
-                                   const unsigned int) const
+double
+BubbleFunction<dim>::value (const Point<dim> &p,
+                            const unsigned int) const
 {
   double return_value = 1.;
   for (unsigned int i=0; i<dim; ++i)
@@ -91,8 +92,9 @@ double BubbleFunction<dim>::value (const Point<dim> &p,
 }
 
 template <int dim>
-Tensor<1,dim> BubbleFunction<dim>::gradient (const Point<dim> &p,
-                                             const unsigned int) const
+Tensor<1,dim>
+BubbleFunction<dim>::gradient (const Point<dim> &p,
+                               const unsigned int) const
 {
   Tensor<1,dim> grad;
 
@@ -126,15 +128,21 @@ class Step3
 public:
   Step3 (FiniteElement<dim> *fe, const unsigned int degree);
 
-  void run ();
+  void
+  run ();
 
 
 private:
-  void make_grid ();
-  void setup_system ();
-  void assemble_system (unsigned int i);
-  void solve ();
-  void output_results (unsigned int i) const;
+  void
+  make_grid ();
+  void
+  setup_system ();
+  void
+  assemble_system (unsigned int i);
+  void
+  solve ();
+  void
+  output_results (unsigned int i) const;
 
   Triangulation<dim>   triangulation;
   FiniteElement<dim>   *fe;
@@ -159,14 +167,16 @@ Step3<dim>::Step3 (FiniteElement<dim> *fe, const unsigned int degree)
 
 
 template <int dim>
-void Step3<dim>::make_grid ()
+void
+Step3<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (0);
 }
 
 template <int dim>
-void Step3<dim>::setup_system ()
+void
+Step3<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (*fe);
   std::cout << "Number of degrees of freedom: "
@@ -185,7 +195,8 @@ void Step3<dim>::setup_system ()
 
 
 template <int dim>
-void Step3<dim>::assemble_system (unsigned int i)
+void
+Step3<dim>::assemble_system (unsigned int i)
 {
   system_matrix=0.;
   system_rhs=0.;
@@ -241,7 +252,8 @@ void Step3<dim>::assemble_system (unsigned int i)
 
 
 template <int dim>
-void Step3<dim>::solve ()
+void
+Step3<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              solver (solver_control);
@@ -252,7 +264,8 @@ void Step3<dim>::solve ()
 
 
 template <int dim>
-void Step3<dim>::output_results (unsigned int i) const
+void
+Step3<dim>::output_results (unsigned int i) const
 {
   //Visualize the results
 #ifdef DEBUG_Q_BUBBLES
@@ -303,7 +316,8 @@ void Step3<dim>::output_results (unsigned int i) const
 
 
 template <int dim>
-void Step3<dim>::run ()
+void
+Step3<dim>::run ()
 {
   make_grid ();
   setup_system();
@@ -316,7 +330,8 @@ void Step3<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.depth_file (1);

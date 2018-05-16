@@ -110,12 +110,14 @@ namespace MeshWorker
       /**
        * Copy the BlockInfo and the matrix pointers into local variables.
        */
-      void initialize(const BlockInfo *block_info,
-                      AnyData &residuals);
+      void
+      initialize(const BlockInfo *block_info,
+                 AnyData &residuals);
       /**
        * Initialize the constraints.
        */
-      void initialize(const ConstraintMatrix &constraints);
+      void
+      initialize(const ConstraintMatrix &constraints);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -124,28 +126,32 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local residuals into the global residuals.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble both local residuals into the global residuals.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1,
+               const DOFINFO &info2);
     private:
       /**
        * Assemble a single local residual into the global.
        */
-      void assemble(VectorType                                 &global,
-                    const BlockVector<double>                  &local,
-                    const std::vector<types::global_dof_index> &dof);
+      void
+      assemble(VectorType                                 &global,
+               const BlockVector<double>                  &local,
+               const std::vector<types::global_dof_index> &dof);
 
       /**
        * The global vectors, stored as an AnyData container of pointers.
@@ -206,13 +212,15 @@ namespace MeshWorker
        * Copy the BlockInfo and the matrix pointers into local variables and
        * initialize cell matrix vectors.
        */
-      void initialize(const BlockInfo *block_info,
-                      MatrixBlockVector<MatrixType> &matrices);
+      void
+      initialize(const BlockInfo *block_info,
+                 MatrixBlockVector<MatrixType> &matrices);
 
       /**
        * Initialize the constraints.
        */
-      void initialize(const ConstraintMatrix &constraints);
+      void
+      initialize(const ConstraintMatrix &constraints);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -221,32 +229,36 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1,
+               const DOFINFO &info2);
 
     private:
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble(MatrixBlock<MatrixType>                    &global,
-                    const FullMatrix<number>                   &local,
-                    const unsigned int                          block_row,
-                    const unsigned int                          block_col,
-                    const std::vector<types::global_dof_index> &dof1,
-                    const std::vector<types::global_dof_index> &dof2);
+      void
+      assemble(MatrixBlock<MatrixType>                    &global,
+               const FullMatrix<number>                   &local,
+               const unsigned int                          block_row,
+               const unsigned int                          block_col,
+               const std::vector<types::global_dof_index> &dof1,
+               const std::vector<types::global_dof_index> &dof2);
 
       /**
        * The global matrices, stored as a vector of pointers.
@@ -316,27 +328,31 @@ namespace MeshWorker
        * Copy the BlockInfo and the matrix pointers into local variables and
        * initialize cell matrix vectors.
        */
-      void initialize(const BlockInfo *block_info,
-                      MatrixPtrVector &matrices);
+      void
+      initialize(const BlockInfo *block_info,
+                 MatrixPtrVector &matrices);
 
       /**
        * Initialize the multilevel constraints.
        */
-      void initialize(const MGConstrainedDoFs &mg_constrained_dofs);
+      void
+      initialize(const MGConstrainedDoFs &mg_constrained_dofs);
 
       /**
        * Multigrid methods on locally refined meshes need additional matrices.
        * For discontinuous Galerkin methods, these are two flux matrices
        * across the refinement edge, which are set by this method.
        */
-      void initialize_edge_flux(MatrixPtrVector &up, MatrixPtrVector &down);
+      void
+      initialize_edge_flux(MatrixPtrVector &up, MatrixPtrVector &down);
 
       /**
        * Multigrid methods on locally refined meshes need additional matrices.
        * For discontinuous Galerkin methods, these are two flux matrices
        * across the refinement edge, which are set by this method.
        */
-      void initialize_interfaces (MatrixPtrVector &interface_in, MatrixPtrVector &interface_out);
+      void
+      initialize_interfaces (MatrixPtrVector &interface_in, MatrixPtrVector &interface_out);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -345,95 +361,104 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1,
+               const DOFINFO &info2);
 
     private:
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble(MatrixType                                 &global,
+      void
+      assemble(MatrixType                                 &global,
+               const FullMatrix<number>                   &local,
+               const unsigned int                          block_row,
+               const unsigned int                          block_col,
+               const std::vector<types::global_dof_index> &dof1,
+               const std::vector<types::global_dof_index> &dof2,
+               const unsigned int                          level1,
+               const unsigned int                          level2,
+               bool                                        transpose = false);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_fluxes(MatrixType                                 &global,
+                      const FullMatrix<number>                   &local,
+                      const unsigned int                          block_row,
+                      const unsigned int                          block_col,
+                      const std::vector<types::global_dof_index> &dof1,
+                      const std::vector<types::global_dof_index> &dof2,
+                      const unsigned int                          level1,
+                      const unsigned int                          level2);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_up(MatrixType                                 &global,
+                  const FullMatrix<number>                   &local,
+                  const unsigned int                          block_row,
+                  const unsigned int                          block_col,
+                  const std::vector<types::global_dof_index> &dof1,
+                  const std::vector<types::global_dof_index> &dof2,
+                  const unsigned int                          level1,
+                  const unsigned int                          level2);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_down(MatrixType                                 &global,
                     const FullMatrix<number>                   &local,
                     const unsigned int                          block_row,
                     const unsigned int                          block_col,
                     const std::vector<types::global_dof_index> &dof1,
                     const std::vector<types::global_dof_index> &dof2,
                     const unsigned int                          level1,
-                    const unsigned int                          level2,
-                    bool                                        transpose = false);
+                    const unsigned int                          level2);
 
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble_fluxes(MatrixType                                 &global,
-                           const FullMatrix<number>                   &local,
-                           const unsigned int                          block_row,
-                           const unsigned int                          block_col,
-                           const std::vector<types::global_dof_index> &dof1,
-                           const std::vector<types::global_dof_index> &dof2,
-                           const unsigned int                          level1,
-                           const unsigned int                          level2);
+      void
+      assemble_in(MatrixType                                 &global,
+                  const FullMatrix<number>                   &local,
+                  const unsigned int                          block_row,
+                  const unsigned int                          block_col,
+                  const std::vector<types::global_dof_index> &dof1,
+                  const std::vector<types::global_dof_index> &dof2,
+                  const unsigned int                          level1,
+                  const unsigned int                          level2);
 
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble_up(MatrixType                                 &global,
-                       const FullMatrix<number>                   &local,
-                       const unsigned int                          block_row,
-                       const unsigned int                          block_col,
-                       const std::vector<types::global_dof_index> &dof1,
-                       const std::vector<types::global_dof_index> &dof2,
-                       const unsigned int                          level1,
-                       const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_down(MatrixType                                 &global,
-                         const FullMatrix<number>                   &local,
-                         const unsigned int                          block_row,
-                         const unsigned int                          block_col,
-                         const std::vector<types::global_dof_index> &dof1,
-                         const std::vector<types::global_dof_index> &dof2,
-                         const unsigned int                          level1,
-                         const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_in(MatrixType                                 &global,
-                       const FullMatrix<number>                   &local,
-                       const unsigned int                          block_row,
-                       const unsigned int                          block_col,
-                       const std::vector<types::global_dof_index> &dof1,
-                       const std::vector<types::global_dof_index> &dof2,
-                       const unsigned int                          level1,
-                       const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_out(MatrixType                                 &global,
-                        const FullMatrix<number>                   &local,
-                        const unsigned int                          block_row,
-                        const unsigned int                          block_col,
-                        const std::vector<types::global_dof_index> &dof1,
-                        const std::vector<types::global_dof_index> &dof2,
-                        const unsigned int                          level1,
-                        const unsigned int                          level2);
+      void
+      assemble_out(MatrixType                                 &global,
+                   const FullMatrix<number>                   &local,
+                   const unsigned int                          block_row,
+                   const unsigned int                          block_col,
+                   const std::vector<types::global_dof_index> &dof1,
+                   const std::vector<types::global_dof_index> &dof2,
+                   const unsigned int                          level1,
+                   const unsigned int                          level2);
 
       /**
        * The level matrices, stored as a vector of pointers.

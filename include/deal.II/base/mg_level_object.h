@@ -72,7 +72,8 @@ public:
   /**
    * Access object on level @p level.
    */
-  Object &operator[] (const unsigned int level);
+  Object &
+  operator[] (const unsigned int level);
 
   /**
    * Access object on level @p level.
@@ -80,7 +81,8 @@ public:
    * This function can be called on a @p const object, and
    * consequently returns a @p const reference.
    */
-  const Object &operator[] (const unsigned int level) const;
+  const Object &
+  operator[] (const unsigned int level) const;
 
   /**
    * Delete all previous contents of this object and reset its size according
@@ -93,8 +95,9 @@ public:
    *
    * @pre minlevel <= maxlevel
    */
-  void resize (const unsigned int new_minlevel,
-               const unsigned int new_maxlevel);
+  void
+  resize (const unsigned int new_minlevel,
+          const unsigned int new_maxlevel);
 
   /**
    * Call <tt>operator = (s)</tt> on all objects stored by this object.
@@ -102,7 +105,8 @@ public:
    * this operation. This is, in particular, true for vectors and matrices
    * if @p d is zero, thereby zeroing out all vector or matrix entries.
    */
-  MGLevelObject<Object> &operator = (const double d);
+  MGLevelObject<Object> &
+  operator = (const double d);
 
   /**
    * Call @p clear on all objects stored by this object. This function
@@ -115,7 +119,8 @@ public:
    * @deprecated Use clear_elements () instead
    */
   DEAL_II_DEPRECATED
-  void clear();
+  void
+  clear();
 
   /**
    * Call @p clear on all objects stored by this object. This function
@@ -125,17 +130,20 @@ public:
    * template type to this class does not provide a
    * <code>clear()</code> member function.
    */
-  void clear_elements();
+  void
+  clear_elements();
 
   /**
    * The coarsest level for which this class stores a level object.
    */
-  unsigned int min_level () const;
+  unsigned int
+  min_level () const;
 
   /**
    * The highest level for which this class stores a level object.
    */
-  unsigned int max_level () const;
+  unsigned int
+  max_level () const;
 
   /**
    * Apply the action @p action to every object stored in here. The
@@ -148,12 +156,14 @@ public:
    * function pointer.
    */
   template <typename ActionFunctionObjectType>
-  void apply (ActionFunctionObjectType action);
+  void
+  apply (ActionFunctionObjectType action);
 
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**

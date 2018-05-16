@@ -37,7 +37,8 @@
 #include <numeric>
 
 
-void test ()
+void
+test ()
 {
   //make grid
   Triangulation<2> triangulation;
@@ -111,7 +112,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

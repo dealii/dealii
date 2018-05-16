@@ -117,13 +117,15 @@ public:
    * Prints the list of the indices to <tt>out</tt>.
    */
   template <class StreamType>
-  void output_indices(StreamType &out) const;
+  void
+  output_indices(StreamType &out) const;
 
   /**
    * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==n()</tt>. Stores a copy of <tt>renumber</tt>.
    */
-  void set_numbering(const std::vector<unsigned int> &renumber);
+  void
+  set_numbering(const std::vector<unsigned int> &renumber);
 
   /**
    * Compute the value and the first and second derivatives of each
@@ -138,12 +140,13 @@ public:
    * function, rather than using any of the compute_value(), compute_grad() or
    * compute_grad_grad() functions, see below, in a loop over all polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<double>         &values,
-                std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads,
-                std::vector<Tensor<3,dim> > &third_derivatives,
-                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim>            &unit_point,
+           std::vector<double>         &values,
+           std::vector<Tensor<1,dim> > &grads,
+           std::vector<Tensor<2,dim> > &grad_grads,
+           std::vector<Tensor<3,dim> > &third_derivatives,
+           std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
    * Compute the value of the <tt>i</tt>th polynomial at unit point
@@ -151,8 +154,9 @@ public:
    *
    * Consider using compute() instead.
    */
-  double compute_value (const unsigned int i,
-                        const Point<dim> &p) const;
+  double
+  compute_value (const unsigned int i,
+                 const Point<dim> &p) const;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th polynomial
@@ -163,8 +167,9 @@ public:
    * @tparam order The order of the derivative.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order,dim>
+  compute_derivative (const unsigned int i,
+                      const Point<dim> &p) const;
 
   /**
    * Compute the gradient of the <tt>i</tt>th polynomial at unit point
@@ -172,8 +177,9 @@ public:
    *
    * Consider using compute() instead.
    */
-  Tensor<1,dim> compute_grad (const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1,dim>
+  compute_grad (const unsigned int i,
+                const Point<dim> &p) const;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
@@ -181,8 +187,9 @@ public:
    *
    * Consider using compute() instead.
    */
-  Tensor<2,dim> compute_grad_grad (const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2,dim>
+  compute_grad_grad (const unsigned int i,
+                     const Point<dim> &p) const;
 
   /**
    * Return the number of polynomials spanning the space represented by this
@@ -190,7 +197,8 @@ public:
    * given, then the result of this function is <i>N</i> in 1d,
    * <i>N(N+1)/2</i> in 2d, and <i>N(N+1)(N+2)/6</i> in 3d.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
   /**
    * Degree of the space. This is by definition the number of polynomials
@@ -198,7 +206,8 @@ public:
    * vector. The latter value is never checked and therefore left to the
    * application.
    */
-  unsigned int degree () const;
+  unsigned int
+  degree () const;
 
   /**
    * Static function used in the constructor to compute the number of
@@ -207,7 +216,8 @@ public:
    * @warning The argument `n` is not the maximal degree, but the number of
    * onedimensional polynomials, thus the degree plus one.
    */
-  static unsigned int compute_n_pols (const unsigned int n);
+  static unsigned int
+  compute_n_pols (const unsigned int n);
 
 protected:
 
@@ -248,11 +258,14 @@ private:
 /* -------------- declaration of explicit specializations --- */
 
 template <>
-std::array<unsigned int,1> PolynomialSpace<1>::compute_index(const unsigned int n) const;
+std::array<unsigned int,1>
+PolynomialSpace<1>::compute_index(const unsigned int n) const;
 template <>
-std::array<unsigned int,2> PolynomialSpace<2>::compute_index(const unsigned int n) const;
+std::array<unsigned int,2>
+PolynomialSpace<2>::compute_index(const unsigned int n) const;
 template <>
-std::array<unsigned int,3> PolynomialSpace<3>::compute_index(const unsigned int n) const;
+std::array<unsigned int,3>
+PolynomialSpace<3>::compute_index(const unsigned int n) const;
 
 
 

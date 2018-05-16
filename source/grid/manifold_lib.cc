@@ -1371,7 +1371,8 @@ TransfiniteInterpolationManifold<dim,spacedim>::clone() const
 template <int dim, int spacedim>
 void
 TransfiniteInterpolationManifold<dim,spacedim>
-::initialize(const Triangulation<dim,spacedim> &triangulation)
+::
+initialize(const Triangulation<dim,spacedim> &triangulation)
 {
   this->triangulation = &triangulation;
   // in case the triangulatoin is cleared, remove the pointers by a signal
@@ -1696,8 +1697,9 @@ namespace
 template <int dim, int spacedim>
 Point<spacedim>
 TransfiniteInterpolationManifold<dim,spacedim>
-::push_forward(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-               const Point<dim> &chart_point) const
+::
+push_forward(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+             const Point<dim> &chart_point) const
 {
   AssertDimension(cell->level(), level_coarse);
 
@@ -1716,9 +1718,10 @@ TransfiniteInterpolationManifold<dim,spacedim>
 template <int dim, int spacedim>
 DerivativeForm<1,dim,spacedim>
 TransfiniteInterpolationManifold<dim,spacedim>
-::push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const Point<dim>      &chart_point,
-                        const Point<spacedim> &pushed_forward_chart_point) const
+::
+push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                      const Point<dim>      &chart_point,
+                      const Point<spacedim> &pushed_forward_chart_point) const
 {
   // compute the derivative with the help of finite differences
   DerivativeForm<1,dim,spacedim> grad;
@@ -1744,9 +1747,10 @@ TransfiniteInterpolationManifold<dim,spacedim>
 template <int dim, int spacedim>
 Point<dim>
 TransfiniteInterpolationManifold<dim,spacedim>
-::pull_back(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-            const Point<spacedim> &point,
-            const Point<dim>      &initial_guess) const
+::
+pull_back(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+          const Point<spacedim> &point,
+          const Point<dim>      &initial_guess) const
 {
   Point<dim> outside;
   for (unsigned int d=0; d<dim; ++d)
@@ -1868,7 +1872,8 @@ TransfiniteInterpolationManifold<dim,spacedim>
 template <int dim, int spacedim>
 std::array<unsigned int, 20>
 TransfiniteInterpolationManifold<dim,spacedim>
-::get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &points) const
+::
+get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &points) const
 {
   // The methods to identify cells around points in GridTools are all written
   // for the active cells, but we are here looking at some cells at the coarse
@@ -1944,8 +1949,9 @@ TransfiniteInterpolationManifold<dim,spacedim>
 template <int dim, int spacedim>
 typename Triangulation<dim,spacedim>::cell_iterator
 TransfiniteInterpolationManifold<dim, spacedim>
-::compute_chart_points (const ArrayView<const Point<spacedim>> &surrounding_points,
-                        ArrayView<Point<dim>>                   chart_points) const
+::
+compute_chart_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                      ArrayView<Point<dim>>                   chart_points) const
 {
   Assert(surrounding_points.size() == chart_points.size(),
          ExcMessage("The chart points array view must be as large as the "
@@ -1978,7 +1984,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
   // computed since there is no effective way to guess them.
   auto guess_chart_point_structdim_2 = [&](const unsigned int i) -> Point<dim>
   {
-    Assert(surrounding_points.size() == 8 && 2 < i && i < 8,
+    Assert(surrounding_points.size() == 8 && 2 < i &&i < 8,
     ExcMessage("This function assumes that there are eight surrounding "
     "points around a two-dimensional object. It also assumes "
     "that the first three chart points have already been "
@@ -2030,7 +2036,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
   // since there is no effective way to guess them.
   auto guess_chart_point_structdim_3 = [&](const unsigned int i) -> Point<dim>
   {
-    Assert(surrounding_points.size() == 8 && 4 < i && i < 8,
+    Assert(surrounding_points.size() == 8 && 4 < i &&i < 8,
     ExcMessage("This function assumes that there are eight surrounding "
     "points around a three-dimensional object. It also "
     "assumes that the first five chart points have already "
@@ -2166,8 +2172,9 @@ TransfiniteInterpolationManifold<dim, spacedim>
 template <int dim, int spacedim>
 Point<spacedim>
 TransfiniteInterpolationManifold<dim, spacedim>
-::get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const ArrayView<const double>          &weights) const
+::
+get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
+               const ArrayView<const double>          &weights) const
 {
   boost::container::small_vector<Point<dim>, 100> chart_points(surrounding_points.size());
   ArrayView<Point<dim>> chart_points_view = make_array_view(chart_points.begin(),

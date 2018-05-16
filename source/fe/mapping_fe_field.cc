@@ -207,7 +207,8 @@ namespace
   // Construct a quadrature formula containing the vertices of the reference
   // cell in dimension dim (with invalid weights)
   template<int dim>
-  Quadrature<dim> &get_vertex_quadrature()
+  Quadrature<dim> &
+  get_vertex_quadrature()
   {
     static Quadrature<dim> quad;
     if (quad.size() == 0)

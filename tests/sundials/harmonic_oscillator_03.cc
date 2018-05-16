@@ -47,7 +47,8 @@
  * y[1](t) = k cos(k t)
  *
  */
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream out("output");
 

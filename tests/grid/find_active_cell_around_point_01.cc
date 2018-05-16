@@ -35,7 +35,8 @@
 
 
 template <int dim, int spacedim>
-void test(unsigned int n_ref, unsigned int n_points)
+void
+test(unsigned int n_ref, unsigned int n_points)
 {
   deallog << "Testing " << dim << ", " << spacedim << std::endl;
 
@@ -68,7 +69,8 @@ void test(unsigned int n_ref, unsigned int n_points)
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

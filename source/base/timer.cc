@@ -103,7 +103,8 @@ namespace internal
 
 
 
-CPUClock::time_point CPUClock::now() noexcept
+CPUClock::time_point
+CPUClock::now() noexcept
 {
   double system_cpu_duration = 0.0;
 #ifdef DEAL_II_MSVC
@@ -170,7 +171,8 @@ Timer::Timer(MPI_Comm mpi_communicator,
 
 
 
-void Timer::start ()
+void
+Timer::start ()
 {
   running = true;
 #ifdef DEAL_II_WITH_MPI
@@ -186,7 +188,8 @@ void Timer::start ()
 
 
 
-double Timer::stop ()
+double
+Timer::stop ()
 {
   if (running)
     {
@@ -218,7 +221,8 @@ double Timer::stop ()
 
 
 
-double Timer::cpu_time() const
+double
+Timer::cpu_time() const
 {
   if (running)
     {
@@ -237,28 +241,32 @@ double Timer::cpu_time() const
 
 
 
-double Timer::last_cpu_time() const
+double
+Timer::last_cpu_time() const
 {
   return internal::TimerImplementation::to_seconds(cpu_times.last_lap_time);
 }
 
 
 
-double Timer::get_lap_time() const
+double
+Timer::get_lap_time() const
 {
   return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
 }
 
 
 
-double Timer::operator() () const
+double
+Timer::operator() () const
 {
   return cpu_time();
 }
 
 
 
-double Timer::wall_time () const
+double
+Timer::wall_time () const
 {
   wall_clock_type::duration current_elapsed_wall_time;
   if (running)
@@ -273,14 +281,16 @@ double Timer::wall_time () const
 
 
 
-double Timer::last_wall_time () const
+double
+Timer::last_wall_time () const
 {
   return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
 }
 
 
 
-void Timer::reset ()
+void
+Timer::reset ()
 {
   wall_times.reset();
   cpu_times.reset();

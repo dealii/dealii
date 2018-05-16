@@ -39,7 +39,8 @@ class MyTensorFunction : dealii::TensorFunction<rank, dim, Number>
 {
 };
 
-int main()
+int
+main()
 {
   initlog();
 

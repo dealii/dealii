@@ -25,7 +25,8 @@
 #include <vector>
 
 
-void test ()
+void
+test ()
 {
   PETScWrappers::MPI::Vector v(PETSC_COMM_WORLD, 100, 100);
   v(0) = 1;
@@ -37,7 +38,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

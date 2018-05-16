@@ -123,7 +123,8 @@ test_standard_tensors ()
                ExcInternalError());
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

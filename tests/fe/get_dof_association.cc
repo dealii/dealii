@@ -24,7 +24,8 @@
 
 
 template <int dim>
-void test (const FiniteElement<dim> &fe)
+void
+test (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -51,7 +52,8 @@ void test (const FiniteElement<dim> &fe)
   deallog << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

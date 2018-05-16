@@ -148,27 +148,32 @@ namespace Particles
      * Serialize the contents of this class.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void
+    serialize (Archive &ar, const unsigned int version);
 
     /**
      * Advance the ParticleAccessor to the next particle.
      */
-    void next ();
+    void
+    next ();
 
     /**
      * Move the ParticleAccessor to the previous particle.
      */
-    void prev ();
+    void
+    prev ();
 
     /**
      * Inequality operator.
      */
-    bool operator != (const ParticleAccessor<dim,spacedim> &other) const;
+    bool
+    operator != (const ParticleAccessor<dim,spacedim> &other) const;
 
     /**
      * Equality operator.
      */
-    bool operator == (const ParticleAccessor<dim,spacedim> &other) const;
+    bool
+    operator == (const ParticleAccessor<dim,spacedim> &other) const;
 
   protected:
     /**

@@ -29,33 +29,38 @@
 
 // Helper functions
 template<int dim>
-std::array<Point<dim>, dim+1> get_simplex();
+std::array<Point<dim>, dim+1>
+get_simplex();
 
 template<>
-std::array<Point<1>, 2> get_simplex()
+std::array<Point<1>, 2>
+get_simplex()
 {
   return {{Point<1>(3), Point<1>(5)}};
 }
 
 
 template<>
-std::array<Point<2>, 3> get_simplex()
+std::array<Point<2>, 3>
+get_simplex()
 {
   return {{Point<2>(4,2), Point<2>(3,3), Point<2>(2,2.5)}};
 }
 
 
 template<>
-std::array<Point<3>, 4> get_simplex()
+std::array<Point<3>, 4>
+get_simplex()
 {
   return {{Point<3>(4,2,0), Point<3>(3,3,0), Point<3>(2,2.5,0), Point<3>(4.5, 3, 2)}};
 }
 
 
 // Exact integral of 1/R times a polynomial computed using Maple.
-double exact_integral_one_over_r(const unsigned int vertex_index,
-                                 const unsigned int i,
-                                 const unsigned int j)
+double
+exact_integral_one_over_r(const unsigned int vertex_index,
+                          const unsigned int i,
+                          const unsigned int j)
 {
   Assert(vertex_index < 4, ExcInternalError());
   Assert(i<6, ExcNotImplemented());
@@ -237,8 +242,9 @@ double exact_integral_one_over_r(const unsigned int vertex_index,
 
 
 
-double exact_integral_one_over_r_middle(const unsigned int i,
-                                        const unsigned int j)
+double
+exact_integral_one_over_r_middle(const unsigned int i,
+                                 const unsigned int j)
 {
   Assert(i<6, ExcNotImplemented());
   Assert(j<6, ExcNotImplemented());

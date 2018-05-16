@@ -97,12 +97,15 @@ class VectorFunction : public Function<dim>
 {
 public:
   VectorFunction() : Function<dim>(dim) {}
-  virtual double value (const Point<dim> &p, const unsigned int component) const;
-  virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
+  virtual double
+  value (const Point<dim> &p, const unsigned int component) const;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const;
 };
 
 template <>
-double VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
+double
+VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
   Assert (component < 2,  ExcIndexRange (component, 0, 1));
 
@@ -121,13 +124,15 @@ double VectorFunction<2>::value(const Point<2> &p, const unsigned int component)
 }
 
 template <int dim>
-void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
+void
+VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
-void create_tria(Triangulation<2> &triangulation, const Point<2> *vertices_parallelograms)
+void
+create_tria(Triangulation<2> &triangulation, const Point<2> *vertices_parallelograms)
 {
   const std::vector<Point<2> > vertices (&vertices_parallelograms[0],
                                          &vertices_parallelograms[n_vertices]);
@@ -153,7 +158,8 @@ void create_tria(Triangulation<2> &triangulation, const Point<2> *vertices_paral
 }
 
 template <int dim>
-void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Point<dim> *vertices_parallelograms)
+void
+test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Point<dim> *vertices_parallelograms)
 {
   deallog << "dim: " << dim << "\t" << fe.get_name() << std::endl;
   deallog << "DoFs\t\t||u-u_h||\tcurl(u_h)\tdiv(u_h)" << std::endl;
@@ -224,7 +230,8 @@ void test(const FiniteElement<dim> &fe, unsigned n_cycles, bool global, const Po
     }
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(7);

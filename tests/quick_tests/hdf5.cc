@@ -18,7 +18,8 @@
 #include <hdf5.h>
 #include <cstdio>
 
-int main()
+int
+main()
 {
   hid_t       file_id;
   herr_t      status;

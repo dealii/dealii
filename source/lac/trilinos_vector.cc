@@ -338,10 +338,11 @@ namespace TrilinosWrappers
 
 
 
-    void Vector::reinit(const IndexSet &locally_owned_entries,
-                        const IndexSet &ghost_entries,
-                        const MPI_Comm &communicator,
-                        const bool      vector_writable)
+    void
+    Vector::reinit(const IndexSet &locally_owned_entries,
+                   const IndexSet &ghost_entries,
+                   const MPI_Comm &communicator,
+                   const bool      vector_writable)
     {
       nonlocal_vector.reset();
       owned_elements = locally_owned_entries;
@@ -468,7 +469,8 @@ namespace TrilinosWrappers
 
 
 
-    Vector &Vector::operator= (Vector &&v) noexcept
+    Vector &
+    Vector::operator= (Vector &&v) noexcept
     {
       swap(v);
       return *this;

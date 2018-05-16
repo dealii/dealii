@@ -29,7 +29,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

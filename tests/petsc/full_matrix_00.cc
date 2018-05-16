@@ -26,7 +26,8 @@
 // elements, reinitialise it to a different size and fill in some
 // elements again. To be sure this generates the correct results the
 // test is verbose (and uses tiny matrices).
-void test (PETScWrappers::FullMatrix &m)
+void
+test (PETScWrappers::FullMatrix &m)
 {
   // assign some matrix elements
   for (unsigned int i=0; i<m.m(); ++i)
@@ -76,7 +77,8 @@ void test (PETScWrappers::FullMatrix &m)
   deallog << "OK" << std::endl;
 }
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

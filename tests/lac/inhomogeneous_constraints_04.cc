@@ -50,11 +50,13 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
-void test(bool use_constraint_matrix)
+void
+test(bool use_constraint_matrix)
 {
   DynamicSparsityPattern csp(8,8);
   for (unsigned int i=0; i<8; ++i)
@@ -137,7 +139,8 @@ void test(bool use_constraint_matrix)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

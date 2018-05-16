@@ -25,10 +25,12 @@
 
 
 template <int dim, int spacedim>
-void test ();
+void
+test ();
 
 template <>
-void test<3,3> ()
+void test<3,3>
+()
 {
   const int dim = 3;
   const int spacedim = 3;
@@ -68,7 +70,8 @@ void test<3,3> ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog ();
 

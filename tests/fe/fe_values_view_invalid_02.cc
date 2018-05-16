@@ -30,8 +30,9 @@
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test (const Triangulation<dim> &tr,
+      const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -61,7 +62,8 @@ ok:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -71,7 +73,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

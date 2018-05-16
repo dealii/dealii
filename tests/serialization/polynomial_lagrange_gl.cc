@@ -22,7 +22,8 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <boost/serialization/vector.hpp>
 
-void test ()
+void
+test ()
 {
   unsigned int n1 = 3;
   unsigned int support_point1 = 1;
@@ -40,7 +41,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

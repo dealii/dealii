@@ -23,7 +23,8 @@
 #include "../tests.h"
 
 
-int main()
+int
+main()
 {
   typedef Sacado::Fad::DFad<double> Sdouble;
   initlog();

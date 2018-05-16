@@ -21,7 +21,8 @@
 #include <deal.II/base/array_view.h>
 
 template <typename T>
-void test (const T &t)
+void
+test (const T &t)
 {
   try
     {
@@ -33,7 +34,8 @@ void test (const T &t)
     }
 }
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

@@ -29,7 +29,8 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperatorQuad
 {
 public :
-  __device__ void operator()(
+  __device__ void
+  operator()(
     CUDAWrappers::FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> *fe_eval,
     const unsigned int q_point) const;
 };
@@ -52,7 +53,8 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperator
 {
 public:
-  __device__ void operator()(
+  __device__ void
+  operator()(
     const unsigned int cell,
     const typename CUDAWrappers::MatrixFree<dim,Number>::Data *gpu_data,
     CUDAWrappers::SharedData<dim,Number>                *shared_data,
@@ -98,8 +100,9 @@ public:
     data (data_in)
   {};
 
-  void vmult(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
-             const LinearAlgebra::CUDAWrappers::Vector<Number> &src);
+  void
+  vmult(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
+        const LinearAlgebra::CUDAWrappers::Vector<Number> &src);
 
 private:
   const CUDAWrappers::MatrixFree<dim,Number> &data;
@@ -108,7 +111,8 @@ private:
 
 
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
-void MatrixFreeTest<dim,fe_degree,Number,n_q_points_1d>::vmult(
+void
+MatrixFreeTest<dim,fe_degree,Number,n_q_points_1d>::vmult(
   LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
   const LinearAlgebra::CUDAWrappers::Vector<Number> &src)
 {

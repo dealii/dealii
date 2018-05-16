@@ -111,7 +111,8 @@ locally_owned_dofs_per_subdomain (const DoFHandlerType  &dof_handler)
 } //locally_owned_dofs_per_subdomain
 
 
-void test ()
+void
+test ()
 {
   const unsigned int global_mesh_refinement_steps = 5;
   const unsigned int number_of_eigenvalues        = 5;
@@ -356,7 +357,8 @@ void test ()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile,/*do not print job id*/false);

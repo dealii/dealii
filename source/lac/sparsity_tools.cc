@@ -52,10 +52,11 @@ namespace SparsityTools
 
   namespace
   {
-    void partition_metis (const SparsityPattern           &sparsity_pattern,
-                          const std::vector<unsigned int> &cell_weights,
-                          const unsigned int               n_partitions,
-                          std::vector<unsigned int>       &partition_indices)
+    void
+    partition_metis (const SparsityPattern           &sparsity_pattern,
+                     const std::vector<unsigned int> &cell_weights,
+                     const unsigned int               n_partitions,
+                     std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that METIS is actually
       // installed and detected
@@ -156,7 +157,8 @@ namespace SparsityTools
 //Query functions unused if zoltan is not installed
 #ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
     //Query functions for partition_zoltan
-    int get_number_of_objects(void *data, int *ierr)
+    int
+    get_number_of_objects(void *data, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
 
@@ -166,9 +168,10 @@ namespace SparsityTools
     }
 
 
-    void get_object_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
-                         ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                         int /*wgt_dim*/, float * /*obj_wgts*/, int *ierr)
+    void
+    get_object_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
+                    ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                    int /*wgt_dim*/, float * /*obj_wgts*/, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr = ZOLTAN_OK;
@@ -187,10 +190,11 @@ namespace SparsityTools
     }
 
 
-    void get_num_edges_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
-                            int num_obj,
-                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR /*localID*/,
-                            int *numEdges, int *ierr)
+    void
+    get_num_edges_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
+                       int num_obj,
+                       ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR /*localID*/,
+                       int *numEdges, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
 
@@ -209,11 +213,12 @@ namespace SparsityTools
 
 
 
-    void get_edge_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
-                       int num_obj, ZOLTAN_ID_PTR /*globalID*/, ZOLTAN_ID_PTR /*localID*/,
-                       int * /*num_edges*/,
-                       ZOLTAN_ID_PTR nborGID, int *nborProc,
-                       int /*wgt_dim*/, float * /*ewgts*/, int *ierr)
+    void
+    get_edge_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
+                  int num_obj, ZOLTAN_ID_PTR /*globalID*/, ZOLTAN_ID_PTR /*localID*/,
+                  int * /*num_edges*/,
+                  ZOLTAN_ID_PTR nborGID, int *nborProc,
+                  int /*wgt_dim*/, float * /*ewgts*/, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr = ZOLTAN_OK;
@@ -241,10 +246,11 @@ namespace SparsityTools
 #endif
 
 
-    void partition_zoltan (const SparsityPattern           &sparsity_pattern,
-                           const std::vector<unsigned int> &cell_weights,
-                           const unsigned int               n_partitions,
-                           std::vector<unsigned int>       &partition_indices)
+    void
+    partition_zoltan (const SparsityPattern           &sparsity_pattern,
+                      const std::vector<unsigned int> &cell_weights,
+                      const unsigned int               n_partitions,
+                      std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that ZOLTAN is actually
       // installed and detected
@@ -340,11 +346,12 @@ namespace SparsityTools
   }
 
 
-  void partition (const SparsityPattern     &sparsity_pattern,
-                  const unsigned int         n_partitions,
-                  std::vector<unsigned int> &partition_indices,
-                  const Partitioner partitioner
-                 )
+  void
+  partition (const SparsityPattern     &sparsity_pattern,
+             const unsigned int         n_partitions,
+             std::vector<unsigned int> &partition_indices,
+             const Partitioner partitioner
+            )
   {
     std::vector<unsigned int> cell_weights;
 
@@ -354,12 +361,13 @@ namespace SparsityTools
   }
 
 
-  void partition (const SparsityPattern           &sparsity_pattern,
-                  const std::vector<unsigned int> &cell_weights,
-                  const unsigned int               n_partitions,
-                  std::vector<unsigned int>       &partition_indices,
-                  const Partitioner                partitioner
-                 )
+  void
+  partition (const SparsityPattern           &sparsity_pattern,
+             const std::vector<unsigned int> &cell_weights,
+             const unsigned int               n_partitions,
+             std::vector<unsigned int>       &partition_indices,
+             const Partitioner                partitioner
+            )
   {
     Assert (sparsity_pattern.n_rows()==sparsity_pattern.n_cols(),
             ExcNotQuadratic());
@@ -387,8 +395,9 @@ namespace SparsityTools
   }
 
 
-  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
-                                       std::vector<unsigned int> &color_indices)
+  unsigned int
+  color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                          std::vector<unsigned int> &color_indices)
   {
     // Make sure that ZOLTAN is actually
     // installed and detected
@@ -949,10 +958,11 @@ namespace SparsityTools
 
   }
 
-  void distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
-                                   const std::vector<IndexSet> &owned_set_per_cpu,
-                                   const MPI_Comm              &mpi_comm,
-                                   const IndexSet              &myrange)
+  void
+  distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
+                              const std::vector<IndexSet> &owned_set_per_cpu,
+                              const MPI_Comm              &mpi_comm,
+                              const IndexSet              &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
 

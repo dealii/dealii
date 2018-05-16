@@ -59,7 +59,8 @@ check_solve (const MatrixType &A,
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

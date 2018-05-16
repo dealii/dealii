@@ -32,7 +32,8 @@ pred_mat_id(const typename Triangulation<dim>::active_cell_iterator &cell)
 }
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim = " << dim << std::endl;
 
@@ -74,7 +75,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

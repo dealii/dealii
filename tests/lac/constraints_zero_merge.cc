@@ -26,7 +26,8 @@
 
 
 
-void test ()
+void
+test ()
 {
 
   ConstraintMatrix cm1, cm2;
@@ -52,7 +53,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

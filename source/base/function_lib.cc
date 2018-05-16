@@ -2289,18 +2289,20 @@ namespace Functions
     // interpolate a data value from a table where ix denotes
     // the (lower) left endpoint of the interval to interpolate
     // in, and p_unit denotes the point in unit coordinates to do so.
-    double interpolate (const Table<1,double> &data_values,
-                        const TableIndices<1> &ix,
-                        const Point<1>        &xi)
+    double
+    interpolate (const Table<1,double> &data_values,
+                 const TableIndices<1> &ix,
+                 const Point<1>        &xi)
     {
       return ((1-xi[0])*data_values[ix[0]]
               +
               xi[0]*data_values[ix[0]+1]);
     }
 
-    double interpolate (const Table<2,double> &data_values,
-                        const TableIndices<2> &ix,
-                        const Point<2>        &p_unit)
+    double
+    interpolate (const Table<2,double> &data_values,
+                 const TableIndices<2> &ix,
+                 const Point<2>        &p_unit)
     {
       return (((1-p_unit[0])*data_values[ix[0]][ix[1]]
                +
@@ -2311,9 +2313,10 @@ namespace Functions
                p_unit[0]*data_values[ix[0]+1][ix[1]+1])*p_unit[1]);
     }
 
-    double interpolate (const Table<3,double> &data_values,
-                        const TableIndices<3> &ix,
-                        const Point<3>        &p_unit)
+    double
+    interpolate (const Table<3,double> &data_values,
+                 const TableIndices<3> &ix,
+                 const Point<3>        &p_unit)
     {
       return ((((1-p_unit[0])*data_values[ix[0]][ix[1]][ix[2]]
                 +
@@ -2337,10 +2340,11 @@ namespace Functions
     // denotes the lower left endpoint of the interval to interpolate
     // in, p_unit denotes the point in unit coordinates, and dx
     // denotes the width of the interval in each dimension.
-    Tensor<1,1> gradient_interpolate (const Table<1,double> &data_values,
-                                      const TableIndices<1> &ix,
-                                      const Point<1>        &p_unit,
-                                      const Point<1>        &dx)
+    Tensor<1,1>
+    gradient_interpolate (const Table<1,double> &data_values,
+                          const TableIndices<1> &ix,
+                          const Point<1>        &p_unit,
+                          const Point<1>        &dx)
     {
       (void)p_unit;
       Tensor<1,1> grad;
@@ -2349,10 +2353,11 @@ namespace Functions
     }
 
 
-    Tensor<1,2> gradient_interpolate (const Table<2,double> &data_values,
-                                      const TableIndices<2> &ix,
-                                      const Point<2>        &p_unit,
-                                      const Point<2>        &dx)
+    Tensor<1,2>
+    gradient_interpolate (const Table<2,double> &data_values,
+                          const TableIndices<2> &ix,
+                          const Point<2>        &p_unit,
+                          const Point<2>        &dx)
     {
       Tensor<1,2> grad;
       double
@@ -2367,10 +2372,11 @@ namespace Functions
     }
 
 
-    Tensor<1,3> gradient_interpolate (const Table<3,double> &data_values,
-                                      const TableIndices<3> &ix,
-                                      const Point<3>        &p_unit,
-                                      const Point<3>        &dx)
+    Tensor<1,3>
+    gradient_interpolate (const Table<3,double> &data_values,
+                          const TableIndices<3> &ix,
+                          const Point<3>        &p_unit,
+                          const Point<3>        &dx)
     {
       Tensor<1,3> grad;
       double

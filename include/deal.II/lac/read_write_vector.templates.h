@@ -272,25 +272,28 @@ namespace LinearAlgebra
   namespace internal
   {
     template <typename PETSC_Number, typename Number>
-    void copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
-                            const PETSC_Number *petsc_end_ptr,
-                            Number *ptr)
+    void
+    copy_petsc_vector (const PETSC_Number *petsc_start_ptr,
+                       const PETSC_Number *petsc_end_ptr,
+                       Number *ptr)
     {
       std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
     }
 
     template <typename PETSC_Number, typename Number>
-    void copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
-                            const std::complex<PETSC_Number> *petsc_end_ptr,
-                            std::complex<Number> *ptr)
+    void
+    copy_petsc_vector (const std::complex<PETSC_Number> *petsc_start_ptr,
+                       const std::complex<PETSC_Number> *petsc_end_ptr,
+                       std::complex<Number> *ptr)
     {
       std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
     }
 
     template <typename PETSC_Number, typename Number>
-    void copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
-                            const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
-                            Number * /*ptr*/)
+    void
+    copy_petsc_vector (const std::complex<PETSC_Number> * /*petsc_start_ptr*/,
+                       const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
+                       Number * /*ptr*/)
     {
       AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
     }

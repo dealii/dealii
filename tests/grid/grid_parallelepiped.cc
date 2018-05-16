@@ -27,12 +27,14 @@
 #include <iostream>
 
 // Output
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 // The simplest test case is to create a parallelepiped grid, output
 // the result, and hope for the best.
 template <int dim>
-void check_parallelepiped (bool colorize, bool log)
+void
+check_parallelepiped (bool colorize, bool log)
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
@@ -74,7 +76,8 @@ void check_parallelepiped (bool colorize, bool log)
   triangulation.clear ();
 }
 
-int main ()
+int
+main ()
 {
   // Check parallelepiped
   check_parallelepiped<1> (false, true);

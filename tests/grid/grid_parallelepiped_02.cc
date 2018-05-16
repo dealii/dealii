@@ -28,7 +28,8 @@
 #include <iostream>
 
 // Output
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 // This test creates a parallelepiped (one element) and the same
 // parallelepiped (one element); because the code that makes the two
@@ -37,7 +38,8 @@ std::ofstream logfile ("output");
 //
 // Here is the implementation in nd:
 template <int dim>
-void check_nd_parallelepiped_by_comparison (bool log)
+void
+check_nd_parallelepiped_by_comparison (bool log)
 {
 
   // build corners for this particular dim that are known to give the
@@ -89,7 +91,8 @@ void check_nd_parallelepiped_by_comparison (bool log)
     }
 }
 
-int main ()
+int
+main ()
 {
   // Check parallelepiped
   check_nd_parallelepiped_by_comparison<1> (true);

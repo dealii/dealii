@@ -67,7 +67,8 @@ public:
    * Return the polynomial degree of this finite element, i.e. the value
    * passed to the constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree () const;
 
   // for documentation, see the FiniteElement base class
   virtual

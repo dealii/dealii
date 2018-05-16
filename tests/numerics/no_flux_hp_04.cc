@@ -38,8 +38,9 @@ class RadialFunction : public Function<dim>
 public:
   RadialFunction() : Function<dim> (dim) {}
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double> &v) const
   {
     Assert (v.size() == dim, ExcInternalError());
 
@@ -63,8 +64,9 @@ public:
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const hp::FECollection<dim> &fe)
+void
+test (const Triangulation<dim> &tr,
+      const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -110,7 +112,8 @@ void test (const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_hyper_sphere()
+void
+test_hyper_sphere()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
@@ -128,7 +131,8 @@ void test_hyper_sphere()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

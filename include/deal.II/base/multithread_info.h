@@ -62,21 +62,24 @@ public:
    * to the documentation in <tt>multithread_info.cc</tt> near to the
    * <tt>error</tt> directive.
    */
-  static unsigned int n_cores ();
+  static unsigned int
+  n_cores ();
 
   /**
    * Return the number of threads to use. This is initially set to the number
    * of cores the system has (see n_cores()) but can be further restricted by
    * set_thread_limit() and the environment variable DEAL_II_NUM_THREADS.
    */
-  static unsigned int n_threads ();
+  static unsigned int
+  n_threads ();
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
    * This is not exact (but will usually be close) because calculating the
    * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption ();
 
   /**
    * Set the maximum number of threads to be used to the minimum of the
@@ -91,7 +94,8 @@ public:
    * argument of the constructor of Utilities::MPI::MPI_InitFinalize if you
    * have an MPI based code.
    */
-  static void set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
+  static void
+  set_thread_limit (const unsigned int max_threads = numbers::invalid_unsigned_int);
 
   /**
    * Return if the TBB is running using a single thread either because of
@@ -99,12 +103,14 @@ public:
    * is used in the PETScWrappers to avoid using the interface that is not
    * thread-safe.
    */
-  static bool is_running_single_threaded ();
+  static bool
+  is_running_single_threaded ();
 
   /**
    * Make sure the multithreading API is initialized. This normally does not need to be called in usercode.
    */
-  static void initialize_multithreading ();
+  static void
+  initialize_multithreading ();
 
 private:
 
@@ -113,7 +119,8 @@ private:
    * Linux, OSF, SGI, and Sun machines; if no detection of the number of CPUs
    * is supported, or if detection fails, this function returns one.
    */
-  static unsigned int get_n_cpus ();
+  static unsigned int
+  get_n_cpus ();
 
   /**
    * Variable representing the maximum number of threads.

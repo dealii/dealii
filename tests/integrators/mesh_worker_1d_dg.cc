@@ -58,31 +58,39 @@ namespace Advection
   public:
     AdvectionProblem ();
     ~AdvectionProblem ();
-    void run ();
+    void
+    run ();
 
   private:
 
     const MappingQGeneric<dim> mapping;
 
-    void setup_system ();
+    void
+    setup_system ();
 
-    void integrate_cell_term (MeshWorker::DoFInfo<dim> &dinfo,
-                              MeshWorker::IntegrationInfo<dim> &info);
+    void
+    integrate_cell_term (MeshWorker::DoFInfo<dim> &dinfo,
+                         MeshWorker::IntegrationInfo<dim> &info);
 
-    void integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
-                                  MeshWorker::IntegrationInfo<dim> &info);
+    void
+    integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
+                             MeshWorker::IntegrationInfo<dim> &info);
 
-    void integrate_face_term (MeshWorker::DoFInfo<dim> &dinfo1,
-                              MeshWorker::DoFInfo<dim> &dinfo2,
-                              MeshWorker::IntegrationInfo<dim> &info1,
-                              MeshWorker::IntegrationInfo<dim> &info2);
+    void
+    integrate_face_term (MeshWorker::DoFInfo<dim> &dinfo1,
+                         MeshWorker::DoFInfo<dim> &dinfo2,
+                         MeshWorker::IntegrationInfo<dim> &info1,
+                         MeshWorker::IntegrationInfo<dim> &info2);
 
-    void output_results (int timestep) const;
+    void
+    output_results (int timestep) const;
 
-    void create_grid ();
+    void
+    create_grid ();
 
-    void assemble_rhs (Vector<double> &solution,
-                       Vector<double> &residual);
+    void
+    assemble_rhs (Vector<double> &solution,
+                  Vector<double> &residual);
 
     // For problems with non-diagonal mass matrices
 //    void assemble_mass_matrix_and_multiply (Vector<double>& solution,
@@ -121,7 +129,8 @@ namespace Advection
 
 
   template < >
-  void AdvectionProblem<1>::create_grid()
+  void
+  AdvectionProblem<1>::create_grid()
   {
     double ll_x=0.;
     double ur_x=1.;
@@ -144,7 +153,8 @@ namespace Advection
   }//create_grid()
 
   template < >
-  void AdvectionProblem<2>::create_grid()
+  void
+  AdvectionProblem<2>::create_grid()
   {
     // dim==1 implemented:
     double ll_x=0., ll_y=0.;
@@ -170,7 +180,8 @@ namespace Advection
   }//create_grid()
 
   template <>
-  void AdvectionProblem<3>::create_grid()
+  void
+  AdvectionProblem<3>::create_grid()
   {
     double ll_x=0., ll_y=0., ll_z=0.;
     double ur_x=1., ur_y=0.01, ur_z=0.01;
@@ -197,7 +208,8 @@ namespace Advection
   }//create_grid()
 
   template <int dim>
-  void AdvectionProblem<dim>::setup_system ()
+  void
+  AdvectionProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     solution.reinit(dof_handler.n_dofs());
@@ -209,8 +221,9 @@ namespace Advection
 
 
   template <int dim>
-  void AdvectionProblem<dim>::assemble_rhs (Vector<double> &solution,
-                                            Vector<double> &residual)
+  void
+  AdvectionProblem<dim>::assemble_rhs (Vector<double> &solution,
+                                       Vector<double> &residual)
   {
     const unsigned int n_gauss_points = std::ceil(((2.0*fe.degree) +1)/2);
 
@@ -263,8 +276,9 @@ namespace Advection
   }//assemble_system
 
   template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term (MeshWorker::DoFInfo<dim> &dinfo,
-                                                   MeshWorker::IntegrationInfo<dim> &info)
+  void
+  AdvectionProblem<dim>::integrate_cell_term (MeshWorker::DoFInfo<dim> &dinfo,
+                                              MeshWorker::IntegrationInfo<dim> &info)
   {
     const FEValuesBase<dim> &fe_v = info.fe_values();
 
@@ -299,8 +313,9 @@ namespace Advection
   }//integrate_cell_term
 
   template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
-                                                       MeshWorker::IntegrationInfo<dim> &info)
+  void
+  AdvectionProblem<dim>::integrate_boundary_term (MeshWorker::DoFInfo<dim> &dinfo,
+                                                  MeshWorker::IntegrationInfo<dim> &info)
   {
     const unsigned int boundary_id = dinfo.face->boundary_id();
 
@@ -332,10 +347,11 @@ namespace Advection
   }//integrate_boundary_term
 
   template <int dim>
-  void AdvectionProblem<dim>::integrate_face_term (MeshWorker::DoFInfo<dim> &dinfo1,
-                                                   MeshWorker::DoFInfo<dim> &dinfo2,
-                                                   MeshWorker::IntegrationInfo<dim> &info1,
-                                                   MeshWorker::IntegrationInfo<dim> &info2)
+  void
+  AdvectionProblem<dim>::integrate_face_term (MeshWorker::DoFInfo<dim> &dinfo1,
+                                              MeshWorker::DoFInfo<dim> &dinfo2,
+                                              MeshWorker::IntegrationInfo<dim> &info1,
+                                              MeshWorker::IntegrationInfo<dim> &info2)
   {
     const FEValuesBase<dim> &fe_v_1 = info1.fe_values();
     const FEValuesBase<dim> &fe_v_2 = info2.fe_values();
@@ -373,7 +389,8 @@ namespace Advection
 
 
   template <int dim>
-  void AdvectionProblem<dim>::output_results (int timestep) const
+  void
+  AdvectionProblem<dim>::output_results (int timestep) const
   {
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -395,7 +412,8 @@ namespace Advection
 
 
   template <int dim>
-  void AdvectionProblem<dim>::run ()
+  void
+  AdvectionProblem<dim>::run ()
   {
     // Make the mesh
     create_grid();
@@ -432,7 +450,8 @@ namespace Advection
 }//namespace
 
 
-int main ()
+int
+main ()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

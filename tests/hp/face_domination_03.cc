@@ -34,7 +34,8 @@ public:
   MixedFECollection ();
   ~MixedFECollection ();
 
-  void run ();
+  void
+  run ();
 
   Triangulation<dim> triangulation;
 
@@ -62,7 +63,8 @@ MixedFECollection<dim>::~MixedFECollection ()
 }
 
 template <int dim>
-void MixedFECollection<dim>::run ()
+void
+MixedFECollection<dim>::run ()
 {
   // add two a CG and a DG finite element object to fe_collection
   fe_collection.push_back (continuous_fe);
@@ -96,7 +98,8 @@ void MixedFECollection<dim>::run ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

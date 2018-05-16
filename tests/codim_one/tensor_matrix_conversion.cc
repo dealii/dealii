@@ -24,7 +24,8 @@
 #include<deal.II/lac/full_matrix.h>
 #include<deal.II/base/tensor.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <typename number>
@@ -73,7 +74,8 @@ display_tensor_2(Tensor<2,b> &T)
 
 }
 
-int main ()
+int
+main ()
 {
 
   deallog.attach(logfile);

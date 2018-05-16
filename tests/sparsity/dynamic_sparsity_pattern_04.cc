@@ -23,7 +23,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 100;
   DynamicSparsityPattern csp (N,N);
@@ -39,7 +40,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

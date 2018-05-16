@@ -58,7 +58,8 @@ namespace numbers
       template <>
       struct NaNInitializer<float>
       {
-        static float invalid_element ()
+        static float
+        invalid_element ()
         {
           return std::numeric_limits<float>::signaling_NaN();
         }
@@ -73,7 +74,8 @@ namespace numbers
       template <>
       struct NaNInitializer<double>
       {
-        static double invalid_element ()
+        static double
+        invalid_element ()
         {
           return std::numeric_limits<double>::signaling_NaN();
         }
@@ -88,7 +90,8 @@ namespace numbers
       template <int dim, typename T>
       struct NaNInitializer<Tensor<1,dim,T> >
       {
-        static Tensor<1,dim,T> invalid_element ()
+        static Tensor<1,dim,T>
+        invalid_element ()
         {
           Tensor<1,dim,T> nan_tensor;
 
@@ -109,7 +112,8 @@ namespace numbers
       template <int rank, int dim, typename T>
       struct NaNInitializer<Tensor<rank,dim,T> >
       {
-        static Tensor<rank,dim,T> invalid_element ()
+        static Tensor<rank,dim,T>
+        invalid_element ()
         {
           Tensor<rank,dim,T> nan_tensor;
 
@@ -131,7 +135,8 @@ namespace numbers
       template <int dim, typename T>
       struct NaNInitializer<Point<dim,T> >
       {
-        static Point<dim,T> invalid_element ()
+        static Point<dim,T>
+        invalid_element ()
         {
           Point<dim,T> nan_point;
 
@@ -152,7 +157,8 @@ namespace numbers
       template <int rank, int dim, typename T>
       struct NaNInitializer<SymmetricTensor<rank,dim,T> >
       {
-        static SymmetricTensor<rank,dim,T> invalid_element ()
+        static SymmetricTensor<rank,dim,T>
+        invalid_element ()
         {
           // initialize symmetric tensors via the unrolled list of elements
           T initializers[SymmetricTensor<rank,dim,T>::n_independent_components];
@@ -173,7 +179,8 @@ namespace numbers
       template <int order, int dim, int spacedim, typename T>
       struct NaNInitializer<DerivativeForm<order,dim,spacedim,T> >
       {
-        static DerivativeForm<order,dim,spacedim,T> invalid_element ()
+        static DerivativeForm<order,dim,spacedim,T>
+        invalid_element ()
         {
           DerivativeForm<order,dim,spacedim,T> form;
 

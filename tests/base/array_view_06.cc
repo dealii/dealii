@@ -21,7 +21,8 @@
 #include <deal.II/base/array_view.h>
 
 
-void test ()
+void
+test ()
 {
   std::vector<int> v(10);
 
@@ -37,7 +38,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

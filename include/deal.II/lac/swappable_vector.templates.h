@@ -88,7 +88,8 @@ SwappableVector<number>::operator= (const SwappableVector<number> &v)
 
 
 template <typename number>
-void SwappableVector<number>::swap_out (const std::string &name)
+void
+SwappableVector<number>::swap_out (const std::string &name)
 {
   // if the vector was stored in
   // another file previously, and
@@ -122,7 +123,8 @@ void SwappableVector<number>::swap_out (const std::string &name)
 
 
 template <typename number>
-void SwappableVector<number>::reload ()
+void
+SwappableVector<number>::reload ()
 {
   // if in MT mode: synchronize with
   // possibly existing @p alert
@@ -154,7 +156,8 @@ void SwappableVector<number>::reload ()
 
 
 template <typename number>
-void SwappableVector<number>::alert ()
+void
+SwappableVector<number>::alert ()
 {
 #ifndef DEAL_II_WITH_THREADS
   // note: this function does nothing
@@ -188,7 +191,8 @@ void SwappableVector<number>::alert ()
 
 
 template <typename number>
-void SwappableVector<number>::reload_vector (const bool set_flag)
+void
+SwappableVector<number>::reload_vector (const bool set_flag)
 {
   (void)set_flag;
 
@@ -212,7 +216,8 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
 
 
 template <typename number>
-void SwappableVector<number>::kill_file ()
+void
+SwappableVector<number>::kill_file ()
 {
   // if in MT mode, wait for other
   // operations to finish first

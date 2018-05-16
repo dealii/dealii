@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   Triangulation<dim> triangulation;
 
@@ -70,7 +71,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

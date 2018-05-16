@@ -28,7 +28,8 @@ using namespace Polynomials;
 typedef std::vector<Polynomial<double> > PolVector;
 
 
-void print_2d (const AnisotropicPolynomials<2> &aniso)
+void
+print_2d (const AnisotropicPolynomials<2> &aniso)
 {
   const unsigned int N=10, M=13;
   for (unsigned int i=0; i<=N; ++i)
@@ -53,7 +54,8 @@ void print_2d (const AnisotropicPolynomials<2> &aniso)
 
 
 template <class Pol>
-void check_2d ()
+void
+check_2d ()
 {
   // two checks with higher degree in
   // x or y direction
@@ -77,7 +79,8 @@ void check_2d ()
 }
 
 
-void print_3d (const AnisotropicPolynomials<3> &aniso)
+void
+print_3d (const AnisotropicPolynomials<3> &aniso)
 {
   const unsigned int N=4, M=3, P=5;
   for (unsigned int i=0; i<=N; ++i)
@@ -107,7 +110,8 @@ void print_3d (const AnisotropicPolynomials<3> &aniso)
 
 
 template <class Pol>
-void check_3d ()
+void
+check_3d ()
 {
   // three checks with higher degree
   // in x, y or z direction
@@ -143,7 +147,8 @@ void check_3d ()
 
 
 template <class Pol>
-void check ()
+void
+check ()
 {
   check_2d<Pol> ();
   check_3d<Pol> ();
@@ -151,7 +156,8 @@ void check ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

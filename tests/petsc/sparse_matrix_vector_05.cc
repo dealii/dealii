@@ -24,8 +24,9 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test (PETScWrappers::MPI::Vector &v,
+      PETScWrappers::MPI::Vector &w)
 {
   PETScWrappers::SparseMatrix m(v.size(),v.size(),v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -64,7 +65,8 @@ void test (PETScWrappers::MPI::Vector &v,
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -33,11 +33,13 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void flatten_triangulation( Triangulation<dim> &tria_in, Triangulation<dim> &tria_out )
+void
+flatten_triangulation( Triangulation<dim> &tria_in, Triangulation<dim> &tria_out )
 // takes a possibly refined triangulation and returns a new coarse triangulation
 // created from the vertices of the input
 {
@@ -82,8 +84,9 @@ void flatten_triangulation( Triangulation<dim> &tria_in, Triangulation<dim> &tri
 // place.
 
 template <int dim>
-void mesh_info(const Triangulation<dim> &tria,
-               const std::string        &filename)
+void
+mesh_info(const Triangulation<dim> &tria,
+          const std::string        &filename)
 {
   deallog << "Mesh info for " << filename << ":" << std::endl
           << " dimension: " << dim << std::endl
@@ -117,7 +120,8 @@ void mesh_info(const Triangulation<dim> &tria,
 }
 
 
-void test ()
+void
+test ()
 {
   Point<2> center;
 
@@ -154,7 +158,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

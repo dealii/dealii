@@ -229,7 +229,8 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
 }
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

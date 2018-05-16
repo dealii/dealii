@@ -20,7 +20,8 @@
 
 
 template <int rank, int dim>
-void check ()
+void
+check ()
 {
   // build a regular tensor
   SymmetricTensor<rank,dim> t;
@@ -44,7 +45,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -22,7 +22,8 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
@@ -49,7 +50,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

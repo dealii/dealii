@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   SymmetricTensor<2,dim> S;
   for (unsigned int i=0; i<S.n_independent_components; ++i)
@@ -38,7 +39,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -165,7 +165,8 @@ namespace
   // the bisection algorithm can never find a threshold equal to one of the
   // end points of the interval. So we slightly increase the interval before
   // we even start
-  void adjust_interesting_range (double (&interesting_range)[2])
+  void
+  adjust_interesting_range (double (&interesting_range)[2])
   {
     Assert (interesting_range[0] <= interesting_range[1],
             ExcInternalError());

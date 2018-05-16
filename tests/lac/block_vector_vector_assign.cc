@@ -24,8 +24,9 @@
 #include <utility>
 
 template <typename Vector1, typename Vector2>
-bool operator == (const Vector1 &v1,
-                  const Vector2 &v2)
+bool
+operator == (const Vector1 &v1,
+             const Vector2 &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -36,7 +37,8 @@ bool operator == (const Vector1 &v1,
 }
 
 
-void test ()
+void
+test ()
 {
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
@@ -65,7 +67,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

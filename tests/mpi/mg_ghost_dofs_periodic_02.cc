@@ -28,7 +28,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Assert(dim == 3, ExcNotImplemented());
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
@@ -73,7 +74,8 @@ void test()
 
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   using namespace dealii;
 

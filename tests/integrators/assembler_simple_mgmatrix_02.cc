@@ -36,7 +36,8 @@
 using namespace dealii;
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -74,7 +75,8 @@ void test(FiniteElement<dim> &fe)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

@@ -41,7 +41,8 @@
 
 
 template <int dim>
-void transfer(std::ostream &out)
+void
+transfer(std::ostream &out)
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -88,7 +89,8 @@ void transfer(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

@@ -32,7 +32,8 @@ namespace LACExceptions
     error_code (error_code)
   {}
 
-  void ExcPETScError::print_info (std::ostream &out) const
+  void
+  ExcPETScError::print_info (std::ostream &out) const
   {
     out << "deal.II encountered an error while calling a PETSc function."
         << std::endl;

@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void plot_FE_Bernstein_shape_functions()
+void
+plot_FE_Bernstein_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 
@@ -58,7 +59,8 @@ void plot_FE_Bernstein_shape_functions()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;

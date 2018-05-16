@@ -70,7 +70,8 @@ namespace internal
 
 
 
-    void NumberCache::clear ()
+    void
+    NumberCache::clear ()
     {
       n_global_dofs = 0;
       n_locally_owned_dofs = 0;

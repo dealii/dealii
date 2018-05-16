@@ -22,7 +22,8 @@
 #include <deal.II/lac/constraint_matrix.h>
 
 
-void test ()
+void
+test ()
 {
   ConstraintMatrix cm;
 
@@ -59,7 +60,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test();

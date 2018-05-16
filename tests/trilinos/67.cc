@@ -26,7 +26,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::SparseMatrix &m)
+void
+test (TrilinosWrappers::SparseMatrix &m)
 {
   Assert (m.m() != 0, ExcInternalError());
   Assert (m.n() != 0, ExcInternalError());
@@ -101,7 +102,8 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

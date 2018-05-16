@@ -112,25 +112,29 @@ public:
    * will not try to subscribe to a null-pointer, but still delete the old
    * subscription.
    */
-  SmartPointer<T,P> &operator= (T *tt);
+  SmartPointer<T,P> &
+  operator= (T *tt);
 
   /**
    * Assignment operator for SmartPointer.  The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
   template <class Q>
-  SmartPointer<T,P> &operator= (const SmartPointer<T,Q> &tt);
+  SmartPointer<T,P> &
+  operator= (const SmartPointer<T,Q> &tt);
 
   /**
    * Assignment operator for SmartPointer.  The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
-  SmartPointer<T,P> &operator= (const SmartPointer<T,P> &tt);
+  SmartPointer<T,P> &
+  operator= (const SmartPointer<T,P> &tt);
 
   /**
    * Delete the object pointed to and set the pointer to zero.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Conversion to normal pointer.
@@ -141,13 +145,15 @@ public:
    * Dereferencing operator. This operator throws an ExcNotInitialized if the
    * pointer is a null pointer.
    */
-  T &operator * () const;
+  T &
+  operator * () const;
 
   /**
    * Dereferencing operator. This operator throws an ExcNotInitialized if the
    * pointer is a null pointer.
    */
-  T *operator -> () const;
+  T *
+  operator -> () const;
 
   /**
    * Exchange the pointers of this object and the argument. Since both the
@@ -159,7 +165,8 @@ public:
    * pointer are implemented in global namespace.
    */
   template <class Q>
-  void swap (SmartPointer<T,Q> &tt);
+  void
+  swap (SmartPointer<T,Q> &tt);
 
   /**
    * Swap pointers between this object and the pointer given. As this releases
@@ -169,14 +176,16 @@ public:
    * Note that we indeed need a reference of a pointer, as we want to change
    * the pointer variable which we are given.
    */
-  void swap (T *&tt);
+  void
+  swap (T *&tt);
 
   /**
    * Return an estimate of the amount of memory (in bytes) used by this class.
    * Note in particular, that this only includes the amount of memory used by
    * <b>this</b> object, not by the object pointed to.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**
@@ -281,7 +290,8 @@ SmartPointer<T,P>::clear ()
 
 template <typename T, typename P>
 inline
-SmartPointer<T,P> &SmartPointer<T,P>::operator = (T *tt)
+SmartPointer<T,P> &
+SmartPointer<T,P>::operator = (T *tt)
 {
   // optimize if no real action is
   // requested
@@ -352,7 +362,8 @@ SmartPointer<T,P>::operator T *() const
 
 template <typename T, typename P>
 inline
-T &SmartPointer<T,P>::operator * () const
+T &
+SmartPointer<T,P>::operator * () const
 {
   Assert(t != nullptr, ExcNotInitialized());
   return *t;
@@ -362,7 +373,8 @@ T &SmartPointer<T,P>::operator * () const
 
 template <typename T, typename P>
 inline
-T *SmartPointer<T,P>::operator -> () const
+T *
+SmartPointer<T,P>::operator -> () const
 {
   Assert(t != nullptr, ExcNotInitialized());
   return t;
@@ -373,7 +385,8 @@ T *SmartPointer<T,P>::operator -> () const
 template <typename T, typename P>
 template <class Q>
 inline
-void SmartPointer<T,P>::swap (SmartPointer<T,Q> &tt)
+void
+SmartPointer<T,P>::swap (SmartPointer<T,Q> &tt)
 {
 #ifdef DEBUG
   SmartPointer<T,P> aux(t,id);
@@ -388,7 +401,8 @@ void SmartPointer<T,P>::swap (SmartPointer<T,Q> &tt)
 
 template <typename T, typename P>
 inline
-void SmartPointer<T,P>::swap (T *&tt)
+void
+SmartPointer<T,P>::swap (T *&tt)
 {
   if (t != nullptr)
     t->unsubscribe (id);
@@ -427,7 +441,8 @@ SmartPointer<T,P>::memory_consumption () const
  */
 template <typename T, typename P, class Q>
 inline
-void swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
+void
+swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
 {
   t1.swap (t2);
 }
@@ -443,7 +458,8 @@ void swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
  */
 template <typename T, typename P>
 inline
-void swap (SmartPointer<T,P> &t1, T *&t2)
+void
+swap (SmartPointer<T,P> &t1, T *&t2)
 {
   t1.swap (t2);
 }
@@ -459,7 +475,8 @@ void swap (SmartPointer<T,P> &t1, T *&t2)
  */
 template <typename T, typename P>
 inline
-void swap (T *&t1, SmartPointer<T,P> &t2)
+void
+swap (T *&t1, SmartPointer<T,P> &t2)
 {
   t2.swap (t1);
 }

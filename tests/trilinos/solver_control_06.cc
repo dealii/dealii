@@ -64,25 +64,37 @@ public:
 
   ~Test_Solver_Output();
 
-  void run();
+  void
+  run();
 
 private:
-  void make_grid();
+  void
+  make_grid();
 
-  void setup_system();
+  void
+  setup_system();
 
-  void assemble_system();
+  void
+  assemble_system();
 
-  void solve_base();
-  void solve_cg();
-  void solve_cgs();
-  void solve_gmres();
-  void solve_bicgstab();
-  void solve_tfqmr();
+  void
+  solve_base();
+  void
+  solve_cg();
+  void
+  solve_cgs();
+  void
+  solve_gmres();
+  void
+  solve_bicgstab();
+  void
+  solve_tfqmr();
 
-  void refine_grid();
+  void
+  refine_grid();
 
-  void output(unsigned int cycle);
+  void
+  output(unsigned int cycle);
 
   MPI_Comm mpi_comm;
   const unsigned int n_mpi_proc;
@@ -132,7 +144,8 @@ Test_Solver_Output::~Test_Solver_Output()
   dof_handler.clear();
 }
 
-void Test_Solver_Output::run()
+void
+Test_Solver_Output::run()
 {
   const unsigned int n_cycles = 2;
   for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
@@ -176,13 +189,15 @@ void Test_Solver_Output::run()
     }
 }
 
-void Test_Solver_Output::make_grid()
+void
+Test_Solver_Output::make_grid()
 {
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(5);
 }
 
-void Test_Solver_Output::setup_system()
+void
+Test_Solver_Output::setup_system()
 {
   TimerOutput::Scope t(timer, "setup");
 
@@ -220,7 +235,8 @@ void Test_Solver_Output::setup_system()
                        mpi_comm);
 }
 
-void Test_Solver_Output::assemble_system()
+void
+Test_Solver_Output::assemble_system()
 {
   TimerOutput::Scope t(timer, "assembly");
 
@@ -280,7 +296,8 @@ void Test_Solver_Output::assemble_system()
   system_rhs.compress(VectorOperation::add);
 }
 
-void Test_Solver_Output::solve_base()
+void
+Test_Solver_Output::solve_base()
 {
   TimerOutput::Scope t(timer, "solve_base");
   pcout << "Solving using SolverBase" << std::endl;
@@ -303,7 +320,8 @@ void Test_Solver_Output::solve_base()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::solve_cg()
+void
+Test_Solver_Output::solve_cg()
 {
   TimerOutput::Scope t(timer, "solve_cg");
   pcout << "Solving using SolverCG" << std::endl;
@@ -326,7 +344,8 @@ void Test_Solver_Output::solve_cg()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::solve_cgs()
+void
+Test_Solver_Output::solve_cgs()
 {
   TimerOutput::Scope t(timer, "solve_cgs");
   pcout << "Solving using SolverCGS" << std::endl;
@@ -349,7 +368,8 @@ void Test_Solver_Output::solve_cgs()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::solve_gmres()
+void
+Test_Solver_Output::solve_gmres()
 {
   TimerOutput::Scope t(timer, "solve_gmres");
   pcout << "Solving using SolverGMRES" << std::endl;
@@ -372,7 +392,8 @@ void Test_Solver_Output::solve_gmres()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::solve_bicgstab()
+void
+Test_Solver_Output::solve_bicgstab()
 {
   TimerOutput::Scope t(timer, "solve_bicgstab");
   pcout << "Solving using SolverBicgstab" << std::endl;
@@ -395,7 +416,8 @@ void Test_Solver_Output::solve_bicgstab()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::solve_tfqmr()
+void
+Test_Solver_Output::solve_tfqmr()
 {
   TimerOutput::Scope t(timer, "solve_tfqmr");
   pcout << "Solving using SolverTFQMR" << std::endl;
@@ -418,7 +440,8 @@ void Test_Solver_Output::solve_tfqmr()
   locally_relevant_solution = completely_distributed_solution;
 }
 
-void Test_Solver_Output::output(unsigned int cycle)
+void
+Test_Solver_Output::output(unsigned int cycle)
 {
   DataOut<2> data_out;
 
@@ -455,7 +478,8 @@ void Test_Solver_Output::output(unsigned int cycle)
     }
 }
 
-void Test_Solver_Output::refine_grid()
+void
+Test_Solver_Output::refine_grid()
 {
   TimerOutput::Scope t(timer, "refine");
 
@@ -472,7 +496,8 @@ void Test_Solver_Output::refine_grid()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   mpi_initlog();

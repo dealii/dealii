@@ -22,7 +22,8 @@ char logname[] = "output";
 #include <deal.II/fe/fe_q_hierarchical.h>
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << std::setprecision (8);
 

@@ -610,7 +610,8 @@ public:
    * a bit field. To avoid implicit conversions to and from integral values,
    * this constructor is marked as explicit.
    */
-  explicit RefinementCase (const std::uint8_t refinement_case);
+  explicit
+  RefinementCase (const std::uint8_t refinement_case);
 
   /**
    * Return the numeric value stored by this class. While the presence of this
@@ -629,13 +630,15 @@ public:
    * Return the union of the refinement flags represented by the current
    * object and the one given as argument.
    */
-  RefinementCase operator | (const RefinementCase &r) const;
+  RefinementCase
+  operator | (const RefinementCase &r) const;
 
   /**
    * Return the intersection of the refinement flags represented by the
    * current object and the one given as argument.
    */
-  RefinementCase operator & (const RefinementCase &r) const;
+  RefinementCase
+  operator & (const RefinementCase &r) const;
 
   /**
    * Return the negation of the refinement flags represented by the current
@@ -644,7 +647,8 @@ public:
    * if the current value is <code>isotropic_refinement</code> then the result
    * will be <code>no_refinement</code>; etc.
    */
-  RefinementCase operator ~ () const;
+  RefinementCase
+  operator ~ () const;
 
 
   /**
@@ -653,20 +657,23 @@ public:
    * <tt>RefinementPossibilities<dim>::cut_x</tt>.
    */
   static
-  RefinementCase cut_axis (const unsigned int i);
+  RefinementCase
+  cut_axis (const unsigned int i);
 
   /**
    * Return the amount of memory occupied by an object of this type.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption ();
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize(Archive &ar,
-                 const unsigned int version);
+  void
+  serialize(Archive &ar,
+            const unsigned int version);
 
   /**
    * Exception.
@@ -991,7 +998,8 @@ namespace internal
     /**
      * Return the amount of memory occupied by an object of this type.
      */
-    static constexpr std::size_t memory_consumption ();
+    static constexpr std::size_t
+    memory_consumption ();
 
     /**
      * Exception.
@@ -1068,7 +1076,8 @@ struct GeometryInfo<0>
    * <tt>ref_case</tt>. Since we are concerned here with points, the number of
    * children is equal to one.
    */
-  static unsigned int n_children(const RefinementCase<0> &refinement_case);
+  static unsigned int
+  n_children(const RefinementCase<0> &refinement_case);
 
   /**
    * Number of vertices a cell has.
@@ -2514,8 +2523,9 @@ RefinementCase<dim>::memory_consumption ()
 template <int dim>
 template <class Archive>
 inline
-void RefinementCase<dim>::serialize (Archive &ar,
-                                     const unsigned int)
+void
+RefinementCase<dim>::serialize (Archive &ar,
+                                const unsigned int)
 {
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t

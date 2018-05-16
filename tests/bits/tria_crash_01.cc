@@ -27,14 +27,16 @@
 
 
 
-bool predicate (const Point<3> &p,
-                const double    diameter)
+bool
+predicate (const Point<3> &p,
+           const double    diameter)
 {
   return ((p[0]-.2)*(p[0]-.2) + (p[2]-p[1]/4)*(p[2]-p[1]/4) < diameter * diameter);
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

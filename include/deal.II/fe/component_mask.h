@@ -113,7 +113,8 @@ public:
   /**
    * Set a particular entry in the mask to a value.
    */
-  void set (const unsigned int index, const bool value);
+  void
+  set (const unsigned int index, const bool value);
 
   /**
    * If this component mask has been initialized with a mask of size greater
@@ -123,7 +124,8 @@ public:
    * object would return true when calling represents_the_all_selected_mask())
    * then return zero since no definite size is known.
    */
-  unsigned int size () const;
+  unsigned int
+  size () const;
 
   /**
    * Return whether a particular component is selected by this mask. If this
@@ -138,7 +140,8 @@ public:
    * Otherwise, the given index needs to be between zero and the number of
    * components that this mask represents.
    */
-  bool operator[] (const unsigned int component_index) const;
+  bool
+  operator[] (const unsigned int component_index) const;
 
   /**
    * Return whether this component mask represents a mask with exactly
@@ -189,23 +192,27 @@ public:
    * Return a component mask that contains the union of the components
    * selected by the current object and the one passed as an argument.
    */
-  ComponentMask operator | (const ComponentMask &mask) const;
+  ComponentMask
+  operator | (const ComponentMask &mask) const;
 
   /**
    * Return a component mask that has only those elements set that are set
    * both in the current object as well as the one passed as an argument.
    */
-  ComponentMask operator & (const ComponentMask &mask) const;
+  ComponentMask
+  operator & (const ComponentMask &mask) const;
 
   /**
    * Return whether this object and the argument are identical.
    */
-  bool operator== (const ComponentMask &mask) const;
+  bool
+  operator== (const ComponentMask &mask) const;
 
   /**
    * Return whether this object and the argument are not identical.
    */
-  bool operator!= (const ComponentMask &mask) const;
+  bool
+  operator!= (const ComponentMask &mask) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -230,8 +237,9 @@ private:
   // make the output operator a friend so it can access
   // the component_mask array
   friend
-  std::ostream &operator << (std::ostream &out,
-                             const ComponentMask &mask);
+  std::ostream &
+  operator << (std::ostream &out,
+               const ComponentMask &mask);
 };
 
 
@@ -245,8 +253,9 @@ private:
  * @param out The stream to write to.
  * @param mask The mask to write. @return A reference to the first argument.
  */
-std::ostream &operator << (std::ostream &out,
-                           const ComponentMask &mask);
+std::ostream &
+operator << (std::ostream &out,
+             const ComponentMask &mask);
 
 
 // -------------------- inline functions ---------------------

@@ -807,7 +807,8 @@ private:
   /**
    * Inhibit automatic assignment operator.
    */
-  ParameterHandler &operator= (const ParameterHandler &) = delete;
+  ParameterHandler &
+  operator= (const ParameterHandler &) = delete;
 
 public:
   /**
@@ -863,7 +864,8 @@ public:
    * safer as we have virtual functions.  It actually does nothing
    * spectacular.
    */
-  virtual ~ParameterHandler () override = default;
+  virtual
+  ~ParameterHandler () override = default;
 
   /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>
@@ -893,9 +895,10 @@ public:
    * occurs, that is everything that comes after the parameter whose
    * value does not satisfy its pattern is ignored.
    */
-  virtual void parse_input (std::istream &input,
-                            const std::string &filename = "input file",
-                            const std::string &last_line = "");
+  virtual void
+  parse_input (std::istream &input,
+               const std::string &filename = "input file",
+               const std::string &last_line = "");
 
   /**
    * Parse the given file to provide values for known parameter fields. The
@@ -940,8 +943,9 @@ public:
    *   }
    * @endcode
    */
-  virtual void parse_input (const std::string &filename,
-                            const std::string &last_line = "");
+  virtual void
+  parse_input (const std::string &filename,
+               const std::string &last_line = "");
 
   /**
    * Parse input from a string to populate known parameter fields. The lines
@@ -951,8 +955,9 @@ public:
    * then calls the other parse_input() function with that stream. See
    * there for more information.
    */
-  virtual void parse_input_from_string (const char *s,
-                                        const std::string &last_line = "");
+  virtual void
+  parse_input_from_string (const char *s,
+                           const std::string &last_line = "");
 
   /**
    * Parse input from an XML stream to populate known parameter fields. This
@@ -961,7 +966,8 @@ public:
    * a file written using this method and then modified by the graphical
    * parameter GUI (see the general documentation of this class).
    */
-  virtual void parse_input_from_xml (std::istream &input);
+  virtual void
+  parse_input_from_xml (std::istream &input);
 
   /**
    * Parse input from a JSON stream to populate known parameter fields. This
@@ -970,12 +976,14 @@ public:
    * a separate program that knows how to write JSON format for ParameterHandler
    * input.
    */
-  virtual void parse_input_from_json (std::istream &input);
+  virtual void
+  parse_input_from_json (std::istream &input);
 
   /**
    * Clear all contents.
    */
-  void clear ();
+  void
+  clear ();
 
 
   /**
@@ -997,10 +1005,11 @@ public:
    * @note An entry can be declared more than once without generating an
    * error, for example to override an earlier default value.
    */
-  void declare_entry (const std::string           &entry,
-                      const std::string           &default_value,
-                      const Patterns::PatternBase &pattern = Patterns::Anything(),
-                      const std::string           &documentation = std::string());
+  void
+  declare_entry (const std::string           &entry,
+                 const std::string           &default_value,
+                 const Patterns::PatternBase &pattern = Patterns::Anything(),
+                 const std::string           &documentation = std::string());
 
   /**
    * Attach an action to the parameter with name @p entry in the current
@@ -1044,8 +1053,9 @@ public:
    *  stops to read any further content from the file. See
    *  ParameterHandler::parse_input() for more information.
    */
-  void add_action (const std::string &entry,
-                   const std::function<void (const std::string &value)> &action);
+  void
+  add_action (const std::string &entry,
+              const std::function<void (const std::string &value)> &action);
 
   /**
    * Declare a new entry name @p entry, set its default value to the content of
@@ -1057,11 +1067,12 @@ public:
    * Patterns::Tools::Convert<T>::to_pattern(), but a custom one can be used.
    */
   template <class ParameterType>
-  void add_parameter(const std::string &entry,
-                     ParameterType &parameter,
-                     const std::string &documentation = std::string(),
-                     const Patterns::PatternBase &pattern =
-                       *Patterns::Tools::Convert<ParameterType>::to_pattern());
+  void
+  add_parameter(const std::string &entry,
+                ParameterType &parameter,
+                const std::string &documentation = std::string(),
+                const Patterns::PatternBase &pattern =
+                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -1106,45 +1117,52 @@ public:
    * (see above) but make it clear that this old name will eventually be
    * removed.
    */
-  void declare_alias (const std::string &existing_entry_name,
-                      const std::string &alias_name,
-                      const bool         alias_is_deprecated = false);
+  void
+  declare_alias (const std::string &existing_entry_name,
+                 const std::string &alias_name,
+                 const bool         alias_is_deprecated = false);
 
   /**
    * Enter a subsection. If it does not yet exist, create it.
    */
-  void enter_subsection (const std::string &subsection);
+  void
+  enter_subsection (const std::string &subsection);
 
   /**
    * Leave present subsection.
    */
-  void leave_subsection ();
+  void
+  leave_subsection ();
 
   /**
    * Return value of entry <tt>entry_string</tt>.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
    * value of an undeclared entry is required, an exception will be thrown.
    */
-  std::string get (const std::string &entry_string) const;
+  std::string
+  get (const std::string &entry_string) const;
 
   /**
    * Return value of entry <tt>entry_string</tt> as <tt>long int</tt>. (A long
    * int is chosen so that even very large unsigned values can be returned by
    * this function).
    */
-  long int       get_integer (const std::string &entry_string) const;
+  long int
+  get_integer (const std::string &entry_string) const;
 
   /**
    * Return value of entry <tt>entry_name</tt> as <tt>double</tt>.
    */
-  double         get_double (const std::string &entry_name) const;
+  double
+  get_double (const std::string &entry_name) const;
 
   /**
    * Return value of entry <tt>entry_name</tt> as <tt>bool</tt>. The entry may
    * be "true" or "yes" for <tt>true</tt>, "false" or "no" for <tt>false</tt>
    * respectively.
    */
-  bool           get_bool (const std::string &entry_name) const;
+  bool
+  get_bool (const std::string &entry_name) const;
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1155,8 +1173,9 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const std::string &new_value);
+  void
+  set (const std::string &entry_name,
+       const std::string &new_value);
 
   /**
    * Same as above, but an overload where the second argument is a character
@@ -1168,8 +1187,9 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const char        *new_value);
+  void
+  set (const std::string &entry_name,
+       const char        *new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1180,8 +1200,9 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const long int    &new_value);
+  void
+  set (const std::string &entry_name,
+       const long int    &new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1196,8 +1217,9 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const double      &new_value);
+  void
+  set (const std::string &entry_name,
+       const double      &new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1208,8 +1230,9 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const bool        &new_value);
+  void
+  set (const std::string &entry_name,
+       const bool        &new_value);
 
 
   /**
@@ -1292,17 +1315,19 @@ public:
    *   outputs information, it is not a <code>const</code> function.
    */
   DEAL_II_DEPRECATED
-  void print_parameters_section (std::ostream       &out,
-                                 const OutputStyle   style,
-                                 const unsigned int  indent_level,
-                                 const bool          include_top_level_elements = false);
+  void
+  print_parameters_section (std::ostream       &out,
+                            const OutputStyle   style,
+                            const unsigned int  indent_level,
+                            const bool          include_top_level_elements = false);
 
   /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
    * file style.
    */
-  void log_parameters (LogStream &out);
+  void
+  log_parameters (LogStream &out);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1313,27 +1338,31 @@ public:
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
-  void log_parameters_section (LogStream &out);
+  void
+  log_parameters_section (LogStream &out);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Write the data of this object to a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void save (Archive &ar, const unsigned int version) const;
+  void
+  save (Archive &ar, const unsigned int version) const;
 
   /**
    * Read the data of this object from a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void load (Archive &ar, const unsigned int version);
+  void
+  load (Archive &ar, const unsigned int version);
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -1505,13 +1534,15 @@ private:
    * This function simply calls collate_path_string() with
    * @p subsection_path as argument
    */
-  std::string get_current_path () const;
+  std::string
+  get_current_path () const;
 
   /**
    * Given the name of an entry as argument, the function computes a full path
    * into the parameter tree using the current subsection.
    */
-  std::string get_current_full_path (const std::string &name) const;
+  std::string
+  get_current_full_path (const std::string &name) const;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
@@ -1525,9 +1556,10 @@ private:
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
    */
-  void scan_line (std::string         line,
-                  const std::string  &input_filename,
-                  const unsigned int  current_line_n);
+  void
+  scan_line (std::string         line,
+             const std::string  &input_filename,
+             const unsigned int  current_line_n);
 
   /**
    * Print out the parameters of the subsection given by the
@@ -1540,10 +1572,11 @@ private:
    * so that subsections properly nest inside the output of higher
    * sections.
    */
-  void recursively_print_parameters (const std::vector<std::string> &target_subsection_path,
-                                     const OutputStyle               style,
-                                     const unsigned int              indent_level,
-                                     std::ostream                   &out) const;
+  void
+  recursively_print_parameters (const std::vector<std::string> &target_subsection_path,
+                                const OutputStyle               style,
+                                const unsigned int              indent_level,
+                                std::ostream                   &out) const;
 
   friend class MultipleParameterLoop;
 };
@@ -1780,18 +1813,21 @@ public:
      * Destructor. It doesn't actually do anything, but is declared to force
      * derived classes to have a virtual destructor.
      */
-    virtual ~UserClass () = default;
+    virtual
+    ~UserClass () = default;
 
     /**
      * <tt>create_new</tt> must provide a clean object, either by creating a
      * new one or by cleaning an old one.
      */
-    virtual void create_new (const unsigned int run_no) = 0;
+    virtual void
+    create_new (const unsigned int run_no) = 0;
 
     /**
      * Get the parameters and run any necessary action.
      */
-    virtual void run (ParameterHandler &prm) = 0;
+    virtual void
+    run (ParameterHandler &prm) = 0;
   };
 
   /**
@@ -1803,7 +1839,8 @@ public:
    * Destructor. Declare this only to have a virtual destructor, which is
    * safer as we have virtual functions. It actually does nothing spectacular.
    */
-  virtual ~MultipleParameterLoop () override = default;
+  virtual
+  ~MultipleParameterLoop () override = default;
 
   /**
    * Read input from a stream until the stream returns the <tt>eof</tt>
@@ -1820,9 +1857,10 @@ public:
    * this class. This is because the other two <tt>parse_input</tt> functions
    * just reformat their inputs and then call this version.
    */
-  virtual void parse_input (std::istream &input,
-                            const std::string &filename = "input file",
-                            const std::string &last_line = "") override;
+  virtual void
+  parse_input (std::istream &input,
+               const std::string &filename = "input file",
+               const std::string &last_line = "") override;
 
   /**
    * Overriding virtual functions which are overloaded (like
@@ -1836,13 +1874,15 @@ public:
   /**
    * run the central loop.
    */
-  void loop (UserClass &uc);
+  void
+  loop (UserClass &uc);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
 
@@ -1886,7 +1926,8 @@ private:
     /**
      * Split the entry value into the different branches.
      */
-    void split_different_values ();
+    void
+    split_different_values ();
 
     /**
      * Path to variant entry.
@@ -1918,7 +1959,8 @@ private:
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
   };
 
   /**
@@ -1935,7 +1977,8 @@ private:
   /**
    * Initialize the different branches, i.e.  construct the combinations.
    */
-  void init_branches ();
+  void
+  init_branches ();
 
   /**
    * Traverse the section currently set by
@@ -1943,12 +1986,14 @@ private:
    * variant or array entries. Then fill the multiple_choices variable using
    * this information.
    */
-  void init_branches_current_section ();
+  void
+  init_branches_current_section ();
 
   /**
    * Transfer the entry values for one run to the entry tree.
    */
-  void fill_entry_values (const unsigned int run_no);
+  void
+  fill_entry_values (const unsigned int run_no);
 };
 
 
@@ -1994,10 +2039,11 @@ ParameterHandler::load (Archive &ar, const unsigned int)
 
 
 template <class ParameterType>
-void ParameterHandler::add_parameter(const std::string &entry,
-                                     ParameterType &parameter,
-                                     const std::string &documentation,
-                                     const Patterns::PatternBase &pattern)
+void
+ParameterHandler::add_parameter(const std::string &entry,
+                                ParameterType &parameter,
+                                const std::string &documentation,
+                                const Patterns::PatternBase &pattern)
 {
 
   static_assert(std::is_const<ParameterType>::value == false,

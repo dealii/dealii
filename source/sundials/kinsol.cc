@@ -53,9 +53,10 @@ namespace SUNDIALS
   namespace
   {
     template<typename VectorType>
-    int t_kinsol_function(N_Vector yy,
-                          N_Vector FF,
-                          void *user_data)
+    int
+    t_kinsol_function(N_Vector yy,
+                      N_Vector FF,
+                      void *user_data)
     {
       KINSOL<VectorType> &solver = *static_cast<KINSOL<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -84,7 +85,8 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_kinsol_setup_jacobian(KINMem kinsol_mem)
+    int
+    t_kinsol_setup_jacobian(KINMem kinsol_mem)
     {
       KINSOL<VectorType> &solver = *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -105,11 +107,12 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_kinsol_solve_jacobian(KINMem kinsol_mem,
-                                N_Vector x,
-                                N_Vector b,
-                                realtype *sJpnorm,
-                                realtype *sFdotJp)
+    int
+    t_kinsol_solve_jacobian(KINMem kinsol_mem,
+                            N_Vector x,
+                            N_Vector b,
+                            realtype *sJpnorm,
+                            realtype *sFdotJp)
     {
       KINSOL<VectorType> &solver = *static_cast<KINSOL<VectorType> *>(kinsol_mem->kin_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -178,7 +181,8 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  unsigned int KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
+  unsigned int
+  KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
     unsigned int system_size = initial_guess_and_solution.size();
 
@@ -337,7 +341,8 @@ namespace SUNDIALS
   }
 
   template<typename VectorType>
-  void KINSOL<VectorType>::set_functions_to_trigger_an_assert()
+  void
+  KINSOL<VectorType>::set_functions_to_trigger_an_assert()
   {
 
     reinit_vector = [](VectorType &)

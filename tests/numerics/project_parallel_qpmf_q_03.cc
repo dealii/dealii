@@ -21,7 +21,8 @@
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>
-void test ()
+void
+test ()
 {
   FE_Q<dim> fe1(1);
   FE_Q<dim> fe2(2);
@@ -31,7 +32,8 @@ void test ()
   test_with_hanging_nodes<2, 6,dim> ({{&fe2,&fe4}}, 2, 0); // take first with non-standard n_q_points_1d
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
                                                        numbers::invalid_unsigned_int);

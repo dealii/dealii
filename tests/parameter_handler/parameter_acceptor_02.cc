@@ -25,12 +25,13 @@ public:
   Test()
   {
     add_parameter("A double", a);
-    add_parameter("An int"  , b);
+    add_parameter("An int", b);
     add_parameter("A string", c);
-    add_parameter("A bool"  , d);
+    add_parameter("A bool", d);
   };
 
-  void log_info()
+  void
+  log_info()
   {
     deallog << "My type: " << boost::core::demangle(typeid(*this).name()) << std::endl
             << "a: " << a << std::endl
@@ -48,7 +49,8 @@ private:
 };
 
 
-int main ()
+int
+main ()
 {
   initlog();
   Test<1> a;

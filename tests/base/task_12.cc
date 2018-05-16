@@ -25,7 +25,8 @@
 
 // return a double, to make sure we correctly identify the return type
 // of the expressions used in new_task(...)
-double test (int i)
+double
+test (int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
   sleep (1);
@@ -37,7 +38,8 @@ double test (int i)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

@@ -36,10 +36,11 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, typename Number, int spacedim>
-void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
-                             const Vector<Number>        &criteria,
-                             const double                 threshold,
-                             const unsigned int           max_to_mark)
+void
+GridRefinement::refine (Triangulation<dim,spacedim> &tria,
+                        const Vector<Number>        &criteria,
+                        const double                 threshold,
+                        const unsigned int           max_to_mark)
 {
   Assert (criteria.size() == tria.n_active_cells(),
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -83,9 +84,10 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
 
 
 template <int dim, typename Number, int spacedim>
-void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
-                              const Vector<Number>        &criteria,
-                              const double                 threshold)
+void
+GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
+                         const Vector<Number>        &criteria,
+                         const double                 threshold)
 {
   Assert (criteria.size() == tria.n_active_cells(),
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));

@@ -24,10 +24,12 @@
 
 
 template <int dim, int spacedim>
-void test ();
+void
+test ();
 
 template <>
-void test<2,2> ()
+void test<2,2>
+()
 {
   const int dim = 2;
   const int spacedim = 2;
@@ -47,7 +49,8 @@ void test<2,2> ()
 
 // version for <1,3>, <2,3>, and <3,3>
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   Triangulation<dim, spacedim> tria;
   Point<spacedim> origin(0.1, 0.2, 0.3);
@@ -72,7 +75,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog ();
 

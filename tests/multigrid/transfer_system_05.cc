@@ -36,7 +36,8 @@ using namespace std;
 
 
 template <int dim>
-void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
+void
+check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -117,7 +118,8 @@ void check (const FiniteElement<dim> &fe, const unsigned int selected_block)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

@@ -34,10 +34,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename, unsigned int degree)
+void
+test(std::string filename, unsigned int degree)
 {
   Triangulation<dim, spacedim> tria;
   FE_Q<dim, spacedim> base_fe(degree);
@@ -84,7 +86,8 @@ void test(std::string filename, unsigned int degree)
 
 }
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

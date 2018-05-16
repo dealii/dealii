@@ -42,10 +42,13 @@ class Local : public Subscriptor
 public:
   typedef MeshWorker::IntegrationInfo<dim> CellInfo;
 
-  void cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void bdry(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
-            CellInfo &info1, CellInfo &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  bdry(MeshWorker::DoFInfo<dim> &dinfo, CellInfo &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1, MeshWorker::DoFInfo<dim> &dinfo2,
+       CellInfo &info1, CellInfo &info2) const;
 
   bool cells;
   bool faces;
@@ -196,7 +199,8 @@ test(const FiniteElement<dim> &fe)
 }
 
 
-int main ()
+int
+main ()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

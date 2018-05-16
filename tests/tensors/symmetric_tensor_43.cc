@@ -23,7 +23,8 @@
 #include<complex>
 
 template <int rank, int dim, typename NumberType>
-void fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
+void
+fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
 {
   for (unsigned int i=0; i!=t.n_independent_components; ++i)
     {
@@ -32,7 +33,8 @@ void fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
 }
 
 template <int dim, int rank, typename NumberType, typename OtherNumberType>
-void test_operators ()
+void
+test_operators ()
 {
   const OtherNumberType s1 = 2.0;
   const OtherNumberType s2 = 0.5;
@@ -62,7 +64,8 @@ void test_operators ()
 }
 
 template <int rank, typename NumberType, typename OtherNumberType>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << 1 << std::endl;
   test_operators<1,rank,NumberType,OtherNumberType> ();
@@ -73,7 +76,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

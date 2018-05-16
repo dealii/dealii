@@ -25,7 +25,8 @@ const double entries[9] = { 11,12,13,21,22,23,31,32,33 };
 
 // Create a positive definite random matrix
 
-void random_matrix(FullMatrix<double> &A)
+void
+random_matrix(FullMatrix<double> &A)
 {
   for (unsigned int i=0; i<A.m(); ++i)
     for (unsigned int j=0; j<A.n(); ++j)

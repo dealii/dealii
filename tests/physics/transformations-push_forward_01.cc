@@ -27,7 +27,8 @@
 using namespace dealii;
 
 template <int dim>
-void test_tensor (const Tensor<2,dim> &F)
+void
+test_tensor (const Tensor<2,dim> &F)
 {
   // Rank-1 Tensors
   {
@@ -124,7 +125,8 @@ void test_tensor (const Tensor<2,dim> &F)
 }
 
 template <int dim>
-void test_symmetric_tensor (const Tensor<2,dim> &F)
+void
+test_symmetric_tensor (const Tensor<2,dim> &F)
 {
   // Rank-2 Symmetric tensors
   {
@@ -216,7 +218,8 @@ void test_symmetric_tensor (const Tensor<2,dim> &F)
 }
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // Test with unit tensor
   test_tensor<dim>(unit_symmetric_tensor<dim>());
@@ -235,7 +238,8 @@ void test ()
   test_symmetric_tensor<dim>(F);
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
 

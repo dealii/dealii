@@ -28,7 +28,8 @@ using namespace dealii;
 
 
 template <int dim>
-void test_vertices()
+void
+test_vertices()
 {
   deallog << dim << "D:" << std::endl;
 
@@ -59,7 +60,8 @@ void test_vertices()
 
 
 template <int dim>
-void test_lines()
+void
+test_lines()
 {
   deallog << dim << "D:" << std::endl;
 
@@ -89,7 +91,8 @@ void test_lines()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

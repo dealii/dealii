@@ -20,7 +20,8 @@
 
 #include <array>
 
-int main()
+int
+main()
 {
   initlog();
 

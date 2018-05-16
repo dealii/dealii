@@ -476,21 +476,23 @@ public:
    * initialization function with several DoFHandler arguments.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>     &mapping,
-               const DoFHandlerType   &dof_handler,
-               const ConstraintMatrix &constraint,
-               const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData());
+  void
+  reinit (const Mapping<dim>     &mapping,
+          const DoFHandlerType   &dof_handler,
+          const ConstraintMatrix &constraint,
+          const QuadratureType   &quad,
+          const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but using a $Q_1$
    * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const DoFHandlerType   &dof_handler,
-               const ConstraintMatrix &constraint,
-               const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData());
+  void
+  reinit (const DoFHandlerType   &dof_handler,
+          const ConstraintMatrix &constraint,
+          const QuadratureType   &quad,
+          const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Same as above.
@@ -501,12 +503,13 @@ public:
    */
   template <typename DoFHandlerType, typename QuadratureType>
   DEAL_II_DEPRECATED
-  void reinit (const Mapping<dim>     &mapping,
-               const DoFHandlerType   &dof_handler,
-               const ConstraintMatrix &constraint,
-               const IndexSet         &locally_owned_dofs,
-               const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData());
+  void
+  reinit (const Mapping<dim>     &mapping,
+          const DoFHandlerType   &dof_handler,
+          const ConstraintMatrix &constraint,
+          const IndexSet         &locally_owned_dofs,
+          const QuadratureType   &quad,
+          const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Extracts the information needed to perform loops over cells. The
@@ -529,21 +532,23 @@ public:
    * elements are always integrated with the same quadrature formula.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>                          &mapping,
-               const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<QuadratureType>           &quad,
-               const AdditionalData                         additional_data = AdditionalData());
+  void
+  reinit (const Mapping<dim>                          &mapping,
+          const std::vector<const DoFHandlerType *>   &dof_handler,
+          const std::vector<const ConstraintMatrix *> &constraint,
+          const std::vector<QuadratureType>           &quad,
+          const AdditionalData                         additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<QuadratureType>           &quad,
-               const AdditionalData                         additional_data = AdditionalData());
+  void
+  reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
+          const std::vector<const ConstraintMatrix *> &constraint,
+          const std::vector<QuadratureType>           &quad,
+          const AdditionalData                         additional_data = AdditionalData());
 
   /**
    * Same as above.
@@ -554,12 +559,13 @@ public:
    */
   template <typename DoFHandlerType, typename QuadratureType>
   DEAL_II_DEPRECATED
-  void reinit (const Mapping<dim>                          &mapping,
-               const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const std::vector<IndexSet>                 &locally_owned_set,
-               const std::vector<QuadratureType>           &quad,
-               const AdditionalData                        additional_data = AdditionalData());
+  void
+  reinit (const Mapping<dim>                          &mapping,
+          const std::vector<const DoFHandlerType *>   &dof_handler,
+          const std::vector<const ConstraintMatrix *> &constraint,
+          const std::vector<IndexSet>                 &locally_owned_set,
+          const std::vector<QuadratureType>           &quad,
+          const AdditionalData                        additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as before, but now the index set
@@ -569,34 +575,38 @@ public:
    * are integrated together based on the same quadrature formula.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const Mapping<dim>                          &mapping,
-               const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const QuadratureType                        &quad,
-               const AdditionalData                         additional_data = AdditionalData());
+  void
+  reinit (const Mapping<dim>                          &mapping,
+          const std::vector<const DoFHandlerType *>   &dof_handler,
+          const std::vector<const ConstraintMatrix *> &constraint,
+          const QuadratureType                        &quad,
+          const AdditionalData                         additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as above, but  using a $Q_1$
    * mapping.
    */
   template <typename DoFHandlerType, typename QuadratureType>
-  void reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
-               const std::vector<const ConstraintMatrix *> &constraint,
-               const QuadratureType                        &quad,
-               const AdditionalData                         additional_data = AdditionalData());
+  void
+  reinit (const std::vector<const DoFHandlerType *>   &dof_handler,
+          const std::vector<const ConstraintMatrix *> &constraint,
+          const QuadratureType                        &quad,
+          const AdditionalData                         additional_data = AdditionalData());
 
   /**
    * Copy function. Creates a deep copy of all data structures. It is usually
    * enough to keep the data for different operations once, so this function
    * should not be needed very often.
    */
-  void copy_from (const MatrixFree<dim,Number> &matrix_free_base);
+  void
+  copy_from (const MatrixFree<dim,Number> &matrix_free_base);
 
   /**
    * Clear all data fields and brings the class into a condition similar to
    * after having called the default constructor.
    */
-  void clear();
+  void
+  clear();
 
   //@}
 
@@ -695,14 +705,15 @@ public:
    * possible.
    */
   template <typename OutVector, typename InVector>
-  void cell_loop (const std::function<void (const MatrixFree<dim,Number> &,
-                                            OutVector &,
-                                            const InVector &,
-                                            const std::pair<unsigned int,
-                                            unsigned int> &)> &cell_operation,
-                  OutVector      &dst,
-                  const InVector &src,
-                  const bool      zero_dst_vector = false) const;
+  void
+  cell_loop (const std::function<void (const MatrixFree<dim,Number> &,
+                                       OutVector &,
+                                       const InVector &,
+                                       const std::pair<unsigned int,
+                                       unsigned int> &)> &cell_operation,
+             OutVector      &dst,
+             const InVector &src,
+             const bool      zero_dst_vector = false) const;
 
   /**
    * This is the second variant to run the loop over all cells, now providing
@@ -746,29 +757,31 @@ public:
    * possible.
    */
   template <typename CLASS, typename OutVector, typename InVector>
-  void cell_loop (void (CLASS::*cell_operation)(const MatrixFree &,
-                                                OutVector &,
-                                                const InVector &,
-                                                const std::pair<unsigned int,
-                                                unsigned int> &)const,
-                  const CLASS    *owning_class,
-                  OutVector      &dst,
-                  const InVector &src,
-                  const bool      zero_dst_vector = false) const;
+  void
+  cell_loop (void (CLASS::*cell_operation)(const MatrixFree &,
+                                           OutVector &,
+                                           const InVector &,
+                                           const std::pair<unsigned int,
+                                           unsigned int> &)const,
+             const CLASS    *owning_class,
+             OutVector      &dst,
+             const InVector &src,
+             const bool      zero_dst_vector = false) const;
 
   /**
    * Same as above, but for class member functions which are non-const.
    */
   template <typename CLASS, typename OutVector, typename InVector>
-  void cell_loop (void (CLASS::*cell_operation)(const MatrixFree &,
-                                                OutVector &,
-                                                const InVector &,
-                                                const std::pair<unsigned int,
-                                                unsigned int> &),
-                  CLASS          *owning_class,
-                  OutVector      &dst,
-                  const InVector &src,
-                  const bool      zero_dst_vector = false) const;
+  void
+  cell_loop (void (CLASS::*cell_operation)(const MatrixFree &,
+                                           OutVector &,
+                                           const InVector &,
+                                           const std::pair<unsigned int,
+                                           unsigned int> &),
+             CLASS          *owning_class,
+             OutVector      &dst,
+             const InVector &src,
+             const bool      zero_dst_vector = false) const;
 
   /**
    * This method runs a loop over all cells (in parallel) and performs the MPI
@@ -846,26 +859,27 @@ public:
    * in analogy to `dst_vector_face_access`.
    */
   template <typename OutVector, typename InVector>
-  void loop (const std::function<void (const MatrixFree<dim,Number> &,
-                                       OutVector &,
-                                       const InVector &,
-                                       const std::pair<unsigned int,
-                                       unsigned int> &)> &cell_operation,
-             const std::function<void (const MatrixFree<dim,Number> &,
-                                       OutVector &,
-                                       const InVector &,
-                                       const std::pair<unsigned int,
-                                       unsigned int> &)> &face_operation,
-             const std::function<void (const MatrixFree<dim,Number> &,
-                                       OutVector &,
-                                       const InVector &,
-                                       const std::pair<unsigned int,
-                                       unsigned int> &)> &boundary_operation,
-             OutVector      &dst,
-             const InVector &src,
-             const bool      zero_dst_vector = false,
-             const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
-             const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
+  void
+  loop (const std::function<void (const MatrixFree<dim,Number> &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int,
+                                  unsigned int> &)> &cell_operation,
+        const std::function<void (const MatrixFree<dim,Number> &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int,
+                                  unsigned int> &)> &face_operation,
+        const std::function<void (const MatrixFree<dim,Number> &,
+                                  OutVector &,
+                                  const InVector &,
+                                  const std::pair<unsigned int,
+                                  unsigned int> &)> &boundary_operation,
+        OutVector      &dst,
+        const InVector &src,
+        const bool      zero_dst_vector = false,
+        const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
+        const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
 
   /**
    * This is the second variant to run the loop over all cells, interior
@@ -952,53 +966,55 @@ public:
    * in analogy to `dst_vector_face_access`.
    */
   template <typename CLASS, typename OutVector, typename InVector>
-  void loop (void (CLASS::*cell_operation)(const MatrixFree &,
-                                           OutVector &,
-                                           const InVector &,
-                                           const std::pair<unsigned int,
-                                           unsigned int> &)const,
-             void (CLASS::*face_operation)(const MatrixFree &,
-                                           OutVector &,
-                                           const InVector &,
-                                           const std::pair<unsigned int,
-                                           unsigned int> &)const,
-             void (CLASS::*boundary_operation)(const MatrixFree &,
-                                               OutVector &,
-                                               const InVector &,
-                                               const std::pair<unsigned int,
-                                               unsigned int> &)const,
-             const CLASS    *owning_class,
-             OutVector      &dst,
-             const InVector &src,
-             const bool      zero_dst_vector = false,
-             const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
-             const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
+  void
+  loop (void (CLASS::*cell_operation)(const MatrixFree &,
+                                      OutVector &,
+                                      const InVector &,
+                                      const std::pair<unsigned int,
+                                      unsigned int> &)const,
+        void (CLASS::*face_operation)(const MatrixFree &,
+                                      OutVector &,
+                                      const InVector &,
+                                      const std::pair<unsigned int,
+                                      unsigned int> &)const,
+        void (CLASS::*boundary_operation)(const MatrixFree &,
+                                          OutVector &,
+                                          const InVector &,
+                                          const std::pair<unsigned int,
+                                          unsigned int> &)const,
+        const CLASS    *owning_class,
+        OutVector      &dst,
+        const InVector &src,
+        const bool      zero_dst_vector = false,
+        const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
+        const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
 
   /**
    * Same as above, but for class member functions which are non-const.
    */
   template <typename CLASS, typename OutVector, typename InVector>
-  void loop (void (CLASS::*cell_operation)(const MatrixFree &,
-                                           OutVector &,
-                                           const InVector &,
-                                           const std::pair<unsigned int,
-                                           unsigned int> &),
-             void (CLASS::*face_operation)(const MatrixFree &,
-                                           OutVector &,
-                                           const InVector &,
-                                           const std::pair<unsigned int,
-                                           unsigned int> &),
-             void (CLASS::*boundary_operation)(const MatrixFree &,
-                                               OutVector &,
-                                               const InVector &,
-                                               const std::pair<unsigned int,
-                                               unsigned int> &),
-             CLASS          *owning_class,
-             OutVector      &dst,
-             const InVector &src,
-             const bool      zero_dst_vector = false,
-             const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
-             const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
+  void
+  loop (void (CLASS::*cell_operation)(const MatrixFree &,
+                                      OutVector &,
+                                      const InVector &,
+                                      const std::pair<unsigned int,
+                                      unsigned int> &),
+        void (CLASS::*face_operation)(const MatrixFree &,
+                                      OutVector &,
+                                      const InVector &,
+                                      const std::pair<unsigned int,
+                                      unsigned int> &),
+        void (CLASS::*boundary_operation)(const MatrixFree &,
+                                          OutVector &,
+                                          const InVector &,
+                                          const std::pair<unsigned int,
+                                          unsigned int> &),
+        CLASS          *owning_class,
+        OutVector      &dst,
+        const InVector &src,
+        const bool      zero_dst_vector = false,
+        const DataAccessOnFaces dst_vector_face_access = DataAccessOnFaces::unspecified,
+        const DataAccessOnFaces src_vector_face_access = DataAccessOnFaces::unspecified) const;
 
   /**
    * In the hp adaptive case, a subrange of cells as computed during the cell
@@ -1050,8 +1066,9 @@ public:
    * around which impacts the performance.
    */
   template <typename VectorType>
-  void initialize_dof_vector(VectorType &vec,
-                             const unsigned int dof_handler_index=0) const;
+  void
+  initialize_dof_vector(VectorType &vec,
+                        const unsigned int dof_handler_index=0) const;
 
   /**
    * Initialize function for a distributed vector. The length of the vector is
@@ -1074,8 +1091,9 @@ public:
    * around which impacts the performance.
    */
   template <typename Number2>
-  void initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
-                             const unsigned int dof_handler_index=0) const;
+  void
+  initialize_dof_vector(LinearAlgebra::distributed::Vector<Number2> &vec,
+                        const unsigned int dof_handler_index=0) const;
 
   /**
    * Return the partitioner that represents the locally owned data and the
@@ -1124,8 +1142,9 @@ public:
    * that if a DoFHandler calls DoFHandler::renumber_dofs, all information in
    * MatrixFree becomes invalid.
    */
-  void renumber_dofs (std::vector<types::global_dof_index> &renumbering,
-                      const unsigned int dof_handler_index=0);
+  void
+  renumber_dofs (std::vector<types::global_dof_index> &renumbering,
+                 const unsigned int dof_handler_index=0);
 
   //@}
 
@@ -1138,18 +1157,21 @@ public:
    */
   template <int spacedim>
   static
-  bool is_supported (const FiniteElement<dim, spacedim> &fe);
+  bool
+  is_supported (const FiniteElement<dim, spacedim> &fe);
 
   /**
    * Return the number of different DoFHandlers specified at initialization.
    */
-  unsigned int n_components () const;
+  unsigned int
+  n_components () const;
 
   /**
    * For the finite element underlying the DoFHandler specified by @p
    * dof_handler_index, return the number of base elements.
    */
-  unsigned int n_base_elements (const unsigned int dof_handler_index) const;
+  unsigned int
+  n_base_elements (const unsigned int dof_handler_index) const;
 
   /**
    * Return the number of cells this structure is based on. If you are using a
@@ -1158,7 +1180,8 @@ public:
    * on this number but rather on n_cell_batches() which gives the number of
    * cells as seen when lumping several cells together with vectorization.
    */
-  unsigned int n_physical_cells () const;
+  unsigned int
+  n_physical_cells () const;
 
   /**
    * Return the number of cell batches that this structure works on.  The
@@ -1169,7 +1192,8 @@ public:
    * `n_physical_cells()/VectorizedArray::n_array_elements` (depending on how
    * many cell chunks that do not get filled up completely).
    */
-  unsigned int n_macro_cells () const;
+  unsigned int
+  n_macro_cells () const;
 
   /**
    * Return the number of cell batches that this structure works on. The
@@ -1180,7 +1204,8 @@ public:
    * approximately `n_physical_cells()/VectorizedArray::n_array_elements`
    * (depending on how many cell chunks that do not get filled up completely).
    */
-  unsigned int n_cell_batches () const;
+  unsigned int
+  n_cell_batches () const;
 
   /**
    * Return the number of additional cell batches that this structure keeps
@@ -1188,7 +1213,8 @@ public:
    * triangulation are kept in this data structure, but only the ones which
    * are necessary for evaluating face integrals from both sides.
    */
-  unsigned int n_ghost_cell_batches () const;
+  unsigned int
+  n_ghost_cell_batches () const;
 
   /**
    * Return the number of interior face batches that this structure works on.
@@ -1197,7 +1223,8 @@ public:
    * n_inner_face_batches() (exclusive), so this is the appropriate size if
    * you want to store arrays of data for all interior faces to be worked on.
    */
-  unsigned int n_inner_face_batches () const;
+  unsigned int
+  n_inner_face_batches () const;
 
   /**
    * Return the number of boundary face batches that this structure works on.
@@ -1207,13 +1234,15 @@ public:
    * need to store arrays that hold data for all boundary faces but not the
    * interior ones, this number gives the appropriate size.
    */
-  unsigned int n_boundary_face_batches () const;
+  unsigned int
+  n_boundary_face_batches () const;
 
   /**
    * Return the number of faces that are not processed locally but belong to
    * locally owned faces.
    */
-  unsigned int n_ghost_inner_face_batches() const;
+  unsigned int
+  n_ghost_inner_face_batches() const;
 
   /**
    * In order to apply different operators to different parts of the boundary,
@@ -1221,7 +1250,8 @@ public:
    * faces' own sorting by lanes in a VectorizedArray. Only valid for an index
    * indicating a boundary face.
    */
-  types::boundary_id get_boundary_id (const unsigned int macro_face) const;
+  types::boundary_id
+  get_boundary_id (const unsigned int macro_face) const;
 
   /**
    * Return the boundary ids for the faces within a cell, using the cells'
@@ -1367,7 +1397,8 @@ public:
    * AdditionalData::cell_vectorization_category for non-hp DoFHandler types
    * and return the active FE index in the hp-adaptive case.
    */
-  unsigned int get_cell_category (const unsigned int macro_cell) const;
+  unsigned int
+  get_cell_category (const unsigned int macro_cell) const;
 
   /**
    * Return the category on the cells on the two sides of the current batch of
@@ -1379,33 +1410,38 @@ public:
   /**
    * Queries whether or not the indexation has been set.
    */
-  bool indices_initialized () const;
+  bool
+  indices_initialized () const;
 
   /**
    * Queries whether or not the geometry-related information for the cells has
    * been set.
    */
 
-  bool mapping_initialized () const;
+  bool
+  mapping_initialized () const;
 
   /**
    * Return an approximation of the memory consumption of this class in
    * bytes.
    */
-  std::size_t memory_consumption() const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Prints a detailed summary of memory consumption in the different
    * structures of this class to the given output stream.
    */
   template <typename StreamType>
-  void print_memory_consumption(StreamType &out) const;
+  void
+  print_memory_consumption(StreamType &out) const;
 
   /**
    * Prints a summary of this class to the given output stream. It is focused
    * on the indices, and does not print all the data stored.
    */
-  void print (std::ostream &out) const;
+  void
+  print (std::ostream &out) const;
 
   //@}
 
@@ -1441,7 +1477,8 @@ public:
   /**
    * Return the number of weights in the constraint pool.
    */
-  unsigned int n_constraint_pool_entries() const;
+  unsigned int
+  n_constraint_pool_entries() const;
 
   /**
    * Return a pointer to the first number in the constraint pool data with
@@ -1487,12 +1524,14 @@ public:
    * local contributions of WorkStream, see
    * @ref workstream_paper "the WorkStream paper".
    */
-  AlignedVector<VectorizedArray<Number> > *acquire_scratch_data() const;
+  AlignedVector<VectorizedArray<Number> > *
+  acquire_scratch_data() const;
 
   /**
    * Makes the object of the scratchpad available again.
    */
-  void release_scratch_data(const AlignedVector<VectorizedArray<Number> > *memory) const;
+  void
+  release_scratch_data(const AlignedVector<VectorizedArray<Number> > *memory) const;
 
   /**
    * Obtains a scratch data object for internal use. Make sure to release it
@@ -1503,12 +1542,14 @@ public:
    * that the thread releasing the scratch data can be different than the one
    * that acquired it.
    */
-  AlignedVector<Number> *acquire_scratch_data_non_threadsafe() const;
+  AlignedVector<Number> *
+  acquire_scratch_data_non_threadsafe() const;
 
   /**
    * Makes the object of the scratch data available again.
    */
-  void release_scratch_data_non_threadsafe(const AlignedVector<Number> *memory) const;
+  void
+  release_scratch_data_non_threadsafe(const AlignedVector<Number> *memory) const;
 
   //@}
 
@@ -1518,22 +1559,24 @@ private:
    * This is the actual reinit function that sets up the indices for the
    * DoFHandler case.
    */
-  void internal_reinit (const Mapping<dim>                &mapping,
-                        const std::vector<const DoFHandler<dim> *> &dof_handler,
-                        const std::vector<const ConstraintMatrix *> &constraint,
-                        const std::vector<IndexSet>       &locally_owned_set,
-                        const std::vector<hp::QCollection<1> > &quad,
-                        const AdditionalData              &additional_data);
+  void
+  internal_reinit (const Mapping<dim>                &mapping,
+                   const std::vector<const DoFHandler<dim> *> &dof_handler,
+                   const std::vector<const ConstraintMatrix *> &constraint,
+                   const std::vector<IndexSet>       &locally_owned_set,
+                   const std::vector<hp::QCollection<1> > &quad,
+                   const AdditionalData              &additional_data);
 
   /**
    * Same as before but for hp::DoFHandler instead of generic DoFHandler type.
    */
-  void internal_reinit (const Mapping<dim>               &mapping,
-                        const std::vector<const hp::DoFHandler<dim>*> &dof_handler,
-                        const std::vector<const ConstraintMatrix *> &constraint,
-                        const std::vector<IndexSet>      &locally_owned_set,
-                        const std::vector<hp::QCollection<1> > &quad,
-                        const AdditionalData             &additional_data);
+  void
+  internal_reinit (const Mapping<dim>               &mapping,
+                   const std::vector<const hp::DoFHandler<dim>*> &dof_handler,
+                   const std::vector<const ConstraintMatrix *> &constraint,
+                   const std::vector<IndexSet>      &locally_owned_set,
+                   const std::vector<hp::QCollection<1> > &quad,
+                   const AdditionalData             &additional_data);
 
   /**
    * Initializes the fields in DoFInfo together with the constraint pool that
@@ -1549,20 +1592,23 @@ private:
   /**
    * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
    */
-  void initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handlers,
-                                const AdditionalData &additional_data);
+  void
+  initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handlers,
+                           const AdditionalData &additional_data);
 
   /**
    * Initializes the DoFHandlers based on a hp::DoFHandler<dim> argument.
    */
-  void initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_handlers,
-                                const AdditionalData &additional_data);
+  void
+  initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_handlers,
+                           const AdditionalData &additional_data);
 
   /**
    * Setup connectivity graph with information on the dependencies between
    * block due to shared faces.
    */
-  void make_connectivity_graph_faces (DynamicSparsityPattern &connectivity);
+  void
+  make_connectivity_graph_faces (DynamicSparsityPattern &connectivity);
 
   /**
    * This struct defines which DoFHandler has actually been given at
@@ -2539,8 +2585,9 @@ namespace internal
 #endif
     }
 
-    unsigned int find_vector_in_mf (const LinearAlgebra::distributed::Vector<Number> &vec,
-                                    const bool check_global_compatibility = true) const
+    unsigned int
+    find_vector_in_mf (const LinearAlgebra::distributed::Vector<Number> &vec,
+                       const bool check_global_compatibility = true) const
     {
       unsigned int mf_component = numbers::invalid_unsigned_int;
       (void)check_global_compatibility;
@@ -2572,8 +2619,9 @@ namespace internal
         return *matrix_free.get_dof_info(mf_component).vector_partitioner_face_variants[2];
     }
 
-    void update_ghost_values_start(const unsigned int component_in_block_vector,
-                                   const LinearAlgebra::distributed::Vector<Number> &vec)
+    void
+    update_ghost_values_start(const unsigned int component_in_block_vector,
+                              const LinearAlgebra::distributed::Vector<Number> &vec)
     {
       (void)component_in_block_vector;
       bool ghosts_set = vec.has_ghost_elements();
@@ -2614,8 +2662,9 @@ namespace internal
         }
     }
 
-    void update_ghost_values_finish (const unsigned int component_in_block_vector,
-                                     const LinearAlgebra::distributed::Vector<Number> &vec)
+    void
+    update_ghost_values_finish (const unsigned int component_in_block_vector,
+                                const LinearAlgebra::distributed::Vector<Number> &vec)
     {
       (void)component_in_block_vector;
       if (vector_face_access == dealii::MatrixFree<dim,Number>::DataAccessOnFaces::unspecified ||
@@ -2651,8 +2700,9 @@ namespace internal
         }
     }
 
-    void compress_start(const unsigned int component_in_block_vector,
-                        LinearAlgebra::distributed::Vector<Number> &vec)
+    void
+    compress_start(const unsigned int component_in_block_vector,
+                   LinearAlgebra::distributed::Vector<Number> &vec)
     {
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
@@ -2690,8 +2740,9 @@ namespace internal
         }
     }
 
-    void compress_finish (const unsigned int component_in_block_vector,
-                          LinearAlgebra::distributed::Vector<Number> &vec)
+    void
+    compress_finish (const unsigned int component_in_block_vector,
+                     LinearAlgebra::distributed::Vector<Number> &vec)
     {
       (void)component_in_block_vector;
       if (vector_face_access == dealii::MatrixFree<dim,Number>::DataAccessOnFaces::unspecified ||
@@ -2730,7 +2781,8 @@ namespace internal
         }
     }
 
-    void reset_ghost_values(const LinearAlgebra::distributed::Vector<Number> &vec) const
+    void
+    reset_ghost_values(const LinearAlgebra::distributed::Vector<Number> &vec) const
     {
       if (ghosts_were_set == true)
         return;
@@ -2763,8 +2815,9 @@ namespace internal
         }
     }
 
-    void zero_vector_region(const unsigned int range_index,
-                            LinearAlgebra::distributed::Vector<Number> &vec) const
+    void
+    zero_vector_region(const unsigned int range_index,
+                       LinearAlgebra::distributed::Vector<Number> &vec) const
     {
       if (range_index == numbers::invalid_unsigned_int)
         vec = Number();
@@ -2803,11 +2856,13 @@ namespace internal
   };
 
   template <typename VectorStruct>
-  unsigned int n_components (const VectorStruct &vec);
+  unsigned int
+  n_components (const VectorStruct &vec);
 
   template <typename VectorStruct>
-  unsigned int n_components_block (const VectorStruct &vec,
-                                   std::integral_constant<bool,true>)
+  unsigned int
+  n_components_block (const VectorStruct &vec,
+                      std::integral_constant<bool,true>)
   {
     unsigned int components = 0;
     for (unsigned int bl=0; bl<vec.n_blocks(); ++bl)
@@ -2816,21 +2871,24 @@ namespace internal
   }
 
   template <typename VectorStruct>
-  unsigned int n_components_block (const VectorStruct &,
-                                   std::integral_constant<bool,false>)
+  unsigned int
+  n_components_block (const VectorStruct &,
+                      std::integral_constant<bool,false>)
   {
     return 1;
   }
 
   template <typename VectorStruct>
-  unsigned int n_components (const VectorStruct &vec)
+  unsigned int
+  n_components (const VectorStruct &vec)
   {
     return n_components_block(vec, std::integral_constant<bool,IsBlockVector<VectorStruct>::value>());
   }
 
   template <typename VectorStruct>
   inline
-  unsigned int n_components (const std::vector<VectorStruct> &vec)
+  unsigned int
+  n_components (const std::vector<VectorStruct> &vec)
   {
     unsigned int components = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -2840,7 +2898,8 @@ namespace internal
 
   template <typename VectorStruct>
   inline
-  unsigned int n_components (const std::vector<VectorStruct *> &vec)
+  unsigned int
+  n_components (const std::vector<VectorStruct *> &vec)
   {
     unsigned int components = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -2849,69 +2908,81 @@ namespace internal
   }
 
   template <int dim, typename VectorStruct, typename Number>
-  void update_ghost_values_start_block (const VectorStruct &vec,
-                                        const unsigned int channel,
-                                        std::integral_constant<bool,true>,
-                                        VectorDataExchange<dim,Number> &exchanger);
+  void
+  update_ghost_values_start_block (const VectorStruct &vec,
+                                   const unsigned int channel,
+                                   std::integral_constant<bool,true>,
+                                   VectorDataExchange<dim,Number> &exchanger);
   template <int dim, typename VectorStruct, typename Number>
-  void reset_ghost_values_block (const VectorStruct &vec,
-                                 std::integral_constant<bool,true>,
-                                 VectorDataExchange<dim,Number> &exchanger);
+  void
+  reset_ghost_values_block (const VectorStruct &vec,
+                            std::integral_constant<bool,true>,
+                            VectorDataExchange<dim,Number> &exchanger);
   template <int dim, typename VectorStruct, typename Number>
-  void update_ghost_values_finish_block (const VectorStruct &vec,
-                                         const unsigned int channel,
-                                         std::integral_constant<bool,true>,
-                                         VectorDataExchange<dim,Number> &exchanger);
+  void
+  update_ghost_values_finish_block (const VectorStruct &vec,
+                                    const unsigned int channel,
+                                    std::integral_constant<bool,true>,
+                                    VectorDataExchange<dim,Number> &exchanger);
   template <int dim, typename VectorStruct, typename Number>
-  void compress_start_block (const VectorStruct &vec,
-                             const unsigned int channel,
-                             std::integral_constant<bool,true>,
-                             VectorDataExchange<dim,Number> &exchanger);
+  void
+  compress_start_block (const VectorStruct &vec,
+                        const unsigned int channel,
+                        std::integral_constant<bool,true>,
+                        VectorDataExchange<dim,Number> &exchanger);
   template <int dim, typename VectorStruct, typename Number>
-  void compress_finish_block (const VectorStruct &vec,
-                              const unsigned int channel,
-                              std::integral_constant<bool,true>,
-                              VectorDataExchange<dim,Number> &exchanger);
+  void
+  compress_finish_block (const VectorStruct &vec,
+                         const unsigned int channel,
+                         std::integral_constant<bool,true>,
+                         VectorDataExchange<dim,Number> &exchanger);
   template <int dim, typename VectorStruct, typename Number>
-  void zero_vector_region_block (const unsigned int range_index,
-                                 VectorStruct &,
-                                 std::integral_constant<bool,true>,
-                                 VectorDataExchange<dim,Number> &);
+  void
+  zero_vector_region_block (const unsigned int range_index,
+                            VectorStruct &,
+                            std::integral_constant<bool,true>,
+                            VectorDataExchange<dim,Number> &);
 
   template <int dim, typename VectorStruct, typename Number>
-  void update_ghost_values_start_block (const VectorStruct &,
-                                        const unsigned int,
-                                        std::integral_constant<bool,false>,
-                                        VectorDataExchange<dim,Number> &)
+  void
+  update_ghost_values_start_block (const VectorStruct &,
+                                   const unsigned int,
+                                   std::integral_constant<bool,false>,
+                                   VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
-  void reset_ghost_values_block (const VectorStruct &,
-                                 std::integral_constant<bool,false>,
-                                 VectorDataExchange<dim,Number> &)
+  void
+  reset_ghost_values_block (const VectorStruct &,
+                            std::integral_constant<bool,false>,
+                            VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
-  void update_ghost_values_finish_block (const VectorStruct &,
-                                         const unsigned int,
-                                         std::integral_constant<bool,false>,
-                                         VectorDataExchange<dim,Number> &)
+  void
+  update_ghost_values_finish_block (const VectorStruct &,
+                                    const unsigned int,
+                                    std::integral_constant<bool,false>,
+                                    VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
-  void compress_start_block (const VectorStruct &,
-                             const unsigned int,
-                             std::integral_constant<bool,false>,
-                             VectorDataExchange<dim,Number> &)
+  void
+  compress_start_block (const VectorStruct &,
+                        const unsigned int,
+                        std::integral_constant<bool,false>,
+                        VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
-  void compress_finish_block (const VectorStruct &,
-                              const unsigned int,
-                              std::integral_constant<bool,false>,
-                              VectorDataExchange<dim,Number> &)
+  void
+  compress_finish_block (const VectorStruct &,
+                         const unsigned int,
+                         std::integral_constant<bool,false>,
+                         VectorDataExchange<dim,Number> &)
   {}
   template <int dim, typename VectorStruct, typename Number>
-  void zero_vector_region_block (const unsigned int range_index,
-                                 VectorStruct &vec,
-                                 std::integral_constant<bool,false>,
-                                 VectorDataExchange<dim,Number> &)
+  void
+  zero_vector_region_block (const unsigned int range_index,
+                            VectorStruct &vec,
+                            std::integral_constant<bool,false>,
+                            VectorDataExchange<dim,Number> &)
   {
     if (range_index == 0 || range_index == numbers::invalid_unsigned_int)
       vec = 0;
@@ -2921,9 +2992,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_start (const VectorStruct &vec,
-                                  VectorDataExchange<dim,Number> &exchanger,
-                                  const unsigned int channel = 0)
+  void
+  update_ghost_values_start (const VectorStruct &vec,
+                             VectorDataExchange<dim,Number> &exchanger,
+                             const unsigned int channel = 0)
   {
     update_ghost_values_start_block(vec, channel,
                                     std::integral_constant<bool,
@@ -2935,9 +3007,10 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void update_ghost_values_start (const LinearAlgebra::distributed::Vector<Number> &vec,
-                                  VectorDataExchange<dim,Number2> &exchanger,
-                                  const unsigned int channel = 0)
+  void
+  update_ghost_values_start (const LinearAlgebra::distributed::Vector<Number> &vec,
+                             VectorDataExchange<dim,Number2> &exchanger,
+                             const unsigned int channel = 0)
   {
     exchanger.update_ghost_values_start(channel, vec);
   }
@@ -2946,8 +3019,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct> &vec,
-                                  VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_start (const std::vector<VectorStruct> &vec,
+                             VectorDataExchange<dim,Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -2961,8 +3035,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct *> &vec,
-                                  VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_start (const std::vector<VectorStruct *> &vec,
+                             VectorDataExchange<dim,Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -2976,10 +3051,11 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_start_block (const VectorStruct &vec,
-                                        const unsigned int channel,
-                                        std::integral_constant<bool,true>,
-                                        VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_start_block (const VectorStruct &vec,
+                                   const unsigned int channel,
+                                   std::integral_constant<bool,true>,
+                                   VectorDataExchange<dim,Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       update_ghost_values_start(vec.block(i), exchanger, channel+i);
@@ -2992,8 +3068,9 @@ namespace internal
   // with ghosts all the time
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void reset_ghost_values (const VectorStruct &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
+  void
+  reset_ghost_values (const VectorStruct &vec,
+                      VectorDataExchange<dim,Number> &exchanger)
   {
     reset_ghost_values_block(vec,
                              std::integral_constant<bool,
@@ -3005,8 +3082,9 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
-                           VectorDataExchange<dim,Number2> &exchanger)
+  void
+  reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
+                      VectorDataExchange<dim,Number2> &exchanger)
   {
     exchanger.reset_ghost_values(vec);
   }
@@ -3015,8 +3093,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void reset_ghost_values (const std::vector<VectorStruct> &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
+  void
+  reset_ghost_values (const std::vector<VectorStruct> &vec,
+                      VectorDataExchange<dim,Number> &exchanger)
   {
     for (unsigned int comp=0; comp<vec.size(); comp++)
       reset_ghost_values(vec[comp], exchanger);
@@ -3026,8 +3105,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void reset_ghost_values (const std::vector<VectorStruct *> &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
+  void
+  reset_ghost_values (const std::vector<VectorStruct *> &vec,
+                      VectorDataExchange<dim,Number> &exchanger)
   {
     for (unsigned int comp=0; comp<vec.size(); comp++)
       reset_ghost_values(*vec[comp], exchanger);
@@ -3037,9 +3117,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void reset_ghost_values_block (const VectorStruct &vec,
-                                 std::integral_constant<bool,true>,
-                                 VectorDataExchange<dim,Number> &exchanger)
+  void
+  reset_ghost_values_block (const VectorStruct &vec,
+                            std::integral_constant<bool,true>,
+                            VectorDataExchange<dim,Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       reset_ghost_values(vec.block(i), exchanger);
@@ -3049,9 +3130,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_finish (const VectorStruct &vec,
-                                   VectorDataExchange<dim,Number> &exchanger,
-                                   const unsigned int channel = 0)
+  void
+  update_ghost_values_finish (const VectorStruct &vec,
+                              VectorDataExchange<dim,Number> &exchanger,
+                              const unsigned int channel = 0)
   {
     update_ghost_values_finish_block(vec, channel,
                                      std::integral_constant<bool,
@@ -3063,9 +3145,10 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void update_ghost_values_finish (const LinearAlgebra::distributed::Vector<Number> &vec,
-                                   VectorDataExchange<dim,Number2> &exchanger,
-                                   const unsigned int channel = 0)
+  void
+  update_ghost_values_finish (const LinearAlgebra::distributed::Vector<Number> &vec,
+                              VectorDataExchange<dim,Number2> &exchanger,
+                              const unsigned int channel = 0)
   {
     exchanger.update_ghost_values_finish(channel, vec);
   }
@@ -3074,8 +3157,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct> &vec,
-                                   VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_finish (const std::vector<VectorStruct> &vec,
+                              VectorDataExchange<dim,Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3089,8 +3173,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct *> &vec,
-                                   VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_finish (const std::vector<VectorStruct *> &vec,
+                              VectorDataExchange<dim,Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3104,10 +3189,11 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void update_ghost_values_finish_block (const VectorStruct &vec,
-                                         const unsigned int channel,
-                                         std::integral_constant<bool,true>,
-                                         VectorDataExchange<dim,Number> &exchanger)
+  void
+  update_ghost_values_finish_block (const VectorStruct &vec,
+                                    const unsigned int channel,
+                                    std::integral_constant<bool,true>,
+                                    VectorDataExchange<dim,Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       update_ghost_values_finish(vec.block(i), exchanger, channel+i);
@@ -3117,9 +3203,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_start (VectorStruct &vec,
-                       VectorDataExchange<dim, Number> &exchanger,
-                       const unsigned int channel = 0)
+  void
+  compress_start (VectorStruct &vec,
+                  VectorDataExchange<dim, Number> &exchanger,
+                  const unsigned int channel = 0)
   {
     compress_start_block (vec, channel,
                           std::integral_constant<bool,
@@ -3131,9 +3218,10 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void compress_start (LinearAlgebra::distributed::Vector<Number> &vec,
-                       VectorDataExchange<dim,Number2> &exchanger,
-                       const unsigned int           channel = 0)
+  void
+  compress_start (LinearAlgebra::distributed::Vector<Number> &vec,
+                  VectorDataExchange<dim,Number2> &exchanger,
+                  const unsigned int           channel = 0)
   {
     exchanger.compress_start(channel, vec);
   }
@@ -3142,8 +3230,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_start (std::vector<VectorStruct> &vec,
-                       VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_start (std::vector<VectorStruct> &vec,
+                  VectorDataExchange<dim, Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3157,8 +3246,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_start (std::vector<VectorStruct *> &vec,
-                       VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_start (std::vector<VectorStruct *> &vec,
+                  VectorDataExchange<dim, Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3172,10 +3262,11 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_start_block (VectorStruct      &vec,
-                             const unsigned int channel,
-                             std::integral_constant<bool,true>,
-                             VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_start_block (VectorStruct      &vec,
+                        const unsigned int channel,
+                        std::integral_constant<bool,true>,
+                        VectorDataExchange<dim, Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       compress_start(vec.block(i), exchanger, channel+i);
@@ -3185,9 +3276,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_finish (VectorStruct &vec,
-                        VectorDataExchange<dim, Number> &exchanger,
-                        const unsigned int channel = 0)
+  void
+  compress_finish (VectorStruct &vec,
+                   VectorDataExchange<dim, Number> &exchanger,
+                   const unsigned int channel = 0)
   {
     compress_finish_block(vec, channel,
                           std::integral_constant<bool,
@@ -3199,9 +3291,10 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void compress_finish (LinearAlgebra::distributed::Vector<Number> &vec,
-                        VectorDataExchange<dim, Number2> &exchanger,
-                        const unsigned int channel = 0)
+  void
+  compress_finish (LinearAlgebra::distributed::Vector<Number> &vec,
+                   VectorDataExchange<dim, Number2> &exchanger,
+                   const unsigned int channel = 0)
   {
     exchanger.compress_finish(channel, vec);
   }
@@ -3210,8 +3303,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_finish (std::vector<VectorStruct> &vec,
-                        VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_finish (std::vector<VectorStruct> &vec,
+                   VectorDataExchange<dim, Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3225,8 +3319,9 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_finish (std::vector<VectorStruct *> &vec,
-                        VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_finish (std::vector<VectorStruct *> &vec,
+                   VectorDataExchange<dim, Number> &exchanger)
   {
     unsigned int component_index = 0;
     for (unsigned int comp=0; comp<vec.size(); comp++)
@@ -3240,10 +3335,11 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void compress_finish_block (VectorStruct &vec,
-                              const unsigned int channel,
-                              std::integral_constant<bool,true>,
-                              VectorDataExchange<dim, Number> &exchanger)
+  void
+  compress_finish_block (VectorStruct &vec,
+                         const unsigned int channel,
+                         std::integral_constant<bool,true>,
+                         VectorDataExchange<dim, Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       compress_finish(vec.block(i), exchanger, channel+i);
@@ -3253,9 +3349,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void zero_vector_region (const unsigned int range_index,
-                           VectorStruct &vec,
-                           VectorDataExchange<dim, Number> &exchanger)
+  void
+  zero_vector_region (const unsigned int range_index,
+                      VectorStruct &vec,
+                      VectorDataExchange<dim, Number> &exchanger)
   {
     zero_vector_region_block(range_index, vec,
                              std::integral_constant<bool,
@@ -3267,9 +3364,10 @@ namespace internal
 
   template <int dim, typename Number, typename Number2>
   inline
-  void zero_vector_region (const unsigned int range_index,
-                           LinearAlgebra::distributed::Vector<Number> &vec,
-                           VectorDataExchange<dim, Number2> &exchanger)
+  void
+  zero_vector_region (const unsigned int range_index,
+                      LinearAlgebra::distributed::Vector<Number> &vec,
+                      VectorDataExchange<dim, Number2> &exchanger)
   {
     exchanger.zero_vector_region(range_index, vec);
   }
@@ -3278,9 +3376,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void zero_vector_region (const unsigned int range_index,
-                           std::vector<VectorStruct> &vec,
-                           VectorDataExchange<dim, Number> &exchanger)
+  void
+  zero_vector_region (const unsigned int range_index,
+                      std::vector<VectorStruct> &vec,
+                      VectorDataExchange<dim, Number> &exchanger)
   {
     for (unsigned int comp=0; comp<vec.size(); comp++)
       zero_vector_region(range_index, vec[comp], exchanger);
@@ -3290,9 +3389,10 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void zero_vector_region (const unsigned int range_index,
-                           std::vector<VectorStruct *> &vec,
-                           VectorDataExchange<dim, Number> &exchanger)
+  void
+  zero_vector_region (const unsigned int range_index,
+                      std::vector<VectorStruct *> &vec,
+                      VectorDataExchange<dim, Number> &exchanger)
   {
     for (unsigned int comp=0; comp<vec.size(); comp++)
       zero_vector_region(range_index, *vec[comp], exchanger);
@@ -3302,10 +3402,11 @@ namespace internal
 
   template <int dim, typename VectorStruct, typename Number>
   inline
-  void zero_vector_region_block (const unsigned int range_index,
-                                 VectorStruct &vec,
-                                 std::integral_constant<bool,true>,
-                                 VectorDataExchange<dim, Number> &exchanger)
+  void
+  zero_vector_region_block (const unsigned int range_index,
+                            VectorStruct &vec,
+                            std::integral_constant<bool,true>,
+                            VectorDataExchange<dim, Number> &exchanger)
   {
     for (unsigned int i=0; i<vec.n_blocks(); ++i)
       zero_vector_region(range_index, vec.block(i), exchanger);
@@ -3383,7 +3484,8 @@ namespace internal
     {}
 
     // Runs the cell work. If no function is given, nothing is done
-    virtual void cell(const std::pair<unsigned int,unsigned int> &cell_range) override
+    virtual void
+    cell(const std::pair<unsigned int,unsigned int> &cell_range) override
     {
       if (cell_function != nullptr && cell_range.second > cell_range.first)
         (container.*cell_function)(matrix_free, this->dst, this->src, cell_range);
@@ -3391,7 +3493,8 @@ namespace internal
 
     // Runs the assembler on interior faces. If no function is given, nothing
     // is done
-    virtual void face(const std::pair<unsigned int,unsigned int> &face_range) override
+    virtual void
+    face(const std::pair<unsigned int,unsigned int> &face_range) override
     {
       if (face_function != nullptr && face_range.second > face_range.first)
         (container.*face_function)(matrix_free, this->dst, this->src, face_range);
@@ -3399,7 +3502,8 @@ namespace internal
 
     // Runs the assembler on boundary faces. If no function is given, nothing
     // is done
-    virtual void boundary(const std::pair<unsigned int,unsigned int> &face_range) override
+    virtual void
+    boundary(const std::pair<unsigned int,unsigned int> &face_range) override
     {
       if (boundary_function != nullptr && face_range.second > face_range.first)
         (container.*boundary_function)(matrix_free, this->dst, this->src, face_range);
@@ -3411,27 +3515,31 @@ namespace internal
     // the problem that reading from a vector that we also write to is usually
     // not intended in case there is overlap, but this is up to the
     // application code to decide and we cannot catch this case here).
-    virtual void vector_update_ghosts_start() override
+    virtual void
+    vector_update_ghosts_start() override
     {
       if (!src_and_dst_are_same)
         internal::update_ghost_values_start(src, src_data_exchanger);
     }
 
     // Finishes the communication for the update ghost values operation
-    virtual void vector_update_ghosts_finish() override
+    virtual void
+    vector_update_ghosts_finish() override
     {
       if (!src_and_dst_are_same)
         internal::update_ghost_values_finish(src, src_data_exchanger);
     }
 
     // Starts the communication for the vector compress operation
-    virtual void vector_compress_start() override
+    virtual void
+    vector_compress_start() override
     {
       internal::compress_start(dst, dst_data_exchanger);
     }
 
     // Finishes the communication for the vector compress operation
-    virtual void vector_compress_finish() override
+    virtual void
+    vector_compress_finish() override
     {
       internal::compress_finish(dst, dst_data_exchanger);
       if (!src_and_dst_are_same)
@@ -3439,7 +3547,8 @@ namespace internal
     }
 
     // Zeros the given input vector
-    virtual void zero_dst_vector_range(const unsigned int range_index) override
+    virtual void
+    zero_dst_vector_range(const unsigned int range_index) override
     {
       if (zero_dst_vector_setting)
         internal::zero_vector_region(range_index, dst, dst_data_exchanger);
@@ -3481,22 +3590,25 @@ namespace internal
       boundary (boundary)
     {}
 
-    void cell_integrator (const MF &mf, OutVector &dst, const InVector &src,
-                          const std::pair<unsigned int, unsigned int> &range) const
+    void
+    cell_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                     const std::pair<unsigned int, unsigned int> &range) const
     {
       if (cell)
         cell(mf, dst, src, range);
     }
 
-    void face_integrator (const MF &mf, OutVector &dst, const InVector &src,
-                          const std::pair<unsigned int, unsigned int> &range) const
+    void
+    face_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                     const std::pair<unsigned int, unsigned int> &range) const
     {
       if (face)
         face(mf, dst, src, range);
     }
 
-    void boundary_integrator (const MF &mf, OutVector &dst, const InVector &src,
-                              const std::pair<unsigned int, unsigned int> &range) const
+    void
+    boundary_integrator (const MF &mf, OutVector &dst, const InVector &src,
+                         const std::pair<unsigned int, unsigned int> &range) const
     {
       if (boundary)
         boundary(mf, dst, src, range);

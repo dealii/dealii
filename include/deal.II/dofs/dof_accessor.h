@@ -313,19 +313,22 @@ public:
    * Implement the copy operator needed for the iterator classes.
    */
   template <bool level_dof_access2>
-  void copy_from (const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &a);
+  void
+  copy_from (const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &a);
 
   /**
    * Copy operator used by the iterator class. Keeps the previously set dof
    * handler, but sets the object coordinates of the TriaAccessor.
    */
-  void copy_from (const TriaAccessorBase<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension> &da);
+  void
+  copy_from (const TriaAccessorBase<structdim, DoFHandlerType::dimension, DoFHandlerType::space_dimension> &da);
 
   /**
    * Tell the caller whether get_active_or_mg_dof_indices() accesses active or
    * level dofs.
    */
-  static bool is_level_cell();
+  static bool
+  is_level_cell();
 
   /**
    * @name Accessing sub-objects
@@ -401,8 +404,9 @@ public:
    * <code>cell-@>active_fe_index</code> as last argument.
    *
    */
-  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
-                        const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
+  void
+  get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
+                   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -410,16 +414,18 @@ public:
    * multigrid hierarchy. The indices refer to the local numbering for the
    * level this line lives on.
    */
-  void get_mg_dof_indices (const int level,
-                           std::vector<types::global_dof_index> &dof_indices,
-                           const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
+  void
+  get_mg_dof_indices (const int level,
+                      std::vector<types::global_dof_index> &dof_indices,
+                      const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   /**
    * Set the level DoF indices that are returned by get_mg_dof_indices.
    */
-  void set_mg_dof_indices (const int level,
-                           const std::vector<types::global_dof_index> &dof_indices,
-                           const unsigned int fe_index = DoFHandlerType::default_fe_index);
+  void
+  set_mg_dof_indices (const int level,
+                      const std::vector<types::global_dof_index> &dof_indices,
+                      const unsigned int fe_index = DoFHandlerType::default_fe_index);
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -488,7 +494,8 @@ public:
   /**
    * Return the dof_index on the given level. Also see dof_index.
    */
-  types::global_dof_index mg_dof_index (const int level, const unsigned int i) const;
+  types::global_dof_index
+  mg_dof_index (const int level, const unsigned int i) const;
 
   /**
    * @}
@@ -608,18 +615,21 @@ public:
    * active degrees of freedom.
    */
   template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-  bool operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
+  bool
+  operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Compare for inequality. The boolean not of operator==().
    */
   template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-  bool operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
+  bool
+  operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 protected:
   /**
    * Reset the DoF handler pointer.
    */
-  void set_dof_handler (DoFHandlerType *dh);
+  void
+  set_dof_handler (DoFHandlerType *dh);
 
   /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p
@@ -638,11 +648,13 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_dof_index (const unsigned int i,
-                      const types::global_dof_index index,
-                      const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
+  void
+  set_dof_index (const unsigned int i,
+                 const types::global_dof_index index,
+                 const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
-  void set_mg_dof_index (const int level, const unsigned int i, const types::global_dof_index index) const;
+  void
+  set_mg_dof_index (const int level, const unsigned int i, const types::global_dof_index index) const;
 
   /**
    * Set the global index of the <i>i</i> degree on the @p vertex-th vertex of
@@ -826,13 +838,15 @@ public:
    * Implement the copy operator needed for the iterator classes.
    */
   template <bool level_dof_access2>
-  void copy_from (const DoFAccessor<0, DoFHandlerType<1,spacedim>, level_dof_access2> &a);
+  void
+  copy_from (const DoFAccessor<0, DoFHandlerType<1,spacedim>, level_dof_access2> &a);
 
   /**
    * Copy operator used by the iterator class. Keeps the previously set dof
    * handler, but sets the object coordinates of the TriaAccessor.
    */
-  void copy_from (const TriaAccessorBase<0, 1, spacedim> &da);
+  void
+  copy_from (const TriaAccessorBase<0, 1, spacedim> &da);
 
   /**
    * @name Accessing sub-objects
@@ -909,8 +923,9 @@ public:
    * of this function that calls the present function with
    * <code>cell-@>active_fe_index</code> as last argument.
    */
-  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
-                        const unsigned int fe_index = AccessorData::default_fe_index) const;
+  void
+  get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
+                   const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Return the global multilevel indices of the degrees of freedom that live
@@ -918,9 +933,10 @@ public:
    * multigrid hierarchy. The indices refer to the local numbering for the
    * level this line lives on.
    */
-  void get_mg_dof_indices (const int level,
-                           std::vector<types::global_dof_index> &dof_indices,
-                           const unsigned int fe_index = AccessorData::default_fe_index) const;
+  void
+  get_mg_dof_indices (const int level,
+                      std::vector<types::global_dof_index> &dof_indices,
+                      const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Global DoF index of the <i>i</i> degree associated with the @p vertexth
@@ -939,9 +955,10 @@ public:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  types::global_dof_index vertex_dof_index (const unsigned int vertex,
-                                            const unsigned int i,
-                                            const unsigned int fe_index = AccessorData::default_fe_index) const;
+  types::global_dof_index
+  vertex_dof_index (const unsigned int vertex,
+                    const unsigned int i,
+                    const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree of freedom of this object.
@@ -957,8 +974,9 @@ public:
    * In order to specify which set of degrees of freedom to work on, the last
    * argument is used to disambiguate.
    */
-  types::global_dof_index dof_index (const unsigned int i,
-                                     const unsigned int fe_index = AccessorData::default_fe_index) const;
+  types::global_dof_index
+  dof_index (const unsigned int i,
+             const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * @}
@@ -1065,18 +1083,21 @@ protected:
    * Compare for equality.
    */
   template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-  bool operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
+  bool
+  operator == (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Compare for inequality.
    */
   template <int dim2, class DoFHandlerType2, bool level_dof_access2>
-  bool operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
+  bool
+  operator != (const DoFAccessor<dim2,DoFHandlerType2,level_dof_access2> &) const;
 
   /**
    * Reset the DoF handler pointer.
    */
-  void set_dof_handler (DoFHandlerType<1,spacedim> *dh);
+  void
+  set_dof_handler (DoFHandlerType<1,spacedim> *dh);
 
   /**
    * Set the index of the <i>i</i>th degree of freedom of this object to @p
@@ -1095,9 +1116,10 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_dof_index (const unsigned int i,
-                      const types::global_dof_index index,
-                      const unsigned int fe_index = AccessorData::default_fe_index) const;
+  void
+  set_dof_index (const unsigned int i,
+                 const types::global_dof_index index,
+                 const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Set the global index of the <i>i</i> degree on the @p vertex-th vertex of
@@ -1116,10 +1138,11 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_vertex_dof_index (const unsigned int vertex,
-                             const unsigned int i,
-                             const types::global_dof_index index,
-                             const unsigned int fe_index = AccessorData::default_fe_index) const;
+  void
+  set_vertex_dof_index (const unsigned int vertex,
+                        const unsigned int i,
+                        const types::global_dof_index index,
+                        const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Iterator classes need to be friends because they need to access
@@ -1209,9 +1232,10 @@ public:
    * index. Since the current object doesn't point to anything useful, like
    * all other functions in this class this function only throws an exception.
    */
-  void set_dof_index (const unsigned int i,
-                      const types::global_dof_index index,
-                      const unsigned int fe_index = DoFHandler<dim,spacedim>::default_fe_index) const;
+  void
+  set_dof_index (const unsigned int i,
+                 const types::global_dof_index index,
+                 const unsigned int fe_index = DoFHandler<dim,spacedim>::default_fe_index) const;
 };
 
 
@@ -1430,8 +1454,9 @@ public:
    * vectors are compatible and with similar accuracy.
    */
   template <class InputVector, typename number>
-  void get_dof_values (const InputVector &values,
-                       Vector<number>    &local_values) const;
+  void
+  get_dof_values (const InputVector &values,
+                  Vector<number>    &local_values) const;
 
   /**
    * Return the values of the given vector restricted to the dofs of this cell
@@ -1448,9 +1473,10 @@ public:
    * vectors are compatible and with similar accuracy.
    */
   template <class InputVector, typename ForwardIterator>
-  void get_dof_values (const InputVector &values,
-                       ForwardIterator    local_values_begin,
-                       ForwardIterator    local_values_end) const;
+  void
+  get_dof_values (const InputVector &values,
+                  ForwardIterator    local_values_begin,
+                  ForwardIterator    local_values_end) const;
 
   /**
    * Return the values of the given vector restricted to the dofs of this cell
@@ -1469,10 +1495,11 @@ public:
    * correctly distributed when the dof values are calculated.
    */
   template <class InputVector, typename ForwardIterator>
-  void get_dof_values (const ConstraintMatrix &constraints,
-                       const InputVector      &values,
-                       ForwardIterator         local_values_begin,
-                       ForwardIterator         local_values_end) const;
+  void
+  get_dof_values (const ConstraintMatrix &constraints,
+                  const InputVector      &values,
+                  ForwardIterator         local_values_begin,
+                  ForwardIterator         local_values_end) const;
 
   /**
    * This function is the counterpart to get_dof_values(): it takes a vector
@@ -1496,8 +1523,9 @@ public:
    * compatible and with similar accuracy.
    */
   template <class OutputVector, typename number>
-  void set_dof_values (const Vector<number> &local_values,
-                       OutputVector         &values) const;
+  void
+  set_dof_values (const Vector<number> &local_values,
+                  OutputVector         &values) const;
 
   /**
    * Return the interpolation of the given finite element function to the
@@ -1531,10 +1559,11 @@ public:
    * classes.
    */
   template <class InputVector, typename number>
-  void get_interpolated_dof_values (const InputVector &values,
-                                    Vector<number>    &interpolated_values,
-                                    const unsigned int fe_index
-                                    = DoFHandlerType::default_fe_index) const;
+  void
+  get_interpolated_dof_values (const InputVector &values,
+                               Vector<number>    &interpolated_values,
+                               const unsigned int fe_index
+                               = DoFHandlerType::default_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you
@@ -1589,10 +1618,11 @@ public:
    * classes.
    */
   template <class OutputVector, typename number>
-  void set_dof_values_by_interpolation (const Vector<number> &local_values,
-                                        OutputVector         &values,
-                                        const unsigned int    fe_index
-                                        = DoFHandlerType::default_fe_index) const;
+  void
+  set_dof_values_by_interpolation (const Vector<number> &local_values,
+                                   OutputVector         &values,
+                                   const unsigned int    fe_index
+                                   = DoFHandlerType::default_fe_index) const;
 
   /**
    * Distribute a local (cell based) vector to a global one by mapping the
@@ -1684,7 +1714,8 @@ public:
    *
    * Examples for this use are in the implementation of DoFRenumbering.
    */
-  void get_active_or_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
+  void
+  get_active_or_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
    * Return the <i>global</i> indices of the degrees of freedom located on
@@ -1721,7 +1752,8 @@ public:
    * cells, if all degrees of freedom of the FiniteElement are located in
    * vertices. This functionality will vanish in a future release.
    */
-  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
+  void
+  get_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
    * @deprecated Use get_active_or_mg_dof_indices() with level_cell_iterator
@@ -1730,7 +1762,8 @@ public:
    * Retrieve the global indices of the degrees of freedom on this cell in the
    * level vector associated to the level of the cell.
    */
-  void get_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
+  void
+  get_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
    * @}
@@ -1780,7 +1813,8 @@ public:
    * ghost cells, during the call to hp::DoFHandler::distribute_dofs().
    * See the documentation of hp::DoFHandler for more information.
    */
-  unsigned int active_fe_index () const;
+  unsigned int
+  active_fe_index () const;
 
   /**
    * Set the index of the FiniteElement used for this cell. This determines
@@ -1809,7 +1843,8 @@ public:
    * have this cell as a ghost cell -- see the documentation of the
    * hp::DoFHandler class.
    */
-  void set_active_fe_index (const unsigned int i) const;
+  void
+  set_active_fe_index (const unsigned int i) const;
   /**
    * @}
    */
@@ -1818,17 +1853,20 @@ public:
    * Set the DoF indices of this cell to the given values. This function
    * bypasses the DoF cache, if one exists for the given DoF handler class.
    */
-  void set_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
+  void
+  set_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
 
   /**
    * Set the Level DoF indices of this cell to the given values.
    */
-  void set_mg_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
+  void
+  set_mg_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
 
   /**
    * Update the cache in which we store the dof indices of this cell.
    */
-  void update_cell_dof_indices_cache () const;
+  void
+  update_cell_dof_indices_cache () const;
 
 private:
 

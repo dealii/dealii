@@ -25,9 +25,11 @@
 #include <iostream>
 
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   deallog.attach (logfile);
   deallog.depth_console (1);

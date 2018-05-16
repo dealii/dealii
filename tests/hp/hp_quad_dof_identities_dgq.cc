@@ -25,7 +25,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=1; i<8-dim; ++i)
@@ -59,7 +60,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

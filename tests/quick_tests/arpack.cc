@@ -46,7 +46,8 @@
 using namespace dealii;
 
 template <int dim>
-void test ()
+void
+test ()
 {
   const unsigned int n_eigenvalues=3;
 
@@ -120,7 +121,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

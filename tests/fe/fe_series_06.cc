@@ -25,7 +25,8 @@
 
 using namespace dealii;
 
-void test_2d ()
+void
+test_2d ()
 {
   const unsigned int dim = 2;
   const unsigned int N   = 7;
@@ -66,7 +67,8 @@ void test_2d ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

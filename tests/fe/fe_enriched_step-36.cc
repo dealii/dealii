@@ -69,13 +69,15 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const;
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const;
 };
 
 template <int dim>
-double PotentialFunction<dim>::value(const Point<dim> &p,
-                                     const unsigned int ) const
+double
+PotentialFunction<dim>::value(const Point<dim> &p,
+                              const unsigned int ) const
 {
   Assert (p.square() > 0.,
           ExcDivideByZero());
@@ -95,15 +97,17 @@ public:
       radius(radius)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0) const
   {
     Tensor<1,dim> dist = point-origin;
     const double r = dist.norm();
     return std::exp(-Z*r);
   }
 
-  bool is_enriched(const Point<dim> &point) const
+  bool
+  is_enriched(const Point<dim> &point) const
   {
     if (origin.distance(point) < radius)
       return true;
@@ -111,8 +115,9 @@ public:
       return false;
   }
 
-  virtual Tensor< 1, dim> gradient (const Point<dim > &p,
-                                    const unsigned int component=0) const
+  virtual Tensor< 1, dim>
+  gradient (const Point<dim > &p,
+            const unsigned int component=0) const
   {
     Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
@@ -150,18 +155,27 @@ namespace Step36
   {
   public:
     EigenvalueProblem ();
-    virtual ~EigenvalueProblem();
-    void run ();
+    virtual
+    ~EigenvalueProblem();
+    void
+    run ();
 
   private:
-    bool cell_is_pou(const typename hp::DoFHandler<dim>::cell_iterator &cell) const;
+    bool
+    cell_is_pou(const typename hp::DoFHandler<dim>::cell_iterator &cell) const;
 
-    std::pair<unsigned int, unsigned int> setup_system ();
-    void assemble_system ();
-    std::pair<unsigned int, double> solve ();
-    void estimate_error ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    std::pair<unsigned int, unsigned int>
+    setup_system ();
+    void
+    assemble_system ();
+    std::pair<unsigned int, double>
+    solve ();
+    void
+    estimate_error ();
+    void
+    refine_grid ();
+    void
+    output_results (const unsigned int cycle) const;
 
     Triangulation<dim>  triangulation;
     hp::DoFHandler<dim> dof_handler;
@@ -476,7 +490,8 @@ namespace Step36
   }
 
   template <int dim>
-  void EigenvalueProblem<dim>::estimate_error ()
+  void
+  EigenvalueProblem<dim>::estimate_error ()
   {
     {
       std::vector<const PETScWrappers::MPI::Vector *> sol (number_of_eigenvalues);
@@ -511,7 +526,8 @@ namespace Step36
   }
 
   template <int dim>
-  void EigenvalueProblem<dim>::refine_grid ()
+  void
+  EigenvalueProblem<dim>::refine_grid ()
   {
     const double threshold = 0.9 * estimated_error_per_cell.linfty_norm();
     GridRefinement::refine (triangulation,
@@ -523,7 +539,8 @@ namespace Step36
   }
 
   template <int dim>
-  void EigenvalueProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  EigenvalueProblem<dim>::output_results (const unsigned int cycle) const
   {
     Vector<float> fe_index(triangulation.n_active_cells());
     {
@@ -635,7 +652,8 @@ namespace Step36
   }
 }
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
 
   try

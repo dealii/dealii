@@ -40,9 +40,10 @@
 #include <string>
 
 template <typename number>
-void print_formatted (const FullMatrix<number> &A,
-                      const unsigned int        precision,
-                      const unsigned int        width)
+void
+print_formatted (const FullMatrix<number> &A,
+                 const unsigned int        precision,
+                 const unsigned int        width)
 {
   for (unsigned int i=0; i<A.m(); ++i)
     {

@@ -103,8 +103,9 @@ namespace TrilinosWrappers
        * communicator contains the layout of the distribution of data among
        * the MPI processes.
        */
-      explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-                            const MPI_Comm              &communicator = MPI_COMM_WORLD);
+      explicit
+      BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+                   const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
       /**
        * Creates a BlockVector with ghost elements. See the respective
@@ -133,7 +134,8 @@ namespace TrilinosWrappers
        * but there is no content in the individual components and the user has
        * to fill appropriate data using a reinit of the blocks.
        */
-      explicit BlockVector (const size_type num_blocks);
+      explicit
+      BlockVector (const size_type num_blocks);
 
       /**
        * Destructor. Clears memory
@@ -144,18 +146,21 @@ namespace TrilinosWrappers
        * Copy operator: fill all components of the vector that are locally
        * stored with the given scalar value.
        */
-      BlockVector &operator= (const value_type s);
+      BlockVector &
+      operator= (const value_type s);
 
       /**
        * Copy operator for arguments of the same type.
        */
-      BlockVector &operator= (const BlockVector &v);
+      BlockVector &
+      operator= (const BlockVector &v);
 
       /**
        * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
        */
-      BlockVector &operator= (BlockVector &&v) noexcept;
+      BlockVector &
+      operator= (BlockVector &&v) noexcept;
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -168,7 +173,8 @@ namespace TrilinosWrappers
        * accept only one possible number type in the deal.II vector.
        */
       template <typename Number>
-      BlockVector &operator= (const ::dealii::BlockVector<Number> &v);
+      BlockVector &
+      operator= (const ::dealii::BlockVector<Number> &v);
 
       /**
        * Reinitialize the BlockVector to contain as many blocks as there are
@@ -178,9 +184,10 @@ namespace TrilinosWrappers
        * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with
        * zeros.
        */
-      void reinit (const std::vector<IndexSet> &parallel_partitioning,
-                   const MPI_Comm              &communicator = MPI_COMM_WORLD,
-                   const bool                   omit_zeroing_entries = false);
+      void
+      reinit (const std::vector<IndexSet> &parallel_partitioning,
+              const MPI_Comm              &communicator = MPI_COMM_WORLD,
+              const bool                   omit_zeroing_entries = false);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -199,10 +206,11 @@ namespace TrilinosWrappers
        * threads to write into the vector (for the other reinit methods, only
        * one thread is allowed to write into the ghost entries at a time).
        */
-      void reinit (const std::vector<IndexSet> &partitioning,
-                   const std::vector<IndexSet> &ghost_values,
-                   const MPI_Comm              &communicator = MPI_COMM_WORLD,
-                   const bool      vector_writable = false);
+      void
+      reinit (const std::vector<IndexSet> &partitioning,
+              const std::vector<IndexSet> &ghost_values,
+              const MPI_Comm              &communicator = MPI_COMM_WORLD,
+              const bool      vector_writable = false);
 
 
       /**
@@ -219,8 +227,9 @@ namespace TrilinosWrappers
        * actions on this object may yield unpredictable results since they may
        * be routed to the wrong block.
        */
-      void reinit (const BlockVector &V,
-                   const bool omit_zeroing_entries = false);
+      void
+      reinit (const BlockVector &V,
+              const bool omit_zeroing_entries = false);
 
       /**
        * Change the number of blocks to <tt>num_blocks</tt>. The individual
@@ -228,7 +237,8 @@ namespace TrilinosWrappers
        * user resizes the individual blocks by herself in an appropriate way,
        * and calls <tt>collect_sizes</tt> afterwards.
        */
-      void reinit (const size_type num_blocks);
+      void
+      reinit (const size_type num_blocks);
 
       /**
        * This reinit function is meant to be used for parallel calculations
@@ -247,8 +257,9 @@ namespace TrilinosWrappers
        * vector products as for example done during the solution of linear
        * systems.
        */
-      void import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
-                                        const BlockVector                         &v);
+      void
+      import_nonlocal_data_for_fe (const TrilinosWrappers::BlockSparseMatrix &m,
+                                   const BlockVector                         &v);
 
       /**
        * Return if this Vector contains ghost elements.
@@ -256,7 +267,8 @@ namespace TrilinosWrappers
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      bool has_ghost_elements() const;
+      bool
+      has_ghost_elements() const;
 
       /**
        * Swap the contents of this vector and the other vector <tt>v</tt>. One
@@ -275,15 +287,17 @@ namespace TrilinosWrappers
        * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
        * functions.
        */
-      void swap (BlockVector &v);
+      void
+      swap (BlockVector &v);
 
       /**
        * Print to a stream.
        */
-      void print (std::ostream       &out,
-                  const unsigned int  precision = 3,
-                  const bool          scientific = true,
-                  const bool          across = true) const;
+      void
+      print (std::ostream       &out,
+             const unsigned int  precision = 3,
+             const bool          scientific = true,
+             const bool          across = true) const;
 
       /**
        * Exception
@@ -408,8 +422,9 @@ namespace TrilinosWrappers
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline
-    void swap (BlockVector &u,
-               BlockVector &v)
+    void
+    swap (BlockVector &u,
+          BlockVector &v)
     {
       u.swap (v);
     }
@@ -437,9 +452,10 @@ namespace internal
     public:
       template <typename Matrix>
       static
-      void reinit_range_vector (const Matrix &matrix,
-                                TrilinosWrappers::MPI::BlockVector &v,
-                                bool omit_zeroing_entries)
+      void
+      reinit_range_vector (const Matrix &matrix,
+                           TrilinosWrappers::MPI::BlockVector &v,
+                           bool omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_range_indices(),
                  matrix.get_mpi_communicator(), omit_zeroing_entries);
@@ -447,9 +463,10 @@ namespace internal
 
       template <typename Matrix>
       static
-      void reinit_domain_vector(const Matrix &matrix,
-                                TrilinosWrappers::MPI::BlockVector &v,
-                                bool omit_zeroing_entries)
+      void
+      reinit_domain_vector(const Matrix &matrix,
+                           TrilinosWrappers::MPI::BlockVector &v,
+                           bool omit_zeroing_entries)
       {
         v.reinit(matrix.locally_owned_domain_indices(),
                  matrix.get_mpi_communicator(), omit_zeroing_entries);

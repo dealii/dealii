@@ -22,7 +22,8 @@
 #include <deal.II/base/parameter_handler.h>
 
 
-void check (const char *p)
+void
+check (const char *p)
 {
   std::string parameter_set_by_action;
 
@@ -49,7 +50,8 @@ void check (const char *p)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

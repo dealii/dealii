@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "Testing hyper_ball in dim: " << dim << "..."<< std::endl;
 
@@ -70,7 +71,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

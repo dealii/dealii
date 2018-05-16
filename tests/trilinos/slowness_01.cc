@@ -30,7 +30,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 200;
 
@@ -107,7 +108,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

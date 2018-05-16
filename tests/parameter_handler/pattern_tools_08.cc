@@ -20,7 +20,8 @@
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 

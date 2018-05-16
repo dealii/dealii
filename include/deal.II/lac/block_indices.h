@@ -89,15 +89,17 @@ public:
   /**
    * Specialized constructor for a structure with blocks of equal size.
    */
-  explicit BlockIndices(const unsigned int n_blocks,
-                        const size_type block_size = 0);
+  explicit
+  BlockIndices(const unsigned int n_blocks,
+               const size_type block_size = 0);
 
   /**
    * Reinitialize the number of blocks and assign each block the same number
    * of elements.
    */
-  void reinit (const unsigned int n_blocks,
-               const size_type n_elements_per_block);
+  void
+  reinit (const unsigned int n_blocks,
+          const size_type n_elements_per_block);
 
   /**
    * Reinitialize the number of indices within each block from the given
@@ -105,12 +107,14 @@ public:
    * <tt>block_sizes</tt> and the size of block @p i is set to
    * <tt>block_sizes[i]</tt>.
    */
-  void reinit (const std::vector<size_type> &block_sizes);
+  void
+  reinit (const std::vector<size_type> &block_sizes);
 
   /**
    * Add another block of given size to the end of the block structure.
    */
-  void push_back(const size_type size);
+  void
+  push_back(const size_type size);
 
   /**
    * @name Size information
@@ -120,25 +124,29 @@ public:
   /**
    * Number of blocks in index field.
    */
-  unsigned int size () const;
+  unsigned int
+  size () const;
 
   /**
    * Return the total number of indices accumulated over all blocks, that is,
    * the dimension of the vector space of the block vector.
    */
-  size_type total_size () const;
+  size_type
+  total_size () const;
 
   /**
    * The size of the @p ith block.
    */
-  size_type block_size (const unsigned int i) const;
+  size_type
+  block_size (const unsigned int i) const;
 
   /**
    * String representation of the block sizes. The output is of the form
    * `[nb->b1,b2,b3|s]`, where `nb` is n_blocks(), `s` is total_size() and
    * `b1` etc. are the values returned by block_size() for each of the blocks.
    */
-  std::string to_string () const;
+  std::string
+  to_string () const;
 
   //@}
 
@@ -163,42 +171,49 @@ public:
   /**
    * Return the global index of @p index in block @p block.
    */
-  size_type local_to_global (const unsigned int block,
-                             const size_type index) const;
+  size_type
+  local_to_global (const unsigned int block,
+                   const size_type index) const;
 
   /**
    * The start index of the ith block.
    */
-  size_type block_start (const unsigned int i) const;
+  size_type
+  block_start (const unsigned int i) const;
   //@}
 
   /**
    * Copy operator.
    */
-  BlockIndices &operator = (const BlockIndices &b);
+  BlockIndices &
+  operator = (const BlockIndices &b);
 
   /**
    * Move assignment operator. Move another BlockIndices object onto the
    * current one by transferring its contents.
    */
-  BlockIndices &operator = (BlockIndices &&) noexcept;
+  BlockIndices &
+  operator = (BlockIndices &&) noexcept;
 
   /**
    * Compare whether two objects are the same, i.e. whether the number of
    * blocks and the sizes of all blocks are equal.
    */
-  bool operator == (const BlockIndices &b) const;
+  bool
+  operator == (const BlockIndices &b) const;
 
   /**
    * Swap the contents of these two objects.
    */
-  void swap (BlockIndices &b);
+  void
+  swap (BlockIndices &b);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
 private:
   /**
@@ -485,7 +500,8 @@ BlockIndices::memory_consumption () const
  * @author Wolfgang Bangerth, 2000
  */
 inline
-void swap (BlockIndices &u, BlockIndices &v)
+void
+swap (BlockIndices &u, BlockIndices &v)
 {
   u.swap (v);
 }

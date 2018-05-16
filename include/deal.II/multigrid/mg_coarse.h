@@ -51,19 +51,22 @@ public:
   /**
    * Clear the pointer.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Initialize new data.
    */
-  void initialize (const MGSmootherBase<VectorType> &coarse_smooth);
+  void
+  initialize (const MGSmootherBase<VectorType> &coarse_smooth);
 
   /**
    * Implementation of the abstract function.
    */
-  void operator() (const unsigned int level,
-                   VectorType         &dst,
-                   const VectorType   &src) const override;
+  void
+  operator() (const unsigned int level,
+              VectorType         &dst,
+              const VectorType   &src) const override;
 
 private:
   /**
@@ -113,29 +116,33 @@ public:
    * Initialize new data.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void initialize (SolverType &,
-                   const MatrixType &,
-                   const PreconditionerType &);
+  void
+  initialize (SolverType &,
+              const MatrixType &,
+              const PreconditionerType &);
 
   /**
    * Clear all pointers.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Implementation of the abstract function. Calls the solver method with
    * matrix, vectors and preconditioner.
    */
-  void operator() (const unsigned int level,
-                   VectorType         &dst,
-                   const VectorType   &src) const;
+  void
+  operator() (const unsigned int level,
+              VectorType         &dst,
+              const VectorType   &src) const;
 
   /**
    * Set the matrix. This gives the possibility to replace the matrix that
    * was given to the constructor by a new matrix.
    */
   template <typename MatrixType>
-  void set_matrix (const MatrixType &);
+  void
+  set_matrix (const MatrixType &);
 
 private:
   /**
@@ -187,22 +194,25 @@ public:
    * Initialize with new data, see the corresponding constructor for more
    * details.
    */
-  void initialize (SolverType &solver,
-                   const MatrixType &matrix,
-                   const PreconditionerType &precondition);
+  void
+  initialize (SolverType &solver,
+              const MatrixType &matrix,
+              const PreconditionerType &precondition);
 
   /**
    * Clear all pointers.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Implementation of the abstract function. Calls the solve method of the
    * given solver with matrix, vectors, and preconditioner.
    */
-  virtual void operator() (const unsigned int level,
-                           VectorType         &dst,
-                           const VectorType   &src) const override;
+  virtual void
+  operator() (const unsigned int level,
+              VectorType         &dst,
+              const VectorType   &src) const override;
 
 private:
   /**
@@ -256,11 +266,13 @@ public:
   /**
    * Initialize for a new matrix.
    */
-  void initialize (const FullMatrix<number> &A);
+  void
+  initialize (const FullMatrix<number> &A);
 
-  void operator() (const unsigned int level,
-                   VectorType         &dst,
-                   const VectorType   &src) const override;
+  void
+  operator() (const unsigned int level,
+              VectorType         &dst,
+              const VectorType   &src) const override;
 
 private:
   /**
@@ -289,16 +301,19 @@ public:
   /**
    * Initialize for a new matrix. This resets the dimensions to the
    */
-  void initialize (const FullMatrix<number> &A, const double threshold = 0);
+  void
+  initialize (const FullMatrix<number> &A, const double threshold = 0);
 
-  void operator() (const unsigned int level,
-                   VectorType         &dst,
-                   const VectorType   &src) const;
+  void
+  operator() (const unsigned int level,
+              VectorType         &dst,
+              const VectorType   &src) const;
 
   /**
    * Write the singular values to @p deallog.
    */
-  void log () const;
+  void
+  log () const;
 
 private:
 
@@ -358,7 +373,8 @@ MGCoarseGridApplySmoother<VectorType>::operator() (const unsigned int level,
 
 template <typename SolverType, class VectorType>
 MGCoarseGridLACIteration<SolverType, VectorType>
-::MGCoarseGridLACIteration()
+::
+MGCoarseGridLACIteration()
   :
   solver(0, typeid(*this).name()),
   matrix(0),
@@ -369,9 +385,10 @@ MGCoarseGridLACIteration<SolverType, VectorType>
 template <typename SolverType, class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 MGCoarseGridLACIteration<SolverType, VectorType>
-::MGCoarseGridLACIteration (SolverType               &s,
-                            const MatrixType         &m,
-                            const PreconditionerType &p)
+::
+MGCoarseGridLACIteration (SolverType               &s,
+                          const MatrixType         &m,
+                          const PreconditionerType &p)
   :
   solver(&s, typeid(*this).name())
 {
@@ -385,7 +402,8 @@ MGCoarseGridLACIteration<SolverType, VectorType>
 
 template <typename SolverType, class VectorType>
 MGCoarseGridLACIteration<SolverType, VectorType>
-::~MGCoarseGridLACIteration()
+::
+~MGCoarseGridLACIteration()
 {
   clear();
 }
@@ -395,9 +413,10 @@ template <typename SolverType, class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 MGCoarseGridLACIteration<SolverType, VectorType>
-::initialize (SolverType               &s,
-              const MatrixType         &m,
-              const PreconditionerType &p)
+::
+initialize (SolverType               &s,
+            const MatrixType         &m,
+            const PreconditionerType &p)
 {
   solver = &s;
   // Workaround: Unfortunately, not every "m" object has a rich enough
@@ -411,7 +430,8 @@ MGCoarseGridLACIteration<SolverType, VectorType>
 template <typename SolverType, class VectorType>
 void
 MGCoarseGridLACIteration<SolverType, VectorType>
-::clear()
+::
+clear()
 {
   solver = nullptr;
   matrix = LinearOperator<VectorType>();
@@ -436,7 +456,8 @@ template <typename SolverType, class VectorType>
 template <typename MatrixType>
 void
 MGCoarseGridLACIteration<SolverType, VectorType>
-::set_matrix(const MatrixType &m)
+::
+set_matrix(const MatrixType &m)
 {
   // Workaround: Unfortunately, not every "m" object has a rich enough
   // interface to populate reinit_(domain|range)_vector. Thus, supply an
@@ -453,7 +474,8 @@ template <class VectorType,
           class MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerType>
-::MGCoarseGridIterativeSolver ()
+::
+MGCoarseGridIterativeSolver ()
   :
   solver(0, typeid(*this).name()),
   matrix(0, typeid(*this).name()),
@@ -467,9 +489,10 @@ template <class VectorType,
           class MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerType>
-::MGCoarseGridIterativeSolver (SolverType &solver,
-                               const MatrixType &matrix,
-                               const PreconditionerType &preconditioner)
+::
+MGCoarseGridIterativeSolver (SolverType &solver,
+                             const MatrixType &matrix,
+                             const PreconditionerType &preconditioner)
   :
   solver (&solver, typeid(*this).name()),
   matrix (&matrix, typeid(*this).name()),
@@ -484,9 +507,10 @@ template <class VectorType,
           class PreconditionerType>
 void
 MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerType>
-::initialize (SolverType &solver_,
-              const MatrixType &matrix_,
-              const PreconditionerType &preconditioner_)
+::
+initialize (SolverType &solver_,
+            const MatrixType &matrix_,
+            const PreconditionerType &preconditioner_)
 {
   solver = &solver_;
   matrix = &matrix_;
@@ -502,7 +526,8 @@ template <class VectorType,
           class PreconditionerType>
 void
 MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerType>
-::clear ()
+::
+clear ()
 {
   solver = 0;
   matrix = 0;

@@ -24,8 +24,9 @@
 #include <vector>
 
 
-void test (PETScWrappers::VectorBase &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test (PETScWrappers::VectorBase &v,
+      PETScWrappers::MPI::Vector &w)
 {
   // set the first vector
   for (unsigned int k=0; k<v.size(); ++k)
@@ -42,7 +43,8 @@ void test (PETScWrappers::VectorBase &v,
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

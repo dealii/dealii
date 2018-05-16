@@ -36,7 +36,8 @@ namespace internal
   {
     namespace
     {
-      unsigned int count_nonzeros(const std::vector<unsigned int> &vec)
+      unsigned int
+      count_nonzeros(const std::vector<unsigned int> &vec)
       {
         return std::count_if(vec.begin(), vec.end(), [](const unsigned int i)
         {
@@ -668,8 +669,9 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
 template <int dim, int spacedim>
 const FullMatrix<double> &
 FESystem<dim,spacedim>
-::get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case) const
+::
+get_restriction_matrix (const unsigned int child,
+                        const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
@@ -757,8 +759,9 @@ FESystem<dim,spacedim>
 template <int dim, int spacedim>
 const FullMatrix<double> &
 FESystem<dim,spacedim>
-::get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case) const
+::
+get_prolongation_matrix (const unsigned int child,
+                         const RefinementCase<dim> &refinement_case) const
 {
   Assert (refinement_case<RefinementCase<dim>::isotropic_refinement+1,
           ExcIndexRange(refinement_case,0,RefinementCase<dim>::isotropic_refinement+1));
@@ -1284,7 +1287,8 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 
 
 template <int dim, int spacedim>
-void FESystem<dim,spacedim>::build_interface_constraints ()
+void
+FESystem<dim,spacedim>::build_interface_constraints ()
 {
   // check whether all base elements implement their interface constraint
   // matrices. if this is not the case, then leave the interface costraints of
@@ -1467,8 +1471,9 @@ void FESystem<dim,spacedim>::build_interface_constraints ()
 
 
 template <int dim, int spacedim>
-void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
-                                         const std::vector<unsigned int> &multiplicities)
+void
+FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+                                    const std::vector<unsigned int> &multiplicities)
 {
   Assert (fes.size() == multiplicities.size(),
           ExcDimensionMismatch (fes.size(), multiplicities.size()) );

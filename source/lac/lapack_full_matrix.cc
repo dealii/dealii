@@ -269,9 +269,10 @@ LAPACKFullMatrix<number>::add (const number a,
 namespace
 {
   template <typename number>
-  void cholesky_rank1(LAPACKFullMatrix<number> &A,
-                      const number a,
-                      const Vector<number> &v)
+  void
+  cholesky_rank1(LAPACKFullMatrix<number> &A,
+                 const number a,
+                 const Vector<number> &v)
   {
     const typename LAPACKFullMatrix<number>::size_type N = A.n();
     Vector<number> z(v);
@@ -349,9 +350,10 @@ namespace
 
 
   template <typename number>
-  void cholesky_rank1(LAPACKFullMatrix<std::complex<number> > &/*A*/,
-                      const std::complex<number> /*a*/,
-                      const Vector<std::complex<number> > &/*v*/)
+  void
+  cholesky_rank1(LAPACKFullMatrix<std::complex<number> > &/*A*/,
+                 const std::complex<number> /*a*/,
+                 const Vector<std::complex<number> > &/*v*/)
   {
     AssertThrow(false, ExcNotImplemented());
   }
@@ -919,7 +921,8 @@ LAPACKFullMatrix<number>::set_property(const Property p)
 
 
 template <typename number>
-number LAPACKFullMatrix<number>::l1_norm() const
+number
+LAPACKFullMatrix<number>::l1_norm() const
 {
   const char type('O');
   return norm(type);
@@ -928,7 +931,8 @@ number LAPACKFullMatrix<number>::l1_norm() const
 
 
 template <typename number>
-number LAPACKFullMatrix<number>::linfty_norm() const
+number
+LAPACKFullMatrix<number>::linfty_norm() const
 {
   const char type('I');
   return norm(type);
@@ -937,7 +941,8 @@ number LAPACKFullMatrix<number>::linfty_norm() const
 
 
 template <typename number>
-number LAPACKFullMatrix<number>::frobenius_norm() const
+number
+LAPACKFullMatrix<number>::frobenius_norm() const
 {
   const char type('F');
   return norm(type);
@@ -946,7 +951,8 @@ number LAPACKFullMatrix<number>::frobenius_norm() const
 
 
 template <typename number>
-number LAPACKFullMatrix<number>::norm(const char type) const
+number
+LAPACKFullMatrix<number>::norm(const char type) const
 {
   Threads::Mutex::ScopedLock lock (mutex);
 
@@ -980,7 +986,8 @@ number LAPACKFullMatrix<number>::norm(const char type) const
 
 
 template <typename number>
-number LAPACKFullMatrix<number>::trace() const
+number
+LAPACKFullMatrix<number>::trace() const
 {
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,

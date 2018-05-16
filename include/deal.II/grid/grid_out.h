@@ -87,12 +87,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
   /**
@@ -139,12 +141,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -206,12 +210,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -257,12 +263,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
   /**
@@ -354,12 +362,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -396,12 +406,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -452,12 +464,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
   /**
@@ -498,12 +512,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
   /**
@@ -594,12 +610,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -729,12 +747,14 @@ namespace GridOutFlags
     /**
      * Declare parameters in ParameterHandler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Parse parameters of ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
   };
 
 
@@ -882,8 +902,9 @@ public:
    * Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_dx (const Triangulation<dim,spacedim> &tria,
-                 std::ostream             &out) const;
+  void
+  write_dx (const Triangulation<dim,spacedim> &tria,
+            std::ostream             &out) const;
 
   /**
    * Write the triangulation in the gnuplot format.
@@ -917,9 +938,10 @@ public:
    * Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_gnuplot (const Triangulation<dim,spacedim> &tria,
-                      std::ostream           &out,
-                      const Mapping<dim,spacedim> *mapping=nullptr) const;
+  void
+  write_gnuplot (const Triangulation<dim,spacedim> &tria,
+                 std::ostream           &out,
+                 const Mapping<dim,spacedim> *mapping=nullptr) const;
 
   /**
    * Write the triangulation in the msh format.
@@ -940,8 +962,9 @@ public:
    * Works also in the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_msh (const Triangulation<dim,spacedim> &tria,
-                  std::ostream             &out) const;
+  void
+  write_msh (const Triangulation<dim,spacedim> &tria,
+             std::ostream             &out) const;
 
   /**
    * Write the triangulation in the ucd format.
@@ -963,8 +986,9 @@ public:
    * Works also for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_ucd (const Triangulation<dim,spacedim> &tria,
-                  std::ostream             &out) const;
+  void
+  write_ucd (const Triangulation<dim,spacedim> &tria,
+             std::ostream             &out) const;
 
   /**
    * Write the triangulation in the encapsulated postscript format.
@@ -996,9 +1020,10 @@ public:
    * Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_eps (const Triangulation<dim, spacedim> &tria,
-                  std::ostream             &out,
-                  const Mapping<dim, spacedim>       *mapping=nullptr) const;
+  void
+  write_eps (const Triangulation<dim, spacedim> &tria,
+             std::ostream             &out,
+             const Mapping<dim, spacedim>       *mapping=nullptr) const;
 
   /**
    * Write two-dimensional XFig-file.
@@ -1019,9 +1044,10 @@ public:
    * Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_xfig (const Triangulation<dim, spacedim> &tria,
-                   std::ostream              &out,
-                   const Mapping<dim, spacedim>        *mapping=nullptr) const;
+  void
+  write_xfig (const Triangulation<dim, spacedim> &tria,
+              std::ostream              &out,
+              const Mapping<dim, spacedim>        *mapping=nullptr) const;
 
   /**
    * Write the triangulation in the SVG format.
@@ -1041,8 +1067,9 @@ public:
    * @note This function is currently only implemented for two-dimensional
    * grids in two space dimensions.
    */
-  void write_svg (const Triangulation<2,2> &tria,
-                  std::ostream             &out) const;
+  void
+  write_svg (const Triangulation<2,2> &tria,
+             std::ostream             &out) const;
 
   /**
    * Declaration of the same function as above for all other dimensions and
@@ -1050,8 +1077,9 @@ public:
    * declared to exist to support dimension independent programming.
    */
   template <int dim, int spacedim>
-  void write_svg (const Triangulation<dim,spacedim> &tria,
-                  std::ostream                      &out) const;
+  void
+  write_svg (const Triangulation<dim,spacedim> &tria,
+             std::ostream                      &out) const;
 
 
   /**
@@ -1069,8 +1097,9 @@ public:
    * @note Not implemented for the codimension one case.
    */
   template <int dim, int spacedim>
-  void write_mathgl (const Triangulation<dim, spacedim> &tria,
-                     std::ostream             &out) const;
+  void
+  write_mathgl (const Triangulation<dim, spacedim> &tria,
+                std::ostream             &out) const;
 
   /**
    * Write triangulation in VTK format.
@@ -1090,8 +1119,9 @@ public:
    * across faces.
    */
   template <int dim, int spacedim>
-  void write_vtk (const Triangulation<dim,spacedim> &tria,
-                  std::ostream                      &out) const;
+  void
+  write_vtk (const Triangulation<dim,spacedim> &tria,
+             std::ostream                      &out) const;
 
   /**
    * Write triangulation in VTU format.
@@ -1111,8 +1141,9 @@ public:
    * across faces.
    */
   template <int dim, int spacedim>
-  void write_vtu (const Triangulation<dim,spacedim> &tria,
-                  std::ostream                      &out) const;
+  void
+  write_vtu (const Triangulation<dim,spacedim> &tria,
+             std::ostream                      &out) const;
 
   /**
    * Write triangulation in VTU format for each processor, and add a .pvtu file for
@@ -1143,88 +1174,103 @@ public:
    * so that each piece does not overlap.
    */
   template <int dim, int spacedim>
-  void write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim> &tria,
-                                        const std::string                 &filename_without_extension,
-                                        const bool                        view_levels=false,
-                                        const bool                        include_artificial=false) const;
+  void
+  write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim> &tria,
+                                   const std::string                 &filename_without_extension,
+                                   const bool                        view_levels=false,
+                                   const bool                        include_artificial=false) const;
 
   /**
    * Write grid to @p out according to the given data format. This function
    * simply calls the appropriate <tt>write_*</tt> function.
    */
   template <int dim, int spacedim>
-  void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream                      &out,
-              const OutputFormat                 output_format,
-              const Mapping<dim,spacedim>       *mapping=nullptr) const;
+  void
+  write (const Triangulation<dim,spacedim> &tria,
+         std::ostream                      &out,
+         const OutputFormat                 output_format,
+         const Mapping<dim,spacedim>       *mapping=nullptr) const;
 
   /**
    * Write mesh in default format set by ParameterHandler.
    */
   template <int dim, int spacedim>
-  void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream                      &out,
-              const Mapping<dim,spacedim>       *mapping=nullptr) const;
+  void
+  write (const Triangulation<dim,spacedim> &tria,
+         std::ostream                      &out,
+         const Mapping<dim,spacedim>       *mapping=nullptr) const;
 
   /**
    * Set flags for DX output
    */
-  void set_flags (const GridOutFlags::DX &flags);
+  void
+  set_flags (const GridOutFlags::DX &flags);
 
   /**
    * Set flags for Gmsh output
    */
-  void set_flags (const GridOutFlags::Msh &flags);
+  void
+  set_flags (const GridOutFlags::Msh &flags);
 
   /**
    * Set flags for UCD output
    */
-  void set_flags (const GridOutFlags::Ucd &flags);
+  void
+  set_flags (const GridOutFlags::Ucd &flags);
 
   /**
    * Set flags for GNUPLOT output
    */
-  void set_flags (const GridOutFlags::Gnuplot &flags);
+  void
+  set_flags (const GridOutFlags::Gnuplot &flags);
 
   /**
    * Set flags for EPS output of a one-dimensional triangulation
    */
-  void set_flags (const GridOutFlags::Eps<1> &flags);
+  void
+  set_flags (const GridOutFlags::Eps<1> &flags);
 
   /**
    * Set flags for EPS output of a two-dimensional triangulation
    */
-  void set_flags (const GridOutFlags::Eps<2> &flags);
+  void
+  set_flags (const GridOutFlags::Eps<2> &flags);
 
   /**
    * Set flags for EPS output of a three-dimensional triangulation
    */
-  void set_flags (const GridOutFlags::Eps<3> &flags);
+  void
+  set_flags (const GridOutFlags::Eps<3> &flags);
 
   /**
    * Set flags for EPS output of a three-dimensional triangulation
    */
-  void set_flags (const GridOutFlags::XFig &flags);
+  void
+  set_flags (const GridOutFlags::XFig &flags);
 
   /**
    * Set flags for SVG output
    */
-  void set_flags (const GridOutFlags::Svg &flags);
+  void
+  set_flags (const GridOutFlags::Svg &flags);
 
   /**
    * Set flags for MathGL output
    */
-  void set_flags (const GridOutFlags::MathGL &flags);
+  void
+  set_flags (const GridOutFlags::MathGL &flags);
 
   /**
    * Set flags for VTK output
    */
-  void set_flags (const GridOutFlags::Vtk &flags);
+  void
+  set_flags (const GridOutFlags::Vtk &flags);
 
   /**
    * Set flags for VTU output
    */
-  void set_flags (const GridOutFlags::Vtu &flags);
+  void
+  set_flags (const GridOutFlags::Vtu &flags);
 
   /**
    * Provide a function that can tell us which suffix a given output format
@@ -1240,13 +1286,15 @@ public:
    * Since this function does not need data from this object, it is static and
    * can thus be called without creating an object of this class.
    */
-  static std::string default_suffix (const OutputFormat output_format);
+  static std::string
+  default_suffix (const OutputFormat output_format);
 
   /**
    * Default suffix for the default output format selected through
    * ParameterHandler.
    */
-  std::string default_suffix () const;
+  std::string
+  default_suffix () const;
 
   /**
    * Return the @p OutputFormat value corresponding to the given string. If
@@ -1261,30 +1309,35 @@ public:
    * To get a list of presently available format names, e.g. to give it to the
    * ParameterHandler class, use the function get_output_format_names().
    */
-  static OutputFormat parse_output_format (const std::string &format_name);
+  static OutputFormat
+  parse_output_format (const std::string &format_name);
 
   /**
    * Return a list of implemented output formats. The different names are
    * separated by vertical bar signs (<tt>`|'</tt>) as used by the
    * ParameterHandler classes.
    */
-  static std::string get_output_format_names ();
+  static std::string
+  get_output_format_names ();
 
   /**
    * Declare parameters in ParameterHandler.
    */
-  static void declare_parameters (ParameterHandler &param);
+  static void
+  declare_parameters (ParameterHandler &param);
 
   /**
    * Parse parameters of ParameterHandler.
    */
-  void parse_parameters (ParameterHandler &param);
+  void
+  parse_parameters (ParameterHandler &param);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Exception
@@ -1615,11 +1668,12 @@ private:
    *
    * For SVG output of grids.
    */
-  static Point<2> svg_project_point(Point<3> point,
-                                    Point<3> camera_position,
-                                    Point<3> camera_direction,
-                                    Point<3> camera_horizontal,
-                                    float camera_focus);
+  static Point<2>
+  svg_project_point(Point<3> point,
+                    Point<3> camera_position,
+                    Point<3> camera_direction,
+                    Point<3> camera_horizontal,
+                    float camera_focus);
 
   /**
    * Return the number of faces in the triangulation which have a boundary
@@ -1634,20 +1688,24 @@ private:
    * there for more information.
    */
   template <int dim, int spacedim>
-  unsigned int n_boundary_faces (const Triangulation<dim,spacedim> &tria) const;
+  unsigned int
+  n_boundary_faces (const Triangulation<dim,spacedim> &tria) const;
 
   /**
    * Declaration of the specialization of above function for 1d. Simply
    * returns zero.
    */
-  unsigned int n_boundary_faces (const Triangulation<1,1> &tria) const;
+  unsigned int
+  n_boundary_faces (const Triangulation<1,1> &tria) const;
 
   /**
    * Declaration of the specialization of above function for 1d, 2sd. Simply
    * returns zero.
    */
-  unsigned int n_boundary_faces (const Triangulation<1,2> &tria) const;
-  unsigned int n_boundary_faces (const Triangulation<1,3> &tria) const;
+  unsigned int
+  n_boundary_faces (const Triangulation<1,2> &tria) const;
+  unsigned int
+  n_boundary_faces (const Triangulation<1,3> &tria) const;
 
   /**
    * Return the number of lines in the triangulation which have a boundary
@@ -1662,31 +1720,37 @@ private:
    * there for more information.
    */
   template <int dim, int spacedim>
-  unsigned int n_boundary_lines (const Triangulation<dim,spacedim> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<dim,spacedim> &tria) const;
 
   /**
    * Declaration of the specialization of above function for 1d. Simply
    * returns zero.
    */
-  unsigned int n_boundary_lines (const Triangulation<1,1> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<1,1> &tria) const;
 
   /**
    * Declaration of the specialization of above function for 1d, 2sd. Simply
    * returns zero.
    */
-  unsigned int n_boundary_lines (const Triangulation<1,2> &tria) const;
-  unsigned int n_boundary_lines (const Triangulation<1,3> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<1,2> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<1,3> &tria) const;
 
   /**
    * Declaration of the specialization of above function for 2d. Simply
    * returns zero.
    */
-  unsigned int n_boundary_lines (const Triangulation<2,2> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<2,2> &tria) const;
   /**
    * Declaration of the specialization of above function for 2d, 3sd. Simply
    * returns zero.
    */
-  unsigned int n_boundary_lines (const Triangulation<2,3> &tria) const;
+  unsigned int
+  n_boundary_lines (const Triangulation<2,3> &tria) const;
 };
 
 

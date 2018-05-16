@@ -20,7 +20,8 @@
 
 
 template <int dim>
-void initialize (SymmetricTensor<2,dim> &st)
+void
+initialize (SymmetricTensor<2,dim> &st)
 {
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
@@ -29,7 +30,8 @@ void initialize (SymmetricTensor<2,dim> &st)
 
 
 template <int dim>
-void initialize (SymmetricTensor<4,dim> &st)
+void
+initialize (SymmetricTensor<4,dim> &st)
 {
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i; j<dim; ++j)
@@ -41,7 +43,8 @@ void initialize (SymmetricTensor<4,dim> &st)
 
 
 template <int rank, int dim>
-void check ()
+void
+check ()
 {
   // build a regular tensor
   SymmetricTensor<rank,dim> st;
@@ -56,7 +59,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

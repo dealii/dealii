@@ -63,7 +63,8 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 };
 
 

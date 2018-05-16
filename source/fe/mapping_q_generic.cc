@@ -206,9 +206,10 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void compute_shape_function_values_general (const unsigned int            n_shape_functions,
-                                                  const std::vector<Point<dim> > &unit_points,
-                                                  typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data)
+      void
+      compute_shape_function_values_general (const unsigned int            n_shape_functions,
+                                             const std::vector<Point<dim> > &unit_points,
+                                             typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data)
       {
         const unsigned int n_points=unit_points.size();
 

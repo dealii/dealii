@@ -32,7 +32,8 @@
 
 
 template <typename NumberType>
-void test()
+void
+test()
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -90,7 +91,8 @@ void test()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

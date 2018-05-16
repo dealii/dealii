@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   std::vector<bool> v1(12);
   for (unsigned int i=0; i<v1.size(); ++i)
@@ -48,7 +49,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

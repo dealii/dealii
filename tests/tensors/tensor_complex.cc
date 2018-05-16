@@ -22,7 +22,8 @@
 #include <deal.II/lac/vector.h>
 #include <complex>
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

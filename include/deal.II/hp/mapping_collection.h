@@ -66,7 +66,8 @@ namespace hp
      * desired, though it would probably be clearer to add all mappings the
      * same way.
      */
-    explicit MappingCollection (const Mapping<dim,spacedim> &mapping);
+    explicit
+    MappingCollection (const Mapping<dim,spacedim> &mapping);
 
     /**
      * Copy constructor.
@@ -85,7 +86,8 @@ namespace hp
      * is later destroyed by this object upon destruction of the entire
      * collection.
      */
-    void push_back (const Mapping<dim,spacedim> &new_mapping);
+    void
+    push_back (const Mapping<dim,spacedim> &new_mapping);
 
     /**
      * Return the mapping object which was specified by the user for the
@@ -100,13 +102,15 @@ namespace hp
     /**
      * Return the number of mapping objects stored in this container.
      */
-    unsigned int size () const;
+    unsigned int
+    size () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
   private:
     /**

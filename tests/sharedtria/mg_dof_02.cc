@@ -35,7 +35,8 @@
 #include <deal.II/fe/fe_dgq.h>
 
 template <int dim>
-void write_dof_data (DoFHandler<dim> &dof_handler)
+void
+write_dof_data (DoFHandler<dim> &dof_handler)
 {
   FE_Q<dim> fe (2);
 
@@ -73,7 +74,8 @@ void write_dof_data (DoFHandler<dim> &dof_handler)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
                                             (Triangulation<dim>::limit_level_difference_at_vertices), true,
@@ -106,7 +108,8 @@ void test()
   write_dof_data(dof_handler);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

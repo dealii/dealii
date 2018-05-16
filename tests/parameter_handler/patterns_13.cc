@@ -23,7 +23,8 @@
 using namespace Patterns;
 using namespace Patterns::Tools;
 
-int main()
+int
+main()
 {
   initlog();
 

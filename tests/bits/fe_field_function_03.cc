@@ -31,7 +31,8 @@
 #include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -76,7 +77,8 @@ void test()
   deallog << " correct values: " <<values_c[0] << " " << values_c[1]  <<", approximations: "<<values_a[0] << " " << values_a[1] << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

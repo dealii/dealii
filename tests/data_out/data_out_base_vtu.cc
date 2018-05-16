@@ -25,8 +25,9 @@
 // Output data on repetitions of the unit hypercube
 
 template <int dim, int spacedim>
-void check(DataOutBase::VtkFlags flags,
-           std::ostream &out)
+void
+check(DataOutBase::VtkFlags flags,
+      std::ostream &out)
 {
   const unsigned int np = 4;
 
@@ -46,7 +47,8 @@ void check(DataOutBase::VtkFlags flags,
 
 
 template <int dim, int spacedim>
-void check_all(std::ostream &log)
+void
+check_all(std::ostream &log)
 {
   DataOutBase::VtkFlags flags;
   log << "==============================" << std::endl
@@ -55,7 +57,8 @@ void check_all(std::ostream &log)
   check<dim,spacedim>(flags, log);
 }
 
-int main()
+int
+main()
 {
   std::stringstream ss;
   check_all<1,1>(ss);

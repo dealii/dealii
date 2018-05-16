@@ -23,7 +23,8 @@
 #include <deal.II/base/bounding_box.h>
 
 template <int spacedim>
-void test(const unsigned int &size)
+void
+test(const unsigned int &size)
 {
   std::vector< BoundingBox<spacedim> > b_boxes(size);
 
@@ -64,7 +65,8 @@ void test(const unsigned int &size)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

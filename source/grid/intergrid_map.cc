@@ -40,8 +40,9 @@ InterGridMap<MeshType>::InterGridMap ()
 
 
 template <class MeshType>
-void InterGridMap<MeshType>::make_mapping (const MeshType &source_grid,
-                                           const MeshType &destination_grid)
+void
+InterGridMap<MeshType>::make_mapping (const MeshType &source_grid,
+                                      const MeshType &destination_grid)
 {
   // first delete all contents
   clear ();
@@ -170,7 +171,8 @@ InterGridMap<MeshType>::operator [] (const cell_iterator &source_cell) const
 
 
 template <class MeshType>
-void InterGridMap<MeshType>::clear ()
+void
+InterGridMap<MeshType>::clear ()
 {
   mapping.clear ();
   source_grid      = nullptr;

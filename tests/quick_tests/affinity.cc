@@ -28,7 +28,8 @@
 #include <sys/sysinfo.h>
 #endif
 
-bool getaffinity(unsigned int &bits_set,unsigned int &mask)
+bool
+getaffinity(unsigned int &bits_set,unsigned int &mask)
 {
   bits_set = 0;
   mask = 0x00;
@@ -56,7 +57,8 @@ bool getaffinity(unsigned int &bits_set,unsigned int &mask)
   return true;
 }
 
-int get_num_thread_env()
+int
+get_num_thread_env()
 {
   const char *penv = getenv ("DEAL_II_NUM_THREADS");
   if (penv!=nullptr)
@@ -77,7 +79,8 @@ int get_num_thread_env()
 }
 
 
-int main ()
+int
+main ()
 {
   // we need this, otherwise gcc will not link against deal.II
   dealii::Triangulation<2> test;

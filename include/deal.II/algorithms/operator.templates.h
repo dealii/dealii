@@ -33,7 +33,8 @@ namespace Algorithms
   {}
 
   template <typename VectorType>
-  void OutputOperator<VectorType>::initialize_stream(std::ostream &stream)
+  void
+  OutputOperator<VectorType>::initialize_stream(std::ostream &stream)
   {
     os =&stream;
   }

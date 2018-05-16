@@ -36,7 +36,8 @@
 
 using namespace dealii;
 
-double f_x(double x_m)
+double
+f_x(double x_m)
 {
   double x = x_m*1000.0;
   double y_m = 0.0;
@@ -78,9 +79,11 @@ public:
     y_FoR (h)
   {}
 
-  virtual ~PushForward() {};
+  virtual
+  ~PushForward() {};
 
-  virtual double value (const Point<dim> &p,const unsigned int component = 0) const;
+  virtual double
+  value (const Point<dim> &p,const unsigned int component = 0) const;
 
 private:
   const double h;
@@ -97,7 +100,8 @@ private:
 
 
 template <int dim>
-double PushForward<dim>::value(const Point<dim> &p,const unsigned int component) const
+double
+PushForward<dim>::value(const Point<dim> &p,const unsigned int component) const
 {
   double result = 0;
 
@@ -136,9 +140,11 @@ public:
     y_FoR (h)
   {}
 
-  virtual ~PullBack() {};
+  virtual
+  ~PullBack() {};
 
-  virtual double value (const Point<dim> &p,const unsigned int component = 0) const;
+  virtual double
+  value (const Point<dim> &p,const unsigned int component = 0) const;
 
 private:
   const double h;
@@ -151,7 +157,8 @@ private:
 };
 
 template <int dim>
-double PullBack<dim>::value(const Point<dim> &p,const unsigned int component) const
+double
+PullBack<dim>::value(const Point<dim> &p,const unsigned int component) const
 {
   double result = 0;
 
@@ -176,7 +183,8 @@ double PullBack<dim>::value(const Point<dim> &p,const unsigned int component) co
 }
 
 template <int dim>
-void create_tria(Triangulation<dim> &triangulation, const Manifold<dim> &manifold)
+void
+create_tria(Triangulation<dim> &triangulation, const Manifold<dim> &manifold)
 {
   const double h = 0.028;
   std::vector<unsigned int> refinements(dim,1);
@@ -202,7 +210,8 @@ void create_tria(Triangulation<dim> &triangulation, const Manifold<dim> &manifol
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   deallog << "dim: " << dim << std::endl;
 
@@ -246,7 +255,8 @@ void test()
     }
 }
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (5);
   deallog.attach (std::cout);

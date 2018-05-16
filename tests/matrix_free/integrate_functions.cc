@@ -38,7 +38,8 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
@@ -54,13 +55,15 @@ public:
             update_values | update_gradients | update_JxW_values)
   {};
 
-  void operator () (const MatrixFree<dim,Number> &data,
-                    VectorType       &dst,
-                    const VectorType &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const;
+  void
+  operator () (const MatrixFree<dim,Number> &data,
+               VectorType       &dst,
+               const VectorType &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const;
 
-  void test_functions (Vector<Number> &dst,
-                       Vector<Number> &dst_deal) const
+  void
+  test_functions (Vector<Number> &dst,
+                  Vector<Number> &dst_deal) const
   {
     dst = 0;
     dst_deal = 0;
@@ -141,7 +144,8 @@ operator () (const MatrixFree<dim,Number> &data,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
   const SphericalManifold<dim> manifold;
@@ -216,7 +220,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog << std::setprecision (3);

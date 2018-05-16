@@ -34,7 +34,8 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
@@ -47,12 +48,14 @@ public:
     data (data_in)
   {};
 
-  void operator () (const MatrixFree<dim,Number> &data,
-                    VectorType       &dst,
-                    const VectorType &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const;
+  void
+  operator () (const MatrixFree<dim,Number> &data,
+               VectorType       &dst,
+               const VectorType &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const;
 
-  void test_functions (const VectorType &src) const
+  void
+  test_functions (const VectorType &src) const
   {
     for (unsigned int i=0; i<5; ++i)
       errors[i] = 0;
@@ -144,7 +147,8 @@ operator () (const MatrixFree<dim,Number> &data,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -182,7 +186,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

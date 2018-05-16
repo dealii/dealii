@@ -22,7 +22,8 @@
 #include <deal.II/lac/vector.h>
 
 
-int main()
+int
+main()
 {
   initlog();
 

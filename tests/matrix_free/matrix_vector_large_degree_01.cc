@@ -24,7 +24,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_mf.h"
 
@@ -39,7 +40,8 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);
@@ -92,7 +94,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

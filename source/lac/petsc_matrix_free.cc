@@ -98,11 +98,12 @@ namespace PETScWrappers
 
 
 
-  void MatrixFree::reinit (const MPI_Comm     &communicator,
-                           const unsigned int  m,
-                           const unsigned int  n,
-                           const unsigned int  local_rows,
-                           const unsigned int  local_columns)
+  void
+  MatrixFree::reinit (const MPI_Comm     &communicator,
+                      const unsigned int  m,
+                      const unsigned int  n,
+                      const unsigned int  local_rows,
+                      const unsigned int  local_columns)
   {
     this->communicator = communicator;
 
@@ -115,12 +116,13 @@ namespace PETScWrappers
 
 
 
-  void MatrixFree::reinit (const MPI_Comm     &communicator,
-                           const unsigned int  m,
-                           const unsigned int  n,
-                           const std::vector<unsigned int> &local_rows_per_process,
-                           const std::vector<unsigned int> &local_columns_per_process,
-                           const unsigned int  this_process)
+  void
+  MatrixFree::reinit (const MPI_Comm     &communicator,
+                      const unsigned int  m,
+                      const unsigned int  n,
+                      const std::vector<unsigned int> &local_rows_per_process,
+                      const std::vector<unsigned int> &local_columns_per_process,
+                      const unsigned int  this_process)
   {
     Assert (local_rows_per_process.size() == local_columns_per_process.size(),
             ExcDimensionMismatch (local_rows_per_process.size(),
@@ -139,28 +141,31 @@ namespace PETScWrappers
 
 
 
-  void MatrixFree::reinit (const unsigned int  m,
-                           const unsigned int  n,
-                           const unsigned int  local_rows,
-                           const unsigned int  local_columns)
+  void
+  MatrixFree::reinit (const unsigned int  m,
+                      const unsigned int  n,
+                      const unsigned int  local_rows,
+                      const unsigned int  local_columns)
   {
     reinit (MPI_COMM_WORLD, m, n, local_rows, local_columns);
   }
 
 
 
-  void MatrixFree::reinit (const unsigned int  m,
-                           const unsigned int  n,
-                           const std::vector<unsigned int> &local_rows_per_process,
-                           const std::vector<unsigned int> &local_columns_per_process,
-                           const unsigned int  this_process)
+  void
+  MatrixFree::reinit (const unsigned int  m,
+                      const unsigned int  n,
+                      const std::vector<unsigned int> &local_rows_per_process,
+                      const std::vector<unsigned int> &local_columns_per_process,
+                      const unsigned int  this_process)
   {
     reinit (MPI_COMM_WORLD, m, n, local_rows_per_process, local_columns_per_process, this_process);
   }
 
 
 
-  void MatrixFree::clear ()
+  void
+  MatrixFree::clear ()
   {
     const PetscErrorCode ierr = destroy_matrix (matrix);
     AssertThrow (ierr == 0, ExcPETScError (ierr));
@@ -171,7 +176,8 @@ namespace PETScWrappers
 
 
 
-  void MatrixFree::vmult (Vec  &dst, const Vec  &src) const
+  void
+  MatrixFree::vmult (Vec  &dst, const Vec  &src) const
   {
     // VectorBase permits us to manipulate, but not own, a Vec
     PETScWrappers::VectorBase x(src);
@@ -183,7 +189,8 @@ namespace PETScWrappers
 
 
 
-  int MatrixFree::matrix_free_mult (Mat  A, Vec  src, Vec  dst)
+  int
+  MatrixFree::matrix_free_mult (Mat  A, Vec  src, Vec  dst)
   {
     // create a pointer to this MatrixFree
     // object and link the given matrix A
@@ -201,10 +208,11 @@ namespace PETScWrappers
 
 
 
-  void MatrixFree::do_reinit (const unsigned int  m,
-                              const unsigned int  n,
-                              const unsigned int  local_rows,
-                              const unsigned int  local_columns)
+  void
+  MatrixFree::do_reinit (const unsigned int  m,
+                         const unsigned int  n,
+                         const unsigned int  local_rows,
+                         const unsigned int  local_columns)
   {
     Assert (local_rows <= m, ExcDimensionMismatch (local_rows, m));
     Assert (local_columns <= n, ExcDimensionMismatch (local_columns, n));

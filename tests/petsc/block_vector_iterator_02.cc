@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   PETScWrappers::MPI::BlockVector v(2, MPI_COMM_WORLD, 1, 1);
   v(0) = 1;
@@ -71,7 +72,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -34,13 +34,15 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 // Computes the area and the outer normals of circles and spheres
 // which are more and more refined, and prints the error on the
 // output.
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
 
   Triangulation<dim, spacedim> triangulation;
@@ -95,7 +97,8 @@ void test(std::string filename)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

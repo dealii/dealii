@@ -23,7 +23,8 @@
 #include <deal.II/lac/solver_control.h>
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);

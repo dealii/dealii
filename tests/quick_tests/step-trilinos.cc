@@ -47,12 +47,16 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
 
   Triangulation<2> triangulation;
   FE_Q<2>          fe;
@@ -71,7 +75,8 @@ LaplaceProblem::LaplaceProblem ()
   dof_handler (triangulation)
 {}
 
-void LaplaceProblem::setup_system ()
+void
+LaplaceProblem::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -91,7 +96,8 @@ void LaplaceProblem::setup_system ()
   output_table.add_value ("dofs",  dof_handler.n_dofs());
 }
 
-void LaplaceProblem::assemble_system ()
+void
+LaplaceProblem::assemble_system ()
 {
   QGauss<2> quadrature_formula(2);
 
@@ -149,7 +155,8 @@ void LaplaceProblem::assemble_system ()
   b.compress (VectorOperation::add);
 }
 
-void LaplaceProblem::solve ()
+void
+LaplaceProblem::solve ()
 {
   SolverControl solver_control (1e03, 1e-03);
   TrilinosWrappers::SolverCG cg_solver (solver_control);
@@ -163,7 +170,8 @@ void LaplaceProblem::solve ()
               ExcInternalError());
 }
 
-void LaplaceProblem::run ()
+void
+LaplaceProblem::run ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
 
@@ -181,7 +189,8 @@ void LaplaceProblem::run ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   try
     {

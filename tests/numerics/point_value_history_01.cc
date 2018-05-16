@@ -55,7 +55,8 @@ class TestPointValueHistory
 {
 public:
   TestPointValueHistory();
-  void run();
+  void
+  run();
 
 private:
   Triangulation <dim> triangulation;
@@ -78,7 +79,8 @@ TestPointValueHistory<dim>::TestPointValueHistory() :
 
 
 template <int dim>
-void TestPointValueHistory<dim>::run()
+void
+TestPointValueHistory<dim>::run()
 {
   // Make a triangulation
   GridGenerator::hyper_cube(triangulation, 0, 1);
@@ -260,7 +262,8 @@ void TestPointValueHistory<dim>::run()
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile << std::setprecision(2);

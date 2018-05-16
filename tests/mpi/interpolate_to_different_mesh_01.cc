@@ -29,18 +29,20 @@ template <int dim>
 class SomeFunction : public Function<dim>
 {
 public:
-  double value (const Point<dim> &p,
-                const unsigned int) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     return 1+p(0)*p(0);
   }
 };
 
 template <int dim>
-void setup(DoFHandler<dim> &dh,
-           FE_Q<dim> &fe,
-           LA::MPI::Vector &vec,
-           LA::MPI::Vector &lr_vec)
+void
+setup(DoFHandler<dim> &dh,
+      FE_Q<dim> &fe,
+      LA::MPI::Vector &vec,
+      LA::MPI::Vector &lr_vec)
 {
   dh.distribute_dofs (fe);
   vec.reinit(dh.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -50,7 +52,8 @@ void setup(DoFHandler<dim> &dh,
 }
 
 template <int dim>
-void output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const std::string filename_)
+void
+output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const std::string filename_)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -85,7 +88,8 @@ void output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const st
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -187,7 +191,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

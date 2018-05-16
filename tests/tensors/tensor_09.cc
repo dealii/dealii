@@ -20,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   FESystem<dim> fe(FE_Nothing<dim>(), 2);
   FEValues<dim> fe_values (fe, QGauss<dim>(2), update_values);
@@ -39,7 +40,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

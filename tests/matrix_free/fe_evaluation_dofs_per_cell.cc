@@ -29,7 +29,8 @@
 
 
 template <typename FEEval>
-void print_info(const FEEval &eval)
+void
+print_info(const FEEval &eval)
 {
   // copy static variables to int to avoid taking references (with possibly
   // undefined references) when inside deallog::operator<<
@@ -53,7 +54,8 @@ void print_info(const FEEval &eval)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const unsigned int degree = 1;
   FESystem<dim> fe1(FE_Q<dim>(degree+1), dim);
@@ -92,7 +94,8 @@ void test()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test<1>();

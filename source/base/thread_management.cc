@@ -31,17 +31,20 @@ namespace Threads
 {
   namespace internal
   {
-    static std::atomic<unsigned int> n_existing_threads_counter(1);
+    static std::atomic<unsigned int>
+    n_existing_threads_counter(1);
 
 
-    void register_thread ()
+    void
+    register_thread ()
     {
       ++n_existing_threads_counter;
     }
 
 
 
-    void deregister_thread ()
+    void
+    deregister_thread ()
     {
       --n_existing_threads_counter;
       Assert (n_existing_threads_counter >= 1,
@@ -51,7 +54,8 @@ namespace Threads
 
 
     [[noreturn]]
-    void handle_std_exception (const std::exception &exc)
+    void
+    handle_std_exception (const std::exception &exc)
     {
       // lock the following context
       // to ensure that we don't
@@ -89,7 +93,8 @@ namespace Threads
 
 
     [[noreturn]]
-    void handle_unknown_exception ()
+    void
+    handle_unknown_exception ()
     {
       // lock the following context
       // to ensure that we don't
@@ -122,13 +127,15 @@ namespace Threads
 
 
 
-  unsigned int n_existing_threads ()
+  unsigned int
+  n_existing_threads ()
   {
     return internal::n_existing_threads_counter;
   }
 
 
-  unsigned int this_thread_id ()
+  unsigned int
+  this_thread_id ()
   {
 #ifdef SYS_gettid
     const pid_t this_id = syscall(SYS_gettid);

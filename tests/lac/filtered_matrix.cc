@@ -25,7 +25,8 @@
 
 
 template <typename VectorType>
-void test (const FilteredMatrix<VectorType> &M)
+void
+test (const FilteredMatrix<VectorType> &M)
 {
   deallog << "Iterator";
 
@@ -78,7 +79,8 @@ void test (const FilteredMatrix<VectorType> &M)
   deallog << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

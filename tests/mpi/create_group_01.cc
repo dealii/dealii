@@ -23,7 +23,8 @@
 
 #include "../tests.h"
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv, 1);
   MPILogInitAll log_all;

@@ -22,7 +22,8 @@ class Test
 {
 public:
 
-  void generate_all_dim(const char *myname)
+  void
+  generate_all_dim(const char *myname)
   {
     generate<1,1>(myname);
     generate<2,2>(myname);
@@ -31,7 +32,8 @@ public:
 
 
   template <int dim, int spacedim>
-  void generate(const char *myname)
+  void
+  generate(const char *myname)
   {
     std::string name = myname;
 
@@ -43,7 +45,8 @@ public:
   }
 
 
-  void generate_all_codim(const char *myname)
+  void
+  generate_all_codim(const char *myname)
   {
     generate<1,1> (myname);
     generate<1,2> (myname);
@@ -54,7 +57,8 @@ public:
   }
 };
 
-int main ()
+int
+main ()
 {
   initlog();
 

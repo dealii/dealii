@@ -37,7 +37,8 @@ namespace std_cxx14
   {
     using type = index_sequence;
     using value_type = size_t;
-    static constexpr std::size_t size() noexcept { return sizeof...(Ints); }
+    static constexpr std::size_t
+    size() noexcept { return sizeof...(Ints); }
   };
 
   // --------------------------------------------------------------

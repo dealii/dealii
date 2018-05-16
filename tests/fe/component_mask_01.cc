@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   ComponentMask m;
   AssertThrow (m[0] == true, ExcInternalError());
@@ -38,7 +39,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

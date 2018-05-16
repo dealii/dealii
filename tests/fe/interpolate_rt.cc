@@ -23,8 +23,9 @@
 // FE_RaviartThomas<dim>::interpolate(...)
 
 template <int dim>
-void check1(const Function<dim> &f,
-            const unsigned int degree)
+void
+check1(const Function<dim> &f,
+       const unsigned int degree)
 {
   FE_RaviartThomas<dim> fe(degree);
   deallog << fe.get_name() << ' ';
@@ -39,7 +40,8 @@ void check1(const Function<dim> &f,
   deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

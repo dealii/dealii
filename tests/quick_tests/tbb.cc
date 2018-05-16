@@ -22,12 +22,14 @@
 
 using namespace dealii;
 
-void add_one(unsigned int &var)
+void
+add_one(unsigned int &var)
 {
   var += 1;
 }
 
-void test1()
+void
+test1()
 {
   unsigned int tmp = 1;
   Threads::Task<> task = Threads::new_task (&add_one,tmp);
@@ -46,19 +48,22 @@ struct copy_data
 };
 
 
-void assemble(const std::vector<int>::iterator &it,
-              scratch_data &scratch,
-              copy_data &data)
+void
+assemble(const std::vector<int>::iterator &it,
+         scratch_data &scratch,
+         copy_data &data)
 {
   data.value = (*it);
 }
 
-void copy(int &value, const copy_data &data)
+void
+copy(int &value, const copy_data &data)
 {
   value += data.value;
 }
 
-void test2()
+void
+test2()
 {
   const int maxi = 10000;
   std::vector<int> v(maxi);
@@ -78,7 +83,8 @@ void test2()
     exit(2);
 }
 
-int main ()
+int
+main ()
 {
   std::cout << "TBB will use " << tbb::task_scheduler_init::default_num_threads() << " threads." << std::endl;
 

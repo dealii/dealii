@@ -37,7 +37,8 @@
 using namespace dealii;
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

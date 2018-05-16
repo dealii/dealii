@@ -31,7 +31,8 @@
 
 
 
-void check (Triangulation<2> &tria)
+void
+check (Triangulation<2> &tria)
 {
   MappingQ<2> map(5);
 
@@ -60,7 +61,8 @@ void check (Triangulation<2> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::scientific;

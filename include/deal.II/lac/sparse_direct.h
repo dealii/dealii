@@ -117,7 +117,8 @@ public:
    * This function does nothing. It is only here to provide a interface
    * consistent with other sparse direct solvers.
    */
-  void initialize (const SparsityPattern &sparsity_pattern);
+  void
+  initialize (const SparsityPattern &sparsity_pattern);
 
   /**
    * Factorize the matrix. This function may be called multiple times for
@@ -137,14 +138,16 @@ public:
    * solves are required.
    */
   template <class Matrix>
-  void factorize (const Matrix &matrix);
+  void
+  factorize (const Matrix &matrix);
 
   /**
    * Initialize memory and call SparseDirectUMFPACK::factorize.
    */
   template <class Matrix>
-  void initialize(const Matrix &matrix,
-                  const AdditionalData additional_data = AdditionalData());
+  void
+  initialize(const Matrix &matrix,
+             const AdditionalData additional_data = AdditionalData());
 
   /**
    * @}
@@ -166,39 +169,45 @@ public:
    * In other words, this function actually multiplies with the exact inverse
    * of the matrix, $A^{-1}$.
    */
-  void vmult (Vector<double> &dst,
-              const Vector<double> &src) const;
+  void
+  vmult (Vector<double> &dst,
+         const Vector<double> &src) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void vmult (BlockVector<double> &dst,
-              const BlockVector<double> &src) const;
+  void
+  vmult (BlockVector<double> &dst,
+         const BlockVector<double> &src) const;
 
   /**
    * Same as before, but uses the transpose of the matrix, i.e. this function
    * multiplies with $A^{-T}$.
    */
-  void Tvmult (Vector<double> &dst,
-               const Vector<double> &src) const;
+  void
+  Tvmult (Vector<double> &dst,
+          const Vector<double> &src) const;
 
   /**
    * Same as before, but for block vectors
    */
-  void Tvmult (BlockVector<double> &dst,
-               const BlockVector<double> &src) const;
+  void
+  Tvmult (BlockVector<double> &dst,
+          const BlockVector<double> &src) const;
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
   /**
    * @}
@@ -226,14 +235,16 @@ public:
    * If @p transpose is set to true this function solves for the transpose of
    * the matrix, i.e. $x=A^{-T}b$.
    */
-  void solve (Vector<double> &rhs_and_solution,
-              const bool      transpose = false) const;
+  void
+  solve (Vector<double> &rhs_and_solution,
+         const bool      transpose = false) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void solve (BlockVector<double> &rhs_and_solution,
-              const bool           transpose = false) const;
+  void
+  solve (BlockVector<double> &rhs_and_solution,
+         const bool           transpose = false) const;
 
   /**
    * Call the two functions factorize() and solve() in that order, i.e.
@@ -242,17 +253,19 @@ public:
    * The solution will be returned in place of the right hand side vector.
    */
   template <class Matrix>
-  void solve (const Matrix   &matrix,
-              Vector<double> &rhs_and_solution,
-              const bool      transpose = false);
+  void
+  solve (const Matrix   &matrix,
+         Vector<double> &rhs_and_solution,
+         const bool      transpose = false);
 
   /**
    * Same as before, but for block vectors.
    */
   template <class Matrix>
-  void solve (const Matrix        &matrix,
-              BlockVector<double> &rhs_and_solution,
-              const bool           transpose = false);
+  void
+  solve (const Matrix        &matrix,
+         BlockVector<double> &rhs_and_solution,
+         const bool           transpose = false);
 
   /**
    * @}
@@ -319,7 +332,8 @@ private:
   /**
    * Free all memory that hasn't been freed yet.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Make sure that the arrays Ai and Ap are sorted in each row. UMFPACK wants
@@ -328,13 +342,16 @@ private:
    * BlockSparseMatrix classes
    */
   template <typename number>
-  void sort_arrays (const SparseMatrixEZ<number> &);
+  void
+  sort_arrays (const SparseMatrixEZ<number> &);
 
   template <typename number>
-  void sort_arrays (const SparseMatrix<number> &);
+  void
+  sort_arrays (const SparseMatrix<number> &);
 
   template <typename number>
-  void sort_arrays (const BlockSparseMatrix<number> &);
+  void
+  sort_arrays (const BlockSparseMatrix<number> &);
 
   /**
    * The arrays in which we store the data for the solver. SuiteSparse_long

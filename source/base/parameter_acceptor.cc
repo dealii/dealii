@@ -41,7 +41,8 @@ ParameterAcceptor::~ParameterAcceptor()
   class_list[acceptor_id] = nullptr;
 }
 
-std::string ParameterAcceptor::get_section_name() const
+std::string
+ParameterAcceptor::get_section_name() const
 {
   return (section_name != "" ? section_name : boost::core::demangle(typeid(*this).name()));
 }
@@ -122,8 +123,9 @@ ParameterAcceptor::initialize(const std::string &filename,
 
 
 
-void ParameterAcceptor::initialize(std::istream &input_stream,
-                                   ParameterHandler &prm)
+void
+ParameterAcceptor::initialize(std::istream &input_stream,
+                              ParameterHandler &prm)
 
 {
   AssertThrow(input_stream, ExcIO());
@@ -141,17 +143,20 @@ ParameterAcceptor::clear()
 
 
 
-void ParameterAcceptor::declare_parameters(ParameterHandler &)
+void
+ParameterAcceptor::declare_parameters(ParameterHandler &)
 {}
 
 
 
-void ParameterAcceptor::parse_parameters(ParameterHandler &)
+void
+ParameterAcceptor::parse_parameters(ParameterHandler &)
 {}
 
 
 
-void ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
+void
+ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
 {
   for (unsigned int i=0; i< class_list.size(); ++i)
     if (class_list[i] != nullptr)
@@ -163,7 +168,8 @@ void ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
       }
 }
 
-void ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
+void
+ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 {
   for (unsigned int i=0; i< class_list.size(); ++i)
     if (class_list[i] != nullptr)
@@ -215,7 +221,8 @@ ParameterAcceptor::get_section_path() const
   return sections;
 }
 
-void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
+void
+ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
   const auto sections = get_section_path();
   for (const auto &sec : sections)
@@ -224,7 +231,8 @@ void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAccep
     }
 }
 
-void ParameterAcceptor::leave_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
+void
+ParameterAcceptor::leave_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
   const auto sections = get_section_path();
   for (unsigned int i=0; i<sections.size(); ++i)

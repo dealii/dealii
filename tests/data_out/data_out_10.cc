@@ -34,7 +34,8 @@
 
 
 
-void test()
+void
+test()
 {
   const unsigned int number_of_time_steps = 3;
   std::vector<std::pair<double,std::vector<std::string > > > times_and_piece_names(number_of_time_steps);
@@ -57,7 +58,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

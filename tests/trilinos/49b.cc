@@ -28,7 +28,8 @@
 #include <vector>
 
 
-void test (TrilinosWrappers::MPI::BlockVector &v)
+void
+test (TrilinosWrappers::MPI::BlockVector &v)
 {
   std::vector<types::global_dof_index> sizes (2, 3);
   dealii::BlockVector<TrilinosScalar> w (sizes);
@@ -60,7 +61,8 @@ void test (TrilinosWrappers::MPI::BlockVector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

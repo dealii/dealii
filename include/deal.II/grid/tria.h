@@ -263,7 +263,8 @@ struct SubCellData
    * when @p dim equals one, and whether the @p boundary_quads
    * vector is empty when @p dim equals two.
    */
-  bool check_consistency (const unsigned int dim) const;
+  bool
+  check_consistency (const unsigned int dim) const;
 };
 
 
@@ -347,15 +348,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize (Archive &ar,
-                      const unsigned int version);
+      void
+      serialize (Archive &ar,
+                 const unsigned int version);
     };
 
 
@@ -405,15 +408,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize (Archive &ar,
-                      const unsigned int version);
+      void
+      serialize (Archive &ar,
+                 const unsigned int version);
     };
 
 
@@ -464,15 +469,17 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize (Archive &ar,
-                      const unsigned int version);
+      void
+      serialize (Archive &ar,
+                 const unsigned int version);
     };
   }
 }
@@ -1613,7 +1620,8 @@ public:
      * automatically generated destructor would have a different one due to
      * member objects.
      */
-    virtual ~DistortedCellList () noexcept override;
+    virtual
+    ~DistortedCellList () noexcept override;
 
     /**
      * A list of those cells among the coarse mesh cells that are deformed or
@@ -1678,12 +1686,14 @@ public:
   /**
    * Move assignment operator.
    */
-  Triangulation &operator = (Triangulation<dim, spacedim> &&tria) noexcept;
+  Triangulation &
+  operator = (Triangulation<dim, spacedim> &&tria) noexcept;
 
   /**
    * Delete the object and all levels of the hierarchy.
    */
-  virtual ~Triangulation () override;
+  virtual
+  ~Triangulation () override;
 
   /**
    * Reset this triangulation into a virgin state by deleting all data.
@@ -1691,19 +1701,22 @@ public:
    * Note that this operation is only allowed if no subscriptions to this
    * object exist any more, such as DoFHandler objects using it.
    */
-  virtual void clear ();
+  virtual void
+  clear ();
 
   /**
    * Set the mesh smoothing to @p mesh_smoothing. This overrides the
    * MeshSmoothing given to the constructor. It is allowed to call this
    * function only if the triangulation is empty.
    */
-  virtual void set_mesh_smoothing (const MeshSmoothing mesh_smoothing);
+  virtual void
+  set_mesh_smoothing (const MeshSmoothing mesh_smoothing);
 
   /**
    * Return the mesh smoothing requirements that are obeyed.
    */
-  virtual const MeshSmoothing &get_mesh_smoothing() const;
+  virtual const MeshSmoothing &
+  get_mesh_smoothing() const;
 
   /**
    * If @p dim==spacedim, assign a boundary object to a certain part of the
@@ -1746,8 +1759,9 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   DEAL_II_DEPRECATED
-  void set_boundary (const types::manifold_id   number,
-                     const Boundary<dim,spacedim> &boundary_object);
+  void
+  set_boundary (const types::manifold_id   number,
+                const Boundary<dim,spacedim> &boundary_object);
 
 
   /**
@@ -1765,7 +1779,8 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   DEAL_II_DEPRECATED
-  void set_boundary (const types::manifold_id number);
+  void
+  set_boundary (const types::manifold_id number);
 
   /**
    * Assign a manifold object to a certain part of the triangulation. If
@@ -1790,8 +1805,9 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_manifold (const types::manifold_id   number,
-                     const Manifold<dim,spacedim> &manifold_object);
+  void
+  set_manifold (const types::manifold_id   number,
+                const Manifold<dim,spacedim> &manifold_object);
 
 
   /**
@@ -1809,7 +1825,8 @@ public:
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
   DEAL_II_DEPRECATED
-  void set_manifold (const types::manifold_id number);
+  void
+  set_manifold (const types::manifold_id number);
 
   /**
    * Reset those parts of the triangulation with the given
@@ -1823,7 +1840,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void reset_manifold (const types::manifold_id manifold_number);
+  void
+  reset_manifold (const types::manifold_id manifold_number);
 
   /**
    * Reset all parts of the triangulation, regardless of their
@@ -1836,7 +1854,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void reset_all_manifolds ();
+  void
+  reset_all_manifolds ();
 
   /**
    * Set the manifold_id of all cells and faces to the given argument.
@@ -1846,7 +1865,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_all_manifold_ids (const types::manifold_id number);
+  void
+  set_all_manifold_ids (const types::manifold_id number);
 
   /**
    * Set the manifold_id of all boundary faces to the given argument.
@@ -1856,7 +1876,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_all_manifold_ids_on_boundary (const types::manifold_id number);
+  void
+  set_all_manifold_ids_on_boundary (const types::manifold_id number);
 
   /**
    * Set the manifold_id of all boundary faces and edges with given
@@ -1867,8 +1888,9 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  void set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
-                                         const types::manifold_id number);
+  void
+  set_all_manifold_ids_on_boundary (const types::boundary_id b_id,
+                                    const types::manifold_id number);
 
 
   /**
@@ -1884,7 +1906,8 @@ public:
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   DEAL_II_DEPRECATED
-  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
+  const Boundary<dim,spacedim> &
+  get_boundary (const types::manifold_id number) const;
 
   /**
    * Return a constant reference to a Manifold object used for this
@@ -1895,7 +1918,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const Manifold<dim,spacedim> &get_manifold (const types::manifold_id number) const;
+  const Manifold<dim,spacedim> &
+  get_manifold (const types::manifold_id number) const;
 
   /**
    * Return a vector containing all boundary indicators assigned to boundary
@@ -1908,7 +1932,8 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  std::vector<types::boundary_id> get_boundary_ids() const;
+  std::vector<types::boundary_id>
+  get_boundary_ids() const;
 
   /**
    * Return a vector containing all manifold indicators assigned to the
@@ -1921,7 +1946,8 @@ public:
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  std::vector<types::manifold_id> get_manifold_ids() const;
+  std::vector<types::manifold_id>
+  get_manifold_ids() const;
 
   /**
    * Copy @p other_tria to this triangulation. This operation is not cheap, so
@@ -1949,7 +1975,8 @@ public:
    * how the old triangulation changes, not how any triangulation it may be
    * copied to changes.
    */
-  virtual void copy_triangulation (const Triangulation<dim, spacedim> &other_tria);
+  virtual void
+  copy_triangulation (const Triangulation<dim, spacedim> &other_tria);
 
   /**
    * Create a triangulation from a list of vertices and a list of cells, each
@@ -1994,9 +2021,10 @@ public:
    * otherwise cells can legitimately be twisted if the manifold they describe
    * is twisted.
    */
-  virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
-                                     const std::vector<CellData<dim> > &cells,
-                                     const SubCellData                 &subcelldata);
+  virtual void
+  create_triangulation (const std::vector<Point<spacedim> >    &vertices,
+                        const std::vector<CellData<dim> > &cells,
+                        const SubCellData                 &subcelldata);
 
   /**
    * For backward compatibility, only. This function takes the cell data in
@@ -2006,7 +2034,8 @@ public:
    * @note This function internally calls create_triangulation and therefore
    * can throw the same exception as the other function.
    */
-  virtual void create_triangulation_compatibility (
+  virtual void
+  create_triangulation_compatibility (
     const std::vector<Point<spacedim> >    &vertices,
     const std::vector<CellData<dim> > &cells,
     const SubCellData                 &subcelldata);
@@ -2017,7 +2046,8 @@ public:
    *
    * This function throws an exception if dim equals spacedim.
    */
-  void flip_all_direction_flags();
+  void
+  flip_all_direction_flags();
 
   /**
    * @name Mesh refinement
@@ -2030,7 +2060,8 @@ public:
    * do not yet have children). The cells are only flagged, not refined, thus
    * you have the chance to save the refinement flags.
    */
-  void set_all_refine_flags ();
+  void
+  set_all_refine_flags ();
 
   /**
    * Refine all cells @p times times, by alternatingly calling
@@ -2046,7 +2077,8 @@ public:
    * times > 1) . See the section on signals in the general documentation of
    * this class.
    */
-  void refine_global (const unsigned int times = 1);
+  void
+  refine_global (const unsigned int times = 1);
 
   /**
    * Execute both refinement and coarsening of the triangulation.
@@ -2079,7 +2111,8 @@ public:
    * insert hooks, such as saving refinement flags and the like (see e.g. the
    * PersistentTriangulation class).
    */
-  virtual void execute_coarsening_and_refinement ();
+  virtual void
+  execute_coarsening_and_refinement ();
 
   /**
    * Do both preparation for refinement and coarsening as well as mesh
@@ -2110,7 +2143,8 @@ public:
    * This function uses the user flags, so store them if you still need them
    * afterwards.
    */
-  virtual bool prepare_coarsening_and_refinement ();
+  virtual bool
+  prepare_coarsening_and_refinement ();
 
   /*
    * @}
@@ -2161,7 +2195,8 @@ public:
     typedef T result_type;
 
     template <typename InputIterator>
-    T operator()(InputIterator first, InputIterator last) const
+    T
+    operator()(InputIterator first, InputIterator last) const
     {
       return std::accumulate (first, last, T());
     }
@@ -2347,48 +2382,57 @@ public:
    * Save the addresses of the cells which are flagged for refinement to @p
    * out.  For usage, read the general documentation for this class.
    */
-  void save_refine_flags (std::ostream &out) const;
+  void
+  save_refine_flags (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    */
-  void save_refine_flags (std::vector<bool> &v) const;
+  void
+  save_refine_flags (std::vector<bool> &v) const;
 
   /**
    * Read the information stored by @p save_refine_flags.
    */
-  void load_refine_flags (std::istream &in);
+  void
+  load_refine_flags (std::istream &in);
 
   /**
    * Read the information stored by @p save_refine_flags.
    */
-  void load_refine_flags (const std::vector<bool> &v);
+  void
+  load_refine_flags (const std::vector<bool> &v);
 
   /**
    * Analogue to @p save_refine_flags.
    */
-  void save_coarsen_flags (std::ostream &out) const;
+  void
+  save_coarsen_flags (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    */
-  void save_coarsen_flags (std::vector<bool> &v) const;
+  void
+  save_coarsen_flags (std::vector<bool> &v) const;
 
   /**
    * Analogue to @p load_refine_flags.
    */
-  void load_coarsen_flags (std::istream &out);
+  void
+  load_coarsen_flags (std::istream &out);
 
   /**
    * Analogue to @p load_refine_flags.
    */
-  void load_coarsen_flags (const std::vector<bool> &v);
+  void
+  load_coarsen_flags (const std::vector<bool> &v);
 
   /**
    * Return whether this triangulation has ever undergone anisotropic (as
    * opposed to only isotropic) refinement.
    */
-  bool get_anisotropic_refinement_flag() const;
+  bool
+  get_anisotropic_refinement_flag() const;
 
   /*
    * @}
@@ -2403,237 +2447,274 @@ public:
    * Clear all user flags.  See also
    * @ref GlossUserFlags.
    */
-  void clear_user_flags ();
+  void
+  clear_user_flags ();
 
   /**
    * Save all user flags. See the general documentation for this class and the
    * documentation for the @p save_refine_flags for more details.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags (std::ostream &out) const;
+  void
+  save_user_flags (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    * The output vector is resized if necessary.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags (std::vector<bool> &v) const;
+  void
+  save_user_flags (std::vector<bool> &v) const;
 
   /**
    * Read the information stored by @p save_user_flags.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags (std::istream &in);
+  void
+  load_user_flags (std::istream &in);
 
   /**
    * Read the information stored by @p save_user_flags.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags (const std::vector<bool> &v);
+  void
+  load_user_flags (const std::vector<bool> &v);
 
   /**
    * Clear all user flags on lines.  See also
    * @ref GlossUserFlags.
    */
-  void clear_user_flags_line ();
+  void
+  clear_user_flags_line ();
 
   /**
    * Save the user flags on lines.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_line (std::ostream &out) const;
+  void
+  save_user_flags_line (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    * The output vector is resized if necessary.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_line (std::vector<bool> &v) const;
+  void
+  save_user_flags_line (std::vector<bool> &v) const;
 
   /**
    * Load the user flags located on lines.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_line (std::istream &in);
+  void
+  load_user_flags_line (std::istream &in);
 
   /**
    * Load the user flags located on lines.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_line (const std::vector<bool> &v);
+  void
+  load_user_flags_line (const std::vector<bool> &v);
 
   /**
    * Clear all user flags on quads.  See also
    * @ref GlossUserFlags.
    */
-  void clear_user_flags_quad ();
+  void
+  clear_user_flags_quad ();
 
   /**
    * Save the user flags on quads.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_quad (std::ostream &out) const;
+  void
+  save_user_flags_quad (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    * The output vector is resized if necessary.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_quad (std::vector<bool> &v) const;
+  void
+  save_user_flags_quad (std::vector<bool> &v) const;
 
   /**
    * Load the user flags located on quads.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_quad (std::istream &in);
+  void
+  load_user_flags_quad (std::istream &in);
 
   /**
    * Load the user flags located on quads.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_quad (const std::vector<bool> &v);
+  void
+  load_user_flags_quad (const std::vector<bool> &v);
 
 
   /**
    * Clear all user flags on quads.  See also
    * @ref GlossUserFlags.
    */
-  void clear_user_flags_hex ();
+  void
+  clear_user_flags_hex ();
 
   /**
    * Save the user flags on hexs.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_hex (std::ostream &out) const;
+  void
+  save_user_flags_hex (std::ostream &out) const;
 
   /**
    * Same as above, but store the flags to a bitvector rather than to a file.
    * The output vector is resized if necessary.  See also
    * @ref GlossUserFlags.
    */
-  void save_user_flags_hex (std::vector<bool> &v) const;
+  void
+  save_user_flags_hex (std::vector<bool> &v) const;
 
   /**
    * Load the user flags located on hexs.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_hex (std::istream &in);
+  void
+  load_user_flags_hex (std::istream &in);
 
   /**
    * Load the user flags located on hexs.  See also
    * @ref GlossUserFlags.
    */
-  void load_user_flags_hex (const std::vector<bool> &v);
+  void
+  load_user_flags_hex (const std::vector<bool> &v);
 
   /**
    * Clear all user pointers and indices and allow the use of both for next
    * access.  See also
    * @ref GlossUserData.
    */
-  void clear_user_data ();
+  void
+  clear_user_data ();
 
   /**
    * Save all user indices. The output vector is resized if necessary. See
    * also
    * @ref GlossUserData.
    */
-  void save_user_indices (std::vector<unsigned int> &v) const;
+  void
+  save_user_indices (std::vector<unsigned int> &v) const;
 
   /**
    * Read the information stored by save_user_indices().  See also
    * @ref GlossUserData.
    */
-  void load_user_indices (const std::vector<unsigned int> &v);
+  void
+  load_user_indices (const std::vector<unsigned int> &v);
 
   /**
    * Save all user pointers. The output vector is resized if necessary.  See
    * also
    * @ref GlossUserData.
    */
-  void save_user_pointers (std::vector<void *> &v) const;
+  void
+  save_user_pointers (std::vector<void *> &v) const;
 
   /**
    * Read the information stored by save_user_pointers().  See also
    * @ref GlossUserData.
    */
-  void load_user_pointers (const std::vector<void *> &v);
+  void
+  load_user_pointers (const std::vector<void *> &v);
 
   /**
    * Save the user indices on lines. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_indices_line (std::vector<unsigned int> &v) const;
+  void
+  save_user_indices_line (std::vector<unsigned int> &v) const;
 
   /**
    * Load the user indices located on lines.  See also
    * @ref GlossUserData.
    */
-  void load_user_indices_line (const std::vector<unsigned int> &v);
+  void
+  load_user_indices_line (const std::vector<unsigned int> &v);
 
   /**
    * Save the user indices on quads. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_indices_quad (std::vector<unsigned int> &v) const;
+  void
+  save_user_indices_quad (std::vector<unsigned int> &v) const;
 
   /**
    * Load the user indices located on quads.  See also
    * @ref GlossUserData.
    */
-  void load_user_indices_quad (const std::vector<unsigned int> &v);
+  void
+  load_user_indices_quad (const std::vector<unsigned int> &v);
 
   /**
    * Save the user indices on hexes. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_indices_hex (std::vector<unsigned int> &v) const;
+  void
+  save_user_indices_hex (std::vector<unsigned int> &v) const;
 
   /**
    * Load the user indices located on hexs.  See also
    * @ref GlossUserData.
    */
-  void load_user_indices_hex (const std::vector<unsigned int> &v);
+  void
+  load_user_indices_hex (const std::vector<unsigned int> &v);
   /**
    * Save the user indices on lines. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_pointers_line (std::vector<void *> &v) const;
+  void
+  save_user_pointers_line (std::vector<void *> &v) const;
 
   /**
    * Load the user pointers located on lines.  See also
    * @ref GlossUserData.
    */
-  void load_user_pointers_line (const std::vector<void *> &v);
+  void
+  load_user_pointers_line (const std::vector<void *> &v);
 
   /**
    * Save the user pointers on quads. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_pointers_quad (std::vector<void *> &v) const;
+  void
+  save_user_pointers_quad (std::vector<void *> &v) const;
 
   /**
    * Load the user pointers located on quads.  See also
    * @ref GlossUserData.
    */
-  void load_user_pointers_quad (const std::vector<void *> &v);
+  void
+  load_user_pointers_quad (const std::vector<void *> &v);
 
   /**
    * Save the user pointers on hexes. The output vector is resized if
    * necessary.  See also
    * @ref GlossUserData.
    */
-  void save_user_pointers_hex (std::vector<void *> &v) const;
+  void
+  save_user_pointers_hex (std::vector<void *> &v) const;
 
   /**
    * Load the user pointers located on hexs.  See also
    * @ref GlossUserData.
    */
-  void load_user_pointers_hex (const std::vector<void *> &v);
+  void
+  load_user_pointers_hex (const std::vector<void *> &v);
 
   /*
    * @}
@@ -2647,7 +2728,8 @@ public:
   /**
    * Iterator to the first used cell on level @p level.
    */
-  cell_iterator        begin       (const unsigned int level = 0) const;
+  cell_iterator
+  begin       (const unsigned int level = 0) const;
 
   /**
    * Iterator to the first active cell on level @p level. If the given level
@@ -2661,37 +2743,43 @@ public:
    * have zero iterations, as may be expected if there are no active cells on
    * this level.
    */
-  active_cell_iterator begin_active(const unsigned int level = 0) const;
+  active_cell_iterator
+  begin_active(const unsigned int level = 0) const;
 
   /**
    * Iterator past the end; this iterator serves for comparisons of iterators
    * with past-the-end or before-the-beginning states.
    */
-  cell_iterator        end () const;
+  cell_iterator
+  end () const;
 
   /**
    * Return an iterator which is the first iterator not on level. If @p level
    * is the last level, then this returns <tt>end()</tt>.
    */
-  cell_iterator        end (const unsigned int level) const;
+  cell_iterator
+  end (const unsigned int level) const;
 
   /**
    * Return an active iterator which is the first active iterator not on the
    * given level. If @p level is the last level, then this returns
    * <tt>end()</tt>.
    */
-  active_cell_iterator end_active (const unsigned int level) const;
+  active_cell_iterator
+  end_active (const unsigned int level) const;
 
 
   /**
    * Return an iterator pointing to the last used cell.
    */
-  cell_iterator        last () const;
+  cell_iterator
+  last () const;
 
   /**
    * Return an iterator pointing to the last active cell.
    */
-  active_cell_iterator last_active () const;
+  active_cell_iterator
+  last_active () const;
 
   /**
    * @name Cell iterator functions returning ranges of iterators
@@ -2707,7 +2795,8 @@ public:
    *
    * @ingroup CPP11
    */
-  IteratorRange<cell_iterator>        cell_iterators () const;
+  IteratorRange<cell_iterator>
+  cell_iterators () const;
 
   /**
    * Return an iterator range that contains all active cells that make up this
@@ -2744,7 +2833,8 @@ public:
    *
    * @ingroup CPP11
    */
-  IteratorRange<active_cell_iterator> active_cell_iterators () const;
+  IteratorRange<active_cell_iterator>
+  active_cell_iterators () const;
 
   /**
    * Return an iterator range that contains all cells (active or not) that
@@ -2761,7 +2851,8 @@ public:
    *
    * @ingroup CPP11
    */
-  IteratorRange<cell_iterator>        cell_iterators_on_level (const unsigned int level) const;
+  IteratorRange<cell_iterator>
+  cell_iterators_on_level (const unsigned int level) const;
 
   /**
    * Return an iterator range that contains all active cells that make up the
@@ -2778,7 +2869,8 @@ public:
    *
    * @ingroup CPP11
    */
-  IteratorRange<active_cell_iterator> active_cell_iterators_on_level (const unsigned int level) const;
+  IteratorRange<active_cell_iterator>
+  active_cell_iterators_on_level (const unsigned int level) const;
 
   /*
    * @}
@@ -2795,18 +2887,21 @@ public:
   /**
    * Iterator to the first used face.
    */
-  face_iterator        begin_face       () const;
+  face_iterator
+  begin_face       () const;
 
   /**
    * Iterator to the first active face.
    */
-  active_face_iterator begin_active_face() const;
+  active_face_iterator
+  begin_active_face() const;
 
   /**
    * Iterator past the end; this iterator serves for comparisons of iterators
    * with past-the-end or before-the-beginning states.
    */
-  face_iterator        end_face () const;
+  face_iterator
+  end_face () const;
 
   /*
    * @}
@@ -2824,21 +2919,24 @@ public:
    * Iterator to the first used vertex. This function can only be used if dim
    * is not one.
    */
-  vertex_iterator        begin_vertex() const;
+  vertex_iterator
+  begin_vertex() const;
 
   /**
    * Iterator to the first active vertex. Because all vertices are active,
    * begin_vertex() and begin_active_vertex() return the same vertex. This
    * function can only be used if dim is not one.
    */
-  active_vertex_iterator begin_active_vertex() const;
+  active_vertex_iterator
+  begin_active_vertex() const;
 
   /**
    * Iterator past the end; this iterator serves for comparisons of iterators
    * with past-the-end or before-the-beginning states. This function can only
    * be used if dim is not one.
    */
-  vertex_iterator        end_vertex() const;
+  vertex_iterator
+  end_vertex() const;
 
   /*
    * @}
@@ -2861,82 +2959,97 @@ public:
   /**
    * Return the total number of used lines, active or not.
    */
-  unsigned int n_lines () const;
+  unsigned int
+  n_lines () const;
 
   /**
    * Return the total number of used lines, active or not on level @p level.
    */
-  unsigned int n_lines (const unsigned int level) const;
+  unsigned int
+  n_lines (const unsigned int level) const;
 
   /**
    * Return the total number of active lines.
    */
-  unsigned int n_active_lines () const;
+  unsigned int
+  n_active_lines () const;
 
   /**
    * Return the total number of active lines, on level @p level.
    */
-  unsigned int n_active_lines (const unsigned int level) const;
+  unsigned int
+  n_active_lines (const unsigned int level) const;
 
   /**
    * Return the total number of used quads, active or not.
    */
-  unsigned int n_quads () const;
+  unsigned int
+  n_quads () const;
 
   /**
    * Return the total number of used quads, active or not on level @p level.
    */
-  unsigned int n_quads (const unsigned int level) const;
+  unsigned int
+  n_quads (const unsigned int level) const;
 
   /**
    * Return the total number of active quads, active or not.
    */
-  unsigned int n_active_quads () const;
+  unsigned int
+  n_active_quads () const;
 
   /**
    * Return the total number of active quads, active or not on level @p level.
    */
-  unsigned int n_active_quads (const unsigned int level) const;
+  unsigned int
+  n_active_quads (const unsigned int level) const;
 
   /**
    * Return the total number of used hexahedra, active or not.
    */
-  unsigned int n_hexs() const;
+  unsigned int
+  n_hexs() const;
 
   /**
    * Return the total number of used hexahedra, active or not on level @p
    * level.
    */
-  unsigned int n_hexs(const unsigned int level) const;
+  unsigned int
+  n_hexs(const unsigned int level) const;
 
   /**
    * Return the total number of active hexahedra, active or not.
    */
-  unsigned int n_active_hexs() const;
+  unsigned int
+  n_active_hexs() const;
 
   /**
    * Return the total number of active hexahedra, active or not on level @p
    * level.
    */
-  unsigned int n_active_hexs(const unsigned int level) const;
+  unsigned int
+  n_active_hexs(const unsigned int level) const;
 
   /**
    * Return the total number of used cells, active or not.  Maps to
    * <tt>n_lines()</tt> in one space dimension and so on.
    */
-  unsigned int n_cells () const;
+  unsigned int
+  n_cells () const;
 
   /**
    * Return the total number of used cells, active or not, on level @p level.
    * Maps to <tt>n_lines(level)</tt> in one space dimension and so on.
    */
-  unsigned int n_cells (const unsigned int level) const;
+  unsigned int
+  n_cells (const unsigned int level) const;
 
   /**
    * Return the total number of active cells. Maps to
    * <tt>n_active_lines()</tt> in one space dimension and so on.
    */
-  unsigned int n_active_cells () const;
+  unsigned int
+  n_active_cells () const;
 
   /**
    * Return the total number of active cells. For the current class, this is
@@ -2945,28 +3058,32 @@ public:
    * may return a value greater than the number of active cells reported by
    * the triangulation object on the current processor.
    */
-  virtual types::global_dof_index n_global_active_cells () const;
+  virtual types::global_dof_index
+  n_global_active_cells () const;
 
 
   /**
    * Return the total number of active cells on level @p level.  Maps to
    * <tt>n_active_lines(level)</tt> in one space dimension and so on.
    */
-  unsigned int n_active_cells (const unsigned int level) const;
+  unsigned int
+  n_active_cells (const unsigned int level) const;
 
   /**
    * Return the total number of used faces, active or not.  In 2D, the result
    * equals n_lines(), while in 3D it equals n_quads(). Since there are no
    * face objects in 1d, the function returns zero in 1d.
    */
-  unsigned int n_faces () const;
+  unsigned int
+  n_faces () const;
 
   /**
    * Return the total number of active faces, active or not.  In 2D, the
    * result equals n_active_lines(), while in 3D it equals n_active_quads().
    * Since there are no face objects in 1d, the function returns zero in 1d.
    */
-  unsigned int n_active_faces () const;
+  unsigned int
+  n_active_faces () const;
 
   /**
    * Return the number of levels in this triangulation.
@@ -2985,7 +3102,8 @@ public:
    * because in a coarse, unrefined mesh, all cells have level zero -- making
    * the number of levels equal to one.)
    */
-  unsigned int n_levels () const;
+  unsigned int
+  n_levels () const;
 
   /**
    * Return the number of levels in use. This function is equivalent to
@@ -2994,7 +3112,8 @@ public:
    * and therefore can be larger than n_levels().
    */
   virtual
-  unsigned int n_global_levels () const;
+  unsigned int
+  n_global_levels () const;
 
   /**
    * Return true if the triangulation has hanging nodes.
@@ -3006,7 +3125,8 @@ public:
    * of what the function is supposed to do in the parallel context).
    */
   virtual
-  bool has_hanging_nodes() const;
+  bool
+  has_hanging_nodes() const;
 
   /**
    * Return the total number of vertices.  Some of them may not be used, which
@@ -3015,7 +3135,8 @@ public:
    * holes in the numbers of used vertices.  You can get the number of used
    * vertices using @p n_used_vertices function.
    */
-  unsigned int n_vertices () const;
+  unsigned int
+  n_vertices () const;
 
   /**
    * Return a constant reference to all the vertices present in this
@@ -3032,12 +3153,14 @@ public:
    * Return the number of vertices that are presently in use, i.e. belong to
    * at least one used element.
    */
-  unsigned int n_used_vertices () const;
+  unsigned int
+  n_used_vertices () const;
 
   /**
    * Return @p true if the vertex with this @p index is used.
    */
-  bool vertex_used (const unsigned int index) const;
+  bool
+  vertex_used (const unsigned int index) const;
 
   /**
    * Return a constant reference to the array of @p bools indicating whether
@@ -3057,7 +3180,8 @@ public:
    *
    * In one space dimension, two is returned.
    */
-  unsigned int max_adjacent_cells () const;
+  unsigned int
+  max_adjacent_cells () const;
 
   /**
    * This function always returns @p invalid_subdomain_id but is there for
@@ -3065,7 +3189,8 @@ public:
    * class. For distributed parallel triangulations this function returns the
    * subdomain id of those cells that are owned by the current processor.
    */
-  virtual types::subdomain_id locally_owned_subdomain () const;
+  virtual types::subdomain_id
+  locally_owned_subdomain () const;
 
   /**
    * Return a reference to the current object.
@@ -3105,7 +3230,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_lines () const;
+  unsigned int
+  n_raw_lines () const;
 
   /**
    * Number of lines, used or unused, on the given level.
@@ -3116,7 +3242,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_lines (const unsigned int level) const;
+  unsigned int
+  n_raw_lines (const unsigned int level) const;
 
   /**
    * Total number of quads, used or unused.
@@ -3127,7 +3254,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_quads () const;
+  unsigned int
+  n_raw_quads () const;
 
   /**
    * Number of quads, used or unused, on the given level.
@@ -3138,7 +3266,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_quads (const unsigned int level) const;
+  unsigned int
+  n_raw_quads (const unsigned int level) const;
 
   /**
    * Number of hexs, used or unused, on the given level.
@@ -3149,7 +3278,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_hexs (const unsigned int level) const;
+  unsigned int
+  n_raw_hexs (const unsigned int level) const;
 
   /**
    * Number of cells, used or unused, on the given level.
@@ -3160,7 +3290,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_cells (const unsigned int level) const;
+  unsigned int
+  n_raw_cells (const unsigned int level) const;
 
   /**
    * Return the total number of faces, used or not. In 2d, the result equals
@@ -3172,7 +3303,8 @@ public:
    * the other classes that build very closely on it (in particular, the
    * DoFHandler class).
    */
-  unsigned int n_raw_faces () const;
+  unsigned int
+  n_raw_faces () const;
 
   /*
    * @}
@@ -3186,7 +3318,8 @@ public:
    * accessed through a pointer to this base class, even if the actual object
    * is a derived class.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t
+  memory_consumption () const;
 
   /**
    * Write the data of this object to a stream for the purpose of
@@ -3197,8 +3330,9 @@ public:
    * stored. For more information see the general documentation of this class.
    */
   template <class Archive>
-  void save (Archive &ar,
-             const unsigned int version) const;
+  void
+  save (Archive &ar,
+        const unsigned int version) const;
 
   /**
    * Read the data of this object from a stream for the purpose of
@@ -3216,8 +3350,9 @@ public:
    * signals, see the general documentation of this class.
    */
   template <class Archive>
-  void load (Archive &ar,
-             const unsigned int version);
+  void
+  load (Archive &ar,
+        const unsigned int version);
 
 
   /**
@@ -3337,24 +3472,27 @@ protected:
    * the input vector) is stored as plain text as well. The format should
    * therefore be interplatform compatible.
    */
-  static void write_bool_vector (const unsigned int       magic_number1,
-                                 const std::vector<bool> &v,
-                                 const unsigned int       magic_number2,
-                                 std::ostream            &out);
+  static void
+  write_bool_vector (const unsigned int       magic_number1,
+                     const std::vector<bool> &v,
+                     const unsigned int       magic_number2,
+                     std::ostream            &out);
 
   /**
    * Re-read a vector of bools previously written by @p write_bool_vector and
    * compare with the magic numbers.
    */
-  static void read_bool_vector (const unsigned int       magic_number1,
-                                std::vector<bool>       &v,
-                                const unsigned int       magic_number2,
-                                std::istream            &in);
+  static void
+  read_bool_vector (const unsigned int       magic_number1,
+                    std::vector<bool>       &v,
+                    const unsigned int       magic_number2,
+                    std::istream            &in);
 
   /**
    * Recreate information about periodic neighbors from periodic_face_pairs_level_0.
    */
-  void update_periodic_face_map ();
+  void
+  update_periodic_face_map ();
 
 
 private:
@@ -3395,13 +3533,15 @@ private:
    * Iterator to the first cell, used or not, on level @p level. If a level
    * has no cells, a past-the-end iterator is returned.
    */
-  raw_cell_iterator    begin_raw   (const unsigned int level = 0) const;
+  raw_cell_iterator
+  begin_raw   (const unsigned int level = 0) const;
 
   /**
    * Return a raw iterator which is the first iterator not on level. If @p
    * level is the last level, then this returns <tt>end()</tt>.
    */
-  raw_cell_iterator    end_raw (const unsigned int level) const;
+  raw_cell_iterator
+  end_raw (const unsigned int level) const;
 
   /*
    * @}
@@ -3437,7 +3577,8 @@ private:
    * Iterator past the end; this iterator serves for comparisons of iterators
    * with past-the-end or before-the-beginning states.
    */
-  line_iterator        end_line () const;
+  line_iterator
+  end_line () const;
 
   /*
    * @}
@@ -3528,7 +3669,8 @@ private:
    * assertion due to input errors (e.g. in the create_triangulation()
    * function).
    */
-  void clear_despite_subscriptions ();
+  void
+  clear_despite_subscriptions ();
 
   /**
    * For all cells, set the active cell indices so that active cells know the
@@ -3536,7 +3678,8 @@ private:
    * value. This function is called after mesh creation, refinement, and
    * serialization.
    */
-  void reset_active_cell_indices ();
+  void
+  reset_active_cell_indices ();
 
   /**
    * Refine all cells on all levels which were previously flagged for
@@ -3551,7 +3694,8 @@ private:
    * if the <code>check_for_distorted_cells</code> flag was specified upon
    * creation of this object, at
    */
-  DistortedCellList execute_refinement ();
+  DistortedCellList
+  execute_refinement ();
 
   /**
    * Coarsen all cells which were flagged for coarsening, or rather: delete
@@ -3559,13 +3703,15 @@ private:
    * coarsening and several other constraints hold (see the general doc of
    * this class).
    */
-  void execute_coarsening ();
+  void
+  execute_coarsening ();
 
   /**
    * Make sure that either all or none of the children of a cell are tagged
    * for coarsening.
    */
-  void fix_coarsen_flags ();
+  void
+  fix_coarsen_flags ();
 
   /**
    * Array of pointers pointing to the objects storing the cell data on the
@@ -3708,8 +3854,9 @@ namespace internal
   namespace TriangulationImplementation
   {
     template <class Archive>
-    void NumberCache<1>::serialize (Archive &ar,
-                                    const unsigned int)
+    void
+    NumberCache<1>::serialize (Archive &ar,
+                               const unsigned int)
     {
       ar &n_levels;
       ar &n_lines &n_lines_level;
@@ -3718,8 +3865,9 @@ namespace internal
 
 
     template <class Archive>
-    void NumberCache<2>::serialize (Archive &ar,
-                                    const unsigned int version)
+    void
+    NumberCache<2>::serialize (Archive &ar,
+                               const unsigned int version)
     {
       this->NumberCache<1>::serialize (ar, version);
 
@@ -3729,8 +3877,9 @@ namespace internal
 
 
     template <class Archive>
-    void NumberCache<3>::serialize (Archive &ar,
-                                    const unsigned int version)
+    void
+    NumberCache<3>::serialize (Archive &ar,
+                               const unsigned int version)
     {
       this->NumberCache<2>::serialize (ar, version);
 
@@ -3756,14 +3905,16 @@ Triangulation<dim,spacedim>::vertex_used(const unsigned int index) const
 
 template <int dim, int spacedim>
 inline
-unsigned int Triangulation<dim, spacedim>::n_levels () const
+unsigned int
+Triangulation<dim, spacedim>::n_levels () const
 {
   return number_cache.n_levels;
 }
 
 template <int dim, int spacedim>
 inline
-unsigned int Triangulation<dim, spacedim>::n_global_levels () const
+unsigned int
+Triangulation<dim, spacedim>::n_global_levels () const
 {
   return number_cache.n_levels;
 }
@@ -3896,44 +4047,71 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> unsigned int Triangulation<1,1>::n_raw_lines (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_quads () const;
-template <> unsigned int Triangulation<1,1>::n_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<2,2>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_raw_hexs (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_active_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,1>::n_active_quads () const;
-template <> unsigned int Triangulation<1,1>::max_adjacent_cells () const;
+template <> unsigned int
+Triangulation<1,1>::n_raw_lines (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,1>::n_quads () const;
+template <> unsigned int
+Triangulation<1,1>::n_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,1>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<2,2>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,1>::n_raw_hexs (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,1>::n_active_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,1>::n_active_quads () const;
+template <> unsigned int
+Triangulation<1,1>::max_adjacent_cells () const;
 
 
 // -------------------------------------------------------------------
 // -- Explicit specializations for codimension one grids
 
 
-template <> unsigned int Triangulation<1,2>::n_raw_lines (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_quads () const;
-template <> unsigned int Triangulation<1,2>::n_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_raw_hexs (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_active_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,2>::n_active_quads () const;
-template <> unsigned int Triangulation<1,2>::max_adjacent_cells () const;
+template <> unsigned int
+Triangulation<1,2>::n_raw_lines (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,2>::n_quads () const;
+template <> unsigned int
+Triangulation<1,2>::n_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,2>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,2>::n_raw_hexs (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,2>::n_active_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,2>::n_active_quads () const;
+template <> unsigned int
+Triangulation<1,2>::max_adjacent_cells () const;
 
 // -------------------------------------------------------------------
 // -- Explicit specializations for codimension two grids
 
 
-template <> unsigned int Triangulation<1,3>::n_raw_lines (const unsigned int level) const;
-template <> unsigned int Triangulation<1,3>::n_quads () const;
-template <> unsigned int Triangulation<1,3>::n_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,3>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,3>::n_raw_hexs (const unsigned int level) const;
-template <> unsigned int Triangulation<1,3>::n_active_quads (const unsigned int level) const;
-template <> unsigned int Triangulation<1,3>::n_active_quads () const;
-template <> unsigned int Triangulation<1,3>::max_adjacent_cells () const;
+template <> unsigned int
+Triangulation<1,3>::n_raw_lines (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,3>::n_quads () const;
+template <> unsigned int
+Triangulation<1,3>::n_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,3>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<2,3>::n_raw_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,3>::n_raw_hexs (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,3>::n_active_quads (const unsigned int level) const;
+template <> unsigned int
+Triangulation<1,3>::n_active_quads () const;
+template <> unsigned int
+Triangulation<1,3>::max_adjacent_cells () const;
 
 
 #endif // DOXYGEN

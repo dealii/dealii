@@ -67,7 +67,8 @@ namespace Utilities
    * is also provided by the DEAL_II_PACKAGE_NAME and
    * DEAL_II_PACKAGE_VERSION preprocessor variables.
    */
-  std::string dealii_version_string ();
+  std::string
+  dealii_version_string ();
 
   /**
    * Convert a number @p value to a string, with as many digits as given to
@@ -129,7 +130,8 @@ namespace Utilities
    * This function returns a string containing "dim" if dim is equal to
    * spacedim, otherwise it returns "dim,spacedim".
    */
-  std::string dim_string(const int dim, const int spacedim);
+  std::string
+  dim_string(const int dim, const int spacedim);
 
   /**
    * Given a list of strings, convert it to a list of integers. Throw an
@@ -248,9 +250,10 @@ namespace Utilities
    * Return a string with all occurrences of @p from in @p input replaced by
    * @p to.
    */
-  std::string replace_in_string(const std::string &input,
-                                const std::string &from,
-                                const std::string &to);
+  std::string
+  replace_in_string(const std::string &input,
+                    const std::string &from,
+                    const std::string &to);
 
   /**
    * Return a string with all standard whitespace characters (including
@@ -445,7 +448,8 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  size_t pack (const T &object, std::vector<char> &dest_buffer);
+  size_t
+  pack (const T &object, std::vector<char> &dest_buffer);
 
   /**
    * Creates and returns a buffer solely for the given object, using the
@@ -454,7 +458,8 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  std::vector<char> pack (const T &object);
+  std::vector<char>
+  pack (const T &object);
 
   /**
    * Given a vector of characters, obtained through a call to the function
@@ -485,7 +490,8 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  T unpack (const std::vector<char> &buffer);
+  T
+  unpack (const std::vector<char> &buffer);
 
   /**
    * Same unpack function as above, but takes constant iterators on
@@ -494,8 +500,9 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T>
-  T unpack (const std::vector<char>::iterator &begin,
-            const std::vector<char>::iterator &end);
+  T
+  unpack (const std::vector<char>::iterator &begin,
+          const std::vector<char>::iterator &end);
 
   /**
    * Given a vector of characters, obtained through a call to the function
@@ -528,8 +535,9 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
-  void unpack (const std::vector<char> &buffer,
-               T (&unpacked_object)[N]);
+  void
+  unpack (const std::vector<char> &buffer,
+          T (&unpacked_object)[N]);
 
   /**
    * Same unpack function as above, but takes constant iterators on
@@ -538,9 +546,10 @@ namespace Utilities
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
   template <typename T, int N>
-  void unpack (const std::vector<char>::iterator &begin,
-               const std::vector<char>::iterator &end,
-               T (&unpacked_object)[N]);
+  void
+  unpack (const std::vector<char>::iterator &begin,
+          const std::vector<char>::iterator &end,
+          T (&unpacked_object)[N]);
 
   /**
    * Convert an object of type `std::unique_ptr<From>` to an object of
@@ -619,7 +628,8 @@ namespace Utilities
      * using the /proc/loadavg pseudo-file, on other systems we simply return
      * zero.
      */
-    double get_cpu_load ();
+    double
+    get_cpu_load ();
 
     /**
      * Return the current level of vectorization as described by DEAL_II_COMPILER_VECTORIZATION_LEVEL
@@ -653,7 +663,8 @@ namespace Utilities
      * </tr>
      * </table>
      */
-    const std::string get_current_vectorization_level();
+    const std::string
+    get_current_vectorization_level();
 
     /**
      * Structure that hold information about memory usage in kB. Used by
@@ -687,25 +698,29 @@ namespace Utilities
      * Fill the @p stats structure with information about the memory
      * consumption of this process. This is only implemented on Linux.
      */
-    void get_memory_stats (MemoryStats &stats);
+    void
+    get_memory_stats (MemoryStats &stats);
 
 
     /**
      * Return the name of the host this process runs on.
      */
-    std::string get_hostname ();
+    std::string
+    get_hostname ();
 
 
     /**
      * Return the present time as HH:MM:SS.
      */
-    std::string get_time ();
+    std::string
+    get_time ();
 
     /**
      * Return the present date as YYYY/MM/DD. MM and DD may be either one or
      * two digits.
      */
-    std::string get_date ();
+    std::string
+    get_date ();
 
     /**
      * Call the system function posix_memalign, or a replacement function if
@@ -721,7 +736,8 @@ namespace Utilities
      * @note This function checks internally for error codes, rather than
      * leaving this task to the calling site.
      */
-    void posix_memalign (void **memptr, size_t alignment, size_t size);
+    void
+    posix_memalign (void **memptr, size_t alignment, size_t size);
   }
 
 
@@ -742,7 +758,8 @@ namespace Utilities
      * the communicator will correspond to MPI_COMM_WORLD, i.e. a communicator
      * that encompasses all processes within this MPI universe.
      */
-    const Epetra_Comm &comm_world();
+    const Epetra_Comm &
+    comm_world();
 
     /**
      * Return a Trilinos Epetra_Comm object needed for creation of
@@ -753,7 +770,8 @@ namespace Utilities
      * the communicator will correspond to MPI_COMM_SELF, i.e. a communicator
      * that comprises only this one processor.
      */
-    const Epetra_Comm &comm_self();
+    const Epetra_Comm &
+    comm_self();
 
     /**
      * Given a communicator, duplicate it. If the given communicator is
@@ -823,7 +841,8 @@ namespace Utilities
      * only one MPI process), then the communicator necessarily involves
      * only one process and the function returns 1.
      */
-    unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator);
+    unsigned int
+    get_n_mpi_processes (const Epetra_Comm &mpi_communicator);
 
     /**
      * Return the number of the present MPI process in the space of processes
@@ -831,7 +850,8 @@ namespace Utilities
      * each process between zero and (less than) the number of all processes
      * (given by get_n_mpi_processes()).
      */
-    unsigned int get_this_mpi_process (const Epetra_Comm &mpi_communicator);
+    unsigned int
+    get_this_mpi_process (const Epetra_Comm &mpi_communicator);
 
     /**
      * Given a Trilinos Epetra map, create a new map that has the same
@@ -860,7 +880,8 @@ namespace Utilities
 {
   template <int N, typename T>
   inline
-  T fixed_power (const T n)
+  T
+  fixed_power (const T n)
   {
     Assert (N>=0, ExcNotImplemented());
     switch (N)
@@ -1000,7 +1021,8 @@ namespace Utilities
 // --------------------- non-inline functions
 
   template <typename T>
-  size_t pack (const T &object, std::vector<char> &dest_buffer)
+  size_t
+  pack (const T &object, std::vector<char> &dest_buffer)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1058,7 +1080,8 @@ namespace Utilities
 
 
   template <typename T>
-  std::vector<char> pack (const T &object)
+  std::vector<char>
+  pack (const T &object)
   {
     std::vector<char> buffer;
     pack<T> (object, buffer);
@@ -1067,8 +1090,9 @@ namespace Utilities
 
 
   template <typename T>
-  T unpack (const std::vector<char>::const_iterator &cbegin,
-            const std::vector<char>::const_iterator &cend)
+  T
+  unpack (const std::vector<char>::const_iterator &cbegin,
+          const std::vector<char>::const_iterator &cend)
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1120,16 +1144,18 @@ namespace Utilities
 
 
   template <typename T>
-  T unpack(const std::vector<char> &buffer)
+  T
+  unpack(const std::vector<char> &buffer)
   {
     return unpack<T> (buffer.cbegin(), buffer.cend());
   }
 
 
   template <typename T, int N>
-  void unpack (const std::vector<char>::const_iterator &cbegin,
-               const std::vector<char>::const_iterator &cend,
-               T (&unpacked_object)[N])
+  void
+  unpack (const std::vector<char>::const_iterator &cbegin,
+          const std::vector<char>::const_iterator &cend,
+          T (&unpacked_object)[N])
   {
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1176,8 +1202,9 @@ namespace Utilities
 
 
   template <typename T, int N>
-  void unpack (const std::vector<char> &buffer,
-               T (&unpacked_object)[N])
+  void
+  unpack (const std::vector<char> &buffer,
+          T (&unpacked_object)[N])
   {
     unpack<T,N> (buffer.cbegin(), buffer.cend(), unpacked_object);
   }
@@ -1198,7 +1225,8 @@ namespace boost
     struct Serialize
     {
       template<class Archive, typename... Args>
-      static void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+      static void
+      serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
       {
         ar &std::get<N-1>(t);
         Serialize<N-1>::serialize(ar, t, version);
@@ -1209,7 +1237,8 @@ namespace boost
     struct Serialize<0>
     {
       template<class Archive, typename... Args>
-      static void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+      static void
+      serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
       {
         (void) ar;
         (void) t;
@@ -1218,7 +1247,8 @@ namespace boost
     };
 
     template<class Archive, typename... Args>
-    void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+    void
+    serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
     {
       Serialize<sizeof...(Args)>::serialize(ar, t, version);
     }

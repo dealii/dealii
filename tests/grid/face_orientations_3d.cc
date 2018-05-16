@@ -30,7 +30,8 @@
 
 
 
-void test (const char *filename)
+void
+test (const char *filename)
 {
   Triangulation<3> tria;
   GridIn<3> gi;
@@ -65,7 +66,8 @@ void test (const char *filename)
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   initlog();

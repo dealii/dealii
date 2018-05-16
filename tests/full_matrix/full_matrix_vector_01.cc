@@ -22,8 +22,9 @@
 #include <deal.II/lac/full_matrix.h>
 #include <vector>
 
-void test (Vector<double> &v,
-           Vector<double> &w)
+void
+test (Vector<double> &v,
+      Vector<double> &w)
 {
   FullMatrix<double> m(v.size(), v.size());
   for (unsigned int i=0; i<m.m(); ++i)
@@ -55,7 +56,8 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

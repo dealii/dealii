@@ -32,7 +32,8 @@
 
 
 
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   Triangulation<2> tr;
   GridGenerator::hyper_cube (tr);
@@ -67,7 +68,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

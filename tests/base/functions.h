@@ -112,10 +112,13 @@ public:
   DerivativeTestFunction(const Function<dim> &, const double h);
   ~DerivativeTestFunction();
 
-  virtual void vector_value (const Point<dim> &points, Vector<double> &value) const;
-  virtual double value (const Point<dim> &points, const unsigned int component) const;
-  virtual void vector_value_list (const std::vector< Point< dim > > &points,
-                                  std::vector< Vector< double > > &values) const;
+  virtual void
+  vector_value (const Point<dim> &points, Vector<double> &value) const;
+  virtual double
+  value (const Point<dim> &points, const unsigned int component) const;
+  virtual void
+  vector_value_list (const std::vector< Point< dim > > &points,
+                     std::vector< Vector< double > > &values) const;
 
 private:
   const Function<dim> &func;
@@ -149,7 +152,8 @@ DerivativeTestFunction<dim>::vector_value_list (
 
 
 template <int dim>
-void DerivativeTestFunction<dim>::vector_value (
+void
+DerivativeTestFunction<dim>::vector_value (
   const Point<dim> &point,
   Vector<double> &value) const
 {
@@ -158,7 +162,8 @@ void DerivativeTestFunction<dim>::vector_value (
 
 
 template <int dim>
-double DerivativeTestFunction<dim>::value (
+double
+DerivativeTestFunction<dim>::value (
   const Point<dim> &point,
   const unsigned int comp) const
 {

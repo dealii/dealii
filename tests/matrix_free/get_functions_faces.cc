@@ -27,7 +27,8 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/numerics/vector_tools.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -40,7 +41,8 @@ public:
     data(data)
   {}
 
-  void action(Vector<number> &src) const
+  void
+  action(Vector<number> &src) const
   {
     data.loop (&MatrixFreeTest::dummy,
                &MatrixFreeTest::dummy,
@@ -49,15 +51,17 @@ public:
   }
 
 private:
-  void dummy (const MatrixFree<dim,number> &,
-              Vector<number> &, const Vector<number> &,
-              const std::pair<unsigned int,unsigned int> &) const
+  void
+  dummy (const MatrixFree<dim,number> &,
+         Vector<number> &, const Vector<number> &,
+         const std::pair<unsigned int,unsigned int> &) const
   {
   }
-  void local_apply_boundary_face (const MatrixFree<dim,number>    &data,
-                                  Vector<number> &,
-                                  const Vector<number>            &src,
-                                  const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_boundary_face (const MatrixFree<dim,number>    &data,
+                             Vector<number> &,
+                             const Vector<number>            &src,
+                             const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> fe_eval(data, true);
     for (unsigned int face=face_range.first; face<face_range.second; face++)
@@ -88,8 +92,9 @@ template <int dim>
 class BoundaryFunction : public Function<dim>
 {
 public:
-  virtual double value(const Point<dim> &p,
-                       const unsigned int) const
+  virtual double
+  value(const Point<dim> &p,
+        const unsigned int) const
   {
     return p[0]+0.2*p[1];
   }
@@ -98,7 +103,8 @@ public:
 
 
 template <int dim>
-Point<dim> grid_transform (const Point<dim> &in)
+Point<dim>
+grid_transform (const Point<dim> &in)
 {
   Point<dim> out;
   for (unsigned int d=0; d<dim; ++d)
@@ -109,7 +115,8 @@ Point<dim> grid_transform (const Point<dim> &in)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria, 0, 1);
@@ -138,7 +145,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

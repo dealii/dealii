@@ -40,14 +40,16 @@ using namespace std;
 
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim> &tria)
+void
+save_mesh(const Triangulation<dim,spacedim> &tria)
 {
   GridOut grid_out;
   grid_out.write_gnuplot (tria, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main ()
 {
   ofstream logfile("output");
   deallog.attach(logfile);

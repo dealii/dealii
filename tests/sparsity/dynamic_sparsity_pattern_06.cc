@@ -23,9 +23,11 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
-void test ()
+void
+test ()
 {
   const unsigned int N = 100;
   DynamicSparsityPattern csp (N,N);
@@ -40,7 +42,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

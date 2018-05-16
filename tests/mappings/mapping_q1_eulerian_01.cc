@@ -66,14 +66,16 @@ public:
     Function<dim>(dim)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     return p[component];
   }
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double> &v) const
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double> &v) const
   {
     for (unsigned int i=0; i<dim; ++i)
       v(i) = p[i];
@@ -82,7 +84,8 @@ public:
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -112,7 +115,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

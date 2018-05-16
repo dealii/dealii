@@ -45,7 +45,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ();
+void
+test ();
 
 
 template <int dim>
@@ -59,8 +60,9 @@ public:
     q(q)
   {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     Assert ((component == 0) && (this->n_components == 1),
             ExcInternalError());
@@ -72,8 +74,9 @@ public:
   }
 
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &v) const
   {
     for (unsigned int c=0; c<v.size(); ++c)
       {
@@ -98,10 +101,11 @@ DeclException1 (ExcFailedProjection,
 
 
 template <int dim>
-void do_project (const Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int        p,
-                 const unsigned int        order_difference)
+void
+do_project (const Triangulation<dim> &triangulation,
+            const FiniteElement<dim> &fe,
+            const unsigned int        p,
+            const unsigned int        order_difference)
 {
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
@@ -159,9 +163,10 @@ void do_project (const Triangulation<dim> &triangulation,
 // the whole procedure is repeated for three combinations of face_rotation and
 // face_flip (the standard case in which evereything is as usual is left out)
 template <int dim>
-void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
-                                       const unsigned int        p,
-                                       const unsigned int        order_difference = 0)
+void
+test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
+                                  const unsigned int        p,
+                                  const unsigned int        order_difference = 0)
 {
   if (dim != 3)
     return;
@@ -193,7 +198,8 @@ void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   deallog << std::setprecision (3);
@@ -206,7 +212,8 @@ int main ()
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   test_with_wrong_face_orientation (FE_Q<dim>(3), 3);
 }

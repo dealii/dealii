@@ -21,7 +21,8 @@
 #include <boost/archive/text_iarchive.hpp>
 
 
-void test()
+void
+test()
 {
   const char *filename = "test.txt";
   const unsigned int size(10);
@@ -69,7 +70,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

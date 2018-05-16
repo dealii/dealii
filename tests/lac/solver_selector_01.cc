@@ -64,7 +64,8 @@ check (const MatrixType &A, const VectorType &f)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

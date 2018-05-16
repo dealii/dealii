@@ -23,7 +23,8 @@
 #include <deal.II/base/bounding_box.h>
 
 template <int spacedim>
-void test_bounding_box()
+void
+test_bounding_box()
 {
   BoundingBox<spacedim> a;
   deallog << "Empty BoundingBox: " << std::endl;
@@ -68,7 +69,8 @@ void test_bounding_box()
   deallog << "End test for dimension " << spacedim << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

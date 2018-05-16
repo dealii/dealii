@@ -26,7 +26,8 @@
 // figure out how PetscScalar complex works...
 
 // Multiply a PETSc complex number by a complex number.
-void multiply_petsc_complex_by_a_number ()
+void
+multiply_petsc_complex_by_a_number ()
 {
   deallog << "Check PetscScalar multiply" << std::endl;
 
@@ -50,7 +51,8 @@ void multiply_petsc_complex_by_a_number ()
 }
 
 // Divide a PETSc complex number by a real number.
-void divide_petsc_complex_by_a_number ()
+void
+divide_petsc_complex_by_a_number ()
 {
   deallog << "Check PetscScalar division" << std::endl;
 
@@ -78,7 +80,8 @@ void divide_petsc_complex_by_a_number ()
 }
 
 // Initialize a std::complex number from an PETSc complex number
-void make_std_complex_from_petsc_complex ()
+void
+make_std_complex_from_petsc_complex ()
 {
   deallog << "Check std initialised from PetscScalar" << std::endl;
   const PetscScalar alpha         = 1.0 + 2.0*PETSC_i;
@@ -91,7 +94,8 @@ void make_std_complex_from_petsc_complex ()
 }
 
 // Initialize a PETSc complex number from an std::complex number
-void make_petsc_complex_from_std_complex ()
+void
+make_petsc_complex_from_std_complex ()
 {
   deallog << "Check PetscScalar initialised from std" << std::endl;
   const std::complex<double> beta (1,2);
@@ -104,7 +108,8 @@ void make_petsc_complex_from_std_complex ()
 }
 
 // Initialize a PETSc complex number directly.
-void make_petsc_complex ()
+void
+make_petsc_complex ()
 {
   deallog << "Check a nonzero PetscScalar" << std::endl;
 
@@ -119,7 +124,8 @@ void make_petsc_complex ()
 
 // Initialize a PETSc complex number directly only, check he is
 // initialised to 0+0i.
-void init_petsc_complex ()
+void
+init_petsc_complex ()
 {
   deallog << "Check PetscScalar initialization" << std::endl;
 
@@ -142,7 +148,8 @@ void init_petsc_complex ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile ("output");
   dealii::deallog.attach (logfile);

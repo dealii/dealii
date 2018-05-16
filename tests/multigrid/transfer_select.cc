@@ -35,11 +35,12 @@
 using namespace std;
 
 template <int dim>
-void check_select(const FiniteElement<dim> &fe,
-                  unsigned int selected,
-                  unsigned int mg_selected,
-                  std::vector<unsigned int> target_component,
-                  std::vector<unsigned int> mg_target_component)
+void
+check_select(const FiniteElement<dim> &fe,
+             unsigned int selected,
+             unsigned int mg_selected,
+             std::vector<unsigned int> target_component,
+             std::vector<unsigned int> mg_target_component)
 {
   deallog << fe.get_name()
           << " select " << selected
@@ -118,7 +119,8 @@ void check_select(const FiniteElement<dim> &fe,
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

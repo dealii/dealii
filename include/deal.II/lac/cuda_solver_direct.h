@@ -72,19 +72,22 @@ namespace CUDAWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverDirect() = default;
+    virtual
+    ~SolverDirect() = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>.
      */
-    void solve(const SparseMatrix<Number> &A,
-               LinearAlgebra::CUDAWrappers::Vector<Number> &x,
-               const LinearAlgebra::CUDAWrappers::Vector<Number> &b);
+    void
+    solve(const SparseMatrix<Number> &A,
+          LinearAlgebra::CUDAWrappers::Vector<Number> &x,
+          const LinearAlgebra::CUDAWrappers::Vector<Number> &b);
 
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
   private:
     /**

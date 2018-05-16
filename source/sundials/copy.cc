@@ -62,7 +62,8 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_TRILINOS
 
 
-    void copy(TrilinosWrappers::MPI::Vector &dst, const N_Vector &src)
+    void
+    copy(TrilinosWrappers::MPI::Vector &dst, const N_Vector &src)
     {
       const IndexSet is = dst.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -74,7 +75,8 @@ namespace SUNDIALS
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::Vector &src)
+    void
+    copy(N_Vector &dst, const TrilinosWrappers::MPI::Vector &src)
     {
       const IndexSet is = src.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -85,7 +87,8 @@ namespace SUNDIALS
         }
     }
 
-    void copy(TrilinosWrappers::MPI::BlockVector &dst, const N_Vector &src)
+    void
+    copy(TrilinosWrappers::MPI::BlockVector &dst, const N_Vector &src)
     {
       const IndexSet is = dst.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -97,7 +100,8 @@ namespace SUNDIALS
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::BlockVector &src)
+    void
+    copy(N_Vector &dst, const TrilinosWrappers::MPI::BlockVector &src)
     {
       IndexSet is = src.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -113,7 +117,8 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_PETSC
 #ifndef PETSC_USE_COMPLEX
 
-    void copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src)
+    void
+    copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src)
     {
       const IndexSet is = dst.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -125,7 +130,8 @@ namespace SUNDIALS
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const PETScWrappers::MPI::Vector &src)
+    void
+    copy(N_Vector &dst, const PETScWrappers::MPI::Vector &src)
     {
       const IndexSet is = src.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -136,7 +142,8 @@ namespace SUNDIALS
         }
     }
 
-    void copy(PETScWrappers::MPI::BlockVector &dst, const N_Vector &src)
+    void
+    copy(PETScWrappers::MPI::BlockVector &dst, const N_Vector &src)
     {
       const IndexSet is = dst.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -148,7 +155,8 @@ namespace SUNDIALS
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const PETScWrappers::MPI::BlockVector &src)
+    void
+    copy(N_Vector &dst, const PETScWrappers::MPI::BlockVector &src)
     {
       const IndexSet is = src.locally_owned_elements();
       const size_t N = is.n_elements();
@@ -164,7 +172,8 @@ namespace SUNDIALS
 
 #endif //mpi
 
-    void copy(BlockVector<double> &dst, const N_Vector &src)
+    void
+    copy(BlockVector<double> &dst, const N_Vector &src)
     {
       const size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
@@ -174,7 +183,8 @@ namespace SUNDIALS
         }
     }
 
-    void copy(N_Vector &dst, const BlockVector<double> &src)
+    void
+    copy(N_Vector &dst, const BlockVector<double> &src)
     {
       const size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);
@@ -184,7 +194,8 @@ namespace SUNDIALS
         }
     }
 
-    void copy(Vector<double> &dst, const N_Vector &src)
+    void
+    copy(Vector<double> &dst, const N_Vector &src)
     {
       const size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
@@ -194,7 +205,8 @@ namespace SUNDIALS
         }
     }
 
-    void copy(N_Vector &dst, const Vector<double> &src)
+    void
+    copy(N_Vector &dst, const Vector<double> &src)
     {
       const size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);

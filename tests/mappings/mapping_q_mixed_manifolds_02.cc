@@ -50,7 +50,8 @@ const double Y_C = 0.2; // center
 const unsigned int MANIFOLD_ID = 1;
 
 
-void create_triangulation(Triangulation<2> &tria)
+void
+create_triangulation(Triangulation<2> &tria)
 {
   AssertThrow(std::abs((X_2-X_1) - 2.0*(X_C-X_1))<1.0e-12, ExcMessage("Geometry parameters X_1,X_2,X_C invalid!"));
   SphericalManifold<2> spherical_manifold(Point<2>(X_C,Y_C));
@@ -132,7 +133,8 @@ void create_triangulation(Triangulation<2> &tria)
     }
 }
 
-void create_triangulation(Triangulation<3> &tria)
+void
+create_triangulation(Triangulation<3> &tria)
 {
   Triangulation<2> tria_2d;
   create_triangulation(tria_2d);
@@ -150,8 +152,9 @@ void create_triangulation(Triangulation<3> &tria)
 template <int dim>
 struct ManifoldWrapper
 {
-  Manifold<dim> *operator()(const Tensor<1, dim> &direction,
-                            const Point<dim> &center ) const;
+  Manifold<dim> *
+  operator()(const Tensor<1, dim> &direction,
+             const Point<dim> &center ) const;
 };
 
 template <>
@@ -171,7 +174,8 @@ ManifoldWrapper<3>::operator()(const Tensor<1, 3> &direction,
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   Point<dim> center;
   center[0] = X_C;
@@ -208,7 +212,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

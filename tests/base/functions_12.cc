@@ -20,7 +20,8 @@
 #include <deal.II/base/function_lib.h>
 
 template <int dim>
-void check()
+void
+check()
 {
   unsigned int n_mon = 3;
 
@@ -65,7 +66,8 @@ void check()
 
 }
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

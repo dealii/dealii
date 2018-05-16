@@ -22,7 +22,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   {
     Particles::Particle<dim> particle;
@@ -41,7 +42,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   test<2>();

@@ -106,7 +106,8 @@ public:
 
 private:
 
-  void init_structures()
+  void
+  init_structures()
   {
     locally_owned_dofs = dof_handler.locally_owned_dofs();
     locally_owned_dofs.print(deallog);
@@ -129,7 +130,8 @@ private:
             << system_matrix.local_range().second << std::endl;
   }
 
-  void renumber()
+  void
+  renumber()
   {
     //DoFRenumbering::Cuthill_McKee(dof_handler);
 
@@ -155,7 +157,8 @@ private:
   }
 };
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
   MPILogInitAll log;

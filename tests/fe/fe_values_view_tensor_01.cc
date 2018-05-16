@@ -48,10 +48,13 @@ class MixedElastoPlasticity
 {
 public:
   MixedElastoPlasticity(const unsigned int degree);
-  void run();
+  void
+  run();
 private:
-  void make_grid_and_dofs();
-  void assemble_system();
+  void
+  make_grid_and_dofs();
+  void
+  assemble_system();
 
   const unsigned int degree;
   const unsigned int n_stress_components; // components of stress
@@ -82,7 +85,8 @@ MixedElastoPlasticity<dim>::MixedElastoPlasticity(const unsigned int degree):
 }
 
 template <int dim>
-void MixedElastoPlasticity<dim>::make_grid_and_dofs()
+void
+MixedElastoPlasticity<dim>::make_grid_and_dofs()
 {
   GridGenerator::hyper_cube(triangulation, -1, 1);
   triangulation.refine_global(0);
@@ -148,7 +152,8 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
 }
 
 template <int dim>
-void MixedElastoPlasticity<dim>::assemble_system()
+void
+MixedElastoPlasticity<dim>::assemble_system()
 {
   QGauss<dim> quadrature_formula(1);
 
@@ -194,7 +199,8 @@ void MixedElastoPlasticity<dim>::assemble_system()
 }
 
 template <int dim>
-void MixedElastoPlasticity<dim>::run()
+void
+MixedElastoPlasticity<dim>::run()
 {
   make_grid_and_dofs();
   assemble_system();
@@ -202,7 +208,8 @@ void MixedElastoPlasticity<dim>::run()
 
 }
 
-void check()
+void
+check()
 {
   static const unsigned int dim = 3;
   {
@@ -227,7 +234,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (3);

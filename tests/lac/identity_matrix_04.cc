@@ -67,7 +67,8 @@ check_vmult()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

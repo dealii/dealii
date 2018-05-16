@@ -37,11 +37,13 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
   const SphericalManifold<dim> manifold;
@@ -106,7 +108,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog << std::setprecision (3);

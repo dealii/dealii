@@ -51,7 +51,8 @@ namespace Patterns
   {
 
 
-    std::string escape(const std::string &input, const PatternBase::OutputStyle style)
+    std::string
+    escape(const std::string &input, const PatternBase::OutputStyle style)
     {
       switch (style)
         {
@@ -114,7 +115,8 @@ namespace Patterns
      * whitespace or whether there are other
      * characters as well.
      */
-    bool has_only_whitespace (std::istream &in)
+    bool
+    has_only_whitespace (std::istream &in)
     {
       while (in)
         {
@@ -134,7 +136,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> pattern_factory(const std::string &description)
+  std::unique_ptr<PatternBase>
+  pattern_factory(const std::string &description)
   {
     std::unique_ptr<PatternBase> p;
 
@@ -216,7 +219,8 @@ namespace Patterns
 
 
 
-  bool Integer::match (const std::string &test_string) const
+  bool
+  Integer::match (const std::string &test_string) const
   {
     std::istringstream str(test_string);
 
@@ -238,7 +242,8 @@ namespace Patterns
 
 
 
-  std::string Integer::description (const OutputStyle style) const
+  std::string
+  Integer::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -301,14 +306,16 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Integer::clone() const
+  std::unique_ptr<PatternBase>
+  Integer::clone() const
   {
     return std::unique_ptr<PatternBase>(new Integer(lower_bound, upper_bound));
   }
 
 
 
-  std::unique_ptr<Integer> Integer::create(const std::string &description)
+  std::unique_ptr<Integer>
+  Integer::create(const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -354,7 +361,8 @@ namespace Patterns
 
 
 
-  bool Double::match (const std::string &test_string) const
+  bool
+  Double::match (const std::string &test_string) const
   {
     std::istringstream str(test_string);
 
@@ -377,7 +385,8 @@ namespace Patterns
 
 
 
-  std::string Double::description (const OutputStyle style) const
+  std::string
+  Double::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -464,14 +473,16 @@ namespace Patterns
   }
 
 
-  std::unique_ptr<PatternBase> Double::clone() const
+  std::unique_ptr<PatternBase>
+  Double::clone() const
   {
     return std::unique_ptr<PatternBase>(new Double(lower_bound, upper_bound));
   }
 
 
 
-  std::unique_ptr<Double> Double::create (const std::string &description)
+  std::unique_ptr<Double>
+  Double::create (const std::string &description)
   {
     const std::string description_init_str = description_init;
     if (description.compare(0, description_init_str.size(), description_init_str) != 0)
@@ -523,7 +534,8 @@ namespace Patterns
 
 
 
-  bool Selection::match (const std::string &test_string) const
+  bool
+  Selection::match (const std::string &test_string) const
   {
     std::string tmp(sequence);
 
@@ -554,7 +566,8 @@ namespace Patterns
 
 
 
-  std::string Selection::description (const OutputStyle style) const
+  std::string
+  Selection::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -589,7 +602,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Selection::clone() const
+  std::unique_ptr<PatternBase>
+  Selection::clone() const
   {
     return std::unique_ptr<PatternBase>(new Selection(sequence));
   }
@@ -604,7 +618,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<Selection> Selection::create(const std::string &description)
+  std::unique_ptr<Selection>
+  Selection::create(const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -654,21 +669,24 @@ namespace Patterns
   {}
 
 
-  const std::string &List::get_separator() const
+  const std::string &
+  List::get_separator() const
   {
     return separator;
   }
 
 
 
-  const PatternBase &List::get_base_pattern() const
+  const PatternBase &
+  List::get_base_pattern() const
   {
     return *pattern;
   }
 
 
 
-  bool List::match (const std::string &test_string_list) const
+  bool
+  List::match (const std::string &test_string_list) const
   {
     const std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
@@ -687,7 +705,8 @@ namespace Patterns
 
 
 
-  std::string List::description (const OutputStyle style) const
+  std::string
+  List::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -733,7 +752,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> List::clone() const
+  std::unique_ptr<PatternBase>
+  List::clone() const
   {
     return std::unique_ptr<PatternBase>(new List(*pattern, min_elements, max_elements, separator));
   }
@@ -749,7 +769,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<List> List::create (const std::string &description)
+  std::unique_ptr<List>
+  List::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -832,7 +853,8 @@ namespace Patterns
 
 
 
-  bool Map::match (const std::string &test_string_list) const
+  bool
+  Map::match (const std::string &test_string_list) const
   {
     std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
@@ -861,7 +883,8 @@ namespace Patterns
 
 
 
-  std::string Map::description (const OutputStyle style) const
+  std::string
+  Map::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -913,7 +936,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Map::clone() const
+  std::unique_ptr<PatternBase>
+  Map::clone() const
   {
     return std::unique_ptr<PatternBase>(new Map(*key_pattern, *value_pattern,
                                                 min_elements, max_elements,
@@ -933,7 +957,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<Map> Map::create (const std::string &description)
+  std::unique_ptr<Map>
+  Map::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -980,27 +1005,31 @@ namespace Patterns
 
 
 
-  const PatternBase &Map::get_key_pattern() const
+  const PatternBase &
+  Map::get_key_pattern() const
   {
     return *key_pattern;
   }
 
 
 
-  const PatternBase &Map::get_value_pattern() const
+  const PatternBase &
+  Map::get_value_pattern() const
   {
     return *value_pattern;
   }
 
 
 
-  const std::string &Map::get_separator() const
+  const std::string &
+  Map::get_separator() const
   {
     return separator;
   }
 
 
-  const std::string &Map::get_key_value_separator() const
+  const std::string &
+  Map::get_key_value_separator() const
   {
     return key_value_separator;
   }
@@ -1044,7 +1073,8 @@ namespace Patterns
 
 
 
-  bool Tuple::match (const std::string &test_string_list) const
+  bool
+  Tuple::match (const std::string &test_string_list) const
   {
     std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
@@ -1062,7 +1092,8 @@ namespace Patterns
 
 
 
-  std::string Tuple::description (const OutputStyle style) const
+  std::string
+  Tuple::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1118,7 +1149,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Tuple::clone() const
+  std::unique_ptr<PatternBase>
+  Tuple::clone() const
   {
     return std::unique_ptr<PatternBase>(new Tuple(patterns, separator));
   }
@@ -1134,7 +1166,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<Tuple> Tuple::create (const std::string &description)
+  std::unique_ptr<Tuple>
+  Tuple::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -1179,14 +1212,16 @@ namespace Patterns
 
 
 
-  const PatternBase &Tuple::get_pattern(const unsigned int &i) const
+  const PatternBase &
+  Tuple::get_pattern(const unsigned int &i) const
   {
     return *patterns[i];
   }
 
 
 
-  const std::string &Tuple::get_separator() const
+  const std::string &
+  Tuple::get_separator() const
   {
     return separator;
   }
@@ -1209,7 +1244,8 @@ namespace Patterns
 
 
 
-  bool MultipleSelection::match (const std::string &test_string_list) const
+  bool
+  MultipleSelection::match (const std::string &test_string_list) const
   {
     std::string tmp = test_string_list;
     std::vector<std::string> split_names;
@@ -1273,7 +1309,8 @@ namespace Patterns
 
 
 
-  std::string MultipleSelection::description (const OutputStyle style) const
+  std::string
+  MultipleSelection::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1308,7 +1345,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> MultipleSelection::clone() const
+  std::unique_ptr<PatternBase>
+  MultipleSelection::clone() const
   {
     return std::unique_ptr<PatternBase>(new MultipleSelection(sequence));
   }
@@ -1323,7 +1361,8 @@ namespace Patterns
 
 
 
-  std::unique_ptr<MultipleSelection> MultipleSelection::create (const std::string &description)
+  std::unique_ptr<MultipleSelection>
+  MultipleSelection::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -1350,7 +1389,8 @@ namespace Patterns
 
 
 
-  std::string Bool::description (const OutputStyle style) const
+  std::string
+  Bool::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1378,14 +1418,16 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Bool::clone() const
+  std::unique_ptr<PatternBase>
+  Bool::clone() const
   {
     return std::unique_ptr<PatternBase>(new Bool());
   }
 
 
 
-  std::unique_ptr<Bool> Bool::create (const std::string &description)
+  std::unique_ptr<Bool>
+  Bool::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return std_cxx14::make_unique<Bool>();
@@ -1399,14 +1441,16 @@ namespace Patterns
 
 
 
-  bool Anything::match (const std::string &) const
+  bool
+  Anything::match (const std::string &) const
   {
     return true;
   }
 
 
 
-  std::string Anything::description (const OutputStyle style) const
+  std::string
+  Anything::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1434,14 +1478,16 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> Anything::clone() const
+  std::unique_ptr<PatternBase>
+  Anything::clone() const
   {
     return std::unique_ptr<PatternBase>(new Anything());
   }
 
 
 
-  std::unique_ptr<Anything> Anything::create (const std::string &description)
+  std::unique_ptr<Anything>
+  Anything::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return std_cxx14::make_unique<Anything>();
@@ -1460,14 +1506,16 @@ namespace Patterns
 
 
 
-  bool FileName::match (const std::string &) const
+  bool
+  FileName::match (const std::string &) const
   {
     return true;
   }
 
 
 
-  std::string FileName::description (const OutputStyle style) const
+  std::string
+  FileName::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1502,14 +1550,16 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> FileName::clone() const
+  std::unique_ptr<PatternBase>
+  FileName::clone() const
   {
     return std::unique_ptr<PatternBase>(new FileName(file_type));
   }
 
 
 
-  std::unique_ptr<FileName> FileName::create (const std::string &description)
+  std::unique_ptr<FileName>
+  FileName::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -1538,14 +1588,16 @@ namespace Patterns
 
 
 
-  bool DirectoryName::match (const std::string &) const
+  bool
+  DirectoryName::match (const std::string &) const
   {
     return true;
   }
 
 
 
-  std::string DirectoryName::description (const OutputStyle style) const
+  std::string
+  DirectoryName::description (const OutputStyle style) const
   {
     switch (style)
       {
@@ -1572,14 +1624,16 @@ namespace Patterns
 
 
 
-  std::unique_ptr<PatternBase> DirectoryName::clone() const
+  std::unique_ptr<PatternBase>
+  DirectoryName::clone() const
   {
     return std::unique_ptr<PatternBase>(new DirectoryName());
   }
 
 
 
-  std::unique_ptr<DirectoryName> DirectoryName::create (const std::string &description)
+  std::unique_ptr<DirectoryName>
+  DirectoryName::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       return std_cxx14::make_unique<DirectoryName>();

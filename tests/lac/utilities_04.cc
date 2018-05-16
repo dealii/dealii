@@ -23,7 +23,8 @@
 #include <deal.II/lac/vector.h>
 
 template <typename NumberType>
-void test (const NumberType a, const NumberType b)
+void
+test (const NumberType a, const NumberType b)
 {
 
   FullMatrix<NumberType> rotation(2);
@@ -61,7 +62,8 @@ void test (const NumberType a, const NumberType b)
 
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(6);

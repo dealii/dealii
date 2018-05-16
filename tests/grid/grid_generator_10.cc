@@ -87,7 +87,8 @@ my_cylinder (Triangulation<3> &tria,
 }
 
 
-void check_grid()
+void
+check_grid()
 {
   const unsigned int dim = 3;
   Triangulation<dim> triangulation;
@@ -120,7 +121,8 @@ void check_grid()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);

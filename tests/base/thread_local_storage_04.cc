@@ -32,7 +32,8 @@ struct X
     tls_data (42)
   {}
 
-  int f ()
+  int
+  f ()
   {
     // use TLS::operator=
     tls_data = counter++;
@@ -45,7 +46,8 @@ struct X
 };
 
 
-void test ()
+void
+test ()
 {
   X x;
   {
@@ -67,7 +69,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

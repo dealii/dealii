@@ -31,13 +31,15 @@ class DiagonalMatrixManual
 public:
   DiagonalMatrixManual() {}
 
-  void set_vector_one (const unsigned int size)
+  void
+  set_vector_one (const unsigned int size)
   {
     diagonal.reinit(size);
     diagonal = 1;
   }
 
-  void reinit (const FullMatrix<double> f)
+  void
+  reinit (const FullMatrix<double> f)
   {
     diagonal.reinit(f.m());
     for (unsigned int i=0; i<f.m(); ++i)
@@ -45,12 +47,14 @@ public:
     diagonal.print(deallog);
   }
 
-  typename Vector<double>::size_type m() const
+  typename Vector<double>::size_type
+  m() const
   {
     return diagonal.size();
   }
 
-  void vmult(Vector<double> &dst, const Vector<double> &src) const
+  void
+  vmult(Vector<double> &dst, const Vector<double> &src) const
   {
     dst = src;
     dst.scale(diagonal);
@@ -116,7 +120,8 @@ check()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

@@ -62,14 +62,16 @@ public:
     : Function<dim>(1)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0 ) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0 ) const
   {
     return std::exp(-point.norm());
   }
 
-  virtual Tensor<1,dim> gradient(const Point<dim> &point,
-                                 const unsigned int component = 0) const
+  virtual Tensor<1,dim>
+  gradient(const Point<dim> &point,
+           const unsigned int component = 0) const
   {
     Tensor<1,dim> res = point;
     Assert (point.norm() > 0,
@@ -81,7 +83,8 @@ public:
 
 
 template <int dim>
-void test4()
+void
+test4()
 {
   deallog << "h-refinement:"<<std::endl;
 
@@ -144,7 +147,8 @@ void test4()
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

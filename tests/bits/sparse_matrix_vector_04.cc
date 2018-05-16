@@ -23,8 +23,9 @@
 #include <vector>
 
 
-void test (Vector<double> &v,
-           Vector<double> &w)
+void
+test (Vector<double> &v,
+      Vector<double> &w)
 {
   // set some entries in the
   // matrix. actually, set them all
@@ -68,7 +69,8 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

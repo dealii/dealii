@@ -22,7 +22,8 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   v.reinit (13, true);
 
@@ -33,7 +34,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

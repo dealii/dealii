@@ -27,7 +27,8 @@
 #include <deal.II/fe/fe_system.h>
 
 template <int dim>
-void works(const FiniteElement<dim> &fe, const ComponentMask &m)
+void
+works(const FiniteElement<dim> &fe, const ComponentMask &m)
 {
   deallog << "FE: " << fe.get_name()
           << " mask: " << m << std::endl;
@@ -38,7 +39,8 @@ void works(const FiniteElement<dim> &fe, const ComponentMask &m)
 }
 
 template <int dim>
-void fails(const FiniteElement<dim> &fe, const ComponentMask &m)
+void
+fails(const FiniteElement<dim> &fe, const ComponentMask &m)
 {
   deallog << "FE: " << fe.get_name()
           << " mask: " << m << std::endl;
@@ -57,7 +59,8 @@ void fails(const FiniteElement<dim> &fe, const ComponentMask &m)
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   auto mask_none = [] (const unsigned int n_components) -> ComponentMask
   {
@@ -170,7 +173,8 @@ void check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();

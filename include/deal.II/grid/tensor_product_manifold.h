@@ -129,7 +129,8 @@ namespace internal
   namespace TensorProductManifoldImplementation
   {
     template <int dim1, int dim2>
-    Tensor<1,dim1+dim2> concat(const Tensor<1,dim1> &p1, const Tensor<1,dim2> &p2)
+    Tensor<1,dim1+dim2>
+    concat(const Tensor<1,dim1> &p1, const Tensor<1,dim2> &p2)
     {
       Tensor<1,dim1+dim2> r;
       for (unsigned int d=0; d<dim1; ++d)
@@ -140,7 +141,8 @@ namespace internal
     }
 
     template <int dim1, int dim2>
-    Point<dim1+dim2> concat(const Point<dim1> &p1, const Point<dim2> &p2)
+    Point<dim1+dim2>
+    concat(const Point<dim1> &p1, const Point<dim2> &p2)
     {
       Point<dim1+dim2> r;
       for (unsigned int d=0; d<dim1; ++d)
@@ -151,7 +153,8 @@ namespace internal
     }
 
     template <int dim1, int dim2>
-    void split_point(const Point<dim1+dim2> &source, Point<dim1> &p1, Point<dim2> &p2)
+    void
+    split_point(const Point<dim1+dim2> &source, Point<dim1> &p1, Point<dim2> &p2)
     {
       for (unsigned int d=0; d<dim1; ++d)
         p1[d] = source[d];
@@ -166,7 +169,8 @@ template <int dim,
           int dim_A, int spacedim_A, int chartdim_A,
           int dim_B, int spacedim_B, int chartdim_B>
 TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>
-::TensorProductManifold(
+::
+TensorProductManifold(
   const ChartManifold<dim_A, spacedim_A, chartdim_A> &manifold_A,
   const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B)
   : ChartManifold<dim,spacedim_A+spacedim_B,chartdim_A+chartdim_B> (
@@ -192,7 +196,8 @@ template <int dim,
           int dim_B, int spacedim_B, int chartdim_B>
 Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::chartdim>
 TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>
-::pull_back(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::spacedim> &space_point) const
+::
+pull_back(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::spacedim> &space_point) const
 {
   Point<spacedim_A> space_point_A;
   Point<spacedim_B> space_point_B;
@@ -209,7 +214,8 @@ template <int dim,
           int dim_B, int spacedim_B, int chartdim_B>
 Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::spacedim>
 TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>
-::push_forward(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::chartdim> &chart_point) const
+::
+push_forward(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::chartdim> &chart_point) const
 {
   Point<chartdim_A> chart_point_A;
   Point<chartdim_B> chart_point_B;
@@ -229,7 +235,8 @@ DerivativeForm<1,
                TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::spacedim>
 
                TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>
-               ::push_forward_gradient(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::chartdim> &chart_point) const
+               ::
+               push_forward_gradient(const Point<TensorProductManifold<dim, dim_A, spacedim_A, chartdim_A, dim_B, spacedim_B, chartdim_B>::chartdim> &chart_point) const
 {
   Point<chartdim_A> chart_point_A;
   Point<chartdim_B> chart_point_B;

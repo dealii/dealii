@@ -26,7 +26,8 @@ template <int dim>
 class X : public TensorFunction<1,dim>
 {
 public:
-  virtual Tensor<1,dim> value (const Point<dim> &p) const
+  virtual Tensor<1,dim>
+  value (const Point<dim> &p) const
   {
     return p;
   }
@@ -34,7 +35,8 @@ public:
 
 
 template <int dim>
-void check1 ()
+void
+check1 ()
 {
   X<dim> x;
   VectorFunctionFromTensorFunction<dim>
@@ -73,7 +75,8 @@ void check1 ()
 
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

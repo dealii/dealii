@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   const types::global_dof_index n_rows = 5;
   PETScWrappers::SparseMatrix matrix(n_rows, n_rows, 2);
@@ -50,7 +51,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

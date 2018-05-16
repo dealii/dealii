@@ -27,8 +27,9 @@
 namespace dealii
 {
   template <int dim, int spacedim>
-  bool operator == (const Triangulation<dim,spacedim> &t1,
-                    const Triangulation<dim,spacedim> &t2)
+  bool
+  operator == (const Triangulation<dim,spacedim> &t1,
+               const Triangulation<dim,spacedim> &t2)
   {
     // test a few attributes, though we can't
     // test everything unfortunately...
@@ -124,7 +125,8 @@ namespace dealii
 
 
 template <int dim, int spacedim>
-void do_boundary (Triangulation<dim,spacedim> &t1)
+void
+do_boundary (Triangulation<dim,spacedim> &t1)
 {
   typename Triangulation<dim,spacedim>::cell_iterator
   c1 = t1.begin();
@@ -136,12 +138,14 @@ void do_boundary (Triangulation<dim,spacedim> &t1)
 
 
 template <int spacedim>
-void do_boundary (Triangulation<1,spacedim> &)
+void
+do_boundary (Triangulation<1,spacedim> &)
 {}
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   Triangulation<dim,spacedim> tria_1, tria_2;
 
@@ -170,7 +174,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

@@ -108,7 +108,8 @@ namespace internal
       /**
        * Return the memory consumption of the present data structure.
        */
-      std::size_t memory_consumption() const
+      std::size_t
+      memory_consumption() const
       {
         return sizeof (*this);
       }
@@ -127,7 +128,8 @@ namespace internal
        * Clear all data fields to be in a state similar to after having
        * called the default constructor.
        */
-      void clear()
+      void
+      clear()
       {
         faces = std::vector<FaceToCellTopology<vectorization_width> >();
         cell_and_face_to_plain_faces.reinit(TableIndices<3>(0,0,0));
@@ -137,7 +139,8 @@ namespace internal
       /**
        * Return the memory consumption of the present data structure.
        */
-      std::size_t memory_consumption() const
+      std::size_t
+      memory_consumption() const
       {
         return sizeof (faces) + cell_and_face_to_plain_faces.memory_consumption()
                + cell_and_face_boundary_id.memory_consumption();

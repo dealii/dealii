@@ -34,7 +34,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // create a 2x1 (or 2x1x1) mesh
   Triangulation<dim> triangulation;
@@ -60,7 +61,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

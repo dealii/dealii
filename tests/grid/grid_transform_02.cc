@@ -34,7 +34,8 @@
 
 
 
-int main ()
+int
+main ()
 {
   const int dim = 2;
 

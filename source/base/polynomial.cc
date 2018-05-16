@@ -889,7 +889,8 @@ namespace Polynomials
   {
   }
 
-  std::vector<double> Lobatto::compute_coefficients (const unsigned int p)
+  std::vector<double>
+  Lobatto::compute_coefficients (const unsigned int p)
   {
     switch (p)
       {
@@ -957,7 +958,8 @@ namespace Polynomials
       }
   }
 
-  std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigned int p)
+  std::vector<Polynomial<double> >
+  Lobatto::generate_complete_basis (const unsigned int p)
   {
     std::vector<Polynomial<double> > basis (p + 1);
 
@@ -1240,7 +1242,8 @@ namespace Polynomials
     // originally been derived by a secant method for the integral entry
     // l_0(x) * l_1(x) but we only need to do one iteration because the zero
     // x_star is linear in the integral value.
-    double find_support_point_x_star (const std::vector<double> &jacobi_roots)
+    double
+    find_support_point_x_star (const std::vector<double> &jacobi_roots)
     {
       // Initial guess for the support point position values: The zero turns
       // out to be between zero and the first root of the Jacobi polynomial,
@@ -1518,12 +1521,18 @@ namespace Polynomials
   template class Polynomial<double>;
   template class Polynomial<long double>;
 
-  template void Polynomial<float>::shift(const float offset);
-  template void Polynomial<float>::shift(const double offset);
-  template void Polynomial<double>::shift(const double offset);
-  template void Polynomial<long double>::shift(const long double offset);
-  template void Polynomial<float>::shift(const long double offset);
-  template void Polynomial<double>::shift(const long double offset);
+  template void
+  Polynomial<float>::shift(const float offset);
+  template void
+  Polynomial<float>::shift(const double offset);
+  template void
+  Polynomial<double>::shift(const double offset);
+  template void
+  Polynomial<long double>::shift(const long double offset);
+  template void
+  Polynomial<float>::shift(const long double offset);
+  template void
+  Polynomial<double>::shift(const long double offset);
 
   template class Monomial<float>;
   template class Monomial<double>;

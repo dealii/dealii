@@ -80,39 +80,46 @@ public:
    * Return the length of the slice using the same interface as
    * <tt>std::vector</tt>.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
   /**
    * Return a reference to the $i$th element of the range represented by the
    * current object.
    */
-  typename VectorType::reference operator[] (unsigned int i);
+  typename VectorType::reference
+  operator[] (unsigned int i);
 
   /**
    * Return a @p const reference to the $i$th element of the range represented
    * by the current object.
    */
-  typename VectorType::const_reference operator[] (unsigned int i) const;
+  typename VectorType::const_reference
+  operator[] (unsigned int i) const;
 
   /**
    * Standard-conforming iterator function.
    */
-  typename VectorType::iterator begin();
+  typename VectorType::iterator
+  begin();
 
   /**
    * Standard-conforming iterator function.
    */
-  typename VectorType::const_iterator begin() const;
+  typename VectorType::const_iterator
+  begin() const;
 
   /**
    * Standard-conforming iterator function.
    */
-  typename VectorType::iterator end();
+  typename VectorType::iterator
+  end();
 
   /**
    * Standard-conforming iterator function.
    */
-  typename VectorType::const_iterator end() const;
+  typename VectorType::const_iterator
+  end() const;
 
 private:
   /**

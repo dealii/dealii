@@ -38,9 +38,11 @@
 using namespace dealii;
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
-void test()
+void
+test()
 {
   const unsigned int dim = 1;
   const unsigned int spacedim=2;
@@ -97,7 +99,8 @@ void test()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

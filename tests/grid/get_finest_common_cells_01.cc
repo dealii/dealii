@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   // create 2 triangulations with the
   // same coarse grid, and refine
@@ -62,7 +63,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

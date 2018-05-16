@@ -24,13 +24,15 @@
 #include <deal.II/base/function.h>
 #include "create_mesh.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "get_functions_common.h"
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   create_mesh (tria);

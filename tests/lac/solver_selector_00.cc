@@ -26,7 +26,8 @@ DEAL_II_NAMESPACE_OPEN
 template class SolverSelector<>;
 DEAL_II_NAMESPACE_CLOSE
 
-int main ()
+int
+main ()
 {
   initlog();
 

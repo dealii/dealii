@@ -26,7 +26,8 @@
 using namespace dealii;
 
 
-int main()
+int
+main()
 {
   initlog();
 

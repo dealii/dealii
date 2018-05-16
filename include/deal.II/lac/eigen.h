@@ -89,7 +89,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~EigenPower ();
+  virtual
+  ~EigenPower ();
 
   /**
    * Power method. @p x is the (not necessarily normalized, but nonzero) start
@@ -185,7 +186,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~EigenInverse ();
+  virtual
+  ~EigenInverse ();
 
   /**
    * Inverse method. @p value is the start guess for the eigenvalue and @p x

@@ -23,7 +23,8 @@
 #include <boost/iostreams/device/file.hpp>
 
 
-void test ()
+void
+test ()
 {
   // create a stream where we read from gzipped data
   boost::iostreams::filtering_istream in;
@@ -47,7 +48,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

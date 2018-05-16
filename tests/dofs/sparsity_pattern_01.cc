@@ -37,8 +37,9 @@
 
 
 
-bool operator == (const BlockSparsityPattern &sp1,
-                  const BlockSparsityPattern &sp2)
+bool
+operator == (const BlockSparsityPattern &sp1,
+             const BlockSparsityPattern &sp2)
 {
   if (sp1.n_block_rows() != sp2.n_block_rows())
     return false;
@@ -203,7 +204,8 @@ check ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

@@ -31,7 +31,8 @@
 
 
 template <int dim, int spacedim>
-void do_test(const Triangulation<dim,spacedim> &tria)
+void
+do_test(const Triangulation<dim,spacedim> &tria)
 {
   for (unsigned int degree = 1; degree < 5; ++degree)
     {
@@ -55,7 +56,8 @@ void do_test(const Triangulation<dim,spacedim> &tria)
 }
 
 template <int dim, int spacedim>
-void test_polar()
+void
+test_polar()
 {
   deallog << "Testing with PolarManifold dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -78,7 +80,8 @@ void test_polar()
 }
 
 template <int dim, int spacedim>
-void test_spherical()
+void
+test_spherical()
 {
   deallog << "Testing with SphericalManifold dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -99,7 +102,8 @@ void test_spherical()
   do_test(tria);
 }
 
-void test_cylinder(unsigned int ref=1)
+void
+test_cylinder(unsigned int ref=1)
 {
   const unsigned int dim=3, spacedim = 3;
   deallog << "Testing with CylindricalManifold in 3d" << std::endl;
@@ -132,7 +136,8 @@ void test_cylinder(unsigned int ref=1)
   do_test(tria);
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

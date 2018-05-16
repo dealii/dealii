@@ -144,7 +144,8 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverBase () = default;
+    virtual
+    ~SolverBase () = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -280,7 +281,8 @@ namespace TrilinosWrappers
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
     /**
      * Exception
@@ -307,14 +309,16 @@ namespace TrilinosWrappers
      * once it is done this function solves the linear problem.
      */
     template <typename Preconditioner>
-    void do_solve(const Preconditioner &preconditioner);
+    void
+    do_solve(const Preconditioner &preconditioner);
 
     /**
      * A function that sets the preconditioner that the solver will apply
      */
     template <typename Preconditioner>
-    void set_preconditioner (AztecOO              &solver,
-                             const Preconditioner &preconditioner);
+    void
+    set_preconditioner (AztecOO              &solver,
+                        const Preconditioner &preconditioner);
 
     /**
      * A structure that collects the Trilinos sparse matrix, the right hand
@@ -626,7 +630,8 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverDirect () = default;
+    virtual
+    ~SolverDirect () = default;
 
     /**
      * Initializes the direct solver for the matrix <tt>A</tt> and creates a
@@ -634,14 +639,16 @@ namespace TrilinosWrappers
      * data structure. Note that there is no need for a preconditioner
      * here and solve() is not called.
      */
-    void initialize (const SparseMatrix &A);
+    void
+    initialize (const SparseMatrix &A);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the
      * package set in initialize(). Note the matrix is not refactorized during
      * this call.
      */
-    void solve (MPI::Vector &x, const MPI::Vector &b);
+    void
+    solve (MPI::Vector &x, const MPI::Vector &b);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> based on the package set in
@@ -689,7 +696,8 @@ namespace TrilinosWrappers
     /**
      * Access to object that controls convergence.
      */
-    SolverControl &control() const;
+    SolverControl &
+    control() const;
 
     /**
      * Exception
@@ -704,7 +712,8 @@ namespace TrilinosWrappers
      * Actually performs the operations for solving the linear system,
      * including the factorization and forward and backward substitution.
      */
-    void do_solve();
+    void
+    do_solve();
 
     /**
      * Reference to the object that controls convergence of the iterative

@@ -78,7 +78,8 @@ using namespace dealii;
 template <int dim>
 struct less_than_key
 {
-  inline bool operator() (const std::pair<Point<dim>,Vector<double> > &pair1, const std::pair<Point<dim>,Vector<double> > &pair2)
+  inline bool
+  operator() (const std::pair<Point<dim>,Vector<double> > &pair1, const std::pair<Point<dim>,Vector<double> > &pair2)
   {
     const double precision = 1e-3;
     const Point<dim> &p1 = pair1.first;
@@ -101,10 +102,11 @@ struct less_than_key
 //  |1 |1 |    |
 //  ------------
 template <int dim>
-void test2cells(const FiniteElement<dim> &fe_0,
-                const FiniteElement<dim> &fe_1,
-                const FiniteElement<dim> &fe_2,
-                const FiniteElement<dim> &fe_common)
+void
+test2cells(const FiniteElement<dim> &fe_0,
+           const FiniteElement<dim> &fe_1,
+           const FiniteElement<dim> &fe_2,
+           const FiniteElement<dim> &fe_common)
 {
   const unsigned int n_comp = fe_0.n_components ();
   Triangulation<dim>   triangulation;
@@ -303,7 +305,8 @@ void test2cells(const FiniteElement<dim> &fe_0,
 
   dof_handler.clear();
 }
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

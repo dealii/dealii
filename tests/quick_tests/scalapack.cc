@@ -33,7 +33,8 @@
 
 
 template <typename FullMatrix>
-void create_spd (FullMatrix &A)
+void
+create_spd (FullMatrix &A)
 {
   const unsigned int size = A.n();
   Assert (size == A.m(), ExcDimensionMismatch(size,A.m()));
@@ -59,7 +60,8 @@ void create_spd (FullMatrix &A)
 
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void
+test(const unsigned int size, const unsigned int block_size)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -109,7 +111,8 @@ void test(const unsigned int size, const unsigned int block_size)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

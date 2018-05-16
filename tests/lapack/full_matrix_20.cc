@@ -41,7 +41,8 @@ test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

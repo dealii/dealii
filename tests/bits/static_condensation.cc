@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -102,17 +103,20 @@ class Solution : public Function<dim>,
 public:
   Solution () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                  const unsigned int  component = 0) const;
+  virtual Tensor<1,dim>
+  gradient (const Point<dim>   &p,
+            const unsigned int  component = 0) const;
 };
 
 
 template <int dim>
-double Solution<dim>::value (const Point<dim>   &p,
-                             const unsigned int) const
+double
+Solution<dim>::value (const Point<dim>   &p,
+                      const unsigned int) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<this->n_source_centers; ++i)
@@ -127,8 +131,9 @@ double Solution<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-                                       const unsigned int) const
+Tensor<1,dim>
+Solution<dim>::gradient (const Point<dim>   &p,
+                         const unsigned int) const
 {
   Tensor<1,dim> return_value;
 
@@ -154,14 +159,16 @@ class RightHandSide : public Function<dim>,
 public:
   RightHandSide () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim>   &p,
-                                  const unsigned int) const
+double
+RightHandSide<dim>::value (const Point<dim>   &p,
+                           const unsigned int) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<this->n_source_centers; ++i)
@@ -194,14 +201,20 @@ public:
   HelmholtzProblem (const unsigned int   fe_degree,
                     const RefinementMode refinement_mode);
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system (const bool do_reconstruct);
-  void solve ();
-  void refine_grid ();
-  void process_solution (const unsigned int cycle);
+  void
+  setup_system ();
+  void
+  assemble_system (const bool do_reconstruct);
+  void
+  solve ();
+  void
+  refine_grid ();
+  void
+  process_solution (const unsigned int cycle);
 
   Triangulation<dim>                      triangulation;
   FE_Q<dim>                               fe;
@@ -249,7 +262,8 @@ HelmholtzProblem<dim>::HelmholtzProblem (const unsigned int   fe_degree,
 
 
 template <int dim>
-void HelmholtzProblem<dim>::setup_system ()
+void
+HelmholtzProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -306,7 +320,8 @@ void HelmholtzProblem<dim>::setup_system ()
 
 
 template <int dim>
-void HelmholtzProblem<dim>::assemble_system (const bool do_reconstruct)
+void
+HelmholtzProblem<dim>::assemble_system (const bool do_reconstruct)
 {
   QGauss<dim>   quadrature_formula (fe.degree+1);
   QGauss<dim-1> face_quadrature_formula (fe.degree+1);
@@ -474,7 +489,8 @@ void HelmholtzProblem<dim>::assemble_system (const bool do_reconstruct)
 
 
 template <int dim>
-void HelmholtzProblem<dim>::solve ()
+void
+HelmholtzProblem<dim>::solve ()
 {
   {
     SolverControl           solver_control (1000, 1e-12);
@@ -505,7 +521,8 @@ void HelmholtzProblem<dim>::solve ()
 
 
 template <int dim>
-void HelmholtzProblem<dim>::refine_grid ()
+void
+HelmholtzProblem<dim>::refine_grid ()
 {
   switch (refinement_mode)
     {
@@ -545,7 +562,8 @@ void HelmholtzProblem<dim>::refine_grid ()
 
 
 template <int dim>
-void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
+void
+HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 {
   {
     Vector<float> difference_per_cell (triangulation.n_active_cells());
@@ -603,7 +621,8 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 
 
 template <int dim>
-void HelmholtzProblem<dim>::run ()
+void
+HelmholtzProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6-dim; ++cycle)
     {
@@ -654,7 +673,8 @@ void HelmholtzProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

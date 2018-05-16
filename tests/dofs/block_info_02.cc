@@ -27,8 +27,9 @@
 
 
 template <int dim>
-void test_grid(const Triangulation<dim> &tr,
-               const FiniteElement<dim> &fe)
+void
+test_grid(const Triangulation<dim> &tr,
+          const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
@@ -75,7 +76,8 @@ void test_grid(const Triangulation<dim> &tr,
 
 
 template <int dim>
-void test_fe (const FiniteElement<dim> &fe)
+void
+test_fe (const FiniteElement<dim> &fe)
 {
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
@@ -84,7 +86,8 @@ void test_fe (const FiniteElement<dim> &fe)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -48,8 +48,9 @@ public:
     Function<dim>(1)
   {}
 
-  double value(const Point<dim> &p,
-               const unsigned int comp=0) const
+  double
+  value(const Point<dim> &p,
+        const unsigned int comp=0) const
   {
     const double x = p[0];
     const double y = p[1];
@@ -62,22 +63,26 @@ class MyQData : public TransferableQuadraturePointData
 {
 public:
   MyQData() {};
-  virtual ~MyQData() {};
+  virtual
+  ~MyQData() {};
 
-  unsigned int number_of_values() const
+  unsigned int
+  number_of_values() const
   {
     return 1;
   }
 
   double value;
 
-  virtual void pack_values(std::vector<double> &scalars) const
+  virtual void
+  pack_values(std::vector<double> &scalars) const
   {
     Assert (scalars.size()==1, ExcInternalError());
     scalars[0] = value;
   }
 
-  virtual void unpack_values(const std::vector<double> &scalars)
+  virtual void
+  unpack_values(const std::vector<double> &scalars)
   {
     Assert (scalars.size() ==1, ExcInternalError());
     value = scalars[0];
@@ -94,10 +99,11 @@ DeclException3 (ExcWrongValue,
  * Loop over quadrature points and check that value is the same as given by the function.
  */
 template <int dim,typename DATA>
-void check_qph(parallel::distributed::Triangulation<dim> &tr,
-               const CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,DATA> &manager,
-               const Quadrature<dim> &rhs_quadrature,
-               const MyFunction<dim> &func)
+void
+check_qph(parallel::distributed::Triangulation<dim> &tr,
+          const CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,DATA> &manager,
+          const Quadrature<dim> &rhs_quadrature,
+          const MyFunction<dim> &func)
 {
   DoFHandler<dim> dof_handler(tr);
   FE_Q<dim> dummy_fe(1);
@@ -125,7 +131,8 @@ void check_qph(parallel::distributed::Triangulation<dim> &tr,
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
@@ -197,7 +204,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();

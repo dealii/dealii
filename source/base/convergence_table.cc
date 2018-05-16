@@ -18,10 +18,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
-                                                  const std::string &reference_column_key,
-                                                  const RateMode     rate_mode,
-                                                  const unsigned int dim)
+void
+ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
+                                             const std::string &reference_column_key,
+                                             const RateMode     rate_mode,
+                                             const unsigned int dim)
 {
   Assert(columns.count(data_column_key),
          ExcColumnNotExistent(data_column_key));

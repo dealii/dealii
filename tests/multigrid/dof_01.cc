@@ -38,7 +38,8 @@ using namespace std;
 
 
 template <int dim>
-void dofs(const DoFHandler<dim> &dof)
+void
+dofs(const DoFHandler<dim> &dof)
 {
   typename DoFHandler<dim>::cell_iterator cell;
   const typename DoFHandler<dim>::cell_iterator end = dof.end();
@@ -62,7 +63,8 @@ void dofs(const DoFHandler<dim> &dof)
 
 
 template <int dim>
-void check_fe(FiniteElement<dim> &fe)
+void
+check_fe(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -81,7 +83,8 @@ void check_fe(FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> q1(1);
   FE_Q<dim> q2(2);
@@ -94,7 +97,8 @@ void check()
   check_fe(s1);
 }
 
-int main()
+int
+main()
 {
   initlog(__FILE__);
   check<1> ();

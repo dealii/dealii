@@ -26,7 +26,8 @@
 
 typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
 
-void test ()
+void
+test ()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -68,7 +69,8 @@ void test ()
   AssertThrow(n_filtered_cells==cell_set.size(), ExcMessage("Filtered cells missing."));
 }
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog << std::setprecision(4);

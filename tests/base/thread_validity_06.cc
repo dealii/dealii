@@ -30,7 +30,8 @@ struct X
 {
   X() : i(0) {}
   X(const X &x) : i(x.i+1) {}
-  X &operator= (const X &x)
+  X &
+  operator= (const X &x)
   {
     i = x.i+1;
     return *this;
@@ -39,14 +40,16 @@ struct X
 };
 
 
-void execute_ref (const X &x)
+void
+execute_ref (const X &x)
 {
   Assert (x.i == 0, ExcInternalError());
   deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << x.i << std::endl;
   deallog << "OK" << std::endl;
 }
 
-void execute_value (X x)
+void
+execute_value (X x)
 {
   Assert (x.i > 0, ExcInternalError());
   deallog << unify_pretty_function(__PRETTY_FUNCTION__) << ' ' << (x.i>0 ? "OK" : "not OK")
@@ -55,7 +58,8 @@ void execute_value (X x)
 }
 
 
-void test ()
+void
+test ()
 {
   {
     X x;
@@ -72,7 +76,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);

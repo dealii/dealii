@@ -50,7 +50,8 @@
 #include <math.h>
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int spacedim>
 class BEM
@@ -60,17 +61,24 @@ public:
 
   BEM();
 
-  void run();
+  void
+  run();
 
 private:
 
-  void make_dofs();
-  void assemble_system();
-  void solve();
-  void output_results();
+  void
+  make_dofs();
+  void
+  assemble_system();
+  void
+  solve();
+  void
+  output_results();
 
-  void read_grid(std::string filename);
-  void write_grid(std::string filename);
+  void
+  read_grid(std::string filename);
+  void
+  write_grid(std::string filename);
 
 
   Triangulation<spacedim-1,spacedim>    tria;
@@ -481,7 +489,8 @@ BEM<spacedim>::write_grid(std::string filename)
   grid_out.write_msh (tria, logfile);
 }
 
-int main ()
+int
+main ()
 {
 
   BEM<2> bem;

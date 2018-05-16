@@ -538,12 +538,14 @@ DynamicSparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void DynamicSparsityPattern::Line::add_entries(size_type *,
-                                                        size_type *,
-                                                        const bool);
-template void DynamicSparsityPattern::Line::add_entries(const size_type *,
-                                                        const size_type *,
-                                                        const bool);
+template void
+DynamicSparsityPattern::Line::add_entries(size_type *,
+                                          size_type *,
+                                          const bool);
+template void
+DynamicSparsityPattern::Line::add_entries(const size_type *,
+                                          const size_type *,
+                                          const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void DynamicSparsityPattern::Line::
 add_entries(std::vector<size_type>::iterator,
@@ -551,16 +553,20 @@ add_entries(std::vector<size_type>::iterator,
             const bool);
 #endif
 
-template void DynamicSparsityPattern::compute_mmult_pattern(
+template void
+DynamicSparsityPattern::compute_mmult_pattern(
   const DynamicSparsityPattern &,
   const DynamicSparsityPattern &);
-template void DynamicSparsityPattern::compute_mmult_pattern(
+template void
+DynamicSparsityPattern::compute_mmult_pattern(
   const DynamicSparsityPattern &,
   const SparsityPattern &);
-template void DynamicSparsityPattern::compute_mmult_pattern(
+template void
+DynamicSparsityPattern::compute_mmult_pattern(
   const SparsityPattern &,
   const DynamicSparsityPattern &);
-template void DynamicSparsityPattern::compute_mmult_pattern(
+template void
+DynamicSparsityPattern::compute_mmult_pattern(
   const SparsityPattern &,
   const SparsityPattern &);
 

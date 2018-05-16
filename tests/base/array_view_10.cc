@@ -21,7 +21,8 @@
 #include <deal.II/base/array_view.h>
 
 
-void test ()
+void
+test ()
 {
   // converting a non-const vector to an ArrayView to const or
   // non-const data should work
@@ -45,7 +46,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

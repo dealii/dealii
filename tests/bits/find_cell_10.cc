@@ -68,7 +68,8 @@
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
   Triangulation<2>     triangulation;
 
@@ -91,7 +92,8 @@ void test()
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

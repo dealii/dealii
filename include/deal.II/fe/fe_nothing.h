@@ -252,7 +252,8 @@ public:
   /**
    * @return true if the FE dominates any other.
    */
-  bool is_dominating() const;
+  bool
+  is_dominating() const;
 
   /**
    * Comparison operator. In addition to the fields already checked by
@@ -262,7 +263,8 @@ public:
    * for this purpose obviously also needs to be of type FE_Nothing).
    */
   virtual
-  bool operator == (const FiniteElement<dim,spacedim> &fe) const override;
+  bool
+  operator == (const FiniteElement<dim,spacedim> &fe) const override;
 
 private:
 

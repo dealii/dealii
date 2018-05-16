@@ -27,7 +27,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   std::vector<bool> v(12);
   for (unsigned int i=0; i<v.size(); ++i)
@@ -53,7 +54,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

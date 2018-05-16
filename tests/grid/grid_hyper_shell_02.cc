@@ -28,11 +28,13 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void check (double r1, double r2, unsigned int n)
+void
+check (double r1, double r2, unsigned int n)
 {
   Point<dim> center;
   Triangulation<dim> tria (Triangulation<dim>::none);
@@ -46,7 +48,8 @@ void check (double r1, double r2, unsigned int n)
 }
 
 
-int main()
+int
+main()
 {
   deallog << std::setprecision(3);
   deallog.attach(logfile);

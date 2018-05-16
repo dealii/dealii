@@ -28,14 +28,16 @@
 #include <iostream>
 
 // Output
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 // As sketched in the deal.II docs, the parallelepiped class is just a
 // hyper_rectangle in 1d and a parallelogram in 2d. That can checked
 // by simple comparison to a reference triangulation.
 
 // Here is the implementation in 1d:
-void check_1d_parallelepiped_by_comparison (bool log)
+void
+check_1d_parallelepiped_by_comparison (bool log)
 {
   // Data structure defining dim coordinates that make up a
   // parallelepiped.
@@ -61,7 +63,8 @@ void check_1d_parallelepiped_by_comparison (bool log)
 
 
 // Here is the implementation in 2d:
-void check_2d_parallelepiped_by_comparison (bool log)
+void
+check_2d_parallelepiped_by_comparison (bool log)
 {
   // build corners for this particular dim that are known to give the
   // same output order as parallelogram:
@@ -87,7 +90,8 @@ void check_2d_parallelepiped_by_comparison (bool log)
     }
 }
 
-int main ()
+int
+main ()
 {
   // Check parallelepiped
   check_1d_parallelepiped_by_comparison (true);

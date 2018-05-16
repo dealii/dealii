@@ -68,7 +68,8 @@ struct CPUClock
    * used. Unfortunately, this requires platform-specific calls, so this
    * function returns 0 on platforms that are neither Windows nor POSIX.
    */
-  static time_point now() noexcept;
+  static time_point
+  now() noexcept;
 };
 
 /**
@@ -148,7 +149,8 @@ public:
    * returns a reference to the same structure.
    */
   DEAL_II_DEPRECATED
-  const Utilities::MPI::MinMaxAvg &get_data() const;
+  const Utilities::MPI::MinMaxAvg &
+  get_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -156,7 +158,8 @@ public:
    * communicator. This structure does not contain meaningful values until
    * Timer::stop() has been called.
    */
-  const Utilities::MPI::MinMaxAvg &get_last_lap_wall_time_data() const;
+  const Utilities::MPI::MinMaxAvg &
+  get_last_lap_wall_time_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -168,7 +171,8 @@ public:
    * returns a reference the same structure.
    */
   DEAL_II_DEPRECATED
-  const Utilities::MPI::MinMaxAvg &get_total_data() const;
+  const Utilities::MPI::MinMaxAvg &
+  get_total_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -176,7 +180,8 @@ public:
    * communicator. This structure does not contain meaningful values until
    * Timer::stop() has been called.
    */
-  const Utilities::MPI::MinMaxAvg &get_accumulated_wall_time_data() const;
+  const Utilities::MPI::MinMaxAvg &
+  get_accumulated_wall_time_data() const;
 
   /**
    * Prints the data returned by get_data(), i.e. for the last lap,
@@ -187,14 +192,16 @@ public:
    */
   template <class StreamType>
   DEAL_II_DEPRECATED
-  void print_data(StreamType &stream) const;
+  void
+  print_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_last_lap_wall_time_data() to the
    * given stream.
    */
   template <class StreamType>
-  void print_last_lap_wall_time_data(StreamType &stream) const;
+  void
+  print_last_lap_wall_time_data(StreamType &stream) const;
 
   /**
    * Prints the data returned by get_total_data(), i.e. for the total run,
@@ -205,21 +212,24 @@ public:
    */
   template <class StreamType>
   DEAL_II_DEPRECATED
-  void print_total_data(StreamType &stream) const;
+  void
+  print_total_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_accumulated_wall_time_data() to the
    * given stream.
    */
   template <class StreamType>
-  void print_accumulated_wall_time_data(StreamType &stream) const;
+  void
+  print_accumulated_wall_time_data(StreamType &stream) const;
 
   /**
    * Begin measuring a new lap. If <code>sync_lap_times</code> is
    * <code>true</code> then an MPI barrier is used to ensure that all
    * processes begin the lap at the same wall time.
    */
-  void start ();
+  void
+  start ();
 
   /**
    * Stop the timer. This updates the lap times and accumulated times. If
@@ -229,18 +239,21 @@ public:
    *
    * Return the accumulated CPU time in seconds.
    */
-  double stop ();
+  double
+  stop ();
 
   /**
    * Stop the timer, if it is running, and reset all measured values to their
    * default states.
    */
-  void reset ();
+  void
+  reset ();
 
   /**
    * Equivalent to calling Timer::reset() followed by calling Timer::start().
    */
-  void restart();
+  void
+  restart();
 
   /**
    * Access to the current CPU time without stopping the timer. The elapsed
@@ -249,19 +262,22 @@ public:
    * @deprecated Use cpu_time() instead.
    */
   DEAL_II_DEPRECATED
-  double operator() () const;
+  double
+  operator() () const;
 
   /**
    * Return the current accumulated wall time (including the current lap, if
    * the timer is running) in seconds without stopping the timer.
    */
-  double wall_time () const;
+  double
+  wall_time () const;
 
   /**
    * Return the wall time of the last lap in seconds. The timer is not stopped
    * by this function.
    */
-  double last_wall_time() const;
+  double
+  last_wall_time() const;
 
   /**
    * Return the accumulated CPU time (including the current lap, if the timer
@@ -271,13 +287,15 @@ public:
    * value is the sum of all accumulated CPU times over all processors in the
    * communicator.
    */
-  double cpu_time() const;
+  double
+  cpu_time() const;
 
   /**
    * Return the CPU time of the last lap in seconds. The timer is not stopped
    * by this function.
    */
-  double last_cpu_time() const;
+  double
+  last_cpu_time() const;
 
   /**
    * Return the wall time taken between the last start()/stop() call.
@@ -285,7 +303,8 @@ public:
    * @deprecated Use last_wall_time() instead.
    */
   DEAL_II_DEPRECATED
-  double get_lap_time () const;
+  double
+  get_lap_time () const;
 
 private:
   /**
@@ -343,7 +362,8 @@ private:
      * Reset the clock by setting <code>current_lap_start_time</code> to the
      * current clock time and the durations to zero.
      */
-    void reset();
+    void
+    reset();
   };
 
   /**
@@ -585,7 +605,8 @@ public:
      * In case you want to exit the scope before the destructor is executed,
      * call this function.
      */
-    void stop();
+    void
+    stop();
 
   private:
     /**
@@ -762,12 +783,14 @@ public:
    * Open a section by given a string name of it. In case the name already
    * exists, that section is entered once again and times are accumulated.
    */
-  void enter_subsection (const std::string &section_name);
+  void
+  enter_subsection (const std::string &section_name);
 
   /**
    * Same as @p enter_subsection.
    */
-  void enter_section (const std::string &section_name);
+  void
+  enter_section (const std::string &section_name);
 
   //TODO: make some of these functions DEPRECATED (I would keep enter/exit_section)
 
@@ -775,23 +798,27 @@ public:
    * Leave a section. If no name is given, the last section that was entered
    * is left.
    */
-  void leave_subsection (const std::string &section_name = std::string());
+  void
+  leave_subsection (const std::string &section_name = std::string());
 
   /**
    * Same as @p leave_subsection.
    */
-  void exit_section (const std::string &section_name = std::string());
+  void
+  exit_section (const std::string &section_name = std::string());
 
   /**
    * Get a map with the collected data of the specified type for each subsection
    */
-  std::map<std::string, double> get_summary_data (const OutputData kind) const;
+  std::map<std::string, double>
+  get_summary_data (const OutputData kind) const;
 
   /**
    * Print a formatted table that summarizes the time consumed in the various
    * sections.
    */
-  void print_summary () const;
+  void
+  print_summary () const;
 
   /**
    * By calling this function, all output can be disabled. This function
@@ -799,7 +826,8 @@ public:
    * output in a flexible way without putting a lot of <tt>if</tt> clauses in
    * the program.
    */
-  void disable_output ();
+  void
+  disable_output ();
 
   /**
    * This function re-enables output of this class if it was previously
@@ -807,12 +835,14 @@ public:
    * disable_output() can be useful if one wants to control the output in a
    * flexible way without putting a lot of <tt>if</tt> clauses in the program.
    */
-  void enable_output ();
+  void
+  enable_output ();
 
   /**
    * Resets the recorded timing information.
    */
-  void reset ();
+  void
+  reset ();
 
 private:
   /**
@@ -886,7 +916,8 @@ private:
 
 
 inline
-void Timer::restart ()
+void
+Timer::restart ()
 {
   reset();
   start();

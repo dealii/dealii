@@ -25,7 +25,8 @@
 
 
 template <typename number>
-void test (unsigned int variant)
+void
+test (unsigned int variant)
 {
   const unsigned int n = 64;
   Vector<number> rhs(n), sol(n);
@@ -82,7 +83,8 @@ void test (unsigned int variant)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

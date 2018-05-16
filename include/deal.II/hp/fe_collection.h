@@ -66,14 +66,16 @@ namespace hp
      * push_back(), if desired, though it would probably be clearer to add all
      * mappings the same way.
      */
-    explicit FECollection (const FiniteElement<dim,spacedim> &fe);
+    explicit
+    FECollection (const FiniteElement<dim,spacedim> &fe);
 
     /**
      * Constructor. This constructor creates a FECollection from more than
      * one finite element.
      */
     template <class... FETypes>
-    explicit FECollection (const FETypes &... fes);
+    explicit
+    FECollection (const FETypes &... fes);
 
     /**
      * Constructor. Same as above but for any number of elements. Pointers to
@@ -121,7 +123,8 @@ namespace hp
      * When a new element is added, it needs to have the same number of vector
      * components as all other elements already in the collection.
      */
-    void push_back (const FiniteElement<dim,spacedim> &new_fe);
+    void
+    push_back (const FiniteElement<dim,spacedim> &new_fe);
 
     /**
      * Get a reference to the given element in this collection.
@@ -135,7 +138,8 @@ namespace hp
     /**
      * Return the number of finite element objects stored in this collection.
      */
-    unsigned int size () const;
+    unsigned int
+    size () const;
 
     /**
      * Return the number of vector components of the finite elements in this
@@ -146,7 +150,8 @@ namespace hp
      * @ref GlossComponent "the glossary"
      * for more information.
      */
-    unsigned int n_components () const;
+    unsigned int
+    n_components () const;
 
     /**
      * Return the number of vector blocks of the finite elements in this
@@ -164,48 +169,56 @@ namespace hp
      * they are the same, this function returns the result of
      * FiniteElement::n_blocks().
      */
-    unsigned int n_blocks () const;
+    unsigned int
+    n_blocks () const;
 
     /**
      * Return the maximal number of degrees of freedom per vertex over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_vertex () const;
+    unsigned int
+    max_dofs_per_vertex () const;
 
     /**
      * Return the maximal number of degrees of freedom per line over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_line () const;
+    unsigned int
+    max_dofs_per_line () const;
 
     /**
      * Return the maximal number of degrees of freedom per quad over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_quad () const;
+    unsigned int
+    max_dofs_per_quad () const;
 
     /**
      * Return the maximal number of degrees of freedom per hex over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_hex () const;
+    unsigned int
+    max_dofs_per_hex () const;
 
     /**
      * Return the maximal number of degrees of freedom per face over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_face () const;
+    unsigned int
+    max_dofs_per_face () const;
 
     /**
      * Return the maximal number of degrees of freedom per cell over all
      * elements of this collection.
      */
-    unsigned int max_dofs_per_cell () const;
+    unsigned int
+    max_dofs_per_cell () const;
 
     /**
      * Return an estimate for the memory allocated for this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
 
     /**
@@ -225,7 +238,8 @@ namespace hp
      * But the get_face_interpolation_matrix might still fail to find an
      * interpolation matrix between these two elements.
      */
-    bool hp_constraints_are_implemented () const;
+    bool
+    hp_constraints_are_implemented () const;
 
     /**
      * Try to find a least dominant finite element inside this FECollection

@@ -38,8 +38,9 @@
 #include <metis.h>
 
 
-void partition (const SparsityPattern     &sparsity_pattern,
-                const unsigned int         n_partitions)
+void
+partition (const SparsityPattern     &sparsity_pattern,
+           const unsigned int         n_partitions)
 {
   // generate the data structures for
   // METIS. Note that this is particularly
@@ -110,7 +111,8 @@ void partition (const SparsityPattern     &sparsity_pattern,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -126,7 +128,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

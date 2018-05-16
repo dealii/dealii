@@ -21,7 +21,8 @@
 #include <deal.II/base/table_indices.h>
 
 
-int main()
+int
+main()
 {
   initlog();
 

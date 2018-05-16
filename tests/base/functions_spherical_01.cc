@@ -34,16 +34,18 @@ public:
       Z(Z)
   {}
 
-  virtual double value(const Point<dim> &point,
-                       const unsigned int component = 0) const
+  virtual double
+  value(const Point<dim> &point,
+        const unsigned int component = 0) const
   {
     Tensor<1,dim> dist = point-origin;
     const double r = dist.norm();
     return std::exp(-Z*r);
   }
 
-  virtual Tensor< 1, dim> gradient (const Point<dim > &p,
-                                    const unsigned int component=0) const
+  virtual Tensor< 1, dim>
+  gradient (const Point<dim > &p,
+            const unsigned int component=0) const
   {
     Tensor<1,dim> dist = p-origin;
     const double r = dist.norm();
@@ -52,8 +54,9 @@ public:
     return -Z*std::exp(-Z*r)*dist;
   }
 
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p,
-                                          const unsigned int component=0) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p,
+           const unsigned int component=0) const
   {
     Tensor<1,dim> dir = p-origin;
     const double r = dir.norm();
@@ -85,14 +88,16 @@ public:
   {}
 
 private:
-  virtual double svalue(const std::array<double, dim> &sp,
-                        const unsigned int) const
+  virtual double
+  svalue(const std::array<double, dim> &sp,
+         const unsigned int) const
   {
     return std::exp(-Z*sp[0]);
   }
 
-  virtual std::array<double, dim> sgradient(const std::array<double, dim> &sp,
-                                            const unsigned int) const
+  virtual std::array<double, dim>
+  sgradient(const std::array<double, dim> &sp,
+            const unsigned int) const
   {
     std::array<double, dim> res;
     res[0] = -Z*std::exp(-Z*sp[0]);
@@ -101,8 +106,9 @@ private:
     return res;
   }
 
-  virtual std::array<double, 6> shessian (const std::array<double, dim> &sp,
-                                          const unsigned int) const
+  virtual std::array<double, 6>
+  shessian (const std::array<double, dim> &sp,
+            const unsigned int) const
   {
     std::array<double, 6> res;
     res[0] = Z*Z*std::exp(-Z*sp[0]);
@@ -115,7 +121,8 @@ private:
 };
 
 template <int dim>
-void check()
+void
+check()
 {
   Point<dim> center;
   const double Z = 2.5;
@@ -161,7 +168,8 @@ void check()
   deallog << "OK"<< std::endl;
 }
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

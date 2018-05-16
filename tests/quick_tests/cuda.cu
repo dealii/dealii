@@ -21,12 +21,14 @@
 
 using namespace dealii;
 
-__global__ void double_value(double *x, double *y)
+__global__ void
+double_value(double *x, double *y)
 {
   y[threadIdx.x] = 2. * x[threadIdx.x];
 }
 
-int main()
+int
+main()
 {
   constexpr int n = 4;
 

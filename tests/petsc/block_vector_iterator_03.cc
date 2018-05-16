@@ -26,8 +26,9 @@
 #include <utility>
 
 template <typename number>
-bool operator == (const PETScWrappers::MPI::BlockVector &v1,
-                  const PETScWrappers::MPI::BlockVector &v2)
+bool
+operator == (const PETScWrappers::MPI::BlockVector &v1,
+             const PETScWrappers::MPI::BlockVector &v2)
 {
   if (v1.size() != v2.size())
     return false;
@@ -38,7 +39,8 @@ bool operator == (const PETScWrappers::MPI::BlockVector &v1,
 }
 
 
-void test ()
+void
+test ()
 {
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
@@ -221,7 +223,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);

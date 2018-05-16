@@ -33,9 +33,11 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
-void test(unsigned int degree)
+void
+test(unsigned int degree)
 {
   const unsigned int dim = 1;
   const unsigned int spacedim = 1;
@@ -75,7 +77,8 @@ void test(unsigned int degree)
 
 }
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

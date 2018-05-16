@@ -45,15 +45,16 @@ DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
   template<int dim0, int dim1, int spacedim, typename Sparsity>
-  void create_coupling_sparsity_pattern(const DoFHandler<dim0, spacedim> &space_dh,
-                                        const DoFHandler<dim1, spacedim> &immersed_dh,
-                                        const Quadrature<dim1>           &quad,
-                                        Sparsity                         &sparsity,
-                                        const ConstraintMatrix           &constraints,
-                                        const ComponentMask              &space_comps,
-                                        const ComponentMask              &immersed_comps,
-                                        const Mapping<dim0, spacedim>    &space_mapping,
-                                        const Mapping<dim1, spacedim>    &immersed_mapping)
+  void
+  create_coupling_sparsity_pattern(const DoFHandler<dim0, spacedim> &space_dh,
+                                   const DoFHandler<dim1, spacedim> &immersed_dh,
+                                   const Quadrature<dim1>           &quad,
+                                   Sparsity                         &sparsity,
+                                   const ConstraintMatrix           &constraints,
+                                   const ComponentMask              &space_comps,
+                                   const ComponentMask              &immersed_comps,
+                                   const Mapping<dim0, spacedim>    &space_mapping,
+                                   const Mapping<dim1, spacedim>    &immersed_mapping)
   {
     GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
     create_coupling_sparsity_pattern(cache, space_dh, immersed_dh,
@@ -65,15 +66,16 @@ namespace NonMatching
 
 
   template<int dim0, int dim1, int spacedim, typename Sparsity>
-  void create_coupling_sparsity_pattern(const GridTools::Cache<dim0,spacedim> &cache,
-                                        const DoFHandler<dim0, spacedim>      &space_dh,
-                                        const DoFHandler<dim1, spacedim>      &immersed_dh,
-                                        const Quadrature<dim1>                &quad,
-                                        Sparsity                              &sparsity,
-                                        const ConstraintMatrix                &constraints,
-                                        const ComponentMask                   &space_comps,
-                                        const ComponentMask                   &immersed_comps,
-                                        const Mapping<dim1, spacedim>         &immersed_mapping)
+  void
+  create_coupling_sparsity_pattern(const GridTools::Cache<dim0,spacedim> &cache,
+                                   const DoFHandler<dim0, spacedim>      &space_dh,
+                                   const DoFHandler<dim1, spacedim>      &immersed_dh,
+                                   const Quadrature<dim1>                &quad,
+                                   Sparsity                              &sparsity,
+                                   const ConstraintMatrix                &constraints,
+                                   const ComponentMask                   &space_comps,
+                                   const ComponentMask                   &immersed_comps,
+                                   const Mapping<dim1, spacedim>         &immersed_mapping)
   {
     AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
     AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
@@ -173,15 +175,16 @@ namespace NonMatching
 
 
   template<int dim0, int dim1, int spacedim, typename Matrix>
-  void create_coupling_mass_matrix(const DoFHandler<dim0, spacedim> &space_dh,
-                                   const DoFHandler<dim1, spacedim> &immersed_dh,
-                                   const Quadrature<dim1>           &quad,
-                                   Matrix                           &matrix,
-                                   const ConstraintMatrix           &constraints,
-                                   const ComponentMask              &space_comps,
-                                   const ComponentMask              &immersed_comps,
-                                   const Mapping<dim0, spacedim>    &space_mapping,
-                                   const Mapping<dim1, spacedim>    &immersed_mapping)
+  void
+  create_coupling_mass_matrix(const DoFHandler<dim0, spacedim> &space_dh,
+                              const DoFHandler<dim1, spacedim> &immersed_dh,
+                              const Quadrature<dim1>           &quad,
+                              Matrix                           &matrix,
+                              const ConstraintMatrix           &constraints,
+                              const ComponentMask              &space_comps,
+                              const ComponentMask              &immersed_comps,
+                              const Mapping<dim0, spacedim>    &space_mapping,
+                              const Mapping<dim1, spacedim>    &immersed_mapping)
   {
     GridTools::Cache<dim0,spacedim> cache(space_dh.get_triangulation(), space_mapping);
     create_coupling_mass_matrix(cache, space_dh, immersed_dh,
@@ -192,15 +195,16 @@ namespace NonMatching
 
 
   template<int dim0, int dim1, int spacedim, typename Matrix>
-  void create_coupling_mass_matrix(const GridTools::Cache<dim0, spacedim> &cache,
-                                   const DoFHandler<dim0, spacedim>       &space_dh,
-                                   const DoFHandler<dim1, spacedim>       &immersed_dh,
-                                   const Quadrature<dim1>                 &quad,
-                                   Matrix                                 &matrix,
-                                   const ConstraintMatrix                 &constraints,
-                                   const ComponentMask                    &space_comps,
-                                   const ComponentMask                    &immersed_comps,
-                                   const Mapping<dim1, spacedim>          &immersed_mapping)
+  void
+  create_coupling_mass_matrix(const GridTools::Cache<dim0, spacedim> &cache,
+                              const DoFHandler<dim0, spacedim>       &space_dh,
+                              const DoFHandler<dim1, spacedim>       &immersed_dh,
+                              const Quadrature<dim1>                 &quad,
+                              Matrix                                 &matrix,
+                              const ConstraintMatrix                 &constraints,
+                              const ComponentMask                    &space_comps,
+                              const ComponentMask                    &immersed_comps,
+                              const Mapping<dim1, spacedim>          &immersed_mapping)
   {
     AssertDimension(matrix.m(), space_dh.n_dofs());
     AssertDimension(matrix.n(), immersed_dh.n_dofs());

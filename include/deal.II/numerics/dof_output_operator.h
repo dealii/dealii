@@ -50,8 +50,10 @@ namespace Algorithms
     DoFOutputOperator (const std::string &filename_base = std::string("output"),
                        const unsigned int digits = 3);
 
-    void parse_parameters(ParameterHandler &param);
-    void initialize (const DoFHandler<dim, spacedim> &dof_handler);
+    void
+    parse_parameters(ParameterHandler &param);
+    void
+    initialize (const DoFHandler<dim, spacedim> &dof_handler);
 
     virtual OutputOperator<VectorType> &
     operator << (const AnyData &vectors) override;

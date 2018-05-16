@@ -33,7 +33,8 @@
 
 
 template <int dim>
-void test (unsigned int degree)
+void
+test (unsigned int degree)
 {
   Triangulation<dim-1, dim> mesh;
   GridGenerator::hyper_cube(mesh);
@@ -57,7 +58,8 @@ void test (unsigned int degree)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

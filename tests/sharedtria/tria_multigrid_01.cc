@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void compare_meshes (parallel::shared::Triangulation<dim> &shared_tria, parallel::distributed::Triangulation<dim> &p4est_tria)
+void
+compare_meshes (parallel::shared::Triangulation<dim> &shared_tria, parallel::distributed::Triangulation<dim> &p4est_tria)
 {
   std::map<CellId, unsigned int> shared_map;
   std::map<CellId, unsigned int> p4est_map;
@@ -100,7 +101,8 @@ void compare_meshes (parallel::shared::Triangulation<dim> &shared_tria, parallel
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
                                                    (Triangulation<dim>::limit_level_difference_at_vertices), true,
@@ -151,7 +153,8 @@ void test()
   compare_meshes(shared_tria,p4est_tria);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll all;

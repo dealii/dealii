@@ -152,7 +152,8 @@ SolverControl::enable_history_data ()
 
 
 
-const std::vector<double> &SolverControl::get_history_data() const
+const std::vector<double> &
+SolverControl::get_history_data() const
 {
   Assert (history_data_enabled, ExcHistoryDataRequired());
   Assert (history_data.size() > 0,
@@ -211,7 +212,8 @@ SolverControl::declare_parameters (ParameterHandler &param)
 }
 
 
-void SolverControl::parse_parameters (ParameterHandler &param)
+void
+SolverControl::parse_parameters (ParameterHandler &param)
 {
   set_max_steps (param.get_integer("Max steps"));
   set_tolerance (param.get_double("Tolerance"));

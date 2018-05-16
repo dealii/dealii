@@ -67,24 +67,33 @@ namespace mg
     /**
      * Reset the object.
      */
-    void reset();
+    void
+    reset();
 
     /**
      * Access matrix on a level.
      */
-    const LinearOperator<VectorType> &operator[] (unsigned int level) const;
+    const LinearOperator<VectorType> &
+    operator[] (unsigned int level) const;
 
-    virtual void vmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
-    virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
-    virtual void Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
-    virtual void Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
-    virtual unsigned int get_minlevel() const override;
-    virtual unsigned int get_maxlevel() const override;
+    virtual void
+    vmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void
+    vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void
+    Tvmult (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual void
+    Tvmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const override;
+    virtual unsigned int
+    get_minlevel() const override;
+    virtual unsigned int
+    get_maxlevel() const override;
 
     /**
      * Memory used by this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
   private:
     MGLevelObject<LinearOperator<VectorType> > matrices;
   };
@@ -118,41 +127,47 @@ public:
    * Set the matrix object to be used. The matrix object must exist longer as
    * the @p MGMatrixSelect object, since only a pointer is stored.
    */
-  void set_matrix (MGLevelObject<MatrixType> *M);
+  void
+  set_matrix (MGLevelObject<MatrixType> *M);
 
   /**
    * Select the block for multiplication.
    */
-  void select_block (const unsigned int row,
-                     const unsigned int col);
+  void
+  select_block (const unsigned int row,
+                const unsigned int col);
 
   /**
    * Matrix-vector-multiplication on a certain level.
    */
-  virtual void vmult (const unsigned int level,
-                      Vector<number> &dst,
-                      const Vector<number> &src) const;
+  virtual void
+  vmult (const unsigned int level,
+         Vector<number> &dst,
+         const Vector<number> &src) const;
 
   /**
    * Adding matrix-vector-multiplication on a certain level.
    */
-  virtual void vmult_add (const unsigned int level,
-                          Vector<number> &dst,
-                          const Vector<number> &src) const;
+  virtual void
+  vmult_add (const unsigned int level,
+             Vector<number> &dst,
+             const Vector<number> &src) const;
 
   /**
    * Transpose matrix-vector-multiplication on a certain level.
    */
-  virtual void Tvmult (const unsigned int level,
-                       Vector<number> &dst,
-                       const Vector<number> &src) const;
+  virtual void
+  Tvmult (const unsigned int level,
+          Vector<number> &dst,
+          const Vector<number> &src) const;
 
   /**
    * Adding transpose matrix-vector-multiplication on a certain level.
    */
-  virtual void Tvmult_add (const unsigned int level,
-                           Vector<number> &dst,
-                           const Vector<number> &src) const;
+  virtual void
+  Tvmult_add (const unsigned int level,
+              Vector<number> &dst,
+              const Vector<number> &src) const;
 
 private:
   /**

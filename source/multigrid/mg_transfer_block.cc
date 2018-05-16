@@ -194,7 +194,8 @@ MGTransferBlock<number>::copy_to_mg (
 
 
 template <int dim, int spacedim>
-void MGTransferBlockBase::build_matrices (
+void
+MGTransferBlockBase::build_matrices (
   const DoFHandler<dim,spacedim> &,
   const DoFHandler<dim,spacedim> &mg_dof)
 {
@@ -449,7 +450,8 @@ void MGTransferBlockBase::build_matrices (
 
 template <typename number>
 template <int dim, int spacedim>
-void MGTransferBlockSelect<number>::build_matrices (
+void
+MGTransferBlockSelect<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
   const DoFHandler<dim,spacedim> &mg_dof,
   unsigned int select)
@@ -533,7 +535,8 @@ void MGTransferBlockSelect<number>::build_matrices (
 
 template <typename number>
 template <int dim, int spacedim>
-void MGTransferBlock<number>::build_matrices (
+void
+MGTransferBlock<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
   const DoFHandler<dim,spacedim> &mg_dof,
   const std::vector<bool> &sel)

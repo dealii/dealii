@@ -32,7 +32,8 @@
 using namespace dealii;
 
 template <int dim>
-void set_periodicity(parallel::distributed::Triangulation<dim> &triangulation, bool reverse)
+void
+set_periodicity(parallel::distributed::Triangulation<dim> &triangulation, bool reverse)
 {
   typename Triangulation<dim>::cell_iterator cell_1 = triangulation.begin();
   typename Triangulation<dim>::cell_iterator cell_2 = cell_1++;
@@ -64,7 +65,8 @@ void set_periodicity(parallel::distributed::Triangulation<dim> &triangulation, b
 }
 
 /* The 2D case */
-void generate_grid(parallel::distributed::Triangulation<2> &triangulation, int orientation)
+void
+generate_grid(parallel::distributed::Triangulation<2> &triangulation, int orientation)
 {
   Point<2> vertices_1[]
   =
@@ -108,7 +110,8 @@ void generate_grid(parallel::distributed::Triangulation<2> &triangulation, int o
 
 
 /* The 3D case */
-void generate_grid(parallel::distributed::Triangulation<3> &triangulation, int orientation)
+void
+generate_grid(parallel::distributed::Triangulation<3> &triangulation, int orientation)
 {
   Point<3> vertices_1[]
   =
@@ -278,7 +281,8 @@ void check
     }
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   try
     {

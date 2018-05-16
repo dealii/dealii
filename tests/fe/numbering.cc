@@ -20,11 +20,13 @@
 #include <vector>
 
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 
 template <int dim>
-void check (const FE_Q<dim> &fe)
+void
+check (const FE_Q<dim> &fe)
 {
   Assert (fe.n_components() == 1, ExcInternalError());
 
@@ -229,7 +231,8 @@ void check (const FE_Q<dim> &fe)
 
 
 template <int dim>
-void check_dim ()
+void
+check_dim ()
 {
   for (unsigned int degree=1; degree<6; ++degree)
     {
@@ -239,7 +242,8 @@ void check_dim ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   deallog << std::fixed;

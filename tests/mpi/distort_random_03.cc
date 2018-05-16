@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void test1 (const bool keep_boundary)
+void
+test1 (const bool keep_boundary)
 {
   const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   parallel::shared::Triangulation<dim> tria (MPI_COMM_WORLD);
@@ -55,7 +56,8 @@ void test1 (const bool keep_boundary)
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

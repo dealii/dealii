@@ -41,8 +41,9 @@ namespace PETScWrappers
    * PetscOptionsSetValue with a version check (the signature of this function
    * changed in PETSc 3.7.0).
    */
-  inline void set_option_value (const std::string &name,
-                                const std::string &value)
+  inline void
+  set_option_value (const std::string &name,
+                    const std::string &value)
   {
 #if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
     const PetscErrorCode ierr = PetscOptionsSetValue (name.c_str (), value.c_str ());
@@ -64,7 +65,8 @@ namespace PETScWrappers
    * given by MatDestroy.
    *
    */
-  inline PetscErrorCode destroy_matrix (Mat &matrix)
+  inline PetscErrorCode
+  destroy_matrix (Mat &matrix)
   {
     // PETSc will check whether or not matrix is nullptr.
     return MatDestroy (&matrix);
@@ -82,7 +84,8 @@ namespace PETScWrappers
    * exception if an error occurs, but instead just returns the error code
    * given by MatDestroy.
    */
-  inline PetscErrorCode destroy_krylov_solver (KSP &krylov_solver)
+  inline PetscErrorCode
+  destroy_krylov_solver (KSP &krylov_solver)
   {
     // PETSc will check whether or not matrix is nullptr.
     return KSPDestroy (&krylov_solver);
@@ -97,9 +100,10 @@ namespace PETScWrappers
    * @warning The argument option_value is ignored in versions of PETSc
    * before 3.0.0 since the corresponding function did not take this argument.
    */
-  inline void set_matrix_option (Mat &matrix,
-                                 const MatOption option_name,
-                                 const PetscBool option_value = PETSC_FALSE)
+  inline void
+  set_matrix_option (Mat &matrix,
+                     const MatOption option_name,
+                     const PetscBool option_value = PETSC_FALSE)
   {
     const PetscErrorCode ierr = MatSetOption (matrix, option_name, option_value);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -111,7 +115,8 @@ namespace PETScWrappers
    * Tell PETSc that we are not planning on adding new entries to the
    * matrix. Generate errors in debug mode.
    */
-  inline void close_matrix (Mat &matrix)
+  inline void
+  close_matrix (Mat &matrix)
   {
 #  ifdef DEBUG
     set_matrix_option (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
@@ -127,7 +132,8 @@ namespace PETScWrappers
    * row with clear_rows() which calls MatZeroRows(). Otherwise one can
    * not write into that row afterwards.
    */
-  inline void set_keep_zero_rows (Mat &matrix)
+  inline void
+  set_keep_zero_rows (Mat &matrix)
   {
     set_matrix_option (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
   }

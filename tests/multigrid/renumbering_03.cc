@@ -37,7 +37,8 @@
 using namespace std;
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> fe(3);
   deallog << fe.get_name() << std::endl;
@@ -65,7 +66,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   initlog(__FILE__);
   check<1> ();

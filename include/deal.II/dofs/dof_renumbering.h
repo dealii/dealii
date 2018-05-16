@@ -359,7 +359,8 @@ namespace DoFRenumbering
     /**
      * Return true if c1 less c2.
      */
-    bool operator () (const Iterator &c1, const Iterator &c2) const
+    bool
+    operator () (const Iterator &c1, const Iterator &c2) const
     {
       const Tensor<1,dim> diff = c2->center() - c1->center();
       return (diff*dir > 0);
@@ -393,8 +394,9 @@ namespace DoFRenumbering
     /**
      * Return true if c1 less c2.
      */
-    bool operator () (const std::pair<Point<dim>,types::global_dof_index> &c1,
-                      const std::pair<Point<dim>,types::global_dof_index> &c2) const
+    bool
+    operator () (const std::pair<Point<dim>,types::global_dof_index> &c1,
+                 const std::pair<Point<dim>,types::global_dof_index> &c2) const
     {
       const Tensor<1,dim> diff = c2.first-c1.first;
       return (diff*dir > 0 || (diff*dir==0 && c1.second<c2.second));

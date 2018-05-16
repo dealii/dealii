@@ -83,7 +83,8 @@ MGTransferBlock<number>::initialize (const std::vector<number> &f,
 
 
 template <typename number>
-void MGTransferBlock<number>::prolongate (
+void
+MGTransferBlock<number>::prolongate (
   const unsigned int   to_level,
   BlockVector<number>       &dst,
   const BlockVector<number> &src) const
@@ -108,7 +109,8 @@ void MGTransferBlock<number>::prolongate (
 
 
 template <typename number>
-void MGTransferBlock<number>::restrict_and_add (
+void
+MGTransferBlock<number>::restrict_and_add (
   const unsigned int   from_level,
   BlockVector<number>       &dst,
   const BlockVector<number> &src) const
@@ -217,7 +219,8 @@ MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
 
 
 template <typename number>
-void MGTransferSelect<number>::prolongate (
+void
+MGTransferSelect<number>::prolongate (
   const unsigned int   to_level,
   Vector<number>       &dst,
   const Vector<number> &src) const
@@ -233,7 +236,8 @@ void MGTransferSelect<number>::prolongate (
 
 
 template <typename number>
-void MGTransferSelect<number>::restrict_and_add (
+void
+MGTransferSelect<number>::restrict_and_add (
   const unsigned int   from_level,
   Vector<number>       &dst,
   const Vector<number> &src) const

@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -45,7 +46,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   //Initialize MPI and Zoltan
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);

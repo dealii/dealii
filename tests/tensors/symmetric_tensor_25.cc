@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   for (unsigned int round=0; round<10; ++round)
     {
@@ -60,7 +61,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

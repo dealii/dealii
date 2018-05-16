@@ -1408,7 +1408,8 @@ TriaAccessor<structdim,dim,spacedim>::set_line_orientation (const unsigned int l
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim, dim, spacedim>::set_used_flag () const
+void
+TriaAccessor<structdim, dim, spacedim>::set_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
           TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
@@ -1745,7 +1746,8 @@ TriaAccessor<structdim,dim,spacedim>::clear_user_flag () const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::recursively_set_user_flag () const
+void
+TriaAccessor<structdim,dim,spacedim>::recursively_set_user_flag () const
 {
   set_user_flag ();
 
@@ -1757,7 +1759,8 @@ void TriaAccessor<structdim,dim,spacedim>::recursively_set_user_flag () const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::recursively_clear_user_flag () const
+void
+TriaAccessor<structdim,dim,spacedim>::recursively_clear_user_flag () const
 {
   clear_user_flag ();
 
@@ -1769,7 +1772,8 @@ void TriaAccessor<structdim,dim,spacedim>::recursively_clear_user_flag () const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::clear_user_data () const
+void
+TriaAccessor<structdim,dim,spacedim>::clear_user_data () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().clear_user_data(this->present_index);
@@ -1778,7 +1782,8 @@ void TriaAccessor<structdim,dim,spacedim>::clear_user_data () const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::set_user_pointer (void *p) const
+void
+TriaAccessor<structdim,dim,spacedim>::set_user_pointer (void *p) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().user_pointer(this->present_index) = p;
@@ -1787,7 +1792,8 @@ void TriaAccessor<structdim,dim,spacedim>::set_user_pointer (void *p) const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::clear_user_pointer () const
+void
+TriaAccessor<structdim,dim,spacedim>::clear_user_pointer () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().user_pointer(this->present_index) = nullptr;
@@ -1796,7 +1802,8 @@ void TriaAccessor<structdim,dim,spacedim>::clear_user_pointer () const
 
 
 template <int structdim, int dim, int spacedim>
-void *TriaAccessor<structdim,dim,spacedim>::user_pointer () const
+void *
+TriaAccessor<structdim,dim,spacedim>::user_pointer () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->objects().user_pointer(this->present_index);
@@ -1831,7 +1838,8 @@ TriaAccessor<structdim,dim,spacedim>::recursively_clear_user_pointer () const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::set_user_index (unsigned int p) const
+void
+TriaAccessor<structdim,dim,spacedim>::set_user_index (unsigned int p) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().user_index(this->present_index) = p;
@@ -1840,7 +1848,8 @@ void TriaAccessor<structdim,dim,spacedim>::set_user_index (unsigned int p) const
 
 
 template <int structdim, int dim, int spacedim>
-void TriaAccessor<structdim,dim,spacedim>::clear_user_index () const
+void
+TriaAccessor<structdim,dim,spacedim>::clear_user_index () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->objects().user_index(this->present_index) = 0;
@@ -1849,7 +1858,8 @@ void TriaAccessor<structdim,dim,spacedim>::clear_user_index () const
 
 
 template <int structdim, int dim, int spacedim>
-unsigned int TriaAccessor<structdim,dim,spacedim>::user_index () const
+unsigned int
+TriaAccessor<structdim,dim,spacedim>::user_index () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->objects().user_index(this->present_index);
@@ -2562,7 +2572,8 @@ TriaAccessor<0, dim, spacedim>::measure () const
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::face_orientation (const unsigned int /*face*/)
+bool
+TriaAccessor<0, dim, spacedim>::face_orientation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2571,7 +2582,8 @@ bool TriaAccessor<0, dim, spacedim>::face_orientation (const unsigned int /*face
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::face_flip (const unsigned int /*face*/)
+bool
+TriaAccessor<0, dim, spacedim>::face_flip (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2580,7 +2592,8 @@ bool TriaAccessor<0, dim, spacedim>::face_flip (const unsigned int /*face*/)
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::face_rotation (const unsigned int /*face*/)
+bool
+TriaAccessor<0, dim, spacedim>::face_rotation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2589,7 +2602,8 @@ bool TriaAccessor<0, dim, spacedim>::face_rotation (const unsigned int /*face*/)
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::line_orientation (const unsigned int /*line*/)
+bool
+TriaAccessor<0, dim, spacedim>::line_orientation (const unsigned int /*line*/)
 {
   return false;
 }
@@ -2598,7 +2612,8 @@ bool TriaAccessor<0, dim, spacedim>::line_orientation (const unsigned int /*line
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::has_children ()
+bool
+TriaAccessor<0, dim, spacedim>::has_children ()
 {
   return false;
 }
@@ -2607,7 +2622,8 @@ bool TriaAccessor<0, dim, spacedim>::has_children ()
 
 template <int dim, int spacedim>
 inline
-unsigned int TriaAccessor<0, dim, spacedim>::n_children()
+unsigned int
+TriaAccessor<0, dim, spacedim>::n_children()
 {
   return 0;
 }
@@ -2616,7 +2632,8 @@ unsigned int TriaAccessor<0, dim, spacedim>::n_children()
 
 template <int dim, int spacedim>
 inline
-unsigned int TriaAccessor<0, dim, spacedim>::number_of_children ()
+unsigned int
+TriaAccessor<0, dim, spacedim>::number_of_children ()
 {
   return 0;
 }
@@ -2625,7 +2642,8 @@ unsigned int TriaAccessor<0, dim, spacedim>::number_of_children ()
 
 template <int dim, int spacedim>
 inline
-unsigned int TriaAccessor<0, dim, spacedim>::max_refinement_depth ()
+unsigned int
+TriaAccessor<0, dim, spacedim>::max_refinement_depth ()
 {
   return 0;
 }
@@ -2654,7 +2672,8 @@ TriaAccessor<0, dim, spacedim>::isotropic_child (const unsigned int)
 
 template <int dim, int spacedim>
 inline
-RefinementCase<0> TriaAccessor<0, dim, spacedim>::refinement_case ()
+RefinementCase<0>
+TriaAccessor<0, dim, spacedim>::refinement_case ()
 {
   return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
 }
@@ -2663,7 +2682,8 @@ RefinementCase<0> TriaAccessor<0, dim, spacedim>::refinement_case ()
 
 template <int dim, int spacedim>
 inline
-int TriaAccessor<0, dim, spacedim>::child_index (const unsigned int)
+int
+TriaAccessor<0, dim, spacedim>::child_index (const unsigned int)
 {
   return -1;
 }
@@ -2672,7 +2692,8 @@ int TriaAccessor<0, dim, spacedim>::child_index (const unsigned int)
 
 template <int dim, int spacedim>
 inline
-int TriaAccessor<0, dim, spacedim>::isotropic_child_index (const unsigned int)
+int
+TriaAccessor<0, dim, spacedim>::isotropic_child_index (const unsigned int)
 {
   return -1;
 }
@@ -2681,7 +2702,8 @@ int TriaAccessor<0, dim, spacedim>::isotropic_child_index (const unsigned int)
 
 template <int dim, int spacedim>
 inline
-bool TriaAccessor<0, dim, spacedim>::used () const
+bool
+TriaAccessor<0, dim, spacedim>::used () const
 {
   return tria->vertex_used(global_vertex_index);
 }
@@ -2979,7 +3001,8 @@ TriaAccessor<0, 1, spacedim>::manifold_id () const
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int /*face*/)
+bool
+TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2988,7 +3011,8 @@ bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int /*face*/
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int /*face*/)
+bool
+TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int /*face*/)
 {
   return false;
 }
@@ -2997,7 +3021,8 @@ bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int /*face*/)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int /*face*/)
+bool
+TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int /*face*/)
 {
   return false;
 }
@@ -3006,7 +3031,8 @@ bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int /*face*/)
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int /*line*/)
+bool
+TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int /*line*/)
 {
   return false;
 }
@@ -3015,7 +3041,8 @@ bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int /*line*/
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::has_children ()
+bool
+TriaAccessor<0, 1, spacedim>::has_children ()
 {
   return false;
 }
@@ -3024,7 +3051,8 @@ bool TriaAccessor<0, 1, spacedim>::has_children ()
 
 template <int spacedim>
 inline
-unsigned int TriaAccessor<0, 1, spacedim>::n_children()
+unsigned int
+TriaAccessor<0, 1, spacedim>::n_children()
 {
   return 0;
 }
@@ -3033,7 +3061,8 @@ unsigned int TriaAccessor<0, 1, spacedim>::n_children()
 
 template <int spacedim>
 inline
-unsigned int TriaAccessor<0, 1, spacedim>::number_of_children ()
+unsigned int
+TriaAccessor<0, 1, spacedim>::number_of_children ()
 {
   return 0;
 }
@@ -3042,7 +3071,8 @@ unsigned int TriaAccessor<0, 1, spacedim>::number_of_children ()
 
 template <int spacedim>
 inline
-unsigned int TriaAccessor<0, 1, spacedim>::max_refinement_depth ()
+unsigned int
+TriaAccessor<0, 1, spacedim>::max_refinement_depth ()
 {
   return 0;
 }
@@ -3068,14 +3098,16 @@ TriaAccessor<0, 1, spacedim>::isotropic_child (const unsigned int)
 
 template <int spacedim>
 inline
-RefinementCase<0> TriaAccessor<0, 1, spacedim>::refinement_case ()
+RefinementCase<0>
+TriaAccessor<0, 1, spacedim>::refinement_case ()
 {
   return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
 }
 
 template <int spacedim>
 inline
-int TriaAccessor<0, 1, spacedim>::child_index (const unsigned int)
+int
+TriaAccessor<0, 1, spacedim>::child_index (const unsigned int)
 {
   return -1;
 }
@@ -3083,7 +3115,8 @@ int TriaAccessor<0, 1, spacedim>::child_index (const unsigned int)
 
 template <int spacedim>
 inline
-int TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
+int
+TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
 {
   return -1;
 }
@@ -3116,7 +3149,8 @@ TriaAccessor<0, 1, spacedim>::set_manifold_id (const types::manifold_id b)
 
 template <int spacedim>
 inline
-void TriaAccessor<0, 1, spacedim>::set_all_boundary_ids (const types::boundary_id b)
+void
+TriaAccessor<0, 1, spacedim>::set_all_boundary_ids (const types::boundary_id b)
 {
   set_boundary_id (b);
 }
@@ -3125,7 +3159,8 @@ void TriaAccessor<0, 1, spacedim>::set_all_boundary_ids (const types::boundary_i
 
 template <int spacedim>
 inline
-void TriaAccessor<0, 1, spacedim>::set_all_manifold_ids (const types::manifold_id b)
+void
+TriaAccessor<0, 1, spacedim>::set_all_manifold_ids (const types::manifold_id b)
 {
   set_manifold_id (b);
 }
@@ -3134,7 +3169,8 @@ void TriaAccessor<0, 1, spacedim>::set_all_manifold_ids (const types::manifold_i
 
 template <int spacedim>
 inline
-bool TriaAccessor<0, 1, spacedim>::used () const
+bool
+TriaAccessor<0, 1, spacedim>::used () const
 {
   return tria->vertex_used(global_vertex_index);
 }

@@ -27,7 +27,8 @@
 using namespace std;
 
 template <int dim>
-void plot(const PolynomialsBDM<dim> &poly)
+void
+plot(const PolynomialsBDM<dim> &poly)
 {
   QTrapez<1> base_quadrature;
   QIterated<dim> quadrature(base_quadrature, poly.degree()+4);
@@ -53,7 +54,8 @@ void plot(const PolynomialsBDM<dim> &poly)
     }
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

@@ -261,9 +261,11 @@ public:
    */
   FE_P1NC();
 
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
-  virtual UpdateFlags requires_update_flags (const UpdateFlags flags) const override;
+  virtual UpdateFlags
+  requires_update_flags (const UpdateFlags flags) const override;
 
   virtual
   std::unique_ptr<FiniteElement<2,2>>
@@ -272,7 +274,8 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FE_P1NC () override = default;
+  virtual
+  ~FE_P1NC () override = default;
 
 
 
@@ -281,7 +284,8 @@ private:
   /**
    * Return the vector consists of the numbers of degrees of freedom per objects.
    */
-  static std::vector<unsigned int> get_dpo_vector ();
+  static std::vector<unsigned int>
+  get_dpo_vector ();
 
   /**
    * Return the coefficients of 4 local linear shape functions $\phi_j(x,y) = a x + b y + c$ on given cell.
@@ -361,7 +365,8 @@ private:
   /**
    * Create the constraints matrix for hanging edges.
    */
-  void initialize_constraints ();
+  void
+  initialize_constraints ();
 
 };
 

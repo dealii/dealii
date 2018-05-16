@@ -26,7 +26,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
@@ -50,7 +51,8 @@ void test ()
     }
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

@@ -32,7 +32,8 @@
 
 
 template <int dim>
-Point<dim> stretch (const Point<dim> &p)
+Point<dim>
+stretch (const Point<dim> &p)
 {
   Point<dim> q = p;
   q(dim-1) *= 2.;

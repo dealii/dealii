@@ -51,7 +51,8 @@
 #include <iostream>
 #include <complex>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
@@ -62,18 +63,28 @@ public:
   LaplaceProblem ();
   ~LaplaceProblem ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void test_equality ();
-  void assemble_reference ();
-  void assemble_test_1 ();
-  void assemble_test_2 ();
-  void solve ();
-  void create_coarse_grid ();
-  void estimate_smoothness (Vector<float> &smoothness_indicators) const;
-  void postprocess ();
+  void
+  setup_system ();
+  void
+  test_equality ();
+  void
+  assemble_reference ();
+  void
+  assemble_test_1 ();
+  void
+  assemble_test_2 ();
+  void
+  solve ();
+  void
+  create_coarse_grid ();
+  void
+  estimate_smoothness (Vector<float> &smoothness_indicators) const;
+  void
+  postprocess ();
 
   Triangulation<dim>   triangulation;
 
@@ -104,8 +115,9 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -127,8 +139,9 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim> () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component) const;
 };
 
 
@@ -175,7 +188,8 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe_collection);
 
@@ -233,7 +247,8 @@ void LaplaceProblem<dim>::setup_system ()
 // test whether we are equal with the
 // standard matrix and right hand side
 template <int dim>
-void LaplaceProblem<dim>::test_equality ()
+void
+LaplaceProblem<dim>::test_equality ()
 {
   // need to manually go through the
   // matrix, since we can have different
@@ -276,7 +291,8 @@ void LaplaceProblem<dim>::test_equality ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_reference ()
+void
+LaplaceProblem<dim>::assemble_reference ()
 {
   reference_matrix = 0;
   reference_rhs = 0;
@@ -356,7 +372,8 @@ void LaplaceProblem<dim>::assemble_reference ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_test_1 ()
+void
+LaplaceProblem<dim>::assemble_test_1 ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -429,7 +446,8 @@ void LaplaceProblem<dim>::assemble_test_1 ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_test_2 ()
+void
+LaplaceProblem<dim>::assemble_test_2 ()
 {
   test_matrix = 0;
   test_rhs = 0;
@@ -500,7 +518,8 @@ void LaplaceProblem<dim>::assemble_test_2 ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (reference_rhs.size(),
                                           1e-8*reference_rhs.l2_norm());
@@ -524,7 +543,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::postprocess ()
+void
+LaplaceProblem<dim>::postprocess ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   for (unsigned int i=0; i<estimated_error_per_cell.size(); ++i)
@@ -538,7 +558,8 @@ void LaplaceProblem<dim>::postprocess ()
 
 
 template <>
-void LaplaceProblem<2>::create_coarse_grid ()
+void
+LaplaceProblem<2>::create_coarse_grid ()
 {
   const unsigned int dim = 2;
 
@@ -611,7 +632,8 @@ void LaplaceProblem<2>::create_coarse_grid ()
 
 
 template <>
-void LaplaceProblem<3>::create_coarse_grid ()
+void
+LaplaceProblem<3>::create_coarse_grid ()
 {
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (1);
@@ -620,7 +642,8 @@ void LaplaceProblem<3>::create_coarse_grid ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -795,7 +818,8 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);

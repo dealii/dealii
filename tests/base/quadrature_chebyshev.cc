@@ -28,11 +28,14 @@ using namespace dealii;
 
 
 template <typename quadrature_type, unsigned short startn>
-void check_quadrature (double *);
-void check_GRC_right(double *);
+void
+check_quadrature (double *);
+void
+check_GRC_right(double *);
 
 
-int main()
+int
+main()
 {
   // this stores the exact values of \int_0^1 x^i/sqrt(x(1-x)) dx
   static double exact_monomials[32];
@@ -91,7 +94,8 @@ int main()
 
 
 template <typename quadrature_type,unsigned short startn>
-void check_quadrature(double *exact_monomials)
+void
+check_quadrature(double *exact_monomials)
 {
 
   for (unsigned int n=startn; n<18; ++n)
@@ -127,7 +131,8 @@ void check_quadrature(double *exact_monomials)
 }
 
 
-void check_GRC_right (double *exact_monomials)
+void
+check_GRC_right (double *exact_monomials)
 {
 
   for (unsigned int n=1; n<18; ++n)

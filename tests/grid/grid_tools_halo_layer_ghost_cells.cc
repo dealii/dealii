@@ -25,7 +25,8 @@
 #include <algorithm>
 
 template <int dim>
-void test ()
+void
+test ()
 {
   const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
   deallog << "dim = " << dim << std::endl;
@@ -84,7 +85,8 @@ void test ()
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

@@ -41,20 +41,23 @@ public:
    *
    * @note Names will be added to the end of the current list.
    */
-  void add (const std::string &name);
+  void
+  add (const std::string &name);
 
 
   /**
    * Create the index vector pointing into the AnyData object.
    */
-  void initialize(const AnyData &data);
+  void
+  initialize(const AnyData &data);
 
 
   /**
    * The number of names in this object. This function may be used whether
    * initialize() was called before or not.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
 
   /**
@@ -63,7 +66,8 @@ public:
    *
    * Indices are in the same order as the calls to add().
    */
-  unsigned int operator() (unsigned int i) const;
+  unsigned int
+  operator() (unsigned int i) const;
 
 
 private:

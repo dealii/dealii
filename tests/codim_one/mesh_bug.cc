@@ -31,7 +31,8 @@
 #include <deal.II/grid/manifold_lib.h>
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
 

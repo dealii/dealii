@@ -24,7 +24,8 @@
 
 // test the method evaluate_all_convergence_rates with argument reference_column_key,
 
-int main ()
+int
+main ()
 {
   initlog();
 

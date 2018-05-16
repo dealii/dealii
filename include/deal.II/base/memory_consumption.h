@@ -118,7 +118,8 @@ namespace MemoryConsumption
    * larger.
    */
   inline
-  std::size_t memory_consumption (const char *string);
+  std::size_t
+  memory_consumption (const char *string);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -126,7 +127,8 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std::complex<T> &);
+  std::size_t
+  memory_consumption (const std::complex<T> &);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -134,14 +136,16 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const VectorizedArray<T> &);
+  std::size_t
+  memory_consumption (const VectorizedArray<T> &);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
    * <tt>std::string</tt> variable.
    */
   inline
-  std::size_t memory_consumption (const std::string &s);
+  std::size_t
+  memory_consumption (const std::string &s);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -172,7 +176,8 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std::vector<T> &v);
+  std::size_t
+  memory_consumption (const std::vector<T> &v);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -196,7 +201,8 @@ namespace MemoryConsumption
    */
   template <typename T, std::size_t N>
   inline
-  std::size_t memory_consumption (const std::array<T,N> &v);
+  std::size_t
+  memory_consumption (const std::array<T,N> &v);
 
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
@@ -208,7 +214,8 @@ namespace MemoryConsumption
    */
   template <typename T, int N>
   inline
-  std::size_t memory_consumption (const T (&v)[N]);
+  std::size_t
+  memory_consumption (const T (&v)[N]);
 
   /**
    * Specialization of the determination of the memory consumption of a
@@ -218,7 +225,8 @@ namespace MemoryConsumption
    * bit field.
    */
   inline
-  std::size_t memory_consumption (const std::vector<bool> &v);
+  std::size_t
+  memory_consumption (const std::vector<bool> &v);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a pair
@@ -226,7 +234,8 @@ namespace MemoryConsumption
    */
   template <typename A, typename B>
   inline
-  std::size_t memory_consumption (const std::pair<A,B> &p);
+  std::size_t
+  memory_consumption (const std::pair<A,B> &p);
 
   /**
    * Calculate the memory consumption of a pointer.
@@ -249,7 +258,8 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std::shared_ptr<T> &);
+  std::size_t
+  memory_consumption (const std::shared_ptr<T> &);
 
   /**
    * Return the amount of memory used by a std::unique_ptr object.
@@ -258,7 +268,8 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  std::size_t memory_consumption (const std::unique_ptr<T> &);
+  std::size_t
+  memory_consumption (const std::unique_ptr<T> &);
 }
 
 
@@ -278,7 +289,8 @@ namespace MemoryConsumption
 
 
   inline
-  std::size_t memory_consumption (const char *string)
+  std::size_t
+  memory_consumption (const char *string)
   {
     if (string == nullptr)
       {
@@ -294,7 +306,8 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  std::size_t memory_consumption (const std::complex<T> &)
+  std::size_t
+  memory_consumption (const std::complex<T> &)
   {
     return sizeof(std::complex<T>);
   }
@@ -303,7 +316,8 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  std::size_t memory_consumption (const VectorizedArray<T> &)
+  std::size_t
+  memory_consumption (const VectorizedArray<T> &)
   {
     return sizeof(VectorizedArray<T>);
   }
@@ -311,7 +325,8 @@ namespace MemoryConsumption
 
 
   inline
-  std::size_t memory_consumption (const std::string &s)
+  std::size_t
+  memory_consumption (const std::string &s)
   {
     return sizeof(s) + s.length();
   }
@@ -319,7 +334,8 @@ namespace MemoryConsumption
 
 
   template <typename T>
-  std::size_t memory_consumption (const std::vector<T> &v)
+  std::size_t
+  memory_consumption (const std::vector<T> &v)
   {
     // shortcut for types that do not allocate memory themselves
     if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
@@ -341,7 +357,8 @@ namespace MemoryConsumption
 
 
   template <typename T, std::size_t N>
-  std::size_t memory_consumption (const std::array<T,N> &v)
+  std::size_t
+  memory_consumption (const std::array<T,N> &v)
   {
     // shortcut for types that do not allocate memory themselves
     if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
@@ -360,7 +377,8 @@ namespace MemoryConsumption
 
 
   template <typename T, int N>
-  std::size_t memory_consumption (const T (&v)[N])
+  std::size_t
+  memory_consumption (const T (&v)[N])
   {
     std::size_t mem = 0;
     for (unsigned int i=0; i<N; ++i)
@@ -371,7 +389,8 @@ namespace MemoryConsumption
 
 
   inline
-  std::size_t memory_consumption (const std::vector<bool> &v)
+  std::size_t
+  memory_consumption (const std::vector<bool> &v)
   {
     return v.capacity() / 8 + sizeof(v);
   }
@@ -380,7 +399,8 @@ namespace MemoryConsumption
 
   template <typename A, typename B>
   inline
-  std::size_t memory_consumption (const std::pair<A,B> &p)
+  std::size_t
+  memory_consumption (const std::pair<A,B> &p)
   {
     return (memory_consumption(p.first) +
             memory_consumption(p.second));

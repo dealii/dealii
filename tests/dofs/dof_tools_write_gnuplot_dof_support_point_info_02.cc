@@ -71,7 +71,8 @@ test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
   test<2>();

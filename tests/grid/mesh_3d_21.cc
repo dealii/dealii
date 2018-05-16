@@ -34,7 +34,8 @@
 
 
 
-void check_this (Triangulation<3> &tria)
+void
+check_this (Triangulation<3> &tria)
 {
   FE_Q<3> fe(1);
   DoFHandler<3> dof_handler (tria);
@@ -90,7 +91,8 @@ void check_this (Triangulation<3> &tria)
 
 
 
-void check (Triangulation<3> &tria)
+void
+check (Triangulation<3> &tria)
 {
   (++tria.begin_active())->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
@@ -115,7 +117,8 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

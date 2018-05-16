@@ -43,7 +43,8 @@
 
 
 template <int dim, int spacedim>
-void print(const FiniteElement<dim, spacedim> &fe)
+void
+print(const FiniteElement<dim, spacedim> &fe)
 {
   deallog << fe.get_name()  << " supported by MatrixFree: "
           << std::boolalpha << MatrixFree<dim>::is_supported(fe)
@@ -51,7 +52,8 @@ void print(const FiniteElement<dim, spacedim> &fe)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

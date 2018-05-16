@@ -24,9 +24,10 @@
 // FE_Q<dim>::interpolate(...)
 
 template <int dim>
-void check1(const Function<dim> &f,
-            const unsigned int degree,
-            const unsigned int comp)
+void
+check1(const Function<dim> &f,
+       const unsigned int degree,
+       const unsigned int comp)
 {
   FE_Q<dim> feq(degree);
   FESystem<dim> fe(feq, comp);
@@ -42,11 +43,12 @@ void check1(const Function<dim> &f,
 }
 
 template <int dim>
-void check3(const Function<dim> &f,
-            const unsigned int degree,
-            const unsigned int comp1,
-            const unsigned int comp2,
-            const unsigned int comp3)
+void
+check3(const Function<dim> &f,
+       const unsigned int degree,
+       const unsigned int comp1,
+       const unsigned int comp2,
+       const unsigned int comp3)
 {
   FE_Q<dim> feq1(degree);
   FE_Q<dim> feq2(degree+1);
@@ -63,7 +65,8 @@ void check3(const Function<dim> &f,
   deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

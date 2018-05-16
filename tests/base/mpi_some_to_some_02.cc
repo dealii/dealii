@@ -28,22 +28,25 @@
 
 using namespace Patterns::Tools;
 
-inline unsigned int random_index(const unsigned int &max_index)
+inline unsigned int
+random_index(const unsigned int &max_index)
 {
   return Testing::rand()*(max_index-1)/RAND_MAX;
 }
 
 template<typename T>
-std::string to_string(const T &object)
+std::string
+to_string(const T &object)
 {
   return Convert<T>::to_string(object);
 }
 
 template<int dim>
-void test(const unsigned int max_particles,
-          const double shared_fraction,
-          const unsigned int max_cell_levels,
-          const unsigned int max_cell_index)
+void
+test(const unsigned int max_particles,
+     const double shared_fraction,
+     const unsigned int max_cell_levels,
+     const unsigned int max_cell_index)
 {
 
   auto n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -103,7 +106,8 @@ void test(const unsigned int max_particles,
     deallog << "Not OK" << std::endl;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll log;

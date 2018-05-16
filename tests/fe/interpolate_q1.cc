@@ -25,8 +25,9 @@
 // FE_DGQ<dim>::interpolate(...)
 
 template <int dim>
-void check(const Function<dim> &f,
-           const unsigned int degree)
+void
+check(const Function<dim> &f,
+      const unsigned int degree)
 {
   FE_Q<dim> fe(degree);
   deallog << fe.get_name() << ' ';
@@ -41,8 +42,9 @@ void check(const Function<dim> &f,
 }
 
 template <int dim>
-void check_dg(const Function<dim> &f,
-              const unsigned int degree)
+void
+check_dg(const Function<dim> &f,
+         const unsigned int degree)
 {
   FE_DGQ<dim> fe(degree);
   deallog << fe.get_name() << ' ';
@@ -57,8 +59,9 @@ void check_dg(const Function<dim> &f,
 }
 
 template <int dim>
-void check_dg_lobatto(const Function<dim> &f,
-                      const unsigned int degree)
+void
+check_dg_lobatto(const Function<dim> &f,
+                 const unsigned int degree)
 {
   QGaussLobatto<1> fe_quadrature(degree);
   FE_DGQArbitraryNodes<dim> fe(fe_quadrature);
@@ -73,7 +76,8 @@ void check_dg_lobatto(const Function<dim> &f,
   deallog << " vector " << difference(fe,dofs,f) << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

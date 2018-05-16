@@ -279,7 +279,8 @@ public:
    * returns <tt>FE_DGPNonparametric<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -300,8 +301,9 @@ public:
    * class, FiniteElement::shape_value(), this function throws an exception of
    * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const override;
+  virtual double
+  shape_value (const unsigned int i,
+               const Point<dim> &p) const override;
 
   /**
    * This function is intended to return the value of a shape function at a
@@ -313,9 +315,10 @@ public:
    * class, FiniteElement::shape_value_component(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim> &p,
-                                        const unsigned int component) const override;
+  virtual double
+  shape_value_component (const unsigned int i,
+                         const Point<dim> &p,
+                         const unsigned int component) const override;
 
   /**
    * This function is intended to return the gradient of a shape function at a
@@ -327,8 +330,9 @@ public:
    * class, FiniteElement::shape_grad(), this function throws an exception of
    * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const override;
+  virtual Tensor<1,dim>
+  shape_grad (const unsigned int  i,
+              const Point<dim>   &p) const override;
 
   /**
    * This function is intended to return the gradient of a shape function at a
@@ -340,9 +344,10 @@ public:
    * class, FiniteElement::shape_grad_component(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
-                                              const unsigned int component) const override;
+  virtual Tensor<1,dim>
+  shape_grad_component (const unsigned int i,
+                        const Point<dim> &p,
+                        const unsigned int component) const override;
 
   /**
    * This function is intended to return the Hessian of a shape function at a
@@ -354,8 +359,9 @@ public:
    * class, FiniteElement::shape_grad_grad(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad (const unsigned int  i,
+                   const Point<dim> &p) const override;
 
   /**
    * This function is intended to return the Hessian of a shape function at a
@@ -367,15 +373,17 @@ public:
    * class, FiniteElement::shape_grad_grad_component(), this function throws
    * an exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim> &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<2,dim>
+  shape_grad_grad_component (const unsigned int i,
+                             const Point<dim> &p,
+                             const unsigned int component) const override;
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value
    * passed to the constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree () const;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -465,7 +473,8 @@ public:
    * of the degree of the element), as it has no hanging nodes (being a
    * discontinuous element).
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -488,8 +497,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -499,7 +509,8 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
 protected:
 

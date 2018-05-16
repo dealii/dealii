@@ -25,7 +25,8 @@
 #include <deal.II/base/function_parser.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

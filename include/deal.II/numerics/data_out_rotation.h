@@ -154,8 +154,9 @@ public:
    * @param n_subdivisions See DataOut::build_patches() for an extensive
    * description of this parameter.
    */
-  virtual void build_patches (const unsigned int n_patches_per_circle,
-                              const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches (const unsigned int n_patches_per_circle,
+                 const unsigned int n_subdivisions = 0);
 
   /**
    * Return the first cell which we want output for. The default
@@ -163,7 +164,8 @@ public:
    * @ref GlossActive "active cell",
    * but you might want to return other cells in a derived class.
    */
-  virtual cell_iterator first_cell ();
+  virtual cell_iterator
+  first_cell ();
 
   /**
    * Return the next cell after @p cell which we want output for. If there are
@@ -176,7 +178,8 @@ public:
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
    */
-  virtual cell_iterator next_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_cell (const cell_iterator &cell);
 
   /**
    * Exception

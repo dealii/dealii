@@ -102,7 +102,8 @@ namespace Functions
 
 
   template <int dim>
-  void ParsedFunction<dim>::parse_parameters(ParameterHandler &prm)
+  void
+  ParsedFunction<dim>::parse_parameters(ParameterHandler &prm)
   {
     std::string vnames = prm.get("Variable names");
     std::string expression = prm.get("Function expression");
@@ -152,8 +153,9 @@ namespace Functions
 
 
   template <int dim>
-  void ParsedFunction<dim>::vector_value (const Point<dim> &p,
-                                          Vector<double>   &values) const
+  void
+  ParsedFunction<dim>::vector_value (const Point<dim> &p,
+                                     Vector<double>   &values) const
   {
     function_object.vector_value(p, values);
   }
@@ -161,8 +163,9 @@ namespace Functions
 
 
   template <int dim>
-  double ParsedFunction<dim>::value (const Point<dim>   &p,
-                                     unsigned int comp) const
+  double
+  ParsedFunction<dim>::value (const Point<dim>   &p,
+                              unsigned int comp) const
   {
     return function_object.value(p, comp);
   }
@@ -170,7 +173,8 @@ namespace Functions
 
 
   template <int dim>
-  void ParsedFunction<dim>::set_time (const double newtime)
+  void
+  ParsedFunction<dim>::set_time (const double newtime)
   {
     function_object.set_time(newtime);
     AutoDerivativeFunction<dim>::set_time(newtime);

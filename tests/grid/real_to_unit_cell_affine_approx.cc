@@ -26,8 +26,9 @@
 
 
 template <int dim, int spacedim>
-void do_test(const Triangulation<dim,spacedim> &tria,
-             const Point<spacedim> &p)
+void
+do_test(const Triangulation<dim,spacedim> &tria,
+        const Point<spacedim> &p)
 {
   MappingQ<dim,spacedim> mapping(1);
 
@@ -56,7 +57,8 @@ void do_test(const Triangulation<dim,spacedim> &tria,
 
 
 template <int dim>
-void test1()
+void
+test1()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -71,7 +73,8 @@ void test1()
 
 
 template <int dim>
-void test2()
+void
+test2()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball(tria);
@@ -85,7 +88,8 @@ void test2()
 
 
 template <int dim, int spacedim>
-void test3()
+void
+test3()
 {
   Triangulation<dim,spacedim> triangulation;
   GridIn<dim, spacedim> grid_in;
@@ -109,7 +113,8 @@ void test3()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

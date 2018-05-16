@@ -52,14 +52,16 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ();
+void
+test ();
 
 
 
 
 template <int dim>
-void do_check (const Triangulation<dim> &triangulation,
-               const hp::FECollection<dim> &fe)
+void
+do_check (const Triangulation<dim> &triangulation,
+          const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim>        dof_handler(triangulation);
 
@@ -82,7 +84,8 @@ void do_check (const Triangulation<dim> &triangulation,
 
 
 
-void test_with_wrong_face_orientation (const hp::FECollection<3> &fe)
+void
+test_with_wrong_face_orientation (const hp::FECollection<3> &fe)
 {
   Triangulation<3>     triangulation;
   GridGenerator::hyper_ball (triangulation);
@@ -94,7 +97,8 @@ void test_with_wrong_face_orientation (const hp::FECollection<3> &fe)
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

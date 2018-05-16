@@ -24,7 +24,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   if (dim > 1)
     for (unsigned int p=0; p<6-dim; ++p)

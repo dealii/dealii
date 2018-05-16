@@ -40,14 +40,16 @@ FE_P1NC::FE_P1NC()
 
 
 
-std::string FE_P1NC::get_name () const
+std::string
+FE_P1NC::get_name () const
 {
   return "FE_P1NC";
 }
 
 
 
-UpdateFlags FE_P1NC::requires_update_flags (const UpdateFlags flags) const
+UpdateFlags
+FE_P1NC::requires_update_flags (const UpdateFlags flags) const
 {
   UpdateFlags out = update_default;
 
@@ -307,7 +309,8 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
 
 
 
-void FE_P1NC::initialize_constraints ()
+void
+FE_P1NC::initialize_constraints ()
 {
   // coefficient relation between children and mother
   interface_constraints

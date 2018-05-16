@@ -27,7 +27,8 @@
 #include <deal.II/grid/grid_tools.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

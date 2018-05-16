@@ -209,43 +209,51 @@ namespace Algorithms
      * instance, which contains the initial value when the operator is called.
      * It contains the final value when the operator returns.
      */
-    virtual void operator() (AnyData &out, const AnyData &in) override;
+    virtual void
+    operator() (AnyData &out, const AnyData &in) override;
 
     /**
      * Register an event triggered by an outer iteration.
      */
-    virtual void notify(const Event &) override;
+    virtual void
+    notify(const Event &) override;
 
     /**
      * Define an operator which will output the result in each step. Note that
      * no output will be generated without this.
      */
-    void set_output(OutputOperator<VectorType> &output);
+    void
+    set_output(OutputOperator<VectorType> &output);
 
     /**
      * Declare parameters in a parameter handler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
 
     /**
      * Read the parameters in the ParameterHandler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
 
     /**
      * The current time in the timestepping scheme.
      */
-    double current_time() const;
+    double
+    current_time() const;
 
     /**
      * The weight between implicit and explicit part.
      */
-    double theta() const;
+    double
+    theta() const;
 
     /**
      * Set a new weight and return the old
      */
-    double theta(double new_theta);
+    double
+    theta(double new_theta);
 
     /**
      * The data handed to the #op_explicit time stepping operator.
@@ -253,7 +261,8 @@ namespace Algorithms
      * The time in here is the time at the beginning of the current step, the
      * time step is (1-#theta) times the actual time step.
      */
-    const TimestepData &explicit_data() const;
+    const TimestepData &
+    explicit_data() const;
 
     /**
      * The data handed to the #op_implicit time stepping operator.
@@ -261,12 +270,14 @@ namespace Algorithms
      * The time in here is the time at the beginning of the current step, the
      * time step is #theta times the actual time step.
      */
-    const TimestepData &implicit_data() const;
+    const TimestepData &
+    implicit_data() const;
 
     /**
      * Allow access to the control object.
      */
-    TimestepControl &timestep_control();
+    TimestepControl &
+    timestep_control();
 
   private:
     /**
@@ -355,7 +366,8 @@ namespace Algorithms
 
   template <typename VectorType>
   inline
-  void ThetaTimestepping<VectorType>::set_output (OutputOperator<VectorType> &out)
+  void
+  ThetaTimestepping<VectorType>::set_output (OutputOperator<VectorType> &out)
   {
     output = &out;
   }
@@ -363,7 +375,8 @@ namespace Algorithms
 
   template <typename VectorType>
   inline
-  double ThetaTimestepping<VectorType>::theta () const
+  double
+  ThetaTimestepping<VectorType>::theta () const
   {
     return vtheta;
   }
@@ -371,7 +384,8 @@ namespace Algorithms
 
   template <typename VectorType>
   inline
-  double ThetaTimestepping<VectorType>::theta (double new_theta)
+  double
+  ThetaTimestepping<VectorType>::theta (double new_theta)
   {
     const double tmp = vtheta;
     vtheta = new_theta;
@@ -381,7 +395,8 @@ namespace Algorithms
 
   template <typename VectorType>
   inline
-  double ThetaTimestepping<VectorType>::current_time () const
+  double
+  ThetaTimestepping<VectorType>::current_time () const
   {
     return control.now();
   }

@@ -22,7 +22,8 @@
 #include <cassert>
 
 // sparse matrix elements
-void test (PETScWrappers::SparseMatrix &m)
+void
+test (PETScWrappers::SparseMatrix &m)
 {
   deallog << "Check matrix access" << std::endl;
 
@@ -43,7 +44,8 @@ void test (PETScWrappers::SparseMatrix &m)
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile ("output");
   dealii::deallog.attach (logfile);

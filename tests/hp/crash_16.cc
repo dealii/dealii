@@ -47,7 +47,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   hp::FECollection<dim> fe;
   for (unsigned int i=1; i<4; ++i)
@@ -128,7 +129,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (3);

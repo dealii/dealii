@@ -38,7 +38,8 @@ DeclException2 (ExcNumberMismatch,
 typedef Triangulation<2>::active_cell_iterator active_cell_iterator;
 
 template <typename Iterator>
-bool always_true (const Iterator)
+bool
+always_true (const Iterator)
 {
   return true;
 }
@@ -47,7 +48,8 @@ bool always_true (const Iterator)
 
 
 
-void test ()
+void
+test ()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -99,7 +101,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.get_file_stream() << std::setprecision(4);

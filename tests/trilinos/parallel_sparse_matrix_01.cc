@@ -32,7 +32,8 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,
@@ -102,7 +103,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

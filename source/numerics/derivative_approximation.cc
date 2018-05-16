@@ -47,7 +47,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <typename T>
-  inline T sqr (const T t)
+  inline T
+  sqr (const T t)
   {
     return t*t;
   }
@@ -106,7 +107,8 @@ namespace DerivativeApproximation
        * Return the norm of the derivative object. Here, for the gradient, we
        * choose the Euclidean norm of the gradient vector.
        */
-      static double derivative_norm (const Derivative &d);
+      static double
+      derivative_norm (const Derivative &d);
 
       /**
        * If for the present derivative order, symmetrization of the derivative
@@ -115,7 +117,8 @@ namespace DerivativeApproximation
        * For the first derivatives, no such thing is necessary, so this function
        * is a no-op.
        */
-      static void symmetrize (Derivative &derivative_tensor);
+      static void
+      symmetrize (Derivative &derivative_tensor);
     };
 
     // static variables
@@ -221,7 +224,8 @@ namespace DerivativeApproximation
        * norm of vectors. It is also the largest value of the curvature of the
        * solution.
        */
-      static double derivative_norm (const Derivative &d);
+      static double
+      derivative_norm (const Derivative &d);
 
       /**
        * If for the present derivative order, symmetrization of the derivative
@@ -232,7 +236,8 @@ namespace DerivativeApproximation
        *
        * Note that this function actually modifies its argument.
        */
-      static void symmetrize (Derivative &derivative_tensor);
+      static void
+      symmetrize (Derivative &derivative_tensor);
     };
 
     template <int dim>
@@ -564,7 +569,8 @@ namespace DerivativeApproximation
        * norm of vectors. It is also the largest value of the curvature of the
        * solution.
        */
-      static double derivative_norm (const Derivative &d);
+      static double
+      derivative_norm (const Derivative &d);
 
       /**
        * If for the present derivative order, symmetrization of the derivative
@@ -575,7 +581,8 @@ namespace DerivativeApproximation
        *
        * Note that this function actually modifies its argument.
        */
-      static void symmetrize (Derivative &derivative_tensor);
+      static void
+      symmetrize (Derivative &derivative_tensor);
     };
 
     template <int dim>

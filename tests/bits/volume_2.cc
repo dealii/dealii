@@ -41,8 +41,9 @@
 
 
 template <int dim>
-void check (const Triangulation<dim> &tria,
-            const unsigned int        order)
+void
+check (const Triangulation<dim> &tria,
+       const unsigned int        order)
 {
   MappingQ<dim> mapping(order);
   FE_Q<dim> fe(1);
@@ -106,7 +107,8 @@ void check (const Triangulation<dim> &tria,
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

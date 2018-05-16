@@ -20,7 +20,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/manifold_lib.h>
 
-int main()
+int
+main()
 {
   initlog(true);
 

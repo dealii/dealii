@@ -22,7 +22,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (unsigned int i=1; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)

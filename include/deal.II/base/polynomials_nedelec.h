@@ -73,34 +73,39 @@ public:
    * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
    * in a loop over all tensor product polynomials.
    */
-  void compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values,
-                std::vector<Tensor<2, dim> > &grads,
-                std::vector<Tensor<3,dim> > &grad_grads,
-                std::vector<Tensor<4,dim> > &third_derivatives,
-                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim> &unit_point, std::vector<Tensor<1, dim> > &values,
+           std::vector<Tensor<2, dim> > &grads,
+           std::vector<Tensor<3,dim> > &grad_grads,
+           std::vector<Tensor<4,dim> > &third_derivatives,
+           std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
    * Return the number of Nédélec polynomials.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
   /**
    * Return the degree of the Nédélec space, which is one less than the
    * highest polynomial degree.
    */
-  unsigned int degree () const;
+  unsigned int
+  degree () const;
 
   /**
    * Return the name of the space, which is <tt>Nedelec</tt>.
    */
-  std::string name () const;
+  std::string
+  name () const;
 
   /**
    * Return the number of polynomials in the space <tt>N(degree)</tt> without
    * requiring to build an object of PolynomialsNedelec. This is required by
    * the FiniteElement classes.
    */
-  static unsigned int compute_n_pols (unsigned int degree);
+  static unsigned int
+  compute_n_pols (unsigned int degree);
 
 private:
   /**
@@ -123,19 +128,22 @@ private:
    * A static member function that creates the polynomial space we use to
    * initialize the #polynomial_space member variable.
    */
-  static std::vector<std::vector< Polynomials::Polynomial< double > > > create_polynomials (const unsigned int k);
+  static std::vector<std::vector< Polynomials::Polynomial< double > > >
+  create_polynomials (const unsigned int k);
 };
 
 
 template <int dim>
-inline unsigned int PolynomialsNedelec<dim>::n () const
+inline unsigned int
+PolynomialsNedelec<dim>::n () const
 {
   return n_pols;
 }
 
 
 template <int dim>
-inline unsigned int PolynomialsNedelec<dim>::degree () const
+inline unsigned int
+PolynomialsNedelec<dim>::degree () const
 {
   return my_degree;
 }

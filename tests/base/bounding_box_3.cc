@@ -23,7 +23,8 @@
 #include <deal.II/base/bounding_box.h>
 
 template <int spacedim>
-void test_bounding_box()
+void
+test_bounding_box()
 {
 
   std::pair<Point<spacedim>,Point<spacedim>> unit;
@@ -219,7 +220,8 @@ void test_bounding_box()
   deallog << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

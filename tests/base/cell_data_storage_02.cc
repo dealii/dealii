@@ -44,8 +44,9 @@ public:
     Function<dim>(1)
   {}
 
-  double value(const Point<dim> &p,
-               const unsigned int comp=0) const
+  double
+  value(const Point<dim> &p,
+        const unsigned int comp=0) const
   {
     const double x = p[0];
     const double y = p[1];
@@ -60,7 +61,8 @@ class MyQData
 {
 public:
   MyQData(): value(default_value) {};
-  virtual ~MyQData() {};
+  virtual
+  ~MyQData() {};
 
   double value;
 };
@@ -71,7 +73,8 @@ DeclException3 (ExcWrongValue,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   const MyFunction<dim> my_func;
 
@@ -130,7 +133,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   initlog();

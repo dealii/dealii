@@ -111,7 +111,8 @@ check_solve( SolverType &solver,
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(6);

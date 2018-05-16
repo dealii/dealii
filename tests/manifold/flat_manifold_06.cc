@@ -22,7 +22,8 @@
 
 // Helper function
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "Testing dim=" << dim
           << ", spacedim="<< spacedim << std::endl;
@@ -48,7 +49,8 @@ void test()
   deallog << manifold.get_tangent_vector (x2, x1) << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

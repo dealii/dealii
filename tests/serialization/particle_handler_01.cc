@@ -25,9 +25,10 @@
 #include <deal.II/fe/mapping_q.h>
 
 template <int dim, int spacedim>
-void create_regular_particle_distribution(Particles::ParticleHandler<dim,spacedim> &particle_handler,
-                                          const parallel::distributed::Triangulation<dim,spacedim> &tr,
-                                          const unsigned int particles_per_direction = 3)
+void
+create_regular_particle_distribution(Particles::ParticleHandler<dim,spacedim> &particle_handler,
+                                     const parallel::distributed::Triangulation<dim,spacedim> &tr,
+                                     const unsigned int particles_per_direction = 3)
 {
   for (unsigned int i=0; i<particles_per_direction; ++i)
     for (unsigned int j=0; j<particles_per_direction; ++j)
@@ -66,7 +67,8 @@ void create_regular_particle_distribution(Particles::ParticleHandler<dim,spacedi
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tr);
@@ -141,7 +143,8 @@ void test ()
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

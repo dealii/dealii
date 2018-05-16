@@ -266,7 +266,8 @@ namespace TrilinosWrappers
 
 
 
-  void PreconditionAMGMueLu::clear ()
+  void
+  PreconditionAMGMueLu::clear ()
   {
     PreconditionBase::clear();
     trilinos_matrix.reset();
@@ -289,12 +290,14 @@ namespace TrilinosWrappers
 
 
   // explicit instantiations
-  template void PreconditionAMGMueLu::initialize (const ::dealii::SparseMatrix<double> &,
-                                                  const AdditionalData &, const double,
-                                                  const ::dealii::SparsityPattern *);
-  template void PreconditionAMGMueLu::initialize (const ::dealii::SparseMatrix<float> &,
-                                                  const AdditionalData &, const double,
-                                                  const ::dealii::SparsityPattern *);
+  template void
+  PreconditionAMGMueLu::initialize (const ::dealii::SparseMatrix<double> &,
+                                    const AdditionalData &, const double,
+                                    const ::dealii::SparsityPattern *);
+  template void
+  PreconditionAMGMueLu::initialize (const ::dealii::SparseMatrix<float> &,
+                                    const AdditionalData &, const double,
+                                    const ::dealii::SparsityPattern *);
 
 }
 

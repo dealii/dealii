@@ -53,7 +53,8 @@ print_patches (const SparsityPattern &bl)
 
 
 template <class TR>
-void test_global_refinement(
+void
+test_global_refinement(
   void (*test_block_list)(const TR &tr, const FiniteElement<TR::dimension> &fe))
 {
   const unsigned int dim=TR::dimension;
@@ -93,7 +94,8 @@ void test_global_refinement(
 }
 
 template <int dim>
-void test_global_refinement_parallel(
+void
+test_global_refinement_parallel(
   void (*test_block_list)(const parallel::distributed::Triangulation<dim> &tr, const FiniteElement<dim> &fe))
 {
   parallel::distributed::Triangulation<dim> trl(MPI_COMM_WORLD, Triangulation<dim>::

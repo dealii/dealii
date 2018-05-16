@@ -90,9 +90,10 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::MPI::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int n_blocks,
-                                  const size_type    block_size,
-                                  const bool         omit_zeroing_entries)
+void
+BlockVector<Number>::reinit (const unsigned int n_blocks,
+                             const size_type    block_size,
+                             const bool         omit_zeroing_entries)
 {
   std::vector<size_type> block_sizes(n_blocks, block_size);
   reinit(block_sizes, omit_zeroing_entries);
@@ -100,8 +101,9 @@ void BlockVector<Number>::reinit (const unsigned int n_blocks,
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const std::vector<size_type> &block_sizes,
-                                  const bool                    omit_zeroing_entries)
+void
+BlockVector<Number>::reinit (const std::vector<size_type> &block_sizes,
+                             const bool                    omit_zeroing_entries)
 {
   this->block_indices.reinit (block_sizes);
   if (this->components.size() != this->n_blocks())
@@ -113,7 +115,8 @@ void BlockVector<Number>::reinit (const std::vector<size_type> &block_sizes,
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (
+void
+BlockVector<Number>::reinit (
   const BlockIndices &n,
   const bool omit_zeroing_entries)
 {
@@ -128,8 +131,9 @@ void BlockVector<Number>::reinit (
 
 template <typename Number>
 template <typename Number2>
-void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
-                                  const bool omit_zeroing_entries)
+void
+BlockVector<Number>::reinit (const BlockVector<Number2> &v,
+                             const bool omit_zeroing_entries)
 {
   this->block_indices = v.get_block_indices();
   if (this->components.size() != this->n_blocks())
@@ -154,7 +158,8 @@ BlockVector<Number>::operator= (const TrilinosWrappers::MPI::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::swap (BlockVector<Number> &v)
+void
+BlockVector<Number>::swap (BlockVector<Number> &v)
 {
   std::swap(this->components, v.components);
 
@@ -164,10 +169,11 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
 
 
 template <typename Number>
-void BlockVector<Number>::print (std::ostream       &out,
-                                 const unsigned int  precision,
-                                 const bool          scientific,
-                                 const bool          across) const
+void
+BlockVector<Number>::print (std::ostream       &out,
+                            const unsigned int  precision,
+                            const bool          scientific,
+                            const bool          across) const
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     {
@@ -182,7 +188,8 @@ void BlockVector<Number>::print (std::ostream       &out,
 
 
 template <typename Number>
-void BlockVector<Number>::block_write (std::ostream &out) const
+void
+BlockVector<Number>::block_write (std::ostream &out) const
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].block_write(out);
@@ -191,7 +198,8 @@ void BlockVector<Number>::block_write (std::ostream &out) const
 
 
 template <typename Number>
-void BlockVector<Number>::block_read (std::istream &in)
+void
+BlockVector<Number>::block_read (std::istream &in)
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].block_read(in);

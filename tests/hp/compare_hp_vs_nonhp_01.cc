@@ -48,7 +48,8 @@
 #include <deal.II/numerics/data_out.h>
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
@@ -56,11 +57,13 @@ class ExactSolution: public Function<dim>
 {
 public:
   ExactSolution ();
-  virtual double value (const Point<dim> &p, const unsigned int component = 0) const;
+  virtual double
+  value (const Point<dim> &p, const unsigned int component = 0) const;
 };
 
 template <int dim>
-double ExactSolution<dim>::value (const Point<dim> &p, const unsigned int) const
+double
+ExactSolution<dim>::value (const Point<dim> &p, const unsigned int) const
 {
   return p (0) * p (0);
 }
@@ -78,15 +81,20 @@ namespace with_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim> ();
+    LaplaceProblem<dim>
+    ();
 
-    void run (Vector<double> &sol);
+    void
+    run (Vector<double> &sol);
 
   private:
     const ExactSolution<dim> exact_solution;
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    void solve ();
+    void
+    make_grid_and_dofs ();
+    void
+    assemble_system ();
+    void
+    solve ();
 
     Triangulation<dim>     triangulation;
     hp::FECollection<dim>      fe;
@@ -108,7 +116,8 @@ namespace with_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::make_grid_and_dofs ()
+  void
+  LaplaceProblem<dim>::make_grid_and_dofs ()
   {
     GridGenerator::hyper_cube (triangulation);
     triangulation.refine_global (2);
@@ -137,7 +146,8 @@ namespace with_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     hp::FEValues<dim> fe_values (fe, quadrature,
                                  update_values | update_gradients | update_JxW_values);
@@ -205,7 +215,8 @@ namespace with_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     SolverControl           solver_control (1000, 1e-12);
     SolverCG<>              cg (solver_control);
@@ -215,7 +226,8 @@ namespace with_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::run (Vector<double> &sol)
+  void
+  LaplaceProblem<dim>::run (Vector<double> &sol)
   {
     make_grid_and_dofs ();
     assemble_system ();
@@ -232,15 +244,20 @@ namespace without_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim> ();
+    LaplaceProblem<dim>
+    ();
 
-    void run (Vector<double> &sol);
+    void
+    run (Vector<double> &sol);
 
   private:
     const ExactSolution<dim> exact_solution;
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    void solve ();
+    void
+    make_grid_and_dofs ();
+    void
+    assemble_system ();
+    void
+    solve ();
 
     Triangulation<dim>     triangulation;
     FE_Q<dim>              fe;
@@ -260,7 +277,8 @@ namespace without_hp
   {}
 
   template <int dim>
-  void LaplaceProblem<dim>::make_grid_and_dofs ()
+  void
+  LaplaceProblem<dim>::make_grid_and_dofs ()
   {
     GridGenerator::hyper_cube (triangulation);
     triangulation.refine_global (2);
@@ -289,7 +307,8 @@ namespace without_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system ()
   {
     QGauss<dim>  quadrature_formula(2);
     FEValues<dim> fe_values (fe, quadrature_formula,
@@ -354,7 +373,8 @@ namespace without_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     SolverControl           solver_control (1000, 1e-12);
     SolverCG<>              cg (solver_control);
@@ -364,7 +384,8 @@ namespace without_hp
   }
 
   template <int dim>
-  void LaplaceProblem<dim>::run (Vector<double> &sol)
+  void
+  LaplaceProblem<dim>::run (Vector<double> &sol)
   {
     make_grid_and_dofs ();
     assemble_system ();
@@ -376,7 +397,8 @@ namespace without_hp
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -393,7 +415,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   logfile.precision(2);
   deallog << std::setprecision(2);

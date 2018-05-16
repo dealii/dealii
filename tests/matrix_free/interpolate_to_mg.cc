@@ -75,8 +75,9 @@ public:
     Function<dim>(1)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component = 0) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component = 0) const
   {
     (void)component;
     return p[0]*2. + p[1] - 10.;
@@ -85,7 +86,8 @@ public:
 
 
 template <int dim, int fe_degree=2, int n_q_points=fe_degree+1, typename NumberType=double, typename LevelNumberType=NumberType>
-void test (const unsigned int n_glob_ref=2, const unsigned int n_ref = 0)
+void
+test (const unsigned int n_glob_ref=2, const unsigned int n_ref = 0)
 {
   SimpleField<dim> function;
 
@@ -238,7 +240,8 @@ void test (const unsigned int n_glob_ref=2, const unsigned int n_ref = 0)
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

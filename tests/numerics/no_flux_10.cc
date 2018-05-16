@@ -119,10 +119,11 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
       }
 }
 
-void sixty_deg_hyper_shell (Triangulation<3> &tria,
-                            const Point<3> &center,
-                            const double inner_radius,
-                            const double outer_radius)
+void
+sixty_deg_hyper_shell (Triangulation<3> &tria,
+                       const Point<3> &center,
+                       const double inner_radius,
+                       const double outer_radius)
 {
   const double r0 = inner_radius;
   const double r1 = outer_radius;
@@ -159,7 +160,8 @@ void sixty_deg_hyper_shell (Triangulation<3> &tria,
 
 
 template <int dim>
-void run()
+void
+run()
 {
   Triangulation<dim> triangulation;
   FESystem<dim> fe(FE_Q<dim>(1), dim);
@@ -210,7 +212,8 @@ void run()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   logfile.precision (4);

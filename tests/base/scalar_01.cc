@@ -21,14 +21,16 @@
 #include <deal.II/lac/vector.h>
 
 template <typename U, typename V>
-void compare (const U &u, const V &v)
+void
+compare (const U &u, const V &v)
 {
   AssertThrow (static_cast<double>(u)==static_cast<double>(v), ExcInternalError());
 }
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

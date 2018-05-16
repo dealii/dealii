@@ -48,7 +48,8 @@ SparseLUDecomposition<number>::~SparseLUDecomposition()
 
 
 template <typename number>
-void SparseLUDecomposition<number>::clear()
+void
+SparseLUDecomposition<number>::clear()
 {
   std::vector<const size_type *> tmp;
   tmp.swap (prebuilt_lower_bound);
@@ -66,7 +67,8 @@ void SparseLUDecomposition<number>::clear()
 
 template <typename number>
 template <typename somenumber>
-void SparseLUDecomposition<number>::initialize (
+void
+SparseLUDecomposition<number>::initialize (
   const SparseMatrix<somenumber> &matrix,
   const AdditionalData data)
 {

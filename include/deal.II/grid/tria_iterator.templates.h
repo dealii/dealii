@@ -273,7 +273,8 @@ TriaIterator<Accessor>::operator = (const TriaRawIterator<OtherAccessor> &i)
 
 template <typename Accessor>
 inline
-TriaIterator<Accessor> &TriaIterator<Accessor>::operator ++ ()
+TriaIterator<Accessor> &
+TriaIterator<Accessor>::operator ++ ()
 {
   while (TriaRawIterator<Accessor>::operator++(),
          (this->state() == IteratorState::valid))
@@ -285,7 +286,8 @@ TriaIterator<Accessor> &TriaIterator<Accessor>::operator ++ ()
 
 template <typename Accessor>
 inline
-TriaIterator<Accessor>  TriaIterator<Accessor>::operator ++ (int)
+TriaIterator<Accessor>
+TriaIterator<Accessor>::operator ++ (int)
 {
   TriaIterator<Accessor> tmp(*this);
   operator++ ();
@@ -562,7 +564,8 @@ TriaActiveIterator<Accessor>::operator -- ()
 
 template <typename Accessor>
 inline
-TriaActiveIterator<Accessor> TriaActiveIterator<Accessor>::operator -- (int)
+TriaActiveIterator<Accessor>
+TriaActiveIterator<Accessor>::operator -- (int)
 {
   TriaActiveIterator<Accessor> tmp(*this);
   operator-- ();

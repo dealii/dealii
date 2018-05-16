@@ -26,7 +26,8 @@
 #include <deal.II/lac/vector.h>
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;

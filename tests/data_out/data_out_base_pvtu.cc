@@ -49,7 +49,8 @@ class DataOutX : public DataOutInterface<2,2>
 
 
 template <int dim, int spacedim>
-void check(std::ostream &out)
+void
+check(std::ostream &out)
 {
   names.resize (5);
   names[0] = "x1";
@@ -66,7 +67,8 @@ void check(std::ostream &out)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   check<2,2>(logfile);

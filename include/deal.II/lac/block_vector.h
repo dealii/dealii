@@ -99,8 +99,9 @@ public:
    * Confer the other constructor further down if you intend to use blocks of
    * different sizes.
    */
-  explicit BlockVector (const unsigned int n_blocks = 0,
-                        const size_type block_size = 0);
+  explicit
+  BlockVector (const unsigned int n_blocks = 0,
+               const size_type block_size = 0);
 
   /**
    * Copy Constructor. Dimension set to that of @p v, all components are
@@ -180,14 +181,16 @@ public:
    * @ref GlossCompress "Compressing distributed objects"
    * for more information.
    */
-  void compress (::dealii::VectorOperation::values operation
-                 =::dealii::VectorOperation::unknown);
+  void
+  compress (::dealii::VectorOperation::values operation
+            =::dealii::VectorOperation::unknown);
 
   /**
    * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
-  BlockVector &operator= (const value_type s);
+  BlockVector &
+  operator= (const value_type s);
 
   /**
    * Copy operator for arguments of the same type. Resize the present vector
@@ -200,7 +203,8 @@ public:
    * Move the given vector. This operator replaces the present vector with
    * the contents of the given argument vector.
    */
-  BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default; // NOLINT
+  BlockVector<Number> &
+  operator= (BlockVector<Number> &&/*v*/) = default; // NOLINT
 
   /**
    * Copy operator for template arguments of different types. Resize the
@@ -237,9 +241,10 @@ public:
    *
    * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const unsigned int n_blocks,
-               const size_type block_size = 0,
-               const bool omit_zeroing_entries = false);
+  void
+  reinit (const unsigned int n_blocks,
+          const size_type block_size = 0,
+          const bool omit_zeroing_entries = false);
 
   /**
    * Reinitialize the BlockVector such that it contains
@@ -257,8 +262,9 @@ public:
    * reinit() on one of the blocks, then subsequent actions on this object may
    * yield unpredictable results since they may be routed to the wrong block.
    */
-  void reinit (const std::vector<size_type> &block_sizes,
-               const bool                    omit_zeroing_entries=false);
+  void
+  reinit (const std::vector<size_type> &block_sizes,
+          const bool                    omit_zeroing_entries=false);
 
   /**
    * Reinitialize the BlockVector to reflect the structure found in
@@ -269,8 +275,9 @@ public:
    *
    * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const BlockIndices &block_indices,
-               const bool omit_zeroing_entries=false);
+  void
+  reinit (const BlockIndices &block_indices,
+          const bool omit_zeroing_entries=false);
 
   /**
    * Change the dimension to that of the vector <tt>V</tt>. The same applies
@@ -286,15 +293,17 @@ public:
    * yield unpredictable results since they may be routed to the wrong block.
    */
   template <typename Number2>
-  void reinit (const BlockVector<Number2> &V,
-               const bool                 omit_zeroing_entries=false);
+  void
+  reinit (const BlockVector<Number2> &V,
+          const bool                 omit_zeroing_entries=false);
 
   /**
    * Multiply each element of this vector by the corresponding element of
    * <tt>v</tt>.
    */
   template <class BlockVector2>
-  void scale (const BlockVector2 &v);
+  void
+  scale (const BlockVector2 &v);
 
   /**
    * Swap the contents of this vector and the other vector <tt>v</tt>. One
@@ -307,22 +316,25 @@ public:
    * containers. Also, there is a global function swap(u,v) that simply calls
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
    */
-  void swap (BlockVector<Number> &v);
+  void
+  swap (BlockVector<Number> &v);
 
   /**
    * Print to a stream.
    */
-  void print (std::ostream       &out,
-              const unsigned int  precision = 3,
-              const bool          scientific = true,
-              const bool          across = true) const;
+  void
+  print (std::ostream       &out,
+         const unsigned int  precision = 3,
+         const bool          scientific = true,
+         const bool          across = true) const;
 
   /**
    * Write the vector en bloc to a stream. This is done in a binary mode, so
    * the output is neither readable by humans nor (probably) by other
    * computers using a different operating system or number format.
    */
-  void block_write (std::ostream &out) const;
+  void
+  block_write (std::ostream &out) const;
 
   /**
    * Read a vector en block from a file. This is done using the inverse
@@ -335,7 +347,8 @@ public:
    * bluntest attempts to interpret some data as a vector stored bitwise to a
    * file, but not more.
    */
-  void block_read (std::istream &in);
+  void
+  block_read (std::istream &in);
 
   /**
    * @addtogroup Exceptions
@@ -430,7 +443,8 @@ BlockVector<Number>::operator= (const BlockVector<Number2> &v)
 
 template <typename Number>
 inline
-void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
+void
+BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
 {
   for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].compress(operation);
@@ -440,7 +454,8 @@ void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
 
 template <typename Number>
 template <class BlockVector2>
-void BlockVector<Number>::scale (const BlockVector2 &v)
+void
+BlockVector<Number>::scale (const BlockVector2 &v)
 {
   BaseClass::scale (v);
 }
@@ -458,8 +473,9 @@ void BlockVector<Number>::scale (const BlockVector2 &v)
  */
 template <typename Number>
 inline
-void swap (BlockVector<Number> &u,
-           BlockVector<Number> &v)
+void
+swap (BlockVector<Number> &u,
+      BlockVector<Number> &v)
 {
   u.swap (v);
 }
@@ -481,18 +497,20 @@ namespace internal
     public:
       template <typename Matrix>
       static
-      void reinit_range_vector (const Matrix &matrix,
-                                BlockVector<number> &v,
-                                bool omit_zeroing_entries)
+      void
+      reinit_range_vector (const Matrix &matrix,
+                           BlockVector<number> &v,
+                           bool omit_zeroing_entries)
       {
         v.reinit(matrix.get_row_indices(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
       static
-      void reinit_domain_vector(const Matrix &matrix,
-                                BlockVector<number> &v,
-                                bool omit_zeroing_entries)
+      void
+      reinit_domain_vector(const Matrix &matrix,
+                           BlockVector<number> &v,
+                           bool omit_zeroing_entries)
       {
         v.reinit(matrix.get_column_indices(), omit_zeroing_entries);
       }

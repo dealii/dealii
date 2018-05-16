@@ -19,8 +19,9 @@ const double eps = 1e-10;
 using namespace dealii;
 
 template <int dim>
-void test2cells(const unsigned int p1=2,
-                const unsigned int p2=1)
+void
+test2cells(const unsigned int p1=2,
+           const unsigned int p2=1)
 {
   deallog << "2cells: "<<dim<<"d, p1="<<p1<<", p2="<<p2<<std::endl;
   Triangulation<dim>   triangulation;
@@ -59,7 +60,8 @@ void test2cells(const unsigned int p1=2,
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

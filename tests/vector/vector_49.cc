@@ -23,7 +23,8 @@
 #include <vector>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   // set some entries of the vector
   for (unsigned int i=0; i<v.size(); ++i)
@@ -45,7 +46,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

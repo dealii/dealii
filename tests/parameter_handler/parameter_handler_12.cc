@@ -21,7 +21,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check ()
 {
   ParameterHandler prm;
   prm.declare_entry ("test_1", "3", Patterns::Integer());
@@ -38,7 +39,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

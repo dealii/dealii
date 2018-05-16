@@ -23,7 +23,8 @@
 #include <deal.II/base/aligned_vector.h>
 
 template <typename Number=double>
-void test()
+void
+test()
 {
   const unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
@@ -158,7 +159,8 @@ void test()
 
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   using namespace dealii;
 

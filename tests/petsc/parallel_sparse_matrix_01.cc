@@ -52,7 +52,8 @@ get_this_mpi_process ()
 }
 
 
-void test ()
+void
+test ()
 {
   typedef PETScWrappers::MPI::SparseMatrix::size_type size_type;
 
@@ -116,7 +117,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -45,8 +45,9 @@ template <int dim>
 class LinearFunction : public Function<dim>
 {
 public:
-  double value (const Point<dim> &p,
-                const unsigned int) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     return 1;
   }
@@ -54,7 +55,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -79,7 +81,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

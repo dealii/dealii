@@ -23,7 +23,8 @@
 #include <deal.II/base/function_parser.h>
 
 
-void eval(const std::string &exp, const Point<2> &p, double expected)
+void
+eval(const std::string &exp, const Point<2> &p, double expected)
 {
   std::string variables = "x,y";
   std::map<std::string,double> constants;
@@ -44,7 +45,8 @@ void eval(const std::string &exp, const Point<2> &p, double expected)
 }
 
 
-void test()
+void
+test()
 {
   eval("if(x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(0.5,0.0), 0.5);
   eval("if(x<0.0,0.0,if(x>1.0,1.0,x))",Point<2>(-2.0,0.0), 0.0);
@@ -98,7 +100,8 @@ void test()
 
 }
 
-int main()
+int
+main()
 {
   initlog();
 

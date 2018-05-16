@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void print_constant_modes(const FiniteElement<dim> &fe)
+void
+print_constant_modes(const FiniteElement<dim> &fe)
 {
   deallog << "Testing " << fe.get_name() << std::endl;
 
@@ -43,7 +44,8 @@ void print_constant_modes(const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   print_constant_modes(FE_Q<dim>(1));
   print_constant_modes(FE_Q<dim>(2));
@@ -64,7 +66,8 @@ void test()
 }
 
 template <>
-void test<1>()
+void test<1>
+()
 {
   print_constant_modes(FE_Q<1>(1));
   print_constant_modes(FESystem<1>(FE_Q<1>(1), 2, FE_Q<1>(2), 1));

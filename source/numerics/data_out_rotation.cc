@@ -409,8 +409,9 @@ build_one_patch (const cell_iterator                                            
 
 
 template <int dim, typename DoFHandlerType>
-void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_patches_per_circle,
-                                                         const unsigned int nnnn_subdivisions)
+void
+DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_patches_per_circle,
+                                                    const unsigned int nnnn_subdivisions)
 {
   // Check consistency of redundant
   // template parameter

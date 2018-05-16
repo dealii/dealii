@@ -165,30 +165,34 @@ namespace internal
        * have to pass that additionally.
        */
 
-      void reserve_space (const unsigned int total_cells,
-                          const unsigned int dimension,
-                          const unsigned int space_dimension);
+      void
+      reserve_space (const unsigned int total_cells,
+                     const unsigned int dimension,
+                     const unsigned int space_dimension);
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory (const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
 
       /**
        * Exception
@@ -229,19 +233,23 @@ namespace internal
       TriaObjectsHex cells;
 
 
-      void reserve_space (const unsigned int total_cells,
-                          const unsigned int dimension,
-                          const unsigned int space_dimension);
-      void monitor_memory (const unsigned int true_dimension) const;
-      std::size_t memory_consumption () const;
+      void
+      reserve_space (const unsigned int total_cells,
+                     const unsigned int dimension,
+                     const unsigned int space_dimension);
+      void
+      monitor_memory (const unsigned int true_dimension) const;
+      std::size_t
+      memory_consumption () const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar,
+                const unsigned int version);
 
       /**
        * Exception
@@ -256,8 +264,9 @@ namespace internal
 
     template <int dim>
     template <class Archive>
-    void TriaLevel<dim>::serialize(Archive &ar,
-                                   const unsigned int)
+    void
+    TriaLevel<dim>::serialize(Archive &ar,
+                              const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
 
@@ -276,8 +285,9 @@ namespace internal
 
 
     template <class Archive>
-    void TriaLevel<3>::serialize(Archive &ar,
-                                 const unsigned int)
+    void
+    TriaLevel<3>::serialize(Archive &ar,
+                            const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
 

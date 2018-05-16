@@ -39,7 +39,8 @@ using namespace dealii;
 
 
 template <int dim>
-void test()
+void
+test()
 {
   using namespace dealii;
 
@@ -168,7 +169,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   using namespace dealii;
 

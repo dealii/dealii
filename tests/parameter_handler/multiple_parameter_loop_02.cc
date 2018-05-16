@@ -28,17 +28,21 @@
 class HelperClass : public MultipleParameterLoop::UserClass
 {
 public:
-  virtual void create_new (unsigned int run_no)
+  virtual void
+  create_new (unsigned int run_no)
   {
     this->run_no = run_no;
   }
-  virtual void declare_parameters (ParameterHandler &prm);
-  virtual void run (ParameterHandler &prm);
+  virtual void
+  declare_parameters (ParameterHandler &prm);
+  virtual void
+  run (ParameterHandler &prm);
   unsigned int run_no;
 };
 
 
-void HelperClass::declare_parameters (ParameterHandler &prm)
+void
+HelperClass::declare_parameters (ParameterHandler &prm)
 {
   prm.enter_subsection ("Testing");
   prm.declare_entry ("string list",
@@ -56,7 +60,8 @@ void HelperClass::declare_parameters (ParameterHandler &prm)
 }
 
 
-void HelperClass::run (ParameterHandler &prm)
+void
+HelperClass::run (ParameterHandler &prm)
 {
   deallog << "Number of run: " << run_no << std::endl;
 
@@ -65,7 +70,8 @@ void HelperClass::run (ParameterHandler &prm)
 
 
 
-void check (const char *p)
+void
+check (const char *p)
 {
   class MultipleParameterLoop prm;
   HelperClass h;
@@ -76,7 +82,8 @@ void check (const char *p)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

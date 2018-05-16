@@ -142,26 +142,30 @@ public:
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    BaseIterator operator* () const;
+    BaseIterator
+    operator* () const;
 
     /**
      * Dereferencing operator.
      * @return The iterator within the collection currently pointed to.
      */
-    const BaseIterator *operator-> () const;
+    const BaseIterator *
+    operator-> () const;
 
     /**
      * Prefix increment operator. Move the current iterator to the next
      * element of the collection and return the new value.
      */
-    IteratorOverIterators &operator ++ ();
+    IteratorOverIterators &
+    operator ++ ();
 
     /**
      * Postfix increment operator. Move the current iterator to the next
      * element of the collection, but return the previous value of the
      * iterator.
      */
-    IteratorOverIterators operator ++ (int);
+    IteratorOverIterators
+    operator ++ (int);
 
     /**
      * Comparison operator
@@ -169,7 +173,8 @@ public:
      * @return Returns whether the current iterator points to a different
      * object than the iterator represented by the argument.
      */
-    bool operator != (const IteratorOverIterators &i_o_i);
+    bool
+    operator != (const IteratorOverIterators &i_o_i);
 
     /**
      * Mark the class as forward iterator and declare some typedefs which are
@@ -215,13 +220,15 @@ public:
   /**
    * Return the iterator pointing to the first element of this range.
    */
-  IteratorOverIterators begin();
+  IteratorOverIterators
+  begin();
 
   /**
    * Return the iterator pointing to the element past the last element of this
    * range.
    */
-  IteratorOverIterators end();
+  IteratorOverIterators
+  end();
 
 private:
   /**

@@ -40,7 +40,8 @@
 #define PRECISION 2
 
 template <int dim, int spacedim>
-void test(const unsigned int degree)
+void
+test(const unsigned int degree)
 {
   deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;
   deallog << "degree = " << degree << std::endl;
@@ -83,7 +84,8 @@ void test(const unsigned int degree)
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

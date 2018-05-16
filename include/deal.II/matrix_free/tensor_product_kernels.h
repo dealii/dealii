@@ -234,9 +234,10 @@ namespace internal
      * @param out Pointer to the start of the output data vector
      */
     template <int direction, bool contract_over_rows, bool add, bool one_line=false>
-    static void apply (const Number2 *DEAL_II_RESTRICT shape_data,
-                       const Number  *in,
-                       Number        *out);
+    static void
+    apply (const Number2 *DEAL_II_RESTRICT shape_data,
+           const Number  *in,
+           Number        *out);
 
     /**
      * This function applies the tensor product operation to produce face values
@@ -268,8 +269,9 @@ namespace internal
      * @param out address of the output data vector
      */
     template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
-    void apply_face (const Number *DEAL_II_RESTRICT in,
-                     Number       *DEAL_II_RESTRICT out) const;
+    void
+    apply_face (const Number *DEAL_II_RESTRICT in,
+                Number       *DEAL_II_RESTRICT out) const;
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -283,9 +285,10 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_general,dim,n_rows,n_columns,Number,Number2>
-  ::apply (const Number2 *DEAL_II_RESTRICT shape_data,
-           const Number  *in,
-           Number        *out)
+  ::
+  apply (const Number2 *DEAL_II_RESTRICT shape_data,
+         const Number  *in,
+         Number        *out)
   {
     static_assert (one_line == false || direction==dim-1,
                    "Single-line evaluation only works for direction=dim-1.");
@@ -352,8 +355,9 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_general,dim,n_rows,n_columns,Number,Number2>
-  ::apply_face (const Number *DEAL_II_RESTRICT in,
-                Number       *DEAL_II_RESTRICT out) const
+  ::
+  apply_face (const Number *DEAL_II_RESTRICT in,
+              Number       *DEAL_II_RESTRICT out) const
   {
     static_assert(dim > 0 && dim<4, "Only dim=1,2,3 supported");
     static_assert(max_derivative >= 0 && max_derivative<3,
@@ -586,13 +590,15 @@ namespace internal
     }
 
     template <int direction, bool contract_over_rows, bool add, bool one_line=false>
-    void apply (const Number2 *DEAL_II_RESTRICT shape_data,
-                const Number  *in,
-                Number        *out) const;
+    void
+    apply (const Number2 *DEAL_II_RESTRICT shape_data,
+           const Number  *in,
+           Number        *out) const;
 
     template <int face_direction, bool contract_onto_face, bool add, int max_derivative>
-    void apply_face (const Number *DEAL_II_RESTRICT in,
-                     Number       *DEAL_II_RESTRICT out) const;
+    void
+    apply_face (const Number *DEAL_II_RESTRICT in,
+                Number       *DEAL_II_RESTRICT out) const;
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -608,9 +614,10 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_general,dim,0,0,Number,Number2>
-  ::apply (const Number2 *DEAL_II_RESTRICT shape_data,
-           const Number  *in,
-           Number        *out) const
+  ::
+  apply (const Number2 *DEAL_II_RESTRICT shape_data,
+         const Number  *in,
+         Number        *out) const
   {
     static_assert (one_line == false || direction==dim-1,
                    "Single-line evaluation only works for direction=dim-1.");
@@ -678,8 +685,9 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_general,dim,0,0,Number,Number2>
-  ::apply_face (const Number *DEAL_II_RESTRICT in,
-                Number       *DEAL_II_RESTRICT out) const
+  ::
+  apply_face (const Number *DEAL_II_RESTRICT in,
+              Number       *DEAL_II_RESTRICT out) const
   {
     Assert(shape_values != nullptr,
            ExcMessage("The given array shape_data must not be the null pointer!"));
@@ -890,8 +898,9 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_symmetric,dim,n_rows,n_columns,Number,Number2>
-  ::values (const Number in [],
-            Number       out []) const
+  ::
+  values (const Number in [],
+          Number       out []) const
   {
     Assert (shape_values != nullptr, ExcNotInitialized());
     AssertIndexRange (direction, dim);
@@ -1068,8 +1077,9 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_symmetric,dim,n_rows,n_columns,Number,Number2>
-  ::gradients (const Number in [],
-               Number       out []) const
+  ::
+  gradients (const Number in [],
+             Number       out []) const
   {
     Assert (shape_gradients != nullptr, ExcNotInitialized());
     AssertIndexRange (direction, dim);
@@ -1193,8 +1203,9 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_symmetric,dim,n_rows,n_columns,Number,Number2>
-  ::hessians (const Number in [],
-              Number       out []) const
+  ::
+  hessians (const Number in [],
+            Number       out []) const
   {
     Assert (shape_hessians != nullptr, ExcNotInitialized());
     AssertIndexRange (direction, dim);
@@ -1495,9 +1506,10 @@ namespace internal
      */
     template <int direction, bool contract_over_rows, bool add, int type,
               bool one_line=false>
-    static void apply (const Number2 *DEAL_II_RESTRICT shape_data,
-                       const Number  *in,
-                       Number        *out);
+    static void
+    apply (const Number2 *DEAL_II_RESTRICT shape_data,
+           const Number  *in,
+           Number        *out);
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -1511,9 +1523,10 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_evenodd,dim,n_rows,n_columns,Number,Number2>
-  ::apply (const Number2 *DEAL_II_RESTRICT shapes,
-           const Number  *in,
-           Number        *out)
+  ::
+  apply (const Number2 *DEAL_II_RESTRICT shapes,
+         const Number  *in,
+         Number        *out)
   {
     static_assert (type < 3, "Only three variants type=0,1,2 implemented");
     static_assert (one_line == false || direction==dim-1,
@@ -1847,9 +1860,10 @@ namespace internal
      */
     template <int direction, bool contract_over_rows, bool add, int type,
               bool one_line=false>
-    static void apply (const Number2 *DEAL_II_RESTRICT shape_data,
-                       const Number  *in,
-                       Number        *out);
+    static void
+    apply (const Number2 *DEAL_II_RESTRICT shape_data,
+           const Number  *in,
+           Number        *out);
 
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -1863,9 +1877,10 @@ namespace internal
   inline
   void
   EvaluatorTensorProduct<evaluate_symmetric_hierarchical,dim,n_rows,n_columns,Number,Number2>
-  ::apply (const Number2 *DEAL_II_RESTRICT shapes,
-           const Number  *in,
-           Number        *out)
+  ::
+  apply (const Number2 *DEAL_II_RESTRICT shapes,
+         const Number  *in,
+         Number        *out)
   {
     static_assert (one_line == false || direction==dim-1,
                    "Single-line evaluation only works for direction=dim-1.");

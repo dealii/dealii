@@ -26,7 +26,8 @@ using namespace dealii;
 
 
 template <int dim>
-void print_quadrature(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
+void
+print_quadrature(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
 {
   for (unsigned int i = 0; i < quadrature.size(); ++i)
     {
@@ -40,7 +41,8 @@ void print_quadrature(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrat
 //Check that get_normals() are callable and are of the same size as
 //points and weights.
 template <int dim>
-void check_get_normals(
+void
+check_get_normals(
   const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
 {
   const std::vector<Point<dim>> &points=
@@ -53,7 +55,8 @@ void check_get_normals(
 
 
 template <int dim>
-void test_non_default_constructor()
+void
+test_non_default_constructor()
 {
   deallog<<"Using constructor"<<std::endl;
   std::vector<Point<dim>> points(1);
@@ -68,7 +71,8 @@ void test_non_default_constructor()
 
 
 template <int dim>
-void test_push_back()
+void
+test_push_back()
 {
   deallog<<"Using push_back"<<std::endl;
   const Point<dim> point;
@@ -84,7 +88,8 @@ void test_push_back()
 
 
 template <int dim>
-void construct_quadrature_and_print_points()
+void
+construct_quadrature_and_print_points()
 {
   test_push_back<dim>();
   test_non_default_constructor<dim>();
@@ -92,7 +97,8 @@ void construct_quadrature_and_print_points()
 
 
 
-int main()
+int
+main()
 {
   initlog();
   construct_quadrature_and_print_points<1>();

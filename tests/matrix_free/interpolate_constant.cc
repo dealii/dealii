@@ -33,15 +33,18 @@ template <int dim>
 class CompareFunction : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p, const unsigned int ) const
+  virtual double
+  value (const Point<dim> &p, const unsigned int ) const
   {
     return 1;
   }
-  virtual Tensor<1,dim> gradient (const Point<dim> &p, const unsigned int ) const
+  virtual Tensor<1,dim>
+  gradient (const Point<dim> &p, const unsigned int ) const
   {
     return Tensor<1,dim>();
   }
-  virtual SymmetricTensor<2,dim> hessian (const Point<dim> &p, const unsigned int ) const
+  virtual SymmetricTensor<2,dim>
+  hessian (const Point<dim> &p, const unsigned int ) const
   {
     return SymmetricTensor<2,dim>();
   }
@@ -50,7 +53,8 @@ public:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);

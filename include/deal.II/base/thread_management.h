@@ -113,13 +113,15 @@ namespace Threads
      * Simulate acquisition of the mutex. As this class does nothing really,
      * this function does nothing as well.
      */
-    inline void acquire () const {}
+    inline void
+    acquire () const {}
 
     /**
      * Simulate release of the mutex. As this class does nothing really, this
      * function does nothing as well.
      */
-    inline void release () const {}
+    inline void
+    release () const {}
   };
 
 
@@ -149,14 +151,16 @@ namespace Threads
      * some data will now be available. Since in single threaded mode, this
      * function of course does nothing.
      */
-    inline void signal () const {}
+    inline void
+    signal () const {}
 
     /**
      * Signal to multiple listener that a condition has been met, i.e. that
      * some data will now be available. Since in single threaded mode, this
      * function of course does nothing.
      */
-    inline void broadcast () const {}
+    inline void
+    broadcast () const {}
 
     /**
      * Wait for the condition to be signalled. Signal variables need to be
@@ -165,7 +169,8 @@ namespace Threads
      * description of the mechanisms. Since in single threaded mode, this
      * function of course does nothing, but returns immediately.
      */
-    inline void wait (DummyThreadMutex &) const {}
+    inline void
+    wait (DummyThreadMutex &) const {}
   };
 
 
@@ -201,7 +206,8 @@ namespace Threads
      * Wait for all threads to reach this point. Since there may only be one
      * thread, return immediately, i.e. this function is a no-op.
      */
-    inline int wait () const
+    inline int
+    wait () const
     {
       return 0;
     }
@@ -209,7 +215,8 @@ namespace Threads
     /**
      * Dump the state of this object. Here: do nothing.
      */
-    inline void dump () const {}
+    inline void
+    dump () const {}
 
     /**
      * @addtogroup Exceptions
@@ -309,7 +316,8 @@ namespace Threads
      * Copy operators. As discussed in this class's documentation, no state
      * is copied from the object given as argument.
      */
-    Mutex &operator = (const Mutex &)
+    Mutex &
+    operator = (const Mutex &)
     {
       return *this;
     }
@@ -318,7 +326,8 @@ namespace Threads
     /**
      * Acquire a mutex.
      */
-    inline void acquire ()
+    inline void
+    acquire ()
     {
       mutex.lock();
     }
@@ -326,7 +335,8 @@ namespace Threads
     /**
      * Release the mutex again.
      */
-    inline void release ()
+    inline void
+    release ()
     {
       mutex.unlock();
     }
@@ -358,7 +368,8 @@ namespace Threads
      * Signal to a single listener that a condition has been met, i.e. that
      * some data will now be available.
      */
-    inline void signal ()
+    inline void
+    signal ()
     {
       condition_variable.notify_one();
     }
@@ -367,7 +378,8 @@ namespace Threads
      * Signal to multiple listener that a condition has been met, i.e. that
      * some data will now be available.
      */
-    inline void broadcast ()
+    inline void
+    broadcast ()
     {
       condition_variable.notify_all();
     }
@@ -381,7 +393,8 @@ namespace Threads
      * The mutex is assumed held at the entry to this function but is released
      * upon exit.
      */
-    inline void wait (Mutex &mutex)
+    inline void
+    wait (Mutex &mutex)
     {
       std::unique_lock<std::mutex> lock(mutex.mutex, std::adopt_lock);
       condition_variable.wait (lock);
@@ -431,7 +444,8 @@ namespace Threads
      * some non-zero value. The operating system picks the special thread by
      * some not further known method.
      */
-    int wait ();
+    int
+    wait ();
 
   private:
     /**
@@ -510,7 +524,8 @@ namespace Threads
    *
    * @ingroup threads
    */
-  unsigned int n_existing_threads ();
+  unsigned int
+  n_existing_threads ();
 
   /**
    * Return a number used as id of this thread. This number is generated using
@@ -523,7 +538,8 @@ namespace Threads
    *
    * @ingroup threads
    */
-  unsigned int this_thread_id ();
+  unsigned int
+  this_thread_id ();
 
   /**
    * Split the range <code>[begin,end)</code> into <code>n_intervals</code>
@@ -587,7 +603,8 @@ namespace Threads
      * function, which will then provide some output.
      */
     [[noreturn]]
-    void handle_std_exception (const std::exception &exc);
+    void
+    handle_std_exception (const std::exception &exc);
 
     /**
      * @internal
@@ -597,7 +614,8 @@ namespace Threads
      * something more useful.
      */
     [[noreturn]]
-    void handle_unknown_exception ();
+    void
+    handle_unknown_exception ();
 
     /**
      * @internal
@@ -606,7 +624,8 @@ namespace Threads
      * of existing threads. It is not thought for use in application programs,
      * but only for use in the template functions below.
      */
-    void register_thread ();
+    void
+    register_thread ();
 
     /**
      * @internal
@@ -615,7 +634,8 @@ namespace Threads
      * of existing threads. It is not thought for use in application programs,
      * but only for use in the template functions below.
      */
-    void deregister_thread ();
+    void
+    deregister_thread ();
   }
 
   /**
@@ -698,14 +718,17 @@ namespace Threads
     public:
       typedef RT &reference_type;
 
-      inline return_value () : value() {}
+      inline
+      return_value () : value() {}
 
-      inline reference_type get ()
+      inline reference_type
+      get ()
       {
         return value;
       }
 
-      inline void set (RT &&v)
+      inline void
+      set (RT &&v)
       {
         value = std::move(v);
       }
@@ -728,16 +751,19 @@ namespace Threads
     public:
       typedef RT &reference_type;
 
-      inline return_value ()
+      inline
+      return_value ()
         : value(nullptr)
       {}
 
-      inline reference_type get () const
+      inline reference_type
+      get () const
       {
         return *value;
       }
 
-      inline void set (RT &v)
+      inline void
+      set (RT &v)
       {
         value = &v;
       }
@@ -756,7 +782,8 @@ namespace Threads
     {
       typedef void reference_type;
 
-      static inline void get () {}
+      static inline void
+      get () {}
     };
   }
 
@@ -765,15 +792,17 @@ namespace Threads
   namespace internal
   {
     template <typename RT>
-    inline void call (const std::function<RT ()> &function,
-                      internal::return_value<RT> &ret_val)
+    inline void
+    call (const std::function<RT ()> &function,
+          internal::return_value<RT> &ret_val)
     {
       ret_val.set (function());
     }
 
 
-    inline void call (const std::function<void ()> &function,
-                      internal::return_value<void> &)
+    inline void
+    call (const std::function<void ()> &function,
+          internal::return_value<void> &)
     {
       function();
     }
@@ -871,7 +900,8 @@ namespace Threads
        * Start the thread and let it put its return value into the ret_val
        * object.
        */
-      void start (const std::function<RT ()> &function)
+      void
+      start (const std::function<RT ()> &function)
       {
         thread_is_active = true;
         ret_val = std::make_shared<return_value<RT>>();
@@ -882,7 +912,8 @@ namespace Threads
       /**
        * Wait for the thread to end.
        */
-      void join ()
+      void
+      join ()
       {
         // see if the thread hasn't been joined yet. if it has, then
         // join() is a no-op. use schmidt's double-checking strategy
@@ -905,8 +936,9 @@ namespace Threads
        * The function that runs on the thread.
        */
       static
-      void thread_entry_point (const std::function<RT ()> &function,
-                               std::shared_ptr<return_value<RT> > ret_val)
+      void
+      thread_entry_point (const std::function<RT ()> &function,
+                          std::shared_ptr<return_value<RT> > ret_val)
       {
         // call the function in question. since an exception that is
         // thrown from one of the called functions will not propagate
@@ -952,7 +984,8 @@ namespace Threads
        * Start the thread and let it put its return value into the ret_val
        * object.
        */
-      void start (const std::function<RT ()> &function)
+      void
+      start (const std::function<RT ()> &function)
       {
         ret_val = std::make_shared<return_value<RT>>();
         call (function, *ret_val);
@@ -961,7 +994,8 @@ namespace Threads
       /**
        * Wait for the thread to end.
        */
-      void join ()
+      void
+      join ()
       {}
     };
 
@@ -1026,7 +1060,8 @@ namespace Threads
      * If you have used the default constructor of this class and have not
      * assigned a thread object to it, then this function is a no-op.
      */
-    void join () const
+    void
+    join () const
     {
       if (thread_descriptor)
         thread_descriptor->join ();
@@ -1082,7 +1117,8 @@ namespace Threads
      * Return true if this object has had a thread associated with it, either
      * by using the non-default constructor or by assignment.
      */
-    bool valid () const
+    bool
+    valid () const
     {
       return static_cast<bool>(thread_descriptor);
     }
@@ -1093,7 +1129,8 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * thread, the check is simply to compare these pointers.
      */
-    bool operator == (const Thread &t) const
+    bool
+    operator == (const Thread &t) const
     {
       return thread_descriptor == t.thread_descriptor;
     }
@@ -1120,7 +1157,8 @@ namespace Threads
     template <typename T>
     struct maybe_make_ref
     {
-      static T act (T &t)
+      static T
+      act (T &t)
       {
         return t;
       }
@@ -1138,7 +1176,8 @@ namespace Threads
     template <typename T>
     struct maybe_make_ref<T &>
     {
-      static std::reference_wrapper<T> act (T &t)
+      static std::reference_wrapper<T>
+      act (T &t)
       {
         return std::ref(t);
       }
@@ -1317,7 +1356,8 @@ namespace Threads
     /**
      * Add another thread object to the collection.
      */
-    ThreadGroup &operator += (const Thread<RT> &t)
+    ThreadGroup &
+    operator += (const Thread<RT> &t)
     {
       threads.push_back (t);
       return *this;
@@ -1329,7 +1369,8 @@ namespace Threads
      * function more than once, and you can also add new thread objects
      * between subsequent calls to this function if you want.
      */
-    void join_all () const
+    void
+    join_all () const
     {
       for (typename std::list<Thread<RT> >::const_iterator
            t=threads.begin(); t!=threads.end(); ++t)
@@ -1364,7 +1405,8 @@ namespace Threads
         task_descriptor (task_descriptor)
       {}
 
-      virtual tbb::task *execute () override
+      virtual tbb::task *
+      execute () override
       {
         // call the function object and put the return value into the
         // proper place
@@ -1477,14 +1519,16 @@ namespace Threads
        * object and that can only reliably happen if the current object is
        * completely constructed already.
        */
-      void queue_task ();
+      void
+      queue_task ();
 
       /**
        * Join a task, i.e. wait for it to finish. This function can safely be
        * called from different threads at the same time, and can also be
        * called more than once.
        */
-      void join ();
+      void
+      join ();
 
 
       template <typename> friend struct TaskEntryPoint;
@@ -1636,13 +1680,15 @@ namespace Threads
        * Wait for the task to return. Since we are in non-MT mode here, there
        * is nothing to do.
        */
-      static void join () {}
+      static void
+      join () {}
 
       /**
        * Run the task. Since we are here in non-MT mode, there is nothing to
        * do that the constructor hasn't already done.
        */
-      static void queue_task () {}
+      static void
+      queue_task () {}
     };
 
 #endif
@@ -1714,7 +1760,8 @@ namespace Threads
      * constructor of this class and have not assigned a task object to it. In
      * other words, the function joinable() must return true.
      */
-    void join () const
+    void
+    join () const
     {
       AssertThrow (joinable(), ExcNoTask());
       task_descriptor->join ();
@@ -1732,7 +1779,8 @@ namespace Threads
      * returns true, it will continue to return true until the task object it
      * reports on is assigned to from another object.
      */
-    bool joinable () const
+    bool
+    joinable () const
     {
       return (task_descriptor !=
               std::shared_ptr<internal::TaskDescriptor<RT> >());
@@ -1795,7 +1843,8 @@ namespace Threads
      * an implicit pointer to an object that exists exactly once for each
      * task, the check is simply to compare these pointers.
      */
-    bool operator == (const Task &t) const
+    bool
+    operator == (const Task &t) const
     {
       AssertThrow (joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;
@@ -1999,7 +2048,8 @@ namespace Threads
     /**
      * Add another task object to the collection.
      */
-    TaskGroup &operator += (const Task<RT> &t)
+    TaskGroup &
+    operator += (const Task<RT> &t)
     {
       tasks.push_back (t);
       return *this;
@@ -2011,7 +2061,8 @@ namespace Threads
      * function more than once, and you can also add new task objects between
      * subsequent calls to this function if you want.
      */
-    void join_all () const
+    void
+    join_all () const
     {
       for (typename std::list<Task<RT> >::const_iterator
            t=tasks.begin(); t!=tasks.end(); ++t)

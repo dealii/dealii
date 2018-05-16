@@ -60,8 +60,9 @@ private:
 public:
   TestFunction (const unsigned int p_order);
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 
@@ -81,8 +82,9 @@ TestFunction<dim>::TestFunction (const unsigned int p_order) :
 
 
 template <int dim>
-double TestFunction<dim>::value (const Point<dim>   &p,
-                                 const unsigned int  /*component*/) const
+double
+TestFunction<dim>::value (const Point<dim>   &p,
+                          const unsigned int  /*component*/) const
 {
   double val = base[0].value(p(0));
   for (unsigned int i = 1; i < dim; ++i)
@@ -96,16 +98,20 @@ class TestFEQConstraints
 {
 public:
   TestFEQConstraints (unsigned int p_order, unsigned int refinements);
-  void run ();
+  void
+  run ();
 
 private:
   const unsigned int refinements;
   const unsigned int p_order;
 
-  void refine_grid_random ();
-  void make_grid_and_dofs ();
+  void
+  refine_grid_random ();
+  void
+  make_grid_and_dofs ();
 
-  void test ();
+  void
+  test ();
 
   Triangulation<dim>     triangulation;
   FE_Q<dim>              fe;
@@ -128,7 +134,8 @@ TestFEQConstraints<dim>::TestFEQConstraints (unsigned int p_order,
 // which are then used to refine the grid. This should be a tough test for
 // the hanging nodes.
 template <int dim>
-void TestFEQConstraints<dim>::refine_grid_random ()
+void
+TestFEQConstraints<dim>::refine_grid_random ()
 {
   const unsigned int n_cells = triangulation.n_active_cells();
   Vector<double> estimated_error_per_cell (n_cells);
@@ -144,7 +151,8 @@ void TestFEQConstraints<dim>::refine_grid_random ()
 
 
 template <int dim>
-void TestFEQConstraints<dim>::make_grid_and_dofs ()
+void
+TestFEQConstraints<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (2);
@@ -169,7 +177,8 @@ void TestFEQConstraints<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void TestFEQConstraints<dim>::test ()
+void
+TestFEQConstraints<dim>::test ()
 {
   TestFunction<dim> test_function (p_order);
   double l2test,
@@ -227,14 +236,16 @@ void TestFEQConstraints<dim>::test ()
 
 
 template <int dim>
-void TestFEQConstraints<dim>::run ()
+void
+TestFEQConstraints<dim>::run ()
 {
   make_grid_and_dofs ();
   test ();
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -28,7 +28,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   // first set a few entries one-by-one in
   // a small matrix
@@ -126,7 +127,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

@@ -53,7 +53,8 @@ reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
 
 
 template <int dim>
-void check_simple(const FiniteElement<dim> &fe)
+void
+check_simple(const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -137,7 +138,8 @@ void check_simple(const FiniteElement<dim> &fe)
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

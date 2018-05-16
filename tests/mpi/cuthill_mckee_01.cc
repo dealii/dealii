@@ -30,7 +30,8 @@
 
 using namespace dealii;
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation < dim > tr(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tr, -1.0, 1.0);
@@ -41,7 +42,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

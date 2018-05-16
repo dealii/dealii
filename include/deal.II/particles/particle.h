@@ -159,12 +159,14 @@ namespace Particles
     /**
      * Copy assignment operator.
      */
-    Particle<dim,spacedim> &operator=(const Particle<dim,spacedim> &particle);
+    Particle<dim,spacedim> &
+    operator=(const Particle<dim,spacedim> &particle);
 
     /**
      * Move assignment operator.
      */
-    Particle<dim,spacedim> &operator=(Particle<dim,spacedim> &&particle) noexcept;
+    Particle<dim,spacedim> &
+    operator=(Particle<dim,spacedim> &&particle) noexcept;
 
     /**
      * Destructor. Releases the property handle if it is valid, and
@@ -283,14 +285,16 @@ namespace Particles
      * serialization.
      */
     template <class Archive>
-    void save (Archive &ar, const unsigned int version) const;
+    void
+    save (Archive &ar, const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void load (Archive &ar, const unsigned int version);
+    void
+    load (Archive &ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -326,7 +330,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void Particle<dim,spacedim>::load (Archive &ar, const unsigned int)
+  void
+  Particle<dim,spacedim>::load (Archive &ar, const unsigned int)
   {
     unsigned int n_properties = 0;
 
@@ -344,7 +349,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void Particle<dim,spacedim>::save (Archive &ar, const unsigned int) const
+  void
+  Particle<dim,spacedim>::save (Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
     if ((property_pool != nullptr) && (properties != PropertyPool::invalid_handle))

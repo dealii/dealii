@@ -21,7 +21,8 @@
 #include <deal.II/base/parameter_handler.h>
 #include <sstream>
 
-void check (const char *defaults, const char *defined, const char *input)
+void
+check (const char *defaults, const char *defined, const char *input)
 {
   ParameterHandler prm;
   prm.declare_entry ("v", defaults, Patterns::MultipleSelection(defined), "");
@@ -35,7 +36,8 @@ void check (const char *defaults, const char *defined, const char *input)
           << "' result='" << prm.get("v") << "'" << std::endl;
 }
 
-void test()
+void
+test()
 {
   check("","one option","set v=");
   check("one option","one option","");
@@ -58,7 +60,8 @@ void test()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

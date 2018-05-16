@@ -46,8 +46,9 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int = 0) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int = 0) const
   {
     // compute the linfty norm of p
     double m = 0;
@@ -61,7 +62,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   SphericalManifold<dim> boundary;
 
@@ -162,7 +164,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

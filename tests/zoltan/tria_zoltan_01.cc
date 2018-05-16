@@ -27,7 +27,8 @@ using namespace dealii;
 // PHG_EDGE_SIZE_THRESHOLD value is low.
 
 template <int dim>
-void test (const MPI_Comm &mpi_communicator)
+void
+test (const MPI_Comm &mpi_communicator)
 {
   parallel::shared::Triangulation<dim>
   triangulation (mpi_communicator,
@@ -42,7 +43,8 @@ void test (const MPI_Comm &mpi_communicator)
               << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   try
     {

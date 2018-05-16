@@ -29,12 +29,14 @@ struct X
   X(int i) : i(i) {}
   int i;
 
-  void execute ()
+  void
+  execute ()
   {
     Assert (false, ExcInternalError());
   }
 
-  void execute () const
+  void
+  execute () const
   {
     Assert (i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
@@ -42,11 +44,13 @@ struct X
 
 private:
   X(const X &);
-  X &operator= (const X &);
+  X &
+  operator= (const X &);
 };
 
 
-void test1 ()
+void
+test1 ()
 {
   const X x(42);
   Threads::Thread<void> t = Threads::new_thread (&X::execute, x);
@@ -59,24 +63,28 @@ struct Y
   Y(int i) : i(i) {}
   int i;
 
-  void execute ()
+  void
+  execute ()
   {
     Assert (i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 
-  void execute () const
+  void
+  execute () const
   {
     Assert (false, ExcInternalError());
   }
 
 private:
   Y(const Y &);
-  Y &operator= (const Y &);
+  Y &
+  operator= (const Y &);
 };
 
 
-void test2 ()
+void
+test2 ()
 {
   Y y(42);
   Threads::Thread<void> t = Threads::new_thread (&Y::execute, y);
@@ -86,7 +94,8 @@ void test2 ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -31,7 +31,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   // the following element has more
   // components than blocks
@@ -55,7 +56,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (4);

@@ -72,7 +72,8 @@ namespace LocalIntegrators
      * @date 2012
      */
     template <int dim>
-    void cell_matrix (
+    void
+    cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const FEValuesBase<dim> &fetest,
@@ -305,7 +306,8 @@ namespace LocalIntegrators
      * component is advected by the same velocity.
      */
     template <int dim>
-    void upwind_value_matrix(
+    void
+    upwind_value_matrix(
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const FEValuesBase<dim> &fetest,
@@ -512,7 +514,8 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void upwind_value_matrix (
+    void
+    upwind_value_matrix (
       FullMatrix<double> &M11,
       FullMatrix<double> &M12,
       FullMatrix<double> &M21,
@@ -590,7 +593,8 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void upwind_face_residual (
+    void
+    upwind_face_residual (
       Vector<double> &result1,
       Vector<double> &result2,
       const FEValuesBase<dim> &fe1,
@@ -668,7 +672,8 @@ namespace LocalIntegrators
      * component is advected the same way.
      */
     template <int dim>
-    void upwind_face_residual (
+    void
+    upwind_face_residual (
       Vector<double> &result1,
       Vector<double> &result2,
       const FEValuesBase<dim> &fe1,

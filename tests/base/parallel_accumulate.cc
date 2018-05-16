@@ -21,8 +21,9 @@
 #include <deal.II/base/parallel.h>
 
 
-int sum (const int begin,
-         const int end)
+int
+sum (const int begin,
+     const int end)
 {
   int s=0;
   for (int i=begin; i<end; ++i)
@@ -31,7 +32,8 @@ int sum (const int begin,
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

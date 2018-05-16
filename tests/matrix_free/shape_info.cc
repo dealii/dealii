@@ -31,12 +31,14 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test (const FiniteElement<dim> &fe,
-           const Quadrature<1>      &quad)
+void
+test (const FiniteElement<dim> &fe,
+      const Quadrature<1>      &quad)
 {
   for (unsigned int i=0; i<fe.n_base_elements(); ++i)
     {
@@ -48,7 +50,8 @@ void test (const FiniteElement<dim> &fe,
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
   QGauss<1> gauss3(3);

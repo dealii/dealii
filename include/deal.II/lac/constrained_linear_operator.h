@@ -60,7 +60,8 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup constraints
  */
 template <typename Range, typename Domain>
-LinearOperator<Range, Domain> distribute_constraints_linear_operator(
+LinearOperator<Range, Domain>
+distribute_constraints_linear_operator(
   const ConstraintMatrix &constraint_matrix,
   const LinearOperator<Range, Domain> &exemplar)
 {
@@ -159,7 +160,8 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
  * @ingroup constraints
  */
 template <typename Range, typename Domain>
-LinearOperator<Range, Domain> project_to_constrained_linear_operator(
+LinearOperator<Range, Domain>
+project_to_constrained_linear_operator(
   const ConstraintMatrix &constraint_matrix,
   const LinearOperator<Range, Domain> &exemplar)
 {

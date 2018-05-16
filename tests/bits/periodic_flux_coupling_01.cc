@@ -41,10 +41,12 @@ class MakeFlux
 {
 public:
   MakeFlux ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid ();
+  void
+  make_grid ();
 
   Triangulation<dim>   triangulation;
   FE_DGQ<dim>          fe;
@@ -62,7 +64,8 @@ MakeFlux<dim>::MakeFlux ()
 
 
 template <int dim>
-void MakeFlux<dim>::make_grid ()
+void
+MakeFlux<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1, true);
   typedef typename dealii::Triangulation<dim>::cell_iterator CellIteratorTria;
@@ -79,7 +82,8 @@ void MakeFlux<dim>::make_grid ()
 
 
 template <int dim>
-void MakeFlux<dim>::run()
+void
+MakeFlux<dim>::run()
 {
   for (unsigned int cycle = 0; cycle < 3; ++cycle)
     {
@@ -125,7 +129,8 @@ void MakeFlux<dim>::run()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

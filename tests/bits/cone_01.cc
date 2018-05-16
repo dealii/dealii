@@ -34,13 +34,15 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   AssertThrow(false, ExcNotImplemented());
 }
 
 template <>
-void check<2> ()
+void check<2>
+()
 {
   constexpr int dim = 2;
   Triangulation<dim> triangulation;
@@ -53,7 +55,8 @@ void check<2> ()
 }
 
 template <>
-void check<3> ()
+void check<3>
+()
 {
   constexpr int dim = 3;
   Triangulation<dim> triangulation;
@@ -68,7 +71,8 @@ void check<3> ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

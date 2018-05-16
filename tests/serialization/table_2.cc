@@ -21,7 +21,8 @@
 #include <boost/serialization/vector.hpp>
 
 
-void test ()
+void
+test ()
 {
   unsigned int index1 = 3, index2 = 4;
   TableIndices<2> indices1(index1, index2);
@@ -49,7 +50,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

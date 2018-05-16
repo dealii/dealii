@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream &out)
 {
   Triangulation<2> triangulation;
   Triangulation<3> tr;
@@ -40,7 +41,8 @@ void test(std::ostream &out)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

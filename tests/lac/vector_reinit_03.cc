@@ -25,7 +25,8 @@
 #include <deal.II/lac/vector_memory.h>
 
 template <typename VectorType>
-void do_test()
+void
+do_test()
 {
   IndexSet set(5);
   set.add_range(0,5);
@@ -97,7 +98,8 @@ void do_test()
 
 }
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

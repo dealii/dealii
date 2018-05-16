@@ -31,7 +31,8 @@
 
 // Helper function
 template <int dim, int spacedim>
-void test(unsigned int ref=1)
+void
+test(unsigned int ref=1)
 {
   PolarManifold<dim,spacedim> manifold;
 
@@ -57,7 +58,8 @@ void test(unsigned int ref=1)
   gridout.write_msh(tria, deallog.get_file_stream());
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

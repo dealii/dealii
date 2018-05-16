@@ -23,7 +23,8 @@
 #include <deal.II/base/bounding_box.h>
 
 template <int spacedim>
-void test_bounding_box()
+void
+test_bounding_box()
 {
   BoundingBox<spacedim> a;
   deallog << "Empty constructor: " << std::endl;
@@ -88,7 +89,8 @@ void test_bounding_box()
   deallog << std::endl;
 }
 
-void test_unitary()
+void
+test_unitary()
 {
   std::pair<Point<3>,Point<3>> boundaries;
 
@@ -118,7 +120,8 @@ void test_unitary()
           << b.point_inside(p1+p3) << " " << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

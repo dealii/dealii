@@ -111,14 +111,16 @@ public:
    * Return the degree of the mapping, i.e. the value which was passed to the
    * constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree () const;
 
   /**
    * Always returns @p true because the default implementation of functions in
    * this class preserves vertex locations.
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * Transform the point @p p on the unit cell to the point @p p_real on the
@@ -202,7 +204,8 @@ public:
    */
 
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const override;
 
 
   /**
@@ -245,7 +248,8 @@ protected:
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Flag that is set by the <tt>fill_fe_[[sub]face]_values</tt> function.

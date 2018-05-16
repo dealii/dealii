@@ -25,7 +25,8 @@
 #include <tuple>
 
 template <int spacedim>
-void test_point_owner(unsigned int n_procs)
+void
+test_point_owner(unsigned int n_procs)
 {
   // Step 1: creating the vector of bounding boxes
   // We want to simulate n_procs bounding boxes:
@@ -162,7 +163,8 @@ void test_point_owner(unsigned int n_procs)
     deallog << "TEST FAILED" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

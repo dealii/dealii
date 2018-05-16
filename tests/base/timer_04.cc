@@ -22,7 +22,8 @@
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn (unsigned int n)
 {
   for (unsigned int i=0 ; i<n ; ++i)
     {
@@ -34,7 +35,8 @@ void burn (unsigned int n)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

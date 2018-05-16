@@ -28,7 +28,8 @@ using namespace Patterns::Tools;
 // Try conversion on map types
 
 template <class T>
-void test(T t)
+void
+test(T t)
 {
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
@@ -38,7 +39,8 @@ void test(T t)
 
 }
 
-int main()
+int
+main()
 {
   initlog();
 

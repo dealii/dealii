@@ -32,8 +32,9 @@
 
 
 
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<2> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<2> &tria)
 {
   switch (case_no)
     {
@@ -56,7 +57,8 @@ void create_triangulation(const unsigned int case_no,
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (3);

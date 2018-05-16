@@ -69,14 +69,21 @@ class MaxwellProblem
 public:
   MaxwellProblem (const unsigned int order);
   ~MaxwellProblem ();
-  void run ();
+  void
+  run ();
 private:
-  double dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> &B) const;
-  double dotprod(const Tensor<1,dim> &A, const Vector<double> &B) const;
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void process_solution(const unsigned int cycle);
+  double
+  dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> &B) const;
+  double
+  dotprod(const Tensor<1,dim> &A, const Vector<double> &B) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  process_solution(const unsigned int cycle);
   Triangulation<dim>   triangulation;
   DoFHandler<dim>      dof_handler;
   FE_Nedelec<dim>            fe;
@@ -97,15 +104,19 @@ class ExactSolution : public Function<dim>
 {
 public:
   ExactSolution() : Function<dim>(2) {}
-  virtual double value (const Point<dim> &p,
-                        const unsigned int component) const;
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &result) const;
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double> &values,
-                           const unsigned int component) const;
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<double> >   &values) const;
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int component) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double> &result) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double> &values,
+              const unsigned int component) const;
+  virtual void
+  vector_value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Vector<double> >   &values) const;
 private:
   static const double bc_constant;
 };
@@ -118,10 +129,12 @@ class RightHandSide :  public Function<dim>
 {
 public:
   RightHandSide ();
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &values) const;
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<double> >   &value_list) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &values) const;
+  virtual void
+  vector_value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Vector<double> >   &value_list) const;
 private:
   static const double bc_constant;
 };
@@ -129,8 +142,9 @@ template <int dim> const double RightHandSide<dim>::bc_constant = 0.1;
 
 // DEFINE EXACT SOLUTION MEMBERS
 template <int dim>
-double ExactSolution<dim>::value(const Point<dim> &p,
-                                 const unsigned int component) const
+double
+ExactSolution<dim>::value(const Point<dim> &p,
+                          const unsigned int component) const
 {
   Assert (dim >= 2, ExcNotImplemented());
   AssertIndexRange(component, dim);
@@ -147,8 +161,9 @@ double ExactSolution<dim>::value(const Point<dim> &p,
 
 }
 template <int dim>
-void ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                      Vector<double> &result) const
+void
+ExactSolution<dim>::vector_value(const Point<dim> &p,
+                                 Vector<double> &result) const
 {
   Assert(dim >= 2, ExcNotImplemented());
   result(0) = cos(numbers::PI*p(0))*sin(numbers::PI*p(1)) + bc_constant;
@@ -156,9 +171,10 @@ void ExactSolution<dim>::vector_value(const Point<dim> &p,
 
 }
 template <int dim>
-void ExactSolution<dim>::value_list (const std::vector<Point<dim> > &points,
-                                     std::vector<double> &values,
-                                     const unsigned int component) const
+void
+ExactSolution<dim>::value_list (const std::vector<Point<dim> > &points,
+                                std::vector<double> &values,
+                                const unsigned int component) const
 {
   Assert (values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
   AssertIndexRange(component, dim);
@@ -175,8 +191,9 @@ void ExactSolution<dim>::value_list (const std::vector<Point<dim> > &points,
     }
 }
 template <int dim>
-void ExactSolution<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                            std::vector<Vector<double> >   &values) const
+void
+ExactSolution<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                       std::vector<Vector<double> >   &values) const
 {
   Assert (dim >= 2, ExcNotImplemented());
   Assert (values.size() == points.size(), ExcDimensionMismatch(values.size(), points.size()));
@@ -197,8 +214,9 @@ RightHandSide<dim>::RightHandSide () :
 {}
 template <int dim>
 inline
-void RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                       Vector<double>   &values) const
+void
+RightHandSide<dim>::vector_value (const Point<dim> &p,
+                                  Vector<double>   &values) const
 {
   Assert (values.size() == dim, ExcDimensionMismatch (values.size(), dim));
   Assert (dim >= 2, ExcNotImplemented());
@@ -208,8 +226,9 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
   values(1) = -(2*numbers::PI*numbers::PI + 1)*sin(numbers::PI*p(0))*cos(numbers::PI*p(1)) + bc_constant;
 }
 template <int dim>
-void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                            std::vector<Vector<double> >   &value_list) const
+void
+RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                       std::vector<Vector<double> >   &value_list) const
 {
   Assert (value_list.size() == points.size(), ExcDimensionMismatch (value_list.size(), points.size()));
   const unsigned int n_points = points.size();
@@ -236,7 +255,8 @@ MaxwellProblem<dim>::~MaxwellProblem ()
 }
 
 template <int dim>
-double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> &B) const
+double
+MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> &B) const
 {
   double return_val = 0;
   for (unsigned int k = 0; k < dim; k++)
@@ -247,7 +267,8 @@ double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> 
 }
 
 template <int dim>
-double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Vector<double> &B) const
+double
+MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Vector<double> &B) const
 {
   double return_val = 0;
   for (unsigned int k = 0; k < dim; k++)
@@ -258,7 +279,8 @@ double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Vector<double>
 }
 
 template <int dim>
-void MaxwellProblem<dim>::setup_system ()
+void
+MaxwellProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
   solution.reinit (dof_handler.n_dofs());
@@ -279,7 +301,8 @@ void MaxwellProblem<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 template <int dim>
-void MaxwellProblem<dim>::assemble_system ()
+void
+MaxwellProblem<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(quad_order);
   FEValues<dim> fe_values (fe, quadrature_formula,
@@ -341,7 +364,8 @@ void MaxwellProblem<dim>::assemble_system ()
     }
 }
 template <int dim>
-void MaxwellProblem<dim>::solve ()
+void
+MaxwellProblem<dim>::solve ()
 {
   /* CG:
     SolverControl           solver_control (1000, 1e-8);
@@ -361,7 +385,8 @@ void MaxwellProblem<dim>::solve ()
 
 }
 template <int dim>
-void MaxwellProblem<dim>::process_solution(const unsigned int cycle)
+void
+MaxwellProblem<dim>::process_solution(const unsigned int cycle)
 {
   const ExactSolution<dim> exact_solution;
   Vector<double> diff_per_cell(triangulation.n_active_cells());
@@ -376,7 +401,8 @@ void MaxwellProblem<dim>::process_solution(const unsigned int cycle)
 }
 
 template <int dim>
-void MaxwellProblem<dim>::run ()
+void
+MaxwellProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -397,7 +423,8 @@ void MaxwellProblem<dim>::run ()
   convergence_table.write_text(deallog.get_file_stream());
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

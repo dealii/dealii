@@ -52,7 +52,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // create a mesh like this (viewed
   // from top, if in 3d):
@@ -109,7 +110,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile(logname);
   logfile.precision (7);

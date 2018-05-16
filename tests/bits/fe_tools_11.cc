@@ -26,7 +26,8 @@
 
 
 template <int dim>
-std::string modify_name (const std::string &name)
+std::string
+modify_name (const std::string &name)
 {
   std::string new_name = name;
   std::string dim_name = std::string("<");

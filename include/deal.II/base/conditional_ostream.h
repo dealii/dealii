@@ -96,17 +96,20 @@ public:
    * active (true) or non-active (false). An object of this class prints to
    * <tt>cout</tt> if and only if its condition is active.
    */
-  void set_condition (const bool active);
+  void
+  set_condition (const bool active);
 
   /**
    * Return the condition of the object.
    */
-  bool is_active() const;
+  bool
+  is_active() const;
 
   /**
    * Return a reference to the stream currently in use.
    */
-  std::ostream &get_stream () const;
+  std::ostream &
+  get_stream () const;
 
   /**
    * Output a constant something through this stream. This function must be @p

@@ -23,14 +23,16 @@
 
 using namespace dealii;
 
-void check(const std::string &input, const std::string &expected)
+void
+check(const std::string &input, const std::string &expected)
 {
   AssertThrow(Utilities::trim(input) == expected, ExcInternalError());
 }
 
 
 
-void test ()
+void
+test ()
 {
   check("\r\nHello World\r\n\r", "Hello World");
   check("", "");
@@ -46,7 +48,8 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -51,7 +51,8 @@ test_block_list(const parallel::distributed::Triangulation<dim> &tr, const Finit
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

@@ -114,7 +114,8 @@ public:
   /**
    * Destructor. Declared in order to make it virtual.
    */
-  virtual ~MatrixOut () override = default;
+  virtual
+  ~MatrixOut () override = default;
 
   /**
    * Generate a list of patches from the given matrix and use the given string
@@ -134,9 +135,10 @@ public:
    * <tt>n()</tt>, which return the number of rows and columns, respectively.
    */
   template <class Matrix>
-  void build_patches (const Matrix      &matrix,
-                      const std::string &name,
-                      const Options      options = Options(false, 1, false));
+  void
+  build_patches (const Matrix      &matrix,
+                 const std::string &name,
+                 const Options      options = Options(false, 1, false));
 
 private:
 
@@ -169,7 +171,8 @@ private:
    * Virtual function through which the names of data sets are obtained by the
    * output functions of the base class.
    */
-  virtual std::vector<std::string> get_dataset_names () const override;
+  virtual std::vector<std::string>
+  get_dataset_names () const override;
 
   /**
    * Get the value of the matrix at gridpoint <tt>(i,j)</tt>. Depending on the
@@ -179,10 +182,11 @@ private:
    * matrix entries is taken.
    */
   template <class Matrix>
-  static double get_gridpoint_value (const Matrix       &matrix,
-                                     const size_type     i,
-                                     const size_type     j,
-                                     const Options      &options);
+  static double
+  get_gridpoint_value (const Matrix       &matrix,
+                       const size_type     i,
+                       const size_type     j,
+                       const Options      &options);
 };
 
 
@@ -199,9 +203,10 @@ namespace internal
        * Return the element with given indices of a sparse matrix.
        */
       template <typename number>
-      double get_element (const dealii::SparseMatrix<number> &matrix,
-                          const types::global_dof_index             i,
-                          const types::global_dof_index             j)
+      double
+      get_element (const dealii::SparseMatrix<number> &matrix,
+                   const types::global_dof_index             i,
+                   const types::global_dof_index             j)
       {
         return matrix.el(i,j);
       }
@@ -212,9 +217,10 @@ namespace internal
        * Return the element with given indices of a block sparse matrix.
        */
       template <typename number>
-      double get_element (const dealii::BlockSparseMatrix<number> &matrix,
-                          const types::global_dof_index                  i,
-                          const types::global_dof_index                  j)
+      double
+      get_element (const dealii::BlockSparseMatrix<number> &matrix,
+                   const types::global_dof_index                  i,
+                   const types::global_dof_index                  j)
       {
         return matrix.el(i,j);
       }
@@ -225,9 +231,10 @@ namespace internal
        * Return the element with given indices of a Trilinos sparse matrix.
        */
       inline
-      double get_element (const TrilinosWrappers::SparseMatrix &matrix,
-                          const types::global_dof_index             i,
-                          const types::global_dof_index             j)
+      double
+      get_element (const TrilinosWrappers::SparseMatrix &matrix,
+                   const types::global_dof_index             i,
+                   const types::global_dof_index             j)
       {
         return matrix.el(i,j);
       }
@@ -239,9 +246,10 @@ namespace internal
        * matrix.
        */
       inline
-      double get_element (const TrilinosWrappers::BlockSparseMatrix &matrix,
-                          const types::global_dof_index                  i,
-                          const types::global_dof_index                  j)
+      double
+      get_element (const TrilinosWrappers::BlockSparseMatrix &matrix,
+                   const types::global_dof_index                  i,
+                   const types::global_dof_index                  j)
       {
         return matrix.el(i,j);
       }
@@ -261,9 +269,10 @@ namespace internal
        * <tt>operator()</tt> on the matrix.
        */
       template <class Matrix>
-      double get_element (const Matrix       &matrix,
-                          const types::global_dof_index     i,
-                          const types::global_dof_index     j)
+      double
+      get_element (const Matrix       &matrix,
+                   const types::global_dof_index     i,
+                   const types::global_dof_index     j)
       {
         return matrix(i,j);
       }

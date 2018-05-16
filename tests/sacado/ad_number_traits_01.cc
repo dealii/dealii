@@ -29,7 +29,8 @@
 using namespace dealii;
 namespace AD = Differentiation::AD;
 
-int main ()
+int
+main ()
 {
   initlog();
 

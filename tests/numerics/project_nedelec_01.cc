@@ -21,7 +21,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   if (dim > 1)
     // only p=1 implemented at present

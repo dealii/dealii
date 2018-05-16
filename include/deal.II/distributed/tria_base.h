@@ -56,17 +56,20 @@ namespace parallel
     /**
      * Destructor.
      */
-    virtual ~Triangulation () override;
+    virtual
+    ~Triangulation () override;
 
     /**
      * Return MPI communicator used by this triangulation.
      */
-    virtual MPI_Comm get_communicator () const;
+    virtual MPI_Comm
+    get_communicator () const;
 
     /**
      * Implementation of the same function as in the base class.
      */
-    virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria) override;
+    virtual void
+    copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria) override;
 
     /**
      * Return the number of active cells owned by each of the MPI processes
@@ -96,19 +99,22 @@ namespace parallel
      * and
      * @ref GlossGhostCell).
      */
-    unsigned int n_locally_owned_active_cells () const;
+    unsigned int
+    n_locally_owned_active_cells () const;
 
     /**
      * Return the sum over all processors of the number of active cells owned
      * by each processor. This equals the overall number of active cells in
      * the triangulation.
      */
-    virtual types::global_dof_index n_global_active_cells () const override;
+    virtual types::global_dof_index
+    n_global_active_cells () const override;
 
     /**
      * Return the local memory consumption in bytes.
      */
-    virtual std::size_t memory_consumption () const override;
+    virtual std::size_t
+    memory_consumption () const override;
 
 
     /**
@@ -118,7 +124,8 @@ namespace parallel
      * the domain that are not very refined, but if other processors store
      * cells in more deeply refined parts of the domain.
      */
-    virtual unsigned int n_global_levels () const override;
+    virtual unsigned int
+    n_global_levels () const override;
 
     /**
      * Return the subdomain id of those cells that are owned by the current
@@ -126,7 +133,8 @@ namespace parallel
      * subdomain id are either owned by another processor or have children
      * that only exist on other processors.
      */
-    types::subdomain_id locally_owned_subdomain () const override;
+    types::subdomain_id
+    locally_owned_subdomain () const override;
 
     /**
      * Return a set of MPI ranks of the processors that have at least one
@@ -218,12 +226,14 @@ namespace parallel
     /**
      * Update the number_cache variable after mesh creation or refinement.
      */
-    virtual void update_number_cache ();
+    virtual void
+    update_number_cache ();
 
     /**
      * Store MPI ranks of level ghost owners of this processor on all levels.
      */
-    void fill_level_ghost_owners ();
+    void
+    fill_level_ghost_owners ();
   };
 
 } // namespace parallel

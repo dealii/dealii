@@ -97,14 +97,16 @@ namespace
       char result;
     } base64_encodestate;
 
-    void base64_init_encodestate(base64_encodestate *state_in)
+    void
+    base64_init_encodestate(base64_encodestate *state_in)
     {
       state_in->step = step_A;
       state_in->result = 0;
     }
 
     inline
-    char base64_encode_value(char value_in)
+    char
+    base64_encode_value(char value_in)
     {
       static const char *encoding
         = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -112,10 +114,11 @@ namespace
       return encoding[(int)value_in];
     }
 
-    int base64_encode_block(const char *plaintext_in,
-                            int length_in,
-                            char *code_out,
-                            base64_encodestate *state_in)
+    int
+    base64_encode_block(const char *plaintext_in,
+                        int length_in,
+                        char *code_out,
+                        base64_encodestate *state_in)
     {
       const char *plainchar = plaintext_in;
       const char *const plaintextend = plaintext_in + length_in;
@@ -177,7 +180,8 @@ namespace
       return codechar - code_out;
     }
 
-    int base64_encode_blockend(char *code_out, base64_encodestate *state_in)
+    int
+    base64_encode_blockend(char *code_out, base64_encodestate *state_in)
     {
       char *codechar = code_out;
 
@@ -233,7 +237,8 @@ namespace
    * Convert between the enum specified inside VtkFlags and the preprocessor
    * constant defined by zlib.
    */
-  int get_zlib_compression_level(const DataOutBase::VtkFlags::ZlibCompressionLevel level)
+  int
+  get_zlib_compression_level(const DataOutBase::VtkFlags::ZlibCompressionLevel level)
   {
     switch (level)
       {
@@ -258,9 +263,10 @@ namespace
    * written to the given stream.
    */
   template <typename T>
-  void write_compressed_block (const std::vector<T>        &data,
-                               const DataOutBase::VtkFlags &flags,
-                               std::ostream                &output_stream)
+  void
+  write_compressed_block (const std::vector<T>        &data,
+                          const DataOutBase::VtkFlags &flags,
+                          std::ostream                &output_stream)
   {
     if (data.size() != 0)
       {
@@ -344,10 +350,12 @@ namespace DataOutBase
       /**
        * Comparison operator for sorting.
        */
-      bool operator < (const SvgCell &) const;
+      bool
+      operator < (const SvgCell &) const;
     };
 
-    bool SvgCell::operator < (const SvgCell &e) const
+    bool
+    SvgCell::operator < (const SvgCell &e) const
     {
       // note the "wrong" order in
       // which we sort the elements
@@ -386,7 +394,8 @@ namespace DataOutBase
       /**
        * Comparison operator for sorting.
        */
-      bool operator < (const EpsCell2d &) const;
+      bool
+      operator < (const EpsCell2d &) const;
     };
 
 
@@ -632,10 +641,11 @@ namespace DataOutBase
 
 
 
-  void DataOutFilter::write_data_set(const std::string &name,
-                                     const unsigned int dimension,
-                                     const unsigned int set_num,
-                                     const Table<2,double> &data_vectors)
+  void
+  DataOutFilter::write_data_set(const std::string &name,
+                                const unsigned int dimension,
+                                const unsigned int set_num,
+                                const Table<2,double> &data_vectors)
   {
     unsigned int new_dim;
 
@@ -827,8 +837,9 @@ namespace
      * function.
      */
     template <int dim>
-    void write_point (const unsigned int,
-                      const Point<dim> &)
+    void
+    write_point (const unsigned int,
+                 const Point<dim> &)
     {
       Assert (false, ExcMessage ("The derived class you are using needs to "
                                  "reimplement this function if you want to call "
@@ -840,7 +851,8 @@ namespace
      * implementation does nothing; derived classes that do not require any
      * action do not need to reimplement this.
      */
-    void flush_points () {}
+    void
+    flush_points () {}
 
     /**
      * Write dim-dimensional cell with first vertex at number start and further
@@ -848,11 +860,12 @@ namespace
      * ignored. All inheriting classes should implement this function.
      */
     template <int dim>
-    void write_cell (const unsigned int /*index*/,
-                     const unsigned int /*start*/,
-                     const unsigned int /*x_offset*/,
-                     const unsigned int /*y_offset*/,
-                     const unsigned int /*z_offset*/)
+    void
+    write_cell (const unsigned int /*index*/,
+                const unsigned int /*start*/,
+                const unsigned int /*x_offset*/,
+                const unsigned int /*y_offset*/,
+                const unsigned int /*z_offset*/)
     {
       Assert (false, ExcMessage ("The derived class you are using needs to "
                                  "reimplement this function if you want to call "
@@ -865,14 +878,16 @@ namespace
      * implementation does nothing; derived classes that do not require any
      * action do not need to reimplement this.
      */
-    void flush_cells () {}
+    void
+    flush_cells () {}
 
     /**
      * Forwarding of an output stream. This function is usually only
      * reimplemented if inheriting classes use zlib.
      */
     template <typename T>
-    std::ostream &operator<< (const T &t)
+    std::ostream &
+    operator<< (const T &t)
     {
       stream << t;
       return stream;
@@ -912,8 +927,9 @@ namespace
               const DataOutBase::DXFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
     /**
      * The order of vertices for
@@ -926,11 +942,12 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
 
     /**
      * Write a complete set of
@@ -943,8 +960,9 @@ namespace
      * this number to be printed.
      */
     template <typename data>
-    void write_dataset (const unsigned int       index,
-                        const std::vector<data> &values);
+    void
+    write_dataset (const unsigned int       index,
+                   const std::vector<data> &values);
   };
 
   /**
@@ -960,8 +978,9 @@ namespace
                const DataOutBase::GmvFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
     /**
      * The order of vertices for
@@ -974,11 +993,12 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
   };
 
   /**
@@ -994,8 +1014,9 @@ namespace
                    const DataOutBase::TecplotFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
     /**
      * The order of vertices for
@@ -1008,11 +1029,12 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
   };
 
   /**
@@ -1028,8 +1050,9 @@ namespace
                const DataOutBase::UcdFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
     /**
      * The additional offset 1 is
@@ -1046,11 +1069,12 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
 
     /**
      * Write a complete set of
@@ -1063,8 +1087,9 @@ namespace
      * this number to be printed.
      */
     template <typename data>
-    void write_dataset (const unsigned int       index,
-                        const std::vector<data> &values);
+    void
+    write_dataset (const unsigned int       index,
+                   const std::vector<data> &values);
   };
 
   /**
@@ -1080,8 +1105,9 @@ namespace
                const DataOutBase::VtkFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
     /**
      * The order of vertices for
@@ -1094,11 +1120,12 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
   };
 
 
@@ -1109,10 +1136,12 @@ namespace
                const DataOutBase::VtkFlags &flags);
 
     template <int dim>
-    void write_point (const unsigned int index,
-                      const Point<dim> &);
+    void
+    write_point (const unsigned int index,
+                 const Point<dim> &);
 
-    void flush_points ();
+    void
+    flush_points ();
 
     /**
      * The order of vertices for
@@ -1125,16 +1154,19 @@ namespace
      * </ol>
      */
     template <int dim>
-    void write_cell (const unsigned int index,
-                     const unsigned int start,
-                     const unsigned int x_offset,
-                     const unsigned int y_offset,
-                     const unsigned int z_offset);
+    void
+    write_cell (const unsigned int index,
+                const unsigned int start,
+                const unsigned int x_offset,
+                const unsigned int y_offset,
+                const unsigned int z_offset);
 
-    void flush_cells ();
+    void
+    flush_cells ();
 
     template <typename T>
-    std::ostream &operator<< (const T &);
+    std::ostream &
+    operator<< (const T &);
 
     /**
      * Forwarding of output stream.
@@ -1148,7 +1180,8 @@ namespace
      * element.
      */
     template <typename T>
-    std::ostream &operator<< (const std::vector<T> &);
+    std::ostream &
+    operator<< (const std::vector<T> &);
 
   private:
     /**
@@ -1871,7 +1904,8 @@ namespace DataOutBase
   {}
 
 
-  void DataOutFilterFlags::declare_parameters (ParameterHandler &prm)
+  void
+  DataOutFilterFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Filter duplicate vertices", "false",
                        Patterns::Bool(),
@@ -1904,7 +1938,8 @@ namespace DataOutBase
 
 
 
-  void DataOutFilterFlags::parse_parameters (const ParameterHandler &prm)
+  void
+  DataOutFilterFlags::parse_parameters (const ParameterHandler &prm)
   {
     filter_duplicate_vertices = prm.get_bool ("Filter duplicate vertices");
     xdmf_hdf5_output = prm.get_bool ("XDMF HDF5 output");
@@ -1925,7 +1960,8 @@ namespace DataOutBase
   {}
 
 
-  void DXFlags::declare_parameters (ParameterHandler &prm)
+  void
+  DXFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Write neighbors", "true",
                        Patterns::Bool(),
@@ -1951,7 +1987,8 @@ namespace DataOutBase
 
 
 
-  void DXFlags::parse_parameters (const ParameterHandler &prm)
+  void
+  DXFlags::parse_parameters (const ParameterHandler &prm)
   {
     write_neighbors = prm.get_bool ("Write neighbors");
 //TODO:[GK] Read the new  parameters
@@ -1959,7 +1996,8 @@ namespace DataOutBase
 
 
 
-  void UcdFlags::declare_parameters (ParameterHandler &prm)
+  void
+  UcdFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Write preamble", "true",
                        Patterns::Bool(),
@@ -1971,7 +2009,8 @@ namespace DataOutBase
 
 
 
-  void UcdFlags::parse_parameters (const ParameterHandler &prm)
+  void
+  UcdFlags::parse_parameters (const ParameterHandler &prm)
   {
     write_preamble = prm.get_bool ("Write preamble");
   }
@@ -1997,7 +2036,8 @@ namespace DataOutBase
 
 
 
-  void PovrayFlags::declare_parameters (ParameterHandler &prm)
+  void
+  PovrayFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Use smooth triangles", "false",
                        Patterns::Bool(),
@@ -2015,7 +2055,8 @@ namespace DataOutBase
 
 
 
-  void PovrayFlags::parse_parameters (const ParameterHandler &prm)
+  void
+  PovrayFlags::parse_parameters (const ParameterHandler &prm)
   {
     smooth        = prm.get_bool ("Use smooth triangles");
     bicubic_patch = prm.get_bool ("Use bicubic patches");
@@ -2167,7 +2208,8 @@ namespace DataOutBase
 
 
 
-  bool EpsCell2d::operator < (const EpsCell2d &e) const
+  bool
+  EpsCell2d::operator < (const EpsCell2d &e) const
   {
     // note the "wrong" order in
     // which we sort the elements
@@ -2176,7 +2218,8 @@ namespace DataOutBase
 
 
 
-  void EpsFlags::declare_parameters (ParameterHandler &prm)
+  void
+  EpsFlags::declare_parameters (ParameterHandler &prm)
   {
     prm.declare_entry ("Index of vector for height", "0",
                        Patterns::Integer(),
@@ -2229,7 +2272,8 @@ namespace DataOutBase
 
 
 
-  void EpsFlags::parse_parameters (const ParameterHandler &prm)
+  void
+  EpsFlags::parse_parameters (const ParameterHandler &prm)
   {
     height_vector = prm.get_integer ("Index of vector for height");
     color_vector  = prm.get_integer ("Index of vector for color");
@@ -2543,7 +2587,8 @@ namespace DataOutBase
      * camera_horizontal, necessary for the correct alignment of the
      * later images), and the focus of the camera (float camera_focus).
      */
-    Point<2> svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus)
+    Point<2>
+    svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus)
     {
       Point<3> camera_vertical;
       camera_vertical[0] = camera_horizontal[1] * camera_direction[2] - camera_horizontal[2] * camera_direction[1];
@@ -2576,7 +2621,8 @@ namespace DataOutBase
      * Function to compute the gradient parameters for a triangle with
      * given values for the vertices.
      */
-    Point<6> svg_get_gradient_parameters(Point<3> points[])
+    Point<6>
+    svg_get_gradient_parameters(Point<3> points[])
     {
       Point<3> v_min, v_max, v_inter;
 
@@ -2795,11 +2841,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
-                  const std::vector<std::string>          &data_names,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                  const UcdFlags                          &flags,
-                  std::ostream                            &out)
+  void
+  write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
+             const std::vector<std::string>          &data_names,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+             const UcdFlags                          &flags,
+             std::ostream                            &out)
   {
     // Note that while in theory dim==0 should be implemented,
     // this is not tested, therefore currently not allowed.
@@ -2890,11 +2937,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
-                 const std::vector<std::string>          &data_names,
-                 const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                 const DXFlags                           &flags,
-                 std::ostream                            &out)
+  void
+  write_dx (const std::vector<Patch<dim,spacedim> > &patches,
+            const std::vector<std::string>          &data_names,
+            const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+            const DXFlags                           &flags,
+            std::ostream                            &out)
   {
     // Point output is currently not implemented.
     AssertThrow (dim>0, ExcNotImplemented());
@@ -3191,11 +3239,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
-                      const std::vector<std::string>          &data_names,
-                      const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                      const GnuplotFlags                      &flags,
-                      std::ostream                            &out)
+  void
+  write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
+                 const std::vector<std::string>          &data_names,
+                 const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+                 const GnuplotFlags                      &flags,
+                 std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
 
@@ -3405,11 +3454,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
-                     const std::vector<std::string>          &data_names,
-                     const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                     const PovrayFlags                       &flags,
-                     std::ostream                            &out)
+  void
+  write_povray (const std::vector<Patch<dim,spacedim> > &patches,
+                const std::vector<std::string>          &data_names,
+                const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+                const PovrayFlags                       &flags,
+                std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
 
@@ -3762,11 +3812,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
-                  const std::vector<std::string>          &/*data_names*/,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                  const EpsFlags                          &/*flags*/,
-                  std::ostream                            &/*out*/)
+  void
+  write_eps (const std::vector<Patch<dim,spacedim> > &/*patches*/,
+             const std::vector<std::string>          &/*data_names*/,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+             const EpsFlags                          &/*flags*/,
+             std::ostream                            &/*out*/)
   {
     // not implemented, see the documentation of the function
     AssertThrow (dim==2, ExcNotImplemented());
@@ -3774,11 +3825,12 @@ namespace DataOutBase
 
 
   template <int spacedim>
-  void write_eps (const std::vector<Patch<2,spacedim> > &patches,
-                  const std::vector<std::string>          &/*data_names*/,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                  const EpsFlags                          &flags,
-                  std::ostream                            &out)
+  void
+  write_eps (const std::vector<Patch<2,spacedim> > &patches,
+             const std::vector<std::string>          &/*data_names*/,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+             const EpsFlags                          &flags,
+             std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
 
@@ -4133,11 +4185,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
-                  const std::vector<std::string>          &data_names,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                  const GmvFlags                          &flags,
-                  std::ostream                            &out)
+  void
+  write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
+             const std::vector<std::string>          &data_names,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+             const GmvFlags                          &flags,
+             std::ostream                            &out)
   {
     // The gmv format does not support cells that only consist
     // of a single point. It does support the output of point data
@@ -4294,11 +4347,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
-                      const std::vector<std::string>          &data_names,
-                      const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                      const TecplotFlags                      &flags,
-                      std::ostream                            &out)
+  void
+  write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
+                 const std::vector<std::string>          &data_names,
+                 const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+                 const TecplotFlags                      &flags,
+                 std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
 
@@ -4482,8 +4536,10 @@ namespace DataOutBase
                     const unsigned int n_cells = 0,
                     const unsigned int n_vert = 0);
       ~TecplotMacros();
-      float &nd(const unsigned int i, const unsigned int j);
-      int    &cd(const unsigned int i, const unsigned int j);
+      float &
+      nd(const unsigned int i, const unsigned int j);
+      int    &
+      cd(const unsigned int i, const unsigned int j);
       std::vector<float> nodalData;
       std::vector<int>   connData;
     private:
@@ -4518,8 +4574,9 @@ namespace DataOutBase
 
 
     inline
-    float &TecplotMacros::nd (const unsigned int i,
-                              const unsigned int j)
+    float &
+    TecplotMacros::nd (const unsigned int i,
+                       const unsigned int j)
     {
       return nodalData[i*n_nodes+j];
     }
@@ -4527,8 +4584,9 @@ namespace DataOutBase
 
 
     inline
-    int &TecplotMacros::cd (const unsigned int i,
-                            const unsigned int j)
+    int &
+    TecplotMacros::cd (const unsigned int i,
+                       const unsigned int j)
     {
       return connData[i+j*n_vert];
     }
@@ -4542,11 +4600,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
-                             const std::vector<std::string>          &data_names,
-                             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                             const TecplotFlags                      &flags,
-                             std::ostream                            &out)
+  void
+  write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
+                        const std::vector<std::string>          &data_names,
+                        const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                        const TecplotFlags                      &flags,
+                        std::ostream                            &out)
   {
     // The FEBLOCK or FEPOINT formats of tecplot only allows full elements
     // (e.g. triangles), not single points. Other tecplot format allow
@@ -5157,8 +5216,9 @@ namespace DataOutBase
   }
 
 
-  void write_vtu_header (std::ostream &out,
-                         const VtkFlags &flags)
+  void
+  write_vtu_header (std::ostream &out,
+                    const VtkFlags &flags)
   {
     AssertThrow (out, ExcIO());
     out << "<?xml version=\"1.0\" ?> \n";
@@ -5191,7 +5251,8 @@ namespace DataOutBase
 
 
 
-  void write_vtu_footer (std::ostream &out)
+  void
+  write_vtu_footer (std::ostream &out)
   {
     AssertThrow (out, ExcIO());
     out << " </UnstructuredGrid>\n";
@@ -5217,11 +5278,12 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_vtu_main (const std::vector<Patch<dim,spacedim> > &patches,
-                       const std::vector<std::string>          &data_names,
-                       const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                       const VtkFlags                          &flags,
-                       std::ostream                            &out)
+  void
+  write_vtu_main (const std::vector<Patch<dim,spacedim> > &patches,
+                  const std::vector<std::string>          &data_names,
+                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                  const VtkFlags                          &flags,
+                  std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
 
@@ -5785,21 +5847,23 @@ namespace DataOutBase
 
 
   template <int dim, int spacedim>
-  void write_svg (const std::vector<Patch<dim,spacedim> > &,
-                  const std::vector<std::string> &,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
-                  const SvgFlags &,
-                  std::ostream &)
+  void
+  write_svg (const std::vector<Patch<dim,spacedim> > &,
+             const std::vector<std::string> &,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+             const SvgFlags &,
+             std::ostream &)
   {
     Assert (false, ExcNotImplemented());
   }
 
   template <int spacedim>
-  void write_svg (const std::vector<Patch<2,spacedim> > &patches,
-                  const std::vector<std::string> &/*data_names*/,
-                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
-                  const SvgFlags &flags,
-                  std::ostream &out)
+  void
+  write_svg (const std::vector<Patch<2,spacedim> > &patches,
+             const std::vector<std::string> &/*data_names*/,
+             const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &/*vector_data_ranges*/,
+             const SvgFlags &flags,
+             std::ostream &out)
   {
     const int dim = 2;
     const unsigned int height = flags.height;
@@ -6503,7 +6567,8 @@ DataOutInterface<dim,spacedim>::DataOutInterface ()
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const
 {
   DataOutBase::write_dx (get_patches(), get_dataset_names(),
                          get_vector_data_ranges(),
@@ -6513,7 +6578,8 @@ void DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const
 {
   DataOutBase::write_ucd (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6523,7 +6589,8 @@ void DataOutInterface<dim,spacedim>::write_ucd (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_gnuplot (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_gnuplot (std::ostream &out) const
 {
   DataOutBase::write_gnuplot (get_patches(), get_dataset_names(),
                               get_vector_data_ranges(),
@@ -6533,7 +6600,8 @@ void DataOutInterface<dim,spacedim>::write_gnuplot (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_povray (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_povray (std::ostream &out) const
 {
   DataOutBase::write_povray (get_patches(), get_dataset_names(),
                              get_vector_data_ranges(),
@@ -6543,7 +6611,8 @@ void DataOutInterface<dim,spacedim>::write_povray (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_eps (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_eps (std::ostream &out) const
 {
   DataOutBase::write_eps (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6553,7 +6622,8 @@ void DataOutInterface<dim,spacedim>::write_eps (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_gmv (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_gmv (std::ostream &out) const
 {
   DataOutBase::write_gmv (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6563,7 +6633,8 @@ void DataOutInterface<dim,spacedim>::write_gmv (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_tecplot (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_tecplot (std::ostream &out) const
 {
   DataOutBase::write_tecplot (get_patches(), get_dataset_names(),
                               get_vector_data_ranges(),
@@ -6573,7 +6644,8 @@ void DataOutInterface<dim,spacedim>::write_tecplot (std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_tecplot_binary (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_tecplot_binary (std::ostream &out) const
 {
   DataOutBase::write_tecplot_binary (get_patches(), get_dataset_names(),
                                      get_vector_data_ranges(),
@@ -6583,7 +6655,8 @@ void DataOutInterface<dim,spacedim>::write_tecplot_binary (std::ostream &out) co
 
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
 {
   DataOutBase::write_vtk (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6591,7 +6664,8 @@ void DataOutInterface<dim,spacedim>::write_vtk (std::ostream &out) const
 }
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_vtu (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_vtu (std::ostream &out) const
 {
   DataOutBase::write_vtu (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6599,7 +6673,8 @@ void DataOutInterface<dim,spacedim>::write_vtu (std::ostream &out) const
 }
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_svg (std::ostream &out) const
+void
+DataOutInterface<dim,spacedim>::write_svg (std::ostream &out) const
 {
   DataOutBase::write_svg (get_patches(), get_dataset_names(),
                           get_vector_data_ranges(),
@@ -6607,7 +6682,8 @@ void DataOutInterface<dim,spacedim>::write_svg (std::ostream &out) const
 }
 
 template <int dim, int spacedim>
-void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename, MPI_Comm comm) const
+void
+DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename, MPI_Comm comm) const
 {
 #ifndef DEAL_II_WITH_MPI
   //without MPI fall back to the normal way to write a vtu file:
@@ -6834,10 +6910,11 @@ write_filtered_data (DataOutBase::DataOutFilter &filtered_data) const
 }
 
 template <int dim, int spacedim>
-void DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &patches,
-                                       const std::vector<std::string>          &data_names,
-                                       const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                                       DataOutBase::DataOutFilter &filtered_data)
+void
+DataOutBase::write_filtered_data (const std::vector<Patch<dim,spacedim> > &patches,
+                                  const std::vector<std::string>          &data_names,
+                                  const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                                  DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
   unsigned int    n_node, n_cell;
@@ -6952,10 +7029,11 @@ write_hdf5_parallel (const DataOutBase::DataOutFilter &data_filter,
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
-                                       const DataOutBase::DataOutFilter &data_filter,
-                                       const std::string &filename,
-                                       MPI_Comm comm)
+void
+DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &patches,
+                                  const DataOutBase::DataOutFilter &data_filter,
+                                  const std::string &filename,
+                                  MPI_Comm comm)
 {
   write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
 }
@@ -6963,12 +7041,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &/*patches*/,
-                                       const DataOutBase::DataOutFilter &data_filter,
-                                       const bool write_mesh_file,
-                                       const std::string &mesh_filename,
-                                       const std::string &solution_filename,
-                                       MPI_Comm comm)
+void
+DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &/*patches*/,
+                                  const DataOutBase::DataOutFilter &data_filter,
+                                  const bool write_mesh_file,
+                                  const std::string &mesh_filename,
+                                  const std::string &solution_filename,
+                                  MPI_Comm comm)
 {
 
   AssertThrow(spacedim>=2,
@@ -7839,7 +7918,8 @@ namespace
   /**
    * Small function to create indentation for XML file.
    */
-  std::string indent(const unsigned int indent_level)
+  std::string
+  indent(const unsigned int indent_level)
   {
     std::string res = "";
     for (unsigned int i=0; i<indent_level; ++i)
@@ -7850,7 +7930,8 @@ namespace
 
 
 
-std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
+std::string
+XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
 {
   if (!valid)
     return "";

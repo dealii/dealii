@@ -58,8 +58,10 @@ namespace Step
     Problem ();
     ~Problem ();
 
-    void refine_mesh ();
-    void setup_system ();
+    void
+    refine_mesh ();
+    void
+    setup_system ();
 
   private:
     Triangulation<dim>    triangulation;
@@ -99,7 +101,8 @@ namespace Step
   }
 
   template <int dim>
-  void Problem<dim>::setup_system ()
+  void
+  Problem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe_collection);
 
@@ -127,7 +130,8 @@ namespace Step
 
 
   template <int dim>
-  void Problem<dim>::refine_mesh ()
+  void
+  Problem<dim>::refine_mesh ()
   {
     dof_handler.begin_active()->set_refine_flag();
     triangulation.execute_coarsening_and_refinement ();
@@ -136,7 +140,8 @@ namespace Step
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   using namespace dealii;
   using namespace Step;
@@ -152,7 +157,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

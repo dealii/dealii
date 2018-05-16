@@ -21,7 +21,8 @@
 
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   DerivativeForm<1,dim,spacedim,std::complex<double> > dF;
   double dF_norm_sqr = 0;
@@ -50,7 +51,8 @@ void test()
   Assert (std::fabs(ddF.norm()-std::sqrt(ddF_norm_sqr)) < 1e-12, ExcInternalError());
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<1,1>();

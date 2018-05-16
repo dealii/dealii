@@ -26,8 +26,9 @@
 // Output data on repetitions of the unit hypercube
 
 template <int dim, int spacedim>
-void check(DataOutBase::TecplotFlags flags,
-           std::ostream &out)
+void
+check(DataOutBase::TecplotFlags flags,
+      std::ostream &out)
 {
   const unsigned int np = 4;
 
@@ -47,7 +48,8 @@ void check(DataOutBase::TecplotFlags flags,
 
 
 template <int dim, int spacedim>
-void check_all()
+void
+check_all()
 {
   char name[100];
   DataOutBase::TecplotFlags flags;
@@ -60,7 +62,8 @@ void check_all()
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
   check_all<1,1>();

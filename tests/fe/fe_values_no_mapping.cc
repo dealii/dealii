@@ -32,8 +32,9 @@ class F :  public Function<dim>
 public:
   F (const unsigned int q) : q(q) {}
 
-  virtual double value (const Point<dim> &p,
-                        const unsigned int) const
+  virtual double
+  value (const Point<dim> &p,
+         const unsigned int) const
   {
     double v=0;
     for (unsigned int d=0; d<dim; ++d)
@@ -47,7 +48,8 @@ private:
 };
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria);

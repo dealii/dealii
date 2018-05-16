@@ -73,7 +73,8 @@ write_vtk (const hp::DoFHandler<dim> &dof_handler, const std::string filename)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim = " << dim << std::endl;
 
@@ -135,7 +136,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

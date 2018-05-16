@@ -530,9 +530,10 @@ namespace internal
   {
     // steps through all children and adds the active cells recursively
     template <typename InIterator>
-    void resolve_cell (const InIterator   &cell,
-                       std::vector<std::pair<unsigned int,unsigned int> > &cell_its,
-                       const unsigned int  subdomain_id)
+    void
+    resolve_cell (const InIterator   &cell,
+                  std::vector<std::pair<unsigned int,unsigned int> > &cell_its,
+                  const unsigned int  subdomain_id)
     {
       if (cell->has_children())
         for (unsigned int child=0; child<cell->n_children(); ++child)
@@ -1472,7 +1473,8 @@ void MatrixFree<dim,Number>::initialize_indices
 
 
 template <int dim, typename Number>
-void MatrixFree<dim,Number>::clear()
+void
+MatrixFree<dim,Number>::clear()
 {
   dof_info.clear();
   mapping_info.clear();
@@ -1493,10 +1495,11 @@ namespace internal
 {
   namespace
   {
-    void fill_index_subrange(const unsigned int begin,
-                             const unsigned int end,
-                             const std::vector<std::pair<unsigned int,unsigned int> > &cell_level_index,
-                             tbb::concurrent_unordered_map<std::pair<unsigned int,unsigned int>, unsigned int> &map)
+    void
+    fill_index_subrange(const unsigned int begin,
+                        const unsigned int end,
+                        const std::vector<std::pair<unsigned int,unsigned int> > &cell_level_index,
+                        tbb::concurrent_unordered_map<std::pair<unsigned int,unsigned int>, unsigned int> &map)
     {
       if (cell_level_index.empty())
         return;
@@ -1509,12 +1512,13 @@ namespace internal
     }
 
     template <int dim>
-    void fill_connectivity_subrange(const unsigned int begin,
-                                    const unsigned int end,
-                                    const dealii::Triangulation<dim> &tria,
-                                    const std::vector<std::pair<unsigned int,unsigned int> > &cell_level_index,
-                                    const tbb::concurrent_unordered_map<std::pair<unsigned int,unsigned int>, unsigned int> &map,
-                                    DynamicSparsityPattern &connectivity_direct)
+    void
+    fill_connectivity_subrange(const unsigned int begin,
+                               const unsigned int end,
+                               const dealii::Triangulation<dim> &tria,
+                               const std::vector<std::pair<unsigned int,unsigned int> > &cell_level_index,
+                               const tbb::concurrent_unordered_map<std::pair<unsigned int,unsigned int>, unsigned int> &map,
+                               DynamicSparsityPattern &connectivity_direct)
     {
       std::vector<types::global_dof_index> new_indices;
       for (unsigned int cell=begin; cell<end; ++cell)
@@ -1548,10 +1552,11 @@ namespace internal
         }
     }
 
-    void fill_connectivity_indirect_subrange(const unsigned int begin,
-                                             const unsigned int end,
-                                             const DynamicSparsityPattern &connectivity_direct,
-                                             DynamicSparsityPattern &connectivity)
+    void
+    fill_connectivity_indirect_subrange(const unsigned int begin,
+                                        const unsigned int end,
+                                        const DynamicSparsityPattern &connectivity_direct,
+                                        DynamicSparsityPattern &connectivity)
     {
       std::vector<types::global_dof_index> new_indices;
       for (unsigned int block=begin; block<end; ++block)
@@ -1627,7 +1632,8 @@ void MatrixFree<dim,Number>::make_connectivity_graph_faces
 
 
 template <int dim, typename Number>
-std::size_t MatrixFree<dim,Number>::memory_consumption () const
+std::size_t
+MatrixFree<dim,Number>::memory_consumption () const
 {
   std::size_t memory = MemoryConsumption::memory_consumption (dof_info);
   memory += MemoryConsumption::memory_consumption (cell_level_index);
@@ -1645,7 +1651,8 @@ std::size_t MatrixFree<dim,Number>::memory_consumption () const
 
 template <int dim, typename Number>
 template <typename StreamType>
-void MatrixFree<dim,Number>::print_memory_consumption (StreamType &out) const
+void
+MatrixFree<dim,Number>::print_memory_consumption (StreamType &out) const
 {
   out << "  Memory matrix-free data total: --> ";
   task_info.print_memory_statistics (out, memory_consumption());
@@ -1681,7 +1688,8 @@ void MatrixFree<dim,Number>::print_memory_consumption (StreamType &out) const
 
 
 template <int dim, typename Number>
-void MatrixFree<dim,Number>::print (std::ostream &out) const
+void
+MatrixFree<dim,Number>::print (std::ostream &out) const
 {
   // print indices local to global
   for (unsigned int no=0; no<dof_info.size(); ++no)

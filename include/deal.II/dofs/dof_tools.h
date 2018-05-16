@@ -1900,11 +1900,12 @@ namespace DoFTools
    * the exclusion of components or of dofs on the boundary.
    */
   template <int dim, int spacedim>
-  void make_cell_patches(SparsityPattern         &block_list,
-                         const DoFHandler<dim,spacedim> &dof_handler,
-                         const unsigned int       level,
-                         const std::vector<bool> &selected_dofs = std::vector<bool>(),
-                         const types::global_dof_index  offset        = 0);
+  void
+  make_cell_patches(SparsityPattern         &block_list,
+                    const DoFHandler<dim,spacedim> &dof_handler,
+                    const unsigned int       level,
+                    const std::vector<bool> &selected_dofs = std::vector<bool>(),
+                    const types::global_dof_index  offset        = 0);
 
   /**
    * Create an incidence matrix that for every vertex on a given level of a
@@ -2029,11 +2030,12 @@ namespace DoFTools
    * <tt>interior_dofs_only</tt> is false.
    */
   template <typename DoFHandlerType>
-  void make_child_patches(SparsityPattern      &block_list,
-                          const DoFHandlerType &dof_handler,
-                          const unsigned int    level,
-                          const bool            interior_dofs_only,
-                          const bool            boundary_dofs = false);
+  void
+  make_child_patches(SparsityPattern      &block_list,
+                     const DoFHandlerType &dof_handler,
+                     const unsigned int    level,
+                     const bool            interior_dofs_only,
+                     const bool            boundary_dofs = false);
 
   /**
    * Create a block list with only a single patch, which in turn contains all
@@ -2055,10 +2057,11 @@ namespace DoFTools
    * the boundary of the domain.
    */
   template <typename DoFHandlerType>
-  void make_single_patch(SparsityPattern      &block_list,
-                         const DoFHandlerType &dof_handler,
-                         const unsigned int    level,
-                         const bool            interior_dofs_only = false);
+  void
+  make_single_patch(SparsityPattern      &block_list,
+                    const DoFHandlerType &dof_handler,
+                    const unsigned int    level,
+                    const bool            interior_dofs_only = false);
 
   /**
    * @}
@@ -2577,8 +2580,9 @@ namespace DoFTools
    * @relatesalso DoFTools
    */
   inline
-  Coupling operator |= (Coupling &c1,
-                        const Coupling c2)
+  Coupling
+  operator |= (Coupling &c1,
+               const Coupling c2)
   {
     if (c2 == always)
       c1 = always;
@@ -2594,8 +2598,9 @@ namespace DoFTools
    * @relatesalso DoFTools
    */
   inline
-  Coupling operator | (const Coupling c1,
-                       const Coupling c2)
+  Coupling
+  operator | (const Coupling c1,
+              const Coupling c2)
   {
     if (c1 == always || c2 == always)
       return always;

@@ -92,7 +92,8 @@ output_vector (const VectorType &v)
 
 
 template <int dim>
-Triangulation<dim> *make_tria ()
+Triangulation<dim> *
+make_tria ()
 {
   Triangulation<dim> *tria = new Triangulation<dim>();
   GridGenerator::hyper_cube(*tria, 0., 1.);
@@ -108,8 +109,9 @@ Triangulation<dim> *make_tria ()
 
 
 template <int dim>
-DoFHandler<dim> *make_dof_handler (const Triangulation<dim> &tria,
-                                   const FiniteElement<dim> &fe)
+DoFHandler<dim> *
+make_dof_handler (const Triangulation<dim> &tria,
+                  const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> *dof_handler = new DoFHandler<dim>(tria);
   dof_handler->distribute_dofs (fe);
@@ -119,8 +121,9 @@ DoFHandler<dim> *make_dof_handler (const Triangulation<dim> &tria,
 
 
 template <int dim>
-hp::DoFHandler<dim> *make_hp_dof_handler (const Triangulation<dim> &tria,
-                                          const hp::FECollection<dim> &fe)
+hp::DoFHandler<dim> *
+make_hp_dof_handler (const Triangulation<dim> &tria,
+                     const hp::FECollection<dim> &fe)
 {
   hp::DoFHandler<dim> *dof_handler = new hp::DoFHandler<dim>(tria);
   dof_handler->distribute_dofs (fe);

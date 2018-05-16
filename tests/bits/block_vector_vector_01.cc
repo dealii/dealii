@@ -25,7 +25,8 @@
 #include <deal.II/lac/block_vector.h>
 
 
-void test (BlockVector<double> &v)
+void
+test (BlockVector<double> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i+1.;
@@ -38,7 +39,8 @@ void test (BlockVector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

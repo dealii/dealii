@@ -74,7 +74,8 @@ public:
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Pull back the given point from the Euclidean space. Will return the polar
@@ -118,7 +119,8 @@ private:
    * Helper function which returns the periodicity associated with this
    * coordinate system, according to dim, chartdim, and spacedim.
    */
-  static Tensor<1,spacedim> get_periodicity();
+  static Tensor<1,spacedim>
+  get_periodicity();
 };
 
 
@@ -228,7 +230,8 @@ public:
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Given any two points in space, first project them on the surface
@@ -401,7 +404,8 @@ public:
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Compute the Cartesian coordinates for a point given in cylindrical
@@ -522,12 +526,14 @@ public:
   /**
    * If needed, we delete the pointers we own.
    */
-  virtual ~FunctionManifold() override;
+  virtual
+  ~FunctionManifold() override;
 
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Given a point in the @p chartdim coordinate system, uses the
@@ -662,7 +668,8 @@ public:
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim, 3> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim, 3> >
+  clone() const override;
 
   /**
    * Pull back operation.
@@ -834,12 +841,14 @@ public:
   /**
    * Destructor.
    */
-  virtual ~TransfiniteInterpolationManifold() override;
+  virtual
+  ~TransfiniteInterpolationManifold() override;
 
   /**
    * Make a clone of this Manifold object.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim,spacedim> >
+  clone() const override;
 
   /**
    * Initializes the manifold with a coarse mesh. The prerequisite for using
@@ -853,7 +862,8 @@ public:
    * @note The triangulation used to construct the manifold must not be
    * destroyed during the usage of this object.
    */
-  void initialize (const Triangulation<dim,spacedim> &triangulation);
+  void
+  initialize (const Triangulation<dim,spacedim> &triangulation);
 
   /**
    * Return the point which shall become the new vertex surrounded by the

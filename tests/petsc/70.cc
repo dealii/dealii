@@ -21,7 +21,8 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

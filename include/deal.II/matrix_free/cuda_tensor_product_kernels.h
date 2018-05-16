@@ -67,61 +67,70 @@ namespace CUDAWrappers
       static constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
       static constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
-      __device__ EvaluatorTensorProduct();
+      __device__
+      EvaluatorTensorProduct();
 
       /**
        * Evaluate the values of a finite element function at the quadrature
        * points.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void values(const Number *in, Number *out) const;
+      __device__ void
+      values(const Number *in, Number *out) const;
 
       /**
        * Evaluate the gradient of a finite element function at the quadrature
        * points for a given @p direction.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void gradients(const Number *in, Number *out) const;
+      __device__ void
+      gradients(const Number *in, Number *out) const;
 
       /**
        * Helper function for values() and gradients().
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void apply(Number shape_data[],
-                            const Number *in,
-                            Number       *out) const;
+      __device__ void
+      apply(Number shape_data[],
+            const Number *in,
+            Number       *out) const;
 
       /**
        * Evaluate the finite element function at the quadrature points.
        */
-      __device__ void value_at_quad_pts(Number *u);
+      __device__ void
+      value_at_quad_pts(Number *u);
 
       /**
        * Helper function for integrate(). Integrate the finite element function.
        */
-      __device__ void integrate_value(Number *u);
+      __device__ void
+      integrate_value(Number *u);
 
       /**
        * Evaluate the gradients of the finite element function at the quadrature
        * points.
        */
-      __device__ void gradient_at_quad_pts(const Number *const u,
-                                           Number *grad_u[dim]);
+      __device__ void
+      gradient_at_quad_pts(const Number *const u,
+                           Number *grad_u[dim]);
 
       /**
        * Helper function for integrate(). Integrate the gradients of the finite
        * element function.
        */
       template <bool add>
-      __device__ void integrate_gradient(Number *u,
-                                         Number *grad_u[dim]);
+      __device__ void
+      integrate_gradient(Number *u,
+                         Number *grad_u[dim]);
     };
 
 
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     __device__ EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::EvaluatorTensorProduct()
+               n_q_points_1d, Number>::
+               EvaluatorTensorProduct()
     {}
 
 
@@ -129,8 +138,9 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::values(const Number *in,
-                                              Number *out) const
+               n_q_points_1d, Number>::
+               values(const Number *in,
+                      Number *out) const
     {
       apply<direction, dof_to_quad, add, in_place>(global_shape_values, in, out);
     }
@@ -140,8 +150,9 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::gradients(const Number *in,
-                                                 Number *out) const
+               n_q_points_1d, Number>::
+               gradients(const Number *in,
+                         Number *out) const
     {
       apply<direction, dof_to_quad, add, in_place>(global_shape_gradients, in, out);
     }
@@ -151,9 +162,10 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::apply(Number shape_data[],
-                                             const Number *in,
-                                             Number       *out) const
+               n_q_points_1d, Number>::
+               apply(Number shape_data[],
+                     const Number *in,
+                     Number       *out) const
     {
       const unsigned int i = (dim == 1) ? 0 : threadIdx.x%n_q_points_1d;
       const unsigned int j = (dim == 3) ? threadIdx.y : 0;
@@ -195,7 +207,8 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     inline
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::value_at_quad_pts(Number *u)
+               n_q_points_1d, Number>::
+               value_at_quad_pts(Number *u)
     {
       switch (dim)
         {
@@ -235,7 +248,8 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     inline
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::integrate_value(Number *u)
+               n_q_points_1d, Number>::
+               integrate_value(Number *u)
     {
       switch (dim)
         {
@@ -275,7 +289,8 @@ namespace CUDAWrappers
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     inline
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::gradient_at_quad_pts(
+               n_q_points_1d, Number>::
+               gradient_at_quad_pts(
                  const Number *const u,
                  Number *grad_u[dim])
     {
@@ -332,7 +347,8 @@ namespace CUDAWrappers
     template <bool add>
     inline
     __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::integrate_gradient(
+               n_q_points_1d, Number>::
+               integrate_gradient(
                  Number *u,
                  Number *grad_u[dim])
     {

@@ -68,10 +68,11 @@ public:
   /**
    * Call-back function for the iterative method.
    */
-  virtual void print_vectors (const unsigned int step,
-                              const VectorType   &x,
-                              const VectorType   &r,
-                              const VectorType   &d) const;
+  virtual void
+  print_vectors (const unsigned int step,
+                 const VectorType   &x,
+                 const VectorType   &r,
+                 const VectorType   &d) const;
 private:
   /**
    * Output object.

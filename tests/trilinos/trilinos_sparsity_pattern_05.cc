@@ -25,7 +25,8 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-void test ()
+void
+test ()
 {
   const int dim = 2;
   //setup system
@@ -61,7 +62,8 @@ void test ()
   sp.print(deallog.get_file_stream());
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   MPILogInitAll log;

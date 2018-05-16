@@ -32,11 +32,13 @@
 #include <algorithm>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << dim << 'D' << std::endl;
   Triangulation<dim> tria;
@@ -95,7 +97,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);

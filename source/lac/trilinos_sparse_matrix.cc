@@ -43,50 +43,58 @@ namespace TrilinosWrappers
   namespace internal
   {
     template <typename VectorType>
-    double *begin(VectorType &V)
+    double *
+    begin(VectorType &V)
     {
       return V.begin();
     }
 
     template <typename VectorType>
-    const double *begin(const VectorType &V)
+    const double *
+    begin(const VectorType &V)
     {
       return V.begin();
     }
 
     template <typename VectorType>
-    double *end(VectorType &V)
+    double *
+    end(VectorType &V)
     {
       return V.end();
     }
 
     template <typename VectorType>
-    const double *end(const VectorType &V)
+    const double *
+    end(const VectorType &V)
     {
       return V.end();
     }
 
 #ifdef DEAL_II_WITH_MPI
     template <>
-    double *begin(LinearAlgebra::EpetraWrappers::Vector &V)
+    double *
+    begin(LinearAlgebra::EpetraWrappers::Vector &V)
     {
       return V.trilinos_vector()[0];
     }
 
     template <>
-    const double *begin(const LinearAlgebra::EpetraWrappers::Vector &V)
+    const double *
+    begin(const LinearAlgebra::EpetraWrappers::Vector &V)
     {
       return V.trilinos_vector()[0];
     }
 
     template <>
-    double *end(LinearAlgebra::EpetraWrappers::Vector &V)
+    double *
+    end(LinearAlgebra::EpetraWrappers::Vector &V)
     {
       return V.trilinos_vector()[0]+V.trilinos_vector().MyLength();
     }
 
     template <>
-    const double *end(const LinearAlgebra::EpetraWrappers::Vector &V)
+    const double *
+    end(const LinearAlgebra::EpetraWrappers::Vector &V)
     {
       return V.trilinos_vector()[0]+V.trilinos_vector().MyLength();
     }
@@ -573,7 +581,8 @@ namespace TrilinosWrappers
         Epetra_CrsGraph(Copy, row_map, n_entries_per_row, true)
       {};
 
-      void SetIndicesAreGlobal()
+      void
+      SetIndicesAreGlobal()
       {
         this->Epetra_CrsGraph::SetIndicesAreGlobal(true);
       }
@@ -769,11 +778,12 @@ namespace TrilinosWrappers
 
   template <typename SparsityPatternType>
   inline
-  void SparseMatrix::reinit (const IndexSet            &row_parallel_partitioning,
-                             const IndexSet            &col_parallel_partitioning,
-                             const SparsityPatternType &sparsity_pattern,
-                             const MPI_Comm            &communicator,
-                             const bool                 exchange_data)
+  void
+  SparseMatrix::reinit (const IndexSet            &row_parallel_partitioning,
+                        const IndexSet            &col_parallel_partitioning,
+                        const SparsityPatternType &sparsity_pattern,
+                        const MPI_Comm            &communicator,
+                        const bool                 exchange_data)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);
@@ -793,10 +803,11 @@ namespace TrilinosWrappers
 
   template <typename SparsityPatternType>
   inline
-  void SparseMatrix::reinit (const Epetra_Map          &row_map,
-                             const Epetra_Map          &col_map,
-                             const SparsityPatternType &sparsity_pattern,
-                             const bool                 exchange_data)
+  void
+  SparseMatrix::reinit (const Epetra_Map          &row_map,
+                        const Epetra_Map          &col_map,
+                        const SparsityPatternType &sparsity_pattern,
+                        const bool                 exchange_data)
   {
     reinit_matrix (row_map, col_map, sparsity_pattern, exchange_data,
                    column_space_map, matrix, nonlocal_matrix,
@@ -860,13 +871,14 @@ namespace TrilinosWrappers
 
   template <typename number>
   inline
-  void SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
-                             const IndexSet      &col_parallel_partitioning,
-                             const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-                             const MPI_Comm      &communicator,
-                             const double         drop_tolerance,
-                             const bool           copy_values,
-                             const ::dealii::SparsityPattern *use_this_sparsity)
+  void
+  SparseMatrix::reinit (const IndexSet      &row_parallel_partitioning,
+                        const IndexSet      &col_parallel_partitioning,
+                        const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
+                        const MPI_Comm      &communicator,
+                        const double         drop_tolerance,
+                        const bool           copy_values,
+                        const ::dealii::SparsityPattern *use_this_sparsity)
   {
     if (copy_values == false)
       {
@@ -1891,16 +1903,18 @@ namespace TrilinosWrappers
     {
       template <typename VectorType>
       inline
-      void check_vector_map_equality(const Epetra_CrsMatrix &,
-                                     const VectorType &,
-                                     const VectorType &)
+      void
+      check_vector_map_equality(const Epetra_CrsMatrix &,
+                                const VectorType &,
+                                const VectorType &)
       {
       }
 
       inline
-      void check_vector_map_equality(const Epetra_CrsMatrix              &m,
-                                     const TrilinosWrappers::MPI::Vector &in,
-                                     const TrilinosWrappers::MPI::Vector &out)
+      void
+      check_vector_map_equality(const Epetra_CrsMatrix              &m,
+                                const TrilinosWrappers::MPI::Vector &in,
+                                const TrilinosWrappers::MPI::Vector &out)
       {
         Assert (in.vector_partitioner().SameAs(m.DomainMap()) == true,
                 ExcMessage ("Column map of matrix does not fit with vector map!"));
@@ -2053,11 +2067,12 @@ namespace TrilinosWrappers
   {
     typedef dealii::types::global_dof_index size_type;
 
-    void perform_mmult (const SparseMatrix &inputleft,
-                        const SparseMatrix &inputright,
-                        SparseMatrix       &result,
-                        const MPI::Vector  &V,
-                        const bool          transpose_left)
+    void
+    perform_mmult (const SparseMatrix &inputleft,
+                   const SparseMatrix &inputright,
+                   SparseMatrix       &result,
+                   const MPI::Vector  &V,
+                   const bool          transpose_left)
     {
 #ifdef DEAL_II_WITH_64BIT_INDICES
       Assert(false,ExcNotImplemented())
@@ -2374,7 +2389,8 @@ namespace TrilinosWrappers
 
 
 
-  MPI_Comm SparseMatrix::get_mpi_communicator () const
+  MPI_Comm
+  SparseMatrix::get_mpi_communicator () const
   {
 
 #ifdef DEAL_II_WITH_MPI
@@ -2933,8 +2949,9 @@ namespace TrilinosWrappers
 
 
 
-      TrilinosPayload operator+(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op)
+      TrilinosPayload
+      operator+(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op)
       {
         typedef typename TrilinosPayload::Domain Domain;
         typedef typename TrilinosPayload::Range  Range;
@@ -3104,8 +3121,9 @@ namespace TrilinosWrappers
 
 
 
-      TrilinosPayload operator*(const TrilinosPayload &first_op,
-                                const TrilinosPayload &second_op)
+      TrilinosPayload
+      operator*(const TrilinosPayload &first_op,
+                const TrilinosPayload &second_op)
       {
         typedef typename TrilinosPayload::Domain Domain;
         typedef typename TrilinosPayload::Range  Range;

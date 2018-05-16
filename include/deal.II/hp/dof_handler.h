@@ -275,7 +275,8 @@ namespace hp
     /**
      * Destructor.
      */
-    virtual ~DoFHandler () override;
+    virtual
+    ~DoFHandler () override;
 
     /**
      * Copy operator. DoFHandler objects are large and expensive.
@@ -283,14 +284,16 @@ namespace hp
      * rather deliberately constructed. As a consequence, this operator
      * is explicitly removed from the interface of this class.
      */
-    DoFHandler &operator = (const DoFHandler &) = delete;
+    DoFHandler &
+    operator = (const DoFHandler &) = delete;
 
     /**
      * Assign a Triangulation and a FECollection to the DoFHandler and compute
      * the distribution of degrees of freedom over the mesh.
      */
-    void initialize(const Triangulation<dim,spacedim> &tria,
-                    const hp::FECollection<dim,spacedim> &fe);
+    void
+    initialize(const Triangulation<dim,spacedim> &tria,
+               const hp::FECollection<dim,spacedim> &fe);
 
     /**
      * Go through the triangulation and "distribute" the degrees of
@@ -317,27 +320,31 @@ namespace hp
      * @note In accordance with dealii::DoFHandler::distribute_dofs(),
      * this function also makes a copy of the object given as argument.
      */
-    virtual void distribute_dofs (const hp::FECollection<dim,spacedim> &fe);
+    virtual void
+    distribute_dofs (const hp::FECollection<dim,spacedim> &fe);
 
     /**
      * Go through the triangulation and set the active FE indices of all
      * active cells to the values given in @p active_fe_indices.
      */
-    void set_active_fe_indices (const std::vector<unsigned int> &active_fe_indices);
+    void
+    set_active_fe_indices (const std::vector<unsigned int> &active_fe_indices);
 
     /**
      * Go through the triangulation and store the active FE indices of all
      * active cells to the vector @p active_fe_indices. This vector is
      * resized, if necessary.
      */
-    void get_active_fe_indices (std::vector<unsigned int> &active_fe_indices) const;
+    void
+    get_active_fe_indices (std::vector<unsigned int> &active_fe_indices) const;
 
     /**
      * Clear all data of this object and especially delete the lock this
      * object has to the finite element used the last time when @p
      * distribute_dofs was called.
      */
-    virtual void clear ();
+    virtual void
+    clear ();
 
     /**
      * Renumber degrees of freedom based on a list of new DoF indices for each
@@ -391,7 +398,8 @@ namespace hp
      *   DoFRenumbering::component_wise() will, in general, not yield
      *   contiguous locally owned DoF indices.
      */
-    void renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
+    void
+    renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
 
     /**
      * Return the maximum number of degrees of freedom a degree of freedom in
@@ -410,7 +418,8 @@ namespace hp
      * module on
      * @ref Sparsity.
      */
-    unsigned int max_couplings_between_dofs () const;
+    unsigned int
+    max_couplings_between_dofs () const;
 
     /**
      * Return the number of degrees of freedom located on the boundary another
@@ -424,7 +433,8 @@ namespace hp
      * dynamic sparsity pattern classes instead (see
      * @ref Sparsity).
      */
-    unsigned int max_couplings_between_boundary_dofs () const;
+    unsigned int
+    max_couplings_between_boundary_dofs () const;
 
     /**
      * @name Cell iterator functions
@@ -433,7 +443,8 @@ namespace hp
     /**
      * Iterator to the first used cell on level @p level.
      */
-    cell_iterator        begin       (const unsigned int level = 0) const;
+    cell_iterator
+    begin       (const unsigned int level = 0) const;
 
     /**
      * Iterator to the first active cell on level @p level. If the given level
@@ -447,26 +458,30 @@ namespace hp
      * have zero iterations, as may be expected if there are no active cells
      * on this level.
      */
-    active_cell_iterator begin_active(const unsigned int level = 0) const;
+    active_cell_iterator
+    begin_active(const unsigned int level = 0) const;
 
     /**
      * Iterator past the end; this iterator serves for comparisons of
      * iterators with past-the-end or before-the-beginning states.
      */
-    cell_iterator        end () const;
+    cell_iterator
+    end () const;
 
     /**
      * Return an iterator which is the first iterator not on level. If @p
      * level is the last level, then this returns <tt>end()</tt>.
      */
-    cell_iterator        end (const unsigned int level) const;
+    cell_iterator
+    end (const unsigned int level) const;
 
     /**
      * Return an active iterator which is the first active iterator not on the
      * given level. If @p level is the last level, then this returns
      * <tt>end()</tt>.
      */
-    active_cell_iterator end_active (const unsigned int level) const;
+    active_cell_iterator
+    end_active (const unsigned int level) const;
 
     /**
      * @name Cell iterator functions returning ranges of iterators
@@ -482,7 +497,8 @@ namespace hp
      *
      * @ingroup CPP11
      */
-    IteratorRange<cell_iterator>        cell_iterators () const;
+    IteratorRange<cell_iterator>
+    cell_iterators () const;
 
     /**
      * Return an iterator range that contains all active cells that make up
@@ -525,7 +541,8 @@ namespace hp
      *
      * @ingroup CPP11
      */
-    IteratorRange<active_cell_iterator> active_cell_iterators () const;
+    IteratorRange<active_cell_iterator>
+    active_cell_iterators () const;
 
     /**
      * Return an iterator range that contains all cells (active or not) that
@@ -542,7 +559,8 @@ namespace hp
      *
      * @ingroup CPP11
      */
-    IteratorRange<cell_iterator>        cell_iterators_on_level (const unsigned int level) const;
+    IteratorRange<cell_iterator>
+    cell_iterators_on_level (const unsigned int level) const;
 
     /**
      * Return an iterator range that contains all active cells that make up
@@ -559,7 +577,8 @@ namespace hp
      *
      * @ingroup CPP11
      */
-    IteratorRange<active_cell_iterator> active_cell_iterators_on_level (const unsigned int level) const;
+    IteratorRange<active_cell_iterator>
+    active_cell_iterators_on_level (const unsigned int level) const;
 
     /*
      * @}
@@ -592,19 +611,22 @@ namespace hp
      * also, of course, equals the number of shape functions that span this
      * space.
      */
-    types::global_dof_index n_dofs () const;
+    types::global_dof_index
+    n_dofs () const;
 
     /**
      * The number of multilevel dofs on given level. Since hp::DoFHandler does
      * not support multilevel methods yet, this function throws an exception
      * ExcNotImplemented() independent of its argument.
      */
-    types::global_dof_index n_dofs(const unsigned int level) const;
+    types::global_dof_index
+    n_dofs(const unsigned int level) const;
 
     /**
      * Return the number of degrees of freedom located on the boundary.
      */
-    types::global_dof_index n_boundary_dofs () const;
+    types::global_dof_index
+    n_boundary_dofs () const;
 
     /**
      * Return the number of degrees of freedom located on those parts of the
@@ -647,14 +669,16 @@ namespace hp
      * processor and cells owned by other processors may be theirs, and
      * degrees of freedom on ghost cells are also not necessarily included.
      */
-    types::global_dof_index n_locally_owned_dofs() const;
+    types::global_dof_index
+    n_locally_owned_dofs() const;
 
     /**
      * Return an IndexSet describing the set of locally owned DoFs as a subset
      * of 0..n_dofs(). The number of elements of this set equals
      * n_locally_owned_dofs().
      */
-    const IndexSet &locally_owned_dofs() const;
+    const IndexSet &
+    locally_owned_dofs() const;
 
     /**
      * Return a vector that stores the locally owned DoFs of each processor.
@@ -697,7 +721,8 @@ namespace hp
      * multilevel methods yet, this function throws an exception
      * ExcNotImplemented() independent of its argument.
      */
-    const IndexSet &locally_owned_mg_dofs(const unsigned int level) const;
+    const IndexSet &
+    locally_owned_mg_dofs(const unsigned int level) const;
 
     /**
      * Return a vector that stores the locally owned level DoFs of each
@@ -715,7 +740,8 @@ namespace hp
      * @deprecated Use get_fe_collection() instead.
      */
     DEAL_II_DEPRECATED
-    const hp::FECollection<dim,spacedim> &get_fe () const;
+    const hp::FECollection<dim,spacedim> &
+    get_fe () const;
 
     /**
      * Return a constant reference to the indexth finite element object that is
@@ -728,13 +754,15 @@ namespace hp
      * Return a constant reference to the set of finite element objects that
      * are used by this @p DoFHandler.
      */
-    const hp::FECollection<dim,spacedim> &get_fe_collection () const;
+    const hp::FECollection<dim,spacedim> &
+    get_fe_collection () const;
 
     /**
      * Return a constant reference to the triangulation underlying this
      * object.
      */
-    const Triangulation<dim,spacedim> &get_triangulation () const;
+    const Triangulation<dim,spacedim> &
+    get_triangulation () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -744,21 +772,24 @@ namespace hp
      * accessed through a pointers to this base class, although the actual
      * object might be a derived class.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t
+    memory_consumption () const;
 
     /**
      * Write the data of this object to a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void save(Archive &ar, const unsigned int version) const;
+    void
+    save(Archive &ar, const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void load(Archive &ar, const unsigned int version);
+    void
+    load(Archive &ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -840,25 +871,29 @@ namespace hp
     /**
      * Setup policy and listeners based on the underlying Triangulation.
      */
-    void setup_policy_and_listeners ();
+    void
+    setup_policy_and_listeners ();
 
     /**
      * Free all used memory.
      */
-    void clear_space ();
+    void
+    clear_space ();
 
     template <int structdim>
-    types::global_dof_index get_dof_index (const unsigned int obj_level,
-                                           const unsigned int obj_index,
-                                           const unsigned int fe_index,
-                                           const unsigned int local_index) const;
+    types::global_dof_index
+    get_dof_index (const unsigned int obj_level,
+                   const unsigned int obj_index,
+                   const unsigned int fe_index,
+                   const unsigned int local_index) const;
 
     template <int structdim>
-    void set_dof_index (const unsigned int obj_level,
-                        const unsigned int obj_index,
-                        const unsigned int fe_index,
-                        const unsigned int local_index,
-                        const types::global_dof_index global_index) const;
+    void
+    set_dof_index (const unsigned int obj_level,
+                   const unsigned int obj_index,
+                   const unsigned int fe_index,
+                   const unsigned int local_index,
+                   const types::global_dof_index global_index) const;
 
     /**
      * Create default tables for the active_fe_indices in the
@@ -867,7 +902,8 @@ namespace hp
      * method is called before refinement and before distribute_dofs is
      * called. It ensures each cell has a valid active_fe_index.
      */
-    void create_active_fe_table ();
+    void
+    create_active_fe_table ();
 
     /**
      * Functions that will be triggered through signals whenever the
@@ -876,8 +912,10 @@ namespace hp
      * Here they are used to administrate the active_fe_fields during the
      * spatial refinement.
      */
-    void pre_refinement_action ();
-    void post_refinement_action ();
+    void
+    pre_refinement_action ();
+    void
+    post_refinement_action ();
 
     /**
      * Space to store the DoF numbers for the different levels. Analogous to
@@ -1002,7 +1040,8 @@ namespace internal
    * Defined in source/dofs/dof_handler.cc.
    */
   template <int dim, int spacedim>
-  std::string policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> &policy);
+  std::string
+  policy_to_string(const dealii::internal::DoFHandlerImplementation::Policy::PolicyBase<dim,spacedim> &policy);
 }
 
 
@@ -1010,7 +1049,8 @@ namespace hp
 {
   template <int dim, int spacedim>
   template <class Archive>
-  void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
+  void
+  DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
   {
     ar &vertex_dofs;
     ar &vertex_dof_offsets;
@@ -1052,7 +1092,8 @@ namespace hp
 
   template <int dim, int spacedim>
   template <class Archive>
-  void DoFHandler<dim, spacedim>::load(Archive &ar, unsigned int)
+  void
+  DoFHandler<dim, spacedim>::load(Archive &ar, unsigned int)
   {
     ar &vertex_dofs;
     ar &vertex_dof_offsets;

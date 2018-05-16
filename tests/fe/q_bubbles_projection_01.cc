@@ -26,7 +26,8 @@ char logname[] = "output";
 #include "deformed_projection.h"
 
 
-void test ()
+void
+test ()
 {
   FESystem<2> fe (FE_Q_Bubbles<2>(QIterated<1>(QTrapez<1>(),3)), 2);
   const std::array<unsigned int,3> min_convergence_steps = {{15,15,15}};

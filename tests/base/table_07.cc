@@ -34,8 +34,10 @@ public:
     deallog << "Move construct." << std::endl;
   }
 
-  T &operator= (const T &) = delete;
-  T &operator= (T &&)
+  T &
+  operator= (const T &) = delete;
+  T &
+  operator= (T &&)
   {
     deallog << "Move assign." << std::endl;
     return *this;
@@ -43,7 +45,8 @@ public:
 };
 
 
-int main()
+int
+main()
 {
   initlog();
   dealii::Table<2,T> table(2,2);

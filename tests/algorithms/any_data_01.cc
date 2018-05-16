@@ -21,7 +21,8 @@
 
 double d1 = 17.;
 
-void fill(AnyData &data)
+void
+fill(AnyData &data)
 {
   int i = 7;
   data.add(i, " i  7");
@@ -32,7 +33,8 @@ void fill(AnyData &data)
 }
 
 
-void extract(const AnyData &data)
+void
+extract(const AnyData &data)
 {
   // This set of tests with old functionality. Remove when deprecating
   // index access
@@ -88,7 +90,8 @@ void extract(const AnyData &data)
 
 }
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

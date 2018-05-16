@@ -31,7 +31,8 @@
 
 
 
-void test()
+void
+test()
 {
   const int dim = 2;
   Triangulation<dim> tria;
@@ -86,7 +87,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

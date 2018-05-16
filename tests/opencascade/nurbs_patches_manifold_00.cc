@@ -27,7 +27,8 @@
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main ()
 {
   initlog();
   deallog.precision(10);

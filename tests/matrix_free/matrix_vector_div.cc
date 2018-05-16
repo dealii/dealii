@@ -23,7 +23,8 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -87,8 +88,9 @@ public:
       }
   }
 
-  void vmult (VectorType &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType &dst,
+         const VectorType &src) const
   {
     AssertDimension (dst.size(), dim);
     for (unsigned int d=0; d<dim; ++d)
@@ -104,7 +106,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim>   tria;
   create_mesh (tria);
@@ -273,7 +276,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

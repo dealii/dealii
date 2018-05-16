@@ -29,7 +29,8 @@ struct X
   X(int i) : i(i) {}
   int i;
 
-  void execute ()
+  void
+  execute ()
   {
     Assert (i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
@@ -37,13 +38,15 @@ struct X
 
 private:
   X(const X &);
-  X &operator= (const X &);
+  X &
+  operator= (const X &);
 };
 
 
 
 
-void test ()
+void
+test ()
 {
   X x(42);
   Threads::Thread<void> t = Threads::new_thread (&X::execute, x);
@@ -53,7 +56,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

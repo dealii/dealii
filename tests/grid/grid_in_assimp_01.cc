@@ -19,7 +19,8 @@
 #include <deal.II/grid/grid_out.h>
 
 
-int main ()
+int
+main ()
 {
   initlog();
   Triangulation<2,3> tria;

@@ -24,7 +24,8 @@
 
 
 template <typename Number>
-void test()
+void
+test()
 {
   FullMatrix<Number> A(2, 76), B(76, 3), C(2, 3), D(3, 2), E(2, 3);
   for (unsigned int i=0; i<A.m(); ++i)
@@ -54,7 +55,8 @@ void test()
   deallog << "Difference 2: " << filter_out_small_numbers(C.l1_norm(),tolerance) << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

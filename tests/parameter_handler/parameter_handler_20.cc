@@ -21,7 +21,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *content)
+void
+check (const char *content)
 {
   deallog << "* check" << std::endl;
   ParameterHandler foo;
@@ -48,7 +49,8 @@ void check (const char *content)
     }
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -36,8 +36,9 @@
 template <int dim>
 struct ManifoldWrapper
 {
-  Manifold<dim> *operator()(const Tensor<1, dim> &direction,
-                            const Point<dim> &center ) const;
+  Manifold<dim> *
+  operator()(const Tensor<1, dim> &direction,
+             const Point<dim> &center ) const;
 };
 
 template <>
@@ -57,7 +58,8 @@ ManifoldWrapper<3>::operator()(const Tensor<1, 3> &direction,
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   Tensor<1, dim> direction;
   direction[dim-1] = 1.;
@@ -101,7 +103,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);

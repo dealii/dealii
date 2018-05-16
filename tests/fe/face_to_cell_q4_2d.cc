@@ -24,7 +24,8 @@
 #include <deal.II/fe/fe_q.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   FE_Q<dim> fe(4);
   const unsigned int dofs_per_face = fe.dofs_per_face;
@@ -48,7 +49,8 @@ void test()
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

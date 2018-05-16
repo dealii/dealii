@@ -21,7 +21,8 @@
 #include <deal.II/base/utilities.h>
 
 
-void test ()
+void
+test ()
 {
   deallog << Utilities::string_to_double (" 413 ") << std::endl;
 
@@ -38,7 +39,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

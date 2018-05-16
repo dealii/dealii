@@ -25,8 +25,9 @@
 #define PRECISION 5
 
 
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<1> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<1> &tria)
 {
   switch (case_no)
     {
@@ -42,8 +43,9 @@ void create_triangulation(const unsigned int case_no,
 }
 
 
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<2> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<2> &tria)
 {
   switch (case_no)
     {
@@ -66,8 +68,9 @@ void create_triangulation(const unsigned int case_no,
 }
 
 
-void create_triangulation(const unsigned int case_no,
-                          Triangulation<3> &tria)
+void
+create_triangulation(const unsigned int case_no,
+                     Triangulation<3> &tria)
 {
   switch (case_no)
     {
@@ -88,7 +91,8 @@ void create_triangulation(const unsigned int case_no,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   for (unsigned int case_no=0; case_no<2; ++case_no)
@@ -103,7 +107,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision (PRECISION);

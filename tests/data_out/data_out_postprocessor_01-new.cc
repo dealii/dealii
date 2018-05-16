@@ -38,7 +38,8 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
@@ -46,12 +47,16 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void solve ();
-  void output_results () const;
+  void
+  make_grid_and_dofs ();
+  void
+  solve ();
+  void
+  output_results () const;
 
   Triangulation<dim>   triangulation;
   FESystem<dim>            fe;
@@ -71,7 +76,8 @@ LaplaceProblem<dim>::LaplaceProblem ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void
+LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
   triangulation.refine_global (1);
@@ -93,8 +99,9 @@ public:
     Function<dim> (2)
   {}
 
-  double value (const Point<dim> &p,
-                const unsigned int component) const
+  double
+  value (const Point<dim> &p,
+         const unsigned int component) const
   {
     switch (component)
       {
@@ -112,7 +119,8 @@ public:
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   // dummy solve. just insert some
   // values as mentioned at the top
@@ -127,7 +135,8 @@ template <int dim>
 class MyPostprocessor : public DataPostprocessor<dim>
 {
 public:
-  virtual std::vector<std::string> get_names () const
+  virtual std::vector<std::string>
+  get_names () const
   {
     return std::vector<std::string>(1,"magnitude");
   }
@@ -141,7 +150,8 @@ public:
       (1,DataComponentInterpretation::component_is_scalar);
   }
 
-  virtual UpdateFlags get_needed_update_flags () const
+  virtual UpdateFlags
+  get_needed_update_flags () const
   {
     return update_values;
   }
@@ -166,7 +176,8 @@ public:
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results () const
+void
+LaplaceProblem<dim>::output_results () const
 {
   MyPostprocessor<dim> p;
   DataOut<dim> data_out;
@@ -179,7 +190,8 @@ void LaplaceProblem<dim>::output_results () const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   make_grid_and_dofs();
   solve ();
@@ -188,7 +200,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);

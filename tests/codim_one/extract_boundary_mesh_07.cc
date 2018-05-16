@@ -48,7 +48,8 @@ namespace Step38
   {
   public:
     Extract_Mesh_Test ();
-    void run ();
+    void
+    run ();
 
   private:
     static const unsigned int boundary_dim = spacedim-1;
@@ -76,7 +77,8 @@ namespace Step38
   {}
 
   template <int spacedim>
-  void Extract_Mesh_Test<spacedim>::run ()
+  void
+  Extract_Mesh_Test<spacedim>::run ()
   {
     GridGenerator::hyper_cube(volume_mesh_triangulation);
     std::set<types::boundary_id> boundary_ids;
@@ -104,7 +106,8 @@ namespace Step38
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

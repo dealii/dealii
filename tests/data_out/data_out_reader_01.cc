@@ -25,7 +25,8 @@
 // test DataOutReader::merge
 
 template <int dim, int spacedim>
-void check()
+void
+check()
 {
   const unsigned int np = 1;
 
@@ -69,7 +70,8 @@ void check()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

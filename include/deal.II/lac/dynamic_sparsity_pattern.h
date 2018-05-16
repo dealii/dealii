@@ -79,22 +79,26 @@ namespace DynamicSparsityPatternIterators
     /**
      * Row number of the element represented by this object.
      */
-    size_type row () const;
+    size_type
+    row () const;
 
     /**
      * Index within the current row of the element represented by this object.
      */
-    size_type index () const;
+    size_type
+    index () const;
 
     /**
      * Column number of the element represented by this object.
      */
-    size_type column () const;
+    size_type
+    column () const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Accessor &) const;
+    bool
+    operator == (const Accessor &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -103,7 +107,8 @@ namespace DynamicSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * sparsity pattern.
      */
-    bool operator < (const Accessor &) const;
+    bool
+    operator < (const Accessor &) const;
 
   protected:
     /**
@@ -133,7 +138,8 @@ namespace DynamicSparsityPatternIterators
     /**
      * Move the accessor to the next nonzero entry in the matrix.
      */
-    void advance ();
+    void
+    advance ();
 
     /**
      * Grant access to iterator class.
@@ -188,32 +194,38 @@ namespace DynamicSparsityPatternIterators
     /**
      * Prefix increment.
      */
-    Iterator &operator++ ();
+    Iterator &
+    operator++ ();
 
     /**
      * Postfix increment.
      */
-    Iterator operator++ (int);
+    Iterator
+    operator++ (int);
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor &
+    operator* () const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor *
+    operator-> () const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Iterator &) const;
+    bool
+    operator == (const Iterator &) const;
 
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const Iterator &) const;
+    bool
+    operator != (const Iterator &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -222,7 +234,8 @@ namespace DynamicSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * matrix.
      */
-    bool operator < (const Iterator &) const;
+    bool
+    operator < (const Iterator &) const;
 
     /**
      * Return the distance between the current iterator and the argument. The
@@ -230,7 +243,8 @@ namespace DynamicSparsityPatternIterators
      * current iterator to get the argument (for a positive return value), or
      * operator-- (for a negative return value).
      */
-    int operator - (const Iterator &p) const;
+    int
+    operator - (const Iterator &p) const;
 
   private:
     /**
@@ -358,7 +372,8 @@ public:
    * declared, defined and fine to be called, but the latter only for empty
    * objects.
    */
-  DynamicSparsityPattern &operator = (const DynamicSparsityPattern &);
+  DynamicSparsityPattern &
+  operator = (const DynamicSparsityPattern &);
 
   /**
    * Reallocate memory and set up data structures for a new sparsity pattern
@@ -366,50 +381,57 @@ public:
    * elements in rows of this set.  Adding elements outside of this set has no
    * effect. The default argument keeps all entries.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const IndexSet &rowset = IndexSet());
+  void
+  reinit (const size_type m,
+          const size_type n,
+          const IndexSet &rowset = IndexSet());
 
   /**
    * Since this object is kept compressed at all times anyway, this function
    * does nothing, but is declared to make the interface of this class as much
    * alike as that of the SparsityPattern class.
    */
-  void compress ();
+  void
+  compress ();
 
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the maximum number of entries per row. Note that this number may
    * change as entries are added.
    */
-  size_type max_entries_per_row () const;
+  size_type
+  max_entries_per_row () const;
 
   /**
    * Add a nonzero entry. If the entry already exists, this call does nothing.
    */
-  void add (const size_type i,
-            const size_type j);
+  void
+  add (const size_type i,
+       const size_type j);
 
   /**
    * Add several nonzero entries to the specified row. Already existing
    * entries are ignored.
    */
   template <typename ForwardIterator>
-  void add_entries (const size_type row,
-                    ForwardIterator begin,
-                    ForwardIterator end,
-                    const bool      indices_are_unique_and_sorted = false);
+  void
+  add_entries (const size_type row,
+               ForwardIterator begin,
+               ForwardIterator end,
+               const bool      indices_are_unique_and_sorted = false);
 
   /**
    * Check if a value at a certain position may be non-zero.
    */
-  bool exists (const size_type i,
-               const size_type j) const;
+  bool
+  exists (const size_type i,
+          const size_type j) const;
 
   /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the
@@ -418,22 +440,25 @@ public:
    * This function throws an exception if the sparsity pattern does not
    * represent a square matrix.
    */
-  void symmetrize ();
+  void
+  symmetrize ();
 
   /**
    * Construct and store in this object the sparsity pattern corresponding to
    * the product of @p left and @p right sparsity pattern.
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
-  void compute_mmult_pattern(const SparsityPatternTypeLeft &left,
-                             const SparsityPatternTypeRight &right);
+  void
+  compute_mmult_pattern(const SparsityPatternTypeLeft &left,
+                        const SparsityPatternTypeRight &right);
 
   /**
    * Print the sparsity pattern. The output consists of one line per row of
    * the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.
    */
-  void print (std::ostream &out) const;
+  void
+  print (std::ostream &out) const;
 
   /**
    * Print the sparsity pattern in a format that @p gnuplot understands and
@@ -448,31 +473,36 @@ public:
    * Print the sparsity pattern in gnuplot by setting the data style to dots
    * or points and use the @p plot command.
    */
-  void print_gnuplot (std::ostream &out) const;
+  void
+  print_gnuplot (std::ostream &out) const;
 
   /**
    * Return the number of rows, which equals the dimension of the image space.
    */
-  size_type n_rows () const;
+  size_type
+  n_rows () const;
 
   /**
    * Return the number of columns, which equals the dimension of the range
    * space.
    */
-  size_type n_cols () const;
+  size_type
+  n_cols () const;
 
   /**
    * Number of entries in a specific row. This function can only be called if
    * the given row is a member of the index set of rows that we want to store.
    */
-  size_type row_length (const size_type row) const;
+  size_type
+  row_length (const size_type row) const;
 
   /**
    * Access to column number field.  Return the column number of the @p
    * indexth entry in @p row.
    */
-  size_type column_number (const size_type row,
-                           const size_type index) const;
+  size_type
+  column_number (const size_type row,
+                 const size_type index) const;
 
   /**
    * @name Iterators
@@ -492,12 +522,14 @@ public:
    * that are not stored. In other words, they will look like empty rows, but
    * no exception will be generated when iterating over such rows.
    */
-  iterator begin () const;
+  iterator
+  begin () const;
 
   /**
    * Final iterator.
    */
-  iterator end () const;
+  iterator
+  end () const;
 
   /**
    * Iterator starting at the first entry of row <tt>r</tt>.
@@ -515,7 +547,8 @@ public:
    * that are not stored. In other words, they will look like empty rows, but
    * no exception will be generated when iterating over such rows.
    */
-  iterator begin (const size_type r) const;
+  iterator
+  begin (const size_type r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -525,7 +558,8 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  iterator end (const size_type r) const;
+  iterator
+  end (const size_type r) const;
 
 // @}
 
@@ -534,20 +568,23 @@ public:
    * bandwidth is the maximum of $|i-j|$ for which the index pair $(i,j)$
    * represents a nonzero entry of the matrix.
    */
-  size_type bandwidth () const;
+  size_type
+  bandwidth () const;
 
   /**
    * Return the number of nonzero elements allocated through this sparsity
    * pattern.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements () const;
 
   /**
    * Return the IndexSet that sets which rows are active on the current
    * processor. It corresponds to the IndexSet given to this class in the
    * constructor or in the reinit function.
    */
-  const IndexSet &row_index_set () const;
+  const IndexSet &
+  row_index_set () const;
 
   /**
    * return whether this object stores only those entries that have been added
@@ -560,13 +597,15 @@ public:
    * template arguments.
    */
   static
-  bool stores_only_added_elements ();
+  bool
+  stores_only_added_elements ();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  size_type memory_consumption () const;
+  size_type
+  memory_consumption () const;
 
 private:
   /**
@@ -609,20 +648,23 @@ private:
     /**
      * Add the given column number to this line.
      */
-    void add (const size_type col_num);
+    void
+    add (const size_type col_num);
 
     /**
      * Add the columns specified by the iterator range to this line.
      */
     template <typename ForwardIterator>
-    void add_entries (ForwardIterator begin,
-                      ForwardIterator end,
-                      const bool indices_are_sorted);
+    void
+    add_entries (ForwardIterator begin,
+                 ForwardIterator end,
+                 const bool indices_are_sorted);
 
     /**
      * estimates memory consumption.
      */
-    size_type memory_consumption () const;
+    size_type
+    memory_consumption () const;
   };
 
 

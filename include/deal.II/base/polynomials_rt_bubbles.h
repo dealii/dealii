@@ -101,35 +101,40 @@ public:
    * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
    * in a loop over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<Tensor<1,dim> > &values,
-                std::vector<Tensor<2,dim> > &grads,
-                std::vector<Tensor<3,dim> > &grad_grads,
-                std::vector<Tensor<4,dim> > &third_derivatives,
-                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim>            &unit_point,
+           std::vector<Tensor<1,dim> > &values,
+           std::vector<Tensor<2,dim> > &grads,
+           std::vector<Tensor<3,dim> > &grad_grads,
+           std::vector<Tensor<4,dim> > &third_derivatives,
+           std::vector<Tensor<5,dim> > &fourth_derivatives) const;
 
   /**
    * Returns the number of enhanced Raviart-Thomas polynomials.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
   /**
    * Returns the degree of the RT_bubble space, which is one less than the highest
    * polynomial degree.
    */
-  unsigned int degree () const;
+  unsigned int
+  degree () const;
 
   /**
    * Return the name of the space, which is <tt>RT_Bubbles</tt>.
    */
-  std::string name () const;
+  std::string
+  name () const;
 
   /**
    * Return the number of polynomials in the space <tt>RT_Bubbles(degree)</tt>
    * without requiring to build an object of PolynomialsRT-Bubbles. This is required
    * by the FiniteElement classes.
    */
-  static unsigned int compute_n_pols(const unsigned int degree);
+  static unsigned int
+  compute_n_pols(const unsigned int degree);
 
 private:
   /**

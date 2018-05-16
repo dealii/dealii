@@ -46,7 +46,8 @@ DEAL_II_NAMESPACE_OPEN
 
 #  if defined(__linux__) ||  defined(__sun__) || defined(__osf__) || defined(_AIX)
 
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROCESSORS_ONLN);
 }
@@ -55,7 +56,8 @@ unsigned int MultithreadInfo::get_n_cpus()
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
 // If it doesn't work please contact the mailinglist.
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   int mib[2];
   int n_cpus;
@@ -92,20 +94,23 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 //#error Detection of Processors not supported on this OS. Setting n_cpus=1 by default.
 
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return 1;
 }
 
 #  endif
 
-unsigned int MultithreadInfo::n_cores()
+unsigned int
+MultithreadInfo::n_cores()
 {
   return MultithreadInfo::n_cpus;
 }
 
 
-void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
+void
+MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
   // set the maximal number of threads to the given value as specified
   n_max_threads = max_threads;
@@ -152,7 +157,8 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 }
 
 
-unsigned int MultithreadInfo::n_threads()
+unsigned int
+MultithreadInfo::n_threads()
 {
   Assert(n_max_threads != numbers::invalid_unsigned_int, ExcInternalError());
   return n_max_threads;
@@ -161,29 +167,34 @@ unsigned int MultithreadInfo::n_threads()
 
 #else                            // not in MT mode
 
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return 1;
 }
 
-unsigned int MultithreadInfo::n_cores()
+unsigned int
+MultithreadInfo::n_cores()
 {
   return 1;
 }
 
-unsigned int MultithreadInfo::n_threads()
+unsigned int
+MultithreadInfo::n_threads()
 {
   return 1;
 }
 
-void MultithreadInfo::set_thread_limit(const unsigned int)
+void
+MultithreadInfo::set_thread_limit(const unsigned int)
 {
 }
 
 #endif
 
 
-bool MultithreadInfo::is_running_single_threaded()
+bool
+MultithreadInfo::is_running_single_threaded()
 {
   return n_threads() == 1;
 }

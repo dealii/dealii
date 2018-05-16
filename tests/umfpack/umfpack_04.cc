@@ -43,10 +43,11 @@
 #include <deal.II/numerics/matrix_tools.h>
 
 template <int dim, typename MatrixType, typename VectorType>
-void assemble_laplace (MatrixType         &B,
-                       VectorType         &bb,
-                       DoFHandler<dim>    &dof_handler,
-                       FiniteElement<dim> &fe)
+void
+assemble_laplace (MatrixType         &B,
+                  VectorType         &bb,
+                  DoFHandler<dim>    &dof_handler,
+                  FiniteElement<dim> &fe)
 {
   QGauss<dim>  quadrature_formula(2);
   FEValues<dim> fe_values (fe, quadrature_formula,
@@ -107,7 +108,8 @@ void assemble_laplace (MatrixType         &B,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << dim << 'd' << std::endl;
 
@@ -254,7 +256,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

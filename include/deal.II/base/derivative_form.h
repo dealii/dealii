@@ -69,22 +69,26 @@ public:
   /**
    * Read-Write access operator.
    */
-  Tensor<order,dim,Number> &operator [] (const unsigned int i);
+  Tensor<order,dim,Number> &
+  operator [] (const unsigned int i);
 
   /**
    * Read-only access operator.
    */
-  const Tensor<order,dim,Number> &operator [] (const unsigned int i) const;
+  const Tensor<order,dim,Number> &
+  operator [] (const unsigned int i) const;
 
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const Tensor<order+1,dim, Number> &);
+  DerivativeForm   &
+  operator = (const Tensor<order+1,dim, Number> &);
 
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const Tensor<1,dim, Number> &);
+  DerivativeForm   &
+  operator = (const Tensor<1,dim, Number> &);
 
   /**
    * Converts a DerivativeForm <order,dim,dim> to Tensor<order+1,dim,Number>.
@@ -102,7 +106,8 @@ public:
    * Return the transpose of a rectangular DerivativeForm, that is to say
    * viewed as a two dimensional matrix.
    */
-  DerivativeForm<1, spacedim, dim, Number> transpose () const;
+  DerivativeForm<1, spacedim, dim, Number>
+  transpose () const;
 
   /**
    * Compute the Frobenius norm of this form, i.e., the expression
@@ -116,7 +121,8 @@ public:
    * transformation F. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T * DF)}$.
    */
-  Number determinant () const;
+  Number
+  determinant () const;
 
   /**
    * Assuming that the current object stores the Jacobian of a mapping
@@ -126,13 +132,15 @@ public:
    * {\mathbb R}^n \mapsto {\mathbb R}^n$), then this function
    * simplifies to computing $\nabla F^{-T}$.
    */
-  DerivativeForm<1, dim, spacedim, Number> covariant_form() const;
+  DerivativeForm<1, dim, spacedim, Number>
+  covariant_form() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption ();
 
   /**
    * Exception.
@@ -145,7 +153,8 @@ private:
   /**
    * Auxiliary function that computes (*this) * $T^{T}$
    */
-  DerivativeForm<1, dim, spacedim, Number> times_T_t (const Tensor<2,dim,Number> &T) const;
+  DerivativeForm<1, dim, spacedim, Number>
+  times_T_t (const Tensor<2,dim,Number> &T) const;
 
 
   /**
@@ -325,7 +334,8 @@ DerivativeForm<order,dim,spacedim,Number>::norm () const
 
 template <int order, int dim, int spacedim, typename Number>
 inline
-Number DerivativeForm<order, dim, spacedim, Number>::determinant() const
+Number
+DerivativeForm<order, dim, spacedim, Number>::determinant() const
 {
   Assert( order==1, ExcMessage("Only for order == 1."));
   if (dim == spacedim)

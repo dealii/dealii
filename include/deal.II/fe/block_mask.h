@@ -109,7 +109,8 @@ public:
    * would return true when calling represents_the_all_selected_mask()) then
    * return zero since no definite size is known.
    */
-  unsigned int size () const;
+  unsigned int
+  size () const;
 
   /**
    * Return whether a particular block is selected by this mask. If this mask
@@ -124,7 +125,8 @@ public:
    * given index needs to be between zero and the number of blocks that this
    * mask represents.
    */
-  bool operator[] (const unsigned int block_index) const;
+  bool
+  operator[] (const unsigned int block_index) const;
 
   /**
    * Return whether this block mask represents a mask with exactly
@@ -175,23 +177,27 @@ public:
    * Return a block mask that contains the union of the blocks selected by the
    * current object and the one passed as an argument.
    */
-  BlockMask operator | (const BlockMask &mask) const;
+  BlockMask
+  operator | (const BlockMask &mask) const;
 
   /**
    * Return a block mask that has only those elements set that are set both in
    * the current object as well as the one passed as an argument.
    */
-  BlockMask operator & (const BlockMask &mask) const;
+  BlockMask
+  operator & (const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are identical.
    */
-  bool operator== (const BlockMask &mask) const;
+  bool
+  operator== (const BlockMask &mask) const;
 
   /**
    * Return whether this object and the argument are not identical.
    */
-  bool operator!= (const BlockMask &mask) const;
+  bool
+  operator!= (const BlockMask &mask) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -209,8 +215,9 @@ private:
   // make the output operator a friend so it can access
   // the block_mask array
   friend
-  std::ostream &operator << (std::ostream &out,
-                             const BlockMask &mask);
+  std::ostream &
+  operator << (std::ostream &out,
+               const BlockMask &mask);
 };
 
 
@@ -224,8 +231,9 @@ private:
  * @param out The stream to write to.
  * @param mask The mask to write. @return A reference to the first argument.
  */
-std::ostream &operator << (std::ostream &out,
-                           const BlockMask &mask);
+std::ostream &
+operator << (std::ostream &out,
+             const BlockMask &mask);
 
 
 // -------------------- inline functions ---------------------

@@ -45,12 +45,16 @@ class LaplaceEigenspectrumProblem
 {
 public:
   LaplaceEigenspectrumProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
 
   Triangulation<2> triangulation;
   FE_Q<2>          fe;
@@ -70,7 +74,8 @@ LaplaceEigenspectrumProblem::LaplaceEigenspectrumProblem ()
   dof_handler (triangulation)
 {}
 
-void LaplaceEigenspectrumProblem::setup_system ()
+void
+LaplaceEigenspectrumProblem::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -93,7 +98,8 @@ void LaplaceEigenspectrumProblem::setup_system ()
   output_table.add_value ("dofs",  dof_handler.n_dofs());
 }
 
-void LaplaceEigenspectrumProblem::assemble_system ()
+void
+LaplaceEigenspectrumProblem::assemble_system ()
 {
   QGauss<2> quadrature_formula(2);
 
@@ -150,7 +156,8 @@ void LaplaceEigenspectrumProblem::assemble_system ()
   B.compress (VectorOperation::add);
 }
 
-void LaplaceEigenspectrumProblem::solve ()
+void
+LaplaceEigenspectrumProblem::solve ()
 {
   SolverControl solver_control (1000, 1e-10);
   SLEPcWrappers::SolverArnoldi eigensolver (solver_control);
@@ -188,7 +195,8 @@ void LaplaceEigenspectrumProblem::solve ()
   output_table.add_value ("error", std::fabs(2.-lambda[0]));
 }
 
-void LaplaceEigenspectrumProblem::run ()
+void
+LaplaceEigenspectrumProblem::run ()
 {
   const double radius = dealii::numbers::PI/2.;
   GridGenerator::hyper_cube (triangulation, -radius, radius);
@@ -221,7 +229,8 @@ void LaplaceEigenspectrumProblem::run ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   try
     {

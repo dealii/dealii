@@ -40,7 +40,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> triangulation;
   FE_Q<dim> fe(1);
@@ -83,7 +84,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

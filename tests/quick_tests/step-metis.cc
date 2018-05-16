@@ -30,7 +30,8 @@ using namespace dealii;
 
 static const unsigned int dim = 2;
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   try
     {

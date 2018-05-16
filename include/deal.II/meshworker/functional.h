@@ -48,7 +48,8 @@ namespace MeshWorker
        * Initialize local data to store functionals. The number <tt>n</tt> is
        * the number of functionals to be computed.
        */
-      void initialize(const unsigned int n);
+      void
+      initialize(const unsigned int n);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
@@ -57,25 +58,29 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face);
+      void
+      initialize_info(DOFINFO &info, bool face);
 
       /**
        * Assemble the local values into the global vectors.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble both local values into the global vectors.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1,
+               const DOFINFO &info2);
 
       /**
        * The value of the ith entry in #results.
        */
-      number operator() (const unsigned int i) const;
+      number
+      operator() (const unsigned int i) const;
     private:
       /**
        * The values into which the results are added.
@@ -116,7 +121,8 @@ namespace MeshWorker
        * typical situation for error estimate is just having a single block in
        * each vector.
        */
-      void initialize(AnyData &results, bool separate_faces = true);
+      void
+      initialize(AnyData &results, bool separate_faces = true);
 
       /**
        * Initialize the local data in the DoFInfo object used later for
@@ -126,25 +132,29 @@ namespace MeshWorker
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
       /**
        * Assemble the local values into the global vectors.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble both local values into the global vectors.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1,
+               const DOFINFO &info2);
 
       /**
        * The value of the ith entry in @p results.
        */
-      number operator() (const unsigned int i) const;
+      number
+      operator() (const unsigned int i) const;
     private:
       AnyData results;
       bool separate_faces;

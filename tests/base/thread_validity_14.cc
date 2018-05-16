@@ -49,9 +49,11 @@ public:
   }
 
   // same idea about copy operators
-  X &operator = (const X &) = delete;
+  X &
+  operator = (const X &) = delete;
 
-  X &operator = (X &&x)
+  X &
+  operator = (X &&x)
   {
     value = x.value;
     x.value = 0;
@@ -65,14 +67,16 @@ public:
 
 
 
-X foo ()
+X
+foo ()
 {
   return X(42);
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -28,12 +28,14 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD, dealii::Triangulation<dim>::none,parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   std::vector<unsigned int> refinements(dim, 1);
@@ -118,7 +120,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, testing_max_num_threads());
   MPILogInitAll log;

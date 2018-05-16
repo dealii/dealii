@@ -23,7 +23,8 @@
 #include <iostream>
 
 
-void test (PETScWrappers::FullMatrix &m)
+void
+test (PETScWrappers::FullMatrix &m)
 {
   // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
@@ -52,7 +53,8 @@ void test (PETScWrappers::FullMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

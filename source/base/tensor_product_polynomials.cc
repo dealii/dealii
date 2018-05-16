@@ -34,38 +34,42 @@ namespace internal
   {
     template <int dim>
     inline
-    void compute_tensor_index(const unsigned int,
-                              const unsigned int,
-                              const unsigned int,
-                              unsigned int      ( &)[dim])
+    void
+    compute_tensor_index(const unsigned int,
+                         const unsigned int,
+                         const unsigned int,
+                         unsigned int      ( &)[dim])
     {
       Assert(false, ExcNotImplemented());
     }
 
     inline
-    void compute_tensor_index(const unsigned int n,
-                              const unsigned int,
-                              const unsigned int,
-                              unsigned int       (&indices)[1])
+    void
+    compute_tensor_index(const unsigned int n,
+                         const unsigned int,
+                         const unsigned int,
+                         unsigned int       (&indices)[1])
     {
       indices[0] = n;
     }
 
     inline
-    void compute_tensor_index(const unsigned int n,
-                              const unsigned int n_pols_0,
-                              const unsigned int,
-                              unsigned int       (&indices)[2])
+    void
+    compute_tensor_index(const unsigned int n,
+                         const unsigned int n_pols_0,
+                         const unsigned int,
+                         unsigned int       (&indices)[2])
     {
       indices[0] = n % n_pols_0;
       indices[1] = n / n_pols_0;
     }
 
     inline
-    void compute_tensor_index(const unsigned int n,
-                              const unsigned int n_pols_0,
-                              const unsigned int n_pols_1,
-                              unsigned int       (&indices)[3])
+    void
+    compute_tensor_index(const unsigned int n,
+                         const unsigned int n_pols_0,
+                         const unsigned int n_pols_1,
+                         unsigned int       (&indices)[3])
     {
       indices[0] = n % n_pols_0;
       indices[1] = (n/n_pols_0) % n_pols_1;
@@ -125,8 +129,9 @@ TensorProductPolynomials<dim,PolynomialType>::set_numbering
 template <>
 double
 TensorProductPolynomials<0,Polynomials::Polynomial<double> >
-::compute_value(const unsigned int,
-                const Point<0> &) const
+::
+compute_value(const unsigned int,
+              const Point<0> &) const
 {
   Assert (false, ExcNotImplemented());
   return 0;

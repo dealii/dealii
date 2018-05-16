@@ -33,7 +33,8 @@
 
 using namespace std;
 
-void log_vector (const std::vector<std::vector<types::global_dof_index> > &count)
+void
+log_vector (const std::vector<std::vector<types::global_dof_index> > &count)
 {
   for (unsigned int l=0; l<count.size(); ++l)
     {
@@ -45,7 +46,8 @@ void log_vector (const std::vector<std::vector<types::global_dof_index> > &count
 }
 
 template <int dim>
-void check_fe(FiniteElement<dim> &fe)
+void
+check_fe(FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -83,7 +85,8 @@ void check_fe(FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> q1(1);
   FE_Q<dim> q2(2);
@@ -103,7 +106,8 @@ void check()
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

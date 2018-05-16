@@ -21,7 +21,8 @@
 #include <boost/serialization/vector.hpp>
 
 
-void test ()
+void
+test ()
 {
   unsigned int degree1 = 3;
   Polynomials::Legendre p1(degree1);
@@ -33,7 +34,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

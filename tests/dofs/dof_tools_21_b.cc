@@ -28,7 +28,8 @@
 #include <iostream>
 #include <utility>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
@@ -53,7 +54,8 @@ using namespace dealii;
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation, int orientation)
+void
+generate_grid(Triangulation<2> &triangulation, int orientation)
 {
   Point<2> vertices_1[]
   =
@@ -113,7 +115,8 @@ void generate_grid(Triangulation<2> &triangulation, int orientation)
 
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation, int orientation)
+void
+generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3> vertices_1[]
   =
@@ -192,7 +195,8 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
  * matching via make_periodicity_constraints
  */
 template <int dim>
-void print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity = false)
+void
+print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity = false)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
   MappingQ<dim> mapping(1);
@@ -294,7 +298,8 @@ void print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity =
 
 
 
-int main()
+int
+main()
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);

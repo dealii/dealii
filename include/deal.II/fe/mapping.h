@@ -305,7 +305,8 @@ public:
    * This function is mainly used by the hp::MappingCollection class.
    */
   virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const = 0;
+  std::unique_ptr<Mapping<dim,spacedim>>
+                                      clone () const = 0;
 
   /**
    * Return the mapped vertices of a cell.
@@ -337,7 +338,8 @@ public:
    * MappingQEulerian, MappingQ1Eulerian, and MappingFEField.
    */
   virtual
-  bool preserves_vertex_locations () const = 0;
+  bool
+  preserves_vertex_locations () const = 0;
 
   /**
    * @name Mapping points between reference and real cells
@@ -565,7 +567,8 @@ public:
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
   };
 
 

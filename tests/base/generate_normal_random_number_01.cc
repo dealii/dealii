@@ -23,7 +23,8 @@
 #include <deal.II/base/utilities.h>
 
 
-std::pair<double,double> test ()
+std::pair<double,double>
+test ()
 {
   const double mu    = 13;
   const double sigma = 3;
@@ -48,7 +49,8 @@ std::pair<double,double> test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -67,12 +67,13 @@ public:
    * compute_grad() or compute_grad_grad() functions, see below, in a loop
    * over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<double>         &values,
-                std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads,
-                std::vector<Tensor<3,dim> > &third_derivatives,
-                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute (const Point<dim>            &unit_point,
+           std::vector<double>         &values,
+           std::vector<Tensor<1,dim> > &grads,
+           std::vector<Tensor<2,dim> > &grad_grads,
+           std::vector<Tensor<3,dim> > &third_derivatives,
+           std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -86,8 +87,9 @@ public:
    * <tt>values.size()==</tt>n() to get the point values of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  double compute_value (const unsigned int i,
-                        const Point<dim> &p) const;
+  double
+  compute_value (const unsigned int i,
+                 const Point<dim> &p) const;
 
   /**
    * Compute the order @p order derivative of the <tt>i</tt>th tensor product
@@ -102,8 +104,9 @@ public:
    * all tensor polynomials all at once and in a much more efficient way.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order,dim>
+  compute_derivative (const unsigned int i,
+                      const Point<dim> &p) const;
 
   /**
    * Compute the grad of the <tt>i</tt>th tensor product polynomial at
@@ -117,8 +120,9 @@ public:
    * <tt>grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<1,dim> compute_grad (const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1,dim>
+  compute_grad (const unsigned int i,
+                const Point<dim> &p) const;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -132,8 +136,9 @@ public:
    * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<2,dim> compute_grad_grad (const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2,dim>
+  compute_grad_grad (const unsigned int i,
+                     const Point<dim> &p) const;
 
   /**
    * Return the number of tensor product polynomials plus the bubble
@@ -141,7 +146,8 @@ public:
    * if the maximum degree of the polynomials is one and
    * <i>n<sup>dim</sup>+dim</i> otherwise.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 };
 
 /** @} */

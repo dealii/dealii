@@ -20,13 +20,15 @@
 
 #include "../tests.h"
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_common.h"
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;

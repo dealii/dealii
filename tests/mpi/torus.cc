@@ -63,7 +63,8 @@ DeclException1(ExcMissingCell,
                cell_iterator,
                << "Trying to find cell " << arg1 << " but it doesn't appear to be in the list");
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());

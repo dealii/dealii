@@ -35,14 +35,16 @@
 
 
 template <int dim>
-void output(parallel::distributed::Triangulation<dim> &tr, std::ostream &stream)
+void
+output(parallel::distributed::Triangulation<dim> &tr, std::ostream &stream)
 {
   GridOut out;
   out.write_vtk(tr, stream);
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -98,7 +100,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

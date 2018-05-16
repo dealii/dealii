@@ -77,9 +77,10 @@ reinit_vector_by_blocks (
 }
 
 template <int dim>
-void check_block(const FiniteElement<dim> &fe,
-                 const vector<bool> &selected,
-                 const vector<double> &factors)
+void
+check_block(const FiniteElement<dim> &fe,
+            const vector<bool> &selected,
+            const vector<double> &factors)
 {
   deallog << fe.get_name() << std::endl << "selected ";
   for (unsigned int i=0; i<selected.size(); ++i)
@@ -192,7 +193,8 @@ void check_block(const FiniteElement<dim> &fe,
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

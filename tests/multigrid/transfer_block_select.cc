@@ -68,7 +68,8 @@ reinit_vector_by_blocks (
 
 
 template <int dim>
-void check_select(const FiniteElement<dim> &fe, unsigned int selected)
+void
+check_select(const FiniteElement<dim> &fe, unsigned int selected)
 {
   deallog << fe.get_name()
           << " select " << selected << std::endl;
@@ -163,7 +164,8 @@ void check_select(const FiniteElement<dim> &fe, unsigned int selected)
 }
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

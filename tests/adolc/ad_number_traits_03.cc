@@ -28,7 +28,8 @@ using namespace dealii;
 namespace AD = Differentiation::AD;
 
 template <typename ADNumber>
-void print ()
+void
+print ()
 {
   deallog << "is_ad_number: " << AD::is_ad_number<ADNumber>::value << std::endl;
   deallog << "is_adolc_number: " << AD::is_adolc_number<ADNumber>::value << std::endl;
@@ -56,7 +57,8 @@ void print ()
   Assert(AD::is_tapeless_ad_number<ADNumber&&>::value == AD::is_tapeless_ad_number<ADNumber>::value, ExcMessage("Error rvalue"));
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

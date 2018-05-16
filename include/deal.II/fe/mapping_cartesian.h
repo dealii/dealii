@@ -64,14 +64,16 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  std::unique_ptr<Mapping<dim, spacedim>> clone () const override;
+  std::unique_ptr<Mapping<dim, spacedim>>
+                                       clone () const override;
 
   /**
    * Return @p true because MappingCartesian preserves vertex
    * locations.
    */
   virtual
-  bool preserves_vertex_locations () const override;
+  bool
+  preserves_vertex_locations () const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -174,7 +176,8 @@ private:
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
     virtual
-    std::size_t memory_consumption () const override;
+    std::size_t
+    memory_consumption () const override;
 
     /**
      * Extents of the last cell we have seen in the coordinate directions,
@@ -253,13 +256,14 @@ private:
   /**
    * Do the computation for the <tt>fill_*</tt> functions.
    */
-  void compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int face_no,
-                     const unsigned int sub_no,
-                     const CellSimilarity::Similarity cell_similarity,
-                     const InternalData &data,
-                     std::vector<Point<dim> > &quadrature_points,
-                     std::vector<Tensor<1,dim> > &normal_vectors) const;
+  void
+  compute_fill (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                const unsigned int face_no,
+                const unsigned int sub_no,
+                const CellSimilarity::Similarity cell_similarity,
+                const InternalData &data,
+                std::vector<Point<dim> > &quadrature_points,
+                std::vector<Tensor<1,dim> > &normal_vectors) const;
 
   /**
    * Value to indicate that a given face or subface number is invalid.

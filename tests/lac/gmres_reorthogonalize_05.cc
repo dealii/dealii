@@ -31,7 +31,8 @@ namespace dealii
 {
   template <typename Number>
   template <typename Number2>
-  Number Vector<Number>::operator* (const Vector<Number2> &v) const
+  Number
+  Vector<Number>::operator* (const Vector<Number2> &v) const
   {
     Number sum = 0;
     for (unsigned int i=0; i<size(); ++i)
@@ -39,7 +40,8 @@ namespace dealii
     return sum;
   }
   template <typename Number>
-  typename Vector<Number>::real_type Vector<Number>::l2_norm () const
+  typename Vector<Number>::real_type
+  Vector<Number>::l2_norm () const
   {
     real_type sum = 0;
     for (unsigned int i=0; i<size(); ++i)
@@ -51,7 +53,8 @@ namespace dealii
 
 
 template <typename number>
-void test ()
+void
+test ()
 {
   const unsigned int n = 200;
   Vector<number> rhs(n), sol(n);
@@ -81,7 +84,8 @@ void test ()
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

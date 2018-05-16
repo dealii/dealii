@@ -30,7 +30,8 @@
 #include <algorithm>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 DeclException2 (ExcNumberMismatch,
@@ -40,7 +41,8 @@ DeclException2 (ExcNumberMismatch,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -173,7 +175,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);

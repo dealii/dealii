@@ -566,11 +566,13 @@ namespace GridTools
     class Shift
     {
     public:
-      explicit Shift (const Tensor<1,spacedim> &shift)
+      explicit
+      Shift (const Tensor<1,spacedim> &shift)
         :
         shift(shift)
       {}
-      Point<spacedim> operator() (const Point<spacedim> p) const
+      Point<spacedim>
+      operator() (const Point<spacedim> p) const
       {
         return p+shift;
       }
@@ -585,11 +587,13 @@ namespace GridTools
     class Rotate2d
     {
     public:
-      explicit Rotate2d (const double angle)
+      explicit
+      Rotate2d (const double angle)
         :
         angle(angle)
       {}
-      Point<2> operator() (const Point<2> &p) const
+      Point<2>
+      operator() (const Point<2> &p) const
       {
         return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
                          std::sin(angle)*p(0) + std::cos(angle) * p(1));
@@ -609,7 +613,8 @@ namespace GridTools
         axis(axis)
       {}
 
-      Point<3> operator() (const Point<3> &p) const
+      Point<3>
+      operator() (const Point<3> &p) const
       {
         if (axis==0)
           return Point<3> (p(0),
@@ -633,11 +638,13 @@ namespace GridTools
     class Scale
     {
     public:
-      explicit Scale (const double factor)
+      explicit
+      Scale (const double factor)
         :
         factor(factor)
       {}
-      Point<spacedim> operator() (const Point<spacedim> p) const
+      Point<spacedim>
+      operator() (const Point<spacedim> p) const
       {
         return p*factor;
       }
@@ -692,9 +699,10 @@ namespace GridTools
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    void laplace_solve (const SparseMatrix<double>                     &S,
-                        const std::map<types::global_dof_index,double> &fixed_dofs,
-                        Vector<double>                                 &u)
+    void
+    laplace_solve (const SparseMatrix<double>                     &S,
+                   const std::map<types::global_dof_index,double> &fixed_dofs,
+                   Vector<double>                                 &u)
     {
       const unsigned int n_dofs=S.n();
       FilteredMatrix<Vector<double> > SF (S);
@@ -718,10 +726,11 @@ namespace GridTools
 
   // Implementation for 1D only
   template <>
-  void laplace_transform (const std::map<unsigned int,Point<1> > &,
-                          Triangulation<1> &,
-                          const Function<1> *,
-                          const bool )
+  void
+  laplace_transform (const std::map<unsigned int,Point<1> > &,
+                     Triangulation<1> &,
+                     const Function<1> *,
+                     const bool )
   {
     Assert(false, ExcNotImplemented());
   }
@@ -2562,11 +2571,12 @@ next_cell:
      * recursive helper function for partition_triangulation_zorder
      */
     template <class IT>
-    void set_subdomain_id_in_zorder_recursively(IT                 cell,
-                                                unsigned int       &current_proc_idx,
-                                                unsigned int       &current_cell_idx,
-                                                const unsigned int n_active_cells,
-                                                const unsigned int n_partitions)
+    void
+    set_subdomain_id_in_zorder_recursively(IT                 cell,
+                                           unsigned int       &current_proc_idx,
+                                           unsigned int       &current_cell_idx,
+                                           const unsigned int n_active_cells,
+                                           const unsigned int n_partitions)
     {
       if (cell->active())
         {
@@ -2775,8 +2785,9 @@ next_cell:
   namespace
   {
     template <int dim, int spacedim>
-    double diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-                    const Mapping<dim,spacedim> &mapping)
+    double
+    diameter(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+             const Mapping<dim,spacedim> &mapping)
     {
       const auto vertices = mapping.get_vertices(cell);
       switch (dim)
@@ -3243,9 +3254,10 @@ next_cell:
 
 
 
-      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
-                         std::integral_constant<int, 1>,
-                         std::integral_constant<int, 1>)
+      void
+      fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
+                    std::integral_constant<int, 1>,
+                    std::integral_constant<int, 1>)
       {
         // nothing to do for the faces of cells in 1d
       }
@@ -3254,9 +3266,10 @@ next_cell:
 
       // possibly fix up the faces of a cell by moving around its mid-points
       template <int dim, int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                         std::integral_constant<int, dim>,
-                         std::integral_constant<int, spacedim>)
+      void
+      fix_up_faces (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                    std::integral_constant<int, dim>,
+                    std::integral_constant<int, spacedim>)
       {
         // see if we first can fix up some of the faces of this object. We can
         // mess with faces if and only if the neighboring cell is not even
@@ -3328,8 +3341,9 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  void copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    const bool reset_boundary_ids)
+  void
+  copy_boundary_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                               const bool reset_boundary_ids)
   {
     const auto src_boundary_ids = tria.get_boundary_ids();
     std::vector<types::manifold_id> dst_manifold_ids(src_boundary_ids.size());
@@ -3348,10 +3362,11 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  void map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
-                                    const std::vector<types::manifold_id> &dst_manifold_ids,
-                                    Triangulation<dim, spacedim> &tria,
-                                    const std::vector<types::boundary_id> &reset_boundary_ids_)
+  void
+  map_boundary_to_manifold_ids(const std::vector<types::boundary_id> &src_boundary_ids,
+                               const std::vector<types::manifold_id> &dst_manifold_ids,
+                               Triangulation<dim, spacedim> &tria,
+                               const std::vector<types::boundary_id> &reset_boundary_ids_)
   {
     AssertDimension(src_boundary_ids.size(), dst_manifold_ids.size());
     const auto reset_boundary_ids = reset_boundary_ids_.size() ?
@@ -3410,8 +3425,9 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  void copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
-                                    const bool compute_face_ids)
+  void
+  copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
+                               const bool compute_face_ids)
   {
     typename Triangulation<dim,spacedim>::active_cell_iterator
     cell=tria.begin_active(), endc=tria.end();
@@ -3531,8 +3547,9 @@ next_cell:
 
 
   template <int dim, int spacedim>
-  void regularize_corner_cells (Triangulation<dim,spacedim> &tria,
-                                const double limit_angle_fraction)
+  void
+  regularize_corner_cells (Triangulation<dim,spacedim> &tria,
+                           const double limit_angle_fraction)
   {
     if (dim == 1)
       return; // Nothing to do
@@ -3961,7 +3978,8 @@ next_cell:
       template < int dim, int spacedim>
       struct cell_hash
       {
-        std::size_t operator()(const typename Triangulation<dim, spacedim>::active_cell_iterator &k) const
+        std::size_t
+        operator()(const typename Triangulation<dim, spacedim>::active_cell_iterator &k) const
         {
           // Return active cell index, which is faster than CellId to compute
           return k->active_cell_index();

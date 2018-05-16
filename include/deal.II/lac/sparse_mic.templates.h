@@ -44,7 +44,8 @@ SparseMIC<number>::~SparseMIC()
 
 
 template <typename number>
-void SparseMIC<number>::clear()
+void
+SparseMIC<number>::clear()
 {
   {
     std::vector<number> tmp;
@@ -66,8 +67,9 @@ void SparseMIC<number>::clear()
 template <typename number>
 template <typename somenumber>
 inline
-void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
-                                    const AdditionalData &data)
+void
+SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
+                               const AdditionalData &data)
 {
   Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
   Assert (data.strengthen_diagonal>=0, ExcInvalidStrengthening (data.strengthen_diagonal));

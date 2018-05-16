@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -58,14 +59,20 @@ class ElasticProblem
 public:
   ElasticProblem ();
   ~ElasticProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  refine_grid ();
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
   DoFHandler<dim>      dof_handler;
@@ -89,11 +96,13 @@ class RightHandSide :  public Function<dim>
 public:
   RightHandSide ();
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &values) const;
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &values) const;
 
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<double> >   &value_list) const;
+  virtual void
+  vector_value_list (const std::vector<Point<dim> > &points,
+                     std::vector<Vector<double> >   &value_list) const;
 };
 
 
@@ -106,8 +115,9 @@ RightHandSide<dim>::RightHandSide ()
 
 template <int dim>
 inline
-void RightHandSide<dim>::vector_value (const Point<dim> &p,
-                                       Vector<double>   &values) const
+void
+RightHandSide<dim>::vector_value (const Point<dim> &p,
+                                  Vector<double>   &values) const
 {
   Assert (values.size() == dim,
           ExcDimensionMismatch (values.size(), dim));
@@ -132,8 +142,9 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                            std::vector<Vector<double> >   &value_list) const
+void
+RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                       std::vector<Vector<double> >   &value_list) const
 {
   Assert (value_list.size() == points.size(),
           ExcDimensionMismatch (value_list.size(), points.size()));
@@ -169,7 +180,8 @@ ElasticProblem<dim>::~ElasticProblem ()
 
 
 template <int dim>
-void ElasticProblem<dim>::setup_system ()
+void
+ElasticProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
   hanging_node_constraints.clear ();
@@ -194,7 +206,8 @@ void ElasticProblem<dim>::setup_system ()
 
 
 template <int dim>
-void ElasticProblem<dim>::assemble_system ()
+void
+ElasticProblem<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula (2);
 
@@ -313,7 +326,8 @@ void ElasticProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void ElasticProblem<dim>::solve ()
+void
+ElasticProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -330,7 +344,8 @@ void ElasticProblem<dim>::solve ()
 
 
 template <int dim>
-void ElasticProblem<dim>::refine_grid ()
+void
+ElasticProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -351,7 +366,8 @@ void ElasticProblem<dim>::refine_grid ()
 
 
 template <int dim>
-void ElasticProblem<dim>::output_results (const unsigned int cycle) const
+void
+ElasticProblem<dim>::output_results (const unsigned int cycle) const
 {
   std::string filename = "solution-";
   filename += ('0' + cycle);
@@ -392,7 +408,8 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void ElasticProblem<dim>::run ()
+void
+ElasticProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<4; ++cycle)
     {
@@ -423,7 +440,8 @@ void ElasticProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

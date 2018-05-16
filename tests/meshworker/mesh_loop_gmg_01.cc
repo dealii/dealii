@@ -36,7 +36,8 @@ struct CopyData
   CopyData(): n_cells(0), n_own_cells(0), n_ghost_cells(0)
   {}
 
-  void reset()
+  void
+  reset()
   {
     n_cells = n_own_cells = n_ghost_cells = 0;
   }
@@ -45,7 +46,8 @@ struct CopyData
 using namespace MeshWorker;
 
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                  Triangulation<dim>::limit_level_difference_at_vertices,
@@ -191,7 +193,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

@@ -85,32 +85,37 @@ public:
    * operator for each level.
    */
   template <class MGMatrixType, class MGRelaxationType>
-  void initialize (const MGMatrixType     &matrices,
-                   const MGRelaxationType &smoothers);
+  void
+  initialize (const MGMatrixType     &matrices,
+              const MGRelaxationType &smoothers);
 
   /**
    * Empty all vectors.
    */
-  void clear ();
+  void
+  clear ();
 
   /**
    * Switch on/off reversed. This is mutually exclusive with transpose().
    */
-  void set_reverse (const bool);
+  void
+  set_reverse (const bool);
 
   /**
    * Implementation of the interface for @p Multigrid. This function does
    * nothing, which by comparison with the definition of this function means
    * that the smoothing operator equals the null operator.
    */
-  virtual void smooth (const unsigned int         level,
-                       BlockVector<number>       &u,
-                       const BlockVector<number> &rhs) const;
+  virtual void
+  smooth (const unsigned int         level,
+          BlockVector<number>       &u,
+          const BlockVector<number> &rhs) const;
 
   /**
    * Memory used by this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 private:
   /**
    * Pointer to the matrices.

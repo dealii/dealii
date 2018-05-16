@@ -19,7 +19,8 @@
 #include <deal.II/lac/matrix_out.h>
 #include <deal.II/lac/full_matrix.h>
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -23,7 +23,8 @@
 #include <iostream>
 
 
-void test (TrilinosWrappers::SparseMatrix &m)
+void
+test (TrilinosWrappers::SparseMatrix &m)
 {
   TrilinosWrappers::SparseMatrix m2(m.m(), m.n(), 0);
 
@@ -60,7 +61,8 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

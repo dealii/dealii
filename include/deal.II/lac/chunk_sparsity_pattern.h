@@ -77,18 +77,21 @@ namespace ChunkSparsityPatternIterators
      * Row number of the element represented by this object. This function can
      * only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int row () const;
+    unsigned int
+    row () const;
 
     /**
      * Return the global index from the reduced sparsity pattern.
      */
-    std::size_t reduced_index() const;
+    std::size_t
+    reduced_index() const;
 
     /**
      * Column number of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int column () const;
+    unsigned int
+    column () const;
 
     /**
      * Return whether the sparsity pattern entry pointed to by this iterator
@@ -99,13 +102,15 @@ namespace ChunkSparsityPatternIterators
      * pattern's lifetime, you will iterate over elements that are not valid.
      * If this is so, then this function will return false.
      */
-    bool is_valid_entry () const;
+    bool
+    is_valid_entry () const;
 
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Accessor &) const;
+    bool
+    operator == (const Accessor &) const;
 
 
     /**
@@ -115,7 +120,8 @@ namespace ChunkSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * sparsity pattern.
      */
-    bool operator < (const Accessor &) const;
+    bool
+    operator < (const Accessor &) const;
 
   protected:
     /**
@@ -141,7 +147,8 @@ namespace ChunkSparsityPatternIterators
     /**
      * Move the accessor to the next nonzero entry in the matrix.
      */
-    void advance ();
+    void
+    advance ();
 
     /**
      * Grant access to iterator class.
@@ -167,32 +174,38 @@ namespace ChunkSparsityPatternIterators
     /**
      * Prefix increment.
      */
-    Iterator &operator++ ();
+    Iterator &
+    operator++ ();
 
     /**
      * Postfix increment.
      */
-    Iterator operator++ (int);
+    Iterator
+    operator++ (int);
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor &
+    operator* () const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor *
+    operator-> () const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Iterator &) const;
+    bool
+    operator == (const Iterator &) const;
 
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const Iterator &) const;
+    bool
+    operator != (const Iterator &) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -201,7 +214,8 @@ namespace ChunkSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * matrix.
      */
-    bool operator < (const Iterator &) const;
+    bool
+    operator < (const Iterator &) const;
 
   private:
     /**
@@ -341,7 +355,8 @@ public:
    * declared, defined and fine to be called, but the latter only for empty
    * objects.
    */
-  ChunkSparsityPattern &operator = (const ChunkSparsityPattern &);
+  ChunkSparsityPattern &
+  operator = (const ChunkSparsityPattern &);
 
   /**
    * Reallocate memory and set up data structures for a new matrix with <tt>m
@@ -351,10 +366,11 @@ public:
    * This function simply maps its operations to the other <tt>reinit</tt>
    * function.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const size_type max_per_row,
-               const size_type chunk_size);
+  void
+  reinit (const size_type m,
+          const size_type n,
+          const size_type max_per_row,
+          const size_type chunk_size);
 
   /**
    * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
@@ -370,18 +386,20 @@ public:
    * are stored first in each row to allow optimized access in relaxation
    * methods of SparseMatrix.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const std::vector<size_type> &row_lengths,
-               const size_type chunk_size);
+  void
+  reinit (const size_type m,
+          const size_type n,
+          const std::vector<size_type> &row_lengths,
+          const size_type chunk_size);
 
   /**
    * Same as above, but with a VectorSlice argument instead.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const VectorSlice<const std::vector<size_type> > &row_lengths,
-               const size_type chunk_size);
+  void
+  reinit (const size_type m,
+          const size_type n,
+          const VectorSlice<const std::vector<size_type> > &row_lengths,
+          const size_type chunk_size);
 
   /**
    * This function compresses the sparsity structure that this object
@@ -395,7 +413,8 @@ public:
    * SparseMatrix objects require the ChunkSparsityPattern objects they are
    * initialized with to be compressed, to reduce memory requirements.
    */
-  void compress ();
+  void
+  compress ();
 
   /**
    * This function can be used as a replacement for reinit(), subsequent calls
@@ -474,11 +493,12 @@ public:
    * iterators that point to such pairs.
    */
   template <typename ForwardIterator>
-  void copy_from (const size_type n_rows,
-                  const size_type n_cols,
-                  const ForwardIterator begin,
-                  const ForwardIterator end,
-                  const size_type chunk_size);
+  void
+  copy_from (const size_type n_rows,
+             const size_type n_cols,
+             const ForwardIterator begin,
+             const ForwardIterator end,
+             const size_type chunk_size);
 
   /**
    * Copy data from an object of type DynamicSparsityPattern. Previous content
@@ -486,8 +506,9 @@ public:
    * afterwards.
    */
   template <typename SparsityPatternType>
-  void copy_from (const SparsityPatternType &dsp,
-                  const size_type            chunk_size);
+  void
+  copy_from (const SparsityPatternType &dsp,
+             const size_type            chunk_size);
 
   /**
    * Take a full matrix and use its nonzero entries to generate a sparse
@@ -497,8 +518,9 @@ public:
    * compressed mode afterwards.
    */
   template <typename number>
-  void copy_from (const FullMatrix<number> &matrix,
-                  const size_type chunk_size);
+  void
+  copy_from (const FullMatrix<number> &matrix,
+             const size_type chunk_size);
 
   /**
    * Set the sparsity pattern of the chunk sparsity pattern to be given by
@@ -518,29 +540,33 @@ public:
    * compressed mode afterwards.
    */
   template <typename Sparsity>
-  void create_from (const unsigned int  m,
-                    const unsigned int  n,
-                    const Sparsity     &sparsity_pattern_for_chunks,
-                    const unsigned int  chunk_size,
-                    const bool          optimize_diagonal = true);
+  void
+  create_from (const unsigned int  m,
+               const unsigned int  n,
+               const Sparsity     &sparsity_pattern_for_chunks,
+               const unsigned int  chunk_size,
+               const bool          optimize_diagonal = true);
 
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero.
    */
-  bool empty () const;
+  bool
+  empty () const;
 
   /**
    * Return the chunk size given as argument when constructing this object.
    */
-  size_type get_chunk_size () const;
+  size_type
+  get_chunk_size () const;
 
   /**
    * Return the maximum number of entries per row. Before compression, this
    * equals the number given to the constructor, while after compression, it
    * equals the maximum number of entries actually allocated by the user.
    */
-  size_type max_entries_per_row () const;
+  size_type
+  max_entries_per_row () const;
 
   /**
    * Add a nonzero entry to the matrix. This function may only be called for
@@ -548,8 +574,9 @@ public:
    *
    * If the entry already exists, nothing bad happens.
    */
-  void add (const size_type i,
-            const size_type j);
+  void
+  add (const size_type i,
+       const size_type j);
 
   /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the
@@ -558,30 +585,35 @@ public:
    * This function throws an exception if the sparsity pattern does not
    * represent a quadratic matrix.
    */
-  void symmetrize ();
+  void
+  symmetrize ();
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
    * image space.
    */
-  inline size_type n_rows () const;
+  inline size_type
+  n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space.
    */
-  inline size_type n_cols () const;
+  inline size_type
+  n_cols () const;
 
   /**
    * Check if a value at a certain position may be non-zero.
    */
-  bool exists (const size_type i,
-               const size_type j) const;
+  bool
+  exists (const size_type i,
+          const size_type j) const;
 
   /**
    * Number of entries in a specific row.
    */
-  size_type row_length (const size_type row) const;
+  size_type
+  row_length (const size_type row) const;
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
@@ -589,7 +621,8 @@ public:
    * represents a nonzero entry of the matrix. Consequently, the maximum
    * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
    */
-  size_type bandwidth () const;
+  size_type
+  bandwidth () const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
@@ -599,12 +632,14 @@ public:
    * This function may only be called if the matrix struct is compressed. It
    * does not make too much sense otherwise anyway.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements () const;
 
   /**
    * Return whether the structure is compressed or not.
    */
-  bool is_compressed () const;
+  bool
+  is_compressed () const;
 
   /**
    * Return whether this object stores only those entries that have been added
@@ -618,19 +653,22 @@ public:
    * in cases where several kinds of sparsity patterns can be passed as
    * template arguments.
    */
-  bool stores_only_added_elements () const;
+  bool
+  stores_only_added_elements () const;
 
   /**
    * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    */
-  iterator begin () const;
+  iterator
+  begin () const;
 
   /**
    * Final iterator.
    */
-  iterator end () const;
+  iterator
+  end () const;
 
   /**
    * Iterator starting at the first entry of row <tt>r</tt>.
@@ -640,7 +678,8 @@ public:
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
    */
-  iterator begin (const unsigned int r) const;
+  iterator
+  begin (const unsigned int r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -650,7 +689,8 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  iterator end (const unsigned int r) const;
+  iterator
+  end (const unsigned int r) const;
 
   /**
    * Write the data of this object en bloc to a file. This is done in a binary
@@ -662,7 +702,8 @@ public:
    * different programs, or allow objects to be persistent across different
    * runs of the program.
    */
-  void block_write (std::ostream &out) const;
+  void
+  block_write (std::ostream &out) const;
 
   /**
    * Read data that has previously been written by block_write() from a file.
@@ -677,14 +718,16 @@ public:
    * bluntest attempts to interpret some data as a vector stored bitwise to a
    * file, but not more.
    */
-  void block_read (std::istream &in);
+  void
+  block_read (std::istream &in);
 
   /**
    * Print the sparsity of the matrix. The output consists of one line per row
    * of the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.
    */
-  void print (std::ostream &out) const;
+  void
+  print (std::ostream &out) const;
 
   /**
    * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
@@ -699,13 +742,15 @@ public:
    * Print the sparsity pattern in gnuplot by setting the data style to dots
    * or points and use the <tt>plot</tt> command.
    */
-  void print_gnuplot (std::ostream &out) const;
+  void
+  print_gnuplot (std::ostream &out) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object. See MemoryConsumption.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * @addtogroup Exceptions

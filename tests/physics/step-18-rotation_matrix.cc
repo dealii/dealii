@@ -138,20 +138,33 @@ namespace Step18
   public:
     TopLevel ();
     ~TopLevel ();
-    void run ();
+    void
+    run ();
   private:
-    void create_coarse_grid ();
-    void setup_system ();
-    void assemble_system ();
-    void solve_timestep ();
-    unsigned int solve_linear_problem ();
-    void output_results () const;
-    void do_initial_timestep ();
-    void do_timestep ();
-    void refine_initial_grid ();
-    void move_mesh ();
-    void setup_quadrature_point_history ();
-    void update_quadrature_point_history ();
+    void
+    create_coarse_grid ();
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    solve_timestep ();
+    unsigned int
+    solve_linear_problem ();
+    void
+    output_results () const;
+    void
+    do_initial_timestep ();
+    void
+    do_timestep ();
+    void
+    refine_initial_grid ();
+    void
+    move_mesh ();
+    void
+    setup_quadrature_point_history ();
+    void
+    update_quadrature_point_history ();
     parallel::shared::Triangulation<dim>   triangulation;
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
@@ -300,7 +313,8 @@ namespace Step18
     dof_handler.clear ();
   }
   template <int dim>
-  void TopLevel<dim>::run ()
+  void
+  TopLevel<dim>::run ()
   {
     present_time = 0;
     present_timestep = 1;
@@ -311,7 +325,8 @@ namespace Step18
       do_timestep ();
   }
   template <int dim>
-  void TopLevel<dim>::create_coarse_grid ()
+  void
+  TopLevel<dim>::create_coarse_grid ()
   {
     const double inner_radius = 0.8,
                  outer_radius = 1;
@@ -343,7 +358,8 @@ namespace Step18
     setup_quadrature_point_history ();
   }
   template <int dim>
-  void TopLevel<dim>::setup_system ()
+  void
+  TopLevel<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     locally_owned_dofs = dof_handler.locally_owned_dofs();
@@ -371,7 +387,8 @@ namespace Step18
     incremental_displacement.reinit (dof_handler.n_dofs());
   }
   template <int dim>
-  void TopLevel<dim>::assemble_system ()
+  void
+  TopLevel<dim>::assemble_system ()
   {
     system_rhs = 0;
     system_matrix = 0;
@@ -458,7 +475,8 @@ namespace Step18
     incremental_displacement = tmp;
   }
   template <int dim>
-  void TopLevel<dim>::solve_timestep ()
+  void
+  TopLevel<dim>::solve_timestep ()
   {
     pcout << "    Assembling system..." << std::flush;
     assemble_system ();
@@ -472,7 +490,8 @@ namespace Step18
     pcout << std::endl;
   }
   template <int dim>
-  unsigned int TopLevel<dim>::solve_linear_problem ()
+  unsigned int
+  TopLevel<dim>::solve_linear_problem ()
   {
     PETScWrappers::MPI::Vector
     distributed_incremental_displacement (locally_owned_dofs,mpi_communicator);
@@ -490,7 +509,8 @@ namespace Step18
     return solver_control.last_step();
   }
   template <int dim>
-  void TopLevel<dim>::output_results () const
+  void
+  TopLevel<dim>::output_results () const
   {
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -575,7 +595,8 @@ namespace Step18
       }
   }
   template <int dim>
-  void TopLevel<dim>::do_initial_timestep ()
+  void
+  TopLevel<dim>::do_initial_timestep ()
   {
     present_time += present_timestep;
     ++timestep_no;
@@ -625,7 +646,8 @@ namespace Step18
     pcout << std::endl;
   }
   template <int dim>
-  void TopLevel<dim>::do_timestep ()
+  void
+  TopLevel<dim>::do_timestep ()
   {
     present_time += present_timestep;
     ++timestep_no;
@@ -651,7 +673,8 @@ namespace Step18
     pcout << std::endl;
   }
   template <int dim>
-  void TopLevel<dim>::refine_initial_grid ()
+  void
+  TopLevel<dim>::refine_initial_grid ()
   {
     Vector<float> error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
@@ -680,7 +703,8 @@ namespace Step18
     setup_quadrature_point_history ();
   }
   template <int dim>
-  void TopLevel<dim>::move_mesh ()
+  void
+  TopLevel<dim>::move_mesh ()
   {
     pcout << "    Moving mesh..." << std::endl;
     std::vector<bool> vertex_touched (triangulation.n_vertices(),
@@ -700,7 +724,8 @@ namespace Step18
           }
   }
   template <int dim>
-  void TopLevel<dim>::setup_quadrature_point_history ()
+  void
+  TopLevel<dim>::setup_quadrature_point_history ()
   {
     unsigned int our_cells = 0;
     for (typename Triangulation<dim>::active_cell_iterator
@@ -728,7 +753,8 @@ namespace Step18
             ExcInternalError());
   }
   template <int dim>
-  void TopLevel<dim>::update_quadrature_point_history ()
+  void
+  TopLevel<dim>::update_quadrature_point_history ()
   {
     FEValues<dim> fe_values (fe, quadrature_formula,
                              update_values | update_gradients);
@@ -770,7 +796,8 @@ namespace Step18
         }
   }
 }
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

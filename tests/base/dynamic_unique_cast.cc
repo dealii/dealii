@@ -21,13 +21,15 @@
 class B
 {
 public:
-  virtual ~B() {}
+  virtual
+  ~B() {}
 };
 
 class D : public B {};
 
 
-void test ()
+void
+test ()
 {
   // Create a pointer to D
   std::unique_ptr<D> d = std_cxx14::make_unique<D>();
@@ -51,7 +53,8 @@ void test ()
 }
 
 
-void invalid_test ()
+void
+invalid_test ()
 {
   // Create a pointer to B
   std::unique_ptr<B> b = std_cxx14::make_unique<B>();
@@ -70,7 +73,8 @@ void invalid_test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

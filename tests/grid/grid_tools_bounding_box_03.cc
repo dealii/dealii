@@ -21,7 +21,8 @@
 #include <deal.II/grid/grid_tools.h>
 
 template <int dim, int spacedim>
-void test_tria_bounding_box()
+void
+test_tria_bounding_box()
 {
   dealii::Point<dim> p1, p2;
   for (unsigned int k = 0; k < dim; ++k)
@@ -40,7 +41,8 @@ void test_tria_bounding_box()
   deallog << boundary_points.first << ", " << boundary_points.second << std::endl;
 }
 
-int main(void)
+int
+main(void)
 {
   initlog();
 

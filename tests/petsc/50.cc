@@ -24,7 +24,8 @@
 #include <vector>
 
 
-void test (PETScWrappers::MPI::Vector &v)
+void
+test (PETScWrappers::MPI::Vector &v)
 {
   Vector<double> w (v.size());
   Vector<float>  x (v.size());
@@ -62,7 +63,8 @@ void test (PETScWrappers::MPI::Vector &v)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

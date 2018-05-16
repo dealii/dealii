@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void check (const SymmetricTensor<4,dim> &A)
+void
+check (const SymmetricTensor<4,dim> &A)
 {
   const SymmetricTensor<4,dim> B = invert (A);
 
@@ -69,7 +70,8 @@ void check (const SymmetricTensor<4,dim> &A)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -118,7 +120,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

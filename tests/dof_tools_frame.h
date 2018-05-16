@@ -77,7 +77,8 @@ check (const Triangulation<dim> &tria,
 
 
 template <int dim>
-void check_grid(const Triangulation<dim> &tr)
+void
+check_grid(const Triangulation<dim> &tr)
 {
   FE_Q<dim> q1(1);
   check(tr, q1);

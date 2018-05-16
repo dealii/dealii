@@ -26,7 +26,8 @@
 #include <iostream>
 
 
-void test ()
+void
+test ()
 {
   TrilinosWrappers::MPI::Vector v;
   v.reinit(complete_index_set(3), MPI_COMM_WORLD);
@@ -56,7 +57,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
   initlog();;

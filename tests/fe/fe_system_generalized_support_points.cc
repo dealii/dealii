@@ -28,7 +28,8 @@
 using namespace dealii;
 
 template<int dim>
-void test()
+void
+test()
 {
   const auto print = [](const FiniteElement<dim> &fe)
   {
@@ -55,7 +56,8 @@ void test()
   print(FESystem<dim>(FESystem<dim>(FE_RaviartThomas<dim>(1), 3, FE_Nedelec<dim>(1), 3), 2, FE_Q<dim>(2), 3, FE_Q<dim>(1), 3));
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

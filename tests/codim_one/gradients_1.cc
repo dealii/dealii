@@ -45,10 +45,12 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename, unsigned int degree = 1)
+void
+test(std::string filename, unsigned int degree = 1)
 
 {
   Triangulation<dim, spacedim> triangulation;
@@ -109,7 +111,8 @@ void test(std::string filename, unsigned int degree = 1)
 
 
 
-int main ()
+int
+main ()
 {
   logfile.precision (4);
   deallog.attach(logfile);

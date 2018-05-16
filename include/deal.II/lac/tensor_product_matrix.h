@@ -72,14 +72,16 @@ public:
    * resulting from the Kronecker product of 1D matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */
-  unsigned int m () const;
+  unsigned int
+  m () const;
 
   /**
    * Return the number of columns of the tensor product matrix
    * resulting from the Kronecker product of 1D matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */
-  unsigned int n () const;
+  unsigned int
+  n () const;
 
   /**
    * Implements a matrix-vector product with the underlying matrix as
@@ -87,8 +89,9 @@ public:
    * This function is operating on ArrayView to allow checks of
    * array bounds with respect to @p dst and @p src.
    */
-  void vmult (const ArrayView<Number> &dst,
-              const ArrayView<const Number> &src) const;
+  void
+  vmult (const ArrayView<Number> &dst,
+         const ArrayView<const Number> &src) const;
 
   /**
    * Implements a matrix-vector product with the underlying matrix as
@@ -96,8 +99,9 @@ public:
    * This function is operating on ArrayView to allow checks of
    * array bounds with respect to @p dst and @p src.
    */
-  void apply_inverse (const ArrayView<Number> &dst,
-                      const ArrayView<const Number> &src) const;
+  void
+  apply_inverse (const ArrayView<Number> &dst,
+                 const ArrayView<const Number> &src) const;
 
 protected:
   /**
@@ -255,24 +259,27 @@ public:
    * and positive definite and every $A_{d}$ to be symmetric and invertible but not
    * necessarily positive definite.
    */
-  void reinit (const std::array<Table<2,Number>,dim> &mass_matrix,
-               const std::array<Table<2,Number>,dim> &derivative_matrix);
+  void
+  reinit (const std::array<Table<2,Number>,dim> &mass_matrix,
+          const std::array<Table<2,Number>,dim> &derivative_matrix);
 
   /**
    * This function is equivalent to the previous reinit() except that
    * the 1D matrices in @p mass_matrix and @p derivative_matrix are
    * passed in terms of a FullMatrix, respectively.
    */
-  void reinit (const std::array<FullMatrix<Number>,dim> &mass_matrix,
-               const std::array<FullMatrix<Number>,dim> &derivative_matrix);
+  void
+  reinit (const std::array<FullMatrix<Number>,dim> &mass_matrix,
+          const std::array<FullMatrix<Number>,dim> &derivative_matrix);
 
   /**
    * This function is equivalent to the first reinit() except that
    * we consider the same 1D mass matrix @p mass_matrix and the same 1D
    * derivative matrix @p derivative_matrix for each tensor direction.
    */
-  void reinit (const Table<2,Number> &mass_matrix,
-               const Table<2,Number> &derivative_matrix);
+  void
+  reinit (const Table<2,Number> &mass_matrix,
+          const Table<2,Number> &derivative_matrix);
 
 private:
   /**
@@ -284,8 +291,9 @@ private:
    * TensorProductMatrixSymmetricSumBase::derivative_matrix.
    */
   template <typename MatrixArray>
-  void reinit_impl (MatrixArray &&mass_matrix,
-                    MatrixArray &&derivative_matrix);
+  void
+  reinit_impl (MatrixArray &&mass_matrix,
+               MatrixArray &&derivative_matrix);
 };
 
 
@@ -335,16 +343,18 @@ public:
    * and positive definite and every $A_{d}$ to be symmetric and invertible but not
    * necessarily positive definite.
    */
-  void reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
-               const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix);
+  void
+  reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+          const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix);
 
   /**
    * This function is equivalent to the previous reinit() except that
    * we consider the same 1D mass matrix @p mass_matrix and the same 1D
    * derivative matrix @p derivative_matrix for each tensor direction.
    */
-  void reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
-               const Table<2,VectorizedArray<Number> > &derivative_matrix);
+  void
+  reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
+          const Table<2,VectorizedArray<Number> > &derivative_matrix);
 
 private:
   /**
@@ -356,8 +366,9 @@ private:
    * TensorProductMatrixSymmetricSumBase::derivative_matrix.
    */
   template <typename MatrixArray>
-  void reinit_impl (MatrixArray &&mass_matrix,
-                    MatrixArray &&derivative_matrix);
+  void
+  reinit_impl (MatrixArray &&mass_matrix,
+               MatrixArray &&derivative_matrix);
 };
 
 
@@ -446,8 +457,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSumBase<dim,Number,size>
-::vmult (const ArrayView<Number> &dst_view,
-         const ArrayView<const Number> &src_view) const
+::
+vmult (const ArrayView<Number> &dst_view,
+       const ArrayView<const Number> &src_view) const
 {
   AssertDimension (dst_view.size(), this->m());
   AssertDimension (src_view.size(), this->n());
@@ -507,8 +519,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSumBase<dim,Number,size>
-::apply_inverse (const ArrayView<Number> &dst_view,
-                 const ArrayView<const Number> &src_view) const
+::
+apply_inverse (const ArrayView<Number> &dst_view,
+               const ArrayView<const Number> &src_view) const
 {
   AssertDimension (dst_view.size(), this->n());
   AssertDimension (src_view.size(), this->m());
@@ -577,8 +590,9 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum (const std::array<Table<2,Number>, dim> &mass_matrix,
-                                   const std::array<Table<2,Number>, dim> &derivative_matrix)
+::
+TensorProductMatrixSymmetricSum (const std::array<Table<2,Number>, dim> &mass_matrix,
+                                 const std::array<Table<2,Number>, dim> &derivative_matrix)
 {
   reinit (mass_matrix, derivative_matrix);
 }
@@ -588,8 +602,9 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum(const std::array<FullMatrix<Number>, dim> &mass_matrix,
-                                  const std::array<FullMatrix<Number>, dim> &derivative_matrix)
+::
+TensorProductMatrixSymmetricSum(const std::array<FullMatrix<Number>, dim> &mass_matrix,
+                                const std::array<FullMatrix<Number>, dim> &derivative_matrix)
 {
   reinit (mass_matrix, derivative_matrix);
 }
@@ -599,8 +614,9 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum (const Table<2,Number> &mass_matrix,
-                                   const Table<2,Number> &derivative_matrix)
+::
+TensorProductMatrixSymmetricSum (const Table<2,Number> &mass_matrix,
+                                 const Table<2,Number> &derivative_matrix)
 {
   reinit (mass_matrix, derivative_matrix);
 }
@@ -612,8 +628,9 @@ template <typename MatrixArray>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::reinit_impl (MatrixArray &&mass_matrices_,
-               MatrixArray &&derivative_matrices_)
+::
+reinit_impl (MatrixArray &&mass_matrices_,
+             MatrixArray &&derivative_matrices_)
 {
   auto &&mass_matrices = std::forward<MatrixArray>(mass_matrices_);
   auto &&derivative_matrices = std::forward<MatrixArray>(derivative_matrices_);
@@ -646,8 +663,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::reinit (const std::array<Table<2,Number>, dim> &mass_matrix,
-          const std::array<Table<2,Number>, dim> &derivative_matrix)
+::
+reinit (const std::array<Table<2,Number>, dim> &mass_matrix,
+        const std::array<Table<2,Number>, dim> &derivative_matrix)
 {
   reinit_impl (mass_matrix, derivative_matrix);
 }
@@ -658,8 +676,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::reinit (const std::array<FullMatrix<Number>, dim> &mass_matrix,
-          const std::array<FullMatrix<Number>, dim> &derivative_matrix)
+::
+reinit (const std::array<FullMatrix<Number>, dim> &mass_matrix,
+        const std::array<FullMatrix<Number>, dim> &derivative_matrix)
 {
   std::array<Table<2,Number>,dim> mass_copy;
   std::array<Table<2,Number>,dim> deriv_copy;
@@ -678,8 +697,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::reinit (const Table<2,Number> &mass_matrix,
-          const Table<2,Number> &derivative_matrix)
+::
+reinit (const Table<2,Number> &mass_matrix,
+        const Table<2,Number> &derivative_matrix)
 {
   std::array<Table<2,Number>,dim> mass_matrices;
   std::array<Table<2,Number>,dim> derivative_matrices;
@@ -697,8 +717,9 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::TensorProductMatrixSymmetricSum (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
-                                   const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
+::
+TensorProductMatrixSymmetricSum (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+                                 const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
 {
   reinit (mass_matrix, derivative_matrix);
 }
@@ -708,8 +729,9 @@ TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::TensorProductMatrixSymmetricSum (const Table<2,VectorizedArray<Number> > &mass_matrix,
-                                   const Table<2,VectorizedArray<Number> > &derivative_matrix)
+::
+TensorProductMatrixSymmetricSum (const Table<2,VectorizedArray<Number> > &mass_matrix,
+                                 const Table<2,VectorizedArray<Number> > &derivative_matrix)
 {
   reinit (mass_matrix, derivative_matrix);
 }
@@ -721,8 +743,9 @@ template <typename MatrixArray>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::reinit_impl (MatrixArray &&mass_matrices_,
-               MatrixArray &&derivative_matrices_)
+::
+reinit_impl (MatrixArray &&mass_matrices_,
+             MatrixArray &&derivative_matrices_)
 {
   auto &&mass_matrix = std::forward<MatrixArray>(mass_matrices_);
   auto &&derivative_matrix = std::forward<MatrixArray>(derivative_matrices_);
@@ -793,8 +816,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
-          const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
+::
+reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+        const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
 {
   reinit_impl (mass_matrix, derivative_matrix);
 }
@@ -805,8 +829,9 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
-          const Table<2,VectorizedArray<Number> > &derivative_matrix)
+::
+reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
+        const Table<2,VectorizedArray<Number> > &derivative_matrix)
 {
   std::array<Table<2,VectorizedArray<Number> >,dim> mass_matrices;
   std::array<Table<2,VectorizedArray<Number> >,dim> derivative_matrices;

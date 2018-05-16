@@ -46,20 +46,24 @@ template <int dim>
 class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
-  void cell(MeshWorker::DoFInfo<dim> &dinfo,
-            typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1,
-            MeshWorker::DoFInfo<dim> &dinfo2,
-            typename MeshWorker::IntegrationInfo<dim> &info1,
-            typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo,
+       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo,
+           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       typename MeshWorker::IntegrationInfo<dim> &info1,
+       typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 template <int dim>
 void MatrixIntegrator<dim>
-::cell(MeshWorker::DoFInfo<dim> &dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const
+::
+cell(MeshWorker::DoFInfo<dim> &dinfo,
+     typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix,
                                          info.fe_values());
@@ -67,8 +71,9 @@ void MatrixIntegrator<dim>
 
 template <int dim>
 void MatrixIntegrator<dim>
-::boundary(MeshWorker::DoFInfo<dim> &dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const
+::
+boundary(MeshWorker::DoFInfo<dim> &dinfo,
+         typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace
@@ -79,10 +84,11 @@ void MatrixIntegrator<dim>
 
 template <int dim>
 void MatrixIntegrator<dim>
-::face(MeshWorker::DoFInfo<dim> &dinfo1,
-       MeshWorker::DoFInfo<dim> &dinfo2,
-       typename MeshWorker::IntegrationInfo<dim> &info1,
-       typename MeshWorker::IntegrationInfo<dim> &info2) const
+::
+face(MeshWorker::DoFInfo<dim> &dinfo1,
+     MeshWorker::DoFInfo<dim> &dinfo2,
+     typename MeshWorker::IntegrationInfo<dim> &info1,
+     typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
   const unsigned int deg = info1.fe_values(0).get_fe().degree;
   LocalIntegrators::Laplace
@@ -98,12 +104,16 @@ class Step4
 {
 public:
   Step4 ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid ();
-  void setup_system();
-  void solve ();
+  void
+  make_grid ();
+  void
+  setup_system();
+  void
+  solve ();
 
   Triangulation<dim>   triangulation;
   FE_DGP<dim>          fe;
@@ -127,7 +137,8 @@ Step4<dim>::Step4 ()
 
 
 template <int dim>
-void Step4<dim>::make_grid ()
+void
+Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (6);
@@ -136,7 +147,8 @@ void Step4<dim>::make_grid ()
 
 
 template <int dim>
-void Step4<dim>::setup_system ()
+void
+Step4<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -171,7 +183,8 @@ void Step4<dim>::setup_system ()
 
 
 template <int dim>
-void Step4<dim>::solve ()
+void
+Step4<dim>::solve ()
 {
 
   deallog.push(Utilities::int_to_string(dof_handler.n_dofs(),5));
@@ -194,7 +207,8 @@ void Step4<dim>::solve ()
 
 
 template <int dim>
-void Step4<dim>::run()
+void
+Step4<dim>::run()
 {
   for (unsigned int cycle = 0; cycle < 2; ++cycle)
     {
@@ -209,7 +223,8 @@ void Step4<dim>::run()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

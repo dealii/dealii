@@ -30,7 +30,8 @@
 
 
 template <class TRIA>
-void check (TRIA &tr)
+void
+check (TRIA &tr)
 {
   typename TRIA::cell_iterator cell = tr.begin(),
                                endc = tr.end();
@@ -48,7 +49,8 @@ void check (TRIA &tr)
 
 
 template <int dim>
-void test()
+void
+test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -85,7 +87,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

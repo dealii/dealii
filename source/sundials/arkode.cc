@@ -51,10 +51,11 @@ namespace SUNDIALS
   {
 
     template<typename VectorType>
-    int t_arkode_explicit_function(realtype tt,
-                                   N_Vector yy,
-                                   N_Vector yp,
-                                   void *user_data)
+    int
+    t_arkode_explicit_function(realtype tt,
+                               N_Vector yy,
+                               N_Vector yp,
+                               void *user_data)
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -77,10 +78,11 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_arkode_implicit_function(realtype tt,
-                                   N_Vector yy,
-                                   N_Vector yp,
-                                   void *user_data)
+    int
+    t_arkode_implicit_function(realtype tt,
+                               N_Vector yy,
+                               N_Vector yp,
+                               void *user_data)
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -103,14 +105,15 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_arkode_setup_jacobian(ARKodeMem arkode_mem,
-                                int convfail,
-                                N_Vector ypred,
-                                N_Vector fpred,
-                                booleantype *jcurPtr,
-                                N_Vector,
-                                N_Vector,
-                                N_Vector)
+    int
+    t_arkode_setup_jacobian(ARKodeMem arkode_mem,
+                            int convfail,
+                            N_Vector ypred,
+                            N_Vector fpred,
+                            booleantype *jcurPtr,
+                            N_Vector,
+                            N_Vector,
+                            N_Vector)
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(arkode_mem->ark_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -137,13 +140,14 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_arkode_solve_jacobian(ARKodeMem arkode_mem,
-                                N_Vector b,
+    int
+    t_arkode_solve_jacobian(ARKodeMem arkode_mem,
+                            N_Vector b,
 #if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
-                                N_Vector,
+                            N_Vector,
 #endif
-                                N_Vector ycur,
-                                N_Vector fcur)
+                            N_Vector ycur,
+                            N_Vector fcur)
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(arkode_mem->ark_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -176,10 +180,11 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_arkode_setup_mass(ARKodeMem arkode_mem,
-                            N_Vector,
-                            N_Vector,
-                            N_Vector)
+    int
+    t_arkode_setup_mass(ARKodeMem arkode_mem,
+                        N_Vector,
+                        N_Vector,
+                        N_Vector)
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(arkode_mem->ark_user_data);
       int err = solver.setup_mass(arkode_mem->ark_tn);
@@ -189,14 +194,15 @@ namespace SUNDIALS
 
 
     template<typename VectorType>
-    int t_arkode_solve_mass(ARKodeMem arkode_mem,
+    int
+    t_arkode_solve_mass(ARKodeMem arkode_mem,
 #if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
-                            N_Vector b,
-                            N_Vector
+                        N_Vector b,
+                        N_Vector
 #else
-                            N_Vector b
+                        N_Vector b
 #endif
-                           )
+                       )
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(arkode_mem->ark_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -248,7 +254,8 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  unsigned int ARKode<VectorType>::solve_ode(VectorType &solution)
+  unsigned int
+  ARKode<VectorType>::solve_ode(VectorType &solution)
   {
 
     unsigned int system_size = solution.size();
@@ -334,9 +341,10 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  void ARKode<VectorType>::reset(const double &current_time,
-                                 const double &current_time_step,
-                                 const VectorType &solution)
+  void
+  ARKode<VectorType>::reset(const double &current_time,
+                            const double &current_time_step,
+                            const VectorType &solution)
   {
 
     unsigned int system_size;
@@ -472,7 +480,8 @@ namespace SUNDIALS
   }
 
   template<typename VectorType>
-  void ARKode<VectorType>::set_functions_to_trigger_an_assert()
+  void
+  ARKode<VectorType>::set_functions_to_trigger_an_assert()
   {
 
     reinit_vector = [](VectorType &)

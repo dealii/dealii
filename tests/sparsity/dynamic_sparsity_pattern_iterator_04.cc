@@ -44,7 +44,8 @@ backtrace:
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 
-void iterate(DynamicSparsityPattern &sp)
+void
+iterate(DynamicSparsityPattern &sp)
 {
   DynamicSparsityPattern::const_iterator i = sp.begin();
   for (; i!=sp.end(); ++i)
@@ -71,7 +72,8 @@ void iterate(DynamicSparsityPattern &sp)
 }
 
 
-void test ()
+void
+test ()
 {
   {
     DynamicSparsityPattern sp (5,4);
@@ -97,7 +99,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

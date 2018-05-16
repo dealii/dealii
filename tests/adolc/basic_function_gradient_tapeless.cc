@@ -25,7 +25,8 @@
 
 #include <math.h>
 
-int main(void)
+int
+main(void)
 {
   initlog();
 

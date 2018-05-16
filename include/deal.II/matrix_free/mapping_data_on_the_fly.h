@@ -80,18 +80,21 @@ namespace internal
       /**
        * Initialize with the given cell iterator.
        */
-      void reinit(typename dealii::Triangulation<dim>::cell_iterator cell);
+      void
+      reinit(typename dealii::Triangulation<dim>::cell_iterator cell);
 
       /**
        * Return whether reinit() has been called at least once, i.e., a cell
        * has been set.
        */
-      bool is_initialized() const;
+      bool
+      is_initialized() const;
 
       /**
        * Return a triangulation iterator to the current cell.
        */
-      typename dealii::Triangulation<dim>::cell_iterator get_cell () const;
+      typename dealii::Triangulation<dim>::cell_iterator
+      get_cell () const;
 
       /**
        * Return a reference to the underlying FEValues object that evaluates
@@ -99,7 +102,8 @@ namespace internal
        * mapped quadrature points are accessible, as no finite element data is
        * actually used).
        */
-      const dealii::FEValues<dim> &get_fe_values () const;
+      const dealii::FEValues<dim> &
+      get_fe_values () const;
 
       /**
        * Return a reference to the underlying storage field of type

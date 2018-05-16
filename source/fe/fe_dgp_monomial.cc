@@ -70,12 +70,14 @@ namespace internal
 
 
       template <int dim>
-      void generate_unit_points (const unsigned int,
-                                 std::vector<Point<dim> > &);
+      void
+      generate_unit_points (const unsigned int,
+                            std::vector<Point<dim> > &);
 
       template <>
-      void generate_unit_points (const unsigned int k,
-                                 std::vector<Point<1> > &p)
+      void
+      generate_unit_points (const unsigned int k,
+                            std::vector<Point<1> > &p)
       {
         Assert(p.size()==k+1, ExcDimensionMismatch(p.size(), k+1));
         const double h = 1./k;
@@ -84,8 +86,9 @@ namespace internal
       }
 
       template <>
-      void generate_unit_points (const unsigned int k,
-                                 std::vector<Point<2> > &p)
+      void
+      generate_unit_points (const unsigned int k,
+                            std::vector<Point<2> > &p)
       {
         Assert(k<=4, ExcNotImplemented());
         Assert(p.size()==start_index2d[k+1]-start_index2d[k], ExcInternalError());
@@ -97,8 +100,9 @@ namespace internal
       }
 
       template <>
-      void generate_unit_points (const unsigned int k,
-                                 std::vector<Point<3> > &p)
+      void
+      generate_unit_points (const unsigned int k,
+                            std::vector<Point<3> > &p)
       {
         Assert(k<=2, ExcNotImplemented());
         Assert(p.size()==start_index3d[k+1]-start_index3d[k], ExcInternalError());

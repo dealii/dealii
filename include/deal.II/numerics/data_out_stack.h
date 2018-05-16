@@ -128,7 +128,8 @@ public:
   /**
    * Destructor. Only declared to make it @p virtual.
    */
-  virtual ~DataOutStack () override = default;
+  virtual
+  ~DataOutStack () override = default;
 
   /**
    * Start the next set of data for a specific parameter value. The argument
@@ -136,8 +137,9 @@ public:
    * from @p parameter_value) with which the output will be extended in
    * parameter direction, i.e. orthogonal to the space directions.
    */
-  void new_parameter_value (const double parameter_value,
-                            const double parameter_step);
+  void
+  new_parameter_value (const double parameter_value,
+                       const double parameter_step);
 
   /**
    * Attach the DoF handler for the grid and data associated with the
@@ -146,7 +148,8 @@ public:
    * This has to happen before adding data vectors for the present parameter
    * value.
    */
-  void attach_dof_handler (const DoFHandlerType &dof_handler);
+  void
+  attach_dof_handler (const DoFHandlerType &dof_handler);
 
   /**
    * Declare a data vector. The @p vector_type argument determines whether the
@@ -156,8 +159,9 @@ public:
    * DoFHandler (and previously attached to this object) has only one
    * component and therefore only one name needs to be given.
    */
-  void declare_data_vector (const std::string &name,
-                            const VectorType   vector_type);
+  void
+  declare_data_vector (const std::string &name,
+                       const VectorType   vector_type);
 
   /**
    * Declare a data vector. The @p vector_type argument determines whether the
@@ -170,8 +174,9 @@ public:
    * <tt>std::vector@<std::string@></tt> containing only one element if the
    * finite element has only one component.
    */
-  void declare_data_vector (const std::vector<std::string> &name,
-                            const VectorType                vector_type);
+  void
+  declare_data_vector (const std::vector<std::string> &name,
+                       const VectorType                vector_type);
 
 
   /**
@@ -194,8 +199,9 @@ public:
    * are already done.
    */
   template <typename number>
-  void add_data_vector (const Vector<number> &vec,
-                        const std::string    &name);
+  void
+  add_data_vector (const Vector<number> &vec,
+                   const std::string    &name);
 
   /**
    * Add a data vector for the presently set value of the parameter.
@@ -216,8 +222,9 @@ public:
    * are already done.
    */
   template <typename number>
-  void add_data_vector (const Vector<number>           &vec,
-                        const std::vector<std::string> &names);
+  void
+  add_data_vector (const Vector<number>           &vec,
+                   const std::vector<std::string> &names);
 
   /**
    * This is the central function of this class since it builds the list of
@@ -234,7 +241,8 @@ public:
    * description of this parameter. The number of subdivisions is always one
    * in the direction of the time-like parameter used by this class.
    */
-  void build_patches (const unsigned int n_subdivisions = 0);
+  void
+  build_patches (const unsigned int n_subdivisions = 0);
 
   /**
    * Release all data that is no more needed once @p build_patches was called
@@ -242,13 +250,15 @@ public:
    *
    * Counterpart of @p new_parameter_value.
    */
-  void finish_parameter_value ();
+  void
+  finish_parameter_value ();
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * Exception
@@ -321,7 +331,8 @@ private:
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
   };
 
   /**
@@ -339,14 +350,16 @@ private:
    * data in the form of Patch structures (declared in the base class
    * DataOutBase) to the actual output function.
    */
-  virtual const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const override;
+  virtual const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > &
+  get_patches () const override;
 
 
   /**
    * Virtual function through which the names of data sets are obtained by the
    * output functions of the base class.
    */
-  virtual std::vector<std::string> get_dataset_names () const override;
+  virtual std::vector<std::string>
+  get_dataset_names () const override;
 };
 
 

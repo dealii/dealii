@@ -51,7 +51,8 @@ using namespace dealii;
 
 static const unsigned int dim = 2;
 
-void test ()
+void
+test ()
 {
 
   MPI_Comm mpi_communicator (MPI_COMM_WORLD);
@@ -161,7 +162,8 @@ void test ()
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   initlog();
   deallog.depth_console(0);

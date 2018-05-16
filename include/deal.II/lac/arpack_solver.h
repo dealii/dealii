@@ -28,31 +28,35 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-extern "C" void dnaupd_(int *ido, char *bmat, unsigned int *n, char *which,
-                        unsigned int *nev, const double *tol, double *resid, int *ncv,
-                        double *v, int *ldv, int *iparam, int *ipntr,
-                        double *workd, double *workl, int *lworkl,
-                        int *info);
+extern "C" void
+dnaupd_(int *ido, char *bmat, unsigned int *n, char *which,
+        unsigned int *nev, const double *tol, double *resid, int *ncv,
+        double *v, int *ldv, int *iparam, int *ipntr,
+        double *workd, double *workl, int *lworkl,
+        int *info);
 
-extern "C" void dsaupd_(int *ido, char *bmat, unsigned int *n, char *which,
-                        unsigned int *nev, double *tol, double *resid, int *ncv,
-                        double *v, int *ldv, int *iparam, int *ipntr,
-                        double *workd, double *workl, int *lworkl,
-                        int *info);
+extern "C" void
+dsaupd_(int *ido, char *bmat, unsigned int *n, char *which,
+        unsigned int *nev, double *tol, double *resid, int *ncv,
+        double *v, int *ldv, int *iparam, int *ipntr,
+        double *workd, double *workl, int *lworkl,
+        int *info);
 
-extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
-                        double *di, double *z, int *ldz, double *sigmar,
-                        double *sigmai, double *workev, char *bmat, unsigned int *n, char *which,
-                        unsigned int *nev, double *tol, double *resid, int *ncv,
-                        double *v, int *ldv, int *iparam, int *ipntr,
-                        double *workd, double *workl, int *lworkl, int *info);
+extern "C" void
+dneupd_(int *rvec, char *howmany, int *select, double *d,
+        double *di, double *z, int *ldz, double *sigmar,
+        double *sigmai, double *workev, char *bmat, unsigned int *n, char *which,
+        unsigned int *nev, double *tol, double *resid, int *ncv,
+        double *v, int *ldv, int *iparam, int *ipntr,
+        double *workd, double *workl, int *lworkl, int *info);
 
-extern "C" void dseupd_(int *rvec, char *howmany, int *select, double *d,
-                        double *z, int *ldz, double *sigmar,
-                        char *bmat, unsigned int *n, char *which,
-                        unsigned int *nev, double *tol, double *resid, int *ncv,
-                        double *v, int *ldv, int *iparam, int *ipntr,
-                        double *workd, double *workl, int *lworkl, int *info);
+extern "C" void
+dseupd_(int *rvec, char *howmany, int *select, double *d,
+        double *z, int *ldz, double *sigmar,
+        char *bmat, unsigned int *n, char *which,
+        unsigned int *nev, double *tol, double *resid, int *ncv,
+        double *v, int *ldv, int *iparam, int *ipntr,
+        double *workd, double *workl, int *lworkl, int *info);
 
 /**
  * Interface for using ARPACK. ARPACK is a collection of Fortran77 subroutines
@@ -169,7 +173,8 @@ public:
      * vectors if the problem is symmetric) to 15. Set the solver to find the
      * eigenvalues of largest magnitude for a non-symmetric problem).
      */
-    explicit AdditionalData(
+    explicit
+    AdditionalData(
       const unsigned int number_of_arnoldi_vectors = 15,
       const WhichEigenvalues eigenvalue_of_interest = largest_magnitude,
       const bool symmetric = false);
@@ -195,7 +200,8 @@ public:
   /**
    * Access to the object that controls convergence.
    */
-  SolverControl &control () const;
+  SolverControl &
+  control () const;
 
   /**
    * Constructor.
@@ -207,14 +213,16 @@ public:
    * Set initial vector for building Krylov space.
    */
   template <typename VectorType>
-  void set_initial_vector(const VectorType &vec);
+  void
+  set_initial_vector(const VectorType &vec);
 
   /**
    * Set shift @p sigma for shift-and-invert spectral transformation.
    *
    * If this function is not called, the shift is assumed to be zero.
    */
-  void set_shift(const std::complex<double> sigma);
+  void
+  set_shift(const std::complex<double> sigma);
 
   /**
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
@@ -267,12 +275,13 @@ public:
    */
   template <typename VectorType, typename MatrixType1,
             typename MatrixType2, typename INVERSE>
-  void solve (const MatrixType1                  &A,
-              const MatrixType2                  &B,
-              const INVERSE                      &inverse,
-              std::vector<std::complex<double> > &eigenvalues,
-              std::vector<VectorType>            &eigenvectors,
-              const unsigned int                  n_eigenvalues = 0);
+  void
+  solve (const MatrixType1                  &A,
+         const MatrixType2                  &B,
+         const INVERSE                      &inverse,
+         std::vector<std::complex<double> > &eigenvalues,
+         std::vector<VectorType>            &eigenvectors,
+         const unsigned int                  n_eigenvalues = 0);
 
 protected:
 
@@ -432,12 +441,13 @@ set_initial_vector(const VectorType &vec)
 template <typename VectorType, typename MatrixType1,
           typename MatrixType2, typename INVERSE>
 inline
-void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
-                          const MatrixType2                  &mass_matrix,
-                          const INVERSE                      &inverse,
-                          std::vector<std::complex<double> > &eigenvalues,
-                          std::vector<VectorType>            &eigenvectors,
-                          const unsigned int                  n_eigenvalues)
+void
+ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
+                     const MatrixType2                  &mass_matrix,
+                     const INVERSE                      &inverse,
+                     std::vector<std::complex<double> > &eigenvalues,
+                     std::vector<VectorType>            &eigenvectors,
+                     const unsigned int                  n_eigenvalues)
 {
   // Problem size
   unsigned int n = eigenvectors[0].size();
@@ -724,7 +734,8 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
 
 
 inline
-SolverControl &ArpackSolver::control () const
+SolverControl &
+ArpackSolver::control () const
 {
   return solver_control;
 }

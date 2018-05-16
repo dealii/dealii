@@ -21,7 +21,8 @@
 #include <deal.II/lac/full_matrix.h>
 
 
-int main()
+int
+main()
 {
   initlog();
 

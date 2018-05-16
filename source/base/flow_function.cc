@@ -47,7 +47,8 @@ namespace Functions
 
 
   template <int dim>
-  void FlowFunction<dim>::vector_value_list (
+  void
+  FlowFunction<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
     std::vector<Vector<double> >   &values) const
   {
@@ -72,7 +73,8 @@ namespace Functions
 
 
   template <int dim>
-  void FlowFunction<dim>::vector_value (
+  void
+  FlowFunction<dim>::vector_value (
     const Point<dim> &point,
     Vector<double> &value) const
   {
@@ -96,7 +98,8 @@ namespace Functions
 
 
   template <int dim>
-  double FlowFunction<dim>::value (
+  double
+  FlowFunction<dim>::value (
     const Point<dim> &point,
     const unsigned int comp) const
   {
@@ -118,7 +121,8 @@ namespace Functions
 
 
   template <int dim>
-  void FlowFunction<dim>::vector_gradient_list (
+  void
+  FlowFunction<dim>::vector_gradient_list (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
@@ -143,7 +147,8 @@ namespace Functions
 
 
   template <int dim>
-  void FlowFunction<dim>::vector_laplacian_list (
+  void
+  FlowFunction<dim>::vector_laplacian_list (
     const std::vector<Point<dim> > &points,
     std::vector<Vector<double> > &values) const
   {
@@ -190,7 +195,8 @@ namespace Functions
 
 
   template <int dim>
-  void PoisseuilleFlow<dim>::vector_values (
+  void
+  PoisseuilleFlow<dim>::vector_values (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -225,7 +231,8 @@ namespace Functions
 
 
   template <int dim>
-  void PoisseuilleFlow<dim>::vector_gradients (
+  void
+  PoisseuilleFlow<dim>::vector_gradients (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
@@ -256,7 +263,8 @@ namespace Functions
 
 
   template <int dim>
-  void PoisseuilleFlow<dim>::vector_laplacians (
+  void
+  PoisseuilleFlow<dim>::vector_laplacians (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -291,7 +299,8 @@ namespace Functions
 
 
   template <int dim>
-  void StokesCosine<dim>::vector_values (
+  void
+  StokesCosine<dim>::vector_values (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -338,7 +347,8 @@ namespace Functions
 
 
   template <int dim>
-  void StokesCosine<dim>::vector_gradients (
+  void
+  StokesCosine<dim>::vector_gradients (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
   {
@@ -402,7 +412,8 @@ namespace Functions
 
 
   template <int dim>
-  void StokesCosine<dim>::vector_laplacians (
+  void
+  StokesCosine<dim>::vector_laplacians (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -521,7 +532,8 @@ namespace Functions
   }
 
 
-  void StokesLSingularity::vector_values (
+  void
+  StokesLSingularity::vector_values (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -557,7 +569,8 @@ namespace Functions
 
 
 
-  void StokesLSingularity::vector_gradients (
+  void
+  StokesLSingularity::vector_gradients (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<Tensor<1,2> > > &values) const
   {
@@ -613,7 +626,8 @@ namespace Functions
 
 
 
-  void StokesLSingularity::vector_laplacians (
+  void
+  StokesLSingularity::vector_laplacians (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -648,7 +662,8 @@ namespace Functions
 
 
 
-  void Kovasznay::vector_values (
+  void
+  Kovasznay::vector_values (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<double> > &values) const
   {
@@ -672,7 +687,8 @@ namespace Functions
   }
 
 
-  void Kovasznay::vector_gradients (
+  void
+  Kovasznay::vector_gradients (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<Tensor<1,2> > > &gradients) const
   {
@@ -704,7 +720,8 @@ namespace Functions
 
 
 
-  void Kovasznay::vector_laplacians (
+  void
+  Kovasznay::vector_laplacians (
     const std::vector<Point<2> > &points,
     std::vector<std::vector<double> > &values) const
   {

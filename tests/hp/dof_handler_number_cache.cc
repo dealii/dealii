@@ -36,7 +36,8 @@
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
 
@@ -111,7 +112,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

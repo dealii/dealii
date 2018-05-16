@@ -76,13 +76,15 @@ public:
    * Destructor. If this class still owns a file to which temporary data was
    * stored, then it is deleted.
    */
-  virtual ~SwappableVector () override;
+  virtual
+  ~SwappableVector () override;
 
   /**
    * Copy operator. Do mostly the same as the copy constructor does; if
    * necessary, delete temporary files owned by this object at first.
    */
-  SwappableVector &operator = (const SwappableVector &);
+  SwappableVector &
+  operator = (const SwappableVector &);
 
   /**
    * Swap out the data of this vector to the file of which the name is given.
@@ -95,7 +97,8 @@ public:
    * If this object owns another file, for example when @p swap_out but no @p
    * kill_file has previously been called, then that is deleted first.
    */
-  void swap_out (const std::string &filename);
+  void
+  swap_out (const std::string &filename);
 
   /**
    * Reload the data of this vector from the file to which it has been stored
@@ -106,7 +109,8 @@ public:
    * This function resets the size of the vector to the number of elements
    * there were upon calling @p swap_out before.
    */
-  void reload ();
+  void
+  reload ();
 
   /**
    * Calling this function can be used to alert this vector that it will need
@@ -124,7 +128,8 @@ public:
    * and has no effect for subsequent calls. Calling this function while the
    * data is still or already in memory is allowed and has no effect.
    */
-  void alert ();
+  void
+  alert ();
 
 
   /**
@@ -139,20 +144,23 @@ public:
    * This throws a ExcIO exception if, for any reason, deleting the file
    * failed.
    */
-  void kill_file ();
+  void
+  kill_file ();
 
   /**
    * Return the name of the file to which the data was stored the last time
    * you called @p swap_out. If @p swap_out was not called, or if in between
    * @p kill_file was called, then the filename is an empty string.
    */
-  const std::string &get_filename () const;
+  const std::string &
+  get_filename () const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption () const;
 
   /**
    * @addtogroup Exceptions
@@ -211,7 +219,8 @@ private:
    * themselves, since they call this function detached, so this function has
    * to signal success itself if this is required.
    */
-  void reload_vector (const bool set_flag);
+  void
+  reload_vector (const bool set_flag);
 };
 
 /*@}*/

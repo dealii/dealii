@@ -50,7 +50,8 @@ const double rect[] =
 
 using namespace dealii;
 
-void test_rect(unsigned int m, unsigned int n, const double *values)
+void
+test_rect(unsigned int m, unsigned int n, const double *values)
 {
   std::ostringstream prefix;
   prefix << m << 'x' << n;
@@ -97,7 +98,8 @@ void test_rect(unsigned int m, unsigned int n, const double *values)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

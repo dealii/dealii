@@ -18,7 +18,8 @@
 
 #include <vector>
 
-void f(const std::vector<int> &v)
+void
+f(const std::vector<int> &v)
 {
   const VectorSlice<const std::vector<int> >
   s = make_slice(v,2,3);
@@ -29,7 +30,8 @@ void f(const std::vector<int> &v)
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 

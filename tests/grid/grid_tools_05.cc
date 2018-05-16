@@ -26,7 +26,8 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii;
 
@@ -39,7 +40,8 @@ using namespace dealii;
  */
 
 /* The 2D case */
-void generate_grid(Triangulation<2> &triangulation)
+void
+generate_grid(Triangulation<2> &triangulation)
 {
   Point<2> vertices_1[]
   =
@@ -94,7 +96,8 @@ void generate_grid(Triangulation<2> &triangulation)
 
 
 /* The 3D case */
-void generate_grid(Triangulation<3> &triangulation)
+void
+generate_grid(Triangulation<3> &triangulation)
 {
   Point<3> vertices_1[]
   =
@@ -162,9 +165,10 @@ void generate_grid(Triangulation<3> &triangulation)
  * Print out the face vertices as well as the orientation of a match:
  */
 template <typename FaceIterator>
-void print_match(const FaceIterator &face_1,
-                 const FaceIterator &face_2,
-                 const std::bitset<3> &orientation)
+void
+print_match(const FaceIterator &face_1,
+            const FaceIterator &face_2,
+            const std::bitset<3> &orientation)
 {
   static const int dim = FaceIterator::AccessorType::dimension;
 
@@ -185,7 +189,8 @@ void print_match(const FaceIterator &face_1,
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);

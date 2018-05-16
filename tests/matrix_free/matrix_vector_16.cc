@@ -37,7 +37,8 @@
 #include <deal.II/lac/vector.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -52,8 +53,9 @@ public:
     constraints (constraints)
   {}
 
-  void vmult (VectorType       &dst,
-              const VectorType &src) const
+  void
+  vmult (VectorType       &dst,
+         const VectorType &src) const
   {
     VectorType src_cpy = src;
     constraints.distribute(src_cpy);
@@ -88,9 +90,10 @@ private:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim>  &dof,
-              const ConstraintMatrix &constraints,
-              const unsigned int      parallel_option = 0)
+void
+do_test (const DoFHandler<dim>  &dof,
+         const ConstraintMatrix &constraints,
+         const unsigned int      parallel_option = 0)
 {
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
@@ -179,7 +182,8 @@ void do_test (const DoFHandler<dim>  &dof,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;
@@ -219,7 +223,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

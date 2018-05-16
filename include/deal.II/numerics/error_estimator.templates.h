@@ -193,7 +193,8 @@ namespace internal
        * associated with the given finite element index into the hp
        * collections.
        */
-      void resize (const unsigned int active_fe_index);
+      void
+      resize (const unsigned int active_fe_index);
     };
 
 
@@ -474,10 +475,11 @@ namespace internal
      * Neumann BC.
      */
     template <typename DoFHandlerType>
-    double boundary_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
-                                const unsigned int                       face_no,
-                                const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_cell,
-                                const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
+    double
+    boundary_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
+                         const unsigned int                       face_no,
+                         const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_cell,
+                         const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
     {
       switch (strategy)
         {
@@ -507,11 +509,12 @@ namespace internal
      * A factor to scale the integral for the regular face.
      */
     template <typename DoFHandlerType>
-    double regular_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
-                               const unsigned int                       face_no,
-                               const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_cell,
-                               const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_neighbor,
-                               const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
+    double
+    regular_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
+                        const unsigned int                       face_no,
+                        const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_cell,
+                        const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values_neighbor,
+                        const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
     {
       switch (strategy)
         {
@@ -541,13 +544,14 @@ namespace internal
      * A factor to scale the integral for the irregular face.
      */
     template <typename DoFHandlerType>
-    double irregular_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
-                                 const typename DoFHandlerType::active_cell_iterator &neighbor_child,
-                                 const unsigned int                       face_no,
-                                 const unsigned int                       subface_no,
-                                 const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values,
-                                 dealii::hp::FESubfaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension>    &fe_subface_values,
-                                 const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
+    double
+    irregular_face_factor(const typename DoFHandlerType::active_cell_iterator &cell,
+                          const typename DoFHandlerType::active_cell_iterator &neighbor_child,
+                          const unsigned int                       face_no,
+                          const unsigned int                       subface_no,
+                          const dealii::hp::FEFaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe_face_values,
+                          dealii::hp::FESubfaceValues<DoFHandlerType::dimension, DoFHandlerType::space_dimension>    &fe_subface_values,
+                          const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
     {
       switch (strategy)
         {
@@ -578,10 +582,11 @@ namespace internal
      * of each cell.
      */
     template <typename DoFHandlerType>
-    double cell_factor(const typename DoFHandlerType::active_cell_iterator &cell,
-                       const unsigned int                       /*face_no*/,
-                       const DoFHandlerType                    &/*dof_handler*/,
-                       const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
+    double
+    cell_factor(const typename DoFHandlerType::active_cell_iterator &cell,
+                const unsigned int                       /*face_no*/,
+                const DoFHandlerType                    &/*dof_handler*/,
+                const typename KellyErrorEstimator<DoFHandlerType::dimension,DoFHandlerType::space_dimension>::Strategy strategy)
     {
       switch (strategy)
         {

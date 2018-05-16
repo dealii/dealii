@@ -93,8 +93,9 @@ public:
     data (data_in)
   {};
 
-  void vmult (std::vector<LinearAlgebra::distributed::Vector<Number> *>       &dst,
-              const std::vector<LinearAlgebra::distributed::Vector<Number> *> &src) const
+  void
+  vmult (std::vector<LinearAlgebra::distributed::Vector<Number> *>       &dst,
+         const std::vector<LinearAlgebra::distributed::Vector<Number> *> &src) const
   {
     for (unsigned int i=0; i<dst.size(); ++i)
       *dst[i] = 0;
@@ -115,7 +116,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   typedef double number;
 
@@ -277,7 +279,8 @@ void test ()
 }
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 

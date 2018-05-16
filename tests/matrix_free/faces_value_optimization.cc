@@ -26,7 +26,8 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int fe_degree, typename number>
 class MatrixFreeTest
@@ -43,7 +44,8 @@ public:
     deallog << "Error between variants: " << error[0] / error[1] << std::endl;
   }
 
-  void check_error(Vector<number> &src) const
+  void
+  check_error(Vector<number> &src) const
   {
     data.loop (&MatrixFreeTest::local_apply,
                &MatrixFreeTest::local_apply_face,
@@ -52,17 +54,19 @@ public:
   }
 
 private:
-  void local_apply (const MatrixFree<dim,number> &,
-                    Vector<number> &,
-                    const Vector<number> &,
-                    const std::pair<unsigned int,unsigned int> &) const
+  void
+  local_apply (const MatrixFree<dim,number> &,
+               Vector<number> &,
+               const Vector<number> &,
+               const std::pair<unsigned int,unsigned int> &) const
   {
   }
 
-  void local_apply_face (const MatrixFree<dim,number>    &data,
-                         Vector<number> &,
-                         const Vector<number>            &src,
-                         const std::pair<unsigned int,unsigned int> &face_range) const
+  void
+  local_apply_face (const MatrixFree<dim,number>    &data,
+                    Vector<number> &,
+                    const Vector<number>            &src,
+                    const std::pair<unsigned int,unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> ref(data,true);
     FEFaceEvaluation<dim,fe_degree,fe_degree+1,1,number> check(data,true);
@@ -157,7 +161,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
@@ -226,7 +231,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

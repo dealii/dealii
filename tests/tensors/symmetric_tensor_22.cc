@@ -20,7 +20,8 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/lac/vector.h>
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

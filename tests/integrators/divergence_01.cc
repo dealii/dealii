@@ -31,7 +31,8 @@ using namespace LocalIntegrators::Divergence;
 
 
 template <int dim>
-void test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
+void
+test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 {
   AssertDimension(fev.get_fe().n_components(), dim);
   AssertDimension(fes.get_fe().n_components(), 1);
@@ -93,7 +94,8 @@ void test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 
 
 template <int dim>
-void test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
+void
+test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 {
   AssertDimension(fev.get_fe().n_components(), dim);
   AssertDimension(fes.get_fe().n_components(), 1);
@@ -130,10 +132,11 @@ void test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 
 
 template <int dim>
-void test_face(const FEValuesBase<dim> &fev1,
-               const FEValuesBase<dim> &fev2,
-               const FEValuesBase<dim> &fes1,
-               const FEValuesBase<dim> &fes2)
+void
+test_face(const FEValuesBase<dim> &fev1,
+          const FEValuesBase<dim> &fev2,
+          const FEValuesBase<dim> &fes1,
+          const FEValuesBase<dim> &fes2)
 {
   AssertDimension(fev1.get_fe().n_components(), dim);
   AssertDimension(fes1.get_fe().n_components(), 1);
@@ -217,7 +220,8 @@ test(Triangulation<dim> &tr)
 }
 
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

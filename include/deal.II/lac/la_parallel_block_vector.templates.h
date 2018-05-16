@@ -110,9 +110,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void BlockVector<Number>::reinit (const size_type n_bl,
-                                      const size_type bl_sz,
-                                      const bool         omit_zeroing_entries)
+    void
+    BlockVector<Number>::reinit (const size_type n_bl,
+                                 const size_type bl_sz,
+                                 const bool         omit_zeroing_entries)
     {
       std::vector<size_type> n(n_bl, bl_sz);
       reinit(n, omit_zeroing_entries);
@@ -120,8 +121,9 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    void BlockVector<Number>::reinit (const std::vector<size_type> &n,
-                                      const bool                    omit_zeroing_entries)
+    void
+    BlockVector<Number>::reinit (const std::vector<size_type> &n,
+                                 const bool                    omit_zeroing_entries)
     {
       this->block_indices.reinit (n);
       if (this->components.size() != this->n_blocks())
@@ -135,8 +137,9 @@ namespace LinearAlgebra
 
     template <typename Number>
     template <typename Number2>
-    void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
-                                      const bool omit_zeroing_entries)
+    void
+    BlockVector<Number>::reinit (const BlockVector<Number2> &v,
+                                 const bool omit_zeroing_entries)
     {
       this->block_indices = v.get_block_indices();
       if (this->components.size() != this->n_blocks())
@@ -814,13 +817,15 @@ namespace LinearAlgebra
     {
       template <typename FullMatrixType>
       inline
-      void set_symmetric(FullMatrixType &, const bool)
+      void
+      set_symmetric(FullMatrixType &, const bool)
       {
       }
 
       template <typename NumberType>
       inline
-      void set_symmetric(LAPACKFullMatrix<NumberType> &matrix, const bool symmetric)
+      void
+      set_symmetric(LAPACKFullMatrix<NumberType> &matrix, const bool symmetric)
       {
         if (symmetric)
           matrix.set_property (LAPACKSupport::symmetric);

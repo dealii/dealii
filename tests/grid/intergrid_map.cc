@@ -34,7 +34,8 @@
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   deallog << "Checking in " << dim << " space dimensions"
           << std::endl
@@ -113,7 +114,8 @@ void check ()
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(2);

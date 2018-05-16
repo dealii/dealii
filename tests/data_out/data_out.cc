@@ -40,7 +40,8 @@
 
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
@@ -48,12 +49,16 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void make_grid_and_dofs ();
-  void solve ();
-  void output_results () const;
+  void
+  make_grid_and_dofs ();
+  void
+  solve ();
+  void
+  output_results () const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -71,7 +76,8 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void
+LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
   triangulation.refine_global (1);
@@ -102,7 +108,8 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   // dummy solve. just insert some
   // arbitrary values
@@ -113,7 +120,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <>
-void LaplaceProblem<2>::output_results () const
+void
+LaplaceProblem<2>::output_results () const
 {
   const unsigned int dim = 2;
 
@@ -162,7 +170,8 @@ void LaplaceProblem<2>::output_results () const
 
 
 template <>
-void LaplaceProblem<3>::output_results () const
+void
+LaplaceProblem<3>::output_results () const
 {
   const unsigned int dim = 3;
 
@@ -200,7 +209,8 @@ void LaplaceProblem<3>::output_results () const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   make_grid_and_dofs();
   solve ();
@@ -209,7 +219,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   logfile << std::setprecision(2);
   deallog << std::setprecision(2);

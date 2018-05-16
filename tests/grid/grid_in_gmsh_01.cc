@@ -27,7 +27,8 @@
 
 
 template <int dim>
-void gmsh_grid (const char *name)
+void
+gmsh_grid (const char *name)
 {
   Triangulation<dim> tria;
   GridIn<dim> grid_in;
@@ -47,7 +48,8 @@ void gmsh_grid (const char *name)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

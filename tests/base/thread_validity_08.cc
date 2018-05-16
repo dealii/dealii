@@ -24,10 +24,12 @@
 
 
 Threads::Mutex mutex;
-static std::atomic<int> spin_lock(0);
+static std::atomic<int>
+spin_lock(0);
 
 
-void worker ()
+void
+worker ()
 {
   // wait for the mutex to make sure the main
   // thread has already moved on. we can immediately
@@ -40,7 +42,8 @@ void worker ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -45,8 +45,9 @@ public:
     Function<dim>(1)
   {}
 
-  double value(const Point<dim> &p,
-               const unsigned int comp=0) const
+  double
+  value(const Point<dim> &p,
+        const unsigned int comp=0) const
   {
     const double x = p[0];
     const double y = p[1];
@@ -59,7 +60,8 @@ class MyQData
 {
 public:
   MyQData() {};
-  virtual ~MyQData() {};
+  virtual
+  ~MyQData() {};
 
   double value;
 };
@@ -74,10 +76,11 @@ DeclException3 (ExcWrongValue,
  * Loop over quadrature points and check that value is the same as given by the function.
  */
 template <int dim,typename DATA>
-void check_qph(Triangulation<dim> &tr,
-               const CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,DATA> &manager,
-               const Quadrature<dim> &rhs_quadrature,
-               const MyFunction<dim> &func)
+void
+check_qph(Triangulation<dim> &tr,
+          const CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,DATA> &manager,
+          const Quadrature<dim> &rhs_quadrature,
+          const MyFunction<dim> &func)
 {
   DoFHandler<dim> dof_handler(tr);
   FE_Q<dim> dummy_fe(1);
@@ -105,7 +108,8 @@ void check_qph(Triangulation<dim> &tr,
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   const MyFunction<dim> my_func;
   Triangulation<dim> tr;
@@ -149,7 +153,8 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   initlog();

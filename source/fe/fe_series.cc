@@ -34,8 +34,9 @@ namespace FESeries
 
   /*-------------- Fourier -------------------------------*/
 
-  void set_k_vectors(Table<1, Tensor<1,1> > &k_vectors,
-                     const unsigned int N)
+  void
+  set_k_vectors(Table<1, Tensor<1,1> > &k_vectors,
+                const unsigned int N)
   {
     k_vectors.reinit(TableIndices<1>(N));
     for (unsigned int i=0; i<N; ++i)
@@ -43,8 +44,9 @@ namespace FESeries
 
   }
 
-  void set_k_vectors(Table<2, Tensor<1,2> > &k_vectors,
-                     const unsigned int N)
+  void
+  set_k_vectors(Table<2, Tensor<1,2> > &k_vectors,
+                const unsigned int N)
   {
     k_vectors.reinit(TableIndices<2>(N,N));
     for (unsigned int i=0; i<N; ++i)
@@ -55,8 +57,9 @@ namespace FESeries
         }
   }
 
-  void set_k_vectors(Table<3, Tensor<1,3> > &k_vectors,
-                     const unsigned int N)
+  void
+  set_k_vectors(Table<3, Tensor<1,3> > &k_vectors,
+                const unsigned int N)
   {
     k_vectors.reinit(TableIndices<3>(N,N,N));
     for (unsigned int i=0; i<N; ++i)
@@ -84,9 +87,10 @@ namespace FESeries
   }
 
   template <int dim>
-  void Fourier<dim>::calculate(const Vector<double>             &local_dof_values,
-                               const unsigned int                cell_active_fe_index,
-                               Table<dim,std::complex<double> > &fourier_coefficients)
+  void
+  Fourier<dim>::calculate(const Vector<double>             &local_dof_values,
+                          const unsigned int                cell_active_fe_index,
+                          Table<dim,std::complex<double> > &fourier_coefficients)
   {
     ensure_existence(cell_active_fe_index);
     const FullMatrix<std::complex<double> > &matrix = fourier_transform_matrices[cell_active_fe_index];
@@ -110,10 +114,11 @@ namespace FESeries
   }
 
   template <int dim>
-  std::complex<double> integrate(const FiniteElement<dim> &fe,
-                                 const Quadrature<dim> &quadrature,
-                                 const Tensor<1,dim> &k_vector,
-                                 const unsigned int j)
+  std::complex<double>
+  integrate(const FiniteElement<dim> &fe,
+            const Quadrature<dim> &quadrature,
+            const Tensor<1,dim> &k_vector,
+            const unsigned int j)
   {
     std::complex<double> sum = 0;
     for (unsigned int q=0; q<quadrature.size(); ++q)
@@ -129,7 +134,8 @@ namespace FESeries
 
 
   template <>
-  void Fourier<2>::ensure_existence(const unsigned int fe)
+  void
+  Fourier<2>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -151,7 +157,8 @@ namespace FESeries
   }
 
   template <>
-  void Fourier<3>::ensure_existence(const unsigned int fe)
+  void
+  Fourier<3>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -174,7 +181,8 @@ namespace FESeries
   }
 
   template <>
-  void Fourier<1>::ensure_existence(const unsigned int fe)
+  void
+  Fourier<1>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -202,8 +210,9 @@ namespace FESeries
    * evaluated at @p x_q in [0,1]^dim.
    */
   template <int dim>
-  double Lh(const Point<dim>  &x_q,
-            const TableIndices<dim> &indices)
+  double
+  Lh(const Point<dim>  &x_q,
+     const TableIndices<dim> &indices)
   {
 #ifdef DEAL_II_WITH_GSL
     double res = 1.0;
@@ -231,7 +240,8 @@ namespace FESeries
    * Multiplier in Legendre coefficients
    */
   template <int dim>
-  double multiplier(const TableIndices<dim> &indices)
+  double
+  multiplier(const TableIndices<dim> &indices)
   {
     double res = 1.0;
     for (unsigned int d = 0; d < dim; d++)
@@ -256,9 +266,10 @@ namespace FESeries
   }
 
   template <int dim>
-  void Legendre<dim>::calculate(const dealii::Vector<double> &local_dof_values,
-                                const unsigned int            cell_active_fe_index,
-                                Table<dim,double>            &legendre_coefficients)
+  void
+  Legendre<dim>::calculate(const dealii::Vector<double> &local_dof_values,
+                           const unsigned int            cell_active_fe_index,
+                           Table<dim,double>            &legendre_coefficients)
   {
     ensure_existence(cell_active_fe_index);
     const FullMatrix<double> &matrix = legendre_transform_matrices[cell_active_fe_index];
@@ -283,10 +294,11 @@ namespace FESeries
 
 
   template <int dim>
-  double integrate_Legendre(const FiniteElement<dim> &fe,
-                            const Quadrature<dim> &quadrature,
-                            const TableIndices<dim> &indices,
-                            const unsigned int dof)
+  double
+  integrate_Legendre(const FiniteElement<dim> &fe,
+                     const Quadrature<dim> &quadrature,
+                     const TableIndices<dim> &indices,
+                     const unsigned int dof)
   {
     double sum = 0;
     for (unsigned int q=0; q<quadrature.size(); ++q)
@@ -300,7 +312,8 @@ namespace FESeries
   }
 
   template <>
-  void Legendre<1>::ensure_existence(const unsigned int fe)
+  void
+  Legendre<1>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -322,7 +335,8 @@ namespace FESeries
 
 
   template <>
-  void Legendre<2>::ensure_existence(const unsigned int fe)
+  void
+  Legendre<2>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -345,7 +359,8 @@ namespace FESeries
   }
 
   template <>
-  void Legendre<3>::ensure_existence(const unsigned int fe)
+  void
+  Legendre<3>::ensure_existence(const unsigned int fe)
   {
     Assert (fe < fe_collection->size(),
             ExcIndexRange(fe,0,fe_collection->size()))
@@ -369,8 +384,9 @@ namespace FESeries
   }
 
   /*-------------- linear_regression -------------------------------*/
-  std::pair<double,double> linear_regression(const std::vector<double> &x,
-                                             const std::vector<double> &y)
+  std::pair<double,double>
+  linear_regression(const std::vector<double> &x,
+                    const std::vector<double> &y)
   {
     FullMatrix<double> K(2,2), invK(2,2);
     Vector<double>     X(2), B(2);

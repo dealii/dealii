@@ -24,7 +24,8 @@
 
 
 template <int dim>
-void plot_FE_DGQ_shape_functions()
+void
+plot_FE_DGQ_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 

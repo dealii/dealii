@@ -57,16 +57,21 @@ class Step6
 public:
   Step6 ();
 
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
+  void
+  setup_system ();
 
-  void assemble_system ();
+  void
+  assemble_system ();
 
-  void solve ();
+  void
+  solve ();
 
-  void refine_grid ();
+  void
+  refine_grid ();
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -93,7 +98,8 @@ Step6<dim>::Step6 ()
 
 
 template <int dim>
-void Step6<dim>::setup_system ()
+void
+Step6<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -122,7 +128,8 @@ void Step6<dim>::setup_system ()
 
 
 template <int dim>
-void Step6<dim>::assemble_system ()
+void
+Step6<dim>::assemble_system ()
 {
   const QGauss<dim> quadrature_formula(3);
 
@@ -174,7 +181,8 @@ void Step6<dim>::assemble_system ()
 
 
 template <int dim>
-void Step6<dim>::solve ()
+void
+Step6<dim>::solve ()
 {
   SolverControl      solver_control (1000, 1e-8);
   SolverCG<>         solver (solver_control);
@@ -204,7 +212,8 @@ void Step6<dim>::solve ()
 
 
 template <int dim>
-void Step6<dim>::refine_grid ()
+void
+Step6<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -223,7 +232,8 @@ void Step6<dim>::refine_grid ()
 
 
 template <int dim>
-void Step6<dim>::run ()
+void
+Step6<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<3; ++cycle)
     {
@@ -248,7 +258,8 @@ void Step6<dim>::run ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);

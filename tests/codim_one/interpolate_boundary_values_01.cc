@@ -27,10 +27,12 @@
 
 #include <string>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
   Triangulation<dim, spacedim> tria;
   GridIn<dim, spacedim> gi;
@@ -77,7 +79,8 @@ void test(std::string filename)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

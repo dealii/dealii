@@ -29,7 +29,8 @@
 #include <deal.II/base/point.h>
 
 template <typename SolverType>
-void test()
+void
+test()
 {
   const unsigned int size = 3;
   SparsityPattern sparsity(size, size, 1);
@@ -53,7 +54,8 @@ void test()
   solvec.print(deallog);
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);

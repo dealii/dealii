@@ -23,7 +23,8 @@
 #include "simplex.h"
 
 template<int dim, typename stream_type>
-void test(int n, const Point<dim> &split_point, stream_type &deallog)
+void
+test(int n, const Point<dim> &split_point, stream_type &deallog)
 {
   QSplit<dim> quad(QSimplex<dim>(QIterated<dim>(QTrapez<1>(),n)),
                    split_point);
@@ -41,7 +42,8 @@ void test(int n, const Point<dim> &split_point, stream_type &deallog)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
   test<1>(4, Point<1>(.3),         deallog);

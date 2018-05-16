@@ -21,7 +21,8 @@
 #include "../tests.h"
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -43,7 +44,8 @@ std::ofstream logfile("output");
 
 // forward declare this function
 template <int dim, int fe_degree>
-void test ();
+void
+test ();
 
 
 
@@ -92,7 +94,8 @@ public:
 
 
 
-  void test_functions (const Vector<Number> &src) const
+  void
+  test_functions (const Vector<Number> &src) const
   {
     Vector<Number> dst_dummy;
     data.cell_loop (&MatrixFreeTest::operator(), this, dst_dummy, src);
@@ -107,8 +110,9 @@ protected:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints)
+void
+do_test (const DoFHandler<dim> &dof,
+         const ConstraintMatrix &constraints)
 {
   // use this for info on problem
   //std::cout << "Number of cells: " << dof.get_triangulation().n_active_cells()
@@ -155,7 +159,8 @@ void do_test (const DoFHandler<dim> &dof,
 }
 
 
-int main ()
+int
+main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
   deallog.attach(logfile);
@@ -166,7 +171,8 @@ int main ()
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   const SphericalManifold<dim> manifold;
   Triangulation<dim> tria;

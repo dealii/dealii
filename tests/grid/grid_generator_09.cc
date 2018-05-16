@@ -25,7 +25,8 @@
 #include <iostream>
 
 template <int dim>
-void check_rect1 (unsigned int n, bool color, bool log)
+void
+check_rect1 (unsigned int n, bool color, bool log)
 {
   Point<dim> left;
   Point<dim> right;
@@ -58,7 +59,8 @@ void check_rect1 (unsigned int n, bool color, bool log)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

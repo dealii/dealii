@@ -23,7 +23,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check ()
 {
   ParameterHandler prm;
   prm.declare_entry ("a", "this that and the other", Patterns::Anything(),
@@ -58,7 +59,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

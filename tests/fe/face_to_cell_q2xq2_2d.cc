@@ -25,7 +25,8 @@
 #include <deal.II/fe/fe_system.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   FESystem<dim> fe(FE_Q<dim>(2), 1,
                    FE_Q<dim>(2), 1);
@@ -50,7 +51,8 @@ void test()
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 

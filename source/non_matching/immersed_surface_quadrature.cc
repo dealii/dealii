@@ -40,7 +40,8 @@ namespace NonMatching
 
 
   template <int dim>
-  void ImmersedSurfaceQuadrature<dim>::push_back(
+  void
+  ImmersedSurfaceQuadrature<dim>::push_back(
     const Point<dim> &point,
     const double weight,
     const Tensor<1, dim> &normal)

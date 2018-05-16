@@ -122,7 +122,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverCG () override = default;
+  virtual
+  ~SolverCG () override = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -171,10 +172,11 @@ protected:
    * vector, the residual and the update vector in each step. It can be used
    * for graphical output of the convergence history.
    */
-  virtual void print_vectors(const unsigned int step,
-                             const VectorType   &x,
-                             const VectorType   &r,
-                             const VectorType   &d) const;
+  virtual void
+  print_vectors(const unsigned int step,
+                const VectorType   &x,
+                const VectorType   &r,
+                const VectorType   &d) const;
 
   /**
    * Estimates the eigenvalues from diagonal and offdiagonal. Uses these

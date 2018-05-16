@@ -84,57 +84,69 @@ namespace Algorithms
     /**
      * Declare the control parameters for parameter handler.
      */
-    static void declare_parameters (ParameterHandler &param);
+    static void
+    declare_parameters (ParameterHandler &param);
     /**
      * Read the control parameters from a parameter handler.
      */
-    void parse_parameters (ParameterHandler &param);
+    void
+    parse_parameters (ParameterHandler &param);
 
     /**
      * The left end of the time interval.
      */
-    double start () const;
+    double
+    start () const;
     /**
      * The right end of the time interval. The control mechanism ensures that
      * the final time step ends at this point.
      */
-    double final () const;
+    double
+    final () const;
     /**
      * The tolerance value controlling the time steps.
      */
-    double tolerance () const;
+    double
+    tolerance () const;
     /**
      * The size of the current time step.
      */
-    double step () const;
+    double
+    step () const;
 
     /**
      * The current time.
      */
-    double now () const;
+    double
+    now () const;
 
     /**
      * Compute the size of the next step and return true if it differs from
      * the current step size. Advance the current time by the new step size.
      */
-    bool advance ();
+    bool
+    advance ();
 
     /**
      * Set start value.
      */
-    void start (double);
+    void
+    start (double);
     /**
      * Set final time value.
      */
-    void final (double);
+    void
+    final (double);
     /**
      * Set tolerance
      */
-    void tolerance (double);
+    void
+    tolerance (double);
     /**
      * Set strategy.
      */
-    void strategy (Strategy);
+    void
+    strategy (Strategy);
 
     /**
      * Set size of the first step. This may be overwritten by the time
@@ -143,27 +155,33 @@ namespace Algorithms
      * @param[in] step The size of the first step, which may be overwritten by
      * the time stepping strategy.
      */
-    void start_step (const double step);
+    void
+    start_step (const double step);
 
     /**
      * Set size of the maximum step size.
      */
-    void max_step (double);
+    void
+    max_step (double);
 
     /**
      * Set now() equal to start(). Initialize step() and print() to their
      * initial values.
      */
-    void restart ();
+    void
+    restart ();
     /**
      * Return true if this timestep should be written to disk.
      */
-    bool print ();
+    bool
+    print ();
     /**
      * Set the output name template.
      */
-    void file_name_format (const char *);
-    const char *file_name_format ();
+    void
+    file_name_format (const char *);
+    const char *
+    file_name_format ();
   private:
 
     double start_val;

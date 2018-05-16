@@ -45,7 +45,8 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 using namespace dealii::MatrixFreeOperators;
 
@@ -91,14 +92,16 @@ class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Ve
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MatrixType &matrix)
+  void
+  initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   level,
-                           LinearAlgebra::distributed::Vector<double> &dst,
-                           const LinearAlgebra::distributed::Vector<double> &src) const
+  virtual void
+  operator() (const unsigned int   level,
+              LinearAlgebra::distributed::Vector<double> &dst,
+              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
     SolverCG<LinearAlgebra::distributed::Vector<double> > solver_coarse (solver_control);
@@ -112,7 +115,8 @@ public:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof)
+void
+do_test (const DoFHandler<dim>  &dof)
 {
   if (types_are_equal<number,float>::value == true)
     {
@@ -262,7 +266,8 @@ void do_test (const DoFHandler<dim>  &dof)
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                  Triangulation<dim>::limit_level_difference_at_vertices,
@@ -292,7 +297,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
 

@@ -27,7 +27,8 @@
 
 
 template <int spacedim>
-void test ()
+void
+test ()
 {
   Triangulation<1,spacedim> tria;
   GridGenerator::hyper_cube (tria);
@@ -42,7 +43,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

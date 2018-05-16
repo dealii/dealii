@@ -23,7 +23,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   VectorizedArray<double> v1 = make_vectorized_array(2.);
   v1 = Utilities::fixed_power<dim>(v1);
@@ -43,7 +44,8 @@ void test ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -30,12 +30,14 @@ template <typename VectorType, int dim>
 class TestOutputOperator : public OutputOperator<VectorType>
 {
 public:
-  void initialize(const DoFHandler<dim> &dof_handler)
+  void
+  initialize(const DoFHandler<dim> &dof_handler)
   {
     dof = &dof_handler;
   }
 
-  virtual OutputOperator<VectorType> &operator<<(const AnyData &vectors)
+  virtual OutputOperator<VectorType> &
+  operator<<(const AnyData &vectors)
   {
     for (unsigned int i=0; i<vectors.size(); ++i)
       {
@@ -58,7 +60,8 @@ private:
 class ZeroResidual : public Algorithms::OperatorBase
 {
 public:
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator ()(AnyData &out, const AnyData &in)
   {
     const Vector<double> &in_vector = *in.entry<const Vector<double>*>(
                                         "Newton iterate");
@@ -70,7 +73,8 @@ public:
 class IdentitySolver : public Algorithms::OperatorBase
 {
 public:
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator ()(AnyData &out, const AnyData &in)
   {
     const Vector<double> &in_vector = *in.entry<const Vector<double>*>(
                                         "Newton residual");
@@ -81,7 +85,8 @@ public:
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
@@ -111,7 +116,8 @@ void test()
 }
 
 
-int main()
+int
+main()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

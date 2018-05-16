@@ -39,10 +39,12 @@ namespace Step22
   {
   public:
     StokesProblem (const unsigned int degree);
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_dofs ();
+    void
+    setup_dofs ();
 
     const unsigned int   degree;
 
@@ -78,7 +80,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::setup_dofs ()
+  void
+  StokesProblem<dim>::setup_dofs ()
   {
     dof_handler.distribute_dofs (fe);
 
@@ -122,7 +125,8 @@ namespace Step22
 
 
   template <int dim>
-  void StokesProblem<dim>::run ()
+  void
+  StokesProblem<dim>::run ()
   {
     Point<dim> center;
     const double inner_radius = .5;
@@ -146,7 +150,8 @@ namespace Step22
 
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   try
     {

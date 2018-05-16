@@ -29,7 +29,8 @@
 #define PRECISION 8
 
 
-std::ofstream logfile ("output");
+std::ofstream
+logfile ("output");
 
 char buf[1000];
 
@@ -74,13 +75,16 @@ public:
     Function<dim> (n_components)
   {}
 
-  virtual ~TestMap1 () {}
+  virtual
+  ~TestMap1 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -103,8 +107,9 @@ TestMap1<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestMap1<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestMap1<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -130,13 +135,16 @@ public:
     phi (ph)
   {}
 
-  virtual ~TestDef1 () {}
+  virtual
+  ~TestDef1 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -160,8 +168,9 @@ TestDef1<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef1<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef1<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -185,13 +194,16 @@ public:
     scale (sc)
   {}
 
-  virtual ~TestDef2 () {}
+  virtual
+  ~TestDef2 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -211,8 +223,9 @@ TestDef2<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef2<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef2<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -237,13 +250,16 @@ public:
     scale (sc)
   {}
 
-  virtual ~TestDef3 () {}
+  virtual
+  ~TestDef3 () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -262,8 +278,9 @@ TestDef3<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestDef3<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestDef3<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -295,13 +312,16 @@ public:
       }
   }
 
-  virtual ~TestPoly () {}
+  virtual
+  ~TestPoly () {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  void vector_value (const Point<dim> &p,
-                     Vector<double>   &return_value) const;
+  void
+  vector_value (const Point<dim> &p,
+                Vector<double>   &return_value) const;
 };
 
 
@@ -322,8 +342,9 @@ TestPoly<dim>::value (const Point<dim>   &p,
 
 
 template <int dim>
-void TestPoly<dim>::vector_value (const Point<dim> &p,
-                                  Vector<double>   &return_value) const
+void
+TestPoly<dim>::vector_value (const Point<dim> &p,
+                             Vector<double>   &return_value) const
 {
   Assert (return_value.size() == this->n_components,
           ExcDimensionMismatch (return_value.size(), this->n_components));
@@ -337,8 +358,9 @@ void TestPoly<dim>::vector_value (const Point<dim> &p,
  * Check the value of the derivative field.
  */
 
-double TestProjection (Mapping<2> &mapping,
-                       DoFHandler<2> *dof_handler)
+double
+TestProjection (Mapping<2> &mapping,
+                DoFHandler<2> *dof_handler)
 {
   Vector<double> solution;
   solution.reinit (dof_handler->n_dofs ());
@@ -428,7 +450,8 @@ double TestProjection (Mapping<2> &mapping,
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;

@@ -60,7 +60,8 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from one.
    */
-  explicit TableIndices (const std::size_t index0);
+  explicit
+  TableIndices (const std::size_t index0);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -140,35 +141,41 @@ public:
   /**
    * Read-only access the value of the <tt>i</tt>th index.
    */
-  std::size_t operator[] (const unsigned int i) const;
+  std::size_t
+  operator[] (const unsigned int i) const;
 
   /**
    * Write access the value of the <tt>i</tt>th index.
    */
-  std::size_t &operator[] (const unsigned int i);
+  std::size_t &
+  operator[] (const unsigned int i);
 
   /**
    * Compare two index fields for equality.
    */
-  bool operator == (const TableIndices<N> &other) const;
+  bool
+  operator == (const TableIndices<N> &other) const;
 
   /**
    * Compare two index fields for inequality.
    */
-  bool operator != (const TableIndices<N> &other) const;
+  bool
+  operator != (const TableIndices<N> &other) const;
 
   /**
    * Sort the indices in ascending order. While this operation is not very
    * useful for Table objects, it is used for the SymmetricTensor class.
    */
-  void sort ();
+  void
+  sort ();
 
   /**
    * Write or read the data of this object to or from a stream for the purpose
    * of serialization.
    */
   template <class Archive>
-  void serialize (Archive &ar, const unsigned int version);
+  void
+  serialize (Archive &ar, const unsigned int version);
 
 protected:
   /**

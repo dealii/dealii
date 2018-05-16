@@ -72,7 +72,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverRelaxation ();
+  virtual
+  ~SolverRelaxation ();
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =

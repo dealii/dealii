@@ -86,12 +86,14 @@ namespace Maxwell
   public:
     ExactSolution();
 
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<double> >   &values) const;
+    virtual void
+    vector_value_list (const std::vector<Point<dim> > &points,
+                       std::vector<Vector<double> >   &values) const;
 
 
-    void curl_value_list(const std::vector<Point<dim> > &points,
-                         std::vector<Vector<double> > &value_list);
+    void
+    curl_value_list(const std::vector<Point<dim> > &points,
+                    std::vector<Vector<double> > &value_list);
   };
 
   template <int dim>
@@ -100,8 +102,9 @@ namespace Maxwell
     Function<dim> (dim)
   {}
   template <int dim>
-  void ExactSolution<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                              std::vector<Vector<double> > &value_list) const
+  void
+  ExactSolution<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+                                         std::vector<Vector<double> > &value_list) const
   {
     Assert(value_list.size() == points.size(), ExcDimensionMismatch(value_list.size(), points.size()));
     const unsigned int n_points = points.size();
@@ -119,8 +122,9 @@ namespace Maxwell
   }
   // Additional functions to create Neumann conditions, zero in this case.
   template <int dim>
-  void ExactSolution<dim>::curl_value_list(const std::vector<Point<dim> > &points,
-                                           std::vector<Vector<double> > &value_list)
+  void
+  ExactSolution<dim>::curl_value_list(const std::vector<Point<dim> > &points,
+                                      std::vector<Vector<double> > &value_list)
   {
     Assert(value_list.size() == points.size(), ExcDimensionMismatch(value_list.size(), points.size()));
     const unsigned int n_points = points.size();
@@ -145,14 +149,20 @@ namespace Maxwell
   public:
     MaxwellProblem (const unsigned int order);
     ~MaxwellProblem ();
-    void run ();
+    void
+    run ();
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void process_solution(const unsigned int cycle);
+    void
+    setup_system ();
+    void
+    assemble_system ();
+    void
+    solve ();
+    void
+    process_solution(const unsigned int cycle);
 
-    double calcErrorHcurlNorm();
+    double
+    calcErrorHcurlNorm();
 
     Triangulation<dim>   triangulation;
     MappingQ<dim>        mapping;
@@ -190,7 +200,8 @@ namespace Maxwell
     dof_handler.clear ();
   }
   template <int dim>
-  double MaxwellProblem<dim>::calcErrorHcurlNorm()
+  double
+  MaxwellProblem<dim>::calcErrorHcurlNorm()
   {
     QGauss<dim>  quadrature_formula(quad_order);
     const unsigned int n_q_points = quadrature_formula.size();
@@ -263,7 +274,8 @@ namespace Maxwell
   }
 
   template <int dim>
-  void MaxwellProblem<dim>::setup_system ()
+  void
+  MaxwellProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::block_wise (dof_handler);
@@ -290,7 +302,8 @@ namespace Maxwell
 
   }
   template <int dim>
-  void MaxwellProblem<dim>::assemble_system ()
+  void
+  MaxwellProblem<dim>::assemble_system ()
   {
     QGauss<dim>  quadrature_formula(quad_order);
     QGauss<dim-1> face_quadrature_formula(quad_order);
@@ -373,7 +386,8 @@ namespace Maxwell
       }
   }
   template <int dim>
-  void MaxwellProblem<dim>::solve ()
+  void
+  MaxwellProblem<dim>::solve ()
   {
     /* Direct */
     SparseDirectUMFPACK A_direct;
@@ -384,7 +398,8 @@ namespace Maxwell
 
   }
   template <int dim>
-  void MaxwellProblem<dim>::process_solution(const unsigned int cycle)
+  void
+  MaxwellProblem<dim>::process_solution(const unsigned int cycle)
   {
 
     Vector<double> diff_per_cell(triangulation.n_active_cells());
@@ -408,7 +423,8 @@ namespace Maxwell
   }
 
   template <int dim>
-  void MaxwellProblem<dim>::run ()
+  void
+  MaxwellProblem<dim>::run ()
   {
     unsigned int numcycles=(p_order>1)?2:3;
 
@@ -453,7 +469,8 @@ namespace Maxwell
   }
 }
 // END MAXWELL CLASS
-int main ()
+int
+main ()
 {
   using namespace Maxwell;
 

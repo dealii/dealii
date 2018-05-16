@@ -33,9 +33,10 @@
 
 
 template <int spacedim>
-void print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
-                 const unsigned int fe_index,
-                 const unsigned int n)
+void
+print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
+            const unsigned int fe_index,
+            const unsigned int n)
 {
   std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices, fe_index);
@@ -47,8 +48,9 @@ void print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
 
 
 template <int spacedim>
-void print_dofs (const typename hp::DoFHandler<1,spacedim>::cell_iterator &i,
-                 const unsigned int n)
+void
+print_dofs (const typename hp::DoFHandler<1,spacedim>::cell_iterator &i,
+            const unsigned int n)
 {
   std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices);
@@ -60,7 +62,8 @@ void print_dofs (const typename hp::DoFHandler<1,spacedim>::cell_iterator &i,
 
 
 template <int spacedim>
-void test ()
+void
+test ()
 {
   Triangulation<1,spacedim> tria;
   GridGenerator::hyper_cube (tria);
@@ -112,7 +115,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

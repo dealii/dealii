@@ -53,8 +53,9 @@ public:
   /**
    * Value of basis function @p i at @p p.
    */
-  double compute_value(const unsigned int i,
-                       const Point<dim> &p) const;
+  double
+  compute_value(const unsigned int i,
+                const Point<dim> &p) const;
 
   /**
    * <tt>order</tt>-th of basis function @p i at @p p.
@@ -62,20 +63,23 @@ public:
    * Consider using compute() instead.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order,dim>
+  compute_derivative (const unsigned int i,
+                      const Point<dim> &p) const;
 
   /**
    * Gradient of basis function @p i at @p p.
    */
-  Tensor<1, dim> compute_grad(const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1, dim>
+  compute_grad(const unsigned int i,
+               const Point<dim> &p) const;
 
   /**
    * Gradient of gradient of basis function @p i at @p p.
    */
-  Tensor<2, dim> compute_grad_grad(const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2, dim>
+  compute_grad_grad(const unsigned int i,
+                    const Point<dim> &p) const;
 
   /**
    * Compute values and derivatives of all basis functions at @p unit_point.
@@ -83,12 +87,13 @@ public:
    * Size of the vectors must be either equal to the number of polynomials or
    * zero. A size of zero means that we are not computing the vector entries.
    */
-  void compute(const Point<dim> &unit_point,
-               std::vector<double> &values,
-               std::vector<Tensor<1, dim> > &grads,
-               std::vector<Tensor<2,dim> > &grad_grads,
-               std::vector<Tensor<3,dim> > &third_derivatives,
-               std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute(const Point<dim> &unit_point,
+          std::vector<double> &values,
+          std::vector<Tensor<1, dim> > &grads,
+          std::vector<Tensor<2,dim> > &grad_grads,
+          std::vector<Tensor<3,dim> > &third_derivatives,
+          std::vector<Tensor<4,dim> > &fourth_derivatives) const;
 };
 
 

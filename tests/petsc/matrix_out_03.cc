@@ -21,7 +21,8 @@
 #include <deal.II/lac/matrix_out.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 

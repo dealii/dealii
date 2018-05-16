@@ -80,13 +80,15 @@ class RightHandSide : public Function<dim>
 public:
   RightHandSide () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-                                  const unsigned int component) const
+double
+RightHandSide<dim>::value (const Point<dim> &p,
+                           const unsigned int component) const
 {
   Assert (component == 0, ExcNotImplemented());
 
@@ -104,13 +106,15 @@ class BoundaryValues : public Function<dim>
 public:
   BoundaryValues () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-                                   const unsigned int component) const
+double
+BoundaryValues<dim>::value (const Point<dim> &p,
+                            const unsigned int component) const
 {
   Assert (component == 0, ExcNotImplemented());
 
@@ -128,13 +132,15 @@ class FluxBoundaryValues : public Function<dim>
 public:
   FluxBoundaryValues () : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 };
 
 template <int dim>
-double FluxBoundaryValues<dim>::value (const Point<dim> &p,
-                                       const unsigned int component) const
+double
+FluxBoundaryValues<dim>::value (const Point<dim> &p,
+                                const unsigned int component) const
 {
   double val = 1; // g = 1
   return val;
@@ -150,7 +156,8 @@ class Advection : public TensorFunction<1,dim>
 public:
   Advection () : TensorFunction<1,dim> () {}
 
-  virtual Tensor<1,dim> value (const Point<dim> &p) const;
+  virtual Tensor<1,dim>
+  value (const Point<dim> &p) const;
 };
 
 template <int dim>
@@ -172,18 +179,22 @@ template <int dim>
 class SystemIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
-  void cell(MeshWorker::DoFInfo<dim> &dinfo,
-            typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1,
-            MeshWorker::DoFInfo<dim> &dinfo2,
-            typename MeshWorker::IntegrationInfo<dim> &info1,
-            typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo,
+       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo,
+           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       typename MeshWorker::IntegrationInfo<dim> &info1,
+       typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 template <int dim>
-void SystemIntegrator<dim>::cell(
+void
+SystemIntegrator<dim>::cell(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -219,7 +230,8 @@ void SystemIntegrator<dim>::cell(
 
 
 template <int dim>
-void SystemIntegrator<dim>::boundary(
+void
+SystemIntegrator<dim>::boundary(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -239,7 +251,8 @@ void SystemIntegrator<dim>::boundary(
 
 
 template <int dim>
-void SystemIntegrator<dim>::face(
+void
+SystemIntegrator<dim>::face(
   MeshWorker::DoFInfo<dim> &dinfo1,
   MeshWorker::DoFInfo<dim> &dinfo2,
   typename MeshWorker::IntegrationInfo<dim> &info1,
@@ -290,18 +303,22 @@ template <int dim>
 class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
-  void cell(MeshWorker::DoFInfo<dim> &dinfo,
-            typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1,
-            MeshWorker::DoFInfo<dim> &dinfo2,
-            typename MeshWorker::IntegrationInfo<dim> &info1,
-            typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo,
+       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo,
+           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       typename MeshWorker::IntegrationInfo<dim> &info1,
+       typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 template <int dim>
-void MatrixIntegrator<dim>::cell(
+void
+MatrixIntegrator<dim>::cell(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -325,7 +342,8 @@ void MatrixIntegrator<dim>::cell(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::boundary(
+void
+MatrixIntegrator<dim>::boundary(
   MeshWorker::DoFInfo<dim> &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
@@ -333,7 +351,8 @@ void MatrixIntegrator<dim>::boundary(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::face(
+void
+MatrixIntegrator<dim>::face(
   MeshWorker::DoFInfo<dim> &dinfo1,
   MeshWorker::DoFInfo<dim> &dinfo2,
   typename MeshWorker::IntegrationInfo<dim> &info1,
@@ -384,17 +403,21 @@ template <int dim>
 class RHSIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
-  void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void face(MeshWorker::DoFInfo<dim> &dinfo1,
-            MeshWorker::DoFInfo<dim> &dinfo2,
-            typename MeshWorker::IntegrationInfo<dim> &info1,
-            typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  void
+  cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+  void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       typename MeshWorker::IntegrationInfo<dim> &info1,
+       typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
 
 
 template <int dim>
-void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
+void
+RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const FEValuesBase<dim> &fe = info.fe_values();
   const unsigned int n_points = fe.n_quadrature_points;
@@ -412,7 +435,8 @@ void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWork
 
 
 template <int dim>
-void RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
+void
+RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const FEValuesBase<dim> &fe = info.fe_values();
   const unsigned int n_points = fe.n_quadrature_points;
@@ -430,10 +454,11 @@ void RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename Mesh
 
 
 template <int dim>
-void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
-                              MeshWorker::DoFInfo<dim> &,
-                              typename MeshWorker::IntegrationInfo<dim> &,
-                              typename MeshWorker::IntegrationInfo<dim> &) const
+void
+RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
+                         MeshWorker::DoFInfo<dim> &,
+                         typename MeshWorker::IntegrationInfo<dim> &,
+                         typename MeshWorker::IntegrationInfo<dim> &) const
 {}
 
 
@@ -447,13 +472,18 @@ public:
   MeshWorkerConstraintMatrixTest(const FiniteElement<dim> &fe);
   ~MeshWorkerConstraintMatrixTest();
 
-  void run();
+  void
+  run();
 
 private:
-  void setup_system();
-  void createInhomConstraints();
-  void assemble_system_MeshWorker();
-  void assemble_MeshWorker();
+  void
+  setup_system();
+  void
+  createInhomConstraints();
+  void
+  assemble_system_MeshWorker();
+  void
+  assemble_MeshWorker();
 
   Triangulation<dim> triangulation;
   const MappingQ1<dim> mapping;
@@ -499,7 +529,8 @@ MeshWorkerConstraintMatrixTest<dim>::~MeshWorkerConstraintMatrixTest ()
 
 
 template <int dim>
-void MeshWorkerConstraintMatrixTest<dim>::setup_system()
+void
+MeshWorkerConstraintMatrixTest<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
@@ -534,7 +565,8 @@ void MeshWorkerConstraintMatrixTest<dim>::setup_system()
  * Assemble with SystemSimple
  */
 template <int dim>
-void MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
+void
+MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
 {
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -567,7 +599,8 @@ void MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
  * Assemble matrix and vector separately
  */
 template <int dim>
-void MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
+void
+MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
 {
 
   MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -605,7 +638,8 @@ void MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
 
 
 template <int dim>
-void MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
+void
+MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
 {
   this->constraintsInhom.clear();
   // boundary constraints
@@ -634,7 +668,8 @@ void MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
 
 
 template <int dim>
-void MeshWorkerConstraintMatrixTest<dim>::run()
+void
+MeshWorkerConstraintMatrixTest<dim>::run()
 {
   setup_system();
   createInhomConstraints();
@@ -669,7 +704,8 @@ void MeshWorkerConstraintMatrixTest<dim>::run()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

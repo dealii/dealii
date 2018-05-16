@@ -294,7 +294,8 @@ namespace TrilinosWrappers
                                   const double               &reduction,
                                   const Epetra_LinearProblem &linear_problem);
 
-        virtual ~TrilinosReductionControl() override = default;
+        virtual
+        ~TrilinosReductionControl() override = default;
 
         virtual bool
         ResidualVectorRequired () const override
@@ -706,7 +707,8 @@ namespace TrilinosWrappers
 
 
 
-  void SolverDirect::initialize (const SparseMatrix &A)
+  void
+  SolverDirect::initialize (const SparseMatrix &A)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -751,7 +753,8 @@ namespace TrilinosWrappers
   }
 
 
-  void SolverDirect::solve (MPI::Vector &x, const MPI::Vector &b)
+  void
+  SolverDirect::solve (MPI::Vector &x, const MPI::Vector &b)
   {
     // Assign the empty LHS vector to the Epetra_LinearProblem object
     linear_problem->SetLHS(&x.trilinos_vector());
@@ -777,8 +780,9 @@ namespace TrilinosWrappers
 
 
 
-  void SolverDirect::solve (dealii::LinearAlgebra::distributed::Vector<double>       &x,
-                            const dealii::LinearAlgebra::distributed::Vector<double> &b)
+  void
+  SolverDirect::solve (dealii::LinearAlgebra::distributed::Vector<double>       &x,
+                       const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
     Epetra_Vector ep_x (View, linear_problem->GetOperator()->OperatorDomainMap(), x.begin());
     Epetra_Vector ep_b (View, linear_problem->GetOperator()->OperatorRangeMap(), const_cast<double *>(b.begin()));

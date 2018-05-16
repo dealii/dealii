@@ -36,7 +36,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   std::set<unsigned int> fes;
   fes.insert(2);
@@ -172,7 +173,8 @@ void test ()
 
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

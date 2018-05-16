@@ -22,7 +22,8 @@
 #include <memory>
 #include <tuple>
 
-int main()
+int
+main()
 {
   initlog();
 

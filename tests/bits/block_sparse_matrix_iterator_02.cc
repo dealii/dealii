@@ -34,7 +34,8 @@
 #include <deal.II/fe/fe_q.h>
 
 
-void test ()
+void
+test ()
 {
   const int dim = 2;
 
@@ -87,7 +88,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

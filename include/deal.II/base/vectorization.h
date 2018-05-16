@@ -71,12 +71,14 @@ namespace internal
   template <typename T>
   struct NumberType<VectorizedArray<T> >
   {
-    static const VectorizedArray<T> &value (const VectorizedArray<T> &t)
+    static const VectorizedArray<T> &
+    value (const VectorizedArray<T> &t)
     {
       return t;
     }
 
-    static VectorizedArray<T> value (const T &t)
+    static VectorizedArray<T>
+    value (const T &t)
     {
       VectorizedArray<T> tmp;
       tmp=t;
@@ -245,7 +247,8 @@ public:
    * VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const Number *ptr)
+  void
+  load (const Number *ptr)
   {
     data = *ptr;
   }
@@ -257,7 +260,8 @@ public:
    * double address to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (Number *ptr) const
+  void
+  store (Number *ptr) const
   {
     *ptr = data;
   }
@@ -307,7 +311,8 @@ public:
    * generic base class.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (Number *ptr) const
+  void
+  streaming_store (Number *ptr) const
   {
     *ptr = data;
   }
@@ -325,8 +330,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const Number       *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const Number       *base_ptr,
+          const unsigned int *offsets)
   {
     data = base_ptr[offsets[0]];
   }
@@ -344,8 +350,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                Number             *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           Number             *base_ptr) const
   {
     base_ptr[offsets[0]] = data;
   }
@@ -661,7 +668,8 @@ public:
    * to casting a double address to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const double *ptr)
+  void
+  load (const double *ptr)
   {
     data = _mm512_loadu_pd (ptr);
   }
@@ -673,7 +681,8 @@ public:
    * VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (double *ptr) const
+  void
+  store (double *ptr) const
   {
     _mm512_storeu_pd (ptr, data);
   }
@@ -682,7 +691,8 @@ public:
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (double *ptr) const
+  void
+  streaming_store (double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%64==0, ExcMessage("Memory not aligned"));
     _mm512_stream_pd(ptr,data);
@@ -701,8 +711,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const double       *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const double       *base_ptr,
+          const unsigned int *offsets)
   {
     // unfortunately, there does not appear to be a 256 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
@@ -725,8 +736,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                double             *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           double             *base_ptr) const
   {
     for (unsigned int i=0; i<8; ++i)
       for (unsigned int j=i+1; j<8; ++j)
@@ -1051,7 +1063,8 @@ public:
    * to casting a float address to VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const float *ptr)
+  void
+  load (const float *ptr)
   {
     data = _mm512_loadu_ps (ptr);
   }
@@ -1063,7 +1076,8 @@ public:
    * VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (float *ptr) const
+  void
+  store (float *ptr) const
   {
     _mm512_storeu_ps (ptr, data);
   }
@@ -1072,7 +1086,8 @@ public:
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (float *ptr) const
+  void
+  streaming_store (float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%64==0, ExcMessage("Memory not aligned"));
     _mm512_stream_ps(ptr,data);
@@ -1091,8 +1106,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const float        *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const float        *base_ptr,
+          const unsigned int *offsets)
   {
     // unfortunately, there does not appear to be a 512 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
@@ -1115,8 +1131,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                float              *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           float              *base_ptr) const
   {
     for (unsigned int i=0; i<16; ++i)
       for (unsigned int j=i+1; j<16; ++j)
@@ -1467,7 +1484,8 @@ public:
    * to casting a double address to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const double *ptr)
+  void
+  load (const double *ptr)
   {
     data = _mm256_loadu_pd (ptr);
   }
@@ -1479,7 +1497,8 @@ public:
    * VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (double *ptr) const
+  void
+  store (double *ptr) const
   {
     _mm256_storeu_pd (ptr, data);
   }
@@ -1488,7 +1507,8 @@ public:
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (double *ptr) const
+  void
+  streaming_store (double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%32==0, ExcMessage("Memory not aligned"));
     _mm256_stream_pd(ptr,data);
@@ -1507,8 +1527,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const double       *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const double       *base_ptr,
+          const unsigned int *offsets)
   {
 #ifdef __AVX2__
     // unfortunately, there does not appear to be a 128 bit integer load, so
@@ -1536,8 +1557,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                double             *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           double             *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
     for (unsigned int i=0; i<4; ++i)
@@ -1842,7 +1864,8 @@ public:
    * to casting a float address to VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const float *ptr)
+  void
+  load (const float *ptr)
   {
     data = _mm256_loadu_ps (ptr);
   }
@@ -1854,7 +1877,8 @@ public:
    * VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (float *ptr) const
+  void
+  store (float *ptr) const
   {
     _mm256_storeu_ps (ptr, data);
   }
@@ -1863,7 +1887,8 @@ public:
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (float *ptr) const
+  void
+  streaming_store (float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%32==0, ExcMessage("Memory not aligned"));
     _mm256_stream_ps(ptr,data);
@@ -1882,8 +1907,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const float        *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const float        *base_ptr,
+          const unsigned int *offsets)
   {
 #ifdef __AVX2__
     // unfortunately, there does not appear to be a 256 bit integer load, so
@@ -1911,8 +1937,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                float              *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           float              *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
     for (unsigned int i=0; i<8; ++i)
@@ -2245,7 +2272,8 @@ public:
    * to casting a double address to VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const double *ptr)
+  void
+  load (const double *ptr)
   {
     data = _mm_loadu_pd (ptr);
   }
@@ -2257,7 +2285,8 @@ public:
    * VectorizedArray<double>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (double *ptr) const
+  void
+  store (double *ptr) const
   {
     _mm_storeu_pd (ptr, data);
   }
@@ -2266,7 +2295,8 @@ public:
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (double *ptr) const
+  void
+  streaming_store (double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%16==0, ExcMessage("Memory not aligned"));
     _mm_stream_pd(ptr,data);
@@ -2285,8 +2315,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const double       *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const double       *base_ptr,
+          const unsigned int *offsets)
   {
     for (unsigned int i=0; i<2; ++i)
       *(reinterpret_cast<double *>(&data)+i) = base_ptr[offsets[i]];
@@ -2305,8 +2336,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                double             *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           double             *base_ptr) const
   {
     for (unsigned int i=0; i<2; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data)+i);
@@ -2396,10 +2428,11 @@ private:
  */
 template <>
 inline
-void vectorized_load_and_transpose(const unsigned int      n_entries,
-                                   const double            *in,
-                                   const unsigned int      *offsets,
-                                   VectorizedArray<double> *out)
+void
+vectorized_load_and_transpose(const unsigned int      n_entries,
+                              const double            *in,
+                              const unsigned int      *offsets,
+                              VectorizedArray<double> *out)
 {
   const unsigned int n_chunks = n_entries/2;
   for (unsigned int i=0; i<n_chunks; ++i)
@@ -2575,7 +2608,8 @@ public:
    * to casting a float address to VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void load (const float *ptr)
+  void
+  load (const float *ptr)
   {
     data = _mm_loadu_ps (ptr);
   }
@@ -2587,7 +2621,8 @@ public:
    * VectorizedArray<float>*.
    */
   DEAL_II_ALWAYS_INLINE
-  void store (float *ptr) const
+  void
+  store (float *ptr) const
   {
     _mm_storeu_ps (ptr, data);
   }
@@ -2596,7 +2631,8 @@ public:
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
-  void streaming_store (float *ptr) const
+  void
+  streaming_store (float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr)%16==0, ExcMessage("Memory not aligned"));
     _mm_stream_ps(ptr,data);
@@ -2615,8 +2651,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void gather (const float        *base_ptr,
-               const unsigned int *offsets)
+  void
+  gather (const float        *base_ptr,
+          const unsigned int *offsets)
   {
     for (unsigned int i=0; i<4; ++i)
       *(reinterpret_cast<float *>(&data)+i) = base_ptr[offsets[i]];
@@ -2635,8 +2672,9 @@ public:
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
-  void scatter (const unsigned int *offsets,
-                float              *base_ptr) const
+  void
+  scatter (const unsigned int *offsets,
+           float              *base_ptr) const
   {
     for (unsigned int i=0; i<4; ++i)
       base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data)+i);
@@ -2725,10 +2763,11 @@ private:
  */
 template <>
 inline
-void vectorized_load_and_transpose(const unsigned int      n_entries,
-                                   const float            *in,
-                                   const unsigned int     *offsets,
-                                   VectorizedArray<float> *out)
+void
+vectorized_load_and_transpose(const unsigned int      n_entries,
+                              const float            *in,
+                              const unsigned int     *offsets,
+                              VectorizedArray<float> *out)
 {
   const unsigned int n_chunks = n_entries/4;
   for (unsigned int i=0; i<n_chunks; ++i)

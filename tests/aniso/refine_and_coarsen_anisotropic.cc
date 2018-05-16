@@ -48,7 +48,8 @@ const unsigned int max_cells = 50000;
 
 
 template <int dim>
-void test_isotropic (int type, std::ostream *logfile)
+void
+test_isotropic (int type, std::ostream *logfile)
 {
   const RefinementCase<dim> ref_cases[7] =
   {
@@ -114,7 +115,8 @@ void test_isotropic (int type, std::ostream *logfile)
 
 
 
-int main ()
+int
+main ()
 {
   std::ostream *logfile;
 

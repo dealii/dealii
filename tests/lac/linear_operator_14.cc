@@ -51,10 +51,11 @@
 using namespace dealii;
 
 template <int dim>
-void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
-                         TrilinosWrappers::MPI::BlockVector  &vector,
-                         const FE_Q<dim>                     &fe_test,
-                         const FE_Q<dim>                     &fe_trial)
+void
+build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
+                    TrilinosWrappers::MPI::BlockVector  &vector,
+                    const FE_Q<dim>                     &fe_test,
+                    const FE_Q<dim>                     &fe_trial)
 {
   deallog.push("build_matrix_vector");
 
@@ -175,8 +176,9 @@ void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   deallog.pop();
 }
 
-void evaluate_ops (const TrilinosWrappers::BlockSparseMatrix &matrix,
-                   const TrilinosWrappers::MPI::BlockVector  &vector)
+void
+evaluate_ops (const TrilinosWrappers::BlockSparseMatrix &matrix,
+              const TrilinosWrappers::MPI::BlockVector  &vector)
 {
   const double tol = 1e-12;
   typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
@@ -465,7 +467,8 @@ void evaluate_ops (const TrilinosWrappers::BlockSparseMatrix &matrix,
   deallog << "Matrix TW::Vector OK" << std::endl;
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   const int dim = 2;
 

@@ -54,12 +54,13 @@ public:
   LaplaceOperator() {};
 
 
-  void initialize (const Mapping<dim> &mapping,
-                   const DoFHandler<dim> &dof_handler,
-                   const MGConstrainedDoFs &mg_constrained_dofs,
-                   const typename FunctionMap<dim>::type &dirichlet_boundary,
-                   const unsigned int level,
-                   const bool threaded)
+  void
+  initialize (const Mapping<dim> &mapping,
+              const DoFHandler<dim> &dof_handler,
+              const MGConstrainedDoFs &mg_constrained_dofs,
+              const typename FunctionMap<dim>::type &dirichlet_boundary,
+              const unsigned int level,
+              const bool threaded)
   {
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
@@ -106,28 +107,32 @@ public:
       compute_inverse_diagonal();
   }
 
-  void vmult(LinearAlgebra::distributed::Vector<number> &dst,
+  void
+  vmult(LinearAlgebra::distributed::Vector<number> &dst,
+        const LinearAlgebra::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
+         const LinearAlgebra::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult_add(LinearAlgebra::distributed::Vector<number> &dst,
              const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    dst = 0;
     vmult_add(dst, src);
   }
 
-  void Tvmult(LinearAlgebra::distributed::Vector<number> &dst,
-              const LinearAlgebra::distributed::Vector<number> &src) const
-  {
-    dst = 0;
-    vmult_add(dst, src);
-  }
-
-  void Tvmult_add(LinearAlgebra::distributed::Vector<number> &dst,
-                  const LinearAlgebra::distributed::Vector<number> &src) const
-  {
-    vmult_add(dst, src);
-  }
-
-  void vmult_add(LinearAlgebra::distributed::Vector<number> &dst,
-                 const LinearAlgebra::distributed::Vector<number> &src) const
+  void
+  vmult_add(LinearAlgebra::distributed::Vector<number> &dst,
+            const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -159,8 +164,9 @@ public:
       }
   }
 
-  void vmult_interface_down(LinearAlgebra::distributed::Vector<number> &dst,
-                            const LinearAlgebra::distributed::Vector<number> &src) const
+  void
+  vmult_interface_down(LinearAlgebra::distributed::Vector<number> &dst,
+                       const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -197,8 +203,9 @@ public:
       dst.local_element(c) = 0.;
   }
 
-  void vmult_interface_up(LinearAlgebra::distributed::Vector<number> &dst,
-                          const LinearAlgebra::distributed::Vector<number> &src) const
+  void
+  vmult_interface_up(LinearAlgebra::distributed::Vector<number> &dst,
+                     const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
     Assert(dst.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner), ExcInternalError());
@@ -227,17 +234,20 @@ public:
       }
   }
 
-  types::global_dof_index m() const
+  types::global_dof_index
+  m() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  types::global_dof_index n() const
+  types::global_dof_index
+  n() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  number el (const unsigned int row,  const unsigned int col) const
+  number
+  el (const unsigned int row,  const unsigned int col) const
   {
     AssertThrow(false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
@@ -349,19 +359,22 @@ template <typename LAPLACEOPERATOR>
 class MGInterfaceMatrix : public Subscriptor
 {
 public:
-  void initialize (const LAPLACEOPERATOR &laplace)
+  void
+  initialize (const LAPLACEOPERATOR &laplace)
   {
     this->laplace = &laplace;
   }
 
-  void vmult (LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &dst,
-              const LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &src) const
+  void
+  vmult (LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &dst,
+         const LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &src) const
   {
     laplace->vmult_interface_down(dst, src);
   }
 
-  void Tvmult (LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &dst,
-               const LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &src) const
+  void
+  Tvmult (LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &dst,
+          const LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type> &src) const
   {
     laplace->vmult_interface_up(dst, src);
   }
@@ -414,14 +427,16 @@ class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Ve
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MatrixType &matrix)
+  void
+  initialize(const MatrixType &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int   level,
-                           LinearAlgebra::distributed::Vector<Number> &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const
+  virtual void
+  operator() (const unsigned int   level,
+              LinearAlgebra::distributed::Vector<Number> &dst,
+              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10);
     SolverCG<LinearAlgebra::distributed::Vector<Number> > solver_coarse (solver_control);
@@ -435,7 +450,8 @@ public:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof, const bool threaded)
+void
+do_test (const DoFHandler<dim>  &dof, const bool threaded)
 {
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
@@ -538,7 +554,8 @@ void do_test (const DoFHandler<dim>  &dof, const bool threaded)
 
 
 template <int dim, int fe_degree, typename Number>
-void test ()
+void
+test ()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
                                                  Triangulation<dim>::limit_level_difference_at_vertices,
@@ -573,7 +590,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv,
                                             testing_max_num_threads());

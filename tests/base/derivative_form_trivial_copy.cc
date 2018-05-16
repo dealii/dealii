@@ -29,7 +29,8 @@
 #include "../tests.h"
 
 template <typename Number>
-void test()
+void
+test()
 {
   deallog << "DerivativeForm<1, 2, 2> is trivially copyable: "
           << boost::has_trivial_copy<DerivativeForm<1, 2, 2, Number> >::value
@@ -45,7 +46,8 @@ void test()
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -21,7 +21,8 @@
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 
-void test ()
+void
+test ()
 {
   TrilinosWrappers::SparsityPattern sp;
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
@@ -67,7 +68,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

@@ -75,8 +75,9 @@ namespace GridTools
    */
   template <class StreamType>
   inline
-  StreamType &operator << (StreamType &s,
-                           const CacheUpdateFlags u)
+  StreamType &
+  operator << (StreamType &s,
+               const CacheUpdateFlags u)
   {
     s << " CacheUpdateFlags";
     if (u & update_vertex_to_cell_map)                 s << "|vertex_to_cell_map";

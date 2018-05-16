@@ -145,7 +145,8 @@ public:
   /**
    * Default copy assignment operator.
    */
-  PackagedOperation<Range> &operator=(const PackagedOperation<Range> &) = default;
+  PackagedOperation<Range> &
+  operator=(const PackagedOperation<Range> &) = default;
 
   /**
    * Copy assignment operator that creates a PackagedOperation object from a
@@ -156,7 +157,8 @@ public:
    * the PackagedOperation object. All changes made on @p u after the creation
    * of the PackagedOperation object are reflected by the operator object.
    */
-  PackagedOperation<Range> &operator=(const Range &u)
+  PackagedOperation<Range> &
+  operator=(const Range &u)
   {
     apply = [&u](Range &v)
     {
@@ -200,7 +202,8 @@ public:
   /**
    * Addition with a PackagedOperation @p second_comp with the same @p Range.
    */
-  PackagedOperation<Range> &operator+=(const PackagedOperation<Range> &second_comp)
+  PackagedOperation<Range> &
+  operator+=(const PackagedOperation<Range> &second_comp)
   {
     *this = *this + second_comp;
     return *this;
@@ -210,7 +213,8 @@ public:
    * Subtraction with a PackagedOperation @p second_comp with the same @p
    * Range.
    */
-  PackagedOperation<Range> &operator-=(const PackagedOperation<Range> &second_comp)
+  PackagedOperation<Range> &
+  operator-=(const PackagedOperation<Range> &second_comp)
   {
     *this = *this - second_comp;
     return *this;
@@ -220,7 +224,8 @@ public:
    * Add a constant @p offset (of the @p Range space) to the result of a
    * PackagedOperation.
    */
-  PackagedOperation<Range> &operator+=(const Range &offset)
+  PackagedOperation<Range> &
+  operator+=(const Range &offset)
   {
     *this = *this + PackagedOperation<Range>(offset);
     return *this;
@@ -230,7 +235,8 @@ public:
    * Subtract a constant @p offset (of the @p Range space) from the result of
    * a PackagedOperation.
    */
-  PackagedOperation<Range> &operator-=(const Range &offset)
+  PackagedOperation<Range> &
+  operator-=(const Range &offset)
   {
     *this = *this - PackagedOperation<Range>(offset);
     return *this;
@@ -239,7 +245,8 @@ public:
   /**
    * Scalar multiplication of the PackagedOperation with a @p number.
    */
-  PackagedOperation<Range> &operator*=(typename Range::value_type number)
+  PackagedOperation<Range> &
+  operator*=(typename Range::value_type number)
   {
     *this = *this * number;
     return *this;
@@ -420,8 +427,9 @@ operator*(typename Range::value_type number,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator+(const PackagedOperation<Range> &comp,
-                                   const Range &offset)
+PackagedOperation<Range>
+operator+(const PackagedOperation<Range> &comp,
+          const Range &offset)
 {
   return comp + PackagedOperation<Range>(offset);
 }
@@ -435,8 +443,9 @@ PackagedOperation<Range> operator+(const PackagedOperation<Range> &comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator+(const Range &offset,
-                                   const PackagedOperation<Range> &comp)
+PackagedOperation<Range>
+operator+(const Range &offset,
+          const PackagedOperation<Range> &comp)
 {
   return PackagedOperation<Range>(offset) + comp;
 }
@@ -450,8 +459,9 @@ PackagedOperation<Range> operator+(const Range &offset,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator-(const PackagedOperation<Range> &comp,
-                                   const Range &offset)
+PackagedOperation<Range>
+operator-(const PackagedOperation<Range> &comp,
+          const Range &offset)
 {
   return comp - PackagedOperation<Range>(offset);
 }
@@ -467,8 +477,9 @@ PackagedOperation<Range> operator-(const PackagedOperation<Range> &comp,
  * @ingroup LAOperators
  */
 template <typename Range>
-PackagedOperation<Range> operator-(const Range &offset,
-                                   const PackagedOperation<Range> &comp)
+PackagedOperation<Range>
+operator-(const Range &offset,
+          const PackagedOperation<Range> &comp)
 {
   return PackagedOperation<Range>(offset) - comp;
 }
@@ -491,18 +502,21 @@ namespace
   class has_vector_interface
   {
     template <typename C>
-    static std::false_type test(...);
+    static std::false_type
+    test(...);
 
     template <typename C>
-    static std::true_type test(decltype(&C::operator+=),
-                               decltype(&C::operator-=),
-                               decltype(&C::l2_norm));
+    static std::true_type
+    test(decltype(&C::operator+=),
+         decltype(&C::operator-=),
+         decltype(&C::l2_norm));
 
   public:
     // type is std::true_type if Matrix provides vmult_add and Tvmult_add,
     // otherwise it is std::false_type
 
-    typedef decltype(test<T>(nullptr, nullptr, nullptr)) type;
+    typedef
+    decltype(test<T>(nullptr, nullptr, nullptr)) type;
   };
 }
 
@@ -523,7 +537,8 @@ namespace
 
 template <typename Range,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator+(const Range &u, const Range &v)
+PackagedOperation<Range>
+operator+(const Range &u, const Range &v)
 {
   PackagedOperation<Range> return_comp;
 
@@ -568,7 +583,8 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
 
 template <typename Range,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator-(const Range &u, const Range &v)
+PackagedOperation<Range>
+operator-(const Range &u, const Range &v)
 {
   PackagedOperation<Range> return_comp;
 
@@ -612,8 +628,9 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
  */
 template <typename Range,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator*(const Range &u,
-                                   typename Range::value_type number)
+PackagedOperation<Range>
+operator*(const Range &u,
+          typename Range::value_type number)
 {
   return PackagedOperation<Range>(u) * number;
 }
@@ -635,8 +652,9 @@ PackagedOperation<Range> operator*(const Range &u,
  */
 template <typename Range,
           typename = typename std::enable_if<has_vector_interface<Range>::type::value>::type>
-PackagedOperation<Range> operator*(typename Range::value_type number,
-                                   const Range &u)
+PackagedOperation<Range>
+operator*(typename Range::value_type number,
+          const Range &u)
 {
   return number * PackagedOperation<Range>(u);
 }

@@ -35,7 +35,8 @@
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
@@ -177,10 +178,13 @@ class TestCases
 {
 public:
   TestCases ();
-  virtual ~TestCases ();
+  virtual
+  ~TestCases ();
 
-  virtual void create_new ();
-  virtual void run (const unsigned int testcase);
+  virtual void
+  create_new ();
+  virtual void
+  run (const unsigned int testcase);
 
 private:
   Triangulation<dim> *tria;
@@ -207,7 +211,8 @@ TestCases<dim>::~TestCases ()
 
 
 template <int dim>
-void TestCases<dim>::create_new ()
+void
+TestCases<dim>::create_new ()
 {
   if (dof  != nullptr) delete dof;
   if (tria != nullptr) delete tria;
@@ -221,7 +226,8 @@ void TestCases<dim>::create_new ()
 
 
 template <int dim>
-void TestCases<dim>::run (const unsigned int test_case)
+void
+TestCases<dim>::run (const unsigned int test_case)
 {
   deallog << "Dimension = " << dim
           << ", Test case = " << test_case << std::endl
@@ -338,7 +344,8 @@ void TestCases<dim>::run (const unsigned int test_case)
 
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
 

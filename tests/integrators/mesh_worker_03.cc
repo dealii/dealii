@@ -39,24 +39,29 @@ template <int dim>
 class MatrixIntegrator : public Subscriptor
 {
 public:
-  static void cell(MeshWorker::DoFInfo<dim> &dinfo,
-                   MeshWorker::IntegrationInfo<dim> &info);
-  static void face(MeshWorker::DoFInfo<dim> &dinfo1,
-                   MeshWorker::DoFInfo<dim> &dinfo2,
-                   MeshWorker::IntegrationInfo<dim> &info1,
-                   MeshWorker::IntegrationInfo<dim> &info2);
-  static void block_cell(MeshWorker::DoFInfo<dim> &dinfo,
-                         MeshWorker::IntegrationInfo<dim> &info);
-  static void block_face(MeshWorker::DoFInfo<dim> &dinfo1,
-                         MeshWorker::DoFInfo<dim> &dinfo2,
-                         MeshWorker::IntegrationInfo<dim> &info1,
-                         MeshWorker::IntegrationInfo<dim> &info2);
+  static void
+  cell(MeshWorker::DoFInfo<dim> &dinfo,
+       MeshWorker::IntegrationInfo<dim> &info);
+  static void
+  face(MeshWorker::DoFInfo<dim> &dinfo1,
+       MeshWorker::DoFInfo<dim> &dinfo2,
+       MeshWorker::IntegrationInfo<dim> &info1,
+       MeshWorker::IntegrationInfo<dim> &info2);
+  static void
+  block_cell(MeshWorker::DoFInfo<dim> &dinfo,
+             MeshWorker::IntegrationInfo<dim> &info);
+  static void
+  block_face(MeshWorker::DoFInfo<dim> &dinfo1,
+             MeshWorker::DoFInfo<dim> &dinfo2,
+             MeshWorker::IntegrationInfo<dim> &info1,
+             MeshWorker::IntegrationInfo<dim> &info2);
 };
 
 
 template <int dim>
-void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo,
-                                 MeshWorker::IntegrationInfo<dim> &info)
+void
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo,
+                            MeshWorker::IntegrationInfo<dim> &info)
 {
   const FiniteElement<dim> &fe = info.fe_values().get_fe();
   FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
@@ -71,10 +76,11 @@ void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo,
 
 
 template <int dim>
-void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &dinfo1,
-                                 MeshWorker::DoFInfo<dim> &dinfo2,
-                                 MeshWorker::IntegrationInfo<dim> &info1,
-                                 MeshWorker::IntegrationInfo<dim> &info2)
+void
+MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &dinfo1,
+                            MeshWorker::DoFInfo<dim> &dinfo2,
+                            MeshWorker::IntegrationInfo<dim> &info1,
+                            MeshWorker::IntegrationInfo<dim> &info2)
 {
   const FiniteElement<dim> &fe1 = info1.fe_values().get_fe();
   const FiniteElement<dim> &fe2 = info2.fe_values().get_fe();
@@ -93,7 +99,8 @@ void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &dinfo1,
 
 
 template <int dim>
-void MatrixIntegrator<dim>::block_cell(
+void
+MatrixIntegrator<dim>::block_cell(
   MeshWorker::DoFInfo<dim> &dinfo,
   MeshWorker::IntegrationInfo<dim> &)
 {
@@ -111,7 +118,8 @@ void MatrixIntegrator<dim>::block_cell(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::block_face(
+void
+MatrixIntegrator<dim>::block_face(
   MeshWorker::DoFInfo<dim> &dinfo1,
   MeshWorker::DoFInfo<dim> &dinfo2,
   MeshWorker::IntegrationInfo<dim> &,
@@ -301,7 +309,8 @@ test(const FiniteElement<dim> &fe)
 }
 
 
-int main ()
+int
+main ()
 {
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());

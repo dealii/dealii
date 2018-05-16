@@ -24,7 +24,8 @@
 #include <deal.II/lac/vector.h>
 
 
-void test (Vector<double> &v)
+void
+test (Vector<double> &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = i+1.;
@@ -37,7 +38,8 @@ void test (Vector<double> &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

@@ -514,9 +514,10 @@ namespace internal
       typedef types::global_dof_index size_type;
 
       template <class VectorType>
-      void set_zero_parallel(const std::vector<size_type> &cm,
-                             VectorType &vec,
-                             size_type shift = 0)
+      void
+      set_zero_parallel(const std::vector<size_type> &cm,
+                        VectorType &vec,
+                        size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());
         IndexSet locally_owned = vec.locally_owned_elements();
@@ -537,7 +538,8 @@ namespace internal
       }
 
       template <typename Number>
-      void set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
+      void
+      set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
@@ -557,18 +559,20 @@ namespace internal
       }
 
       template <class VectorType>
-      void set_zero_in_parallel(const std::vector<size_type> &cm,
-                                VectorType                   &vec,
-                                std::integral_constant<bool, false>)
+      void
+      set_zero_in_parallel(const std::vector<size_type> &cm,
+                           VectorType                   &vec,
+                           std::integral_constant<bool, false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
       template <class VectorType>
-      void set_zero_in_parallel(const std::vector<size_type> &cm,
-                                VectorType                   &vec,
-                                std::integral_constant<bool, true>)
+      void
+      set_zero_in_parallel(const std::vector<size_type> &cm,
+                           VectorType                   &vec,
+                           std::integral_constant<bool, true>)
       {
         size_type start_shift = 0;
         for (size_type j=0; j<vec.n_blocks(); ++j)
@@ -579,8 +583,9 @@ namespace internal
       }
 
       template <class VectorType>
-      void set_zero_serial(const std::vector<size_type> &cm,
-                           VectorType                   &vec)
+      void
+      set_zero_serial(const std::vector<size_type> &cm,
+                      VectorType                   &vec)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
@@ -588,8 +593,9 @@ namespace internal
       }
 
       template <class VectorType>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        VectorType                   &vec)
+      void
+      set_zero_all(const std::vector<size_type> &cm,
+                   VectorType                   &vec)
       {
         set_zero_in_parallel<VectorType>(cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
         vec.compress(VectorOperation::insert);
@@ -597,15 +603,17 @@ namespace internal
 
 
       template <class T>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        dealii::Vector<T>            &vec)
+      void
+      set_zero_all(const std::vector<size_type> &cm,
+                   dealii::Vector<T>            &vec)
       {
         set_zero_serial(cm, vec);
       }
 
       template <class T>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        dealii::BlockVector<T>       &vec)
+      void
+      set_zero_all(const std::vector<size_type> &cm,
+                   dealii::BlockVector<T>       &vec)
       {
         set_zero_serial(cm, vec);
       }
@@ -970,8 +978,10 @@ namespace internals
     Distributing (const size_type global_row = numbers::invalid_size_type,
                   const size_type local_row = numbers::invalid_size_type);
     Distributing (const Distributing &in);
-    Distributing &operator = (const Distributing &in);
-    bool operator < (const Distributing &in) const
+    Distributing &
+    operator = (const Distributing &in);
+    bool
+    operator < (const Distributing &in) const
     {
       return global_row<in.global_row;
     }
@@ -997,7 +1007,8 @@ namespace internals
   }
 
   inline
-  Distributing &Distributing::operator = (const Distributing &in)
+  Distributing &
+  Distributing::operator = (const Distributing &in)
   {
     global_row = in.global_row;
     local_row = in.local_row;
@@ -1031,13 +1042,15 @@ namespace internals
       row_length (8)
     {}
 
-    void reinit ()
+    void
+    reinit ()
     {
       individual_size.resize(0);
       data.resize(0);
     }
 
-    size_type insert_new_index (const std::pair<size_type,double> &pair)
+    size_type
+    insert_new_index (const std::pair<size_type,double> &pair)
     {
       Assert(row_length > 0, ExcInternalError());
       const unsigned int index = individual_size.size();
@@ -1048,8 +1061,9 @@ namespace internals
       return index;
     }
 
-    void append_index (const size_type index,
-                       const std::pair<size_type,double> &pair)
+    void
+    append_index (const size_type index,
+                  const std::pair<size_type,double> &pair)
     {
       AssertIndexRange (index, individual_size.size());
       const size_type my_length = individual_size[index];
@@ -1129,7 +1143,8 @@ namespace internals
       n_inhomogeneous_rows (0)
     {}
 
-    void reinit (const size_type n_local_rows)
+    void
+    reinit (const size_type n_local_rows)
     {
       total_row_indices.resize(n_local_rows);
       for (unsigned int i=0; i<n_local_rows; ++i)
@@ -1140,13 +1155,16 @@ namespace internals
     }
 
     // implemented below
-    void insert_index (const size_type global_row,
-                       const size_type local_row,
-                       const double       constraint_value);
-    void sort ();
+    void
+    insert_index (const size_type global_row,
+                  const size_type local_row,
+                  const double       constraint_value);
+    void
+    sort ();
 
     // Print object for debugging purpose
-    void print(std::ostream &os)
+    void
+    print(std::ostream &os)
     {
       os << "Active rows " << n_active_rows << std::endl
          << "Constr rows " << n_constraints() << std::endl
@@ -1169,14 +1187,16 @@ namespace internals
     // return all kind of information on the constraints
 
     // returns the number of global indices in the struct
-    size_type size () const
+    size_type
+    size () const
     {
       return n_active_rows;
     }
 
     // returns the number of constraints that are associated to the
     // counter_index-th entry in the list
-    size_type size (const size_type counter_index) const
+    size_type
+    size (const size_type counter_index) const
     {
       return (total_row_indices[counter_index].constraint_position ==
               numbers::invalid_size_type ?
@@ -1186,13 +1206,15 @@ namespace internals
     }
 
     // returns the global row of the counter_index-th entry in the list
-    size_type global_row (const size_type counter_index) const
+    size_type
+    global_row (const size_type counter_index) const
     {
       return total_row_indices[counter_index].global_row;
     }
 
     // returns the global row of the counter_index-th entry in the list
-    size_type &global_row (const size_type counter_index)
+    size_type &
+    global_row (const size_type counter_index)
     {
       return total_row_indices[counter_index].global_row;
     }
@@ -1200,13 +1222,15 @@ namespace internals
     // returns the local row in the cell matrix associated with the
     // counter_index-th entry in the list. Returns invalid_size_type for
     // constrained rows
-    size_type local_row (const size_type counter_index) const
+    size_type
+    local_row (const size_type counter_index) const
     {
       return total_row_indices[counter_index].local_row;
     }
 
     // writable index
-    size_type &local_row (const size_type counter_index)
+    size_type &
+    local_row (const size_type counter_index)
     {
       return total_row_indices[counter_index].local_row;
     }
@@ -1214,8 +1238,9 @@ namespace internals
     // returns the local row in the cell matrix associated with the
     // counter_index-th entry in the list in the index_in_constraint-th
     // position of constraints
-    size_type local_row (const size_type counter_index,
-                         const size_type index_in_constraint) const
+    size_type
+    local_row (const size_type counter_index,
+               const size_type index_in_constraint) const
     {
       return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
               [index_in_constraint]).first;
@@ -1223,8 +1248,9 @@ namespace internals
 
     // returns the value of the constraint in the counter_index-th entry in
     // the list in the index_in_constraint-th position of constraints
-    double constraint_value (const size_type counter_index,
-                             const size_type index_in_constraint) const
+    double
+    constraint_value (const size_type counter_index,
+                      const size_type index_in_constraint) const
     {
       return (data_cache.get_entry(total_row_indices[counter_index].constraint_position)
               [index_in_constraint]).second;
@@ -1232,14 +1258,16 @@ namespace internals
 
     // returns whether there is one row with indirect contributions (i.e.,
     // there has been at least one constraint with non-trivial ConstraintLine)
-    bool have_indirect_rows () const
+    bool
+    have_indirect_rows () const
     {
       return data_cache.individual_size.empty() == false;
     }
 
     // append an entry that is constrained. This means that there is one less
     // nontrivial row
-    void insert_constraint (const size_type constrained_local_dof)
+    void
+    insert_constraint (const size_type constrained_local_dof)
     {
       --n_active_rows;
       total_row_indices[n_active_rows].local_row = constrained_local_dof;
@@ -1249,14 +1277,16 @@ namespace internals
     // returns the number of constrained dofs in the structure. Constrained
     // dofs do not contribute directly to the matrix, but are needed in order
     // to set matrix diagonals and resolve inhomogeneities
-    size_type n_constraints () const
+    size_type
+    n_constraints () const
     {
       return total_row_indices.size()-n_active_rows;
     }
 
     // returns the number of constrained dofs in the structure that have an
     // inhomogeneity
-    size_type n_inhomogeneities () const
+    size_type
+    n_inhomogeneities () const
     {
       return n_inhomogeneous_rows;
     }
@@ -1265,7 +1295,8 @@ namespace internals
     // inhomogeneous. inhomogeneous constraints contribute to right hand
     // sides, so to have fast access to them, put them before homogeneous
     // constraints
-    void set_ith_constraint_inhomogeneous (const size_type i)
+    void
+    set_ith_constraint_inhomogeneous (const size_type i)
     {
       Assert (i >= n_inhomogeneous_rows, ExcInternalError());
       std::swap (total_row_indices[n_active_rows+i],
@@ -1275,7 +1306,8 @@ namespace internals
 
     // the local row where constraint number i was detected, to find that row
     // easily when the GlobalRowsToLocal has been set up
-    size_type constraint_origin (size_type i) const
+    size_type
+    constraint_origin (size_type i) const
     {
       return total_row_indices[n_active_rows+i].local_row;
     }
@@ -1496,7 +1528,8 @@ namespace internals
       /**
        * Dereferencing operator.
        */
-      ScratchData &operator* ()
+      ScratchData &
+      operator* ()
       {
         return *my_scratch_data;
       }
@@ -1504,7 +1537,8 @@ namespace internals
       /**
        * Dereferencing operator.
        */
-      ScratchData *operator-> ()
+      ScratchData *
+      operator-> ()
       {
         return my_scratch_data;
       }
@@ -1605,12 +1639,13 @@ namespace internals
   // collect.
   template <typename LocalType>
   static inline
-  LocalType resolve_matrix_entry (const GlobalRowsFromLocal   &global_rows,
-                                  const GlobalRowsFromLocal   &global_cols,
-                                  const size_type              i,
-                                  const size_type              j,
-                                  const size_type              loc_row,
-                                  const FullMatrix<LocalType> &local_matrix)
+  LocalType
+  resolve_matrix_entry (const GlobalRowsFromLocal   &global_rows,
+                        const GlobalRowsFromLocal   &global_cols,
+                        const size_type              i,
+                        const size_type              j,
+                        const size_type              loc_row,
+                        const FullMatrix<LocalType> &local_matrix)
   {
     const size_type loc_col = global_cols.local_row(j);
     LocalType col_val;
@@ -1722,10 +1757,11 @@ namespace internals
   {
     template <typename SparseMatrixIterator, typename LocalType>
     static inline
-    void add_value (const LocalType       value,
-                    const size_type       row,
-                    const size_type       column,
-                    SparseMatrixIterator &matrix_values)
+    void
+    add_value (const LocalType       value,
+               const size_type       row,
+               const size_type       column,
+               SparseMatrixIterator &matrix_values)
     {
       (void)row;
       if (value != LocalType ())

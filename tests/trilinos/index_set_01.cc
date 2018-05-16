@@ -26,7 +26,8 @@
 
 
 
-void test ()
+void
+test ()
 {
   IndexSet my_set;
   my_set.set_size(654);
@@ -52,7 +53,8 @@ void test ()
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

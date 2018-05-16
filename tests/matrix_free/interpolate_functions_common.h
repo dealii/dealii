@@ -41,7 +41,8 @@
 
 // forward declare this function. will be implemented in .cc files
 template <int dim, int fe_degree>
-void test ();
+void
+test ();
 
 template <int dim> class CompareFunction;
 
@@ -60,7 +61,8 @@ public:
     data   (data_in)
   {};
 
-  virtual ~MatrixFreeTest ()
+  virtual
+  ~MatrixFreeTest ()
   {}
 
   // make function virtual to allow derived classes to define a different
@@ -213,7 +215,8 @@ public:
 
 
 
-  void test_functions (const Vector<Number> &src) const
+  void
+  test_functions (const Vector<Number> &src) const
   {
     for (unsigned int i=0; i<4; ++i)
       {
@@ -268,8 +271,9 @@ protected:
 
 
 template <int dim, int fe_degree, typename number>
-void do_test (const DoFHandler<dim> &dof,
-              const ConstraintMatrix &constraints)
+void
+do_test (const DoFHandler<dim> &dof,
+         const ConstraintMatrix &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
   // use this for info on problem
@@ -301,7 +305,8 @@ void do_test (const DoFHandler<dim> &dof,
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

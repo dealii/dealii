@@ -27,7 +27,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-void test ()
+void
+test ()
 {
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria);
@@ -59,7 +60,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   initlog();
 

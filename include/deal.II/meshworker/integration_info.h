@@ -109,27 +109,31 @@ namespace MeshWorker
      * cells will be re-ordered to reflect the block structure of the system.
      */
     template <class FEVALUES>
-    void initialize(const FiniteElement<dim,spacedim> &el,
-                    const Mapping<dim,spacedim> &mapping,
-                    const Quadrature<FEVALUES::integral_dimension> &quadrature,
-                    const UpdateFlags flags,
-                    const BlockInfo *local_block_info = nullptr);
+    void
+    initialize(const FiniteElement<dim,spacedim> &el,
+               const Mapping<dim,spacedim> &mapping,
+               const Quadrature<FEVALUES::integral_dimension> &quadrature,
+               const UpdateFlags flags,
+               const BlockInfo *local_block_info = nullptr);
 
     /**
      * Initialize the data vector and cache the selector.
      */
-    void initialize_data(const std::shared_ptr<VectorDataBase<dim,spacedim> > &data);
+    void
+    initialize_data(const std::shared_ptr<VectorDataBase<dim,spacedim> > &data);
 
     /**
      * Delete the data created by initialize().
      */
-    void clear();
+    void
+    clear();
 
     /**
      * Return a reference to the FiniteElement that was used to initialize
      * this object.
      */
-    const FiniteElement<dim, spacedim> &finite_element() const;
+    const FiniteElement<dim, spacedim> &
+    finite_element() const;
 
     /// This is true if we are assembling for multigrid
     bool multigrid;
@@ -139,14 +143,16 @@ namespace MeshWorker
      * element was used (without the BlockInfo argument). It throws an
      * exception, if applied to a vector of elements.
      */
-    const FEValuesBase<dim, spacedim> &fe_values () const;
+    const FEValuesBase<dim, spacedim> &
+    fe_values () const;
 
     /// Access to finite elements
     /**
      * This access function must be used if the initialize() for a group of
      * elements was used (with a valid BlockInfo object).
      */
-    const FEValuesBase<dim, spacedim> &fe_values (const unsigned int i) const;
+    const FEValuesBase<dim, spacedim> &
+    fe_values (const unsigned int i) const;
 
     /**
      * The vector containing the values of finite element functions in the
@@ -182,14 +188,16 @@ namespace MeshWorker
      * Reinitialize internal data structures for use on a cell.
      */
     template <typename number>
-    void reinit(const DoFInfo<dim, spacedim, number> &i);
+    void
+    reinit(const DoFInfo<dim, spacedim, number> &i);
 
     /**
      * Use the finite element functions in #global_data and fill the vectors
      * #values, #gradients and #hessians.
      */
     template <typename number>
-    void fill_local_data(const DoFInfo<dim, spacedim, number> &info, bool split_fevalues);
+    void
+    fill_local_data(const DoFInfo<dim, spacedim, number> &info, bool split_fevalues);
 
     /**
      * The global data vector used to compute function values in quadrature
@@ -200,7 +208,8 @@ namespace MeshWorker
     /**
      * The memory used by this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
   private:
     /**
@@ -214,7 +223,8 @@ namespace MeshWorker
      * selector.
      */
     template <typename TYPE>
-    void fill_local_data(
+    void
+    fill_local_data(
       std::vector<std::vector<std::vector<TYPE> > > &data,
       VectorSelector &selector,
       bool split_fevalues) const;
@@ -300,9 +310,10 @@ namespace MeshWorker
      * and also set uninitialized quadrature rules to Gauss formulas, which
      * integrate polynomial bilinear forms exactly.
      */
-    void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim> &mapping,
-                    const BlockInfo *block_info = nullptr);
+    void
+    initialize(const FiniteElement<dim, spacedim> &el,
+               const Mapping<dim, spacedim> &mapping,
+               const BlockInfo *block_info = nullptr);
 
     /**
      * Initialize the IntegrationInfo objects contained.
@@ -312,11 +323,12 @@ namespace MeshWorker
      * integrate polynomial bilinear forms exactly.
      */
     template <typename VectorType>
-    void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim>       &mapping,
-                    const AnyData                      &data,
-                    const VectorType                   &dummy,
-                    const BlockInfo                    *block_info = nullptr);
+    void
+    initialize(const FiniteElement<dim, spacedim> &el,
+               const Mapping<dim, spacedim>       &mapping,
+               const AnyData                      &data,
+               const VectorType                   &dummy,
+               const BlockInfo                    *block_info = nullptr);
     /**
      * Initialize the IntegrationInfo objects contained.
      *
@@ -325,11 +337,12 @@ namespace MeshWorker
      * integrate polynomial bilinear forms exactly.
      */
     template <typename VectorType>
-    void initialize(const FiniteElement<dim, spacedim> &el,
-                    const Mapping<dim, spacedim>       &mapping,
-                    const AnyData                      &data,
-                    const MGLevelObject<VectorType>    &dummy,
-                    const BlockInfo                    *block_info = nullptr);
+    void
+    initialize(const FiniteElement<dim, spacedim> &el,
+               const Mapping<dim, spacedim>       &mapping,
+               const AnyData                      &data,
+               const MGLevelObject<VectorType>    &dummy,
+               const BlockInfo                    *block_info = nullptr);
     /**
      * @name FEValues setup
      */
@@ -345,28 +358,33 @@ namespace MeshWorker
      * <tt>neighbor_geometry</tt> to true in order to initialize these values
      * as well.
      */
-    void initialize_update_flags(bool neighbor_geometry = false);
+    void
+    initialize_update_flags(bool neighbor_geometry = false);
 
     /**
      * Add FEValues UpdateFlags for integration on all objects (cells,
      * boundary faces and all interior faces).
      */
-    void add_update_flags_all (const UpdateFlags flags);
+    void
+    add_update_flags_all (const UpdateFlags flags);
 
     /**
      * Add FEValues UpdateFlags for integration on cells.
      */
-    void add_update_flags_cell(const UpdateFlags flags);
+    void
+    add_update_flags_cell(const UpdateFlags flags);
 
     /**
      * Add FEValues UpdateFlags for integration on boundary faces.
      */
-    void add_update_flags_boundary(const UpdateFlags flags);
+    void
+    add_update_flags_boundary(const UpdateFlags flags);
 
     /**
      * Add FEValues UpdateFlags for integration on interior faces.
      */
-    void add_update_flags_face(const UpdateFlags flags);
+    void
+    add_update_flags_face(const UpdateFlags flags);
 
     /**
      * Add additional update flags to the ones already set in this program.
@@ -374,11 +392,12 @@ namespace MeshWorker
      * set for cell, boundary, interelement face for the cell itself or
      * neighbor cell, or any combination thereof.
      */
-    void add_update_flags(const UpdateFlags flags,
-                          const bool cell = true,
-                          const bool boundary = true,
-                          const bool face = true,
-                          const bool neighbor = true);
+    void
+    add_update_flags(const UpdateFlags flags,
+                     const bool cell = true,
+                     const bool boundary = true,
+                     const bool face = true,
+                     const bool neighbor = true);
 
     /**
      * Assign n-point Gauss quadratures to each of the quadrature rules. Here,
@@ -389,15 +408,17 @@ namespace MeshWorker
      * filled with new quadrature rules. If it is false, then only empty rules
      * are changed.
      */
-    void initialize_gauss_quadrature(unsigned int n_cell_points,
-                                     unsigned int n_boundary_points,
-                                     unsigned int n_face_points,
-                                     const bool force = true);
+    void
+    initialize_gauss_quadrature(unsigned int n_cell_points,
+                                unsigned int n_boundary_points,
+                                unsigned int n_face_points,
+                                const bool force = true);
 
     /**
      * The memory used by this object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption () const;
 
     /**
      * The set of update flags for boundary cell integration.
@@ -502,7 +523,8 @@ namespace MeshWorker
      * be used.
      */
     template <class DOFINFO>
-    void post_cell(const DoFInfoBox<dim, DOFINFO> &);
+    void
+    post_cell(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
      * A callback function which is called in the loop over all cells, after
@@ -521,7 +543,8 @@ namespace MeshWorker
      * be used.
      */
     template <class DOFINFO>
-    void post_faces(const DoFInfoBox<dim, DOFINFO> &);
+    void
+    post_faces(const DoFInfoBox<dim, DOFINFO> &);
 
     /**
      * The @p info object for a cell.

@@ -41,7 +41,8 @@
 
 
 template <int dim>
-void test (bool transpose = false)
+void
+test (bool transpose = false)
 {
   deallog << dim << 'd' << std::endl;
 
@@ -124,7 +125,8 @@ void test (bool transpose = false)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

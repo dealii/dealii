@@ -26,8 +26,9 @@
 using namespace Polynomials;
 
 
-void check_derivatives (const std::vector<Polynomial<double> > &p,
-                        const unsigned int                      n_deriv)
+void
+check_derivatives (const std::vector<Polynomial<double> > &p,
+                   const unsigned int                      n_deriv)
 {
   // check whether the values and derivatives
   // are evaluated correctly some randomly
@@ -87,7 +88,8 @@ check_lge (unsigned int n)
 
 
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

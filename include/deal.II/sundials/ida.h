@@ -374,7 +374,8 @@ namespace SUNDIALS
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
-      void add_parameters(ParameterHandler &prm)
+      void
+      add_parameters(ParameterHandler &prm)
       {
         prm.add_parameter("Initial time", initial_time);
         prm.add_parameter("Final time", final_time);
@@ -576,8 +577,9 @@ namespace SUNDIALS
      * Integrate differential-algebraic equations. This function returns the
      * final number of computed steps.
      */
-    unsigned int solve_dae(VectorType &solution,
-                           VectorType &solution_dot);
+    unsigned int
+    solve_dae(VectorType &solution,
+              VectorType &solution_dot);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -600,10 +602,11 @@ namespace SUNDIALS
      * @param[in,out] y   The new (tentative) initial solution
      * @param[in,out] yp  The new (tentative) initial solution_dot
      */
-    void reset(const double &t,
-               const double &h,
-               VectorType &y,
-               VectorType &yp);
+    void
+    reset(const double &t,
+          const double &h,
+          VectorType &y,
+          VectorType &yp);
 
     /**
      * Reinit vector to have the right size, MPI communicator, etc.
@@ -768,7 +771,8 @@ namespace SUNDIALS
      * std::function above to trigger an assert if they are not
      * implemented.
      */
-    void set_functions_to_trigger_an_assert();
+    void
+    set_functions_to_trigger_an_assert();
 
     /**
      * IDA configuration data.

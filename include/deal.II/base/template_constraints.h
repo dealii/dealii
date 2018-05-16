@@ -240,7 +240,8 @@ struct PointerComparison
    * two pointers are equal.
    */
   template <typename T>
-  static bool equal (const T *p1, const T *p2)
+  static bool
+  equal (const T *p1, const T *p2)
   {
     return (p1==p2);
   }
@@ -253,7 +254,8 @@ struct PointerComparison
    * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>
-  static bool equal (const T *, const U *)
+  static bool
+  equal (const T *, const U *)
   {
     return false;
   }
@@ -386,7 +388,8 @@ namespace internal
   template <typename T, typename U>
   struct ProductTypeImpl
   {
-    typedef decltype(std::declval<T>() * std::declval<U>()) type;
+    typedef
+    decltype(std::declval<T>() * std::declval<U>()) type;
   };
 
 }

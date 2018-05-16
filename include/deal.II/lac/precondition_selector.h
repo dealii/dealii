@@ -110,37 +110,43 @@ public:
   /**
    * Destructor.
    */
-  virtual ~PreconditionSelector() override;
+  virtual
+  ~PreconditionSelector() override;
 
   /**
    * Takes the matrix that is needed for preconditionings that involves a
    * matrix. e.g. for @p precondition_jacobi, <tt>~_sor</tt>, <tt>~_ssor</tt>.
    */
-  void use_matrix(const MatrixType &M);
+  void
+  use_matrix(const MatrixType &M);
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m () const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n () const;
 
   /**
    * Precondition procedure. Calls the preconditioning that was specified in
    * the constructor.
    */
-  virtual void vmult (VectorType &dst, const VectorType &src) const;
+  virtual void
+  vmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Transpose precondition procedure. Calls the preconditioning that was
    * specified in the constructor.
    */
-  virtual void Tvmult (VectorType &dst, const VectorType &src) const;
+  virtual void
+  Tvmult (VectorType &dst, const VectorType &src) const;
 
   /**
    * Get the names of all implemented preconditionings. The list of possible
@@ -152,7 +158,8 @@ public:
    * <li>  "ssor" </li>
    * </ul>
    */
-  static std::string get_precondition_names();
+  static std::string
+  get_precondition_names();
 
   /**
    * @addtogroup Exceptions
@@ -192,8 +199,9 @@ private:
 
 template <typename MatrixType, typename VectorType>
 PreconditionSelector<MatrixType,VectorType>
-::PreconditionSelector(const std::string                     &preconditioning,
-                       const typename VectorType::value_type &omega) :
+::
+PreconditionSelector(const std::string                     &preconditioning,
+                     const typename VectorType::value_type &omega) :
   preconditioning(preconditioning),
   omega(omega)  {}
 
@@ -207,7 +215,8 @@ PreconditionSelector<MatrixType,VectorType>::~PreconditionSelector()
 
 
 template <typename MatrixType, typename VectorType>
-void PreconditionSelector<MatrixType,VectorType>::use_matrix(const MatrixType &M)
+void
+PreconditionSelector<MatrixType,VectorType>::use_matrix(const MatrixType &M)
 {
   A=&M;
 }
@@ -233,8 +242,9 @@ PreconditionSelector<MatrixType,VectorType>::n () const
 
 
 template <typename MatrixType, typename VectorType>
-void PreconditionSelector<MatrixType,VectorType>::vmult (VectorType &dst,
-                                                         const VectorType &src) const
+void
+PreconditionSelector<MatrixType,VectorType>::vmult (VectorType &dst,
+                                                    const VectorType &src) const
 {
   if (preconditioning=="none")
     {
@@ -263,8 +273,9 @@ void PreconditionSelector<MatrixType,VectorType>::vmult (VectorType &dst,
 
 
 template <typename MatrixType, typename VectorType>
-void PreconditionSelector<MatrixType,VectorType>::Tvmult (VectorType &dst,
-                                                          const VectorType &src) const
+void
+PreconditionSelector<MatrixType,VectorType>::Tvmult (VectorType &dst,
+                                                     const VectorType &src) const
 {
   if (preconditioning=="none")
     {
@@ -293,7 +304,8 @@ void PreconditionSelector<MatrixType,VectorType>::Tvmult (VectorType &dst,
 
 
 template <typename MatrixType, typename VectorType>
-std::string PreconditionSelector<MatrixType,VectorType>::get_precondition_names()
+std::string
+PreconditionSelector<MatrixType,VectorType>::get_precondition_names()
 {
   return "none|jacobi|sor|ssor";
 }

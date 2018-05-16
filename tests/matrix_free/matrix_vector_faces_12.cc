@@ -25,12 +25,14 @@
 #include "create_mesh.h"
 #include <deal.II/grid/grid_tools.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
 
-double f_x(double x_m)
+double
+f_x(double x_m)
 {
   double x = x_m*1000.0;
   double y_m = 0.0;
@@ -59,7 +61,8 @@ double f_x(double x_m)
   return y_m;
 }
 
-double gamma_x(double x_m)
+double
+gamma_x(double x_m)
 {
   double xmod = x_m/0.028;
   double gamma = 1.;
@@ -91,12 +94,14 @@ public:
     y_FoR (h)
   {}
 
-  virtual std::unique_ptr<Manifold<dim> > clone() const override
+  virtual std::unique_ptr<Manifold<dim> >
+  clone() const override
   {
     return std_cxx14::make_unique<PeriodicHillManifold<dim> >();
   }
 
-  virtual Point<dim> push_forward(const Point<dim> &xi) const override
+  virtual Point<dim>
+  push_forward(const Point<dim> &xi) const override
   {
     Point<dim> x = xi;
 
@@ -113,7 +118,8 @@ public:
     return x;
   }
 
-  virtual Point<dim> pull_back(const Point<dim> &x) const override
+  virtual Point<dim>
+  pull_back(const Point<dim> &x) const override
   {
     Point<dim> xi = x;
 
@@ -191,7 +197,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   Triangulation<dim> triangulation;
   /* --------------- Generate grid ------------------- */

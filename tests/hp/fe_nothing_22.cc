@@ -38,7 +38,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << std::boolalpha;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(1, false)) << std::endl;
@@ -49,7 +50,8 @@ void test ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

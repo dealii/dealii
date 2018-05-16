@@ -28,7 +28,8 @@
 using namespace LocalIntegrators::Laplace;
 
 template <int dim>
-void test_cell(const FEValuesBase<dim> &fev)
+void
+test_cell(const FEValuesBase<dim> &fev)
 {
   const unsigned int n = fev.dofs_per_cell;
   unsigned int d=fev.get_fe().n_components();
@@ -73,7 +74,8 @@ void test_cell(const FEValuesBase<dim> &fev)
 
 
 template <int dim>
-void test_boundary(const FEValuesBase<dim> &fev)
+void
+test_boundary(const FEValuesBase<dim> &fev)
 {
   const unsigned int n = fev.dofs_per_cell;
   unsigned int d=fev.get_fe().n_components();
@@ -122,8 +124,9 @@ void test_boundary(const FEValuesBase<dim> &fev)
 
 
 template <int dim>
-void test_face(const FEValuesBase<dim> &fev1,
-               const FEValuesBase<dim> &fev2)
+void
+test_face(const FEValuesBase<dim> &fev1,
+          const FEValuesBase<dim> &fev2)
 {
   const unsigned int n1 = fev1.dofs_per_cell;
   const unsigned int n2 = fev1.dofs_per_cell;
@@ -275,7 +278,8 @@ test(Triangulation<dim> &tr)
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -110,7 +110,8 @@ public:
    * destroying objects of derived type through pointers to this base
    * class.
    */
-  virtual ~VectorMemory () override = default;
+  virtual
+  ~VectorMemory () override = default;
 
   /**
    * Return a pointer to a new vector. The number of elements or their
@@ -130,7 +131,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () = 0;
+  virtual VectorType *
+  alloc () = 0;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -146,7 +148,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const) = 0;
+  virtual void
+  free (const VectorType *const) = 0;
 
   /**
    * @addtogroup Exceptions
@@ -206,7 +209,8 @@ public:
      * Move operator: this releases the vector owned by the current Pointer
      * and then steals the internal data owned by @p p.
      */
-    Pointer &operator = (Pointer &&p) noexcept = default;
+    Pointer &
+    operator = (Pointer &&p) noexcept = default;
 
     /**
      * Constructor. This constructor automatically allocates a vector from
@@ -256,7 +260,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () override;
+  virtual VectorType *
+  alloc () override;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -275,7 +280,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const v) override;
+  virtual void
+  free (const VectorType *const v) override;
 };
 
 
@@ -329,7 +335,8 @@ public:
    * However, as discussed in the class documentation, this does not imply
    * that their memory is returned to the operating system.
    */
-  virtual ~GrowingVectorMemory() override;
+  virtual
+  ~GrowingVectorMemory() override;
 
   /**
    * Return a pointer to a new vector. The number of elements or their
@@ -349,7 +356,8 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual VectorType *alloc () override;
+  virtual VectorType *
+  alloc () override;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -368,17 +376,20 @@ public:
    *   same kind of service that <code>std::unique</code> provides
    *   for arbitrary memory allocated on the heap.
    */
-  virtual void free (const VectorType *const) override;
+  virtual void
+  free (const VectorType *const) override;
 
   /**
    * Release all vectors that are not currently in use.
    */
-  static void release_unused_memory ();
+  static void
+  release_unused_memory ();
 
   /**
    * Memory consumed by this class and all currently allocated vectors.
    */
-  virtual std::size_t memory_consumption() const;
+  virtual std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -413,7 +424,8 @@ private:
     /**
      * Create data vector; does nothing after first initialization
      */
-    void initialize(const size_type size);
+    void
+    initialize(const size_type size);
 
     /**
      * Pointer to the storage object
@@ -456,7 +468,8 @@ namespace internal
 {
   namespace GrowingVectorMemoryImplementation
   {
-    void release_all_unused_memory();
+    void
+    release_all_unused_memory();
   }
 }
 

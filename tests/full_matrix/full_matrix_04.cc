@@ -22,7 +22,8 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/eigen.h>
 
-void diff(FullMatrix<double> &M)
+void
+diff(FullMatrix<double> &M)
 {
   const double err = M.frobenius_norm();
   if (err < 1.e-14)
@@ -32,7 +33,8 @@ void diff(FullMatrix<double> &M)
 }
 
 
-void test (const unsigned int n, const unsigned int m)
+void
+test (const unsigned int n, const unsigned int m)
 {
   // Create some random matrices
   FullMatrix<double> A(n,n);

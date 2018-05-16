@@ -177,7 +177,8 @@ namespace Functions
      * can tell this object by calling this function. This will speed things
      * up a little.
      */
-    void set_active_cell (const typename DoFHandlerType::active_cell_iterator &newcell);
+    void
+    set_active_cell (const typename DoFHandlerType::active_cell_iterator &newcell);
 
     /**
      * Get one vector value at the given point. It is inefficient to use
@@ -194,8 +195,9 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<typename VectorType::value_type>   &values) const override;
+    virtual void
+    vector_value (const Point<dim> &p,
+                  Vector<typename VectorType::value_type>   &values) const override;
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -214,8 +216,9 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual typename VectorType::value_type value (const Point< dim > &p,
-                                                   const unsigned int  component = 0)    const override;
+    virtual typename VectorType::value_type
+    value (const Point< dim > &p,
+           const unsigned int  component = 0)    const override;
 
     /**
      * Set @p values to the point values of the specified component of the
@@ -232,9 +235,10 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void value_list (const std::vector<Point< dim > >     &points,
-                             std::vector<typename VectorType::value_type > &values,
-                             const unsigned int  component = 0)    const override;
+    virtual void
+    value_list (const std::vector<Point< dim > >     &points,
+                std::vector<typename VectorType::value_type > &values,
+                const unsigned int  component = 0)    const override;
 
 
     /**
@@ -252,8 +256,9 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void vector_value_list (const std::vector<Point< dim > >     &points,
-                                    std::vector<Vector<typename VectorType::value_type> > &values) const override;
+    virtual void
+    vector_value_list (const std::vector<Point< dim > >     &points,
+                       std::vector<Vector<typename VectorType::value_type> > &values) const override;
 
     /**
      * Return the gradient of all components of the function at the given
@@ -289,8 +294,9 @@ namespace Functions
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual Tensor<1,dim,typename VectorType::value_type> gradient(const Point< dim > &p,
-        const unsigned int component = 0)const override;
+    virtual Tensor<1,dim,typename VectorType::value_type>
+    gradient(const Point< dim > &p,
+             const unsigned int component = 0)const override;
 
     /**
      * Return the gradient of all components of the function at all the given

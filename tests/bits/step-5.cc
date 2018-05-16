@@ -54,13 +54,18 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system ();
+  void
+  assemble_system ();
+  void
+  solve ();
+  void
+  output_results (const unsigned int cycle) const;
 
   Triangulation<dim>   triangulation;
   FE_Q<dim>            fe;
@@ -81,19 +86,22 @@ class Coefficient : public Function<dim>
 public:
   Coefficient ()  : Function<dim>() {}
 
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value (const Point<dim>   &p,
+         const unsigned int  component = 0) const;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<double>            &values,
-                           const unsigned int              component = 0) const;
+  virtual void
+  value_list (const std::vector<Point<dim> > &points,
+              std::vector<double>            &values,
+              const unsigned int              component = 0) const;
 };
 
 
 
 template <int dim>
-double Coefficient<dim>::value (const Point<dim> &p,
-                                const unsigned int /*component*/) const
+double
+Coefficient<dim>::value (const Point<dim> &p,
+                         const unsigned int /*component*/) const
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -105,9 +113,10 @@ double Coefficient<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                   std::vector<double>            &values,
-                                   const unsigned int              component) const
+void
+Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+                              std::vector<double>            &values,
+                              const unsigned int              component) const
 {
   Assert (values.size() == points.size(),
           ExcDimensionMismatch (values.size(), points.size()));
@@ -139,7 +148,8 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void
+LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -163,7 +173,8 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void
+LaplaceProblem<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula (2);
 
@@ -237,7 +248,8 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void
+LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -256,7 +268,8 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void
+LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   // reduce output a bit
   if (cycle >= 2)
@@ -282,7 +295,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
@@ -321,7 +335,8 @@ void LaplaceProblem<dim>::run ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

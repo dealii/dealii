@@ -74,8 +74,9 @@ namespace PETScWrappers
      * properties as if it were created by the constructor of this class with
      * the same argument list as the present function.
      */
-    void reinit (const size_type m,
-                 const size_type n);
+    void
+    reinit (const size_type m,
+            const size_type n);
 
 
     /**
@@ -83,7 +84,8 @@ namespace PETScWrappers
      * matrix. Since this is a sequential matrix, it returns the MPI_COMM_SELF
      * communicator.
      */
-    virtual const MPI_Comm &get_mpi_communicator () const override;
+    virtual const MPI_Comm &
+    get_mpi_communicator () const override;
 
   private:
 
@@ -92,8 +94,9 @@ namespace PETScWrappers
      * matching constructor, i.e. create a matrix. Getting rid of the previous
      * matrix is left to the caller.
      */
-    void do_reinit (const size_type m,
-                    const size_type n);
+    void
+    do_reinit (const size_type m,
+               const size_type n);
 
   };
 

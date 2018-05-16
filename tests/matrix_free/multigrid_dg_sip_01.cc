@@ -47,7 +47,8 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree, int n_q_points_1d = fe_degree+1, typename number=double>
@@ -58,9 +59,10 @@ public:
 
   LaplaceOperator() {};
 
-  void initialize (const Mapping<dim> &mapping,
-                   const DoFHandler<dim> &dof_handler,
-                   const unsigned int level = numbers::invalid_unsigned_int)
+  void
+  initialize (const Mapping<dim> &mapping,
+              const DoFHandler<dim> &dof_handler,
+              const unsigned int level = numbers::invalid_unsigned_int)
   {
     const QGauss<1> quad (n_q_points_1d);
     typename MatrixFree<dim,number>::AdditionalData addit_data;
@@ -77,28 +79,32 @@ public:
     compute_inverse_diagonal();
   }
 
-  void vmult(parallel::distributed::Vector<number> &dst,
+  void
+  vmult(parallel::distributed::Vector<number> &dst,
+        const parallel::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult(parallel::distributed::Vector<number> &dst,
+         const parallel::distributed::Vector<number> &src) const
+  {
+    dst = 0;
+    vmult_add(dst, src);
+  }
+
+  void
+  Tvmult_add(parallel::distributed::Vector<number> &dst,
              const parallel::distributed::Vector<number> &src) const
   {
-    dst = 0;
     vmult_add(dst, src);
   }
 
-  void Tvmult(parallel::distributed::Vector<number> &dst,
-              const parallel::distributed::Vector<number> &src) const
-  {
-    dst = 0;
-    vmult_add(dst, src);
-  }
-
-  void Tvmult_add(parallel::distributed::Vector<number> &dst,
-                  const parallel::distributed::Vector<number> &src) const
-  {
-    vmult_add(dst, src);
-  }
-
-  void vmult_add(parallel::distributed::Vector<number> &dst,
-                 const parallel::distributed::Vector<number> &src) const
+  void
+  vmult_add(parallel::distributed::Vector<number> &dst,
+            const parallel::distributed::Vector<number> &src) const
   {
     if (!src.partitioners_are_globally_compatible(*data.get_dof_info(0).vector_partitioner))
       {
@@ -121,17 +127,20 @@ public:
                this, dst, src);
   }
 
-  types::global_dof_index m() const
+  types::global_dof_index
+  m() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  types::global_dof_index n() const
+  types::global_dof_index
+  n() const
   {
     return data.get_vector_partitioner()->size();
   }
 
-  number el (const unsigned int row,  const unsigned int col) const
+  number
+  el (const unsigned int row,  const unsigned int col) const
   {
     AssertThrow(false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
@@ -425,14 +434,16 @@ class MGCoarseIterative : public MGCoarseGridBase<parallel::distributed::Vector<
 public:
   MGCoarseIterative() {}
 
-  void initialize(const MATRIX &matrix)
+  void
+  initialize(const MATRIX &matrix)
   {
     coarse_matrix = &matrix;
   }
 
-  virtual void operator() (const unsigned int,
-                           parallel::distributed::Vector<double> &dst,
-                           const parallel::distributed::Vector<double> &src) const
+  virtual void
+  operator() (const unsigned int,
+              parallel::distributed::Vector<double> &dst,
+              const parallel::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control (1e4, 1e-50, 1e-10, false, false);
     SolverCG<parallel::distributed::Vector<double> > solver_coarse (solver_control);
@@ -478,8 +489,9 @@ private:
 
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
-void do_test (const DoFHandler<dim>  &dof,
-              const bool              also_test_parallel = false)
+void
+do_test (const DoFHandler<dim>  &dof,
+         const bool              also_test_parallel = false)
 {
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;
@@ -557,7 +569,8 @@ void do_test (const DoFHandler<dim>  &dof,
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test ()
 {
   for (int i=5; i<9-fe_degree; ++i)
     {
@@ -577,7 +590,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
   mpi_initlog();

@@ -35,7 +35,8 @@
 
 
 template <int dim>
-void check2 (const FiniteElement<dim> &fe)
+void
+check2 (const FiniteElement<dim> &fe)
 {
   deallog << fe.get_name() << std::endl;
   const std::vector<Point<dim-1> > unit_f_s_p
@@ -46,7 +47,8 @@ void check2 (const FiniteElement<dim> &fe)
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   check2 (FESystem<dim> (FE_Q<dim> (2), 1,
                          FE_DGQ<dim> (2), 1));
@@ -56,7 +58,8 @@ void check ()
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

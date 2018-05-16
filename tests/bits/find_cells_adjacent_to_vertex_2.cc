@@ -29,7 +29,8 @@
 
 
 
-void check (Triangulation<3> &tria)
+void
+check (Triangulation<3> &tria)
 {
   for (unsigned i=0; i<tria.n_vertices(); i++)
     {
@@ -44,7 +45,8 @@ void check (Triangulation<3> &tria)
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

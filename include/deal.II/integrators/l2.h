@@ -50,7 +50,8 @@ namespace LocalIntegrators
      * @date 2008, 2009, 2010
      */
     template <int dim>
-    void mass_matrix (
+    void
+    mass_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const double factor = 1.)
@@ -102,7 +103,8 @@ namespace LocalIntegrators
      * @date 2014
      */
     template <int dim>
-    void weighted_mass_matrix (
+    void
+    weighted_mass_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
       const std::vector<double> &weights)
@@ -150,7 +152,8 @@ namespace LocalIntegrators
      * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
-    void L2 (
+    void
+    L2 (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const std::vector<double> &input,
@@ -175,7 +178,8 @@ namespace LocalIntegrators
      * @date 2008, 2009, 2010
      */
     template <int dim, typename number>
-    void L2 (
+    void
+    L2 (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
@@ -206,7 +210,8 @@ namespace LocalIntegrators
      * @date 2008, 2009, 2010
      */
     template <int dim>
-    void jump_matrix (
+    void
+    jump_matrix (
       FullMatrix<double> &M11,
       FullMatrix<double> &M12,
       FullMatrix<double> &M21,

@@ -1201,10 +1201,11 @@ next_cell:
 
 
   template <class Container>
-  void build_triangulation_from_patch(const std::vector<typename Container::active_cell_iterator> &patch,
-                                      Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
-                                      std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
-                                      typename Container::active_cell_iterator> &patch_to_global_tria_map)
+  void
+  build_triangulation_from_patch(const std::vector<typename Container::active_cell_iterator> &patch,
+                                 Triangulation<Container::dimension,Container::space_dimension> &local_triangulation,
+                                 std::map<typename Triangulation<Container::dimension,Container::space_dimension>::active_cell_iterator,
+                                 typename Container::active_cell_iterator> &patch_to_global_tria_map)
 
   {
     const std::vector<typename Container::cell_iterator> uniform_cells =
@@ -1852,11 +1853,12 @@ next_cell:
    * is parallel to the unit vector in <direction>
    */
   template <int spacedim>
-  inline bool orthogonal_equality (const Point<spacedim>    &point1,
-                                   const Point<spacedim>    &point2,
-                                   const int                 direction,
-                                   const Tensor<1,spacedim> &offset,
-                                   const FullMatrix<double> &matrix)
+  inline bool
+  orthogonal_equality (const Point<spacedim>    &point1,
+                       const Point<spacedim>    &point2,
+                       const int                 direction,
+                       const Tensor<1,spacedim> &offset,
+                       const FullMatrix<double> &matrix)
   {
     Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
@@ -1903,7 +1905,8 @@ next_cell:
   template <> struct OrientationLookupTable<1>
   {
     typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &)
+    static inline std::bitset<3>
+    lookup (const MATCH_T &)
     {
       // The 1D case is trivial
       return 1; // [true ,false,false]
@@ -1913,7 +1916,8 @@ next_cell:
   template <> struct OrientationLookupTable<2>
   {
     typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    static inline std::bitset<3>
+    lookup (const MATCH_T &matching)
     {
       // In 2D matching faces (=lines) results in two cases: Either
       // they are aligned or flipped. We store this "line_flip"
@@ -1934,7 +1938,8 @@ next_cell:
   template <> struct OrientationLookupTable<3>
   {
     typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
-    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    static inline std::bitset<3>
+    lookup (const MATCH_T &matching)
     {
       // The full fledged 3D case. *Yay*
       // See the documentation in include/deal.II/base/geometry_info.h

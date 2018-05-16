@@ -37,15 +37,17 @@ class F : public Function<dim>
 {
 public:
   F() : Function<dim>(2) {}
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double> &v) const
+  virtual void
+  vector_value (const Point<dim> &p,
+                Vector<double> &v) const
   {
     v = 0;
     v[0] = p.square();
   }
 };
 
-double abs_zero(double a)
+double
+abs_zero(double a)
 {
   if ( std::abs(a) < 1e-10)
     return 0;
@@ -54,7 +56,8 @@ double abs_zero(double a)
 }
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -98,7 +101,8 @@ void test()
 
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

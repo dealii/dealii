@@ -39,7 +39,8 @@ namespace Step27
     MixedFECollection ();
     ~MixedFECollection ();
 
-    void run ();
+    void
+    run ();
 
   private:
 
@@ -64,7 +65,8 @@ namespace Step27
   }
 
   template <int dim>
-  void MixedFECollection<dim>::run ()
+  void
+  MixedFECollection<dim>::run ()
   {
     // add two a CG and a DG finite element object to fe_collection
     fe_collection.push_back (FE_Q<dim>(1));
@@ -94,7 +96,8 @@ namespace Step27
 
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

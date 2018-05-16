@@ -53,7 +53,8 @@ write_mat_id_to_file (const Triangulation<dim> &tria)
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "dim = " << dim << std::endl;
 
@@ -117,7 +118,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

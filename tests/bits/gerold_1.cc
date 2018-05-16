@@ -55,7 +55,8 @@ class LaplaceProblem
 {
 public:
   LaplaceProblem ();
-  void run ();
+  void
+  run ();
 
 private:
 
@@ -81,7 +82,8 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void
+LaplaceProblem<dim>::run ()
 {
   deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
 
@@ -102,7 +104,8 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

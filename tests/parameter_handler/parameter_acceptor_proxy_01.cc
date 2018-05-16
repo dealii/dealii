@@ -22,7 +22,8 @@
 // Test proxy class
 
 
-int main ()
+int
+main ()
 {
   initlog();
   auto &prm = ParameterAcceptor::prm;

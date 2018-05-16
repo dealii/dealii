@@ -21,7 +21,8 @@
 #include <deal.II/base/tensor.h>
 
 template <int dim>
-void test_tensor_01 ()
+void
+test_tensor_01 ()
 {
   Tensor<1,dim,std::complex<double> > t;
   for (unsigned int i=0; i<dim; ++i)
@@ -36,7 +37,8 @@ void test_tensor_01 ()
 
 
 template <int dim>
-void test_tensor_02 ()
+void
+test_tensor_02 ()
 {
   Tensor<1,dim,std::complex<double> > t;
   for (unsigned int i=0; i<dim; ++i)
@@ -49,7 +51,8 @@ void test_tensor_02 ()
   deallog << "dim = " << dim << ": " << res << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

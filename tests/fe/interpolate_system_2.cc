@@ -28,7 +28,8 @@
 //
 
 template <int dim, typename T>
-void check(T function, const unsigned int degree)
+void
+check(T function, const unsigned int degree)
 {
   FESystem<dim> fe (FE_RaviartThomas<dim>(degree),
                     2,
@@ -46,7 +47,8 @@ void check(T function, const unsigned int degree)
   deallog << " vector " << vector_difference(fe, dofs, function, 0) << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

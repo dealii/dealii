@@ -51,8 +51,9 @@ const unsigned int dim = 2;//run in 2d to save time
 
 const double eps = 1e-10;
 
-void test (std::string solver_name,
-           std::string preconditioner_name)
+void
+test (std::string solver_name,
+      std::string preconditioner_name)
 {
   const unsigned int global_mesh_refinement_steps = 5;
   const unsigned int number_of_eigenvalues        = 5;
@@ -340,7 +341,8 @@ void test (std::string solver_name,
 }
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile,/*do not print job id*/false);

@@ -69,7 +69,8 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 
 
 template <int dim>
-bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
+bool
+FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 {
   return ((dofs_per_vertex == f.dofs_per_vertex) &&
           (dofs_per_line == f.dofs_per_line) &&

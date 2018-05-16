@@ -39,7 +39,8 @@
 
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim> &fe)
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -70,7 +71,8 @@ void test(FiniteElement<dim> &fe)
 }
 
 template <int dim>
-void testit()
+void
+testit()
 {
   std::vector<std::shared_ptr<FiniteElement<dim> > > fes;
   fes.push_back(std::shared_ptr<FiniteElement<dim> >(new FE_RaviartThomas<dim>(0)));
@@ -90,7 +92,8 @@ void testit()
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

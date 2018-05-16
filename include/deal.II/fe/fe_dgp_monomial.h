@@ -294,7 +294,8 @@ public:
    * returns <tt>FE_DGPMonomial<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>p</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   /**
    * @name Functions to support hp
@@ -353,7 +354,8 @@ public:
    * the degree of the element), as it has no hanging nodes (being a
    * discontinuous element).
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -420,8 +422,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -431,7 +434,8 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,dim> >
@@ -445,12 +449,14 @@ private:
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
   /**
    * Initialize the restriction matrices. Called from the constructor.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction ();
 };
 
 /*@}*/

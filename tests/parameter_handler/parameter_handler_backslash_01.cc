@@ -28,7 +28,8 @@
  * backslash-handling part of ParameterHandler.
  */
 
-int main ()
+int
+main ()
 {
   initlog();
 

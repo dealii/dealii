@@ -21,7 +21,8 @@
 #include <deal.II/lac/vector.h>
 
 template <int dim>
-void test_constant()
+void
+test_constant()
 {
   Tensor<2,dim> t;
   for (unsigned int i=0; i<dim; ++i)
@@ -33,7 +34,8 @@ void test_constant()
 
 
 template <int dim>
-void test_equal()
+void
+test_equal()
 {
   Tensor<2,dim> t;
   unsigned int sum = 0;
@@ -50,7 +52,8 @@ void test_equal()
 
 
 template <int dim>
-void test_unequal()
+void
+test_unequal()
 {
   Tensor<2,dim> s;
   Tensor<2,dim> t;
@@ -68,7 +71,8 @@ void test_unequal()
 }
 
 
-int main ()
+int
+main ()
 {
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());

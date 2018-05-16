@@ -56,7 +56,8 @@ public:
    * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
@@ -78,8 +79,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
@@ -92,7 +94,8 @@ public:
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -141,7 +144,8 @@ private:
   /**
    * Return vector with dofs per vertex, line, quad, hex.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int deg);
 };
 
 
@@ -161,7 +165,8 @@ public:
   /**
    * Return the name of the element
    */
-  std::string get_name() const override;
+  std::string
+  get_name() const override;
 };
 
 

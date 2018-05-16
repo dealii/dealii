@@ -28,7 +28,8 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << "Test for dim = " << dim << std::endl << std::endl;
   hp::FECollection<dim> fe;

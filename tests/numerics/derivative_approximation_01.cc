@@ -78,7 +78,8 @@ check ()
     deallog << second(i)*100 << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision (2);

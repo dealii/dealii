@@ -24,7 +24,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 
@@ -68,7 +69,8 @@ create_notification (const std::string &prefix,
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   deallog << dim << "D" << std::endl;
 
@@ -138,7 +140,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);

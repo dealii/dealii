@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void check()
+void
+check()
 {
   FE_Q<dim> fe(1);
 
@@ -68,7 +69,8 @@ void check()
   }
 }
 
-int main()
+int
+main()
 {
   initlog(__FILE__);
   check<1> ();

@@ -19,7 +19,8 @@
 
 
 #include "../tests.h"
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -61,12 +62,15 @@ namespace Evaluation
   class EvaluationBase
   {
   public:
-    virtual ~EvaluationBase ();
+    virtual
+    ~EvaluationBase ();
 
-    void set_refinement_cycle (const unsigned int refinement_cycle);
+    void
+    set_refinement_cycle (const unsigned int refinement_cycle);
 
-    virtual void operator () (const DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const = 0;
+    virtual void
+    operator () (const DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const = 0;
   protected:
     unsigned int refinement_cycle;
   };
@@ -92,8 +96,9 @@ namespace Evaluation
   public:
     PointValueEvaluation (const Point<dim>   &evaluation_point);
 
-    virtual void operator () (const DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const;
+    virtual void
+    operator () (const DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const;
 
     DeclException1 (ExcEvaluationPointNotFound,
                     Point<dim>,
@@ -154,8 +159,9 @@ namespace Evaluation
   public:
     PointXDerivativeEvaluation (const Point<dim>   &evaluation_point);
 
-    virtual void operator () (const DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const;
+    virtual void
+    operator () (const DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const;
 
     DeclException1 (ExcEvaluationPointNotFound,
                     Point<dim>,
@@ -234,8 +240,9 @@ namespace Evaluation
   public:
     GridOutput (const std::string &output_name_base);
 
-    virtual void operator () (const DoFHandler<dim> &dof_handler,
-                              const Vector<double>  &solution) const;
+    virtual void
+    operator () (const DoFHandler<dim> &dof_handler,
+                 const Vector<double>  &solution) const;
   private:
     const std::string output_name_base;
   };
@@ -278,16 +285,23 @@ namespace LaplaceSolver
   {
   public:
     Base (Triangulation<dim> &coarse_grid);
-    virtual ~Base ();
+    virtual
+    ~Base ();
 
-    virtual void solve_problem () = 0;
-    virtual void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-    virtual void refine_grid () = 0;
-    virtual unsigned int n_dofs () const = 0;
+    virtual void
+    solve_problem () = 0;
+    virtual void
+    postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
+    virtual void
+    refine_grid () = 0;
+    virtual unsigned int
+    n_dofs () const = 0;
 
-    virtual void set_refinement_cycle (const unsigned int cycle);
+    virtual void
+    set_refinement_cycle (const unsigned int cycle);
 
-    virtual void output_solution () const = 0;
+    virtual void
+    output_solution () const = 0;
 
   protected:
     const SmartPointer<Triangulation<dim> > triangulation;
@@ -350,14 +364,16 @@ namespace LaplaceSolver
     Vector<double>                                 solution;
     const SmartPointer<const Function<dim> >       boundary_values;
 
-    virtual void assemble_rhs (Vector<double> &rhs) const = 0;
+    virtual void
+    assemble_rhs (Vector<double> &rhs) const = 0;
 
   private:
     struct LinearSystem
     {
       LinearSystem (const DoFHandler<dim> &dof_handler);
 
-      void solve (Vector<double> &solution) const;
+      void
+      solve (Vector<double> &solution) const;
 
       ConstraintMatrix     hanging_node_constraints;
       SparsityPattern      sparsity_pattern;
@@ -578,20 +594,25 @@ namespace LaplaceSolver
                   const Function<dim>      &boundary_values);
 
     virtual
-    void solve_problem ();
+    void
+    solve_problem ();
 
     virtual
-    unsigned int n_dofs () const;
+    unsigned int
+    n_dofs () const;
 
     virtual
-    void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+    void
+    postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
 
     virtual
-    void output_solution () const;
+    void
+    output_solution () const;
 
   protected:
     const SmartPointer<const Function<dim> > rhs_function;
-    virtual void assemble_rhs (Vector<double> &rhs) const;
+    virtual void
+    assemble_rhs (Vector<double> &rhs) const;
 
     friend class WeightedResidual<dim>;
   };
@@ -712,7 +733,8 @@ namespace LaplaceSolver
                       const Function<dim>      &rhs_function,
                       const Function<dim>      &boundary_values);
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
   };
 
 
@@ -754,7 +776,8 @@ namespace LaplaceSolver
                      const Function<dim>      &rhs_function,
                      const Function<dim>      &boundary_values);
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
   };
 
 
@@ -807,7 +830,8 @@ namespace LaplaceSolver
                              const Function<dim>      &boundary_values,
                              const Function<dim>      &weighting_function);
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
 
   private:
     const SmartPointer<const Function<dim> > weighting_function;
@@ -868,13 +892,16 @@ namespace Data
   struct SetUpBase : public Subscriptor
   {
     virtual
-    const Function<dim>   &get_boundary_values () const = 0;
+    const Function<dim>   &
+    get_boundary_values () const = 0;
 
     virtual
-    const Function<dim>   &get_right_hand_side () const = 0;
+    const Function<dim>   &
+    get_right_hand_side () const = 0;
 
     virtual
-    void create_coarse_grid (Triangulation<dim> &coarse_grid) const = 0;
+    void
+    create_coarse_grid (Triangulation<dim> &coarse_grid) const = 0;
   };
 
 
@@ -884,14 +911,17 @@ namespace Data
     SetUp () {}
 
     virtual
-    const Function<dim>   &get_boundary_values () const;
+    const Function<dim>   &
+    get_boundary_values () const;
 
     virtual
-    const Function<dim>   &get_right_hand_side () const;
+    const Function<dim>   &
+    get_right_hand_side () const;
 
 
     virtual
-    void create_coarse_grid (Triangulation<dim> &coarse_grid) const;
+    void
+    create_coarse_grid (Triangulation<dim> &coarse_grid) const;
 
   private:
     static const typename Traits::BoundaryValues boundary_values;
@@ -937,8 +967,9 @@ namespace Data
     public:
       BoundaryValues () : Function<dim> () {}
 
-      virtual double value (const Point<dim>   &p,
-                            const unsigned int  component) const;
+      virtual double
+      value (const Point<dim>   &p,
+             const unsigned int  component) const;
     };
 
 
@@ -947,8 +978,9 @@ namespace Data
     public:
       RightHandSide () : Function<dim> () {}
 
-      virtual double value (const Point<dim>   &p,
-                            const unsigned int  component) const;
+      virtual double
+      value (const Point<dim>   &p,
+             const unsigned int  component) const;
     };
 
     static
@@ -1289,7 +1321,8 @@ namespace LaplaceSolver
 
   protected:
     const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
-    virtual void assemble_rhs (Vector<double> &rhs) const;
+    virtual void
+    assemble_rhs (Vector<double> &rhs) const;
 
     static const Functions::ZeroFunction<dim> boundary_values;
 
@@ -1378,15 +1411,18 @@ namespace LaplaceSolver
     unsigned int
     n_dofs () const;
 
-    virtual void refine_grid ();
+    virtual void
+    refine_grid ();
 
     virtual
     void
     output_solution () const;
 
   private:
-    void solve_primal_problem ();
-    void solve_dual_problem ();
+    void
+    solve_primal_problem ();
+    void
+    solve_dual_problem ();
 
     typedef
     typename DoFHandler<dim>::active_cell_iterator
@@ -1426,14 +1462,16 @@ namespace LaplaceSolver
 
 
 
-    void estimate_error (Vector<float> &error_indicators) const;
+    void
+    estimate_error (Vector<float> &error_indicators) const;
 
-    void estimate_some (const Vector<double> &primal_solution,
-                        const Vector<double> &dual_weights,
-                        const unsigned int    n_threads,
-                        const unsigned int    this_thread,
-                        Vector<float>        &error_indicators,
-                        FaceIntegrals        &face_integrals) const;
+    void
+    estimate_some (const Vector<double> &primal_solution,
+                   const Vector<double> &dual_weights,
+                   const unsigned int    n_threads,
+                   const unsigned int    this_thread,
+                   Vector<float>        &error_indicators,
+                   FaceIntegrals        &face_integrals) const;
 
     void
     integrate_over_cell (const active_cell_iterator &cell,
@@ -1987,7 +2025,8 @@ public:
     ProblemDescription ();
   };
 
-  static void run (const ProblemDescription &descriptor);
+  static void
+  run (const ProblemDescription &descriptor);
 };
 
 
@@ -2003,7 +2042,8 @@ Framework<dim>::ProblemDescription::ProblemDescription ()
 
 
 template <int dim>
-void Framework<dim>::run (const ProblemDescription &descriptor)
+void
+Framework<dim>::run (const ProblemDescription &descriptor)
 {
   Triangulation<dim>
   triangulation (Triangulation<dim>::smoothing_on_refinement);
@@ -2108,7 +2148,8 @@ void Framework<dim>::run (const ProblemDescription &descriptor)
 
 
 
-int main ()
+int
+main ()
 {
   try
     {

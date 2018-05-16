@@ -38,7 +38,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   // create a hp::DoFHandler with different finite elements on the
   // cells. note that we skip setting active_fe_indices on inactive

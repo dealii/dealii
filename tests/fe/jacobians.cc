@@ -34,8 +34,9 @@
 
 
 template <int dim>
-void do_test(const Triangulation<dim> &tria,
-             const Mapping<dim>       &mapping)
+void
+do_test(const Triangulation<dim> &tria,
+        const Mapping<dim>       &mapping)
 {
   FE_Nothing<dim> dummy;
   // choose a point that is not right in the
@@ -191,7 +192,8 @@ void do_test(const Triangulation<dim> &tria,
 
 
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);

@@ -77,9 +77,10 @@ namespace internal
        * locally.
        */
       template <typename MFAddData>
-      void initialize(const dealii::Triangulation<dim> &triangulation,
-                      const MFAddData                  &additional_data,
-                      std::vector<std::pair<unsigned int,unsigned int> > &cell_levels);
+      void
+      initialize(const dealii::Triangulation<dim> &triangulation,
+                 const MFAddData                  &additional_data,
+                 std::vector<std::pair<unsigned int,unsigned int> > &cell_levels);
 
       /**
        * Upon completion of the dof indices, this function extracts the
@@ -605,9 +606,10 @@ namespace internal
     template <int dim>
     void
     FaceSetup<dim>
-    ::generate_faces(const dealii::Triangulation<dim> &triangulation,
-                     const std::vector<std::pair<unsigned int,unsigned int> > &cell_levels,
-                     TaskInfo &task_info)
+    ::
+    generate_faces(const dealii::Triangulation<dim> &triangulation,
+                   const std::vector<std::pair<unsigned int,unsigned int> > &cell_levels,
+                   TaskInfo &task_info)
     {
       // step 1: create the inverse map between cell iterators and the
       // cell_level_index field
@@ -772,11 +774,12 @@ namespace internal
     template <int dim>
     FaceToCellTopology<1>
     FaceSetup<dim>
-    ::create_face(const unsigned int                                        face_no,
-                  const typename dealii::Triangulation<dim>::cell_iterator &cell,
-                  const unsigned int                                        number_cell_interior,
-                  const typename dealii::Triangulation<dim>::cell_iterator &neighbor,
-                  const unsigned int                                        number_cell_exterior)
+    ::
+    create_face(const unsigned int                                        face_no,
+                const typename dealii::Triangulation<dim>::cell_iterator &cell,
+                const unsigned int                                        number_cell_interior,
+                const typename dealii::Triangulation<dim>::cell_iterator &neighbor,
+                const unsigned int                                        number_cell_exterior)
     {
       FaceToCellTopology<1> info;
       info.cells_interior[0] = number_cell_interior;
@@ -853,8 +856,9 @@ namespace internal
     template <int length>
     struct FaceComparator
     {
-      bool operator() (const FaceToCellTopology<length> &face1,
-                       const FaceToCellTopology<length> &face2) const
+      bool
+      operator() (const FaceToCellTopology<length> &face1,
+                  const FaceToCellTopology<length> &face2) const
       {
         for (unsigned int i=0; i<length; ++i)
           if (face1.cells_interior[i] < face2.cells_interior[i])

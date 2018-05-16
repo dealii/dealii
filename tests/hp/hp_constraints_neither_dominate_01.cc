@@ -76,8 +76,9 @@ const double eps = 1e-10;
 using namespace dealii;
 
 template <int dim>
-void test2cells(const unsigned int p1=2,
-                const unsigned int p2=1)
+void
+test2cells(const unsigned int p1=2,
+           const unsigned int p2=1)
 {
   Assert(dim>1,ExcInternalError());
   Triangulation<dim>   triangulation;
@@ -217,7 +218,8 @@ void test2cells(const unsigned int p1=2,
 
   dof_handler.clear();
 }
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   std::ofstream logfile ("output");
   deallog << std::setprecision(4);

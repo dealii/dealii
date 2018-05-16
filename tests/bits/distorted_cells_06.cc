@@ -37,7 +37,8 @@
 template <int dim>
 class MyManifold : public Manifold<dim>
 {
-  virtual std::unique_ptr<Manifold<dim> > clone() const override
+  virtual std::unique_ptr<Manifold<dim> >
+  clone() const override
   {
     return std::unique_ptr<Manifold<dim> >(new MyManifold<dim>());
   }
@@ -63,7 +64,8 @@ class MyManifold : public Manifold<dim>
 
 
 template <int dim>
-void check ()
+void
+check ()
 {
   MyManifold<dim> my_manifold;
 
@@ -119,7 +121,8 @@ void check ()
 }
 
 
-int main ()
+int
+main ()
 {
   initlog();
 

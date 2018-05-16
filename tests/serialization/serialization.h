@@ -27,23 +27,26 @@
 // compare objects for equality and pointers for equality of the object
 // pointed to
 template <typename T>
-bool compare (const T &t1,
-              const T &t2)
+bool
+compare (const T &t1,
+         const T &t2)
 {
   return t1 == t2;
 }
 
 template <typename T>
-bool compare (T *t1,
-              T *t2)
+bool
+compare (T *t1,
+         T *t2)
 {
   return *t1 == *t2;
 }
 
 
 template <typename T>
-void verify (const T &t1,
-             T       &t2)
+void
+verify (const T &t1,
+        T       &t2)
 {
   // save data to archive
   std::ostringstream oss;

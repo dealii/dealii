@@ -118,7 +118,8 @@ public:
     };
   }
 
-  void run()
+  void
+  run()
   {
     y[1] = kappa;
     y_dot[0] = kappa;
@@ -137,7 +138,8 @@ private:
 };
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 

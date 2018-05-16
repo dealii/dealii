@@ -115,7 +115,8 @@ public:
    * returns <tt>FE_RaviartThomas<dim>(degree)</tt>, with @p dim and @p degree
    * replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   // documentation inherited from the base class
   virtual
@@ -129,8 +130,9 @@ public:
    * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
    * always @p true.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
 
   // documentation inherited from the base class
   virtual
@@ -145,7 +147,8 @@ public:
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const override;
 
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption () const override;
 
 private:
   /**
@@ -162,7 +165,8 @@ private:
    * class and fill the tables with interpolation weights (#boundary_weights
    * and #interior_weights). Called from the constructor.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points (const unsigned int rt_degree);
 
   /**
    * Initialize the interpolation from functions on refined mesh cells onto
@@ -170,7 +174,8 @@ private:
    * element, this restriction operator preserves the divergence of a function
    * weakly.
    */
-  void initialize_restriction ();
+  void
+  initialize_restriction ();
 
   /**
    * These are the factors multiplied to a function in the
@@ -255,7 +260,8 @@ public:
    * returns <tt>FE_RaviartThomasNodal<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name () const override;
 
   // documentation inherited from the base class
   virtual
@@ -267,13 +273,16 @@ public:
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
                                                           std::vector<double>                &nodal_values) const override;
 
-  virtual void get_face_interpolation_matrix (const FiniteElement<dim> &source,
-                                              FullMatrix<double>       &matrix) const override;
+  virtual void
+  get_face_interpolation_matrix (const FiniteElement<dim> &source,
+                                 FullMatrix<double>       &matrix) const override;
 
-  virtual void get_subface_interpolation_matrix (const FiniteElement<dim> &source,
-                                                 const unsigned int        subface,
-                                                 FullMatrix<double>       &matrix) const override;
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual void
+  get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+                                    const unsigned int        subface,
+                                    FullMatrix<double>       &matrix) const override;
+  virtual bool
+  hp_constraints_are_implemented () const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int> >
   hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const override;
@@ -311,8 +320,9 @@ private:
    * Right now, this is only implemented for RT0 in 1D. Otherwise, returns
    * always @p true.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face (const unsigned int shape_index,
+                       const unsigned int face_index) const override;
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
@@ -322,7 +332,8 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points (const unsigned int rt_degree);
 };
 
 

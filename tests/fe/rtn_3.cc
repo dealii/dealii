@@ -29,7 +29,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   for (unsigned int degree=0; degree<9-2*dim; ++degree)
     {

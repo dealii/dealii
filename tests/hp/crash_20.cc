@@ -41,7 +41,8 @@
 
 
 template <int dim>
-void test ()
+void
+test ()
 {
   Triangulation<dim> tria;
   hp::DoFHandler<dim> dof_handler(tria);
@@ -55,7 +56,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   std::ofstream logfile("output");
   logfile.precision(2);

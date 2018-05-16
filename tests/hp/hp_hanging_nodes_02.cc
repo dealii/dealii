@@ -49,12 +49,14 @@
 #include <deal.II/numerics/data_out.h>
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim>
-void run (bool random_p,
-          unsigned int *indx)
+void
+run (bool random_p,
+     unsigned int *indx)
 {
   Triangulation<dim>     triangulation;
   hp::FECollection<dim>              fe;
@@ -126,7 +128,8 @@ void run (bool random_p,
 
 
 template <int dim>
-void run_test (unsigned int *indx)
+void
+run_test (unsigned int *indx)
 {
   run<dim> (true, indx);
   run<dim> (false, indx);
@@ -134,7 +137,8 @@ void run_test (unsigned int *indx)
 
 
 
-int main ()
+int
+main ()
 {
   logfile.precision(8);
 

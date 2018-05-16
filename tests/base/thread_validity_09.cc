@@ -27,10 +27,12 @@
 
 
 Threads::Mutex mutex;
-static std::atomic<int> spin_lock(0);
+static std::atomic<int>
+spin_lock(0);
 
 
-int worker ()
+int
+worker ()
 {
   // wait till the main thread has actually done its work -- we will
   // hang in the 'acquire' line until the main thread releases the
@@ -46,7 +48,8 @@ int worker ()
 
 
 
-int main()
+int
+main()
 {
   initlog();
 

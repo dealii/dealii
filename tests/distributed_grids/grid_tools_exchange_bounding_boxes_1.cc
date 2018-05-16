@@ -23,7 +23,8 @@
 #include <deal.II/grid/grid_tools.h>
 
 template <int spacedim>
-void test_exchange_bbox()
+void
+test_exchange_bbox()
 {
   // For process i the number of boxes n_bboxes[i%7] is created
   std::vector<unsigned int> n_bboxes = {2,4,3,5,1,3,8};
@@ -116,7 +117,8 @@ void test_exchange_bbox()
     }
 }
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;

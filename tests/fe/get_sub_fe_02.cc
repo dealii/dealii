@@ -27,7 +27,8 @@
 #include <deal.II/fe/fe_system.h>
 
 template <int dim>
-void check ()
+void
+check ()
 {
   FESystem<2> fe_velocity(FE_Q<2>(2), 2);
   FE_Q<2> fe_pressure(1);
@@ -72,7 +73,8 @@ void check ()
   deallog << "</table>" << std::endl;
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

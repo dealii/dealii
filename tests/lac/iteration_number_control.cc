@@ -25,7 +25,8 @@
 #include <deal.II/lac/precondition.h>
 
 
-void check()
+void
+check()
 {
   // Check 1: should still terminate after one iteration when using a matrix
   // with only one eigenvalue
@@ -66,7 +67,8 @@ void check()
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 //  logfile.setf(std::ios::fixed);

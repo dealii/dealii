@@ -78,12 +78,16 @@ namespace Step11
   {
   public:
     LaplaceProblem (const unsigned int mapping_degree);
-    void run ();
+    void
+    run ();
 
   private:
-    void setup_system ();
-    void assemble_and_solve ();
-    void solve ();
+    void
+    setup_system ();
+    void
+    assemble_and_solve ();
+    void
+    solve ();
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -125,7 +129,8 @@ namespace Step11
   // constraints that the mean value of the degrees of freedom on the boundary
   // be zero.
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
     solution.reinit (dof_handler.n_dofs());
@@ -216,7 +221,8 @@ namespace Step11
   // The next function then assembles the linear system of equations, solves
   // it, and evaluates the solution.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_and_solve ()
+  void
+  LaplaceProblem<dim>::assemble_and_solve ()
   {
 
 
@@ -345,7 +351,8 @@ namespace Step11
   // The following function solving the linear system of equations is copied
   // from step-5 and is explained there in some detail:
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve ()
   {
     SolverControl           solver_control (1000, 1e-12, false, false);
     SolverCG<>              cg (solver_control);
@@ -364,7 +371,8 @@ namespace Step11
   // Finally the main function controlling the different steps to be
   // performed.
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run ()
   {
     GridGenerator::hyper_ball (triangulation);
     static const SphericalManifold<dim> boundary;
@@ -389,7 +397,8 @@ namespace Step11
   }
 }
 
-int main ()
+int
+main ()
 {
   initlog();
 

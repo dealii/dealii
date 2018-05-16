@@ -39,7 +39,8 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
+std::ofstream
+logfile("output");
 
 
 template <int dim, int fe_degree, typename Number>
@@ -61,12 +62,14 @@ public:
              update_values | update_gradients | update_JxW_values)
   {};
 
-  void operator () (const MatrixFree<dim,Number> &data,
-                    VectorType       &dst,
-                    const VectorType &src,
-                    const std::pair<unsigned int,unsigned int> &cell_range) const;
+  void
+  operator () (const MatrixFree<dim,Number> &data,
+               VectorType       &dst,
+               const VectorType &src,
+               const std::pair<unsigned int,unsigned int> &cell_range) const;
 
-  void test_functions (VectorType &dst) const
+  void
+  test_functions (VectorType &dst) const
   {
     for (unsigned int comp=0; comp<dst.size(); ++comp)
       dst[comp] = 0;
@@ -221,7 +224,8 @@ operator () (const MatrixFree<dim,Number> &data,
 
 
 template <int dim, int fe_degree, typename number>
-void test ()
+void
+test ()
 {
   // create hyper ball geometry and refine some
   // cells
@@ -330,7 +334,8 @@ void test ()
 }
 
 
-int main ()
+int
+main ()
 {
   deallog.attach(logfile);
   deallog << std::setprecision (3);

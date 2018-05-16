@@ -57,7 +57,8 @@ struct MappingEnum
   };
 };
 
-void test (MappingEnum::type mapping_name, unsigned int refinements=1)
+void
+test (MappingEnum::type mapping_name, unsigned int refinements=1)
 {
   using namespace dealii;
 
@@ -156,7 +157,8 @@ void test (MappingEnum::type mapping_name, unsigned int refinements=1)
   return;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

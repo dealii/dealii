@@ -37,7 +37,8 @@ test (const double epsilon)
 
 
 
-int main()
+int
+main()
 {
   initlog();
   test(1e-4);

@@ -241,7 +241,8 @@ public:
    * reinitialized later in the class. Using the assignment operator when the
    * object contains data could be expensive.
    */
-  PointValueHistory &operator=(const PointValueHistory &point_value_history);
+  PointValueHistory &
+  operator=(const PointValueHistory &point_value_history);
 
   /**
    * Deconstructor.
@@ -255,7 +256,8 @@ public:
    * is required rather use the @p add_points method since this minimizes
    * iterations over the mesh.
    */
-  void add_point(const Point <dim> &location);
+  void
+  add_point(const Point <dim> &location);
 
   /**
    * Add multiple points to the class. The support points (one per component)
@@ -267,7 +269,8 @@ public:
    * and there is always a one to one correspondence between the requested
    * point and the added point, even if a point is requested multiple times.
    */
-  void add_points (const std::vector <Point <dim> > &locations);
+  void
+  add_points (const std::vector <Point <dim> > &locations);
 
 
 
@@ -278,8 +281,9 @@ public:
    * are already in the class, so @p add_field_name and @p add_points can be
    * called in any order.
    */
-  void add_field_name(const std::string &vector_name,
-                      const ComponentMask &component_mask = ComponentMask());
+  void
+  add_field_name(const std::string &vector_name,
+                 const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Put another mnemonic string (and hence @p VectorType) into the class.
@@ -289,21 +293,24 @@ public:
    * generates a std::vector 0, ..., n_components-1 and calls the previous
    * function.
    */
-  void add_field_name(const std::string &vector_name,
-                      const unsigned int n_components);
+  void
+  add_field_name(const std::string &vector_name,
+                 const unsigned int n_components);
 
   /**
    * Provide optional names for each component of a field. These names will be
    * used instead of names generated from the field name, if supplied.
    */
-  void add_component_names(const std::string &vector_name,
-                           const std::vector <std::string> &component_names);
+  void
+  add_component_names(const std::string &vector_name,
+                      const std::vector <std::string> &component_names);
 
   /**
    * Provide optional names for the independent values. These names will be
    * used instead of "Indep_...", if supplied.
    */
-  void add_independent_names(const std::vector <std::string> &independent_names);
+  void
+  add_independent_names(const std::vector <std::string> &independent_names);
 
 
 
@@ -316,8 +323,9 @@ public:
    * otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field(const std::string &name,
-                      const VectorType  &solution);
+  void
+  evaluate_field(const std::string &name,
+                 const VectorType  &solution);
 
 
   /**
@@ -338,10 +346,11 @@ public:
    * each vector_name, otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field(const std::vector <std::string> &names,
-                      const VectorType                &solution,
-                      const DataPostprocessor<dim>    &data_postprocessor,
-                      const Quadrature<dim>           &quadrature);
+  void
+  evaluate_field(const std::vector <std::string> &names,
+                 const VectorType                &solution,
+                 const DataPostprocessor<dim>    &data_postprocessor,
+                 const Quadrature<dim>           &quadrature);
 
   /**
    * Construct a std::vector <std::string> containing only vector_name and
@@ -349,10 +358,11 @@ public:
    * fields use the same @p DataPostprocessor object.
    */
   template <class VectorType>
-  void evaluate_field(const std::string            &name,
-                      const VectorType             &solution,
-                      const DataPostprocessor<dim> &data_postprocessor,
-                      const Quadrature<dim>        &quadrature);
+  void
+  evaluate_field(const std::string            &name,
+                 const VectorType             &solution,
+                 const DataPostprocessor<dim> &data_postprocessor,
+                 const Quadrature<dim>        &quadrature);
 
 
   /**
@@ -368,8 +378,9 @@ public:
    * otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field_at_requested_location(const std::string &name,
-                                            const VectorType  &solution);
+  void
+  evaluate_field_at_requested_location(const std::string &name,
+                                       const VectorType  &solution);
 
 
   /**
@@ -380,7 +391,8 @@ public:
    * dataset and that it is added before a new data set is started. This
    * prevents a @p ExcDataLostSync.
    */
-  void start_new_dataset (const double key);
+  void
+  start_new_dataset (const double key);
 
   /**
    * If independent values have been set up, this method stores these values.
@@ -388,7 +400,8 @@ public:
    * are used it must be called for every dataset. A @p ExcDataLostSync
    * exception can be thrown if this method is not called.
    */
-  void push_back_independent (const std::vector <double> &independent_values);
+  void
+  push_back_independent (const std::vector <double> &independent_values);
 
 
   /**
@@ -408,8 +421,9 @@ public:
    * parameter is an empty vector of strings, and will suppress postprocessor
    * locations output.
    */
-  void write_gnuplot (const std::string &base_name,
-                      const std::vector <Point <dim> > &postprocessor_locations = std::vector <Point <dim> > ());
+  void
+  write_gnuplot (const std::string &base_name,
+                 const std::vector <Point <dim> > &postprocessor_locations = std::vector <Point <dim> > ());
 
 
   /**
@@ -434,7 +448,8 @@ public:
    * data_out.write_gnuplot(output);
    * @endcode
    */
-  Vector<double> mark_support_locations();
+  Vector<double>
+  mark_support_locations();
 
   /**
    * Stores the actual location of each support point selected by the @p
@@ -443,7 +458,8 @@ public:
    * convenience, location is resized to the correct number of points by the
    * method.
    */
-  void get_support_locations (std::vector <std::vector<Point <dim> > > &locations);
+  void
+  get_support_locations (std::vector <std::vector<Point <dim> > > &locations);
 
   /**
    * @deprecated
@@ -453,7 +469,8 @@ public:
    * get_support_locations replaces it and reflects the fact that the points
    * returned are actually the support points.
    */
-  void get_points (std::vector <std::vector<Point <dim> > > &locations);
+  void
+  get_points (std::vector <std::vector<Point <dim> > > &locations);
 
   /**
    * Stores the actual location of the points used by the data_postprocessor.
@@ -464,8 +481,9 @@ public:
    * will find the same points. For convenience, location is resized to the
    * correct number of points by the method.
    */
-  void get_postprocessor_locations (const Quadrature<dim> &quadrature,
-                                    std::vector<Point <dim> > &locations);
+  void
+  get_postprocessor_locations (const Quadrature<dim> &quadrature,
+                               std::vector<Point <dim> > &locations);
 
   /**
    * Once datasets have been added to the class, requests to add additional
@@ -478,7 +496,8 @@ public:
    * open or close is called while in the wrong state a @p ExcInvalidState
    * exception is thrown.
    */
-  void close();
+  void
+  close();
 
 
   /**
@@ -490,14 +509,16 @@ public:
    * will throw a @p ExcInvalidState exception, so if used this method should
    * be the last call to the class.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Print useful debugging information about the class, include details about
    * which support points were selected for each point and sizes of the data
    * stored.
    */
-  void status(std::ostream &out);
+  void
+  status(std::ostream &out);
 
 
   /**
@@ -508,7 +529,8 @@ public:
    * = @p true they must be exactly equal.
    */
 
-  bool deep_check (const bool strict);
+  bool
+  deep_check (const bool strict);
 
   /**
    * Exception
@@ -643,7 +665,8 @@ private:
    * It is currently used to check if the triangulation has changed,
    * invalidating precomputed values.
    */
-  void tria_change_listener ();
+  void
+  tria_change_listener ();
 };
 
 

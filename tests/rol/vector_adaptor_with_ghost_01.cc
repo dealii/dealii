@@ -25,7 +25,8 @@ using namespace dealii;
 
 // Vectors are prepared similar to deal.II's test: parallel_vector_07
 template <typename VectorType>
-void prepare_vector (VectorType &v)
+void
+prepare_vector (VectorType &v)
 {
   const unsigned int
   myid    = dealii::Utilities::MPI::this_mpi_process (MPI_COMM_WORLD),
@@ -61,7 +62,8 @@ void prepare_vector (VectorType &v)
 
 
 template <typename VectorType>
-void test ()
+void
+test ()
 {
   VectorType a, b, c;
   prepare_vector (a);
@@ -109,7 +111,8 @@ void test ()
 
 
 
-int main (int argc, char **argv)
+int
+main (int argc, char **argv)
 {
 
 

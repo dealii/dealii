@@ -22,7 +22,8 @@
 #include <iostream>
 
 
-void test (PETScWrappers::FullMatrix &m)
+void
+test (PETScWrappers::FullMatrix &m)
 {
   AssertThrow (m.m() == 5, ExcInternalError());
   AssertThrow (m.n() == 5, ExcInternalError());
@@ -32,7 +33,8 @@ void test (PETScWrappers::FullMatrix &m)
 
 
 
-int main (int argc,char **argv)
+int
+main (int argc,char **argv)
 {
   initlog();
 

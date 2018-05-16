@@ -51,7 +51,8 @@ using namespace dealii;
 // projected.
 
 template<int dim, int spacedim>
-void test()
+void
+test()
 {
   deallog << "dim: " << dim << ", spacedim: "
           << spacedim << std::endl;
@@ -164,7 +165,8 @@ void test()
 
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   auto init = Utilities::MPI::MPI_InitFinalize(argc, argv, 1);
   MPILogInitAll log(true);

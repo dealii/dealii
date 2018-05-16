@@ -24,7 +24,8 @@
 #include <deal.II/lac/vector.h>
 
 
-void test (Vector<std::complex<double> > &v)
+void
+test (Vector<std::complex<double> > &v)
 {
   for (unsigned int i=0; i<v.size(); ++i)
     v(i) = std::complex<double> (i+1., i+2.);
@@ -37,7 +38,8 @@ void test (Vector<std::complex<double> > &v)
 
 
 
-int main ()
+int
+main ()
 {
   initlog();
 
