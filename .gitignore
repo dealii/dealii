@@ -11,6 +11,7 @@
 # misc
 /compile_commands.json
 /.clang_complete
+/contrib/utilities/programs
 
 # emacs temporary and backup files
 *~
