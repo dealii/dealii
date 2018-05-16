@@ -206,9 +206,9 @@ protected:
   * The main quantities which are stored are associated with edge and face
   * parameterisations. These are:
   * <ul>
-  * <li> \lambda_{i} - trilinear function, equal to one at the i-th vertex
+  * <li> $\lambda_{i}$ - trilinear function, equal to one at the $i$-th vertex
   * and zero at all other vertices.</li>
-  * <li> \sigma_{i} - linear functional associated with the i-th vertex.</li>
+  * <li> $\sigma_{i}$ - linear functional associated with the $i$-th vertex.</li>
   * </ul>
   *
   * The definitions of these functionals, as well as the edge and face
@@ -242,12 +242,12 @@ protected:
     * cell-dependent.
     *
     * The edge parameterisation of an edge, E, starting at vertex i and ending
-    * at vertex j is given by \sigma_{E} = \sigma_{i} - \sigma{j}.
+    * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
     *
     * sigma_imj_values[q][i][j] stores the value of the edge parametrisation
-    * connected by vertices i and j at the q-th quadrature point.
+    * connected by vertices $i$ and $j$ at the q-th quadrature point.
     *
-    * Note that not all of the i and j combinations result in valid edges on
+    * Note that not all of the $i$ and $j$ combinations result in valid edges on
     * the hexahedral cell, but they are computed in this fashion for use with
     * non-standard edge and face orientations.
     */
@@ -259,11 +259,11 @@ protected:
     * DoFs, which are cell-dependent. Note that the components of the gradient
     * are constant.
     *
-    * The edge parameterisation of an edge, E, starting at vertex i and ending
-    * at vertex j is given by \sigma_{E} = \sigma_{i} - \sigma{j}.
+    * The edge parameterisation of an edge, $E$, starting at vertex $i$ and ending
+    * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
     *
     * sigma_imj_grads[i][j][d] stores the gradient of the edge parametrisation
-    * connected by vertices i and j in component d.
+    * connected by vertices $i$ and $j$ in component $d$.
     *
     * Note that the gradient of the edge parametrisation is constant on an
     * edge, so we do not need to store it at every quadrature point.
@@ -302,14 +302,14 @@ protected:
     * stored for the 12 edges such that the global vertex numbering would
     * follow the order defined by the "standard" deal.II cell.
     *
-    * The edge extension parameter of an edge, E, starting at vertex i and
-    * ending at vertex j is given by \lambda_{E} = \lambda_{i} + \lambda_{j}.
+    * The edge extension parameter of an edge, $E$, starting at vertex $i$ and
+    * ending at vertex $j$ is given by $\lambda_{E} = \lambda_{i} + \lambda_{j}$.
     *
-    * Note that under this definition, the values of \lambda_{E} do not change
+    * Note that under this definition, the values of $\lambda_{E}$ do not change
     * with the orientation of the edge.
     *
     * edge_lambda_values[m][q] stores the edge extension parameter value at
-    * the q-th quadrature point on edge m.
+    * the $q$-th quadrature point on edge $m$.
     */
     std::vector<std::vector<double> > edge_lambda_values;
 
@@ -320,7 +320,7 @@ protected:
     * deal.II cell.
     *
     * edge_lambda_grads_2d[m][d] stores the gradient of the edge extension
-    * parameter for component d on edge m.
+    * parameter for component $d$ on edge $m$.
     */
     std::vector<std::vector<double> > edge_lambda_grads_2d;
 
@@ -331,7 +331,7 @@ protected:
     * "standard" deal.II cell.
     *
     * edge_lambda_grads_3d[m][q][d] stores the gradient of the edge extension
-    * parameter for component d at the q-th quadrature point on edge m.
+    * parameter for component $d$ at the $q$-th quadrature point on edge m.
     */
     std::vector<std::vector<std::vector<double> > > edge_lambda_grads_3d;
 
@@ -342,7 +342,7 @@ protected:
     * "standard" deal.II cell.
     *
     * edge_lambda_gradgrads_3d[m][d1][d2] stores the 2nd derivatives of the
-    * edge extension parameters with respect to components d1 and d2 on edge m.
+    * edge extension parameters with respect to components d1 and d2 on edge $m$.
     */
     std::vector<std::vector<std::vector<double> > > edge_lambda_gradgrads_3d;
 
@@ -353,13 +353,13 @@ protected:
     *
     * The face extension parameter of a face, F, defined by the vertices
     * v1, v2, v3, v4 is given by
-    * \lambda_{F} = \lambda_{v1} + \lambda_{v2} + \lambda_{v3} + \lambda_{v4}.
+    * $\lambda_{F} = \lambda_{v1} + \lambda_{v2} + \lambda_{v3} + \lambda_{v4}$.
     *
-    * Note that under this definition, the values of \lambda_{F} do not change
+    * Note that under this definition, the values of $\lambda_{F}$ do not change
     * with the orientation of the face.
     *
     * face_lambda_values[m][q] stores the face extension parameter value at
-    * the q-th quadrature point on face m.
+    * the $q$-th quadrature point on face $m$.
     */
     std::vector<std::vector<double> > face_lambda_values;
 
@@ -369,7 +369,7 @@ protected:
     * defined by the "standard" deal.II cell.
     *
     * face_lambda_grads[m][d] stores the gradient of the face extension
-    * parameters for component d on face m.
+    * parameters for component $d$ on face $m$.
     */
     std::vector<std::vector<double> > face_lambda_grads;
   };
