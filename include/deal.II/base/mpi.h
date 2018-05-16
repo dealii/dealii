@@ -126,7 +126,7 @@ namespace Utilities
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
 
     /**
-     * If @comm is an intracommunicator, this function returns a new
+     * If @p comm is an intracommunicator, this function returns a new
      * communicator @p newcomm with communication group defined by the
      * @p group argument. The function is only collective over the group of
      * processes that actually want to create the communicator, i.e., that
