@@ -155,7 +155,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dirs@
 INCLUDE_FILE_PATTERNS  =
 
 # set a few variables that help us generate documentation for
