@@ -36,7 +36,6 @@ template <typename Accessor> class TriaRawIterator;
 template <typename Accessor> class TriaIterator;
 template <typename Accessor> class TriaActiveIterator;
 
-template <int dim, int spacedim> class Boundary;
 template <int dim, int spacedim> class Manifold;
 
 
@@ -1017,16 +1016,6 @@ public:
    * or not.
    */
   bool at_boundary () const;
-
-  /**
-   * Return a constant reference to the manifold object used for this object.
-   * This function exists for backward compatibility and calls get_manifold()
-   * internally.
-   *
-   * @deprecated The classes derived from Boundary have been deprecated in
-   * favor of the Manifold classes.
-   */
-  DEAL_II_DEPRECATED const Boundary<dim,spacedim> &get_boundary () const;
 
   /**
    * Return a constant reference to the manifold object used for this object.

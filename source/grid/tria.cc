@@ -23,7 +23,6 @@
 #include <deal.II/grid/tria_levels.h>
 #include <deal.II/grid/tria_faces.h>
 #include <deal.II/grid/manifold.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -8791,11 +8790,6 @@ namespace internal
 }
 
 
-template <int dim, int spacedim>
-const StraightBoundary<dim,spacedim>
-Triangulation<dim, spacedim>::straight_boundary = StraightBoundary<dim,spacedim>();
-
-
 
 template <int dim, int spacedim>
 const unsigned int
@@ -8944,14 +8938,6 @@ Triangulation<dim,spacedim>::get_mesh_smoothing() const
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number,
-                                            const Boundary<dim, spacedim> &boundary_object)
-{
-  set_manifold(m_number, boundary_object);
-}
-
-template <int dim, int spacedim>
-void
 Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
                                             const Manifold<dim, spacedim> &manifold_object)
 {
@@ -8961,13 +8947,6 @@ Triangulation<dim, spacedim>::set_manifold (const types::manifold_id m_number,
   manifold[m_number] = manifold_object.clone();
 }
 
-
-template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_boundary (const types::manifold_id m_number)
-{
-  set_manifold(m_number);
-}
 
 
 template <int dim, int spacedim>
@@ -9064,18 +9043,6 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary (const types::bou
   Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
-
-template <int dim, int spacedim>
-const Boundary<dim,spacedim> &
-Triangulation<dim, spacedim>::get_boundary (const types::manifold_id m_number) const
-{
-  const Boundary<dim, spacedim> *man =
-    dynamic_cast<const Boundary<dim, spacedim> *>(&get_manifold(m_number));
-  Assert(man != nullptr,
-         ExcMessage("You tried to get a Boundary, but I only have a Manifold."));
-
-  return *man;
-}
 
 
 template <int dim, int spacedim>

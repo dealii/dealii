@@ -34,7 +34,6 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>

@@ -15,8 +15,8 @@
 
 
 
-// test that at the vertices, Boundary::normal_vector returns the same as
-// Boundary::get_normals_at_vertices once the latter vectors are normalized
+// test that at the vertices, Manifold::normal_vector returns the same as
+// Manifold::get_normals_at_vertices once the latter vectors are normalized
 
 
 

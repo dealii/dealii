@@ -582,7 +582,7 @@ namespace Step23
         // that this time the matrix on the left is the mass matrix (which we
         // copy again in order to be able to apply boundary conditions, and
         // the right hand side is $MV^{n-1} - k\left[ \theta A U^n +
-        // (1-\theta) AU^{n-1}\right]$ plus forcing terms. %Boundary values
+        // (1-\theta) AU^{n-1}\right]$ plus forcing terms. Boundary values
         // are applied in the same way as before, except that now we have to
         // use the BoundaryValuesV class:
         laplace_matrix.vmult (system_rhs, solution_u);

@@ -19,7 +19,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
@@ -1047,13 +1046,7 @@ namespace
   Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
                                           const bool use_interpolation)
   {
-    // if we should not interpolate from the surroundings of the current
-    // object or if the object is of the old Boundary type, only use the
-    // vertices points
-    if (use_interpolation == false ||
-        dynamic_cast<const Boundary<dim,spacedim> *>(&obj.get_manifold()) != nullptr)
-      return get_new_point_on_object(obj);
-    else
+    if (use_interpolation)
       {
         TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
         const auto points_and_weights = Manifolds::get_default_points_and_weights(it, use_interpolation);
@@ -1061,6 +1054,10 @@ namespace
                                                                 points_and_weights.first.end()),
                                                 make_array_view(points_and_weights.second.begin(),
                                                                 points_and_weights.second.end()));
+      }
+    else
+      {
+        return get_new_point_on_object(obj);
       }
   }
 }

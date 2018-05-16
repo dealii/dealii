@@ -394,7 +394,7 @@ across $\Gamma$, in order to obtain the Dirichlet data $g$.
 
 So $S$ is some sort of Neumann to Dirichlet map, and we would like to have a
 good approximation for the Dirichlet to Neumann map. A possibility would be to
-use a %Boundary Element approximation of the problem on $\Gamma$, and construct a
+use a Boundary Element approximation of the problem on $\Gamma$, and construct a
 rough approximation of the hyper-singular operator for the Poisson problem
 associated to $\Gamma$, which is precisely a Dirichlet to Neumann map.
 

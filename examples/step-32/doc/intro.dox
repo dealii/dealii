@@ -885,8 +885,7 @@ the following quantities:
   <a target="_top" href="http://en.wikipedia.org/wiki/Outer_core">outer earth
   core</a> starts). The radii are therefore $R_0=(6371-2890)\text{km},
   R_1=(6371-35)\text{km}$. This domain is conveniently generated using the
-  GridGenerator::hyper_shell() function, and we use a HyperShellBoundary
-  objects for the inner and outer boundary.
+  GridGenerator::hyper_shell() function.
 
   <li>At the interface between crust and mantle, the temperature is between
   500 and 900 degrees Celsius, whereas at its bottom it is around 4000 degrees

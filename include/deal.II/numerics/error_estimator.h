@@ -150,7 +150,7 @@ namespace hp
  * coefficient which will then be used for all components.
  *
  *
- * <h3>%Boundary values</h3>
+ * <h3>Boundary values</h3>
  *
  * If the face is at the boundary, i.e. there is no neighboring cell to which
  * the jump in the gradiend could be computed, there are two possibilities:

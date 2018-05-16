@@ -20,7 +20,6 @@
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -161,8 +160,6 @@ void test ()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
   tria.begin_active ()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   typename Triangulation<dim>::active_cell_iterator cell, endc;

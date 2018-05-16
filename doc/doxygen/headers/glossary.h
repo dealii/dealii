@@ -279,7 +279,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBoundaryForm <b>%Boundary form</b></dt>
+ * <dt class="glossary">@anchor GlossBoundaryForm <b>Boundary form</b></dt>
  *
  * <dd>For a dim-dimensional triangulation in dim-dimensional space,
  * the boundary form is a vector defined on faces. It is the vector
@@ -307,7 +307,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBoundaryIndicator <b>%Boundary indicator</b></dt>
+ * <dt class="glossary">@anchor GlossBoundaryIndicator <b>Boundary indicator</b></dt>
  *
  * <dd> In a Triangulation object, every part of the boundary may be
  * associated with a unique number (of type types::boundary_id) that
@@ -364,7 +364,7 @@
  * VectorTools::interpolate_boundary_values,
  * VectorTools::compute_no_normal_flux_constraints.
  *
- * @note %Boundary indicators are inherited from mother faces and edges to
+ * @note Boundary indicators are inherited from mother faces and edges to
  * their children upon mesh refinement. Some more information about boundary
  * indicators is also presented in a section of the documentation of the
  * Triangulation class.
