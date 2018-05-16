@@ -157,7 +157,7 @@ public:
    * A typedef for the actual KDTree object.
    */
   typedef
-  typename nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor> ,
+  typename nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor>,
            PointCloudAdaptor, dim, unsigned int>
            NanoFlannKDTree;
 

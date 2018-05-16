@@ -161,8 +161,8 @@ namespace Differentiation
          */
         static void
         independent_variable(const scalar_type  &in,
-                             const unsigned int ,
-                             const unsigned int ,
+                             const unsigned int,
+                             const unsigned int,
                              ADNumberType       &out)
         {
           out <<= in;
@@ -200,7 +200,7 @@ namespace Differentiation
         static void
         independent_variable(const scalar_type  &in,
                              const unsigned int  index,
-                             const unsigned int  ,
+                             const unsigned int,
                              ADNumberType       &out)
         {
           // It is important that the tapeless variables have their values set

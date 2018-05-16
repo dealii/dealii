@@ -110,7 +110,7 @@ namespace internal
   /* --- Complex double --- */
 
   template <>
-  struct ProductTypeImpl<std::complex<double> ,std::complex<adouble> >
+  struct ProductTypeImpl<std::complex<double>,std::complex<adouble> >
   {
     typedef std::complex<adouble> type;
   };
@@ -128,7 +128,7 @@ namespace internal
   };
 
   template <>
-  struct ProductTypeImpl<std::complex<adub> ,std::complex<adouble> >
+  struct ProductTypeImpl<std::complex<adub>,std::complex<adouble> >
   {
     typedef std::complex<adouble> type;
   };
@@ -142,7 +142,7 @@ namespace internal
   /* --- Complex float --- */
 
   template <>
-  struct ProductTypeImpl<std::complex<float> ,std::complex<adouble> >
+  struct ProductTypeImpl<std::complex<float>,std::complex<adouble> >
   {
     typedef std::complex<adouble> type;
   };

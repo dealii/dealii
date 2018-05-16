@@ -1331,7 +1331,7 @@ void MatrixFree<dim,Number>::initialize_indices
                        face_info.faces[f].cells_interior[v] != numbers::invalid_unsigned_int; ++v)
                     {
                       AssertIndexRange(face_info.faces[f].cells_interior[v],
-                                       n_macro_cells_before*
+                                       n_macro_cells_before *
                                        VectorizedArray<Number>::n_array_elements);
                       if (dof_info[no].index_storage_variants[internal::MatrixFreeFunctions::DoFInfo::dof_access_face_exterior][f] >=
                           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::contiguous

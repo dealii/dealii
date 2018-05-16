@@ -56,7 +56,7 @@ test(const unsigned int size)
     for (unsigned int j = 0; j < size; ++j)
       {
         const NumberType diff = A(i,j) + a * v(i) * v(j) - B(i,j);
-        AssertThrow(std::abs(diff) < 1e-10 * std::abs(B(i,j)) ,
+        AssertThrow(std::abs(diff) < 1e-10 * std::abs(B(i,j)),
                     ExcMessage("diff="+ std::to_string(diff)));
       }
 

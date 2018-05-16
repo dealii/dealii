@@ -1740,7 +1740,7 @@ namespace internal
 
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_points.
-            resize_fast(cell_type.size()*GeometryInfo<dim>::faces_per_cell*
+            resize_fast(cell_type.size()*GeometryInfo<dim>::faces_per_cell *
                         face_data_by_cells[my_q].descriptor[0].n_q_points);
         }
 

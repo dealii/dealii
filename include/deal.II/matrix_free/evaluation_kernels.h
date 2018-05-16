@@ -1010,7 +1010,7 @@ namespace internal
               Number        *gradients_quad,
               Number        *hessians_quad,
               Number *,
-              const bool     ,
+              const bool,
               const bool     evaluate_gradients,
               const bool     evaluate_hessians)
   {

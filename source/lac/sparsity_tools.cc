@@ -173,8 +173,8 @@ namespace SparsityTools
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr = ZOLTAN_OK;
 
-      Assert( globalID != nullptr , ExcInternalError() );
-      Assert( localID != nullptr , ExcInternalError() );
+      Assert( globalID != nullptr, ExcInternalError() );
+      Assert( localID != nullptr, ExcInternalError() );
 
       //set global degrees of freedom
       auto n_dofs = graph->n_rows();
@@ -196,7 +196,7 @@ namespace SparsityTools
 
       *ierr = ZOLTAN_OK;
 
-      Assert ( numEdges != nullptr , ExcInternalError() );
+      Assert ( numEdges != nullptr, ExcInternalError() );
 
       for (int i=0; i<num_obj; ++i)
         {
@@ -230,8 +230,8 @@ namespace SparsityTools
             //Ignore diagonal entries. Not needed for partitioning.
             if ( i != col->column() )
               {
-                Assert( nextNborGID != nullptr , ExcInternalError() );
-                Assert( nextNborProc != nullptr , ExcInternalError() );
+                Assert( nextNborGID != nullptr, ExcInternalError() );
+                Assert( nextNborProc != nullptr, ExcInternalError() );
 
                 *nextNborGID++ = col->column();
                 *nextNborProc++ = 0;    //All the vertices on processor 0
@@ -326,7 +326,7 @@ namespace SparsityTools
       (void)rc;
 
       //check for error code in partitioner
-      Assert( rc == ZOLTAN_OK , ExcInternalError() );
+      Assert( rc == ZOLTAN_OK, ExcInternalError() );
 
       //By default, all indices belong to part 0. After zoltan partition
       //some are migrated to different part ID, which is stored in export_to_part array.
@@ -440,7 +440,7 @@ namespace SparsityTools
 
     (void) rc;
     //Check for error code
-    Assert (rc == ZOLTAN_OK ,
+    Assert (rc == ZOLTAN_OK,
             ExcInternalError());
 
     //Allocate and assign color indices

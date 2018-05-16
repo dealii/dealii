@@ -351,8 +351,8 @@ namespace Differentiation
         template<typename ADNumberType>
         static void
         independent_variable(const ScalarType   &in,
-                             const unsigned int ,
-                             const unsigned int ,
+                             const unsigned int,
+                             const unsigned int,
                              ADNumberType       &out)
         {
           out = in;
@@ -386,8 +386,8 @@ namespace Differentiation
         template<typename ScalarType>
         static void
         independent_variable(const ScalarType   &in,
-                             const unsigned int ,
-                             const unsigned int ,
+                             const unsigned int,
+                             const unsigned int,
                              ADNumberType       &out)
         {
           AssertThrow(false, ExcMessage("Marking for complex numbers has not yet been implemented."));
