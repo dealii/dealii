@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 *
 * This element overcomes the sign conflict issues present in
 * traditional Nédélec elements which arise from the edge and face
-* parameterisations used in the basis functions. Therefore, this
+* parameterizations used in the basis functions. Therefore, this
 * element should provide consistent results for general quadrilateral
 * and hexahedral elements.
 *
@@ -204,7 +204,7 @@ protected:
   * shape functions.
   *
   * The main quantities which are stored are associated with edge and face
-  * parameterisations. These are:
+  * parameterizations. These are:
   * <ul>
   * <li> $\lambda_{i}$ - trilinear function, equal to one at the $i$-th vertex
   * and zero at all other vertices.</li>
@@ -212,7 +212,7 @@ protected:
   * </ul>
   *
   * The definitions of these functionals, as well as the edge and face
-  * parametrisations and edge and face extension parameters, can be found on
+  * parameterizations and edge and face extension parameters, can be found on
   * page 82 of Zaglmayr's thesis. The details of the definition of the
   * globally-defined edge and face orientations can be found on page 67.
   */
@@ -237,14 +237,14 @@ protected:
     mutable std::vector<std::vector<DerivativeForm<1, dim, dim> > > shape_grads;
 
     /**
-    * Storage for all possible edge parameterisation between vertices. These
+    * Storage for all possible edge parameterization between vertices. These
     * are required in the computation of edge- and face-based DoFs, which are
     * cell-dependent.
     *
-    * The edge parameterisation of an edge, E, starting at vertex i and ending
+    * The edge parameterization of an edge, E, starting at vertex i and ending
     * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
     *
-    * sigma_imj_values[q][i][j] stores the value of the edge parametrisation
+    * sigma_imj_values[q][i][j] stores the value of the edge parameterization
     * connected by vertices $i$ and $j$ at the q-th quadrature point.
     *
     * Note that not all of the $i$ and $j$ combinations result in valid edges on
@@ -254,28 +254,28 @@ protected:
     std::vector<std::vector<std::vector<double> > > sigma_imj_values;
 
     /**
-    * Storage for gradients of all possible edge parameterisations between
+    * Storage for gradients of all possible edge parameterizations between
     * vertices. These are required in the computation of edge- and face-based
     * DoFs, which are cell-dependent. Note that the components of the gradient
     * are constant.
     *
-    * The edge parameterisation of an edge, $E$, starting at vertex $i$ and ending
+    * The edge parameterization of an edge, $E$, starting at vertex $i$ and ending
     * at vertex $j$ is given by $\sigma_{E} = \sigma_{i} - \sigma{j}$.
     *
-    * sigma_imj_grads[i][j][d] stores the gradient of the edge parametrisation
+    * sigma_imj_grads[i][j][d] stores the gradient of the edge parameterization
     * connected by vertices $i$ and $j$ in component $d$.
     *
-    * Note that the gradient of the edge parametrisation is constant on an
+    * Note that the gradient of the edge parameterization is constant on an
     * edge, so we do not need to store it at every quadrature point.
     */
     std::vector<std::vector<std::vector<double> > > sigma_imj_grads;
 
     /**
-    * Storage for values of edge parametrisations at quadrature points. These
+    * Storage for values of edge parameterizations at quadrature points. These
     * are stored for the 12 edges such that the global vertex numbering would
     * follow the order defined by the "standard" deal.II cell.
     *
-    * edge_sigma_values[m][q] stores the edge parameterisation value at the
+    * edge_sigma_values[m][q] stores the edge parameterization value at the
     * q-th quadrature point on edge m.
     *
     * These values change with the orientation of the edges of a physical cell
@@ -284,11 +284,11 @@ protected:
     std::vector<std::vector<double> > edge_sigma_values;
 
     /**
-    * Storage for gradients of edge parametrisation at quadrature points.
+    * Storage for gradients of edge parameterization at quadrature points.
     * These are stored for the 12 edges such that the global vertex numbering
     * would follow the order defined by the "standard" deal.II cell.
     *
-    * edge_sigma_grads[m][d] stores the gradient of the edge parameterisation
+    * edge_sigma_grads[m][d] stores the gradient of the edge parameterization
     * for component d on edge m.
     *
     * These values change with the orientation of the edges of a physical cell
