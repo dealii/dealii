@@ -227,9 +227,7 @@ void concentric_disks(Triangulation<2>          &tria,
       cell_idx++;
     }
 
-  tria.create_triangulation(std::vector<Point<2>>(&vertices[0], &vertices[n_vert]),
-                            cells,
-                            SubCellData()); // no boundary information
+  tria.create_triangulation(vertices, cells, SubCellData()); // no boundary information
 
   double eps = 1e-5 * x[0];
   unsigned int label = 100;

@@ -2269,7 +2269,7 @@ next_cell:
             const unsigned int local_pos_recv = vertices_recv_buffers[i][2*j];
             const types::global_vertex_index global_id_recv = vertices_recv_buffers[i][2*j+1];
             const std::string cellid_recv(&cellids_recv_buffers[i][max_cellid_size*j],
-                                          &cellids_recv_buffers[i][max_cellid_size*(j+1)]);
+                                          &cellids_recv_buffers[i][max_cellid_size*j] + max_cellid_size);
             bool found = false;
             typename std::set<active_cell_iterator>::iterator
             cell_set_it = missing_vert_cells.begin(),
