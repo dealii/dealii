@@ -86,5 +86,5 @@ cp bin/clang-format "${CLANG_PATH}"/bin
 cp ../{CODE_OWNERS,CREDITS,LICENSE}.TXT "${CLANG_PATH}"
 rm -rf "${tmpdir}"
 
-echo "All done. clang-format succesfully installed into"
-echo "    ${CLANG_PATH}/clang-6/bin"
+echo "All done. clang-format successfully installed into"
+echo "    ${CLANG_PATH}/bin"

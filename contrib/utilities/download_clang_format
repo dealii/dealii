@@ -74,5 +74,5 @@ else
 fi
 rm -r "${tmpdir}"
 
-echo "All done. clang-format succesfully installed into"
-echo "    ${CLANG_PATH}/clang-6/bin"
+echo "All done. clang-format successfully installed into"
+echo "    ${CLANG_PATH}/bin"
