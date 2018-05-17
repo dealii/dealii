@@ -18,10 +18,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   utilities.cc
   boundary_lib.cc
+  manifold_lib.cc
   )
 
 SET(_inst
   boundary_lib.inst.in
+  manifold_lib.inst.in
   utilities.inst.in
   )
 

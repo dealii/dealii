@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -58,7 +58,7 @@ int main ()
   TopoDS_Edge edge = BRepBuilderAPI_MakeEdge(circle);
 
   // Create a boundary projector.
-  NormalProjectionBoundary<2,3> boundary_line(edge);
+  NormalProjectionManifold<2,3> boundary_line(edge);
 
   // This one is for checking: This
   // is what deal.II would do for a

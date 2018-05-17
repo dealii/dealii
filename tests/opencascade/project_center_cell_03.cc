@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 
-#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/manifold_lib.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -56,15 +56,15 @@ int main ()
   extract_geometrical_shapes(sh, faces, edges, vertices);
 
 
-  // Create a boundary projector on the first face.
-  NormalToMeshProjectionBoundary<2,3> boundary(faces[0]);
+  // Create a manifold projector on the first face.
+  NormalToMeshProjectionManifold<2,3> manifold(faces[0]);
 
   // Create a Triangulation with a single cell
   Triangulation<2,3> tria;
   create_triangulation(faces[0], tria);
 
-  // Set the boundary
-  tria.set_manifold(1, boundary);
+  // Set the manifold
+  tria.set_manifold(1, manifold);
   tria.begin()->set_all_manifold_ids(1);
 
   deallog << "Ncells: " << tria.n_active_cells() << std::endl
