@@ -36,6 +36,11 @@ case "${OSTYPE}" in
     CHECKSUM_CMD="sha256sum"
     CHECKSUM="387b42b30db598d51bf26f020c5bef574cb6355210d2f5909691407a0fc81a26  $FILENAME"
     ;;
+  darwin*)
+    FILENAME="clang-format-6-darwin.tar.gz"
+    CHECKSUM_CMD="shasum"
+    CHECKSUM="8eaf852cc96947245de706f1059e764b7086a82e8bd769da2654936acb1d63e0  $FILENAME"
+    ;;
   *)
     echo "unknown: ${OSTYPE}"
     exit 1
