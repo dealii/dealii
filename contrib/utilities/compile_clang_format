@@ -71,7 +71,16 @@ git reset --hard "${CLANG_COMMIT}"
 cd ../../
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=true ..
+
+case "${OSTYPE}" in
+  darwin*)
+    cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
+    ;;
+  *)
+    cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=true ..
+    ;;
+esac
+
 make -j4 clang-format
 cp bin/clang-format "${CLANG_PATH}"/bin
 cp ../{CODE_OWNERS,CREDITS,LICENSE}.TXT "${CLANG_PATH}"
