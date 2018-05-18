@@ -1174,7 +1174,8 @@ void MatrixFree<dim,Number>::initialize_indices
 
       std::vector<bool> hard_vectorization_boundary(task_info.face_partition_data.size(),
                                                     false);
-      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
+      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none &&
+          task_info.partition_row_index[2] < task_info.face_partition_data.size())
         hard_vectorization_boundary[task_info.partition_row_index[2]] = true;
       else
         for (unsigned int i=0; i<hard_vectorization_boundary.size(); ++i)
