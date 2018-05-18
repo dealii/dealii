@@ -33,13 +33,13 @@ void test_real_to_unit_cell()
 
   Triangulation<dim>   triangulation;
 
-  std::vector<Point<dim> > points ({{
-      Point<dim>(-0.29999999999999999, -0.29999999999999999),
-      Point<dim>(-0.050000000000000003, -0.29999999999999999),
-      Point<dim>(-0.29999999999999999, -0.050000000000000003),
-      Point<dim>(-0.049999999999999989, -0.050000000000000003)
-    }
-  });
+  std::vector<Point<dim> > points
+  {
+    Point<dim>(-0.29999999999999999, -0.29999999999999999),
+    Point<dim>(-0.050000000000000003, -0.29999999999999999),
+    Point<dim>(-0.29999999999999999, -0.050000000000000003),
+    Point<dim>(-0.049999999999999989, -0.050000000000000003)
+  };
   std::vector<CellData<dim> > cells(1);
   cells[0].vertices[0] = 0;
   cells[0].vertices[1] = 1;
@@ -55,7 +55,7 @@ void test_real_to_unit_cell()
     {
       mapping.transform_real_to_unit_cell(triangulation.begin(), point);
     }
-  catch (typename Mapping<dim>::ExcTransformationFailed)
+  catch (typename Mapping<dim>::ExcTransformationFailed &)
     {
       deallog << "Transformation for point " << point << " on cell with "
               << "center " << triangulation.begin()->center() << " is not invertible" << std::endl;
