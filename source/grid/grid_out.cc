@@ -126,13 +126,54 @@ namespace GridOutFlags
   }
 
 
-  Gnuplot::Gnuplot (const bool write_cell_numbers,
-                    const unsigned int n_boundary_face_points,
-                    const bool         curved_inner_cells) :
+
+  Gnuplot::Gnuplot (const bool         write_cell_numbers,
+                    const unsigned int n_extra_curved_line_points,
+                    const bool         curved_inner_cells,
+                    const bool         write_additional_boundary_lines) :
     write_cell_numbers (write_cell_numbers),
-    n_boundary_face_points(n_boundary_face_points),
-    curved_inner_cells(curved_inner_cells)
+    n_extra_curved_line_points(n_extra_curved_line_points),
+    n_boundary_face_points(this->n_extra_curved_line_points),
+    curved_inner_cells(curved_inner_cells),
+    write_additional_boundary_lines(write_additional_boundary_lines)
   {}
+
+
+  // TODO we can get rid of these extra constructors and assignment operators
+  // once we remove the reference member variable.
+  Gnuplot::Gnuplot(const Gnuplot &flags) :
+    Gnuplot(flags.write_cell_numbers,
+            flags.n_extra_curved_line_points,
+            flags.curved_inner_cells,
+            flags.write_additional_boundary_lines)
+  {}
+
+
+
+  Gnuplot::Gnuplot(Gnuplot &&flags) :
+    Gnuplot(static_cast<const Gnuplot &>(flags))
+  {}
+
+
+
+  Gnuplot &
+  Gnuplot::operator=(const Gnuplot &flags)
+  {
+    write_cell_numbers = flags.write_cell_numbers;
+    n_extra_curved_line_points = flags.n_extra_curved_line_points;
+    curved_inner_cells = flags.curved_inner_cells;
+    write_additional_boundary_lines = flags.write_additional_boundary_lines;
+
+    return *this;
+  }
+
+
+
+  Gnuplot &
+  Gnuplot::operator=(Gnuplot &&flags)
+  {
+    return operator=(static_cast<const Gnuplot &>(flags));
+  }
 
 
 
@@ -3237,8 +3278,8 @@ namespace internal
                     }
                   else
                     {
-                      // if, however, the face is not at the boundary, then
-                      // draw it as usual
+                      // if, however, the face is not at the boundary and we
+                      // don't want to curve anything, then draw it as usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
@@ -3384,7 +3425,7 @@ namespace internal
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
 
-                  if (face->at_boundary())
+                  if (face->at_boundary() && gnuplot_flags.write_additional_boundary_lines)
                     {
                       const unsigned int offset=face_no*n_points*n_points;
                       for (unsigned int i=0; i<n_points-1; ++i)
