@@ -774,7 +774,7 @@ namespace internal
           // create a tight map of categories for not taking exceeding amounts
           // of memory below. Sort the new categories by the numbers in the
           // old one.
-          tight_category_map.reserve(n_active_cells+n_ghost_cells);
+          tight_category_map.resize(n_active_cells+n_ghost_cells);
           std::set<unsigned int> used_categories;
           for (unsigned int i=0; i<n_active_cells+n_ghost_cells; ++i)
             used_categories.insert(cell_vectorization_categories[i]);
