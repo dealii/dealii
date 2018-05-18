@@ -3942,7 +3942,7 @@ FEEvaluationBase<dim,n_components_,Number,is_face>
                                          values_dofs[comp][ind_local][v]);
                 }
 
-              if (apply_constraints == true)
+              if (apply_constraints == true && comp+1<n_components)
                 {
                   if (is_face)
                     next_index_indicators = dof_info->row_starts[cells[v]*n_fe_components+first_selected_component+comp+2].second;
