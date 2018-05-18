@@ -24,19 +24,22 @@ then
   exit 1
 fi
 
-mkdir -p images
-
-echo "Downloading images (press ctrl-c to cancel) ..."
-cd images
-{
-trap "echo \"(skipping)\"" SIGINT
-wget -q -nd -A svg,png,gif,webm -m -l 1 -np https://www.dealii.org/images/steps/developer/
-}
-rm robots.txt*
-cd ..
-
 echo "Patching html files ..."
-sed -i 's#"http://www.dealii.org/images/steps/developer/\(step-.*\)"#"images/\1"#g' step_*.html
-sed -i 's#"https://www.dealii.org/images/steps/developer/\(step-.*\)"#"images/\1"#g' step_*.html
+sed -i 's#"https\?://www.dealii.org/images/#"images/#g' step_*.html class*.html
+
+echo "Downloading images (this will take a long time; press ctrl-c to cancel) ..."
+
+for i in steps/developer \
+         shape-functions/{DGPMonomial,DGPNonparametric,DGP}/P{1,2,3,4} \
+         shape-functions/{hierarchical,lagrange}/Q{1,2,3,4}; do
+  echo "  ... processing images/$i"
+  mkdir -p images/"$i"
+  (
+    cd images/"$i"
+    trap "echo \"(skipping)\"" SIGINT
+    wget -q -nd -A svg,png,gif,webm -m -l 1 -np "https://www.dealii.org/images/$i"
+    rm -f robots.txt*
+  )
+done
 
 echo "all done!"
