@@ -2832,11 +2832,12 @@ namespace internal
       void
       update_cell_dof_indices_cache (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, level_dof_access> &accessor)
       {
-        // caches are only for cells with DoFs, i.e., for active ones
+        // caches are only for cells with DoFs, i.e., for active ones and not FE_Nothing
         if (accessor.has_children())
           return;
-
         const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
+        if (dofs_per_cell == 0)
+          return;
 
         // make sure the cache is at least
         // as big as we need it when
