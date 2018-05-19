@@ -3264,8 +3264,11 @@ namespace internal
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
 
-          if (mapping==nullptr ||
-              (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells))
+          if (mapping == nullptr ||
+              (dim == spacedim ? (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells) :
+               // ignore checking for boundary or interior cells in the codim
+               // 1 case: 'or false' is a no-op
+               false))
             {
               // write out the four sides of this cell by putting the four
               // points (+ the initial point again) in a row and lifting the
@@ -3289,7 +3292,7 @@ namespace internal
                 {
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
-                  if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
+                  if (dim != spacedim || face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
                       // Save the points on each face to a vector and then try
                       // to remove colinear points that won't show up in the

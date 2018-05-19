@@ -964,9 +964,8 @@ public:
    * at the boundary. If zero, then use standard Q1 mapping.
    *
    * Names and values of additional flags controlling the output can be found
-   * in the documentation of the GridOutFlags::Gnuplot() class.
-   *
-   * Not implemented for the codimension one case.
+   * in the documentation of the GridOutFlags::Gnuplot class, which also
+   * describes some caveats for the codimension one case.
    */
   template <int dim, int spacedim>
   void write_gnuplot (const Triangulation<dim,spacedim> &tria,
