@@ -168,11 +168,12 @@ namespace Utilities
                             &inactive_with_root_group);
       AssertThrowMPI(ierr);
 
-      // Create the communicator based on the group
-      // Note that on most cores the communicator will be MPI_COMM_NULL.
-      // FIXME: switch to MPI_Comm_create_group for MPI-3 so that only processes within the to-be subgroup call this
-      ierr = MPI_Comm_create(mpi_communicator, inactive_with_root_group,
-                             &mpi_communicator_inactive_with_root);
+      // Create the communicator based on inactive_with_root_group.
+      // Note that on all the active MPI processes (except for the one with
+      // rank 0) the resulting MPI_Comm mpi_communicator_inactive_with_root
+      // will be MPI_COMM_NULL.
+      ierr = Utilities::MPI::create_group(mpi_communicator, inactive_with_root_group,
+                                          55, &mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Group_free(&all_group);
