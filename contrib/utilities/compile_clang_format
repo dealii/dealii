@@ -57,15 +57,41 @@ tmpdir="${TMPDIR:-/tmp}/dealiiclang${RANDOM}${RANDOM}"
 mkdir -p "${tmpdir}"
 cd "${tmpdir}"
 
+GIT_VERSION=$(git version)
+GIT_MAJOR_VERSION=$(echo "${GIT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
+GIT_MINOR_VERSION=$(echo "${GIT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
+
+if [ "$GIT_MAJOR_VERSION" -ge 2 ] && [ "$GIT_MINOR_VERSION" -ge 11 ]; then
+  GIT_SHALLOW_SINCE_AVAILABLE=true
+else
+  GIT_SHALLOW_SINCE_AVAILABLE=false
+fi
+
 git init
 git remote add origin "${LLVM_REPOSITORY}"
-git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+if [ "$GIT_SHALLOW_SINCE_AVAILABLE" = true ]; then
+  git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+else
+  git fetch --depth=1 origin "${RELEASE_BRANCH}"
+  i=1;
+  while ! git cat-file -e ${LLVM_COMMIT} 2> /dev/null; do
+    git fetch --depth=$((i+=10)) origin "${RELEASE_BRANCH}";
+  done
+fi
 git reset --hard "${LLVM_COMMIT}"
 
 git init tools/clang
 cd tools/clang
 git remote add origin "${CLANG_REPOSITORY}"
-git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+if [ "$GIT_SHALLOW_SINCE_AVAILABLE" = true ]; then
+  git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+else
+  git fetch --depth=1 origin "${RELEASE_BRANCH}"
+  i=1;
+  while ! git cat-file -e ${CLANG_COMMIT} 2> /dev/null; do
+    git fetch --depth=$((i+=10)) origin "${RELEASE_BRANCH}";
+  done
+fi
 git reset --hard "${CLANG_COMMIT}"
 
 cd ../../
