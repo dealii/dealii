@@ -1029,39 +1029,36 @@ namespace DoFTools
 
                   const bool periodic_neighbor = cell->has_periodic_neighbor (face);
 
-                  if (cell->at_boundary (face) && (!periodic_neighbor))
+                  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                     {
-                      for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                      const unsigned int ii
+                        = (cell->get_fe().is_primitive(i) ?
+                           cell->get_fe().system_to_component_index(i).first
+                           :
+                           cell->get_fe().get_nonzero_components(i).first_selected_component()
+                          );
+
+                      Assert (ii < cell->get_fe().n_components(), ExcInternalError());
+
+                      for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
                         {
-                          const unsigned int ii
-                            = (cell->get_fe().is_primitive(i) ?
-                               cell->get_fe().system_to_component_index(i).first
+                          const unsigned int jj
+                            = (cell->get_fe().is_primitive(j) ?
+                               cell->get_fe().system_to_component_index(j).first
                                :
-                               cell->get_fe().get_nonzero_components(i).first_selected_component()
+                               cell->get_fe().get_nonzero_components(j).first_selected_component()
                               );
 
-                          Assert (ii < cell->get_fe().n_components(), ExcInternalError());
+                          Assert (jj < cell->get_fe().n_components(), ExcInternalError());
 
-                          for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
-                            {
-                              const unsigned int jj
-                                = (cell->get_fe().is_primitive(j) ?
-                                   cell->get_fe().system_to_component_index(j).first
-                                   :
-                                   cell->get_fe().get_nonzero_components(j).first_selected_component()
-                                  );
-
-                              Assert (jj < cell->get_fe().n_components(), ExcInternalError());
-
-                              if ((flux_mask(ii,jj) == always)
-                                  ||
-                                  (flux_mask(ii,jj) == nonzero))
-                                sparsity.add (dofs_on_this_cell[i],
-                                              dofs_on_this_cell[j]);
-                            }
+                          if ((flux_mask(ii,jj) == always)
+                              ||
+                              (flux_mask(ii,jj) == nonzero))
+                            sparsity.add (dofs_on_this_cell[i],
+                                          dofs_on_this_cell[j]);
                         }
                     }
-                  else
+                  if ((!cell->at_boundary(face)) || periodic_neighbor)
                     {
                       typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
                       neighbor = cell->neighbor_or_periodic_neighbor(face);
@@ -1141,26 +1138,14 @@ namespace DoFTools
                                         {
                                           sparsity.add (dofs_on_this_cell[i],
                                                         dofs_on_other_cell[j]);
-                                          sparsity.add (dofs_on_other_cell[i],
-                                                        dofs_on_this_cell[j]);
-                                          sparsity.add (dofs_on_this_cell[i],
-                                                        dofs_on_this_cell[j]);
-                                          sparsity.add (dofs_on_other_cell[i],
-                                                        dofs_on_other_cell[j]);
                                         }
 
                                       if ((flux_mask(jj,ii) == always)
                                           ||
                                           (flux_mask(jj,ii) == nonzero))
                                         {
-                                          sparsity.add (dofs_on_this_cell[j],
-                                                        dofs_on_other_cell[i]);
                                           sparsity.add (dofs_on_other_cell[j],
                                                         dofs_on_this_cell[i]);
-                                          sparsity.add (dofs_on_this_cell[j],
-                                                        dofs_on_this_cell[i]);
-                                          sparsity.add (dofs_on_other_cell[j],
-                                                        dofs_on_other_cell[i]);
                                         }
                                     }
                                 }
@@ -1198,26 +1183,14 @@ namespace DoFTools
                                     {
                                       sparsity.add (dofs_on_this_cell[i],
                                                     dofs_on_other_cell[j]);
-                                      sparsity.add (dofs_on_other_cell[i],
-                                                    dofs_on_this_cell[j]);
-                                      sparsity.add (dofs_on_this_cell[i],
-                                                    dofs_on_this_cell[j]);
-                                      sparsity.add (dofs_on_other_cell[i],
-                                                    dofs_on_other_cell[j]);
                                     }
 
                                   if ((flux_mask(jj,ii) == always)
                                       ||
                                       (flux_mask(jj,ii) == nonzero))
                                     {
-                                      sparsity.add (dofs_on_this_cell[j],
-                                                    dofs_on_other_cell[i]);
                                       sparsity.add (dofs_on_other_cell[j],
                                                     dofs_on_this_cell[i]);
-                                      sparsity.add (dofs_on_this_cell[j],
-                                                    dofs_on_this_cell[i]);
-                                      sparsity.add (dofs_on_other_cell[j],
-                                                    dofs_on_other_cell[i]);
                                     }
                                 }
                             }
