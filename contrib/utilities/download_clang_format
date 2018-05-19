@@ -34,7 +34,7 @@ case "${OSTYPE}" in
   linux*)
     FILENAME="clang-format-6-linux.tar.gz"
     CHECKSUM_CMD="sha256sum"
-    CHECKSUM="387b42b30db598d51bf26f020c5bef574cb6355210d2f5909691407a0fc81a26  $FILENAME"
+    CHECKSUM="26c046456d0a8c109df74e890f46bbe4ad50b035a9febc13ec41c22dabd005a5  $FILENAME"
     ;;
   darwin*)
     FILENAME="clang-format-6-darwin.tar.gz"
