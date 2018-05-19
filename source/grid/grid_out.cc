@@ -3193,8 +3193,45 @@ namespace internal
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
 
+      std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> interior_cells_to_not_skip;
+      std::vector<Point<spacedim>> point_cache;
       for (; cell!=endc; ++cell)
         {
+          if (!cell->at_boundary() &&
+              interior_cells_to_not_skip.find(cell) == interior_cells_to_not_skip.end())
+            {
+              bool skip_cell = true;
+              for (unsigned int neighbor_n = 0;
+                   neighbor_n < GeometryInfo<dim>::faces_per_cell;
+                   ++neighbor_n)
+                {
+                  const auto neighbor = cell->neighbor(neighbor_n);
+                  Assert(neighbor != endc, ExcInternalError());
+                  // do not skip if the neighbor is coarser
+                  if (neighbor->level() < cell->level())
+                    {
+                      skip_cell = false;
+                      break;
+                    }
+                }
+              if (skip_cell)
+                {
+                  for (unsigned int neighbor_n = 0;
+                       neighbor_n < GeometryInfo<dim>::faces_per_cell;
+                       ++neighbor_n)
+                    {
+                      const auto neighbor = cell->neighbor(neighbor_n);
+                      if (neighbor->active() && !neighbor->at_boundary())
+                        interior_cells_to_not_skip.insert(cell->neighbor(neighbor_n));
+                    }
+                  continue;
+                }
+            }
+
+          const auto current_set_iter = interior_cells_to_not_skip.find(cell);
+          if (current_set_iter != interior_cells_to_not_skip.end())
+            interior_cells_to_not_skip.erase(current_set_iter);
+
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
 
@@ -3219,28 +3256,37 @@ namespace internal
                   << '\n';
             }
           else
-            // cell is at boundary and we
-            // are to treat curved
-            // boundaries. so loop over
-            // all faces and draw them as
-            // small pieces of lines
+            // cell is at boundary and we are to treat curved boundaries. so
+            // loop over all faces and draw them as small pieces of lines
             {
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                 {
+                  point_cache.clear();
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
                   if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
-                      // compute offset
-                      // of quadrature
-                      // points within
-                      // set of projected
-                      // points
+                      // compute offset of quadrature points within set of
+                      // projected points
                       const unsigned int offset=face_no*n_points;
                       for (unsigned int i=0; i<n_points; ++i)
-                        out << (mapping->transform_unit_to_real_cell
-                                (cell, q_projector->point(offset+i)))
+                        point_cache.push_back(mapping->transform_unit_to_real_cell
+                                              (cell, q_projector->point(offset+i)));
+                      while (point_cache.size() > 2)
+                        {
+                          Tensor<1, spacedim> first_difference = point_cache[1] - point_cache[0];
+                          first_difference /= first_difference.norm();
+                          Tensor<1, spacedim> second_difference = point_cache[2] - point_cache[1];
+                          second_difference /= second_difference.norm();
+                          // If the three points are colinear then remove the middle one.
+                          if ((first_difference - second_difference).norm() < 1e-10)
+                            point_cache.erase(point_cache.begin() + 1);
+                          else
+                            break;
+                        }
+                      for (const Point<spacedim> &point : point_cache)
+                        out << point
                             << ' ' << cell->level()
                             << ' ' << static_cast<unsigned int>(cell->material_id())
                             << '\n';
@@ -3250,11 +3296,8 @@ namespace internal
                     }
                   else
                     {
-                      // if, however, the
-                      // face is not at
-                      // the boundary,
-                      // then draw it as
-                      // usual
+                      // if, however, the face is not at the boundary, then
+                      // draw it as usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
@@ -3935,9 +3978,7 @@ namespace internal
       for (LineList::const_iterator line=line_list.begin();
            line!=line_list.end(); ++line)
         if (eps_flags_base.color_lines_level && (line->level > 0))
-          // lines colored according to
-          // refinement level,
-          // contributed by J�rg
+          // lines colored according to refinement level, contributed by Jörg
           // R. Weimar
           out << line->level
               << " l "
