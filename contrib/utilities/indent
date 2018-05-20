@@ -36,34 +36,27 @@ if test ! -d source -o ! -d include -o ! -d examples ; then
 fi
 
 # Add the location 'setup_astyle.sh' installs astyle to to the local PATH.
-ASTYLE_PATH="$(cd "$(dirname "$0")" && pwd)/programs/astyle/bin"
-export PATH=$ASTYLE_PATH:$PATH
+CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-6/bin"
+export PATH=$CLANG_FORMAT_PATH:$PATH
 
-if test ! -f contrib/styles/astyle.rc ; then
-  echo "*** No style file contrib/styles/astyle.rc found."
-  exit 1
-fi
-
-if test -z "$(command -v astyle)" ; then
-  echo "*** No astyle program found."
+if test -z "$(command -v clang-format)" ; then
+  echo "*** No clang-format program found."
   echo "***"
-  echo "*** You can download astyle from http://astyle.sourceforge.net/"
-  echo "*** Note that you will need exactly version 2.04 (no newer or"
-  echo "*** older version will yield the correct indentation)."
-  echo "*** You can run the 'setup_astyle.sh' script for that."
+  echo "*** You can run the 'download_clang_format' script for obtaining"
+  echo "*** a suitable binary."
   exit 1
 fi
 
-if test "$(astyle --version 2>&1)" != "Artistic Style Version 2.04" ; then
-  echo "*** Found a version of astyle different than the required version 2.04."
-  exit 1
-fi
+# if test "$(astyle --version 2>&1)" != "Artistic Style Version 3.1" ; then
+#   echo "*** Found a version of astyle different than the required version 3.1."
+#  exit 1
+# fi
 
 
 
 # collect all header and source files and process them in batches of 50 files
 # with up to 10 in parallel
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
+find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 50 -P 10 clang-format -i
 
 # use the same process to set file permissions for all source files
 find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print0 | xargs -0 -n 50 -P 10 chmod 644
