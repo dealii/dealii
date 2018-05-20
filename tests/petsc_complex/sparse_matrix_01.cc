@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check SparseMatrix::add(other, factor)
 
 #include "../tests.h"
@@ -21,52 +20,51 @@
 #include <iostream>
 #include <vector>
 
-
-void test ()
+void
+test()
 {
-  const unsigned int s = 10;
-  PETScWrappers::SparseMatrix m(s,s,s);
-  for (unsigned int k=0; k<m.m(); ++k)
-    for (unsigned int l=0; l<=k; ++l)
-      m.set (k,l, k+2*l);
+  const unsigned int          s = 10;
+  PETScWrappers::SparseMatrix m(s, s, s);
+  for(unsigned int k = 0; k < m.m(); ++k)
+    for(unsigned int l = 0; l <= k; ++l)
+      m.set(k, l, k + 2 * l);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
-  PETScWrappers::SparseMatrix m2(s,s,s);
-  m2.set(0,1,5.0);
-  for (unsigned int k=0; k<m2.m(); ++k)
-    m2.set(k,k,PetscScalar(1.0+k,-1.0-k));
+  PETScWrappers::SparseMatrix m2(s, s, s);
+  m2.set(0, 1, 5.0);
+  for(unsigned int k = 0; k < m2.m(); ++k)
+    m2.set(k, k, PetscScalar(1.0 + k, -1.0 - k));
   m2.compress(VectorOperation::insert);
 
   // we now print the matrix m, it is all real. Then print after
   // adding m2 which is complex, and then subtract m2 again to get the
   // original matrix back.
 
-  deallog << "before: " << m(0,1) << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << m(k,k) << " ";
+  deallog << "before: " << m(0, 1) << std::endl;
+  for(unsigned int k = 0; k < s; ++k)
+    deallog << m(k, k) << " ";
   deallog << std::endl;
 
-  m.add(m2,1.0);
+  m.add(m2, 1.0);
 
-  deallog << "after: " << m(0,1) << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << m(k,k) << " ";
+  deallog << "after: " << m(0, 1) << std::endl;
+  for(unsigned int k = 0; k < s; ++k)
+    deallog << m(k, k) << " ";
   deallog << std::endl;
 
-  m.add(m2,-1.0);
+  m.add(m2, -1.0);
 
-  deallog << "back to original: " << m(0,1) << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << m(k,k) << " ";
+  deallog << "back to original: " << m(0, 1) << std::endl;
+  for(unsigned int k = 0; k < s; ++k)
+    deallog << m(k, k) << " ";
   deallog << std::endl;
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -75,13 +73,13 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -92,9 +90,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -103,5 +102,4 @@ int main (int argc, char **argv)
                 << std::endl;
       return 1;
     };
-
 }

@@ -16,63 +16,60 @@
 // test GridTools::torus() and TorusManifold, output visually checked
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
-
-
+#include <deal.II/grid/tria.h>
 
 template <int dim, int spacedim>
-void test ();
+void
+test();
 
 template <>
-void test<3,3> ()
+void
+test<3, 3>()
 {
-  const int dim = 3;
-  const int spacedim = 3;
+  const int                    dim      = 3;
+  const int                    spacedim = 3;
   Triangulation<dim, spacedim> triangulation;
 
   GridGenerator::torus(triangulation, 1.0, 0.4);
-  triangulation.set_manifold (1, SphericalManifold<3>());
+  triangulation.set_manifold(1, SphericalManifold<3>());
 
   triangulation.begin_active()->set_refine_flag();
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
   const TorusManifold<3> desc_torus(1.0, 0.4);
-  unsigned int c = 0;
-  for (Triangulation<dim, spacedim>::active_vertex_iterator v = triangulation.begin_active_vertex();
-       v != triangulation.end_vertex();
-       ++v, ++c)
+  unsigned int           c = 0;
+  for(Triangulation<dim, spacedim>::active_vertex_iterator v
+      = triangulation.begin_active_vertex();
+      v != triangulation.end_vertex();
+      ++v, ++c)
     {
-      if (c%3 != 0)
+      if(c % 3 != 0)
         continue;
       Point<3> p = v->vertex(0);
-      Point<3> x(numbers::PI/2.5, numbers::PI/3.5, 1.0);
-      x = desc_torus.push_forward(x);
-      Tensor<1,3> t = desc_torus.get_tangent_vector (p, x);
+      Point<3> x(numbers::PI / 2.5, numbers::PI / 3.5, 1.0);
+      x              = desc_torus.push_forward(x);
+      Tensor<1, 3> t = desc_torus.get_tangent_vector(p, x);
 
-      deallog.get_file_stream() << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2]
-                                << " rto " << t[0] << ", " << t[1] << ", " << t[2]
-                                << std::endl;
+      deallog.get_file_stream()
+        << "set arrow from " << p[0] << ", " << p[1] << ", " << p[2] << " rto "
+        << t[0] << ", " << t[1] << ", " << t[2] << std::endl;
     }
-  deallog.get_file_stream()
-      << "set view equal xyz"
-      << std::endl
-      << "splot '-' w l"
-      << std::endl;
-  GridOut().write_gnuplot (triangulation, deallog.get_file_stream());
-  deallog.get_file_stream() << "e" << std::endl
-                            << "pause -1" << std::endl;
+  deallog.get_file_stream() << "set view equal xyz" << std::endl
+                            << "splot '-' w l" << std::endl;
+  GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
+  deallog.get_file_stream() << "e" << std::endl << "pause -1" << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
-  initlog ();
+  initlog();
 
-  test<3,3> ();
+  test<3, 3>();
 
   return 0;
 }

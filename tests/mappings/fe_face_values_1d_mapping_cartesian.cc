@@ -13,54 +13,49 @@
 //
 // ---------------------------------------------------------------------
 
-
 // like fe_face_values_1d but testing that one can use MappingCartesian
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/fe/mapping_cartesian.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe.h>
-#include <vector>
-#include <string>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/vector.h>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #define PRECISION 4
 
-
-
 template <int dim>
 inline void
-plot_faces(Mapping<dim> &mapping,
-           FiniteElement<dim> &fe,
-           typename DoFHandler<dim>::cell_iterator &cell)
+plot_faces(Mapping<dim>&                            mapping,
+           FiniteElement<dim>&                      fe,
+           typename DoFHandler<dim>::cell_iterator& cell)
 {
   // create a QGauss<0>(4), which should
   // still only have 1 quadrature point
-  QGauss<dim-1> q(4);
-  Assert (q.size() == 1, ExcInternalError());
+  QGauss<dim - 1> q(4);
+  Assert(q.size() == 1, ExcInternalError());
 
-  FEFaceValues<dim> fe_values(mapping, fe, q,
-                              UpdateFlags(update_quadrature_points
-                                          | update_JxW_values
-                                          | update_values
-                                          | update_gradients
-                                          | update_hessians
-                                          | update_normal_vectors));
+  FEFaceValues<dim> fe_values(
+    mapping,
+    fe,
+    q,
+    UpdateFlags(update_quadrature_points | update_JxW_values | update_values
+                | update_gradients | update_hessians | update_normal_vectors));
 
-  for (unsigned int face_nr=0;
-       face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++ face_nr)
+  for(unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
+      ++face_nr)
     {
       deallog << "Face=" << face_nr << std::endl;
       fe_values.reinit(cell, face_nr);
@@ -72,47 +67,41 @@ plot_faces(Mapping<dim> &mapping,
 
       // now print some data on the shape
       // functions
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      for(unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         deallog << "shape_function " << i << ":" << std::endl
-                << "  phi=" << fe_values.shape_value(i,0) << std::endl
-                << "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
-                << "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
+                << "  phi=" << fe_values.shape_value(i, 0) << std::endl
+                << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
+                << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)
+                << std::endl;
 
       deallog << std::endl;
     }
 }
 
-
-
 template <int dim>
 inline void
-plot_subfaces(Mapping<dim> &mapping,
-              FiniteElement<dim> &fe,
-              typename DoFHandler<dim>::cell_iterator &cell)
+plot_subfaces(Mapping<dim>&                            mapping,
+              FiniteElement<dim>&                      fe,
+              typename DoFHandler<dim>::cell_iterator& cell)
 {
-
   // create a QGauss<0>(4), which should
   // still only have 1 quadrature point
-  QGauss<dim-1> q(4);
-  Assert (q.size() == 1, ExcInternalError());
+  QGauss<dim - 1> q(4);
+  Assert(q.size() == 1, ExcInternalError());
 
-  FESubfaceValues<dim> fe_values(mapping, fe, q,
-                                 UpdateFlags(update_quadrature_points
-                                             | update_JxW_values
-                                             | update_values
-                                             | update_gradients
-                                             | update_hessians
-                                             | update_normal_vectors));
-  for (unsigned int face_nr=0;
-       face_nr < GeometryInfo<dim>::faces_per_cell;
-       ++ face_nr)
-    for (unsigned int sub_nr=0;
-         sub_nr < GeometryInfo<dim>::max_children_per_face;
-         ++ sub_nr)
+  FESubfaceValues<dim> fe_values(
+    mapping,
+    fe,
+    q,
+    UpdateFlags(update_quadrature_points | update_JxW_values | update_values
+                | update_gradients | update_hessians | update_normal_vectors));
+  for(unsigned int face_nr = 0; face_nr < GeometryInfo<dim>::faces_per_cell;
+      ++face_nr)
+    for(unsigned int sub_nr = 0;
+        sub_nr < GeometryInfo<dim>::max_children_per_face;
+        ++sub_nr)
       {
-        deallog << "Face=" << face_nr
-                << ", subface=" << sub_nr
-                << std::endl;
+        deallog << "Face=" << face_nr << ", subface=" << sub_nr << std::endl;
 
         fe_values.reinit(cell, face_nr, sub_nr);
 
@@ -123,58 +112,56 @@ plot_subfaces(Mapping<dim> &mapping,
 
         // now print some data on the shape
         // functions
-        for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        for(unsigned int i = 0; i < fe.dofs_per_cell; ++i)
           deallog << "shape_function " << i << ":" << std::endl
-                  << "  phi=" << fe_values.shape_value(i,0) << std::endl
-                  << "  grad phi=" << fe_values.shape_grad(i,0) << std::endl
-                  << "  grad^2 phi=" << fe_values.shape_hessian(i,0) << std::endl;
+                  << "  phi=" << fe_values.shape_value(i, 0) << std::endl
+                  << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
+                  << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)
+                  << std::endl;
 
         deallog << std::endl;
       }
 }
 
-
 template <int dim>
-void mapping_test()
+void
+mapping_test()
 {
   deallog << "dim=" << dim << std::endl;
 
-  std::vector<Mapping<dim> *> mapping_ptr;
-  std::vector<std::string> mapping_strings;
+  std::vector<Mapping<dim>*> mapping_ptr;
+  std::vector<std::string>   mapping_strings;
 
   MappingCartesian<dim> mapping;
-  std::string mapping_name = "MappingCartesian";
+  std::string           mapping_name = "MappingCartesian";
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
 
-  FE_Q<dim> fe_q4(2);
+  FE_Q<dim>       fe_q4(2);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe_q4);
 
   typename DoFHandler<dim>::cell_iterator cell = dof.begin_active();
   {
     std::ostringstream ost;
-    ost << "MappingFace" << dim << "d-"
-        << mapping_name;
+    ost << "MappingFace" << dim << "d-" << mapping_name;
     deallog << ost.str() << std::endl;
     plot_faces(mapping, fe_q4, cell);
   }
 
   {
     std::ostringstream ost;
-    ost << "MappingSubface" << dim << "d-"
-        << mapping_name;
+    ost << "MappingSubface" << dim << "d-" << mapping_name;
     deallog << ost.str() << std::endl;
     plot_subfaces(mapping, fe_q4, cell);
   }
 }
 
-
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog.attach(logfile);
 
@@ -183,4 +170,3 @@ int main()
   // -----------------------
   mapping_test<1>();
 }
-

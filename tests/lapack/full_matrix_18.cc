@@ -13,17 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test LAPACKFullMatrix::invert() with SPD Cholesky by comparing to FullMatrix
 
 #include "../tests.h"
 #include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
-
 
 template <typename NumberType>
 void
@@ -47,7 +45,7 @@ test(const unsigned int size)
   const double error = diff.frobenius_norm();
   deallog << error << std::endl;
 
-  if (error > 1e-10)
+  if(error > 1e-10)
     {
       std::cout << "Lapack:" << std::endl;
       M.print_formatted(std::cout);
@@ -58,16 +56,16 @@ test(const unsigned int size)
     }
 }
 
-
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
-  const std::vector<unsigned int> sizes = {{1,3,11,17,32,64,200,391}};
-  for (const auto &s : sizes)
+  const std::vector<unsigned int> sizes = {{1, 3, 11, 17, 32, 64, 200, 391}};
+  for(const auto& s : sizes)
     {
       deallog << "size=" << s << std::endl;
       // test<float>(s);

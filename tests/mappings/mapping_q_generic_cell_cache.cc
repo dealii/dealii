@@ -28,10 +28,10 @@
 
 using namespace dealii;
 
-
-int main()
+int
+main()
 {
-  initlog ();
+  initlog();
 
   // there used to be a bug in the cell similarity detection beyond the
   // GridTools::transform method , but cell similarity is only enabled without
@@ -40,11 +40,11 @@ int main()
   MultithreadInfo::set_thread_limit(1);
 
   Triangulation<2> triangulation;
-  FE_DGQ<2> fe(0);
-  QMidpoint<2> qf_cell;
+  FE_DGQ<2>        fe(0);
+  QMidpoint<2>     qf_cell;
 
   GridGenerator::hyper_cube(triangulation, 0.0, 1.0);
-  FEValues<2> fe_values (fe, qf_cell, update_JxW_values);
+  FEValues<2> fe_values(fe, qf_cell, update_JxW_values);
 
   // compute the volume of the mesh
   fe_values.reinit(triangulation.begin_active());
@@ -52,7 +52,7 @@ int main()
   deallog << volume_before << std::endl;
 
   // shrink the mesh
-  GridTools::scale (0.5, triangulation);
+  GridTools::scale(0.5, triangulation);
 
   // Now we measure the volume again:
   fe_values.reinit(triangulation.begin_active());

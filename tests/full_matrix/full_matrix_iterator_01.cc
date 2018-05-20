@@ -13,33 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // like sparse_matrix_iterator_12, but for FullMatrix
 
 #include "../tests.h"
 #include <deal.II/lac/full_matrix.h>
 
-
-void test ()
+void
+test()
 {
-  FullMatrix<double> A(3,3);
+  FullMatrix<double> A(3, 3);
 
   // test prefix operator
-  const FullMatrix<double>::const_iterator k = A.begin(),
-                                           j = ++A.begin();
+  const FullMatrix<double>::const_iterator k = A.begin(), j = ++A.begin();
 
-  AssertThrow (k < j, ExcInternalError());
-  AssertThrow (j > k, ExcInternalError());
+  AssertThrow(k < j, ExcInternalError());
+  AssertThrow(j > k, ExcInternalError());
 
-  AssertThrow (!(j < k), ExcInternalError());
-  AssertThrow (!(k > j), ExcInternalError());
+  AssertThrow(!(j < k), ExcInternalError());
+  AssertThrow(!(k > j), ExcInternalError());
 
-  AssertThrow (k != j, ExcInternalError());
-  AssertThrow (!(k == j), ExcInternalError());
+  AssertThrow(k != j, ExcInternalError());
+  AssertThrow(!(k == j), ExcInternalError());
 
-  AssertThrow (k == k, ExcInternalError());
-  AssertThrow (!(k != k), ExcInternalError());
+  AssertThrow(k == k, ExcInternalError());
+  AssertThrow(!(k != k), ExcInternalError());
 
   // test postfix operator
   FullMatrix<double>::const_iterator l = A.begin();
@@ -49,23 +46,22 @@ void test ()
   AssertThrow(l > m, ExcInternalError());
   AssertThrow(l->column() == k->column() + 1, ExcInternalError());
 
-
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -76,9 +72,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

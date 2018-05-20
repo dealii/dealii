@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // TimerOutput is calling MPI functions internally when deal.II is
 // configured with MPI. This creates an error of the form:
 // *** The MPI_Allreduce() function was called before MPI_INIT was invoked.
@@ -23,13 +22,13 @@
 #include "../tests.h"
 #include <deal.II/base/timer.h>
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   {
-
     // use std::cout so that no output is saved to the logfile, because it
     // is difficult to test (timing)
     TimerOutput t(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
@@ -40,4 +39,3 @@ int main ()
 
   deallog << "ok" << std::endl;
 }
-

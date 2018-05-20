@@ -13,90 +13,81 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test interaction with p4est with a few simple coarse grids in 2d
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/base/utilities.h>
-
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (true)
+  if(true)
     {
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-      GridIn<dim> gi;
-      gi.attach_triangulation (tr);
-      std::ifstream in (SOURCE_DIR "/../grid/grid_in_02/2d.xda");
+      GridIn<dim>                               gi;
+      gi.attach_triangulation(tr);
+      std::ifstream in(SOURCE_DIR "/../grid/grid_in_02/2d.xda");
       try
         {
-          gi.read_xda (in);
+          gi.read_xda(in);
         }
-      catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
+      catch(
+        const typename Triangulation<dim>::DistortedCellList& distorted_cells)
         {
           // ignore distorted cells
           deallog << distorted_cells.distorted_cells.size()
-                  << " distorted cells after creating mesh."
-                  << std::endl;
+                  << " distorted cells after creating mesh." << std::endl;
         }
 
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-        deallog << "subdomainid = "
-                << tr.begin_active()->subdomain_id()
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        deallog << "subdomainid = " << tr.begin_active()->subdomain_id()
                 << std::endl;
 
-//      std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
+      //      std::vector<types::subdomain_id> cell_subd(tr.n_active_cells());
 
-//      GridTools::get_subdomain_association(tr, cell_subd);
-//       for (unsigned int i=0;i<tr.n_active_cells();++i)
-//  deallog << cell_subd[i] << " ";
-//       deallog << std::endl;
+      //      GridTools::get_subdomain_association(tr, cell_subd);
+      //       for (unsigned int i=0;i<tr.n_active_cells();++i)
+      //  deallog << cell_subd[i] << " ";
+      //       deallog << std::endl;
 
-      if (myid == 0)
+      if(myid == 0)
         {
           deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 
           Assert(tr.n_global_active_cells() == tr.n_active_cells(),
-                 ExcInternalError() );
+                 ExcInternalError());
         }
 
-      const unsigned int checksum = tr.get_checksum ();
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-        deallog << "Checksum: "
-                << checksum
-                << std::endl;
+      const unsigned int checksum = tr.get_checksum();
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        deallog << "Checksum: " << checksum << std::endl;
     }
 
-
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
 
@@ -106,5 +97,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

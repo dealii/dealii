@@ -13,32 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_point_value_history_h
 #define dealii_point_value_history_h
 
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/component_mask.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_postprocessor.h>
 
-#include <vector>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -54,16 +53,16 @@ namespace internal
     class PointGeometryData
     {
     public:
-      PointGeometryData(const Point <dim> &new_requested_location, const std::vector <Point <dim> > &new_locations,
-                        const std::vector <types::global_dof_index> &new_sol_indices);
-      Point <dim> requested_location;
-      std::vector <Point <dim> > support_point_locations;
-      std::vector <types::global_dof_index> solution_indices;
+      PointGeometryData(
+        const Point<dim>&                           new_requested_location,
+        const std::vector<Point<dim>>&              new_locations,
+        const std::vector<types::global_dof_index>& new_sol_indices);
+      Point<dim>                           requested_location;
+      std::vector<Point<dim>>              support_point_locations;
+      std::vector<types::global_dof_index> solution_indices;
     };
-  }
-}
-
-
+  } // namespace PointValueHistoryImplementation
+} // namespace internal
 
 /**
  * PointValueHistory tackles the overhead of plotting time (or any other
@@ -208,7 +207,7 @@ public:
    * adding points or mesh data.  This may be used for example for recording
    * external input or logging solver performance data.
    */
-  PointValueHistory (const unsigned int n_independent_variables = 0);
+  PointValueHistory(const unsigned int n_independent_variables = 0);
 
   /**
    * Constructor linking the class to a specific @p DoFHandler. This class
@@ -224,15 +223,15 @@ public:
    * making calls to @p push_back_independent as needed.  This may be used for
    * example for recording external input or logging solver performance data.
    */
-  PointValueHistory (const DoFHandler<dim> &dof_handler,
-                     const unsigned int n_independent_variables = 0);
+  PointValueHistory(const DoFHandler<dim>& dof_handler,
+                    const unsigned int     n_independent_variables = 0);
 
   /**
    * Copy constructor. This constructor can be safely called with a @p
    * PointValueHistory object that contains data, but this could be expensive
    * and should be avoided.
    */
-  PointValueHistory (const PointValueHistory &point_value_history);
+  PointValueHistory(const PointValueHistory& point_value_history);
 
   /**
    * Assignment operator. This assignment operator can be safely called once
@@ -241,12 +240,13 @@ public:
    * reinitialized later in the class. Using the assignment operator when the
    * object contains data could be expensive.
    */
-  PointValueHistory &operator=(const PointValueHistory &point_value_history);
+  PointValueHistory&
+  operator=(const PointValueHistory& point_value_history);
 
   /**
    * Deconstructor.
    */
-  ~PointValueHistory ();
+  ~PointValueHistory();
 
   /**
    * Add a single point to the class. The support points (one per component)
@@ -255,7 +255,8 @@ public:
    * is required rather use the @p add_points method since this minimizes
    * iterations over the mesh.
    */
-  void add_point(const Point <dim> &location);
+  void
+  add_point(const Point<dim>& location);
 
   /**
    * Add multiple points to the class. The support points (one per component)
@@ -267,9 +268,8 @@ public:
    * and there is always a one to one correspondence between the requested
    * point and the added point, even if a point is requested multiple times.
    */
-  void add_points (const std::vector <Point <dim> > &locations);
-
-
+  void
+  add_points(const std::vector<Point<dim>>& locations);
 
   /**
    * Put another mnemonic string (and hence @p VectorType) into the class.
@@ -278,8 +278,9 @@ public:
    * are already in the class, so @p add_field_name and @p add_points can be
    * called in any order.
    */
-  void add_field_name(const std::string &vector_name,
-                      const ComponentMask &component_mask = ComponentMask());
+  void
+  add_field_name(const std::string&   vector_name,
+                 const ComponentMask& component_mask = ComponentMask());
 
   /**
    * Put another mnemonic string (and hence @p VectorType) into the class.
@@ -289,23 +290,24 @@ public:
    * generates a std::vector 0, ..., n_components-1 and calls the previous
    * function.
    */
-  void add_field_name(const std::string &vector_name,
-                      const unsigned int n_components);
+  void
+  add_field_name(const std::string& vector_name,
+                 const unsigned int n_components);
 
   /**
    * Provide optional names for each component of a field. These names will be
    * used instead of names generated from the field name, if supplied.
    */
-  void add_component_names(const std::string &vector_name,
-                           const std::vector <std::string> &component_names);
+  void
+  add_component_names(const std::string&              vector_name,
+                      const std::vector<std::string>& component_names);
 
   /**
    * Provide optional names for the independent values. These names will be
    * used instead of "Indep_...", if supplied.
    */
-  void add_independent_names(const std::vector <std::string> &independent_names);
-
-
+  void
+  add_independent_names(const std::vector<std::string>& independent_names);
 
   /**
    * Extract values at the stored points from the VectorType supplied and add
@@ -316,9 +318,8 @@ public:
    * otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field(const std::string &name,
-                      const VectorType  &solution);
-
+  void
+  evaluate_field(const std::string& name, const VectorType& solution);
 
   /**
    * Compute values using a @p DataPostprocessor object with the @p VectorType
@@ -338,10 +339,11 @@ public:
    * each vector_name, otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field(const std::vector <std::string> &names,
-                      const VectorType                &solution,
-                      const DataPostprocessor<dim>    &data_postprocessor,
-                      const Quadrature<dim>           &quadrature);
+  void
+  evaluate_field(const std::vector<std::string>& names,
+                 const VectorType&               solution,
+                 const DataPostprocessor<dim>&   data_postprocessor,
+                 const Quadrature<dim>&          quadrature);
 
   /**
    * Construct a std::vector <std::string> containing only vector_name and
@@ -349,11 +351,11 @@ public:
    * fields use the same @p DataPostprocessor object.
    */
   template <class VectorType>
-  void evaluate_field(const std::string            &name,
-                      const VectorType             &solution,
-                      const DataPostprocessor<dim> &data_postprocessor,
-                      const Quadrature<dim>        &quadrature);
-
+  void
+  evaluate_field(const std::string&            name,
+                 const VectorType&             solution,
+                 const DataPostprocessor<dim>& data_postprocessor,
+                 const Quadrature<dim>&        quadrature);
 
   /**
    * Extract values at the points actually requested from the VectorType
@@ -368,9 +370,9 @@ public:
    * otherwise a @p ExcDataLostSync error can occur.
    */
   template <class VectorType>
-  void evaluate_field_at_requested_location(const std::string &name,
-                                            const VectorType  &solution);
-
+  void
+  evaluate_field_at_requested_location(const std::string& name,
+                                       const VectorType&  solution);
 
   /**
    * Add the key for the current dataset to the dataset. Although calling this
@@ -380,7 +382,8 @@ public:
    * dataset and that it is added before a new data set is started. This
    * prevents a @p ExcDataLostSync.
    */
-  void start_new_dataset (const double key);
+  void
+  start_new_dataset(const double key);
 
   /**
    * If independent values have been set up, this method stores these values.
@@ -388,8 +391,8 @@ public:
    * are used it must be called for every dataset. A @p ExcDataLostSync
    * exception can be thrown if this method is not called.
    */
-  void push_back_independent (const std::vector <double> &independent_values);
-
+  void
+  push_back_independent(const std::vector<double>& independent_values);
 
   /**
    * Write out a series of .gpl files named base_name + "-00.gpl", base_name +
@@ -408,9 +411,10 @@ public:
    * parameter is an empty vector of strings, and will suppress postprocessor
    * locations output.
    */
-  void write_gnuplot (const std::string &base_name,
-                      const std::vector <Point <dim> > &postprocessor_locations = std::vector <Point <dim> > ());
-
+  void
+  write_gnuplot(const std::string&             base_name,
+                const std::vector<Point<dim>>& postprocessor_locations
+                = std::vector<Point<dim>>());
 
   /**
    * Return a @p Vector with the indices of selected points flagged with a 1.
@@ -434,7 +438,8 @@ public:
    * data_out.write_gnuplot(output);
    * @endcode
    */
-  Vector<double> mark_support_locations();
+  Vector<double>
+  mark_support_locations();
 
   /**
    * Stores the actual location of each support point selected by the @p
@@ -443,7 +448,8 @@ public:
    * convenience, location is resized to the correct number of points by the
    * method.
    */
-  void get_support_locations (std::vector <std::vector<Point <dim> > > &locations);
+  void
+  get_support_locations(std::vector<std::vector<Point<dim>>>& locations);
 
   /**
    * @deprecated
@@ -453,7 +459,8 @@ public:
    * get_support_locations replaces it and reflects the fact that the points
    * returned are actually the support points.
    */
-  void get_points (std::vector <std::vector<Point <dim> > > &locations);
+  void
+  get_points(std::vector<std::vector<Point<dim>>>& locations);
 
   /**
    * Stores the actual location of the points used by the data_postprocessor.
@@ -464,8 +471,9 @@ public:
    * will find the same points. For convenience, location is resized to the
    * correct number of points by the method.
    */
-  void get_postprocessor_locations (const Quadrature<dim> &quadrature,
-                                    std::vector<Point <dim> > &locations);
+  void
+  get_postprocessor_locations(const Quadrature<dim>&   quadrature,
+                              std::vector<Point<dim>>& locations);
 
   /**
    * Once datasets have been added to the class, requests to add additional
@@ -478,8 +486,8 @@ public:
    * open or close is called while in the wrong state a @p ExcInvalidState
    * exception is thrown.
    */
-  void close();
-
+  void
+  close();
 
   /**
    * Delete the lock this object has to the @p DoFHandler used the last time
@@ -490,15 +498,16 @@ public:
    * will throw a @p ExcInvalidState exception, so if used this method should
    * be the last call to the class.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Print useful debugging information about the class, include details about
    * which support points were selected for each point and sizes of the data
    * stored.
    */
-  void status(std::ostream &out);
-
+  void
+  status(std::ostream& out);
 
   /**
    * Check the internal data sizes to test for a loss of data sync. This is
@@ -508,7 +517,8 @@ public:
    * = @p true they must be exactly equal.
    */
 
-  bool deep_check (const bool strict);
+  bool
+  deep_check(const bool strict);
 
   /**
    * Exception
@@ -520,44 +530,46 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcDataLostSync,
-                   "This error is thrown to indicate that the data sets appear to be out of "
-                   "sync. The class requires that the number of dataset keys is the same as "
-                   "the number of independent values sets and mesh linked value sets. The "
-                   "number of each of these is allowed to differ by one to allow new values "
-                   "to be added with out restricting the order the user choses to do so. "
-                   "Special cases of no FHandler and no independent values should not "
-                   "trigger this error.");
-
-
-  /**
-   * Exception
-   */
-  DeclExceptionMsg(ExcDoFHandlerRequired,
-                   "A method which requires access to a @p DoFHandler to be meaningful has "
-                   "been called when have_dof_handler is false (most likely due to default "
-                   "constructor being called). Only independent variables may be logged with "
-                   "no DoFHandler.");
+  DeclExceptionMsg(
+    ExcDataLostSync,
+    "This error is thrown to indicate that the data sets appear to be out of "
+    "sync. The class requires that the number of dataset keys is the same as "
+    "the number of independent values sets and mesh linked value sets. The "
+    "number of each of these is allowed to differ by one to allow new values "
+    "to be added with out restricting the order the user choses to do so. "
+    "Special cases of no FHandler and no independent values should not "
+    "trigger this error.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcDoFHandlerChanged,
-                   "The triangulation has been refined or coarsened in some way. This "
-                   "suggests that the internal DoF indices stored by the current "
-                   "object are no longer meaningful.");
+  DeclExceptionMsg(
+    ExcDoFHandlerRequired,
+    "A method which requires access to a @p DoFHandler to be meaningful has "
+    "been called when have_dof_handler is false (most likely due to default "
+    "constructor being called). Only independent variables may be logged with "
+    "no DoFHandler.");
+
+  /**
+   * Exception
+   */
+  DeclExceptionMsg(
+    ExcDoFHandlerChanged,
+    "The triangulation has been refined or coarsened in some way. This "
+    "suggests that the internal DoF indices stored by the current "
+    "object are no longer meaningful.");
 
 private:
   /**
    * Stores keys, values on the abscissa. This will often be time, but
    * possibly time step, iteration etc.
    */
-  std::vector <double> dataset_key;
+  std::vector<double> dataset_key;
 
   /**
    * Values that do not depend on grid location.
    */
-  std::vector <std::vector <double> > independent_values;
+  std::vector<std::vector<double>> independent_values;
 
   /**
    * Save a vector listing component names associated with a
@@ -573,26 +585,24 @@ private:
    * scalar mnemonics will only have one component per point. Vector
    * components are strictly FE.n_components () long.
    */
-  std::map <std::string, std::vector <std::vector <double> > > data_store;
+  std::map<std::string, std::vector<std::vector<double>>> data_store;
 
   /**
    * Save a component mask for each mnemonic.
    */
-  std::map <std::string, ComponentMask> component_mask;
-
+  std::map<std::string, ComponentMask> component_mask;
 
   /**
    * Save a vector listing component names associated with a mnemonic. This
    * will be an empty vector if the user does not supplies names.
    */
-  std::map <std::string, std::vector<std::string> > component_names_map;
+  std::map<std::string, std::vector<std::string>> component_names_map;
 
   /**
    * Save the location and other mesh information about support points.
    */
-  std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >
-  point_geometry_data;
-
+  std::vector<internal::PointValueHistoryImplementation::PointGeometryData<dim>>
+    point_geometry_data;
 
   /**
    * Used to enforce @p closed state for some methods.
@@ -604,13 +614,11 @@ private:
    */
   bool cleared;
 
-
   /**
    * A smart pointer to the dof_handler supplied to the constructor. This can
    * be released by calling @p clear().
    */
-  SmartPointer<const DoFHandler<dim>,PointValueHistory<dim> > dof_handler;
-
+  SmartPointer<const DoFHandler<dim>, PointValueHistory<dim>> dof_handler;
 
   /**
    * Variable to check if the triangulation has changed. If it has changed,
@@ -635,7 +643,6 @@ private:
    */
   unsigned int n_indep;
 
-
   /**
    * A function that will be triggered through signals whenever the
    * triangulation is modified.
@@ -643,9 +650,9 @@ private:
    * It is currently used to check if the triangulation has changed,
    * invalidating precomputed values.
    */
-  void tria_change_listener ();
+  void
+  tria_change_listener();
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 #endif /* dealii_point_value_history_h */

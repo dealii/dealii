@@ -13,31 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test p4est grid interaction with one cell in 2d
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/base/utilities.h>
-
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (true)
+  if(true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -45,45 +41,41 @@ void test()
       GridGenerator::hyper_cube(tr);
       //tr.refine_global(1);
 
-      Assert(tr.n_active_cells()==1, ExcInternalError());
+      Assert(tr.n_active_cells() == 1, ExcInternalError());
 
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-        deallog << "subdomainid = "
-                << tr.begin_active()->subdomain_id()
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        deallog << "subdomainid = " << tr.begin_active()->subdomain_id()
                 << std::endl;
 
-      if (myid == numproc-1)
+      if(myid == numproc - 1)
         {
-          Assert( tr.begin_active()->subdomain_id()==(unsigned int)myid,
-                  ExcInternalError() );
+          Assert(tr.begin_active()->subdomain_id() == (unsigned int) myid,
+                 ExcInternalError());
         }
       else
         {
-          Assert( tr.begin_active()->subdomain_id()==numbers::artificial_subdomain_id,
-                  ExcInternalError() );
+          Assert(tr.begin_active()->subdomain_id()
+                   == numbers::artificial_subdomain_id,
+                 ExcInternalError());
         }
 
-
-      const unsigned int checksum = tr.get_checksum ();
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-        deallog << "Checksum: "
-                << checksum
-                << std::endl;
+      const unsigned int checksum = tr.get_checksum();
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+        deallog << "Checksum: " << checksum << std::endl;
     }
 
-
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
 
@@ -93,5 +85,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

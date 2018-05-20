@@ -20,7 +20,8 @@
 
 #include <deal.II/base/template_constraints.h>
 
-int main()
+int
+main()
 {
   initlog();
 

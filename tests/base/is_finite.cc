@@ -13,17 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check numbers::is_finite
 
 #include "../tests.h"
 
-#include <limits>
 #include <cfenv>
-
+#include <limits>
 
 template <typename T>
-void check ()
+void
+check()
 {
   using namespace numbers;
 
@@ -45,15 +44,15 @@ void check ()
   deallog << std::numeric_limits<T>::max() << "   -->   ";
   deallog << is_finite(std::numeric_limits<T>::max()) << std::endl;
 
-  deallog << static_cast<T> (1) << "   -->   ";
-  deallog << is_finite(static_cast<T> (1)) << std::endl;
+  deallog << static_cast<T>(1) << "   -->   ";
+  deallog << is_finite(static_cast<T>(1)) << std::endl;
 
-  deallog << static_cast<T> (-1) << "   -->   ";
-  deallog << is_finite(static_cast<T> (-1)) << std::endl;
+  deallog << static_cast<T>(-1) << "   -->   ";
+  deallog << is_finite(static_cast<T>(-1)) << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -69,13 +68,11 @@ int main ()
   fedisableexcept(FE_INVALID);
 #endif
 
+  check<double>();
+  check<long double>();
 
-  check<double> ();
-  check<long double> ();
-
-  check<int> ();
-  check<unsigned int> ();
+  check<int>();
+  check<unsigned int>();
 
   return 0;
 }
-

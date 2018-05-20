@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // verify that VectorBase::print uses the precision parameter correctly and
 // restores the previous value of the stream precision
 
@@ -23,8 +21,8 @@
 #include <iostream>
 #include <vector>
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -34,22 +32,23 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 5, 5);
-        for (unsigned int k=0; k<v.size(); ++k)
-          v(k) = PetscScalar (k*1.2345678901234567,2.*k*1.2345678901234567);
+        PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 5, 5);
+        for(unsigned int k = 0; k < v.size(); ++k)
+          v(k)
+            = PetscScalar(k * 1.2345678901234567, 2. * k * 1.2345678901234567);
 
         // print with prescribed precision
         deallog << "unreadable=true,across=false" << std::endl;
-        v.print (logfile, 10, true, false);
+        v.print(logfile, 10, true, false);
 
         deallog << "unreadable=false,across=true" << std::endl;
-        v.print (logfile, 3, false, true);
+        v.print(logfile, 3, false, true);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -60,9 +59,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_tools_common.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -28,42 +27,34 @@
 // this test simply computes the matrix and outputs some of its
 // characteristics
 
-
-
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe,
-            const FiniteElement<dim> &/*fe2*/)
+check_this(const FiniteElement<dim>& fe, const FiniteElement<dim>& /*fe2*/)
 {
-  deallog << std::setprecision (9);
+  deallog << std::setprecision(9);
 
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really
   // work
-  if (fe.n_components() != 1)
+  if(fe.n_components() != 1)
     return;
 
   // ignore this check if this fe has already
   // been treated
   static std::set<std::string> already_checked;
-  if (already_checked.find(fe.get_name()) != already_checked.end())
+  if(already_checked.find(fe.get_name()) != already_checked.end())
     return;
-  already_checked.insert (fe.get_name());
-
+  already_checked.insert(fe.get_name());
 
   // test with different quadrature formulas
-  QGauss<dim> q_lhs(fe.degree+1);
-  QGauss<dim> q_rhs(fe.degree+1>2 ? fe.degree+1-2 : 1);
+  QGauss<dim> q_lhs(fe.degree + 1);
+  QGauss<dim> q_rhs(fe.degree + 1 > 2 ? fe.degree + 1 - 2 : 1);
 
-  FullMatrix<double> X (fe.dofs_per_cell,
-                        q_rhs.size());
+  FullMatrix<double> X(fe.dofs_per_cell, q_rhs.size());
 
-  FETools::compute_projection_from_quadrature_points_matrix (fe,
-                                                             q_lhs, q_rhs,
-                                                             X);
+  FETools::compute_projection_from_quadrature_points_matrix(
+    fe, q_lhs, q_rhs, X);
 
-  output_matrix (X);
+  output_matrix(X);
 }
-

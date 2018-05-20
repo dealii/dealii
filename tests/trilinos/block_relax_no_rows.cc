@@ -13,49 +13,48 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Trilinos PreconditionBlock* used to fail if one processor has no locally
 // owned rows
 
 #include "../tests.h"
-#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
-
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 
 template <class Prec>
-void test()
+void
+test()
 {
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   // only proc 0 and 1 own rows
-  IndexSet rows(4*n_procs);
-  if (myid==0)
-    rows.add_range(0, 2*n_procs);
-  else if (myid==1)
-    rows.add_range(2*n_procs, 4*n_procs);
+  IndexSet rows(4 * n_procs);
+  if(myid == 0)
+    rows.add_range(0, 2 * n_procs);
+  else if(myid == 1)
+    rows.add_range(2 * n_procs, 4 * n_procs);
   rows.compress();
 
-  TrilinosWrappers::MPI::Vector src (rows, MPI_COMM_WORLD),
-                   dst (rows, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector src(rows, MPI_COMM_WORLD),
+    dst(rows, MPI_COMM_WORLD);
 
   TrilinosWrappers::SparseMatrix mat(rows, rows, MPI_COMM_WORLD);
-  for (const auto &row : rows)
+  for(const auto& row : rows)
     {
       const unsigned int i = row;
       mat.set(i, i, 100.);
-      for (unsigned int j=0; j<mat.n(); ++j)
-        if (i!=j)
-          mat.set (i,j, i*j*.5+.5);
+      for(unsigned int j = 0; j < mat.n(); ++j)
+        if(i != j)
+          mat.set(i, j, i * j * .5 + .5);
     }
 
-  for (unsigned int i=0; i<src.size(); ++i)
+  for(unsigned int i = 0; i < src.size(); ++i)
     src(i) = i;
 
-  mat.compress (VectorOperation::insert);
-  src.compress (VectorOperation::insert);
+  mat.compress(VectorOperation::insert);
+  src.compress(VectorOperation::insert);
 
-  Prec preconditioner;
+  Prec                          preconditioner;
   typename Prec::AdditionalData data;
   data.block_size = 4;
 
@@ -65,11 +64,11 @@ void test()
   deallog << "dst: " << dst.l2_norm() << std::endl;
 }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test<TrilinosWrappers::PreconditionBlockJacobi>();
   test<TrilinosWrappers::PreconditionBlockSOR>();

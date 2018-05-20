@@ -13,24 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Utilities::pack/unpack on some types.
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/point.h>
 #include <boost/serialization/utility.hpp>
+#include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
 #include <tuple>
 
 template <int dim>
-void test(const unsigned int &size)
+void
+test(const unsigned int& size)
 {
-  std::vector<Point<dim> > points(size);
-  auto a_pair = std::make_pair(1, 3.14);
+  std::vector<Point<dim>> points(size);
+  auto                    a_pair = std::make_pair(1, 3.14);
 
-  for (auto &p : points)
+  for(auto& p : points)
     p = random_point<dim>();
 
   auto a_tuple = std::make_tuple(a_pair, points);
@@ -39,25 +39,26 @@ void test(const unsigned int &size)
 
   auto tuple_unpacked = Utilities::unpack<decltype(a_tuple)>(buffer);
 
-  auto pair_unpacked = std::get<0>(tuple_unpacked);
+  auto pair_unpacked   = std::get<0>(tuple_unpacked);
   auto points_unpacked = std::get<1>(tuple_unpacked);
 
-  unsigned int i=0;
-  bool ok = (pair_unpacked == a_pair);
+  unsigned int i  = 0;
+  bool         ok = (pair_unpacked == a_pair);
 
-  for (const auto &p : points)
-    if (p.distance(points_unpacked[i++]) > 1e-12)
+  for(const auto& p : points)
+    if(p.distance(points_unpacked[i++]) > 1e-12)
       {
-        deallog << "NOT OK: "
-                << p << " != " << points_unpacked[i-1] << std::endl;
+        deallog << "NOT OK: " << p << " != " << points_unpacked[i - 1]
+                << std::endl;
         ok = false;
       }
 
-  if (ok)
+  if(ok)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

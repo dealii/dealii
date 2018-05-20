@@ -20,9 +20,7 @@
 
 #include <type_traits>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * Type trait for a serial vector, i.e. a vector class for which storage is not
@@ -45,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <typename T>
 struct is_serial_vector;
-
 
 DEAL_II_NAMESPACE_CLOSE
 

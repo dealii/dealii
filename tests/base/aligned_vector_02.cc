@@ -13,36 +13,36 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test for AlignedVector<AlignedVector<unsigned int> >
 
 #include "../tests.h"
 
 #include <deal.II/base/aligned_vector.h>
 
-
 typedef AlignedVector<unsigned int> VEC;
-typedef AlignedVector<VEC> VECVEC;
-void print_vec (VECVEC &v)
+typedef AlignedVector<VEC>          VECVEC;
+void
+print_vec(VECVEC& v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
       deallog << "[";
-      for (unsigned int j=0; j<v[i].size(); ++j)
+      for(unsigned int j = 0; j < v[i].size(); ++j)
         deallog << v[i][j] << " ";
       deallog << "]";
     }
   deallog << std::endl;
 }
 
-void test ()
+void
+test()
 {
   typedef AlignedVector<unsigned int> VEC;
-  VEC a(4);
+  VEC                                 a(4);
   a[0] = 2;
   a[1] = 1;
   a[2] = 42;
-  VECVEC v (2);
+  VECVEC v(2);
   deallog << "Constructor: ";
   print_vec(v);
 
@@ -52,41 +52,39 @@ void test ()
   deallog << "Assignment: ";
   print_vec(v);
 
-  VECVEC w (v);
+  VECVEC w(v);
   deallog << "Assignment vector: ";
   print_vec(w);
   deallog << "Data consistency after assignment: ";
   print_vec(v);
 
   a[1] = 41;
-  a.push_back (100);
+  a.push_back(100);
   v.push_back(a);
   deallog << "Insertion: ";
-  print_vec (v);
+  print_vec(v);
 
   v.resize(1);
   deallog << "Shrinking: ";
-  print_vec (v);
+  print_vec(v);
 
   v.reserve(100);
   deallog << "Reserve: ";
-  print_vec (v);
+  print_vec(v);
 
-  v.resize (10);
+  v.resize(10);
   deallog << "Resize: ";
-  print_vec (v);
+  print_vec(v);
 
   v.resize(0);
   deallog << "Clear: ";
-  print_vec (v);
+  print_vec(v);
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

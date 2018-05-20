@@ -16,10 +16,8 @@
 #ifndef dealii_mesh_worker_assemble_flags_h
 #define dealii_mesh_worker_assemble_flags_h
 
-
 #include <deal.II/base/config.h>
 #include <vector>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -28,7 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-
   /**
    * The enum type given to the mesh_loop() function, telling that function which
    * elements need to be assembled.
@@ -96,8 +93,7 @@ namespace MeshWorker
      */
     work_on_faces = assemble_own_interior_faces_once
                     | assemble_own_interior_faces_both
-                    | assemble_ghost_faces_once
-                    | assemble_ghost_faces_both,
+                    | assemble_ghost_faces_once | assemble_ghost_faces_both,
 
     /**
      * Combination of flags to determine if any work is done on the boundary
@@ -106,27 +102,32 @@ namespace MeshWorker
     work_on_boundary = assemble_boundary_faces,
   };
 
-
   /**
    * Output operator which outputs assemble flags as a set of or'd text values.
    *
    * @ref AssembleFlags
    */
   template <class StreamType>
-  inline
-  StreamType &operator << (StreamType &s, AssembleFlags u)
+  inline StreamType&
+  operator<<(StreamType& s, AssembleFlags u)
   {
     s << " AssembleFlags";
-    if (u & assemble_own_cells        ) s << "|own_cells"        ;
-    if (u & assemble_own_interior_faces_once   ) s << "|own_faces_once"   ;
-    if (u & assemble_own_interior_faces_both   ) s << "|own_faces_both"   ;
-    if (u & assemble_ghost_cells      ) s << "|ghost_cells"      ;
-    if (u & assemble_ghost_faces_once ) s << "|ghost_faces_once" ;
-    if (u & assemble_ghost_faces_both ) s << "|ghost_faces_both" ;
-    if (u & assemble_boundary_faces   ) s << "|boundary_faces"   ;
+    if(u & assemble_own_cells)
+      s << "|own_cells";
+    if(u & assemble_own_interior_faces_once)
+      s << "|own_faces_once";
+    if(u & assemble_own_interior_faces_both)
+      s << "|own_faces_both";
+    if(u & assemble_ghost_cells)
+      s << "|ghost_cells";
+    if(u & assemble_ghost_faces_once)
+      s << "|ghost_faces_once";
+    if(u & assemble_ghost_faces_both)
+      s << "|ghost_faces_both";
+    if(u & assemble_boundary_faces)
+      s << "|boundary_faces";
     return s;
   }
-
 
   /**
    * Global operator which returns an object in which all bits are set which are
@@ -137,17 +138,12 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  inline
-  AssembleFlags
-  operator | (AssembleFlags f1, AssembleFlags f2)
+  inline AssembleFlags
+  operator|(AssembleFlags f1, AssembleFlags f2)
   {
-    return static_cast<AssembleFlags> (
-             static_cast<unsigned int> (f1) |
-             static_cast<unsigned int> (f2));
+    return static_cast<AssembleFlags>(static_cast<unsigned int>(f1)
+                                      | static_cast<unsigned int>(f2));
   }
-
-
-
 
   /**
    * Global operator which sets the bits from the second argument also in the
@@ -155,14 +151,12 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  inline
-  AssembleFlags &
-  operator |= (AssembleFlags &f1, AssembleFlags f2)
+  inline AssembleFlags&
+  operator|=(AssembleFlags& f1, AssembleFlags f2)
   {
     f1 = f1 | f2;
     return f1;
   }
-
 
   /**
    * Global operator which returns an object in which all bits are set which are
@@ -173,15 +167,11 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  inline
-  AssembleFlags
-  operator & (AssembleFlags f1, AssembleFlags f2)
+  inline AssembleFlags operator&(AssembleFlags f1, AssembleFlags f2)
   {
-    return static_cast<AssembleFlags> (
-             static_cast<unsigned int> (f1) &
-             static_cast<unsigned int> (f2));
+    return static_cast<AssembleFlags>(static_cast<unsigned int>(f1)
+                                      & static_cast<unsigned int>(f2));
   }
-
 
   /**
    * Global operator which clears all the bits in the first argument if they are
@@ -189,14 +179,13 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  inline
-  AssembleFlags &
-  operator &= (AssembleFlags &f1, AssembleFlags f2)
+  inline AssembleFlags&
+  operator&=(AssembleFlags& f1, AssembleFlags f2)
   {
     f1 = f1 & f2;
     return f1;
   }
-}
+} // namespace MeshWorker
 
 /*@}*/
 

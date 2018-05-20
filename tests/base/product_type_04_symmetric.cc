@@ -13,32 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test that the product between a symmetric tensor and an integer behaves just
 // like that of the tensor and the integer-converted-to-double
 
 #include "../tests.h"
-#include <typeinfo>
 #include <complex>
+#include <typeinfo>
 
-#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/template_constraints.h>
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
   {
-    SymmetricTensor<2,2> t;
+    SymmetricTensor<2, 2> t;
     t[0][0] = 1.23456;
     t[0][1] = 7.87965;
     t[1][1] = 3.35792;
-    AssertThrow (7*t == 7.0 * t, ExcInternalError());
-    AssertThrow (t*7 == t * 7.0, ExcInternalError());
-    AssertThrow (t*7 == 7*t, ExcInternalError());
-    AssertThrow ((t*7 - (t+t+t+t+t+t+t)).norm() < 1e-12, ExcInternalError());
+    AssertThrow(7 * t == 7.0 * t, ExcInternalError());
+    AssertThrow(t * 7 == t * 7.0, ExcInternalError());
+    AssertThrow(t * 7 == 7 * t, ExcInternalError());
+    AssertThrow((t * 7 - (t + t + t + t + t + t + t)).norm() < 1e-12,
+                ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

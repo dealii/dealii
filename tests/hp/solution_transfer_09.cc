@@ -13,27 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Like _07 but with all same fe indices. This triggered yet another place
 // where we had the same kind of error.
 
 #include "../tests.h"
-#include <sstream>
 #include <iostream>
-
+#include <sstream>
 
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/hp/fe_collection.h>
 
@@ -43,57 +40,56 @@
 
 using namespace dealii;
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
 
-  hp::FECollection<dim>     fe_collection;
+  hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(1));
   fe_collection.push_back(FE_Q<dim>(2));
 
   hp::DoFHandler<dim> dof_handler(triangulation);
   dof_handler.begin_active()->set_active_fe_index(0);
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   // Init solution
   Vector<double> solution(dof_handler.n_dofs());
   solution = 1.0;
 
-
   // set refine flag for the only cell we have, then do the refinement
-  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim> >
-  solution_trans(dof_handler);
-  dof_handler.begin_active()->set_refine_flag ();
+  SolutionTransfer<dim, Vector<double>, hp::DoFHandler<dim>> solution_trans(
+    dof_handler);
+  dof_handler.begin_active()->set_refine_flag();
   solution_trans.prepare_for_pure_refinement();
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
   // now set the active_fe_index flags on the new set of fine level cells
-  for (unsigned int c=0; c<dof_handler.begin(0)->n_children(); ++c)
+  for(unsigned int c = 0; c < dof_handler.begin(0)->n_children(); ++c)
     dof_handler.begin(0)->child(c)->set_active_fe_index(0);
 
   // distribute dofs and transfer solution there
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
   solution_trans.refine_interpolate(solution, new_solution);
 
   // we should now have only 1s in the new_solution vector
-  for (unsigned int i=0; i<new_solution.size(); ++i)
-    AssertThrow (new_solution[i] == 1, ExcInternalError());
+  for(unsigned int i = 0; i < new_solution.size(); ++i)
+    AssertThrow(new_solution[i] == 1, ExcInternalError());
 
   // we are good if we made it to here
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 }

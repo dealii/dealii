@@ -37,15 +37,17 @@ DEAL_II_NAMESPACE_OPEN
 //bool and then an integer and then a double, etc. Verify that this is
 //actually the case.
 
-template <int dim, int spacedim> class Triangulation;
-template <class Accessor> class TriaRawIterator;
-template <int, int, int> class TriaAccessor;
+template <int dim, int spacedim>
+class Triangulation;
+template <class Accessor>
+class TriaRawIterator;
+template <int, int, int>
+class TriaAccessor;
 
 namespace internal
 {
   namespace TriangulationImplementation
   {
-
     /**
      * General template for information belonging to the geometrical objects
      * of a triangulation, i.e. lines, quads, hexahedra...  Apart from the
@@ -84,14 +86,14 @@ namespace internal
        * called active if it has no children. The function
        * TriaAccessorBase::has_children() tests for this.
        */
-      std::vector<int>  children;
+      std::vector<int> children;
 
       /**
        * Store the refinement case each of the cells is refined with. This
        * vector might be replaced by vector<vector<bool> > (dim, vector<bool>
        * (n_cells)) which is more memory efficient.
        */
-      std::vector<RefinementCase<G::dimension> > refinement_cases;
+      std::vector<RefinementCase<G::dimension>> refinement_cases;
 
       /**
        * Vector storing whether an object is used in the @p cells vector.
@@ -114,7 +116,6 @@ namespace internal
        */
       std::vector<bool> user_flags;
 
-
       /**
        * We use this union to store boundary and material data. Because only
        * one out of these two is actually needed here, we use an union.
@@ -127,25 +128,24 @@ namespace internal
           types::material_id material_id;
         };
 
-
         /**
          * Default constructor.
          */
-        BoundaryOrMaterialId ();
+        BoundaryOrMaterialId();
 
         /**
          * Return the size of objects of this kind.
          */
-        static
-        std::size_t memory_consumption ();
+        static std::size_t
+        memory_consumption();
 
         /**
          * Read or write the data of this object to or from a stream for the
          * purpose of serialization
          */
         template <class Archive>
-        void serialize(Archive &ar,
-                       const unsigned int version);
+        void
+        serialize(Archive& ar, const unsigned int version);
       };
 
       /**
@@ -180,8 +180,9 @@ namespace internal
        * In 2D e.g. refined lines have to be stored in pairs, whereas new
        * lines in the interior of refined cells can be stored as single lines.
        */
-      void reserve_space (const unsigned int new_objs_in_pairs,
-                          const unsigned int new_objs_single = 0);
+      void
+      reserve_space(const unsigned int new_objs_in_pairs,
+                    const unsigned int new_objs_single = 0);
 
       /**
        * Return an iterator to the next free slot for a single object. This
@@ -195,8 +196,8 @@ namespace internal
        * @todo This function is not instantiated for the codim-one case
        */
       template <int dim, int spacedim>
-      dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
-      next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria);
+      dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
+      next_free_single_object(const dealii::Triangulation<dim, spacedim>& tria);
 
       /**
        * Return an iterator to the next free slot for a pair of objects. This
@@ -210,22 +211,23 @@ namespace internal
        * @todo This function is not instantiated for the codim-one case
        */
       template <int dim, int spacedim>
-      dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
-      next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria);
+      dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
+      next_free_pair_object(const dealii::Triangulation<dim, spacedim>& tria);
 
       /**
        * Return an iterator to the next free slot for a pair of hexes. Only
        * implemented for <code>G=Hexahedron</code>.
        */
       template <int dim, int spacedim>
-      typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
-      next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
-                     const unsigned int               level);
+      typename dealii::Triangulation<dim, spacedim>::raw_hex_iterator
+      next_free_hex(const dealii::Triangulation<dim, spacedim>& tria,
+                    const unsigned int                          level);
 
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * The orientation of the face number <code>face</code> of the cell with
@@ -241,74 +243,84 @@ namespace internal
        * with the base class function instead of the derived class. Still, we
        * do not want to make it virtual for efficiency reasons.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
-
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
       /**
        * Access to user pointers.
        */
-      void  *&user_pointer(const unsigned int i);
+      void*&
+      user_pointer(const unsigned int i);
 
       /**
        * Read-only access to user pointers.
        */
-      const void *user_pointer(const unsigned int i) const;
+      const void*
+      user_pointer(const unsigned int i) const;
 
       /**
        * Access to user indices.
        */
-      unsigned int &user_index(const unsigned int i);
+      unsigned int&
+      user_index(const unsigned int i);
 
       /**
        * Read-only access to user pointers.
        */
-      unsigned int user_index(const unsigned int i) const;
+      unsigned int
+      user_index(const unsigned int i) const;
 
       /**
        * Reset user data to zero.
        */
-      void clear_user_data(const unsigned int i);
+      void
+      clear_user_data(const unsigned int i);
 
       /**
        * Clear all user pointers or indices and reset their type, such that
        * the next access may be either or.
        */
-      void clear_user_data();
+      void
+      clear_user_data();
 
       /**
        * Clear all user flags.
        */
-      void clear_user_flags();
+      void
+      clear_user_flags();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory(const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
 
       /**
        * Exception
        * @ingroup Exceptions
        */
-      DeclException2 (ExcMemoryInexact,
-                      int, int,
-                      << "The containers have sizes " << arg1 << " and "
-                      << arg2 << ", which is not as expected.");
+      DeclException2(ExcMemoryInexact,
+                     int,
+                     int,
+                     << "The containers have sizes " << arg1 << " and " << arg2
+                     << ", which is not as expected.");
 
       /**
        * dealii::Triangulation objects can either access a user pointer or a
@@ -317,7 +329,7 @@ namespace internal
        *
        * @ingroup Exceptions
        */
-      DeclException0 (ExcPointerIndexClash);
+      DeclException0(ExcPointerIndexClash);
 
     protected:
       /**
@@ -344,7 +356,7 @@ namespace internal
         {
           /// The entry used as user
           /// pointer.
-          void *p;
+          void* p;
           /// The entry used as user
           /// index.
           unsigned int i;
@@ -363,7 +375,8 @@ namespace internal
          * serialization.
          */
         template <class Archive>
-        void serialize (Archive &ar, const unsigned int version);
+        void
+        serialize(Archive& ar, const unsigned int version);
       };
 
       /**
@@ -378,7 +391,6 @@ namespace internal
         /// UserData contains indices.
         data_index
       };
-
 
       /**
        * Pointer which is not used by the library but may be accessed and set
@@ -400,7 +412,7 @@ namespace internal
      * a class TriaObjectsHex, which additionally contains a bool-vector of
      * the face-orientations.
      */
-    class TriaObjectsHex : public TriaObjects<TriaObject<3> >
+    class TriaObjectsHex : public TriaObjects<TriaObject<3>>
     {
     public:
       /**
@@ -410,8 +422,8 @@ namespace internal
        * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
        * they point in opposite direction.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
-
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
       /**
        * For edges, we enforce a standard convention that opposite
@@ -453,35 +465,38 @@ namespace internal
        * <code>vector::reserve()</code>, but does really append the needed
        * elements.
        */
-      void reserve_space (const unsigned int new_objs);
+      void
+      reserve_space(const unsigned int new_objs);
 
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory(const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
-
 
     /**
      * For quadrilaterals in 3D the data of TriaObjects needs to be extended,
@@ -489,7 +504,7 @@ namespace internal
      * therefore we declare a class TriaObjectsQuad3D, which additionally
      * contains a bool-vector of the line-orientations.
      */
-    class TriaObjectsQuad3D: public TriaObjects<TriaObject<2> >
+    class TriaObjectsQuad3D : public TriaObjects<TriaObject<2>>
     {
     public:
       /**
@@ -499,8 +514,8 @@ namespace internal
        * (GeometryInfo::unit_normal_orientation) and <code>false</code> if
        * they point in opposite direction.
        */
-      bool face_orientation(const unsigned int cell, const unsigned int face) const;
-
+      bool
+      face_orientation(const unsigned int cell, const unsigned int face) const;
 
       /**
        * In effect, this field has <code>4*n_quads</code> elements, being the
@@ -515,62 +530,61 @@ namespace internal
        * not only call <code>vector::reserve()</code>, but does really append
        * the needed elements.
        */
-      void reserve_space (const unsigned int new_quads_in_pairs,
-                          const unsigned int new_quads_single = 0);
+      void
+      reserve_space(const unsigned int new_quads_in_pairs,
+                    const unsigned int new_quads_single = 0);
 
       /**
        * Clear all the data contained in this object.
        */
-      void clear();
+      void
+      clear();
 
       /**
        * Check the memory consistency of the different containers. Should only
        * be called with the preprocessor flag @p DEBUG set. The function
        * should be called from the functions of the higher TriaLevel classes.
        */
-      void monitor_memory (const unsigned int true_dimension) const;
+      void
+      monitor_memory(const unsigned int true_dimension) const;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
 
-//----------------------------------------------------------------------//
-
+    //----------------------------------------------------------------------//
 
     template <typename G>
-    inline
-    TriaObjects<G>::BoundaryOrMaterialId::BoundaryOrMaterialId ()
+    inline TriaObjects<G>::BoundaryOrMaterialId::BoundaryOrMaterialId()
     {
       material_id = numbers::invalid_material_id;
     }
 
-
-
     template <typename G>
     std::size_t
-    TriaObjects<G>::BoundaryOrMaterialId::memory_consumption ()
+    TriaObjects<G>::BoundaryOrMaterialId::memory_consumption()
     {
       return sizeof(BoundaryOrMaterialId);
     }
 
-
-
     template <typename G>
     template <class Archive>
     void
-    TriaObjects<G>::BoundaryOrMaterialId::serialize(Archive &ar,
-                                                    const unsigned int /*version*/)
+    TriaObjects<G>::BoundaryOrMaterialId::serialize(
+      Archive& ar,
+      const unsigned int /*version*/)
     {
       // serialize this
       // structure by
@@ -580,282 +594,255 @@ namespace internal
       // in order to make
       // sure we get all
       // bits
-      if (sizeof(material_id) > sizeof(boundary_id))
-        ar &material_id;
+      if(sizeof(material_id) > sizeof(boundary_id))
+        ar& material_id;
       else
-        ar &boundary_id;
+        ar& boundary_id;
     }
 
-
     template <typename G>
-    inline
-    bool
-    TriaObjects<G>::
-    face_orientation(const unsigned int, const unsigned int) const
+    inline bool
+    TriaObjects<G>::face_orientation(const unsigned int,
+                                     const unsigned int) const
     {
       return true;
     }
 
-
     template <typename G>
-    inline
-    void *&
-    TriaObjects<G>::user_pointer (const unsigned int i)
+    inline void*&
+    TriaObjects<G>::user_pointer(const unsigned int i)
     {
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].p;
     }
 
-
     template <typename G>
-    inline
-    const void *
-    TriaObjects<G>::user_pointer (const unsigned int i) const
+    inline const void*
+    TriaObjects<G>::user_pointer(const unsigned int i) const
     {
       Assert(user_data_type == data_unknown || user_data_type == data_pointer,
              ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].p;
     }
 
-
     template <typename G>
-    inline
-    unsigned int &
-    TriaObjects<G>::user_index (const unsigned int i)
+    inline unsigned int&
+    TriaObjects<G>::user_index(const unsigned int i)
     {
       Assert(user_data_type == data_unknown || user_data_type == data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].i;
     }
 
-
     template <typename G>
-    inline
-    void
-    TriaObjects<G>::clear_user_data (const unsigned int i)
+    inline void
+    TriaObjects<G>::clear_user_data(const unsigned int i)
     {
-      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
       user_data[i].i = 0;
     }
 
-
     template <typename G>
-    inline
-    TriaObjects<G>::TriaObjects()
-      :
-      next_free_single (numbers::invalid_unsigned_int),
-      next_free_pair (numbers::invalid_unsigned_int),
-      reverse_order_next_free_single (false),
-      user_data_type(data_unknown)
+    inline TriaObjects<G>::TriaObjects()
+      : next_free_single(numbers::invalid_unsigned_int),
+        next_free_pair(numbers::invalid_unsigned_int),
+        reverse_order_next_free_single(false),
+        user_data_type(data_unknown)
     {}
 
-
     template <typename G>
-    inline
-    unsigned int TriaObjects<G>::user_index (const unsigned int i) const
+    inline unsigned int
+    TriaObjects<G>::user_index(const unsigned int i) const
     {
       Assert(user_data_type == data_unknown || user_data_type == data_index,
              ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
+      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].i;
     }
 
-
     template <typename G>
-    inline
-    void TriaObjects<G>::clear_user_data ()
+    inline void
+    TriaObjects<G>::clear_user_data()
     {
       user_data_type = data_unknown;
-      for (unsigned int i=0; i<user_data.size(); ++i)
+      for(unsigned int i = 0; i < user_data.size(); ++i)
         user_data[i].p = nullptr;
     }
 
-
     template <typename G>
-    inline
-    void TriaObjects<G>::clear_user_flags ()
+    inline void
+    TriaObjects<G>::clear_user_flags()
     {
-      user_flags.assign(user_flags.size(),false);
+      user_flags.assign(user_flags.size(), false);
     }
-
 
     template <typename G>
     template <class Archive>
     void
-    TriaObjects<G>::UserData::serialize (Archive &ar,
-                                         const unsigned int)
+    TriaObjects<G>::UserData::serialize(Archive& ar, const unsigned int)
     {
       // serialize this as an integer
-      ar &i;
+      ar& i;
     }
-
-
 
     template <typename G>
     template <class Archive>
-    void TriaObjects<G>::serialize(Archive &ar,
-                                   const unsigned int)
+    void
+    TriaObjects<G>::serialize(Archive& ar, const unsigned int)
     {
-      ar &cells &children;
-      ar &refinement_cases;
-      ar &used;
-      ar &user_flags;
-      ar &boundary_or_material_id;
-      ar &manifold_id;
-      ar &next_free_single &next_free_pair &reverse_order_next_free_single;
-      ar &user_data &user_data_type;
+      ar& cells& children;
+      ar&        refinement_cases;
+      ar&        used;
+      ar&        user_flags;
+      ar&        boundary_or_material_id;
+      ar&        manifold_id;
+      ar& next_free_single& next_free_pair& reverse_order_next_free_single;
+      ar& user_data& user_data_type;
     }
-
 
     template <class Archive>
-    void TriaObjectsHex::serialize(Archive &ar,
-                                   const unsigned int version)
+    void
+    TriaObjectsHex::serialize(Archive& ar, const unsigned int version)
     {
-      this->TriaObjects<TriaObject<3> >::serialize (ar, version);
+      this->TriaObjects<TriaObject<3>>::serialize(ar, version);
 
-      ar &face_orientations &face_flips &face_rotations;
+      ar& face_orientations& face_flips& face_rotations;
     }
-
 
     template <class Archive>
-    void TriaObjectsQuad3D::serialize(Archive &ar,
-                                      const unsigned int version)
+    void
+    TriaObjectsQuad3D::serialize(Archive& ar, const unsigned int version)
     {
-      this->TriaObjects<TriaObject<2> >::serialize (ar, version);
+      this->TriaObjects<TriaObject<2>>::serialize(ar, version);
 
-      ar &line_orientations;
+      ar& line_orientations;
     }
 
+    //----------------------------------------------------------------------//
 
-//----------------------------------------------------------------------//
-
-    inline
-    bool
+    inline bool
     TriaObjectsHex::face_orientation(const unsigned int cell,
                                      const unsigned int face) const
     {
-      Assert (cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-              ExcIndexRange(0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
-      Assert (face < GeometryInfo<3>::faces_per_cell,
-              ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
+      Assert(
+        cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
+        ExcIndexRange(
+          0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));
+      Assert(face < GeometryInfo<3>::faces_per_cell,
+             ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
 
-      return face_orientations[cell * GeometryInfo<3>::faces_per_cell
-                               + face];
+      return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face];
     }
 
-//----------------------------------------------------------------------//
+    //----------------------------------------------------------------------//
 
-    inline
-    bool
-    TriaObjectsQuad3D::face_orientation(const unsigned int cell, const unsigned int face) const
+    inline bool
+    TriaObjectsQuad3D::face_orientation(const unsigned int cell,
+                                        const unsigned int face) const
     {
-      return line_orientations[cell * GeometryInfo<2>::faces_per_cell
-                               + face];
+      return line_orientations[cell * GeometryInfo<2>::faces_per_cell + face];
     }
 
-
-//----------------------------------------------------------------------//
+    //----------------------------------------------------------------------//
 
     template <class G>
     template <int dim, int spacedim>
-    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
-    TriaObjects<G>::next_free_single_object (const dealii::Triangulation<dim,spacedim> &tria)
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
+    TriaObjects<G>::next_free_single_object(
+      const dealii::Triangulation<dim, spacedim>& tria)
     {
       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
-      int pos=next_free_single,
-          last=used.size()-1;
-      if (!reverse_order_next_free_single)
+      int pos = next_free_single, last = used.size() - 1;
+      if(!reverse_order_next_free_single)
         {
           // first sweep forward, only use really single slots, do not use
           // pair slots
-          for (; pos<last; ++pos)
-            if (!used[pos])
-              if (used[++pos])
+          for(; pos < last; ++pos)
+            if(!used[pos])
+              if(used[++pos])
                 {
                   // this was a single slot
-                  pos-=1;
+                  pos -= 1;
                   break;
                 }
-          if (pos>=last)
+          if(pos >= last)
             {
-              reverse_order_next_free_single=true;
-              next_free_single=used.size()-1;
-              pos=used.size()-1;
+              reverse_order_next_free_single = true;
+              next_free_single               = used.size() - 1;
+              pos                            = used.size() - 1;
             }
           else
-            next_free_single=pos+1;
+            next_free_single = pos + 1;
         }
 
-      if (reverse_order_next_free_single)
+      if(reverse_order_next_free_single)
         {
           // second sweep, use all slots, even
           // in pairs
-          for (; pos>=0; --pos)
-            if (!used[pos])
+          for(; pos >= 0; --pos)
+            if(!used[pos])
               break;
-          if (pos>0)
-            next_free_single=pos-1;
+          if(pos > 0)
+            next_free_single = pos - 1;
           else
             // no valid single object anymore
-            return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
+            return dealii::TriaRawIterator<
+              dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, -1, -1);
         }
 
-      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
+      return dealii::TriaRawIterator<
+        dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, 0, pos);
     }
-
-
 
     template <class G>
     template <int dim, int spacedim>
-    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >
-    TriaObjects<G>::next_free_pair_object (const dealii::Triangulation<dim,spacedim> &tria)
+    dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension, dim, spacedim>>
+    TriaObjects<G>::next_free_pair_object(
+      const dealii::Triangulation<dim, spacedim>& tria)
     {
       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
 
-      int pos=next_free_pair,
-          last=used.size()-1;
-      for (; pos<last; ++pos)
-        if (!used[pos])
-          if (!used[++pos])
+      int pos = next_free_pair, last = used.size() - 1;
+      for(; pos < last; ++pos)
+        if(!used[pos])
+          if(!used[++pos])
             {
               // this was a pair slot
-              pos-=1;
+              pos -= 1;
               break;
             }
-      if (pos>=last)
+      if(pos >= last)
         // no free slot
-        return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, -1, -1);
+        return dealii::TriaRawIterator<
+          dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, -1, -1);
       else
-        next_free_pair=pos+2;
+        next_free_pair = pos + 2;
 
-      return dealii::TriaRawIterator<dealii::TriaAccessor<G::dimension,dim,spacedim> >(&tria, 0, pos);
+      return dealii::TriaRawIterator<
+        dealii::TriaAccessor<G::dimension, dim, spacedim>>(&tria, 0, pos);
     }
 
-
-
-// declaration of explicit specializations
+    // declaration of explicit specializations
 
     template <>
     void
-    TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const;
+    TriaObjects<TriaObject<2>>::monitor_memory(const unsigned int) const;
 
-  }
-}
-
-
+  } // namespace TriangulationImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

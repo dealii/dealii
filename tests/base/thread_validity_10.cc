@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // see that we can query a thread object that has never been
 // assigned
 
@@ -22,33 +21,28 @@
 
 #include <deal.II/base/thread_management.h>
 
-
 Threads::Mutex mutex;
-int spin_lock = 0;
+int            spin_lock = 0;
 
-
-int worker ()
+int
+worker()
 {
-  sleep (1);
+  sleep(1);
   return 42;
 }
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
   Threads::Thread<int> t;
   // join non-existing thread
-  deallog << (t.valid() ? "true" : "false")
-          << std::endl;
+  deallog << (t.valid() ? "true" : "false") << std::endl;
 
   // now assign a thread object and
   // wait for it
-  t = Threads::new_thread (worker);
-  deallog << (t.valid() ? "true" : "false")
-          << std::endl;
-  deallog << "return value = " << t.return_value()
-          << std::endl;
+  t = Threads::new_thread(worker);
+  deallog << (t.valid() ? "true" : "false") << std::endl;
+  deallog << "return value = " << t.return_value() << std::endl;
 }

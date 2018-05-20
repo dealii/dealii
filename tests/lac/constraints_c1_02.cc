@@ -24,37 +24,35 @@
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 using namespace dealii;
-
-
 
 void
 run()
 {
-  ConstraintMatrix     constraints;
+  ConstraintMatrix constraints;
 
   {
     constraints.add_line(7);
-    std::vector<std::pair<types::global_dof_index, double> > rhs;
-    rhs.push_back(std::pair<types::global_dof_index, double>(41,1.0));
-    rhs.push_back(std::pair<types::global_dof_index, double>(42,1.0));
+    std::vector<std::pair<types::global_dof_index, double>> rhs;
+    rhs.push_back(std::pair<types::global_dof_index, double>(41, 1.0));
+    rhs.push_back(std::pair<types::global_dof_index, double>(42, 1.0));
     constraints.add_entries(7, rhs);
   }
 
   {
     constraints.add_line(41);
-    std::vector<std::pair<types::global_dof_index, double> > rhs;
-    rhs.push_back(std::pair<types::global_dof_index, double>(42,1.0));
+    std::vector<std::pair<types::global_dof_index, double>> rhs;
+    rhs.push_back(std::pair<types::global_dof_index, double>(42, 1.0));
     constraints.add_entries(41, rhs);
   }
 
   {
     constraints.add_line(42);
-    std::vector<std::pair<types::global_dof_index, double> > rhs;
-    rhs.push_back(std::pair<types::global_dof_index, double>(41,1.0));
+    std::vector<std::pair<types::global_dof_index, double>> rhs;
+    rhs.push_back(std::pair<types::global_dof_index, double>(41, 1.0));
     constraints.add_entries(42, rhs);
   }
 
@@ -64,17 +62,16 @@ run()
     {
       constraints.close();
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
 
   deallog << "Closed" << std::endl;
-
 }
 
-
-int main()
+int
+main()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();

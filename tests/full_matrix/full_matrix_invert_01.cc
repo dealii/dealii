@@ -13,51 +13,46 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test left and right inversion of FullMatrix
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 #include <limits>
 
-
 using namespace dealii;
-
 
 template <typename number>
 void
-fill_matrix_invertible(FullMatrix<number> &A)
+fill_matrix_invertible(FullMatrix<number>& A)
 {
-  for (unsigned int i=0; i<A.m(); i++)
-    for (unsigned int j=0; j<A.n(); j++)
+  for(unsigned int i = 0; i < A.m(); i++)
+    for(unsigned int j = 0; j < A.n(); j++)
       {
-        A(i,j)=number(i*j);
-        if (i==j)
-          A(i,i)+=i+A.m();
+        A(i, j) = number(i * j);
+        if(i == j)
+          A(i, i) += i + A.m();
       }
 }
 
-
 template <typename number>
 bool
-calculate(const FullMatrix<number> A,
-          bool disp = true)
+calculate(const FullMatrix<number> A, bool disp = true)
 {
   bool retval = true;
   // Different tolerance for different number types
-  const number tol = 1000*std::numeric_limits<number>::epsilon();
+  const number tol = 1000 * std::numeric_limits<number>::epsilon();
 
   // Test left invert
-  if (A.m()>=A.n())
+  if(A.m() >= A.n())
     {
-      FullMatrix<number> A_l_inv(A.n(),A.m());
-      FullMatrix<number> identity(A.n(),A.n());
+      FullMatrix<number> A_l_inv(A.n(), A.m());
+      FullMatrix<number> identity(A.n(), A.n());
       A_l_inv.left_invert(A);
-      A_l_inv.mmult(identity,A);
+      A_l_inv.mmult(identity, A);
 
       FullMatrix<double> M(IdentityMatrix(identity.n()));
       M.add(-1, identity);
-      if (disp || M.linfty_norm() > tol)
+      if(disp || M.linfty_norm() > tol)
         {
           // deallog << "A matrix" << std::endl;
           // display_matrix(A);
@@ -70,20 +65,20 @@ calculate(const FullMatrix<number> A,
     }
 
   // Test right invert
-  if (A.m()<=A.n())
+  if(A.m() <= A.n())
     {
-      FullMatrix<number> A_r_inv(A.n(),A.m());
-      FullMatrix<number> identity(A.m(),A.m());
+      FullMatrix<number> A_r_inv(A.n(), A.m());
+      FullMatrix<number> identity(A.m(), A.m());
       A_r_inv.right_invert(A);
-      A.mmult(identity,A_r_inv);
+      A.mmult(identity, A_r_inv);
 
       FullMatrix<double> M(IdentityMatrix(identity.n()));
       M.add(-1, identity);
-      if (disp || M.linfty_norm() > tol)
+      if(disp || M.linfty_norm() > tol)
         {
           // deallog << "A matrix"<< std::endl;
           // display_matrix(A);
-          deallog << "Right inverse"<< std::endl;
+          deallog << "Right inverse" << std::endl;
           display_matrix(A_r_inv);
           // deallog << "Identity = A*A_r_inv" << std::endl;
           // display_matrix(identity);
@@ -95,33 +90,28 @@ calculate(const FullMatrix<number> A,
   return retval;
 }
 
-
 template <typename number>
 void
-check ()
+check()
 {
   int nFails = 0;
   int maxDim = 10;
-  for (unsigned int i=1; i <= maxDim; ++i)
+  for(unsigned int i = 1; i <= maxDim; ++i)
     {
-      for (unsigned int j=1; j <= maxDim; ++j)
+      for(unsigned int j = 1; j <= maxDim; ++j)
         {
-          FullMatrix<number> A(i,j);
+          FullMatrix<number> A(i, j);
           fill_matrix_invertible(A);
-          if (!calculate(A, false))
+          if(!calculate(A, false))
             {
               nFails++;
             }
         }
     }
 
-  if (nFails > 0)
-    deallog
-        << nFails
-        << " out of "
-        << maxDim *maxDim
-        << " calls with wrong result"
-        << std::endl;
+  if(nFails > 0)
+    deallog << nFails << " out of " << maxDim * maxDim
+            << " calls with wrong result" << std::endl;
   else
     deallog << "OK" << std::endl;
 }

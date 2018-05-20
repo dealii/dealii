@@ -16,108 +16,92 @@
 #ifndef dealii_matrix_lib_templates_h
 #define dealii_matrix_lib_templates_h
 
+#include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 void
-MeanValueFilter::filter(Vector<number> &v) const
+MeanValueFilter::filter(Vector<number>& v) const
 {
   number mean = v.mean_value();
 
-  for (size_type i=0; i<v.size(); ++i)
+  for(size_type i = 0; i < v.size(); ++i)
     v(i) -= mean;
 }
 
-
-
 template <typename number>
 void
-MeanValueFilter::vmult(Vector<number> &dst,
-                       const Vector<number> &src) const
+MeanValueFilter::vmult(Vector<number>& dst, const Vector<number>& src) const
 {
-  Assert (dst.size() == src.size(),
-          ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(),
+         ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
-  for (size_type i=0; i<dst.size(); ++i)
+  for(size_type i = 0; i < dst.size(); ++i)
     dst(i) = src(i) - mean;
 }
 
-
-
 template <typename number>
 void
-MeanValueFilter::vmult_add(Vector<number> &dst,
-                           const Vector<number> &src) const
+MeanValueFilter::vmult_add(Vector<number>& dst, const Vector<number>& src) const
 {
-  Assert (dst.size() == src.size(),
-          ExcDimensionMismatch(dst.size(), src.size()));
+  Assert(dst.size() == src.size(),
+         ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
-  for (size_type i=0; i<dst.size(); ++i)
+  for(size_type i = 0; i < dst.size(); ++i)
     dst(i) += src(i) - mean;
 }
 
-
-
 template <typename number>
 void
-MeanValueFilter::filter(BlockVector<number> &v) const
+MeanValueFilter::filter(BlockVector<number>& v) const
 {
-  Assert (component != numbers::invalid_unsigned_int,
-          ExcNotInitialized());
+  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
 
-  for (unsigned int i=0; i<v.n_blocks(); ++i)
-    if (i == component)
+  for(unsigned int i = 0; i < v.n_blocks(); ++i)
+    if(i == component)
       vmult(v.block(i), v.block(i));
 }
 
-
-
 template <typename number>
 void
-MeanValueFilter::vmult(BlockVector<number> &dst,
-                       const BlockVector<number> &src) const
+MeanValueFilter::vmult(BlockVector<number>&       dst,
+                       const BlockVector<number>& src) const
 {
-  Assert (component != numbers::invalid_unsigned_int,
-          ExcNotInitialized());
+  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
 
-  Assert (dst.n_blocks() == src.n_blocks(),
-          ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  Assert(dst.n_blocks() == src.n_blocks(),
+         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
-  for (unsigned int i=0; i<dst.n_blocks(); ++i)
-    if (i == component)
+  for(unsigned int i = 0; i < dst.n_blocks(); ++i)
+    if(i == component)
       vmult(dst.block(i), src.block(i));
     else
       dst.block(i) = src.block(i);
 }
 
-
-
 template <typename number>
 void
-MeanValueFilter::vmult_add(BlockVector<number> &dst,
-                           const BlockVector<number> &src) const
+MeanValueFilter::vmult_add(BlockVector<number>&       dst,
+                           const BlockVector<number>& src) const
 {
-  Assert (component != numbers::invalid_unsigned_int,
-          ExcNotInitialized());
+  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
 
-  Assert (dst.n_blocks() == src.n_blocks(),
-          ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  Assert(dst.n_blocks() == src.n_blocks(),
+         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
-  for (unsigned int i=0; i<dst.n_blocks(); ++i)
-    if (i == component)
+  for(unsigned int i = 0; i < dst.n_blocks(); ++i)
+    if(i == component)
       vmult_add(dst.block(i), src.block(i));
     else
-      dst.block(i)+=src.block(i);
+      dst.block(i) += src.block(i);
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

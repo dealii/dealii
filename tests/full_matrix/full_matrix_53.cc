@@ -13,69 +13,57 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::left_invert and FullMatrix::right_invert
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
 template <typename number>
 void
-calculate(const FullMatrix<number> A,
-          const FullMatrix<number> B)
+calculate(const FullMatrix<number> A, const FullMatrix<number> B)
 {
-
-  FullMatrix<number> A_r_inv(A.n(),A.m());
-  FullMatrix<number> identity(A.m(),A.m());
+  FullMatrix<number> A_r_inv(A.n(), A.m());
+  FullMatrix<number> identity(A.m(), A.m());
   A_r_inv.right_invert(A);
-  deallog<<"A matrix"<<std::endl;
+  deallog << "A matrix" << std::endl;
   display_matrix(A);
-  deallog<<"Right inverse"<<std::endl;
+  deallog << "Right inverse" << std::endl;
   display_matrix(A_r_inv);
-  deallog<<"Identity = A*A_r_inv"<<std::endl;
-  A.mmult(identity,A_r_inv);
+  deallog << "Identity = A*A_r_inv" << std::endl;
+  A.mmult(identity, A_r_inv);
   display_matrix(identity);
 
-  deallog<<std::endl;
+  deallog << std::endl;
 
-  FullMatrix<number> B_l_inv(B.n(),B.m());
-  FullMatrix<number> identity2(B.n(),B.n());
+  FullMatrix<number> B_l_inv(B.n(), B.m());
+  FullMatrix<number> identity2(B.n(), B.n());
   B_l_inv.left_invert(B);
-  deallog<<"B matrix"<<std::endl;
+  deallog << "B matrix" << std::endl;
   display_matrix(B);
-  deallog<<"Left inverse"<<std::endl;
+  deallog << "Left inverse" << std::endl;
   display_matrix(B_l_inv);
-  deallog<<"Identity = B_l_inv*B"<<std::endl;
-  B_l_inv.mmult(identity2,B);
+  deallog << "Identity = B_l_inv*B" << std::endl;
+  B_l_inv.mmult(identity2, B);
   display_matrix(identity2);
-
 }
-
 
 template <typename number>
 void
-check ()
+check()
 {
-
-  FullMatrix<number> A(1,2);
+  FullMatrix<number> A(1, 2);
   fill_matrix(A);
 
-  FullMatrix<number> B(2,1);
+  FullMatrix<number> B(2, 1);
   fill_matrix(B);
 
-  calculate(A,B);
+  calculate(A, B);
 
-  FullMatrix<number> A1(2,3);
+  FullMatrix<number> A1(2, 3);
   fill_matrix(A1);
 
-  FullMatrix<number> B1(3,2);
+  FullMatrix<number> B1(3, 2);
   fill_matrix(B1);
 
-  calculate(A1,B1);
-
+  calculate(A1, B1);
 }
-

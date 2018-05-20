@@ -13,26 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test TableHandler::start_new_row()
-
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
-  table.set_auto_fill_mode (true);
+  table.set_auto_fill_mode(true);
 
-  std::string keys[3] = { "key1", "key2", "key3" };
+  std::string keys[3] = {"key1", "key2", "key3"};
 
   // fill rows 1 and 2 partially
   table.add_value(keys[0], 0);
@@ -47,14 +45,13 @@ int main ()
   table.add_value(keys[0], 1);
 
   // and start a new row that also fills the remaining columns
-  table.start_new_row ();
+  table.start_new_row();
 
   // do it again:
   table.add_value(keys[0], 2);
-  table.start_new_row ();
+  table.start_new_row();
 
   // produce output. hope that row 4 is
   // completely padded
-  table.write_text(deallog.get_file_stream(),
-                   TableHandler::org_mode_table);
+  table.write_text(deallog.get_file_stream(), TableHandler::org_mode_table);
 }

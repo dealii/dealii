@@ -13,45 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the BlockMask class
 //
 // here: BlockMask::operator&
 
-
 #include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   std::vector<bool> v1(12);
-  for (unsigned int i=0; i<v1.size(); ++i)
-    v1[i] = (i%3 == 0);
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    v1[i] = (i % 3 == 0);
   std::vector<bool> v2(12);
-  for (unsigned int i=0; i<v2.size(); ++i)
-    v2[2] = (i%4 == 0);
+  for(unsigned int i = 0; i < v2.size(); ++i)
+    v2[2] = (i % 4 == 0);
 
   BlockMask m1(v1);
   BlockMask m2(v2);
   BlockMask m = m1 & m2;
 
   // verify equality
-  for (unsigned int i=0; i<v1.size(); ++i)
-    AssertThrow (m[i] == (v1[i] && v2[i]), ExcInternalError());
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    AssertThrow(m[i] == (v1[i] && v2[i]), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

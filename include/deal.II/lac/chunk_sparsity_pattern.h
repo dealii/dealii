@@ -16,7 +16,6 @@
 #ifndef dealii_chunk_sparsity_pattern_h
 #define dealii_chunk_sparsity_pattern_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
@@ -24,20 +23,17 @@
 
 #include <deal.II/lac/sparsity_pattern.h>
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <typename> class ChunkSparseMatrix;
-
+template <typename>
+class ChunkSparseMatrix;
 
 /*! @addtogroup Sparsity
  *@{
  */
-
-
 
 /**
  * Iterators on sparsity patterns
@@ -65,30 +61,32 @@ namespace ChunkSparsityPatternIterators
     /**
      * Constructor.
      */
-    Accessor (const ChunkSparsityPattern *matrix,
-              const unsigned int          row);
+    Accessor(const ChunkSparsityPattern* matrix, const unsigned int row);
 
     /**
      * Constructor. Construct the end accessor for the given sparsity pattern.
      */
-    Accessor (const ChunkSparsityPattern *matrix);
+    Accessor(const ChunkSparsityPattern* matrix);
 
     /**
      * Row number of the element represented by this object. This function can
      * only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int row () const;
+    unsigned int
+    row() const;
 
     /**
      * Return the global index from the reduced sparsity pattern.
      */
-    std::size_t reduced_index() const;
+    std::size_t
+    reduced_index() const;
 
     /**
      * Column number of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int column () const;
+    unsigned int
+    column() const;
 
     /**
      * Return whether the sparsity pattern entry pointed to by this iterator
@@ -99,14 +97,14 @@ namespace ChunkSparsityPatternIterators
      * pattern's lifetime, you will iterate over elements that are not valid.
      * If this is so, then this function will return false.
      */
-    bool is_valid_entry () const;
-
+    bool
+    is_valid_entry() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Accessor &) const;
-
+    bool
+    operator==(const Accessor&) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -115,13 +113,14 @@ namespace ChunkSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * sparsity pattern.
      */
-    bool operator < (const Accessor &) const;
+    bool
+    operator<(const Accessor&) const;
 
   protected:
     /**
      * The sparsity pattern we operate on accessed.
      */
-    const ChunkSparsityPattern *sparsity_pattern;
+    const ChunkSparsityPattern* sparsity_pattern;
 
     /**
      * The accessor of the (reduced) sparsity pattern.
@@ -141,15 +140,14 @@ namespace ChunkSparsityPatternIterators
     /**
      * Move the accessor to the next nonzero entry in the matrix.
      */
-    void advance ();
+    void
+    advance();
 
     /**
      * Grant access to iterator class.
      */
     friend class Iterator;
   };
-
-
 
   /**
    * Iterator that walks over the elements of a sparsity pattern.
@@ -161,38 +159,41 @@ namespace ChunkSparsityPatternIterators
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given row and the index within it.
      */
-    Iterator (const ChunkSparsityPattern *sp,
-              const unsigned int          row);
+    Iterator(const ChunkSparsityPattern* sp, const unsigned int row);
 
     /**
      * Prefix increment.
      */
-    Iterator &operator++ ();
+    Iterator&
+    operator++();
 
     /**
      * Postfix increment.
      */
-    Iterator operator++ (int);
+    Iterator
+    operator++(int);
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor& operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor* operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const Iterator &) const;
+    bool
+    operator==(const Iterator&) const;
 
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const Iterator &) const;
+    bool
+    operator!=(const Iterator&) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -201,7 +202,8 @@ namespace ChunkSparsityPatternIterators
      * This function is only valid if both iterators point into the same
      * matrix.
      */
-    bool operator < (const Iterator &) const;
+    bool
+    operator<(const Iterator&) const;
 
   private:
     /**
@@ -209,9 +211,7 @@ namespace ChunkSparsityPatternIterators
      */
     Accessor accessor;
   };
-}
-
-
+} // namespace ChunkSparsityPatternIterators
 
 /**
  * Structure representing the sparsity pattern of a sparse matrix. This class
@@ -266,7 +266,7 @@ public:
    * useful if you want such objects as member variables in other classes. You
    * can make the structure usable by calling the reinit() function.
    */
-  ChunkSparsityPattern ();
+  ChunkSparsityPattern();
 
   /**
    * Copy constructor. This constructor is only allowed to be called if the
@@ -283,7 +283,7 @@ public:
    * matrices can use the same sparsity structure, copies are only allowed for
    * empty objects, as described above.
    */
-  ChunkSparsityPattern (const ChunkSparsityPattern &);
+  ChunkSparsityPattern(const ChunkSparsityPattern&);
 
   /**
    * Initialize a rectangular matrix.
@@ -291,10 +291,10 @@ public:
    * @arg m number of rows @arg n number of columns @arg max_per_row maximum
    * number of nonzero entries per row
    */
-  ChunkSparsityPattern (const size_type m,
-                        const size_type n,
-                        const size_type max_chunks_per_row,
-                        const size_type chunk_size);
+  ChunkSparsityPattern(const size_type m,
+                       const size_type n,
+                       const size_type max_chunks_per_row,
+                       const size_type chunk_size);
 
   /**
    * Initialize a rectangular matrix.
@@ -303,10 +303,10 @@ public:
    * number of nonzero entries for each row.  This vector must have one entry
    * for each row.
    */
-  ChunkSparsityPattern (const size_type m,
-                        const size_type n,
-                        const std::vector<size_type> &row_lengths,
-                        const size_type chunk_size);
+  ChunkSparsityPattern(const size_type               m,
+                       const size_type               n,
+                       const std::vector<size_type>& row_lengths,
+                       const size_type               chunk_size);
 
   /**
    * Initialize a quadratic matrix of dimension <tt>n</tt> with at most
@@ -316,9 +316,9 @@ public:
    * elements. To avoid this, use the constructor taking row and column
    * numbers separately.
    */
-  ChunkSparsityPattern (const size_type n,
-                        const size_type max_per_row,
-                        const size_type chunk_size);
+  ChunkSparsityPattern(const size_type n,
+                       const size_type max_per_row,
+                       const size_type chunk_size);
 
   /**
    * Initialize a quadratic matrix.
@@ -327,21 +327,22 @@ public:
    * nonzero entries for each row.  This vector must have one entry for each
    * row.
    */
-  ChunkSparsityPattern (const size_type                m,
-                        const std::vector<size_type>  &row_lengths,
-                        const size_type                chunk_size);
+  ChunkSparsityPattern(const size_type               m,
+                       const std::vector<size_type>& row_lengths,
+                       const size_type               chunk_size);
 
   /**
    * Destructor.
    */
-  ~ChunkSparsityPattern () override = default;
+  ~ChunkSparsityPattern() override = default;
 
   /**
    * Copy operator. For this the same holds as for the copy constructor: it is
    * declared, defined and fine to be called, but the latter only for empty
    * objects.
    */
-  ChunkSparsityPattern &operator = (const ChunkSparsityPattern &);
+  ChunkSparsityPattern&
+  operator=(const ChunkSparsityPattern&);
 
   /**
    * Reallocate memory and set up data structures for a new matrix with <tt>m
@@ -351,10 +352,11 @@ public:
    * This function simply maps its operations to the other <tt>reinit</tt>
    * function.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const size_type max_per_row,
-               const size_type chunk_size);
+  void
+  reinit(const size_type m,
+         const size_type n,
+         const size_type max_per_row,
+         const size_type chunk_size);
 
   /**
    * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
@@ -370,18 +372,20 @@ public:
    * are stored first in each row to allow optimized access in relaxation
    * methods of SparseMatrix.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const std::vector<size_type> &row_lengths,
-               const size_type chunk_size);
+  void
+  reinit(const size_type               m,
+         const size_type               n,
+         const std::vector<size_type>& row_lengths,
+         const size_type               chunk_size);
 
   /**
    * Same as above, but with a VectorSlice argument instead.
    */
-  void reinit (const size_type m,
-               const size_type n,
-               const VectorSlice<const std::vector<size_type> > &row_lengths,
-               const size_type chunk_size);
+  void
+  reinit(const size_type                                  m,
+         const size_type                                  n,
+         const VectorSlice<const std::vector<size_type>>& row_lengths,
+         const size_type                                  chunk_size);
 
   /**
    * This function compresses the sparsity structure that this object
@@ -395,7 +399,8 @@ public:
    * SparseMatrix objects require the ChunkSparsityPattern objects they are
    * initialized with to be compressed, to reduce memory requirements.
    */
-  void compress ();
+  void
+  compress();
 
   /**
    * This function can be used as a replacement for reinit(), subsequent calls
@@ -474,11 +479,12 @@ public:
    * iterators that point to such pairs.
    */
   template <typename ForwardIterator>
-  void copy_from (const size_type n_rows,
-                  const size_type n_cols,
-                  const ForwardIterator begin,
-                  const ForwardIterator end,
-                  const size_type chunk_size);
+  void
+  copy_from(const size_type       n_rows,
+            const size_type       n_cols,
+            const ForwardIterator begin,
+            const ForwardIterator end,
+            const size_type       chunk_size);
 
   /**
    * Copy data from an object of type DynamicSparsityPattern. Previous content
@@ -486,8 +492,8 @@ public:
    * afterwards.
    */
   template <typename SparsityPatternType>
-  void copy_from (const SparsityPatternType &dsp,
-                  const size_type            chunk_size);
+  void
+  copy_from(const SparsityPatternType& dsp, const size_type chunk_size);
 
   /**
    * Take a full matrix and use its nonzero entries to generate a sparse
@@ -497,8 +503,8 @@ public:
    * compressed mode afterwards.
    */
   template <typename number>
-  void copy_from (const FullMatrix<number> &matrix,
-                  const size_type chunk_size);
+  void
+  copy_from(const FullMatrix<number>& matrix, const size_type chunk_size);
 
   /**
    * Set the sparsity pattern of the chunk sparsity pattern to be given by
@@ -518,29 +524,33 @@ public:
    * compressed mode afterwards.
    */
   template <typename Sparsity>
-  void create_from (const unsigned int  m,
-                    const unsigned int  n,
-                    const Sparsity     &sparsity_pattern_for_chunks,
-                    const unsigned int  chunk_size,
-                    const bool          optimize_diagonal = true);
+  void
+  create_from(const unsigned int m,
+              const unsigned int n,
+              const Sparsity&    sparsity_pattern_for_chunks,
+              const unsigned int chunk_size,
+              const bool         optimize_diagonal = true);
 
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero.
    */
-  bool empty () const;
+  bool
+  empty() const;
 
   /**
    * Return the chunk size given as argument when constructing this object.
    */
-  size_type get_chunk_size () const;
+  size_type
+  get_chunk_size() const;
 
   /**
    * Return the maximum number of entries per row. Before compression, this
    * equals the number given to the constructor, while after compression, it
    * equals the maximum number of entries actually allocated by the user.
    */
-  size_type max_entries_per_row () const;
+  size_type
+  max_entries_per_row() const;
 
   /**
    * Add a nonzero entry to the matrix. This function may only be called for
@@ -548,8 +558,8 @@ public:
    *
    * If the entry already exists, nothing bad happens.
    */
-  void add (const size_type i,
-            const size_type j);
+  void
+  add(const size_type i, const size_type j);
 
   /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the
@@ -558,30 +568,34 @@ public:
    * This function throws an exception if the sparsity pattern does not
    * represent a quadratic matrix.
    */
-  void symmetrize ();
+  void
+  symmetrize();
 
   /**
    * Return number of rows of this matrix, which equals the dimension of the
    * image space.
    */
-  inline size_type n_rows () const;
+  inline size_type
+  n_rows() const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space.
    */
-  inline size_type n_cols () const;
+  inline size_type
+  n_cols() const;
 
   /**
    * Check if a value at a certain position may be non-zero.
    */
-  bool exists (const size_type i,
-               const size_type j) const;
+  bool
+  exists(const size_type i, const size_type j) const;
 
   /**
    * Number of entries in a specific row.
    */
-  size_type row_length (const size_type row) const;
+  size_type
+  row_length(const size_type row) const;
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
@@ -589,7 +603,8 @@ public:
    * represents a nonzero entry of the matrix. Consequently, the maximum
    * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
    */
-  size_type bandwidth () const;
+  size_type
+  bandwidth() const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
@@ -599,12 +614,14 @@ public:
    * This function may only be called if the matrix struct is compressed. It
    * does not make too much sense otherwise anyway.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements() const;
 
   /**
    * Return whether the structure is compressed or not.
    */
-  bool is_compressed () const;
+  bool
+  is_compressed() const;
 
   /**
    * Return whether this object stores only those entries that have been added
@@ -618,19 +635,22 @@ public:
    * in cases where several kinds of sparsity patterns can be passed as
    * template arguments.
    */
-  bool stores_only_added_elements () const;
+  bool
+  stores_only_added_elements() const;
 
   /**
    * Iterator starting at the first entry of the matrix. The resulting
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    */
-  iterator begin () const;
+  iterator
+  begin() const;
 
   /**
    * Final iterator.
    */
-  iterator end () const;
+  iterator
+  end() const;
 
   /**
    * Iterator starting at the first entry of row <tt>r</tt>.
@@ -640,7 +660,8 @@ public:
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
    */
-  iterator begin (const unsigned int r) const;
+  iterator
+  begin(const unsigned int r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -650,7 +671,8 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  iterator end (const unsigned int r) const;
+  iterator
+  end(const unsigned int r) const;
 
   /**
    * Write the data of this object en bloc to a file. This is done in a binary
@@ -662,7 +684,8 @@ public:
    * different programs, or allow objects to be persistent across different
    * runs of the program.
    */
-  void block_write (std::ostream &out) const;
+  void
+  block_write(std::ostream& out) const;
 
   /**
    * Read data that has previously been written by block_write() from a file.
@@ -677,14 +700,16 @@ public:
    * bluntest attempts to interpret some data as a vector stored bitwise to a
    * file, but not more.
    */
-  void block_read (std::istream &in);
+  void
+  block_read(std::istream& in);
 
   /**
    * Print the sparsity of the matrix. The output consists of one line per row
    * of the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.
    */
-  void print (std::ostream &out) const;
+  void
+  print(std::ostream& out) const;
 
   /**
    * Print the sparsity of the matrix in a format that <tt>gnuplot</tt>
@@ -699,13 +724,15 @@ public:
    * Print the sparsity pattern in gnuplot by setting the data style to dots
    * or points and use the <tt>plot</tt> command.
    */
-  void print_gnuplot (std::ostream &out) const;
+  void
+  print_gnuplot(std::ostream& out) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object. See MemoryConsumption.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * @addtogroup Exceptions
@@ -714,68 +741,74 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidNumber,
-                  int,
-                  << "The provided number is invalid here: " << arg1);
+  DeclException1(ExcInvalidNumber,
+                 int,
+                 << "The provided number is invalid here: " << arg1);
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidIndex,
-                  int, int,
-                  << "The given index " << arg1
-                  << " should be less than " << arg2 << ".");
+  DeclException2(ExcInvalidIndex,
+                 int,
+                 int,
+                 << "The given index " << arg1 << " should be less than "
+                 << arg2 << ".");
   /**
    * Exception
    */
-  DeclException2 (ExcNotEnoughSpace,
-                  int, int,
-                  << "Upon entering a new entry to row " << arg1
-                  << ": there was no free entry any more. " << std::endl
-                  << "(Maximum number of entries for this row: "
-                  << arg2 << "; maybe the matrix is already compressed?)");
+  DeclException2(ExcNotEnoughSpace,
+                 int,
+                 int,
+                 << "Upon entering a new entry to row " << arg1
+                 << ": there was no free entry any more. " << std::endl
+                 << "(Maximum number of entries for this row: " << arg2
+                 << "; maybe the matrix is already compressed?)");
   /**
    * The operation is only allowed after the SparsityPattern has been set up
    * and compress() was called.
    */
-  DeclExceptionMsg (ExcNotCompressed,
-                    "The operation you attempted is only allowed after the SparsityPattern "
-                    "has been set up and compress() was called.");
+  DeclExceptionMsg(
+    ExcNotCompressed,
+    "The operation you attempted is only allowed after the SparsityPattern "
+    "has been set up and compress() was called.");
   /**
    * This operation changes the structure of the SparsityPattern and is not
    * possible after compress() has been called.
    */
-  DeclExceptionMsg (ExcMatrixIsCompressed,
-                    "The operation you attempted changes the structure of the SparsityPattern "
-                    "and is not possible after compress() has been called.");
+  DeclExceptionMsg(
+    ExcMatrixIsCompressed,
+    "The operation you attempted changes the structure of the SparsityPattern "
+    "and is not possible after compress() has been called.");
   /**
    * Exception
    */
-  DeclException0 (ExcEmptyObject);
+  DeclException0(ExcEmptyObject);
   /**
    * Exception
    */
-  DeclException2 (ExcIteratorRange,
-                  int, int,
-                  << "The iterators denote a range of " << arg1
-                  << " elements, but the given number of rows was " << arg2);
+  DeclException2(ExcIteratorRange,
+                 int,
+                 int,
+                 << "The iterators denote a range of " << arg1
+                 << " elements, but the given number of rows was " << arg2);
   /**
    * Exception
    */
-  DeclException0 (ExcMETISNotInstalled);
+  DeclException0(ExcMETISNotInstalled);
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidNumberOfPartitions,
-                  int,
-                  << "The number of partitions you gave is " << arg1
-                  << ", but must be greater than zero.");
+  DeclException1(ExcInvalidNumberOfPartitions,
+                 int,
+                 << "The number of partitions you gave is " << arg1
+                 << ", but must be greater than zero.");
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidArraySize,
-                  int, int,
-                  << "The array has size " << arg1 << " but should have size "
-                  << arg2);
+  DeclException2(ExcInvalidArraySize,
+                 int,
+                 int,
+                 << "The array has size " << arg1 << " but should have size "
+                 << arg2);
   //@}
 private:
   /**
@@ -802,14 +835,14 @@ private:
   /**
    * Make all the chunk sparse matrix kinds friends.
    */
-  template <typename> friend class ChunkSparseMatrix;
+  template <typename>
+  friend class ChunkSparseMatrix;
 
   /**
    * Make the accessor class a friend.
    */
   friend class ChunkSparsityPatternIterators::Accessor;
 };
-
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
@@ -818,149 +851,119 @@ private:
 
 namespace ChunkSparsityPatternIterators
 {
-  inline
-  Accessor::
-  Accessor (const ChunkSparsityPattern *sparsity_pattern,
-            const unsigned int          row)
-    :
-    sparsity_pattern(sparsity_pattern),
-    reduced_accessor(row==sparsity_pattern->n_rows() ?
-                     *sparsity_pattern->sparsity_pattern.end() :
-                     *sparsity_pattern->sparsity_pattern.
-                     begin(row/sparsity_pattern->get_chunk_size())),
-    chunk_row (row==sparsity_pattern->n_rows() ? 0 :
-               row%sparsity_pattern->get_chunk_size()),
-    chunk_col (0)
+  inline Accessor::Accessor(const ChunkSparsityPattern* sparsity_pattern,
+                            const unsigned int          row)
+    : sparsity_pattern(sparsity_pattern),
+      reduced_accessor(row == sparsity_pattern->n_rows() ?
+                         *sparsity_pattern->sparsity_pattern.end() :
+                         *sparsity_pattern->sparsity_pattern.begin(
+                           row / sparsity_pattern->get_chunk_size())),
+      chunk_row(row == sparsity_pattern->n_rows() ?
+                  0 :
+                  row % sparsity_pattern->get_chunk_size()),
+      chunk_col(0)
   {}
 
-
-
-  inline
-  Accessor::
-  Accessor (const ChunkSparsityPattern *sparsity_pattern)
-    :
-    sparsity_pattern(sparsity_pattern),
-    reduced_accessor(*sparsity_pattern->sparsity_pattern.end()),
-    chunk_row (0),
-    chunk_col (0)
+  inline Accessor::Accessor(const ChunkSparsityPattern* sparsity_pattern)
+    : sparsity_pattern(sparsity_pattern),
+      reduced_accessor(*sparsity_pattern->sparsity_pattern.end()),
+      chunk_row(0),
+      chunk_col(0)
   {}
 
-
-
-  inline
-  bool
-  Accessor::is_valid_entry () const
+  inline bool
+  Accessor::is_valid_entry() const
   {
     return reduced_accessor.is_valid_entry()
-           &&
-           sparsity_pattern->get_chunk_size()*reduced_accessor.row()+chunk_row <
-           sparsity_pattern->n_rows()
-           &&
-           sparsity_pattern->get_chunk_size()*reduced_accessor.column()+chunk_col <
-           sparsity_pattern->n_cols();
+           && sparsity_pattern->get_chunk_size() * reduced_accessor.row()
+                  + chunk_row
+                < sparsity_pattern->n_rows()
+           && sparsity_pattern->get_chunk_size() * reduced_accessor.column()
+                  + chunk_col
+                < sparsity_pattern->n_cols();
   }
 
-
-
-  inline
-  unsigned int
+  inline unsigned int
   Accessor::row() const
   {
-    Assert (is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return sparsity_pattern->get_chunk_size()*reduced_accessor.row() +
-           chunk_row;
+    return sparsity_pattern->get_chunk_size() * reduced_accessor.row()
+           + chunk_row;
   }
 
-
-
-  inline
-  unsigned int
+  inline unsigned int
   Accessor::column() const
   {
-    Assert (is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() == true, ExcInvalidIterator());
 
-    return sparsity_pattern->get_chunk_size()*reduced_accessor.column() +
-           chunk_col;
+    return sparsity_pattern->get_chunk_size() * reduced_accessor.column()
+           + chunk_col;
   }
 
-
-
-  inline
-  std::size_t
+  inline std::size_t
   Accessor::reduced_index() const
   {
-    Assert (is_valid_entry() == true, ExcInvalidIterator());
+    Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return reduced_accessor.index_within_sparsity;
   }
 
-
-
-
-  inline
-  bool
-  Accessor::operator == (const Accessor &other) const
+  inline bool
+  Accessor::operator==(const Accessor& other) const
   {
     // no need to check for equality of sparsity patterns as this is done in
     // the reduced case already and every ChunkSparsityPattern has its own
     // reduced sparsity pattern
-    return (reduced_accessor == other.reduced_accessor &&
-            chunk_row == other.chunk_row &&
-            chunk_col == other.chunk_col);
+    return (reduced_accessor == other.reduced_accessor
+            && chunk_row == other.chunk_row && chunk_col == other.chunk_col);
   }
 
-
-
-  inline
-  bool
-  Accessor::operator < (const Accessor &other) const
+  inline bool
+  Accessor::operator<(const Accessor& other) const
   {
-    Assert (sparsity_pattern == other.sparsity_pattern,
-            ExcInternalError());
+    Assert(sparsity_pattern == other.sparsity_pattern, ExcInternalError());
 
-    if (chunk_row != other.chunk_row)
+    if(chunk_row != other.chunk_row)
       {
-        if (reduced_accessor.index_within_sparsity ==
-            reduced_accessor.sparsity_pattern->n_nonzero_elements())
+        if(reduced_accessor.index_within_sparsity
+           == reduced_accessor.sparsity_pattern->n_nonzero_elements())
           return false;
-        if (other.reduced_accessor.index_within_sparsity ==
-            reduced_accessor.sparsity_pattern->n_nonzero_elements())
+        if(other.reduced_accessor.index_within_sparsity
+           == reduced_accessor.sparsity_pattern->n_nonzero_elements())
           return true;
 
-        const unsigned int
-        global_row = sparsity_pattern->get_chunk_size()*reduced_accessor.row()
-                     +chunk_row,
-                     other_global_row = sparsity_pattern->get_chunk_size()*
-                                        other.reduced_accessor.row()+other.chunk_row;
-        if (global_row < other_global_row)
+        const unsigned int global_row
+          = sparsity_pattern->get_chunk_size() * reduced_accessor.row()
+            + chunk_row,
+          other_global_row
+          = sparsity_pattern->get_chunk_size() * other.reduced_accessor.row()
+            + other.chunk_row;
+        if(global_row < other_global_row)
           return true;
-        else if (global_row > other_global_row)
+        else if(global_row > other_global_row)
           return false;
       }
 
-    return (reduced_accessor.index_within_sparsity <
-            other.reduced_accessor.index_within_sparsity ||
-            (reduced_accessor.index_within_sparsity ==
-             other.reduced_accessor.index_within_sparsity &&
-             chunk_col < other.chunk_col));
+    return (reduced_accessor.index_within_sparsity
+              < other.reduced_accessor.index_within_sparsity
+            || (reduced_accessor.index_within_sparsity
+                  == other.reduced_accessor.index_within_sparsity
+                && chunk_col < other.chunk_col));
   }
 
-
-  inline
-  void
-  Accessor::advance ()
+  inline void
+  Accessor::advance()
   {
     const unsigned int chunk_size = sparsity_pattern->get_chunk_size();
-    Assert (chunk_row < chunk_size && chunk_col < chunk_size,
-            ExcIteratorPastEnd());
-    Assert (reduced_accessor.row() * chunk_size + chunk_row <
-            sparsity_pattern->n_rows()
-            &&
-            reduced_accessor.column() * chunk_size + chunk_col <
-            sparsity_pattern->n_cols(),
-            ExcIteratorPastEnd());
-    if (chunk_size == 1)
+    Assert(chunk_row < chunk_size && chunk_col < chunk_size,
+           ExcIteratorPastEnd());
+    Assert(reduced_accessor.row() * chunk_size + chunk_row
+               < sparsity_pattern->n_rows()
+             && reduced_accessor.column() * chunk_size + chunk_col
+                  < sparsity_pattern->n_cols(),
+           ExcIteratorPastEnd());
+    if(chunk_size == 1)
       {
         reduced_accessor.advance();
         return;
@@ -969,24 +972,23 @@ namespace ChunkSparsityPatternIterators
     ++chunk_col;
 
     // end of chunk
-    if (chunk_col == chunk_size
-        ||
-        reduced_accessor.column() * chunk_size + chunk_col ==
-        sparsity_pattern->n_cols())
+    if(chunk_col == chunk_size
+       || reduced_accessor.column() * chunk_size + chunk_col
+            == sparsity_pattern->n_cols())
       {
         const unsigned int reduced_row = reduced_accessor.row();
         // end of row
-        if (reduced_accessor.index_within_sparsity + 1 ==
-            reduced_accessor.sparsity_pattern->rowstart[reduced_row+1])
+        if(reduced_accessor.index_within_sparsity + 1
+           == reduced_accessor.sparsity_pattern->rowstart[reduced_row + 1])
           {
             ++chunk_row;
 
             chunk_col = 0;
 
             // end of chunk rows or end of matrix
-            if (chunk_row == chunk_size ||
-                (reduced_row * chunk_size + chunk_row ==
-                 sparsity_pattern->n_rows()))
+            if(chunk_row == chunk_size
+               || (reduced_row * chunk_size + chunk_row
+                   == sparsity_pattern->n_rows()))
               {
                 chunk_row = 0;
                 reduced_accessor.advance();
@@ -994,8 +996,8 @@ namespace ChunkSparsityPatternIterators
             // go back to the beginning of the same reduced row but with
             // chunk_row increased by one
             else
-              reduced_accessor.index_within_sparsity =
-                reduced_accessor.sparsity_pattern->rowstart[reduced_row];
+              reduced_accessor.index_within_sparsity
+                = reduced_accessor.sparsity_pattern->rowstart[reduced_row];
           }
         // advance within chunk
         else
@@ -1006,199 +1008,151 @@ namespace ChunkSparsityPatternIterators
       }
   }
 
-
-
-  inline
-  Iterator::Iterator (const ChunkSparsityPattern *sparsity_pattern,
-                      const unsigned int          row)
-    :
-    accessor(sparsity_pattern, row)
+  inline Iterator::Iterator(const ChunkSparsityPattern* sparsity_pattern,
+                            const unsigned int          row)
+    : accessor(sparsity_pattern, row)
   {}
 
-
-
-  inline
-  Iterator &
-  Iterator::operator++ ()
+  inline Iterator&
+  Iterator::operator++()
   {
-    accessor.advance ();
+    accessor.advance();
     return *this;
   }
 
-
-
-  inline
-  Iterator
-  Iterator::operator++ (int)
+  inline Iterator
+  Iterator::operator++(int)
   {
     const Iterator iter = *this;
-    accessor.advance ();
+    accessor.advance();
     return iter;
   }
 
-
-
-  inline
-  const Accessor &
-  Iterator::operator* () const
+  inline const Accessor& Iterator::operator*() const
   {
     return accessor;
   }
 
-
-
-  inline
-  const Accessor *
-  Iterator::operator-> () const
+  inline const Accessor* Iterator::operator->() const
   {
     return &accessor;
   }
 
-
-  inline
-  bool
-  Iterator::operator == (const Iterator &other) const
+  inline bool
+  Iterator::operator==(const Iterator& other) const
   {
     return (accessor == other.accessor);
   }
 
-
-
-  inline
-  bool
-  Iterator::operator != (const Iterator &other) const
+  inline bool
+  Iterator::operator!=(const Iterator& other) const
   {
-    return ! (accessor == other.accessor);
+    return !(accessor == other.accessor);
   }
 
-
-  inline
-  bool
-  Iterator::operator < (const Iterator &other) const
+  inline bool
+  Iterator::operator<(const Iterator& other) const
   {
     return accessor < other.accessor;
   }
 
-}
+} // namespace ChunkSparsityPatternIterators
 
-
-
-inline
-ChunkSparsityPattern::iterator
-ChunkSparsityPattern::begin () const
+inline ChunkSparsityPattern::iterator
+ChunkSparsityPattern::begin() const
 {
   return iterator(this, 0);
 }
 
-
-inline
-ChunkSparsityPattern::iterator
-ChunkSparsityPattern::end () const
+inline ChunkSparsityPattern::iterator
+ChunkSparsityPattern::end() const
 {
   return iterator(this, n_rows());
 }
 
-
-
-inline
-ChunkSparsityPattern::iterator
-ChunkSparsityPattern::begin (const unsigned int r) const
+inline ChunkSparsityPattern::iterator
+ChunkSparsityPattern::begin(const unsigned int r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
   return iterator(this, r);
 }
 
-
-
-inline
-ChunkSparsityPattern::iterator
-ChunkSparsityPattern::end (const unsigned int r) const
+inline ChunkSparsityPattern::iterator
+ChunkSparsityPattern::end(const unsigned int r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()))
-  return iterator(this, r+1);
+  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows())) return iterator(this,
+                                                                      r + 1);
 }
 
-
-
-inline
-ChunkSparsityPattern::size_type
-ChunkSparsityPattern::n_rows () const
+inline ChunkSparsityPattern::size_type
+ChunkSparsityPattern::n_rows() const
 {
   return rows;
 }
 
-
-inline
-ChunkSparsityPattern::size_type
-ChunkSparsityPattern::n_cols () const
+inline ChunkSparsityPattern::size_type
+ChunkSparsityPattern::n_cols() const
 {
   return cols;
 }
 
-
-
-inline
-ChunkSparsityPattern::size_type
-ChunkSparsityPattern::get_chunk_size () const
+inline ChunkSparsityPattern::size_type
+ChunkSparsityPattern::get_chunk_size() const
 {
   return chunk_size;
 }
 
-
-
-inline
-bool
-ChunkSparsityPattern::is_compressed () const
+inline bool
+ChunkSparsityPattern::is_compressed() const
 {
   return sparsity_pattern.compressed;
 }
 
-
-
 template <typename ForwardIterator>
 void
-ChunkSparsityPattern::copy_from (const size_type       n_rows,
-                                 const size_type       n_cols,
-                                 const ForwardIterator begin,
-                                 const ForwardIterator end,
-                                 const size_type       chunk_size)
+ChunkSparsityPattern::copy_from(const size_type       n_rows,
+                                const size_type       n_cols,
+                                const ForwardIterator begin,
+                                const ForwardIterator end,
+                                const size_type       chunk_size)
 {
-  Assert (static_cast<size_type>(std::distance (begin, end)) == n_rows,
-          ExcIteratorRange (std::distance (begin, end), n_rows));
+  Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
+         ExcIteratorRange(std::distance(begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
-  const bool is_square = (n_rows == n_cols);
+  const bool             is_square = (n_rows == n_cols);
   std::vector<size_type> row_lengths;
   row_lengths.reserve(n_rows);
-  for (ForwardIterator i=begin; i!=end; ++i)
-    row_lengths.push_back (std::distance (i->begin(), i->end())
-                           +
-                           (is_square ? 1 : 0));
-  reinit (n_rows, n_cols, row_lengths, chunk_size);
+  for(ForwardIterator i = begin; i != end; ++i)
+    row_lengths.push_back(std::distance(i->begin(), i->end())
+                          + (is_square ? 1 : 0));
+  reinit(n_rows, n_cols, row_lengths, chunk_size);
 
   // now enter all the elements into the matrix
   size_type row = 0;
-  typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
-  for (ForwardIterator i=begin; i!=end; ++i, ++row)
+  typedef
+    typename std::iterator_traits<ForwardIterator>::value_type::const_iterator
+      inner_iterator;
+  for(ForwardIterator i = begin; i != end; ++i, ++row)
     {
       const inner_iterator end_of_row = i->end();
-      for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
+      for(inner_iterator j = i->begin(); j != end_of_row; ++j)
         {
           const size_type col
-            = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-          Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
+            = internal::SparsityPatternTools::get_column_index_from_iterator(
+              *j);
+          Assert(col < n_cols, ExcInvalidIndex(col, n_cols));
 
-          add (row, col);
+          add(row, col);
         }
     }
 
   // finally compress everything. this also sorts the entries within each row
-  compress ();
+  compress();
 }
-
 
 #endif // DOXYGEN
 

@@ -13,35 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Utilities::pack/unpack on some types. specifically, make sure
 // that it works on arrays of primitive types
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/point.h>
 #include <boost/serialization/utility.hpp>
+#include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
-#include <tuple>
 #include <cstring>
-
+#include <tuple>
 
 template <typename T, int N>
-void check (const T (&object)[N])
+void
+check(const T (&object)[N])
 {
-  const std::vector<char> buffer = Utilities::pack (object);
-  T unpacked[N];
+  const std::vector<char> buffer = Utilities::pack(object);
+  T                       unpacked[N];
   Utilities::unpack(buffer, unpacked);
 
-  const bool equal_sizes = (buffer.size() == sizeof(T)*N);
-  deallog << "Buffer size check: " << (equal_sizes ? "OK" : "Failed") << std::endl;
-  if (equal_sizes)
-    deallog << "memcmp check: " << (std::memcmp(buffer.data(), &object, buffer.size()) == 0 ? "OK" : "Failed") << std::endl;
+  const bool equal_sizes = (buffer.size() == sizeof(T) * N);
+  deallog << "Buffer size check: " << (equal_sizes ? "OK" : "Failed")
+          << std::endl;
+  if(equal_sizes)
+    deallog << "memcmp check: "
+            << (std::memcmp(buffer.data(), &object, buffer.size()) == 0 ?
+                  "OK" :
+                  "Failed")
+            << std::endl;
 
-  bool equal=true;
-  for (unsigned int i=0; i<N; ++i)
-    if (unpacked[i] != object[i])
+  bool equal = true;
+  for(unsigned int i = 0; i < N; ++i)
+    if(unpacked[i] != object[i])
       {
         equal = false;
         break;
@@ -49,25 +53,26 @@ void check (const T (&object)[N])
   deallog << "direct cmp: " << (equal ? "OK" : "Failed") << std::endl;
 }
 
-
-void test()
+void
+test()
 {
   // try a small array that is packed by just using memcpy
-  double x[3] = { 1, 2, 3 };
-  check (x);
+  double x[3] = {1, 2, 3};
+  check(x);
 
   // now try a much larger array that will actually be serialized
   // using BOOST
-  const unsigned int N=10000;
-  double y[N];
-  for (unsigned int i=0; i<N; ++i)
+  const unsigned int N = 10000;
+  double             y[N];
+  for(unsigned int i = 0; i < N; ++i)
     y[i] = i;
-  check (y);
+  check(y);
 
   deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

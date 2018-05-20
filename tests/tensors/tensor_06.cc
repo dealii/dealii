@@ -13,26 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check Tensor<1,dim>::operator*(Tensor<1,dim>)
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
 
 template <int dim>
-void test_tensor ()
+void
+test_tensor()
 {
-  Tensor<1,dim> t1, t2;
-  for (unsigned int i=0; i<dim; ++i)
+  Tensor<1, dim> t1, t2;
+  for(unsigned int i = 0; i < dim; ++i)
     {
-      t1[i] = i+1;
-      t2[i] = 4.*i-10.;
+      t1[i] = i + 1;
+      t2[i] = 4. * i - 10.;
     }
   double res = t1 * t2;
   deallog << "dim = " << dim << ": " << res << std::endl;
 }
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

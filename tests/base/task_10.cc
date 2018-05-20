@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // verify Threads::Task::joinable()
 
 #include "../tests.h"
@@ -21,22 +20,22 @@
 
 #include <deal.II/base/thread_management.h>
 
-
-void test ()
+void
+test()
 {
-  sleep (3);
+  sleep(3);
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 
   Threads::Task<> t;
-  AssertThrow (t.joinable() == false, ExcInternalError());
+  AssertThrow(t.joinable() == false, ExcInternalError());
 
-  t = Threads::new_task (test);
-  AssertThrow (t.joinable() == true, ExcInternalError());
-  t.join ();
+  t = Threads::new_task(test);
+  AssertThrow(t.joinable() == true, ExcInternalError());
+  t.join();
 }

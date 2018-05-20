@@ -13,16 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::project works for Q elements correctly
 
 #include "project_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=1; p<6-dim; ++p)
-    test_with_wrong_face_orientation (FE_Q<dim>(p), p);
+  for(unsigned int p = 1; p < 6 - dim; ++p)
+    test_with_wrong_face_orientation(FE_Q<dim>(p), p);
 }

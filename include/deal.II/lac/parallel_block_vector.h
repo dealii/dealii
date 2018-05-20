@@ -22,9 +22,7 @@
 #include <cstring>
 #include <iomanip>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace parallel
 {
@@ -53,8 +51,8 @@ namespace parallel
     using LinearAlgebra::distributed::BlockVector;
 
     /*@}*/
-  }
-}
+  } // namespace distributed
+} // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 

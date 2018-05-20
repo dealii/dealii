@@ -13,69 +13,64 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // distribute different finite elements randomly across the domain, then use
 // DoFTools::get_active_fe_indices()
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-
-
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  tria.refine_global (2);
-  tria.begin_active()->set_refine_flag ();
-  tria.execute_coarsening_and_refinement ();
-  tria.refine_global (2);
+  tria.refine_global(2);
+  tria.begin_active()->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
+  tria.refine_global(2);
 
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back(FE_Q<dim> (1));
-  fe_collection.push_back(FE_Q<dim> (2));
-  fe_collection.push_back(FE_Q<dim> (3));
-  fe_collection.push_back(FE_Q<dim> (4));
+  fe_collection.push_back(FE_Q<dim>(1));
+  fe_collection.push_back(FE_Q<dim>(2));
+  fe_collection.push_back(FE_Q<dim>(3));
+  fe_collection.push_back(FE_Q<dim>(4));
 
   hp::DoFHandler<dim> dof_handler(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-       cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
-    cell->set_active_fe_index (Testing::rand() % fe_collection.size());
+  for(typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active();
+      cell != dof_handler.end();
+      ++cell)
+    cell->set_active_fe_index(Testing::rand() % fe_collection.size());
 
   dof_handler.distribute_dofs(fe_collection);
 
-  std::vector<unsigned int> active_fe_indices (tria.n_active_cells());
-  DoFTools::get_active_fe_indices (dof_handler,
-                                   active_fe_indices);
-  for (unsigned int i=0; i<tria.n_active_cells(); ++i)
+  std::vector<unsigned int> active_fe_indices(tria.n_active_cells());
+  DoFTools::get_active_fe_indices(dof_handler, active_fe_indices);
+  for(unsigned int i = 0; i < tria.n_active_cells(); ++i)
     deallog << active_fe_indices[i] << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

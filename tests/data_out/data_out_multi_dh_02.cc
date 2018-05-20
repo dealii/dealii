@@ -17,24 +17,21 @@
 
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/numerics/data_out.h>
 
-
-
-
 template <int dim>
 void
-test ()
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global (1);
+  tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
-  tria.execute_coarsening_and_refinement ();
+  tria.execute_coarsening_and_refinement();
 
   FE_Q<dim> fe1(1);
 
@@ -42,17 +39,18 @@ test ()
   dof1.distribute_dofs(fe1);
 
   Vector<double> v1(dof1.n_dofs()), v2(dof1.n_dofs());
-  for (unsigned int i=0; i<v1.size(); ++i) v1(i) = i;
-  for (unsigned int i=0; i<v2.size(); ++i) v2(i) = -v1(i);
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    v1(i) = i;
+  for(unsigned int i = 0; i < v2.size(); ++i)
+    v2(i) = -v1(i);
 
   DataOut<dim> data_out;
-  data_out.add_data_vector (dof1, v1, "data1");
-  data_out.add_data_vector (dof1, v2, "data2");
-  data_out.build_patches ();
+  data_out.add_data_vector(dof1, v1, "data1");
+  data_out.add_data_vector(dof1, v2, "data2");
+  data_out.build_patches();
 
-  data_out.write_vtk (deallog.get_file_stream());
+  data_out.write_vtk(deallog.get_file_stream());
 }
-
 
 int
 main()
@@ -60,8 +58,8 @@ main()
   try
     {
       std::ofstream logfile("output");
-      deallog << std::setprecision (2);
-      logfile << std::setprecision (2);
+      deallog << std::setprecision(2);
+      logfile << std::setprecision(2);
       deallog.attach(logfile);
 
       test<1>();
@@ -70,9 +68,10 @@ main()
 
       return 0;
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -82,9 +81,10 @@ main()
               << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl
@@ -94,4 +94,3 @@ main()
       return 1;
     };
 }
-

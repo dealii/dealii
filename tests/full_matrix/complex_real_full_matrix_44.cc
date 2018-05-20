@@ -13,35 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::Tmmult. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors, even though we only store real values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m, n, o;
-  make_square_matrix (m);
-  make_square_matrix (n);
-  make_square_matrix (o);
+  FullMatrix<std::complex<number>> m, n, o;
+  make_square_matrix(m);
+  make_square_matrix(n);
+  make_square_matrix(o);
 
-  m.Tmmult (n, o, true);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.Tmmult(n, o, true);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 
-  m.Tmmult (n, o, false);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.Tmmult(n, o, false);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 }

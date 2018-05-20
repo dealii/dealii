@@ -13,54 +13,47 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test functions in namespace WorkStream
 
 #include "../tests.h"
 
 #include <deal.II/base/work_stream.h>
 
-
 struct ScratchData
 {};
-
 
 struct CopyData
 {
   unsigned int computed;
 };
 
-
-void worker (const std::vector<unsigned int>::iterator &i,
-             ScratchData &,
-             CopyData &ad)
+void
+worker(const std::vector<unsigned int>::iterator& i, ScratchData&, CopyData& ad)
 {
   ad.computed = *i * 2;
 }
 
-void copier (const CopyData &ad)
+void
+copier(const CopyData& ad)
 {
   deallog << ad.computed << std::endl;
 }
 
-
-void test ()
+void
+test()
 {
   std::vector<unsigned int> v;
-  for (unsigned int i=0; i<20; ++i)
-    v.push_back (i);
+  for(unsigned int i = 0; i < 20; ++i)
+    v.push_back(i);
 
-  WorkStream::run (v.begin(), v.end(), &worker, &copier,
-                   ScratchData(),
-                   CopyData());
+  WorkStream::run(
+    v.begin(), v.end(), &worker, &copier, ScratchData(), CopyData());
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

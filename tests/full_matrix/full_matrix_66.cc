@@ -13,23 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check assignment from IdenityMatrix
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
   m = IdentityMatrix(5);
-  print_matrix (m);
+  print_matrix(m);
 }
-

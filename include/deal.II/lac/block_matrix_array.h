@@ -20,22 +20,21 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/table.h>
 
+#include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/block_vector.h>
 
-#include <vector>
 #include <map>
-#include <string>
 #include <memory>
 #include <sstream>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup Matrix2
  *@{
  */
-
 
 /**
  * Block matrix composed of different single matrices; these matrices may even
@@ -112,7 +111,8 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2000-2005, 2010
  */
-template <typename number = double, typename BlockVectorType=BlockVector<number> >
+template <typename number          = double,
+          typename BlockVectorType = BlockVector<number>>
 class DEAL_II_DEPRECATED BlockMatrixArray : public Subscriptor
 {
 public:
@@ -125,26 +125,26 @@ public:
    * Default constructor creating a useless object. initialize() must be
    * called before using it.
    */
-  BlockMatrixArray ();
+  BlockMatrixArray();
 
   /**
    * Constructor fixing the dimensions.
    */
-  BlockMatrixArray (const unsigned int n_block_rows,
-                    const unsigned int n_block_cols);
+  BlockMatrixArray(const unsigned int n_block_rows,
+                   const unsigned int n_block_cols);
 
   /**
    * Initialize object completely. This is the function to call for an object
    * created by the default constructor.
    */
-  void initialize (const unsigned int n_block_rows,
-                   const unsigned int n_block_cols);
+  void
+  initialize(const unsigned int n_block_rows, const unsigned int n_block_cols);
 
   /**
    * Adjust the matrix to a new size and delete all blocks.
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_cols);
+  void
+  reinit(const unsigned int n_block_rows, const unsigned int n_block_cols);
 
   /**
    * Add a block matrix entry. The <tt>matrix</tt> is entered into a list of
@@ -157,63 +157,69 @@ public:
    * ExcDimensionMismatch in one of the multiplication functions.
    */
   template <typename MatrixType>
-  void enter (const MatrixType   &matrix,
-              const unsigned int  row,
-              const unsigned int  col,
-              const number        prefix = 1.,
-              const bool          transpose = false);
+  void
+  enter(const MatrixType&  matrix,
+        const unsigned int row,
+        const unsigned int col,
+        const number       prefix    = 1.,
+        const bool         transpose = false);
 
   /**
    * Delete all entries, i.e. reset the matrix to an empty state.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Number of block-entries per column.
    */
-  unsigned int n_block_rows () const;
+  unsigned int
+  n_block_rows() const;
 
   /**
    * Number of block-entries per row.
    */
-  unsigned int n_block_cols () const;
+  unsigned int
+  n_block_cols() const;
 
   /**
    * Matrix-vector multiplication.
    */
-  void vmult (BlockVectorType &dst,
-              const BlockVectorType &src) const;
+  void
+  vmult(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Matrix-vector multiplication adding to <tt>dst</tt>.
    */
-  void vmult_add(BlockVectorType &dst,
-                 const BlockVectorType &src) const;
+  void
+  vmult_add(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Transposed matrix-vector multiplication.
    */
-  void Tvmult (BlockVectorType &dst,
-               const BlockVectorType &src) const;
+  void
+  Tvmult(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Transposed matrix-vector multiplication adding to <tt>dst</tt>.
    */
-  void Tvmult_add (BlockVectorType &dst,
-                   const BlockVectorType &src) const;
+  void
+  Tvmult_add(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Matrix scalar product between two vectors (at least for a symmetric
    * matrix).
    */
-  number matrix_scalar_product (const BlockVectorType &u,
-                                const BlockVectorType &v) const;
+  number
+  matrix_scalar_product(const BlockVectorType& u,
+                        const BlockVectorType& v) const;
 
   /**
    * Compute $u^T M u$. This is the square of the norm induced by the matrix
    * assuming the matrix is symmetric positive definitive.
    */
-  number matrix_norm_square (const BlockVectorType &u) const;
+  number
+  matrix_norm_square(const BlockVectorType& u) const;
 
   /**
    * Print the block structure as a LaTeX-array. This output will not be very
@@ -255,7 +261,8 @@ public:
    * structure of this matrix.
    */
   template <class StreamType>
-  void print_latex (StreamType &out) const;
+  void
+  print_latex(StreamType& out) const;
 
 protected:
   /**
@@ -275,11 +282,11 @@ protected:
      * generated for <tt>matrix</tt>.
      */
     template <typename MatrixType>
-    Entry (const MatrixType &matrix,
-           size_type row,
-           size_type col,
-           number prefix,
-           bool transpose);
+    Entry(const MatrixType& matrix,
+          size_type         row,
+          size_type         col,
+          number            prefix,
+          bool              transpose);
 
     /**
      * Copy constructor invalidating the old object. Since it is only used for
@@ -288,7 +295,7 @@ protected:
      * For a deep copy, we would need a reproduction operator in
      * PointerMatixBase.
      */
-    Entry(const Entry &);
+    Entry(const Entry&);
 
     /**
      * Destructor, where we delete the PointerMatrix created by the
@@ -319,7 +326,7 @@ protected:
     /**
      * The matrix block itself.
      */
-    PointerMatrixBase<typename BlockVectorType::BlockType > *matrix;
+    PointerMatrixBase<typename BlockVectorType::BlockType>* matrix;
 
     /**
      * Assignment operator.
@@ -328,7 +335,9 @@ protected:
      * and only exists for convenience there is no reasonable way to implement
      * this, so it is explicitly deleted.
      */
-    Entry &operator= (const Entry &) = delete;
+    Entry&
+    operator=(const Entry&)
+      = delete;
   };
 
   /**
@@ -348,7 +357,6 @@ private:
 };
 
 /*@}*/
-
 
 /**
  * Inversion of a block-triangular matrix.
@@ -406,9 +414,10 @@ private:
  * @ingroup Preconditioners
  * @author Guido Kanschat, 2001, 2005
  */
-template <typename number = double, typename BlockVectorType = BlockVector<number> >
+template <typename number          = double,
+          typename BlockVectorType = BlockVector<number>>
 class DEAL_II_DEPRECATED BlockTrianglePrecondition
-  : private BlockMatrixArray<number,BlockVectorType>
+  : private BlockMatrixArray<number, BlockVectorType>
 {
 public:
   /**
@@ -420,72 +429,73 @@ public:
    * Default constructor creating a useless object. initialize() must be
    * called before using it.
    */
-  BlockTrianglePrecondition ();
+  BlockTrianglePrecondition();
 
   /**
    * Constructor. This matrix must be block-quadratic, and <tt>n_blocks</tt>
    * is the number of blocks in each direction.
    */
-  BlockTrianglePrecondition (const unsigned int n_blocks);
+  BlockTrianglePrecondition(const unsigned int n_blocks);
 
   /**
    * Resize preconditioner to a new size and clear all blocks.
    */
-  void reinit (const unsigned int n_block_rows);
-
+  void
+  reinit(const unsigned int n_block_rows);
 
   /**
    * Enter a block. This calls BlockMatrixArray::enter(). Remember that the
    * diagonal blocks should actually be inverse matrices or preconditioners.
    */
   template <typename MatrixType>
-  void enter (const MatrixType &matrix,
-              const size_type   row,
-              const size_type   col,
-              const number      prefix    = 1.,
-              const bool        transpose = false);
+  void
+  enter(const MatrixType& matrix,
+        const size_type   row,
+        const size_type   col,
+        const number      prefix    = 1.,
+        const bool        transpose = false);
 
   /**
    * Preconditioning.
    */
-  void vmult (BlockVectorType &dst,
-              const BlockVectorType &src) const;
+  void
+  vmult(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Preconditioning adding to <tt>dst</tt>.
    */
-  void vmult_add (BlockVectorType &dst,
-                  const BlockVectorType &src) const;
+  void
+  vmult_add(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Transposed preconditioning
    */
-  void Tvmult (BlockVectorType &dst,
-               const BlockVectorType &src) const;
+  void
+  Tvmult(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Transposed preconditioning adding to <tt>dst</tt>.
    */
-  void Tvmult_add (BlockVectorType &dst,
-                   const BlockVectorType &src) const;
+  void
+  Tvmult_add(BlockVectorType& dst, const BlockVectorType& src) const;
 
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number,BlockVectorType>::print_latex;
+  using BlockMatrixArray<number, BlockVectorType>::print_latex;
 
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number,BlockVectorType>::n_block_rows;
+  using BlockMatrixArray<number, BlockVectorType>::n_block_rows;
 
   /**
    * Make function of base class available.
    */
-  using BlockMatrixArray<number,BlockVectorType>::n_block_cols;
-  using BlockMatrixArray<number,BlockVectorType>::clear;
-  using BlockMatrixArray<number,BlockVectorType>::Subscriptor::subscribe;
-  using BlockMatrixArray<number,BlockVectorType>::Subscriptor::unsubscribe;
+  using BlockMatrixArray<number, BlockVectorType>::n_block_cols;
+  using BlockMatrixArray<number, BlockVectorType>::clear;
+  using BlockMatrixArray<number, BlockVectorType>::Subscriptor::subscribe;
+  using BlockMatrixArray<number, BlockVectorType>::Subscriptor::unsubscribe;
 
   /**
    * @addtogroup Exceptions
@@ -514,8 +524,8 @@ private:
    * Add all off-diagonal contributions and return the entry of the diagonal
    * element for one row.
    */
-  void do_row (BlockVectorType &dst,
-               size_type row_num) const;
+  void
+  do_row(BlockVectorType& dst, size_type row_num) const;
 
   /**
    * Flag for backward insertion.
@@ -523,72 +533,68 @@ private:
   bool backward;
 };
 
-
 #ifndef DOXYGEN
 //---------------------------------------------------------------------------
 
 template <typename number, typename BlockVectorType>
 template <typename MatrixType>
-inline
-BlockMatrixArray<number, BlockVectorType>::Entry::Entry
-(const MatrixType &m,
- size_type         row,
- size_type         col,
- number            prefix,
- bool              transpose)
-  :
-  row (row),
-  col (col),
-  prefix (prefix),
-  transpose (transpose),
-  matrix (new_pointer_matrix_base(m, typename BlockVectorType::BlockType(), typeid(*this).name()))
+inline BlockMatrixArray<number, BlockVectorType>::Entry::Entry(
+  const MatrixType& m,
+  size_type         row,
+  size_type         col,
+  number            prefix,
+  bool              transpose)
+  : row(row),
+    col(col),
+    prefix(prefix),
+    transpose(transpose),
+    matrix(new_pointer_matrix_base(m,
+                                   typename BlockVectorType::BlockType(),
+                                   typeid(*this).name()))
 {}
-
-
 
 template <typename number, typename BlockVectorType>
 template <typename MatrixType>
-inline
-void
-BlockMatrixArray<number, BlockVectorType>::enter (const MatrixType &matrix,
-                                                  unsigned int      row,
-                                                  unsigned int      col,
-                                                  number            prefix,
-                                                  bool              transpose)
+inline void
+BlockMatrixArray<number, BlockVectorType>::enter(const MatrixType& matrix,
+                                                 unsigned int      row,
+                                                 unsigned int      col,
+                                                 number            prefix,
+                                                 bool              transpose)
 {
-  Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
+  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
+  Assert(col < n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
 }
 
-
 template <typename number, typename BlockVectorType>
 template <class StreamType>
-inline
-void
-BlockMatrixArray<number, BlockVectorType>::print_latex (StreamType &out) const
+inline void
+BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType& out) const
 {
-  out << "\\begin{array}{"
-      << std::string(n_block_cols(), 'c')
-      << "}" << std::endl;
+  out << "\\begin{array}{" << std::string(n_block_cols(), 'c') << "}"
+      << std::endl;
 
-  Table<2,std::string> array(n_block_rows(), n_block_cols());
+  Table<2, std::string> array(n_block_rows(), n_block_cols());
 
-  typedef std::map<const PointerMatrixBase<typename BlockVectorType::BlockType > *, std::string> NameMap;
+  typedef std::map<
+    const PointerMatrixBase<typename BlockVectorType::BlockType>*,
+    std::string>
+          NameMap;
   NameMap matrix_names;
 
-  typename std::vector<Entry>::const_iterator m = entries.begin();
+  typename std::vector<Entry>::const_iterator m   = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
 
   size_type matrix_number = 0;
-  for (; m != end ; ++m)
+  for(; m != end; ++m)
     {
-      if (matrix_names.find(m->matrix) == matrix_names.end())
+      if(matrix_names.find(m->matrix) == matrix_names.end())
         {
-          std::pair<typename NameMap::iterator, bool> x =
-            matrix_names.insert(
-              std::pair<const PointerMatrixBase<typename BlockVectorType::BlockType >*, std::string> (m->matrix,
-                  std::string("M")));
+          std::pair<typename NameMap::iterator, bool> x = matrix_names.insert(
+            std::pair<
+              const PointerMatrixBase<typename BlockVectorType::BlockType>*,
+              std::string>(m->matrix, std::string("M")));
           std::ostringstream stream;
           stream << matrix_number++;
 
@@ -597,24 +603,24 @@ BlockMatrixArray<number, BlockVectorType>::print_latex (StreamType &out) const
 
       std::ostringstream stream;
 
-      if (array(m->row, m->col) != "" && m->prefix >= 0)
+      if(array(m->row, m->col) != "" && m->prefix >= 0)
         stream << "+";
-      if (m->prefix != 1.)
+      if(m->prefix != 1.)
         stream << m->prefix << 'x';
       stream << matrix_names.find(m->matrix)->second;
-//      stream << '(' << m->matrix << ')';
-      if (m->transpose)
+      //      stream << '(' << m->matrix << ')';
+      if(m->transpose)
         stream << "^T";
 
       array(m->row, m->col) += stream.str();
     }
-  for (unsigned int i=0; i<n_block_rows(); ++i)
-    for (unsigned int j=0; j<n_block_cols(); ++j)
+  for(unsigned int i = 0; i < n_block_rows(); ++i)
+    for(unsigned int j = 0; j < n_block_cols(); ++j)
       {
-        out << '\t' << array(i,j);
-        if (j==n_block_cols()-1)
+        out << '\t' << array(i, j);
+        if(j == n_block_cols() - 1)
           {
-            if (i != n_block_rows() - 1)
+            if(i != n_block_rows() - 1)
               out << "\\\\" << std::endl;
             else
               out << std::endl;
@@ -627,18 +633,17 @@ BlockMatrixArray<number, BlockVectorType>::print_latex (StreamType &out) const
 
 template <typename number, typename BlockVectorType>
 template <typename MatrixType>
-inline
-void
-BlockTrianglePrecondition<number, BlockVectorType>::enter (const MatrixType &matrix,
-                                                           size_type         row,
-                                                           size_type         col,
-                                                           number            prefix,
-                                                           bool              transpose)
+inline void
+BlockTrianglePrecondition<number, BlockVectorType>::enter(
+  const MatrixType& matrix,
+  size_type         row,
+  size_type         col,
+  number            prefix,
+  bool              transpose)
 {
-  BlockMatrixArray<number, BlockVectorType>::enter(matrix, row, col, prefix, transpose);
+  BlockMatrixArray<number, BlockVectorType>::enter(
+    matrix, row, col, prefix, transpose);
 }
-
-
 
 #endif // DOXYGEN
 

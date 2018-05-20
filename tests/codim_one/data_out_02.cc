@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // DataOut::build_patches appeared to have a problem with outputting
 // lines in 2d where nodes were numbered differently when writing data
 // vectors as opposed to writing node locations. in the end this
@@ -26,44 +24,44 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
 
 std::ofstream logfile("output");
 
-
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 
   const unsigned int dim = 1;
 
-  Triangulation<dim,dim+1>    triangulation;
-  FE_Q<dim,dim+1>             fe(1);
-  DoFHandler<dim,dim+1>       dof_handler(triangulation);
-  Vector<double> soln;
+  Triangulation<dim, dim + 1> triangulation;
+  FE_Q<dim, dim + 1>          fe(1);
+  DoFHandler<dim, dim + 1>    dof_handler(triangulation);
+  Vector<double>              soln;
 
-  GridIn<dim,dim+1> grid_in;
-  grid_in.attach_triangulation (triangulation);
+  GridIn<dim, dim + 1> grid_in;
+  grid_in.attach_triangulation(triangulation);
   std::ifstream fname(SOURCE_DIR "/grids/square.msh");
-  grid_in.read_msh (fname);
+  grid_in.read_msh(fname);
 
-  dof_handler.distribute_dofs (fe);
-  soln.reinit (dof_handler.n_dofs());
+  dof_handler.distribute_dofs(fe);
+  soln.reinit(dof_handler.n_dofs());
   soln = 0;
-  for (unsigned int i=0; i<soln.size(); ++i)
+  for(unsigned int i = 0; i < soln.size(); ++i)
     soln(i) = i;
-  DataOut<dim, DoFHandler<dim, dim+1> > data_out;
-  data_out.attach_dof_handler (dof_handler);
+  DataOut<dim, DoFHandler<dim, dim + 1>> data_out;
+  data_out.attach_dof_handler(dof_handler);
 
-  data_out.add_data_vector (soln, "scalar_data",
-                            DataOut<dim,DoFHandler<dim, dim+1> >::type_dof_data);
-  data_out.build_patches ();
-  data_out.write_vtk (deallog.get_file_stream());
+  data_out.add_data_vector(
+    soln, "scalar_data", DataOut<dim, DoFHandler<dim, dim + 1>>::type_dof_data);
+  data_out.build_patches();
+  data_out.write_vtk(deallog.get_file_stream());
 
   return 0;
 }

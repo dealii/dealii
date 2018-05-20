@@ -13,45 +13,50 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
 #include "../lapack/create_matrix.h"
+#include "../tests.h"
 
 // test saving and loading of distributed ScaLAPACKMatrices
 
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/timer.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/scalapack.h>
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
-#include <cstdio>
-
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void
+test(const unsigned int size, const unsigned int block_size)
 {
-  const std::string filename ("scalapack_10_test.h5");
+  const std::string filename("scalapack_10_test.h5");
 
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
-  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(mpi_communicator));
+  ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   //create FullMatrix and fill it
   FullMatrix<NumberType> full(size);
-  unsigned int count=0;
-  for (unsigned int i=0; i<size; ++i)
-    for (unsigned int j=0; j<size; ++j, ++count)
-      full(i,j) = count;
+  unsigned int           count = 0;
+  for(unsigned int i = 0; i < size; ++i)
+    for(unsigned int j = 0; j < size; ++j, ++count)
+      full(i, j) = count;
 
   //create 2d process grid
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid
+    = std::make_shared<Utilities::MPI::ProcessGrid>(
+      mpi_communicator, size, size, block_size, block_size);
 
-  ScaLAPACKMatrix<NumberType> scalapack_matrix(size,size,grid,block_size,block_size);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_copy(size,size,grid,block_size,block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix(
+    size, size, grid, block_size, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_copy(
+    size, size, grid, block_size, block_size);
 
   scalapack_matrix = full;
   scalapack_matrix.save(filename.c_str());
@@ -59,31 +64,31 @@ void test(const unsigned int size, const unsigned int block_size)
 
   FullMatrix<NumberType> copy(size);
   scalapack_matrix_copy.copy_to(copy);
-  copy.add(-1,full);
+  copy.add(-1, full);
 
   pcout << size << " " << block_size << std::endl;
 
-  if (copy.frobenius_norm()>1e-12)
+  if(copy.frobenius_norm() > 1e-12)
     pcout << "norm of difference: " << copy.frobenius_norm() << std::endl;
 
-  AssertThrow(copy.frobenius_norm()<1e-12,ExcInternalError());
+  AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
   std::remove(filename.c_str());
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
-  const std::vector<unsigned int> sizes = {{100,200,300}};
-  const std::vector<unsigned int> block_sizes = {{1,16,32}};
+  const std::vector<unsigned int> sizes       = {{100, 200, 300}};
+  const std::vector<unsigned int> block_sizes = {{1, 16, 32}};
 
-  for (const auto &s : sizes)
-    for (const auto &b : block_sizes)
-      test<double>(s,b);
+  for(const auto& s : sizes)
+    for(const auto& b : block_sizes)
+      test<double>(s, b);
 
-  for (const auto &s : sizes)
-    for (const auto &b : block_sizes)
-      test<float>(s,b);
+  for(const auto& s : sizes)
+    for(const auto& b : block_sizes)
+      test<float>(s, b);
 }

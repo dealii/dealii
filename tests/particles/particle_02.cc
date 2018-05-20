@@ -13,16 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Particle constructors, copy, and move operations.
 
 #include "../tests.h"
 #include <deal.II/particles/particle.h>
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   {
     Point<2> position;
@@ -35,35 +33,40 @@ void test ()
 
     const types::particle_index index(7);
 
-    Particles::Particle<2> particle(position,reference_position,index);
+    Particles::Particle<2> particle(position, reference_position, index);
 
     deallog << "Particle location: " << particle.get_location() << std::endl
-            << "Particle reference location: " << particle.get_reference_location() << std::endl
+            << "Particle reference location: "
+            << particle.get_reference_location() << std::endl
             << "Particle index: " << particle.get_id() << std::endl;
 
     const Particles::Particle<2> copy(particle);
 
     deallog << "Copy particle location: " << copy.get_location() << std::endl
-            << "Copy particle reference location: " << copy.get_reference_location() << std::endl
+            << "Copy particle reference location: "
+            << copy.get_reference_location() << std::endl
             << "Copy particle index: " << copy.get_id() << std::endl;
 
     const Particles::Particle<2> moved_particle(std::move(particle));
 
-    deallog << "Moved particle location: " << moved_particle.get_location() << std::endl
-            << "Moved particle reference location: " << moved_particle.get_reference_location() << std::endl
+    deallog << "Moved particle location: " << moved_particle.get_location()
+            << std::endl
+            << "Moved particle reference location: "
+            << moved_particle.get_reference_location() << std::endl
             << "Moved particle index: " << moved_particle.get_id() << std::endl;
 
-    deallog << "Original particle location: " << particle.get_location() << std::endl
-            << "Original particle reference location: " << particle.get_reference_location() << std::endl
+    deallog << "Original particle location: " << particle.get_location()
+            << std::endl
+            << "Original particle reference location: "
+            << particle.get_reference_location() << std::endl
             << "Original particle index: " << particle.get_id() << std::endl;
   }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
   test<2>();

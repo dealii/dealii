@@ -13,23 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::frobenius_norm
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_matrix(m);
   deallog << m.frobenius_norm() << std::endl;
 }
-

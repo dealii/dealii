@@ -13,9 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/config.h>
 #include <cmath>
 #include <complex>
+#include <deal.II/base/config.h>
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -26,16 +26,16 @@ namespace numbers
   const bool NumberTraits<number>::is_complex;
 
   template <typename number>
-  const bool NumberTraits<std::complex<number> >::is_complex;
+  const bool NumberTraits<std::complex<number>>::is_complex;
 
-// explicit instantiations
+  // explicit instantiations
   template struct NumberTraits<double>;
   template struct NumberTraits<float>;
   template struct NumberTraits<long double>;
 
-  template struct NumberTraits<std::complex<double> >;
-  template struct NumberTraits<std::complex<float> >;
-  template struct NumberTraits<std::complex<long double> >;
-}
+  template struct NumberTraits<std::complex<double>>;
+  template struct NumberTraits<std::complex<float>>;
+  template struct NumberTraits<std::complex<long double>>;
+} // namespace numbers
 
 DEAL_II_NAMESPACE_CLOSE

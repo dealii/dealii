@@ -18,8 +18,8 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/ad_number_traits.h>
+#include <deal.II/differentiation/ad/ad_number_types.h>
 
 #include <deal.II/differentiation/ad/adolc_math.h>
 #include <deal.II/differentiation/ad/adolc_number_types.h>
@@ -48,10 +48,8 @@ namespace Differentiation
    * @ingroup auto_symb_diff
    */
   namespace AD
-  {
-
-  }
-}
+  {}
+} // namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE
 

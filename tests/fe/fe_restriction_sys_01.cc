@@ -13,16 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_SYS1(FE_Q<2>(1),3,2);
+  CHECK_SYS1(FE_Q<2>(1), 3, 2);
 }

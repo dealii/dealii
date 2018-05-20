@@ -13,20 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_ALL(Q_Hierarchical,1,2);
-  CHECK_ALL(Q_Hierarchical,2,2);
-  CHECK_ALL(Q_Hierarchical,3,2);
-  CHECK_ALL(Q_Hierarchical,1,3);
-  CHECK_ALL(Q_Hierarchical,2,3);
+  CHECK_ALL(Q_Hierarchical, 1, 2);
+  CHECK_ALL(Q_Hierarchical, 2, 2);
+  CHECK_ALL(Q_Hierarchical, 3, 2);
+  CHECK_ALL(Q_Hierarchical, 1, 3);
+  CHECK_ALL(Q_Hierarchical, 2, 3);
 }

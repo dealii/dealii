@@ -19,28 +19,28 @@
 
 #include "../tests.h"
 
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/packaged_operation.h>
+#include <deal.II/lac/vector.h>
 
 using namespace dealii;
 
-
-void test_applies(std::string description,
-                  const PackagedOperation<Vector<double> > &expr)
+void
+test_applies(std::string                              description,
+             const PackagedOperation<Vector<double>>& expr)
 {
   // test apply
   Vector<double> tmp = expr;
   deallog << description << ": " << tmp << std::endl;
 
   // test apply_add
-  for (auto &i : tmp)
+  for(auto& i : tmp)
     i = 100.;
   expr.apply_add(tmp);
   deallog << "100. * 1_n + " << description << ": " << tmp << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -50,9 +50,9 @@ int main()
   // Tests:
 
   Vector<double> u(25);
-  for (unsigned int i = 0; i < u.size(); ++i)
+  for(unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double) (i + 1);
     }
 
   deallog << "u: " << u << std::endl;
@@ -76,7 +76,7 @@ int main()
 
   // operator+, operator-, operator*
 
-  PackagedOperation<Vector<double> > expr2 = u;
+  PackagedOperation<Vector<double>> expr2 = u;
 
   test_applies("2. * u + u", expr + expr2);
   test_applies("2. * u - u", expr - expr2);

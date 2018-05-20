@@ -13,41 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Utilities::pack/unpack on some types.
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
 template <int dim>
-void test(const unsigned int &size)
+void
+test(const unsigned int& size)
 {
-  std::vector<Point<dim> > points(size);
+  std::vector<Point<dim>> points(size);
 
-  for (auto &p : points)
+  for(auto& p : points)
     p = random_point<dim>();
 
   auto buffer = Utilities::pack(points);
 
-  auto unpacked = Utilities::unpack<std::vector<Point<dim> > >(buffer);
+  auto unpacked = Utilities::unpack<std::vector<Point<dim>>>(buffer);
 
-  unsigned int i=0;
-  bool ok = true;
-  for (const auto &p : points)
-    if (p.distance(unpacked[i++]) > 1e-12)
+  unsigned int i  = 0;
+  bool         ok = true;
+  for(const auto& p : points)
+    if(p.distance(unpacked[i++]) > 1e-12)
       {
-        deallog << "NOT OK: "
-                << p << " != " << unpacked[i-1] << std::endl;
+        deallog << "NOT OK: " << p << " != " << unpacked[i - 1] << std::endl;
         ok = false;
       }
 
-  if (ok)
+  if(ok)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

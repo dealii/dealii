@@ -13,42 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/lac/block_vector.h>
 
 #include <algorithm>
 #include <iostream>
 
-
-
-
-void test ()
+void
+test()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
 
-  deallog << IsBlockVector<Vector<double> >::value << ' '
-          << IsBlockVector<Vector<float> >::value << ' '
-          << IsBlockVector<BlockVector<double> >::value << ' '
-          << IsBlockVector<BlockVector<float> >::value << std::endl;
+  deallog << IsBlockVector<Vector<double>>::value << ' '
+          << IsBlockVector<Vector<float>>::value << ' '
+          << IsBlockVector<BlockVector<double>>::value << ' '
+          << IsBlockVector<BlockVector<float>>::value << std::endl;
 }
 
-
-
-
-int main ()
+int
+main()
 {
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &e)
+  catch(std::exception& e)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << e.what() << std::endl
@@ -58,9 +53,10 @@ int main ()
       // abort
       return 2;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -70,7 +66,6 @@ int main ()
       // abort
       return 3;
     };
-
 
   return 0;
 }

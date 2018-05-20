@@ -25,22 +25,23 @@
 
 #include <math.h>
 
-int main(void)
+int
+main(void)
 {
   initlog();
 
   const unsigned int n = 10;
   adtl::setNumDir(n);
 
-  adtl::adouble *x = new adtl::adouble[n];
-  for (unsigned int i = 0; i < n; i++)
+  adtl::adouble* x = new adtl::adouble[n];
+  for(unsigned int i = 0; i < n; i++)
     {
       x[i] = (i + 1.0) / (2.0 + i);
-      x[i].setADValue(i,1);
+      x[i].setADValue(i, 1);
     }
 
-  adtl::adouble  y = 1.0;
-  for (unsigned int i = 0; i < n; i++)
+  adtl::adouble y = 1.0;
+  for(unsigned int i = 0; i < n; i++)
     y *= x[i];
 
   // --- Function ---
@@ -52,10 +53,10 @@ int main(void)
   // --- Gradient ---
 
   double err_grad = 0;
-  for (unsigned int i = 0; i < n; i++)
+  for(unsigned int i = 0; i < n; i++)
     err_grad += std::abs(y.getADValue(i) - y.getValue() / x[i].getValue());
 
-  deallog << "Error (gradient): " <<  err_grad << std::endl;
+  deallog << "Error (gradient): " << err_grad << std::endl;
 
   // -- Cleanup ---
 

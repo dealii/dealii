@@ -13,34 +13,34 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check n_ghost_indices() and is_ghost_entry(), similar to
 // parallel_vector_09.cc test case
 
 #include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/partitioner.h>
+#include <deal.II/base/utilities.h>
 #include <iostream>
 #include <vector>
 
-
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
+  if(myid == 0)
+    deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange (numproc, set-2);
-  const unsigned int local_size = set - myid;
-  unsigned int global_size = 0;
-  unsigned int my_start = 0;
-  for (unsigned int i=0; i<numproc; ++i)
+  AssertIndexRange(numproc, set - 2);
+  const unsigned int local_size  = set - myid;
+  unsigned int       global_size = 0;
+  unsigned int       my_start    = 0;
+  for(unsigned int i = 0; i < numproc; ++i)
     {
       global_size += set - i;
-      if (i<myid)
+      if(i < myid)
         my_start += set - i;
     }
   // each processor owns some indices and all
@@ -51,79 +51,86 @@ void test ()
   IndexSet local_owned(global_size);
   local_owned.add_range(my_start, my_start + local_size);
   IndexSet local_relevant(global_size);
-  local_relevant = local_owned;
-  unsigned int ghost_indices [10] = {1, 2, 13, set-2, set-1, set, set+1, 2*set,
-                                     2*set+1, 2*set+3
-                                    };
-  local_relevant.add_indices (&ghost_indices[0], &ghost_indices[0]+10);
+  local_relevant                 = local_owned;
+  unsigned int ghost_indices[10] = {1,
+                                    2,
+                                    13,
+                                    set - 2,
+                                    set - 1,
+                                    set,
+                                    set + 1,
+                                    2 * set,
+                                    2 * set + 1,
+                                    2 * set + 3};
+  local_relevant.add_indices(&ghost_indices[0], &ghost_indices[0] + 10);
 
   Utilities::MPI::Partitioner v(local_owned, local_relevant, MPI_COMM_WORLD);
 
   // check number of ghosts everywhere (counted
   // the above)
-  if (myid == 0)
+  if(myid == 0)
     {
-      AssertDimension (v.n_ghost_indices(), 5);
+      AssertDimension(v.n_ghost_indices(), 5);
     }
-  else if (myid == 1)
+  else if(myid == 1)
     {
-      AssertDimension (v.n_ghost_indices(), 8);
+      AssertDimension(v.n_ghost_indices(), 8);
     }
-  else if (myid == 2)
+  else if(myid == 2)
     {
-      AssertDimension (v.n_ghost_indices(), 7);
+      AssertDimension(v.n_ghost_indices(), 7);
     }
   else
     {
-      AssertDimension (v.n_ghost_indices(), 10);
+      AssertDimension(v.n_ghost_indices(), 10);
     }
 
   // count that 13 is ghost only on non-owning
   // processors
-  if (myid == 0)
+  if(myid == 0)
     {
-      AssertThrow (v.is_ghost_entry (13) == false, ExcInternalError());
+      AssertThrow(v.is_ghost_entry(13) == false, ExcInternalError());
     }
   else
     {
-      AssertThrow (v.is_ghost_entry (13) == true, ExcInternalError());
+      AssertThrow(v.is_ghost_entry(13) == true, ExcInternalError());
     }
 
   // count that 27 is ghost nowhere
-  AssertThrow (v.is_ghost_entry (27) == false, ExcInternalError());
-  if (myid == 0)
+  AssertThrow(v.is_ghost_entry(27) == false, ExcInternalError());
+  if(myid == 0)
     {
-      AssertThrow (v.in_local_range (27) == true, ExcInternalError());
+      AssertThrow(v.in_local_range(27) == true, ExcInternalError());
     }
   else
     {
-      AssertThrow (v.in_local_range (27) == false, ExcInternalError());
+      AssertThrow(v.in_local_range(27) == false, ExcInternalError());
     }
 
   // element with number set is ghost
-  if (myid == 1)
+  if(myid == 1)
     {
-      AssertThrow (v.is_ghost_entry (set) == false, ExcInternalError());
+      AssertThrow(v.is_ghost_entry(set) == false, ExcInternalError());
     }
   else
     {
-      AssertThrow (v.is_ghost_entry (set) == true, ExcInternalError());
+      AssertThrow(v.is_ghost_entry(set) == true, ExcInternalError());
     }
 
-  if (myid == 0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
       deallog << std::setprecision(4);
@@ -132,5 +139,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

@@ -17,33 +17,32 @@
  * Author: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000
  */
 
-
 // @sect3{Include files}
 
 // These first include files have all been treated in previous examples, so we
 // won't explain what is in them again.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 // In this example, we will not use the numeration scheme which is used per
 // default by the DoFHandler class, but will renumber them using the
@@ -58,8 +57,8 @@
 // mentioned in the introduction, and we are going to use a ConvergenceTable
 // that collects all important data during a run and prints it at the end as a
 // table. These comes from the following two files:
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/convergence_table.h>
+#include <deal.II/numerics/vector_tools.h>
 // And finally, we need to use the FEFaceValues class, which is declared in
 // the same file as the FEValues class:
 #include <deal.II/fe/fe_values.h>
@@ -103,7 +102,6 @@ namespace Step7
     static const double       width;
   };
 
-
   // The variables which denote the centers and the width of the exponentials
   // have just been declared, now we still need to assign values to
   // them. Here, we can show another small piece of template sorcery, namely
@@ -124,21 +122,15 @@ namespace Step7
   // <code>dim</code>, but can immediately use the following definition:
   template <>
   const Point<1>
-  SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
-    = { Point<1>(-1.0 / 3.0),
-        Point<1>(0.0),
-        Point<1>(+1.0 / 3.0)
-      };
+    SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
+    = {Point<1>(-1.0 / 3.0), Point<1>(0.0), Point<1>(+1.0 / 3.0)};
 
   // Likewise, we can provide an explicit specialization for
   // <code>dim=2</code>. We place the centers for the 2d case as follows:
   template <>
   const Point<2>
-  SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
-    = { Point<2>(-0.5, +0.5),
-        Point<2>(-0.5, -0.5),
-        Point<2>(+0.5, -0.5)
-      };
+    SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
+    = {Point<2>(-0.5, +0.5), Point<2>(-0.5, -0.5), Point<2>(+0.5, -0.5)};
 
   // There remains to assign a value to the half-width of the exponentials. We
   // would like to use the same value for all dimensions. In this case, we
@@ -146,9 +138,7 @@ namespace Step7
   // concrete instantiation by substituting <code>dim</code> with a concrete
   // value:
   template <int dim>
-  const double SolutionBase<dim>::width = 1./8.;
-
-
+  const double SolutionBase<dim>::width = 1. / 8.;
 
   // After declaring and defining the characteristics of solution and right
   // hand side, we can declare the classes representing these two. They both
@@ -184,19 +174,19 @@ namespace Step7
   // Like in step-4, for compatibility with some compilers we explicitly
   // declare the default constructor:
   template <int dim>
-  class Solution : public Function<dim>,
-    protected SolutionBase<dim>
+  class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    Solution () : Function<dim>() {}
+    Solution() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
+    virtual Tensor<1, dim>
+    gradient(const Point<dim>&  p,
+             const unsigned int component = 0) const override;
   };
-
 
   // The actual definition of the values and gradients of the exact solution
   // class is according to their mathematical definition and does not need
@@ -213,20 +203,19 @@ namespace Step7
   // explain it, so if you are interested you can look it up under the phrase
   // <code>two-stage (name) lookup</code>.
   template <int dim>
-  double Solution<dim>::value (const Point<dim>   &p,
-                               const unsigned int) const
+  double
+  Solution<dim>::value(const Point<dim>& p, const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i=0; i<this->n_source_centers; ++i)
+    for(unsigned int i = 0; i < this->n_source_centers; ++i)
       {
-        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
-        return_value += std::exp(-x_minus_xi.norm_square() /
-                                 (this->width * this->width));
+        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+        return_value
+          += std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
       }
 
     return return_value;
   }
-
 
   // Likewise, this is the computation of the gradient of the solution.  In
   // order to accumulate the gradient from the contributions of the
@@ -253,28 +242,26 @@ namespace Step7
   // dimension of their components is not that of a length, but of one over
   // length).
   template <int dim>
-  Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-                                         const unsigned int) const
+  Tensor<1, dim>
+  Solution<dim>::gradient(const Point<dim>& p, const unsigned int) const
   {
-    Tensor<1,dim> return_value;
+    Tensor<1, dim> return_value;
 
-    for (unsigned int i=0; i<this->n_source_centers; ++i)
+    for(unsigned int i = 0; i < this->n_source_centers; ++i)
       {
-        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
 
         // For the gradient, note that its direction is along (x-x_i), so we
         // add up multiples of this distance vector, where the factor is given
         // by the exponentials.
-        return_value += (-2 / (this->width * this->width) *
-                         std::exp(-x_minus_xi.norm_square() /
-                                  (this->width * this->width)) *
-                         x_minus_xi);
+        return_value += (-2 / (this->width * this->width)
+                         * std::exp(-x_minus_xi.norm_square()
+                                    / (this->width * this->width))
+                         * x_minus_xi);
       }
 
     return return_value;
   }
-
-
 
   // Besides the function that represents the exact solution, we also need a
   // function which we can use as right hand side when assembling the linear
@@ -283,43 +270,42 @@ namespace Step7
   // only need the value of the function, not its gradients or higher
   // derivatives.
   template <int dim>
-  class RightHandSide : public Function<dim>,
-    protected SolutionBase<dim>
+  class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    RightHandSide () : Function<dim>() {}
+    RightHandSide() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
-
 
   // The value of the right hand side is given by the negative Laplacian of
   // the solution plus the solution itself, since we wanted to solve
   // Helmholtz's equation:
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim>   &p,
-                                    const unsigned int) const
+  double
+  RightHandSide<dim>::value(const Point<dim>& p, const unsigned int) const
   {
     double return_value = 0;
-    for (unsigned int i=0; i<this->n_source_centers; ++i)
+    for(unsigned int i = 0; i < this->n_source_centers; ++i)
       {
-        const Tensor<1,dim> x_minus_xi = p - this->source_centers[i];
+        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
 
         // The first contribution is the Laplacian:
-        return_value += ((2*dim - 4*x_minus_xi.norm_square()/
-                          (this->width * this->width)) /
-                         (this->width * this->width) *
-                         std::exp(-x_minus_xi.norm_square() /
-                                  (this->width * this->width)));
+        return_value
+          += ((2 * dim
+               - 4 * x_minus_xi.norm_square() / (this->width * this->width))
+              / (this->width * this->width)
+              * std::exp(-x_minus_xi.norm_square()
+                         / (this->width * this->width)));
         // And the second is the solution itself:
-        return_value += std::exp(-x_minus_xi.norm_square() /
-                                 (this->width * this->width));
+        return_value
+          += std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
       }
 
     return return_value;
   }
-
 
   // @sect3{The Helmholtz solver class}
 
@@ -344,22 +330,29 @@ namespace Step7
   public:
     enum RefinementMode
     {
-      global_refinement, adaptive_refinement
+      global_refinement,
+      adaptive_refinement
     };
 
-    HelmholtzProblem (const FiniteElement<dim> &fe,
-                      const RefinementMode      refinement_mode);
+    HelmholtzProblem(const FiniteElement<dim>& fe,
+                     const RefinementMode      refinement_mode);
 
-    ~HelmholtzProblem ();
+    ~HelmholtzProblem();
 
-    void run ();
+    void
+    run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void process_solution (const unsigned int cycle);
+    void
+    setup_system();
+    void
+    assemble_system();
+    void
+    solve();
+    void
+    refine_grid();
+    void
+    process_solution(const unsigned int cycle);
 
     // Now for the data elements of this class. Among the variables that we
     // have already used in previous examples, only the finite element object
@@ -443,24 +436,24 @@ namespace Step7
     // time of the solve object, and destroyed upon destruction, so the lock
     // on the destruction of the finite element object extends throughout the
     // lifetime of this HelmholtzProblem object.
-    Triangulation<dim>                      triangulation;
-    DoFHandler<dim>                         dof_handler;
+    Triangulation<dim> triangulation;
+    DoFHandler<dim>    dof_handler;
 
-    SmartPointer<const FiniteElement<dim> > fe;
+    SmartPointer<const FiniteElement<dim>> fe;
 
-    ConstraintMatrix                        hanging_node_constraints;
+    ConstraintMatrix hanging_node_constraints;
 
-    SparsityPattern                         sparsity_pattern;
-    SparseMatrix<double>                    system_matrix;
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
 
-    Vector<double>                          solution;
-    Vector<double>                          system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
 
     // The second to last variable stores the refinement mode passed to the
     // constructor. Since it is only set in the constructor, we can declare
     // this variable constant, to avoid that someone sets it involuntarily
     // (e.g. in an `if'-statement where == was written as = by chance).
-    const RefinementMode                    refinement_mode;
+    const RefinementMode refinement_mode;
 
     // For each refinement level some data (like the number of cells, or the
     // L2 error of the numerical solution) will be generated and later
@@ -469,9 +462,8 @@ namespace Step7
     // format. Here we don't only use the TableHandler but we use the derived
     // class ConvergenceTable that additionally evaluates rates of
     // convergence:
-    ConvergenceTable                        convergence_table;
+    ConvergenceTable convergence_table;
   };
-
 
   // @sect3{The HelmholtzProblem class implementation}
 
@@ -481,23 +473,19 @@ namespace Step7
   // arguments, and associate the DoF handler object with the triangulation
   // (which is empty at present, however).
   template <int dim>
-  HelmholtzProblem<dim>::HelmholtzProblem (const FiniteElement<dim> &fe,
-                                           const RefinementMode refinement_mode) :
-    dof_handler (triangulation),
-    fe (&fe),
-    refinement_mode (refinement_mode)
+  HelmholtzProblem<dim>::HelmholtzProblem(const FiniteElement<dim>& fe,
+                                          const RefinementMode refinement_mode)
+    : dof_handler(triangulation), fe(&fe), refinement_mode(refinement_mode)
   {}
-
 
   // @sect4{HelmholtzProblem::~HelmholtzProblem}
 
   // This is no different than before:
   template <int dim>
-  HelmholtzProblem<dim>::~HelmholtzProblem ()
+  HelmholtzProblem<dim>::~HelmholtzProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
-
 
   // @sect4{HelmholtzProblem::setup_system}
 
@@ -529,27 +517,27 @@ namespace Step7
   // with renumbering. Similar savings can generally be observed for all the
   // computations in this program.
   template <int dim>
-  void HelmholtzProblem<dim>::setup_system ()
+  void
+  HelmholtzProblem<dim>::setup_system()
   {
-    dof_handler.distribute_dofs (*fe);
-    DoFRenumbering::Cuthill_McKee (dof_handler);
+    dof_handler.distribute_dofs(*fe);
+    DoFRenumbering::Cuthill_McKee(dof_handler);
 
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-                                             hanging_node_constraints);
-    hanging_node_constraints.close ();
+    hanging_node_constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler,
+                                            hanging_node_constraints);
+    hanging_node_constraints.close();
 
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    hanging_node_constraints.condense (dsp);
-    sparsity_pattern.copy_from (dsp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    hanging_node_constraints.condense(dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
   }
-
 
   // @sect4{HelmholtzProblem::assemble_system}
 
@@ -565,20 +553,21 @@ namespace Step7
   // objects. The declaration of a face quadrature formula is then
   // straightforward:
   template <int dim>
-  void HelmholtzProblem<dim>::assemble_system ()
+  void
+  HelmholtzProblem<dim>::assemble_system()
   {
-    QGauss<dim>   quadrature_formula(3);
-    QGauss<dim-1> face_quadrature_formula(3);
+    QGauss<dim>     quadrature_formula(3);
+    QGauss<dim - 1> face_quadrature_formula(3);
 
-    const unsigned int n_q_points    = quadrature_formula.size();
+    const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 
     const unsigned int dofs_per_cell = fe->dofs_per_cell;
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // Then we need objects which can evaluate the values, gradients, etc of
     // the shape functions at the quadrature points. While it seems that it
@@ -602,13 +591,16 @@ namespace Step7
     // points on the real cell since we want to determine the Neumann values
     // from the exact solution object (see below). The class that gives us
     // this information is called FEFaceValues:
-    FEValues<dim>  fe_values (*fe, quadrature_formula,
-                              update_values   | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values(*fe,
+                            quadrature_formula,
+                            update_values | update_gradients
+                              | update_quadrature_points | update_JxW_values);
 
-    FEFaceValues<dim> fe_face_values (*fe, face_quadrature_formula,
-                                      update_values         | update_quadrature_points  |
-                                      update_normal_vectors | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(*fe,
+                                     face_quadrature_formula,
+                                     update_values | update_quadrature_points
+                                       | update_normal_vectors
+                                       | update_JxW_values);
 
     // Then we need some objects already known from previous examples: An
     // object denoting the right hand side function, its values at the
@@ -619,7 +611,7 @@ namespace Step7
     // only querying data, never changing the object. We can therefore declare
     // it <code>const</code>:
     const RightHandSide<dim> right_hand_side;
-    std::vector<double>  rhs_values (n_q_points);
+    std::vector<double>      rhs_values(n_q_points);
 
     // Finally we define an object denoting the exact solution function. We
     // will use it to compute the Neumann values at the boundary from
@@ -632,36 +624,34 @@ namespace Step7
 
     // Now for the main loop over all cells. This is mostly unchanged from
     // previous examples, so we only comment on the things that have changed.
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
-        right_hand_side.value_list (fe_values.get_quadrature_points(),
-                                    rhs_values);
+        right_hand_side.value_list(fe_values.get_quadrature_points(),
+                                   rhs_values);
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
                 // The first thing that has changed is the bilinear form. It
                 // now contains the additional term from the Helmholtz
                 // equation:
-                cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
-                                      fe_values.shape_grad(j,q_point)
-                                      +
-                                      fe_values.shape_value(i,q_point) *
-                                      fe_values.shape_value(j,q_point)) *
-                                     fe_values.JxW(q_point));
+                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point)
+                                         * fe_values.shape_grad(j, q_point)
+                                       + fe_values.shape_value(i, q_point)
+                                           * fe_values.shape_value(j, q_point))
+                                      * fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-                              rhs_values [q_point] *
-                              fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point)
+                              * rhs_values[q_point] * fe_values.JxW(q_point));
             }
 
         // Then there is that second term on the right hand side, the contour
@@ -673,10 +663,11 @@ namespace Step7
         // <code>run()</code> function further below. (The default value of
         // boundary indicators is <code>0</code>, so faces can only have an
         // indicator equal to <code>1</code> if we have explicitly set it.)
-        for (unsigned int face_number=0; face_number<GeometryInfo<dim>::faces_per_cell; ++face_number)
-          if (cell->face(face_number)->at_boundary()
-              &&
-              (cell->face(face_number)->boundary_id() == 1))
+        for(unsigned int face_number = 0;
+            face_number < GeometryInfo<dim>::faces_per_cell;
+            ++face_number)
+          if(cell->face(face_number)->at_boundary()
+             && (cell->face(face_number)->boundary_id() == 1))
             {
               // If we came into here, then we have found an external face
               // belonging to Gamma2. Next, we have to compute the values of
@@ -684,7 +675,7 @@ namespace Step7
               // need for the computation of the contour integral. This is
               // done using the <code>reinit</code> function which we already
               // know from the FEValue class:
-              fe_face_values.reinit (cell, face_number);
+              fe_face_values.reinit(cell, face_number);
 
               // And we can then perform the integration by using a loop over
               // all quadrature points.
@@ -696,29 +687,30 @@ namespace Step7
               // <code>fe_face_values</code> object. This is then used to
               // compute the additional contribution of this face to the right
               // hand side:
-              for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+              for(unsigned int q_point = 0; q_point < n_face_q_points;
+                  ++q_point)
                 {
                   const double neumann_value
-                    = (exact_solution.gradient (fe_face_values.quadrature_point(q_point)) *
-                       fe_face_values.normal_vector(q_point));
+                    = (exact_solution.gradient(
+                         fe_face_values.quadrature_point(q_point))
+                       * fe_face_values.normal_vector(q_point));
 
-                  for (unsigned int i=0; i<dofs_per_cell; ++i)
-                    cell_rhs(i) += (neumann_value *
-                                    fe_face_values.shape_value(i,q_point) *
-                                    fe_face_values.JxW(q_point));
+                  for(unsigned int i = 0; i < dofs_per_cell; ++i)
+                    cell_rhs(i)
+                      += (neumann_value * fe_face_values.shape_value(i, q_point)
+                          * fe_face_values.JxW(q_point));
                 }
             }
 
         // Now that we have the contributions of the present cell, we can
         // transfer it to the global matrix and right hand side vector, as in
         // the examples before:
-        cell->get_dof_indices (local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell->get_dof_indices(local_dof_indices);
+        for(unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              system_matrix.add (local_dof_indices[i],
-                                 local_dof_indices[j],
-                                 cell_matrix(i,j));
+            for(unsigned int j = 0; j < dofs_per_cell; ++j)
+              system_matrix.add(
+                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -734,39 +726,33 @@ namespace Step7
     // have not assigned another indicator (see below). The degrees of freedom
     // at the boundary that do not belong to Gamma1 are therefore excluded
     // from the interpolation of boundary values, just as we want.
-    hanging_node_constraints.condense (system_matrix);
-    hanging_node_constraints.condense (system_rhs);
+    hanging_node_constraints.condense(system_matrix);
+    hanging_node_constraints.condense(system_rhs);
 
-    std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Solution<dim>(),
-                                              boundary_values);
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        solution,
-                                        system_rhs);
+    std::map<types::global_dof_index, double> boundary_values;
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Solution<dim>(), boundary_values);
+    MatrixTools::apply_boundary_values(
+      boundary_values, system_matrix, solution, system_rhs);
   }
-
 
   // @sect4{HelmholtzProblem::solve}
 
   // Solving the system of equations is done in the same way as before:
   template <int dim>
-  void HelmholtzProblem<dim>::solve ()
+  void
+  HelmholtzProblem<dim>::solve()
   {
-    SolverControl           solver_control (1000, 1e-12);
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control(1000, 1e-12);
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute (solution);
+    hanging_node_constraints.distribute(solution);
   }
-
 
   // @sect4{HelmholtzProblem::refine_grid}
 
@@ -801,42 +787,43 @@ namespace Step7
   // handle them. We will use this same technique in other places further down
   // as well.
   template <int dim>
-  void HelmholtzProblem<dim>::refine_grid ()
+  void
+  HelmholtzProblem<dim>::refine_grid()
   {
-    switch (refinement_mode)
+    switch(refinement_mode)
       {
-      case global_refinement:
-      {
-        triangulation.refine_global (1);
-        break;
-      }
+        case global_refinement:
+          {
+            triangulation.refine_global(1);
+            break;
+          }
 
-      case adaptive_refinement:
-      {
-        Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+        case adaptive_refinement:
+          {
+            Vector<float> estimated_error_per_cell(
+              triangulation.n_active_cells());
 
-        KellyErrorEstimator<dim>::estimate (dof_handler,
-                                            QGauss<dim-1>(3),
-                                            typename FunctionMap<dim>::type(),
-                                            solution,
-                                            estimated_error_per_cell);
+            KellyErrorEstimator<dim>::estimate(
+              dof_handler,
+              QGauss<dim - 1>(3),
+              typename FunctionMap<dim>::type(),
+              solution,
+              estimated_error_per_cell);
 
-        GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                         estimated_error_per_cell,
-                                                         0.3, 0.03);
+            GridRefinement::refine_and_coarsen_fixed_number(
+              triangulation, estimated_error_per_cell, 0.3, 0.03);
 
-        triangulation.execute_coarsening_and_refinement ();
+            triangulation.execute_coarsening_and_refinement();
 
-        break;
-      }
+            break;
+          }
 
-      default:
-      {
-        Assert (false, ExcNotImplemented());
-      }
+        default:
+          {
+            Assert(false, ExcNotImplemented());
+          }
       }
   }
-
 
   // @sect4{HelmholtzProblem::process_solution}
 
@@ -845,7 +832,8 @@ namespace Step7
   // that will later be used to display the convergence against the continuous
   // solution in a nice format.
   template <int dim>
-  void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
+  void
+  HelmholtzProblem<dim>::process_solution(const unsigned int cycle)
   {
     // Our first task is to compute error norms. In order to integrate the
     // difference between computed numerical solution and the continuous
@@ -868,16 +856,15 @@ namespace Step7
     // obtained by summing the squares of the norms on each cell, and taking
     // the square root of that value. This is equivalent to taking the l2
     // (lower case <code>l</code>) norm of the vector of norms on each cell:
-    Vector<float> difference_per_cell (triangulation.n_active_cells());
-    VectorTools::integrate_difference (dof_handler,
-                                       solution,
-                                       Solution<dim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(3),
-                                       VectorTools::L2_norm);
-    const double L2_error = VectorTools::compute_global_error(triangulation,
-                                                              difference_per_cell,
-                                                              VectorTools::L2_norm);
+    Vector<float> difference_per_cell(triangulation.n_active_cells());
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      Solution<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(3),
+                                      VectorTools::L2_norm);
+    const double L2_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::L2_norm);
 
     // By same procedure we get the H1 semi-norm. We re-use the
     // <code>difference_per_cell</code> vector since it is no longer used
@@ -886,15 +873,14 @@ namespace Step7
     // of the errors on each individual cell, and then the square root of
     // it -- an operation that is conveniently performed by
     // VectorTools::compute_global_error.
-    VectorTools::integrate_difference (dof_handler,
-                                       solution,
-                                       Solution<dim>(),
-                                       difference_per_cell,
-                                       QGauss<dim>(3),
-                                       VectorTools::H1_seminorm);
-    const double H1_error = VectorTools::compute_global_error(triangulation,
-                                                              difference_per_cell,
-                                                              VectorTools::H1_seminorm);
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      Solution<dim>(),
+                                      difference_per_cell,
+                                      QGauss<dim>(3),
+                                      VectorTools::H1_seminorm);
+    const double H1_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::H1_seminorm);
 
     // Finally, we compute the maximum norm. Of course, we can't actually
     // compute the true maximum, but only the maximum at the quadrature
@@ -911,16 +897,15 @@ namespace Step7
     // from the L infinity errors on each cell with a call to
     // VectorTools::compute_global_error.
     const QTrapez<1>     q_trapez;
-    const QIterated<dim> q_iterated (q_trapez, 5);
-    VectorTools::integrate_difference (dof_handler,
-                                       solution,
-                                       Solution<dim>(),
-                                       difference_per_cell,
-                                       q_iterated,
-                                       VectorTools::Linfty_norm);
-    const double Linfty_error = VectorTools::compute_global_error(triangulation,
-                                difference_per_cell,
-                                VectorTools::Linfty_norm);
+    const QIterated<dim> q_iterated(q_trapez, 5);
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      Solution<dim>(),
+                                      difference_per_cell,
+                                      q_iterated,
+                                      VectorTools::Linfty_norm);
+    const double Linfty_error = VectorTools::compute_global_error(
+      triangulation, difference_per_cell, VectorTools::Linfty_norm);
 
     // After all these errors have been computed, we finally write some
     // output. In addition, we add the important data to the TableHandler by
@@ -928,17 +913,13 @@ namespace Step7
     // necessary to define column keys beforehand -- it is sufficient to just
     // add values, and columns will be introduced into the table in the order
     // values are added the first time.
-    const unsigned int n_active_cells=triangulation.n_active_cells();
-    const unsigned int n_dofs=dof_handler.n_dofs();
+    const unsigned int n_active_cells = triangulation.n_active_cells();
+    const unsigned int n_dofs         = dof_handler.n_dofs();
 
-    std::cout << "Cycle " << cycle << ':'
+    std::cout << "Cycle " << cycle << ':' << std::endl
+              << "   Number of active cells:       " << n_active_cells
               << std::endl
-              << "   Number of active cells:       "
-              << n_active_cells
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << n_dofs
-              << std::endl;
+              << "   Number of degrees of freedom: " << n_dofs << std::endl;
 
     convergence_table.add_value("cycle", cycle);
     convergence_table.add_value("cells", n_active_cells);
@@ -947,7 +928,6 @@ namespace Step7
     convergence_table.add_value("H1", H1_error);
     convergence_table.add_value("Linfty", Linfty_error);
   }
-
 
   // @sect4{HelmholtzProblem::run}
 
@@ -987,45 +967,47 @@ namespace Step7
   // (i.e. before the first refinement step) and refined the mesh only after
   // that.
   template <int dim>
-  void HelmholtzProblem<dim>::run ()
+  void
+  HelmholtzProblem<dim>::run()
   {
-    const unsigned int n_cycles = (refinement_mode==global_refinement)?5:9;
-    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    const unsigned int n_cycles
+      = (refinement_mode == global_refinement) ? 5 : 9;
+    for(unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
-        if (cycle == 0)
+        if(cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation, -1, 1);
-            triangulation.refine_global (3);
+            GridGenerator::hyper_cube(triangulation, -1, 1);
+            triangulation.refine_global(3);
 
-            typename Triangulation<dim>::cell_iterator
-            cell = triangulation.begin (),
-            endc = triangulation.end();
-            for (; cell!=endc; ++cell)
-              for (unsigned int face_number=0;
-                   face_number<GeometryInfo<dim>::faces_per_cell;
-                   ++face_number)
-                if ((std::fabs(cell->face(face_number)->center()(0) - (-1)) < 1e-12)
-                    ||
-                    (std::fabs(cell->face(face_number)->center()(1) - (-1)) < 1e-12))
-                  cell->face(face_number)->set_boundary_id (1);
+            typename Triangulation<dim>::cell_iterator cell
+              = triangulation.begin(),
+              endc = triangulation.end();
+            for(; cell != endc; ++cell)
+              for(unsigned int face_number = 0;
+                  face_number < GeometryInfo<dim>::faces_per_cell;
+                  ++face_number)
+                if((std::fabs(cell->face(face_number)->center()(0) - (-1))
+                    < 1e-12)
+                   || (std::fabs(cell->face(face_number)->center()(1) - (-1))
+                       < 1e-12))
+                  cell->face(face_number)->set_boundary_id(1);
           }
         else
-          refine_grid ();
-
+          refine_grid();
 
         // The next steps are already known from previous examples. This is
         // mostly the basic set-up of every finite element program:
-        setup_system ();
+        setup_system();
 
-        assemble_system ();
-        solve ();
+        assemble_system();
+        solve();
 
         // The last step in this chain of function calls is usually the
         // evaluation of the computed solution for the quantities one is
         // interested in. This is done in the following function. Since the
         // function generates output that indicates the number of the present
         // refinement step, we pass this number as an argument.
-        process_solution (cycle);
+        process_solution(cycle);
       }
 
     // @sect5{Output of graphical data}
@@ -1041,16 +1023,16 @@ namespace Step7
     // another refinement method is added and not handled by the following
     // switch statement:
     std::string vtk_filename;
-    switch (refinement_mode)
+    switch(refinement_mode)
       {
-      case global_refinement:
-        vtk_filename = "solution-global";
-        break;
-      case adaptive_refinement:
-        vtk_filename = "solution-adaptive";
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
+        case global_refinement:
+          vtk_filename = "solution-global";
+          break;
+        case adaptive_refinement:
+          vtk_filename = "solution-adaptive";
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
     // We augment the filename by a postfix denoting the finite element which
@@ -1064,28 +1046,28 @@ namespace Step7
     // safeguard against the case that the polynomial degree has an unexpected
     // value, using the <code>Assert (false, ExcNotImplemented())</code> idiom
     // in the default branch of the switch statement:
-    switch (fe->degree)
+    switch(fe->degree)
       {
-      case 1:
-        vtk_filename += "-q1";
-        break;
-      case 2:
-        vtk_filename += "-q2";
-        break;
+        case 1:
+          vtk_filename += "-q1";
+          break;
+        case 2:
+          vtk_filename += "-q2";
+          break;
 
-      default:
-        Assert (false, ExcNotImplemented());
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
     // Once we have the base name for the output file, we add an extension
     // appropriate for VTK output, open a file, and add the solution vector to
     // the object that will do the actual output:
     vtk_filename += ".vtk";
-    std::ofstream output (vtk_filename);
+    std::ofstream output(vtk_filename);
 
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
 
     // Now building the intermediate format as before is the next step. We
     // introduce one more feature of deal.II here. The background is the
@@ -1115,8 +1097,8 @@ namespace Step7
     //
     // With the intermediate format so generated, we can then actually write
     // the graphical output:
-    data_out.build_patches (fe->degree);
-    data_out.write_vtk (output);
+    data_out.build_patches(fe->degree);
+    data_out.write_vtk(output);
 
     // @sect5{Output of convergence tables}
 
@@ -1173,35 +1155,34 @@ namespace Step7
     // we will write output now. We construct the file name in the same way as
     // before, but with a different prefix "error":
     std::string error_filename = "error";
-    switch (refinement_mode)
+    switch(refinement_mode)
       {
-      case global_refinement:
-        error_filename += "-global";
-        break;
-      case adaptive_refinement:
-        error_filename += "-adaptive";
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
+        case global_refinement:
+          error_filename += "-global";
+          break;
+        case adaptive_refinement:
+          error_filename += "-adaptive";
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
-    switch (fe->degree)
+    switch(fe->degree)
       {
-      case 1:
-        error_filename += "-q1";
-        break;
-      case 2:
-        error_filename += "-q2";
-        break;
-      default:
-        Assert (false, ExcNotImplemented());
+        case 1:
+          error_filename += "-q1";
+          break;
+        case 2:
+          error_filename += "-q2";
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
       }
 
     error_filename += ".tex";
     std::ofstream error_table_file(error_filename);
 
     convergence_table.write_tex(error_table_file);
-
 
     // @sect5{Further table manipulations}
 
@@ -1212,7 +1193,7 @@ namespace Step7
     // determination of something like an order of convergence is somewhat
     // more involved. While we are at it, we also show a few other things that
     // can be done with tables.
-    if (refinement_mode==global_refinement)
+    if(refinement_mode == global_refinement)
       {
         // The first thing is that one can group individual columns together
         // to form so-called super columns. Essentially, the columns remain
@@ -1231,7 +1212,7 @@ namespace Step7
         new_order.emplace_back("n cells");
         new_order.emplace_back("H1");
         new_order.emplace_back("L2");
-        convergence_table.set_column_order (new_order);
+        convergence_table.set_column_order(new_order);
 
         // For everything that happened to the ConvergenceTable until this
         // point, it would have been sufficient to use a simple
@@ -1240,14 +1221,14 @@ namespace Step7
         // automatically evaluating convergence rates. For example, here is
         // how we can let the table compute reduction and convergence rates
         // (convergence rates are the binary logarithm of the reduction rate):
-        convergence_table
-        .evaluate_convergence_rates("L2", ConvergenceTable::reduction_rate);
-        convergence_table
-        .evaluate_convergence_rates("L2", ConvergenceTable::reduction_rate_log2);
-        convergence_table
-        .evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate);
-        convergence_table
-        .evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate_log2);
+        convergence_table.evaluate_convergence_rates(
+          "L2", ConvergenceTable::reduction_rate);
+        convergence_table.evaluate_convergence_rates(
+          "L2", ConvergenceTable::reduction_rate_log2);
+        convergence_table.evaluate_convergence_rates(
+          "H1", ConvergenceTable::reduction_rate);
+        convergence_table.evaluate_convergence_rates(
+          "H1", ConvergenceTable::reduction_rate_log2);
         // Each of these function calls produces an additional column that is
         // merged with the original column (in our example the `L2' and the
         // `H1' column) to a supercolumn.
@@ -1259,27 +1240,27 @@ namespace Step7
         convergence_table.write_text(std::cout);
 
         std::string conv_filename = "convergence";
-        switch (refinement_mode)
+        switch(refinement_mode)
           {
-          case global_refinement:
-            conv_filename += "-global";
-            break;
-          case adaptive_refinement:
-            conv_filename += "-adaptive";
-            break;
-          default:
-            Assert (false, ExcNotImplemented());
+            case global_refinement:
+              conv_filename += "-global";
+              break;
+            case adaptive_refinement:
+              conv_filename += "-adaptive";
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
           }
-        switch (fe->degree)
+        switch(fe->degree)
           {
-          case 1:
-            conv_filename += "-q1";
-            break;
-          case 2:
-            conv_filename += "-q2";
-            break;
-          default:
-            Assert (false, ExcNotImplemented());
+            case 1:
+              conv_filename += "-q1";
+              break;
+            case 2:
+              conv_filename += "-q2";
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
           }
         conv_filename += ".tex";
 
@@ -1291,7 +1272,7 @@ namespace Step7
   // The final step before going to <code>main()</code> is then to close the
   // namespace <code>Step7</code> into which we have put everything we needed
   // for this program:
-}
+} // namespace Step7
 
 // @sect3{Main function}
 
@@ -1304,7 +1285,8 @@ namespace Step7
 // beginning of the function denoting the number of space dimensions. If you
 // want to run the program in 1d or 2d, you will then only have to change this
 // one instance, rather than all uses below:
-int main ()
+int
+main()
 {
   const unsigned int dim = 2;
 
@@ -1321,15 +1303,17 @@ int main ()
       // immediately after one of the three runs has finished, and not only at
       // the end of the <code>try</code> block.
       {
-        std::cout << "Solving with Q1 elements, adaptive refinement" << std::endl
-                  << "=============================================" << std::endl
+        std::cout << "Solving with Q1 elements, adaptive refinement"
+                  << std::endl
+                  << "============================================="
+                  << std::endl
                   << std::endl;
 
-        FE_Q<dim> fe(1);
-        HelmholtzProblem<dim>
-        helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+        FE_Q<dim>             fe(1);
+        HelmholtzProblem<dim> helmholtz_problem_2d(
+          fe, HelmholtzProblem<dim>::adaptive_refinement);
 
-        helmholtz_problem_2d.run ();
+        helmholtz_problem_2d.run();
 
         std::cout << std::endl;
       }
@@ -1339,11 +1323,11 @@ int main ()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim> fe(1);
-        HelmholtzProblem<dim>
-        helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+        FE_Q<dim>             fe(1);
+        HelmholtzProblem<dim> helmholtz_problem_2d(
+          fe, HelmholtzProblem<dim>::global_refinement);
 
-        helmholtz_problem_2d.run ();
+        helmholtz_problem_2d.run();
 
         std::cout << std::endl;
       }
@@ -1353,31 +1337,33 @@ int main ()
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim> fe(2);
-        HelmholtzProblem<dim>
-        helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+        FE_Q<dim>             fe(2);
+        HelmholtzProblem<dim> helmholtz_problem_2d(
+          fe, HelmholtzProblem<dim>::global_refinement);
 
-        helmholtz_problem_2d.run ();
+        helmholtz_problem_2d.run();
 
         std::cout << std::endl;
       }
       {
-        std::cout << "Solving with Q2 elements, adaptive refinement" << std::endl
+        std::cout << "Solving with Q2 elements, adaptive refinement"
+                  << std::endl
                   << "===========================================" << std::endl
                   << std::endl;
 
-        FE_Q<dim> fe(2);
-        HelmholtzProblem<dim>
-        helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+        FE_Q<dim>             fe(2);
+        HelmholtzProblem<dim> helmholtz_problem_2d(
+          fe, HelmholtzProblem<dim>::adaptive_refinement);
 
-        helmholtz_problem_2d.run ();
+        helmholtz_problem_2d.run();
 
         std::cout << std::endl;
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -1387,9 +1373,10 @@ int main ()
                 << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

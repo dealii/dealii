@@ -13,53 +13,48 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // generate the constraints for a case where there are nodes that have
 // a constraint x[i]=0, i.e. where the right hand side is a trivial
 // linear combination of other degrees of freedom. then merge two such
 // constraint matrices
 
-
 #include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
 
-
-
-void test ()
+void
+test()
 {
-
   ConstraintMatrix cm1, cm2;
 
   // a "regular" and a singular
   // constraint to each of the
   // constraint matrices
-  cm1.add_line (1);
-  cm1.add_entry (1, 2, 42.);
-  cm1.add_line (4);
+  cm1.add_line(1);
+  cm1.add_entry(1, 2, 42.);
+  cm1.add_line(4);
 
-  cm2.add_line (11);
-  cm2.add_entry (11, 22, 42.);
-  cm2.add_line (14);
+  cm2.add_line(11);
+  cm2.add_entry(11, 22, 42.);
+  cm2.add_line(14);
 
-  cm2.merge (cm1);
+  cm2.merge(cm1);
 
   deallog << "CM1" << std::endl;
-  cm1.print (deallog.get_file_stream());
+  cm1.print(deallog.get_file_stream());
 
   deallog << "CM2" << std::endl;
-  cm2.print (deallog.get_file_stream());
+  cm2.print(deallog.get_file_stream());
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

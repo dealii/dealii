@@ -13,23 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 // tests that GMRES builds an orthonormal basis properly for a larger matrix
 // and basis size than gmres_orthogonalize_01
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
-
-
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 template <typename number>
-void test ()
+void
+test()
 {
   const unsigned int n = 200;
-  Vector<number> rhs(n), sol(n);
+  Vector<number>     rhs(n), sol(n);
   rhs = 1.;
 
   // only add diagonal entries
@@ -37,17 +35,15 @@ void test ()
   sp.compress();
   SparseMatrix<number> matrix(sp);
 
-  for (unsigned int i=0; i<n; ++i)
-    matrix.diag_element(i) = (i+1);
+  for(unsigned int i = 0; i < n; ++i)
+    matrix.diag_element(i) = (i + 1);
 
-  SolverControl control(1000, 1e3*std::numeric_limits<number>::epsilon());
-  typename SolverGMRES<Vector<number> >::AdditionalData data;
+  SolverControl control(1000, 1e3 * std::numeric_limits<number>::epsilon());
+  typename SolverGMRES<Vector<number>>::AdditionalData data;
   data.max_n_tmp_vectors = 202;
 
-  SolverGMRES<Vector<number> > solver(control, data);
-  auto print_re_orthogonalization =
-    [](int accumulated_iterations)
-  {
+  SolverGMRES<Vector<number>> solver(control, data);
+  auto print_re_orthogonalization = [](int accumulated_iterations) {
     deallog.get_file_stream() << "Re-orthogonalization enabled at step "
                               << accumulated_iterations << std::endl;
   };
@@ -55,7 +51,8 @@ void test ()
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
@@ -68,4 +65,3 @@ int main()
   test<float>();
   deallog.pop();
 }
-

@@ -19,15 +19,16 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_operation.h>
+#include <deal.II/lac/vector_space_vector.h>
 
 #ifdef DEAL_II_WITH_CUDA
 
 DEAL_II_NAMESPACE_OPEN
 
 class CommunicationPatternBase;
-template <typename Number> class ReadWriteVector;
+template <typename Number>
+class ReadWriteVector;
 
 namespace LinearAlgebra
 {
@@ -47,7 +48,7 @@ namespace LinearAlgebra
      * @author Karl Ljungkvist, Bruno Turcksin, 2016
      */
     template <typename Number>
-    class Vector: public VectorSpaceVector<Number>
+    class Vector : public VectorSpaceVector<Number>
     {
     public:
       typedef typename VectorSpaceVector<Number>::value_type value_type;
@@ -62,7 +63,7 @@ namespace LinearAlgebra
       /**
        * Copy constructor.
        */
-      Vector(const Vector<Number> &V);
+      Vector(const Vector<Number>& V);
 
       /**
        * Constructor. Set dimension to @p n and initialize all elements with
@@ -86,15 +87,16 @@ namespace LinearAlgebra
        * determines whether the vector should be filled with zero (false) or
        * left untouched (true).
        */
-      void reinit(const size_type n,
-                  const bool      omit_zeroing_entries = false);
+      void
+      reinit(const size_type n, const bool omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector V. The elements of V are not
        * copied.
        */
-      virtual void reinit(const VectorSpaceVector<Number> &V,
-                          const bool omit_zeroing_entries = false) override;
+      virtual void
+      reinit(const VectorSpaceVector<Number>& V,
+             const bool omit_zeroing_entries = false) override;
 
       /**
        * Import all the element from the input vector @p V.
@@ -104,104 +106,126 @@ namespace LinearAlgebra
        * for distributed vectors. This is the function that should be used to
        * copy a vector to the GPU.
        */
-      virtual void import(const ReadWriteVector<Number> &V,
-                          VectorOperation::values operation,
-                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std::shared_ptr<const CommunicationPatternBase> ()) override;
+      virtual void
+      import(
+        const ReadWriteVector<Number>&                  V,
+        VectorOperation::values                         operation,
+        std::shared_ptr<const CommunicationPatternBase> communication_pattern
+        = std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is
        * only allowed if @p s is equal to zero.
        */
-      virtual Vector<Number> &operator= (const Number s) override;
+      virtual Vector<Number>&
+      operator=(const Number s) override;
 
       /**
        * Multiply the entive vector by a fixed factor.
        */
-      virtual Vector<Number> &operator*= (const Number factor) override;
+      virtual Vector<Number>&
+      operator*=(const Number factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector<Number> &operator/= (const Number factor) override;
+      virtual Vector<Number>&
+      operator/=(const Number factor) override;
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V) override;
+      virtual Vector<Number>&
+      operator+=(const VectorSpaceVector<Number>& V) override;
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V) override;
+      virtual Vector<Number>&
+      operator-=(const VectorSpaceVector<Number>& V) override;
 
       /**
        * Return the scalar product of two vectors.
        */
-      virtual Number operator* (const VectorSpaceVector<Number> &V) const override;
+      virtual Number
+      operator*(const VectorSpaceVector<Number>& V) const override;
 
       /**
        * Add @p to all components. Note that @p a is a scalar not a vector.
        */
-      virtual void add(const Number a) override;
+      virtual void
+      add(const Number a) override;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
        */
-      virtual void add(const Number a, const VectorSpaceVector<Number> &V) override;
+      virtual void
+      add(const Number a, const VectorSpaceVector<Number>& V) override;
 
       /**
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V</tt>.
        */
-      virtual void add(const Number a, const VectorSpaceVector<Number> &V,
-                       const Number b, const VectorSpaceVector<Number> &W) override;
+      virtual void
+      add(const Number                     a,
+          const VectorSpaceVector<Number>& V,
+          const Number                     b,
+          const VectorSpaceVector<Number>& W) override;
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this
        * = s*(*this)+a*V</tt>
        */
-      virtual void sadd(const Number s, const Number a,
-                        const VectorSpaceVector<Number> &V) override;
+      virtual void
+      sadd(const Number                     s,
+           const Number                     a,
+           const VectorSpaceVector<Number>& V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
        * argument. This function is mostly meant to simulate multiplication
        * (and immediate re-assignment) by a diagonal scaling matrix.
        */
-      virtual void scale(const VectorSpaceVector<Number> &scaling_factors) override;
+      virtual void
+      scale(const VectorSpaceVector<Number>& scaling_factors) override;
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
-      virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
+      virtual void
+      equ(const Number a, const VectorSpaceVector<Number>& V) override;
 
       /**
        * Return whether the vector contains only elements with value zero.
        */
-      virtual bool all_zero() const override;
+      virtual bool
+      all_zero() const override;
 
       /**
        * Return the mean value of all the entries of this vector.
        */
-      virtual value_type mean_value() const override;
+      virtual value_type
+      mean_value() const override;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual real_type l1_norm() const override;
+      virtual real_type
+      l1_norm() const override;
 
       /**
        * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual real_type l2_norm() const override;
+      virtual real_type
+      l2_norm() const override;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute
        * value among all entries and among all processors).
        */
-      virtual real_type linfty_norm() const override;
+      virtual real_type
+      linfty_norm() const override;
 
       /**
        * Perform a combined operation of a vector addition and a subsequent
@@ -222,38 +246,44 @@ namespace LinearAlgebra
        * For complex-valued vectors, the scalar product in the second step is
        * implemented as $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual Number add_and_dot(const Number                     a,
-                                 const VectorSpaceVector<Number> &V,
-                                 const VectorSpaceVector<Number> &W) override;
+      virtual Number
+      add_and_dot(const Number                     a,
+                  const VectorSpaceVector<Number>& V,
+                  const VectorSpaceVector<Number>& W) override;
 
       /**
        * Return the pointer to the underlying array.
        */
-      Number *get_values() const;
+      Number*
+      get_values() const;
 
       /**
        * Return the size of the vector.
        */
-      virtual size_type size() const override;
+      virtual size_type
+      size() const override;
 
       /**
        * Return an index set that describe which elements of this vector are
        * owned by the current processor, i.e. [0, size).
        */
-      virtual dealii::IndexSet locally_owned_elements() const override;
+      virtual dealii::IndexSet
+      locally_owned_elements() const override;
 
       /**
        * Print the vector to the output stream @p out.
        */
-      virtual void print(std::ostream       &out,
-                         const unsigned int  precision=2,
-                         const bool          scientific=true,
-                         const bool          across=true) const override;
+      virtual void
+      print(std::ostream&      out,
+            const unsigned int precision  = 2,
+            const bool         scientific = true,
+            const bool         across     = true) const override;
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      virtual std::size_t memory_consumption() const override;
+      virtual std::size_t
+      memory_consumption() const override;
 
       /**
        * Attempt to perform an operation between two incompatible vector types.
@@ -266,7 +296,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the array of elements of this vector.
        */
-      Number *val;
+      Number* val;
 
       /**
        * Number of elements in the vector.
@@ -274,34 +304,29 @@ namespace LinearAlgebra
       size_type n_elements;
     };
 
-
-
     // ------------------------------ Inline functions -----------------------------
     template <typename Number>
-    inline
-    Number *Vector<Number>::get_values() const
+    inline Number*
+    Vector<Number>::get_values() const
     {
       return val;
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::size_type Vector<Number>::size() const
+    inline typename Vector<Number>::size_type
+    Vector<Number>::size() const
     {
       return n_elements;
     }
 
-
     template <typename Number>
-    inline
-    IndexSet Vector<Number>::locally_owned_elements() const
+    inline IndexSet
+    Vector<Number>::locally_owned_elements() const
     {
       return complete_index_set(n_elements);
     }
-  }
-}
+  } // namespace CUDAWrappers
+} // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 

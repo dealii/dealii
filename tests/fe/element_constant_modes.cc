@@ -13,37 +13,36 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
-#include <deal.II/fe/fe_q_iso_q1.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_system.h>
 #include <string>
 
-
 template <int dim>
-void print_constant_modes(const FiniteElement<dim> &fe)
+void
+print_constant_modes(const FiniteElement<dim>& fe)
 {
   deallog << "Testing " << fe.get_name() << std::endl;
 
-  Table<2,bool> constant_modes = fe.get_constant_modes().first;
-  for (unsigned int r=0; r<constant_modes.n_rows(); ++r)
+  Table<2, bool> constant_modes = fe.get_constant_modes().first;
+  for(unsigned int r = 0; r < constant_modes.n_rows(); ++r)
     {
-      for (unsigned int c=0; c<constant_modes.n_cols(); ++c)
-        deallog << constant_modes(r,c) << " ";
+      for(unsigned int c = 0; c < constant_modes.n_cols(); ++c)
+        deallog << constant_modes(r, c) << " ";
       deallog << std::endl;
     }
   deallog << std::endl;
 }
 
-
 template <int dim>
-void test()
+void
+test()
 {
   print_constant_modes(FE_Q<dim>(1));
   print_constant_modes(FE_Q<dim>(2));
@@ -57,25 +56,26 @@ void test()
   print_constant_modes(FE_FaceQ<dim>(1));
   print_constant_modes(FE_FaceP<dim>(1));
   print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q<dim>(2), 1));
-  print_constant_modes(FESystem<dim>(FE_DGP<dim>(1), 1, FE_Q_iso_Q1<dim>(2), 1));
+  print_constant_modes(
+    FESystem<dim>(FE_DGP<dim>(1), 1, FE_Q_iso_Q1<dim>(2), 1));
   print_constant_modes(FE_Q_DG0<dim>(1));
   print_constant_modes(FESystem<dim>(FE_Q_DG0<dim>(2), 1, FE_Q<dim>(1), 2));
   print_constant_modes(FESystem<dim>(FE_Q<dim>(1), 2, FE_Q_DG0<dim>(1), 2));
 }
 
 template <>
-void test<1>()
+void
+test<1>()
 {
   print_constant_modes(FE_Q<1>(1));
   print_constant_modes(FESystem<1>(FE_Q<1>(1), 2, FE_Q<1>(2), 1));
   print_constant_modes(FESystem<1>(FE_DGP<1>(1), 1, FE_Q_iso_Q1<1>(2), 1));
 }
 
-
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   test<1>();

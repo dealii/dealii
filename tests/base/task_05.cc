@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // start several tasks and see that return_value() waits for the correct
 // result
 //
@@ -28,35 +27,30 @@
 
 #include <deal.II/base/thread_management.h>
 
-
-int test (int i)
+int
+test(int i)
 {
   int k = 1;
-  for (unsigned int j=0; j<100000000; ++j)
-    k += j%17+i;
+  for(unsigned int j = 0; j < 100000000; ++j)
+    k += j % 17 + i;
   return k;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  Threads::Task<int> tasks[] =
-  {
-    Threads::new_task (test, 1),
-    Threads::new_task (test, 2),
-    Threads::new_task (test, 3),
-    Threads::new_task (test, 4),
-    Threads::new_task (test, 5),
-    Threads::new_task (test, 6),
-    Threads::new_task (test, 7),
-    Threads::new_task (test, 8)
-  };
+  Threads::Task<int> tasks[] = {Threads::new_task(test, 1),
+                                Threads::new_task(test, 2),
+                                Threads::new_task(test, 3),
+                                Threads::new_task(test, 4),
+                                Threads::new_task(test, 5),
+                                Threads::new_task(test, 6),
+                                Threads::new_task(test, 7),
+                                Threads::new_task(test, 8)};
 
-  for (unsigned int i=0; i<sizeof(tasks)/sizeof(tasks[0]); ++i)
+  for(unsigned int i = 0; i < sizeof(tasks) / sizeof(tasks[0]); ++i)
     deallog << i << ' ' << tasks[i].return_value() << std::endl;
 
   deallog << "OK" << std::endl;

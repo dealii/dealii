@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
@@ -21,43 +20,44 @@
 class Test
 {
 public:
-
-  void generate_all_dim(const char *myname)
+  void
+  generate_all_dim(const char* myname)
   {
-    generate<1,1>(myname);
-    generate<2,2>(myname);
-    generate<3,3>(myname);
+    generate<1, 1>(myname);
+    generate<2, 2>(myname);
+    generate<3, 3>(myname);
   }
 
-
   template <int dim, int spacedim>
-  void generate(const char *myname)
+  void
+  generate(const char* myname)
   {
     std::string name = myname;
 
-    std::unique_ptr<FiniteElement<dim, spacedim> >fe = FETools::get_fe_by_name<dim, spacedim>(name);
+    std::unique_ptr<FiniteElement<dim, spacedim>> fe
+      = FETools::get_fe_by_name<dim, spacedim>(name);
 
     deallog << "Read " << name << std::endl;
     deallog << "Generated :" << std::endl;
-    deallog << fe->get_name()  << std::endl;
+    deallog << fe->get_name() << std::endl;
   }
 
-
-  void generate_all_codim(const char *myname)
+  void
+  generate_all_codim(const char* myname)
   {
-    generate<1,1> (myname);
-    generate<1,2> (myname);
-    generate<2,2> (myname);
-    generate<1,3> (myname);
-    generate<2,3> (myname);
-    generate<3,3> (myname);
+    generate<1, 1>(myname);
+    generate<1, 2>(myname);
+    generate<2, 2>(myname);
+    generate<1, 3>(myname);
+    generate<2, 3>(myname);
+    generate<3, 3>(myname);
   }
 };
 
-int main ()
+int
+main()
 {
   initlog();
-
 
   Test gen;
   // For some of the finite element types, their
@@ -66,44 +66,44 @@ int main ()
 
   //generate_all_dim
   gen.generate_all_dim("FE_Q_Hierarchical(1)");
-  gen.generate<2,2>("FE_ABF(0)");
-//  gen.generate<3,3>("FE_ABF(1)");
-  gen.generate<2,2>("FE_BDM(1)");
-  gen.generate<3,3>("FE_BDM(1)");
-  gen.generate<2,2>("FE_DGBDM(1)");
-  gen.generate<3,3>("FE_DGBDM(1)");
-  gen.generate<2,2>("FE_DGNedelec(1)");
-  gen.generate<3,3>("FE_DGNedelec(1)");
-  gen.generate<2,2>("FE_DGRaviartThomas(1)");
-  gen.generate<3,3>("FE_DGRaviartThomas(1)");
-  gen.generate<2,2>("FE_RaviartThomas(1)");
-  gen.generate<3,3>("FE_RaviartThomas(1)");
-  gen.generate<2,2>("FE_RaviartThomasNodal(1)");
-  gen.generate<3,3>("FE_RaviartThomasNodal(1)");
-  gen.generate<2,2>("FE_Nedelec(1)");
-  gen.generate<3,3>("FE_Nedelec(1)");
+  gen.generate<2, 2>("FE_ABF(0)");
+  //  gen.generate<3,3>("FE_ABF(1)");
+  gen.generate<2, 2>("FE_BDM(1)");
+  gen.generate<3, 3>("FE_BDM(1)");
+  gen.generate<2, 2>("FE_DGBDM(1)");
+  gen.generate<3, 3>("FE_DGBDM(1)");
+  gen.generate<2, 2>("FE_DGNedelec(1)");
+  gen.generate<3, 3>("FE_DGNedelec(1)");
+  gen.generate<2, 2>("FE_DGRaviartThomas(1)");
+  gen.generate<3, 3>("FE_DGRaviartThomas(1)");
+  gen.generate<2, 2>("FE_RaviartThomas(1)");
+  gen.generate<3, 3>("FE_RaviartThomas(1)");
+  gen.generate<2, 2>("FE_RaviartThomasNodal(1)");
+  gen.generate<3, 3>("FE_RaviartThomasNodal(1)");
+  gen.generate<2, 2>("FE_Nedelec(1)");
+  gen.generate<3, 3>("FE_Nedelec(1)");
   gen.generate_all_dim("FE_DGPNonparametric(1)");
   gen.generate_all_dim("FE_DGPMonomial(1)");
   gen.generate_all_dim("FE_FaceQ(1)");
   gen.generate_all_dim("FE_FaceP(1)");
-  gen.generate<2,2>("FE_RannacherTurek(0)");
+  gen.generate<2, 2>("FE_RannacherTurek(0)");
   gen.generate_all_dim("FE_Q_Hierarchical(2)");
-  gen.generate<2,2>("FE_ABF(2)");
-//  gen.generate<3,3>("FE_ABF(2)");
-  gen.generate<2,2>("FE_BDM(2)");
-  gen.generate<3,3>("FE_BDM(2)");
-  gen.generate<2,2>("FE_DGBDM(2)");
-  gen.generate<3,3>("FE_DGBDM(2)");
-  gen.generate<2,2>("FE_DGNedelec(2)");
-  gen.generate<3,3>("FE_DGNedelec(2)");
-  gen.generate<2,2>("FE_DGRaviartThomas(2)");
-  gen.generate<3,3>("FE_DGRaviartThomas(2)");
-  gen.generate<2,2>("FE_RaviartThomas(2)");
-  gen.generate<3,3>("FE_RaviartThomas(2)");
-  gen.generate<2,2>("FE_RaviartThomasNodal(2)");
-  gen.generate<3,3>("FE_RaviartThomasNodal(2)");
-  gen.generate<2,2>("FE_Nedelec(2)");
-  gen.generate<3,3>("FE_Nedelec(2)");
+  gen.generate<2, 2>("FE_ABF(2)");
+  //  gen.generate<3,3>("FE_ABF(2)");
+  gen.generate<2, 2>("FE_BDM(2)");
+  gen.generate<3, 3>("FE_BDM(2)");
+  gen.generate<2, 2>("FE_DGBDM(2)");
+  gen.generate<3, 3>("FE_DGBDM(2)");
+  gen.generate<2, 2>("FE_DGNedelec(2)");
+  gen.generate<3, 3>("FE_DGNedelec(2)");
+  gen.generate<2, 2>("FE_DGRaviartThomas(2)");
+  gen.generate<3, 3>("FE_DGRaviartThomas(2)");
+  gen.generate<2, 2>("FE_RaviartThomas(2)");
+  gen.generate<3, 3>("FE_RaviartThomas(2)");
+  gen.generate<2, 2>("FE_RaviartThomasNodal(2)");
+  gen.generate<3, 3>("FE_RaviartThomasNodal(2)");
+  gen.generate<2, 2>("FE_Nedelec(2)");
+  gen.generate<3, 3>("FE_Nedelec(2)");
   gen.generate_all_dim("FE_DGPNonparametric(2)");
   gen.generate_all_dim("FE_DGPMonomial(2)");
   gen.generate_all_dim("FE_FaceQ(2)");
@@ -133,12 +133,15 @@ int main ()
 
   //systems
   gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]");
-  gen.generate_all_dim("FESystem[FE_DGPNonparametric(1)^2-FE_Q_Hierarchical(1)]");
+  gen.generate_all_dim(
+    "FESystem[FE_DGPNonparametric(1)^2-FE_Q_Hierarchical(1)]");
   gen.generate_all_dim("FESystem[FE_DGQ(1)^2-FE_Q_Hierarchical(1)]");
   gen.generate_all_dim("FESystem[FE_Q(1)^2-FE_Q_Hierarchical(1)]");
 
-  gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_DGPNonparametric(1)]");
-  gen.generate_all_dim("FESystem[FE_DGPNonparametric(1)^2-FE_DGPNonparametric(1)]");
+  gen.generate_all_dim(
+    "FESystem[FE_Q_Hierarchical(1)^2-FE_DGPNonparametric(1)]");
+  gen.generate_all_dim(
+    "FESystem[FE_DGPNonparametric(1)^2-FE_DGPNonparametric(1)]");
   gen.generate_all_dim("FESystem[FE_DGQ(1)^2-FE_DGPNonparametric(1)]");
   gen.generate_all_dim("FESystem[FE_Q(1)^2-FE_DGPNonparametric(1)]");
 

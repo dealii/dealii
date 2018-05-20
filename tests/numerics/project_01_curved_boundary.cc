@@ -13,28 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check VectorTools::project for Vector<double> arguments
-
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/dofs/dof_accessor.h>
-
-
 
 // define a function that is zero within the square
 //   [-sqrt(2)/2,sqrt(2)/2]^d
@@ -46,22 +42,22 @@ template <int dim>
 class F : public Function<dim>
 {
 public:
-  virtual double value (const Point<dim> &p,
-                        const unsigned int = 0) const
+  virtual double
+  value(const Point<dim>& p, const unsigned int = 0) const
   {
     // compute the linfty norm of p
     double m = 0;
-    for (unsigned int d=0; d<dim; ++d)
+    for(unsigned int d = 0; d < dim; ++d)
       m = std::max(m, std::fabs(p[d]));
 
     // let the value increase linearly away from the square
-    return std::max (0., m-std::sqrt(2.)/2);
+    return std::max(0., m - std::sqrt(2.) / 2);
   }
 };
 
-
 template <int dim>
-void test()
+void
+test()
 {
   SphericalManifold<dim> boundary;
 
@@ -69,45 +65,40 @@ void test()
   // same coarse grid, and refine
   // them differently
   Triangulation<dim> tria;
-  GridGenerator::hyper_ball (tria);
-  tria.set_manifold (0, boundary);
+  GridGenerator::hyper_ball(tria);
+  tria.set_manifold(0, boundary);
 
-
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dh (tria);
-  dh.distribute_dofs (fe);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dh(tria);
+  dh.distribute_dofs(fe);
 
   Vector<double> v(dh.n_dofs());
 
   ConstraintMatrix cm;
-  cm.close ();
+  cm.close();
 
   // use the implicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project (dh, cm, QGauss<dim>(3), F<dim>(),
-                          v);
+    VectorTools::project(dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() == 0, ExcInternalError());
+    Assert(v.l2_norm() == 0, ExcInternalError());
   }
 
   // use an explicit Q1 mapping. this will yield a zero solution
   {
-    VectorTools::project (MappingQGeneric<dim>(1),
-                          dh, cm, QGauss<dim>(3), F<dim>(),
-                          v);
+    VectorTools::project(
+      MappingQGeneric<dim>(1), dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() == 0, ExcInternalError());
+    Assert(v.l2_norm() == 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping. this will yield a nonzero solution if it's a
   // straight projection since some of the quadrature points are lying outside
   // the area where the function is zero
   {
-    VectorTools::project (MappingQ<dim>(2),
-                          dh, cm, QGauss<dim>(3), F<dim>(),
-                          v);
+    VectorTools::project(MappingQ<dim>(2), dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() != 0, ExcInternalError());
+    Assert(v.l2_norm() != 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping but enforce zero boundary values. this will
@@ -116,11 +107,10 @@ void test()
   // the DoFs at the boundary are in fact zero (they are interpolated only at
   // points where the function is zero)
   {
-    VectorTools::project (MappingQ<dim>(2),
-                          dh, cm, QGauss<dim>(3), F<dim>(),
-                          v, true);
+    VectorTools::project(
+      MappingQ<dim>(2), dh, cm, QGauss<dim>(3), F<dim>(), v, true);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() != 0, ExcInternalError());
+    Assert(v.l2_norm() != 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping and project to the boundary first. this will
@@ -129,45 +119,55 @@ void test()
   // the boundary will be nonzero since we project, even though the
   // *interpolation* of boundary values onto the trace of the Q1 space is zero
   {
-    VectorTools::project (MappingQ<dim>(2),
-                          dh, cm, QGauss<dim>(3), F<dim>(),
-                          v, false,
-                          QGauss<dim-1>(2), true);
+    VectorTools::project(MappingQ<dim>(2),
+                         dh,
+                         cm,
+                         QGauss<dim>(3),
+                         F<dim>(),
+                         v,
+                         false,
+                         QGauss<dim - 1>(2),
+                         true);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() != 0, ExcInternalError());
-    for (typename DoFHandler<dim>::active_cell_iterator cell=dh.begin_active();
-         cell != dh.end(); ++cell)
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-        deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i,0))
+    Assert(v.l2_norm() != 0, ExcInternalError());
+    for(typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+        cell != dh.end();
+        ++cell)
+      for(unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i, 0))
                 << std::endl;
   }
-
 
   // same as above, but use a projection with a QTrapez formula. this happens
   // to evaluate the function only at points where it is zero, and
   // consequently the values at the boundary should be zero
   {
-    VectorTools::project (MappingQ<dim>(2),
-                          dh, cm, QGauss<dim>(3), F<dim>(),
-                          v, false,
-                          QTrapez<dim-1>(), true);
+    VectorTools::project(MappingQ<dim>(2),
+                         dh,
+                         cm,
+                         QGauss<dim>(3),
+                         F<dim>(),
+                         v,
+                         false,
+                         QTrapez<dim - 1>(),
+                         true);
     deallog << v.l2_norm() << std::endl;
-    Assert (v.l2_norm() != 0, ExcInternalError());
-    for (typename DoFHandler<dim>::active_cell_iterator cell=dh.begin_active();
-         cell != dh.end(); ++cell)
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-        deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i,0))
+    Assert(v.l2_norm() != 0, ExcInternalError());
+    for(typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
+        cell != dh.end();
+        ++cell)
+      for(unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i, 0))
                 << std::endl;
   }
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   test<2>();
   test<3>();
 }
-

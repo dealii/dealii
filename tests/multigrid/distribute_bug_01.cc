@@ -13,71 +13,78 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Document bug in determining level subdomain ids in certain cases. This used
 // to cause deadlocks because the list of ghost neighbors was not symmetric.
 //
 // problematic cases: 2d: 6 and 13 procs, 3d 20 procs (original bug report from Martin)
 
 #include <deal.II/base/timer.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
 
 #include "../tests.h"
 
 using namespace dealii;
 
 template <int dim>
-void print(parallel::distributed::Triangulation<dim> &tr)
+void
+print(parallel::distributed::Triangulation<dim>& tr)
 {
   deallog << "*****" << std::endl;
-  for (typename parallel::distributed::Triangulation<dim>::cell_iterator cell = tr.begin();
-       cell != tr.end(); ++cell)
+  for(typename parallel::distributed::Triangulation<dim>::cell_iterator cell
+      = tr.begin();
+      cell != tr.end();
+      ++cell)
     {
-      if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
+      if(cell->level_subdomain_id() != numbers::artificial_subdomain_id)
         deallog << "cell=" << cell->id()
                 << " level_subdomain_id=" << cell->level_subdomain_id()
                 << std::endl;
     }
 }
 
-
 template <int dim>
-void do_test ()
+void
+do_test()
 {
   FE_Q<dim> fe(1);
   deallog << "Testing " << fe.get_name() << std::endl << std::endl;
-  parallel::distributed::Triangulation<dim> triangulation
-  (MPI_COMM_WORLD,
-   Triangulation<dim>::limit_level_difference_at_vertices,
-   parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  parallel::distributed::Triangulation<dim> triangulation(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
-  GridGenerator::subdivided_hyper_cube (triangulation, 1, -1, 1);
+  GridGenerator::subdivided_hyper_cube(triangulation, 1, -1, 1);
   triangulation.refine_global(2);
-  for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (cell->is_locally_owned() &&
-        cell->center().norm() < 0.55)
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active();
+      cell != triangulation.end();
+      ++cell)
+    if(cell->is_locally_owned() && cell->center().norm() < 0.55)
       cell->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
   print(triangulation);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (cell->is_locally_owned() &&
-        cell->center().norm() > 0.3 && cell->center().norm() < 0.42)
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active();
+      cell != triangulation.end();
+      ++cell)
+    if(cell->is_locally_owned() && cell->center().norm() > 0.3
+       && cell->center().norm() < 0.42)
       cell->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
   print(triangulation);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell=triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (cell->is_locally_owned() &&
-        cell->center().norm() > 0.335 && cell->center().norm() < 0.39)
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active();
+      cell != triangulation.end();
+      ++cell)
+    if(cell->is_locally_owned() && cell->center().norm() > 0.335
+       && cell->center().norm() < 0.39)
       cell->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
   print(triangulation);
@@ -87,11 +94,11 @@ void do_test ()
   dof_handler.distribute_mg_dofs(fe);
 }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
-  MPILogInitAll log;
+  MPILogInitAll                    log;
 
   do_test<2>();
   do_test<3>();

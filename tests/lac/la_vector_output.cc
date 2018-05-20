@@ -13,20 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <deal.II/lac/la_vector.h>
 #include <string>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 
-
-void test()
+void
+test()
 {
-  const char *filename = "test.txt";
-  const unsigned int size(10);
+  const char*                   filename = "test.txt";
+  const unsigned int            size(10);
   LinearAlgebra::Vector<double> vec(size);
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     vec[i] = i;
 
   // Check block_write and block_read
@@ -41,35 +40,37 @@ void test()
   vec.block_read(file_in);
   file_in.close();
   // Check the vector
-  double eps=1e-12;
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(std::abs(vec[i]-(double)i)<eps,
-                ExcMessage("Value in the vector has been changed by block_write or block_read"));
-
+  double eps = 1e-12;
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(
+      std::abs(vec[i] - (double) i) < eps,
+      ExcMessage(
+        "Value in the vector has been changed by block_write or block_read"));
 
   // save data to archive
   {
-    std::ofstream file_out2(filename);
+    std::ofstream                 file_out2(filename);
     boost::archive::text_oarchive oa(file_out2);
-    oa<<vec;
+    oa << vec;
     // archive and stream closed when destructors are called
   }
 
   // Clear the vector
   vec.reinit(0);
   {
-    std::ifstream file_in2(filename);
+    std::ifstream                 file_in2(filename);
     boost::archive::text_iarchive ia(file_in2);
     ia >> vec;
   }
   // Check the vector
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(std::abs(vec[i]-(double)i)<eps,
-                ExcMessage("Value in the vector has been changed by boost archive"));
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(
+      std::abs(vec[i] - (double) i) < eps,
+      ExcMessage("Value in the vector has been changed by boost archive"));
 }
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -80,5 +81,3 @@ int main()
 
   deallog << "OK" << std::endl;
 }
-
-

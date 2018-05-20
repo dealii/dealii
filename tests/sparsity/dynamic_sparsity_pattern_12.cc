@@ -13,21 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check DynamicSparsityPattern::row_length
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  row_length<DynamicSparsityPattern> ();
+  row_length<DynamicSparsityPattern>();
 }
-
-
-

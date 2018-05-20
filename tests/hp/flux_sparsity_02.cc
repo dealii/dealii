@@ -17,51 +17,48 @@
 // with scalar valued hp objects.
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/hp/fe_values.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/fe_values.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <iostream>
 #include <vector>
 
-
-
 template <int dim>
 void
-check ()
+check()
 {
-  Triangulation<dim>   triangulation;
+  Triangulation<dim>        triangulation;
   std::vector<unsigned int> subdivisions(dim, 1U);
   subdivisions[0] = 2;
-  Point<dim> p1,p2;
-  switch (dim)
+  Point<dim> p1, p2;
+  switch(dim)
     {
-    case 2:
-      p1[0] = p1[1] = 0.0;
-      p2[0] = 2.0;
-      p2[1] = 1.0;
-      break;
-    case 3:
-      p1[0] = p1[1] = p1[2] = 0.0;
-      p2[0] = 2.0;
-      p2[1] = p2[2] = 1.0;
-      break;
-    default:
-      Assert(false, ExcNotImplemented());
+      case 2:
+        p1[0] = p1[1] = 0.0;
+        p2[0]         = 2.0;
+        p2[1]         = 1.0;
+        break;
+      case 3:
+        p1[0] = p1[1] = p1[2] = 0.0;
+        p2[0]                 = 2.0;
+        p2[1] = p2[2] = 1.0;
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
     }
 
-  GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                             subdivisions,
-                                             p1, p2);
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation, subdivisions, p1, p2);
 
   // Create FE Collection and insert two FE objects
   // DGQ0 and DGQ1
@@ -77,15 +74,15 @@ check ()
 
   {
     deallog << "cell and face coupling" << std::endl;
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
-    Table<2, DoFTools::Coupling> cell_coupling(1,1);
-    Table<2, DoFTools::Coupling> face_coupling(1,1);
-    cell_coupling(0,0) = DoFTools::always;
-    face_coupling(0,0) = DoFTools::always;
+    Table<2, DoFTools::Coupling> cell_coupling(1, 1);
+    Table<2, DoFTools::Coupling> face_coupling(1, 1);
+    cell_coupling(0, 0) = DoFTools::always;
+    face_coupling(0, 0) = DoFTools::always;
 
-    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(
+      dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect that all dofs couple with each other.
@@ -94,15 +91,15 @@ check ()
 
   {
     deallog << "cell coupling" << std::endl;
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
-    Table<2, DoFTools::Coupling> cell_coupling(1,1);
-    Table<2, DoFTools::Coupling> face_coupling(1,1);
-    cell_coupling(0,0) = DoFTools::always;
-    face_coupling(0,0) = DoFTools::none;
+    Table<2, DoFTools::Coupling> cell_coupling(1, 1);
+    Table<2, DoFTools::Coupling> face_coupling(1, 1);
+    cell_coupling(0, 0) = DoFTools::always;
+    face_coupling(0, 0) = DoFTools::none;
 
-    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(
+      dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect no couplings across the face.
@@ -111,15 +108,15 @@ check ()
 
   {
     deallog << "face coupling" << std::endl;
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
-    Table<2, DoFTools::Coupling> cell_coupling(1,1);
-    Table<2, DoFTools::Coupling> face_coupling(1,1);
-    cell_coupling(0,0) = DoFTools::none;
-    face_coupling(0,0) = DoFTools::always;
+    Table<2, DoFTools::Coupling> cell_coupling(1, 1);
+    Table<2, DoFTools::Coupling> face_coupling(1, 1);
+    cell_coupling(0, 0) = DoFTools::none;
+    face_coupling(0, 0) = DoFTools::always;
 
-    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(
+      dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect that all dofs couple with each other.
@@ -128,15 +125,15 @@ check ()
 
   {
     deallog << "no coupling" << std::endl;
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                               dof_handler.n_dofs());
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
-    Table<2, DoFTools::Coupling> cell_coupling(1,1);
-    Table<2, DoFTools::Coupling> face_coupling(1,1);
-    cell_coupling(0,0) = DoFTools::none;
-    face_coupling(0,0) = DoFTools::none;
+    Table<2, DoFTools::Coupling> cell_coupling(1, 1);
+    Table<2, DoFTools::Coupling> face_coupling(1, 1);
+    cell_coupling(0, 0) = DoFTools::none;
+    face_coupling(0, 0) = DoFTools::none;
 
-    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    DoFTools::make_flux_sparsity_pattern(
+      dof_handler, dsp, cell_coupling, face_coupling);
     dsp.compress();
 
     // Print sparsity pattern, we expect no couplings.
@@ -144,19 +141,15 @@ check ()
   }
 }
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
+  deallog.push("3d");
+  check<3>();
+  deallog.pop();
 }
-
-
-

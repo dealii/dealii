@@ -17,43 +17,41 @@
  * Author: Sven Wetterauer, University of Heidelberg, 2012
  */
 
-
 // @sect3{Include files}
 
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_refinement.h>
 
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
-
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iostream>
@@ -70,7 +68,6 @@
 namespace Step15
 {
   using namespace dealii;
-
 
   // @sect3{The <code>MinimalSurfaceProblem</code> class template}
 
@@ -102,33 +99,41 @@ namespace Step15
   class MinimalSurfaceProblem
   {
   public:
-    MinimalSurfaceProblem ();
-    ~MinimalSurfaceProblem ();
+    MinimalSurfaceProblem();
+    ~MinimalSurfaceProblem();
 
-    void run ();
+    void
+    run();
 
   private:
-    void setup_system (const bool initial_step);
-    void assemble_system ();
-    void solve ();
-    void refine_mesh ();
-    void set_boundary_values ();
-    double compute_residual (const double alpha) const;
-    double determine_step_length () const;
+    void
+    setup_system(const bool initial_step);
+    void
+    assemble_system();
+    void
+    solve();
+    void
+    refine_mesh();
+    void
+    set_boundary_values();
+    double
+    compute_residual(const double alpha) const;
+    double
+    determine_step_length() const;
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim> triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    DoFHandler<dim> dof_handler;
+    FE_Q<dim>       fe;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       present_solution;
-    Vector<double>       newton_update;
-    Vector<double>       system_rhs;
+    Vector<double> present_solution;
+    Vector<double> newton_update;
+    Vector<double> system_rhs;
   };
 
   // @sect3{Boundary condition}
@@ -140,18 +145,19 @@ namespace Step15
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues () : Function<dim>() {}
+    BoundaryValues() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
-
   template <int dim>
-  double BoundaryValues<dim>::value (const Point<dim> &p,
-                                     const unsigned int /*component*/) const
+  double
+  BoundaryValues<dim>::value(const Point<dim>& p,
+                             const unsigned int /*component*/) const
   {
-    return std::sin(2 * numbers::PI * (p[0]+p[1]));
+    return std::sin(2 * numbers::PI * (p[0] + p[1]));
   }
 
   // @sect3{The <code>MinimalSurfaceProblem</code> class implementation}
@@ -162,18 +168,14 @@ namespace Step15
   // few tutorials.
 
   template <int dim>
-  MinimalSurfaceProblem<dim>::MinimalSurfaceProblem ()
-    :
-    dof_handler (triangulation),
-    fe (2)
+  MinimalSurfaceProblem<dim>::MinimalSurfaceProblem()
+    : dof_handler(triangulation), fe(2)
   {}
 
-
-
   template <int dim>
-  MinimalSurfaceProblem<dim>::~MinimalSurfaceProblem ()
+  MinimalSurfaceProblem<dim>::~MinimalSurfaceProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
 
   // @sect4{MinimalSurfaceProblem::setup_system}
@@ -189,32 +191,32 @@ namespace Step15
   // (specifically, in <code>refine_mesh()</code>).
 
   template <int dim>
-  void MinimalSurfaceProblem<dim>::setup_system (const bool initial_step)
+  void
+  MinimalSurfaceProblem<dim>::setup_system(const bool initial_step)
   {
-    if (initial_step)
+    if(initial_step)
       {
-        dof_handler.distribute_dofs (fe);
-        present_solution.reinit (dof_handler.n_dofs());
+        dof_handler.distribute_dofs(fe);
+        present_solution.reinit(dof_handler.n_dofs());
 
-        hanging_node_constraints.clear ();
-        DoFTools::make_hanging_node_constraints (dof_handler,
-                                                 hanging_node_constraints);
-        hanging_node_constraints.close ();
+        hanging_node_constraints.clear();
+        DoFTools::make_hanging_node_constraints(dof_handler,
+                                                hanging_node_constraints);
+        hanging_node_constraints.close();
       }
-
 
     // The remaining parts of the function are the same as in step-6.
 
-    newton_update.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    newton_update.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
 
-    hanging_node_constraints.condense (dsp);
+    hanging_node_constraints.condense(dsp);
 
     sparsity_pattern.copy_from(dsp);
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
   }
 
   // @sect4{MinimalSurfaceProblem::assemble_system}
@@ -231,37 +233,38 @@ namespace Step15
   // vectors, as well as for the gradients of the previous solution at the
   // quadrature points. We then start the loop over all cells:
   template <int dim>
-  void MinimalSurfaceProblem<dim>::assemble_system ()
+  void
+  MinimalSurfaceProblem<dim>::assemble_system()
   {
-    const QGauss<dim>  quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(3);
 
     system_matrix = 0;
-    system_rhs = 0;
+    system_rhs    = 0;
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_gradients         |
-                             update_quadrature_points |
-                             update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_gradients | update_quadrature_points
+                              | update_JxW_values);
 
-    const unsigned int           dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int           n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>           cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>               cell_rhs (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<Tensor<1, dim> > old_solution_gradients(n_q_points);
+    std::vector<Tensor<1, dim>> old_solution_gradients(n_q_points);
 
-    std::vector<types::global_dof_index>    local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
         // For the assembly of the linear system, we have to obtain the values
         // of the previous solution's gradients at the quadrature
@@ -282,44 +285,41 @@ namespace Step15
         // system itself then looks similar to what we always do with the
         // exception of the nonlinear terms, as does copying the results from
         // the local objects into the global ones:
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const double coeff
-              = 1.0 / std::sqrt(1 +
-                                old_solution_gradients[q_point] *
-                                old_solution_gradients[q_point]);
+              = 1.0
+                / std::sqrt(1
+                            + old_solution_gradients[q_point]
+                                * old_solution_gradients[q_point]);
 
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for(unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                for(unsigned int j = 0; j < dofs_per_cell; ++j)
                   {
-                    cell_matrix(i, j) += ( ((fe_values.shape_grad(i, q_point)
-                                             * coeff
-                                             * fe_values.shape_grad(j, q_point))
-                                            -
-                                            (fe_values.shape_grad(i, q_point)
-                                             * coeff * coeff * coeff
-                                             * (fe_values.shape_grad(j, q_point)
-                                                *
-                                                old_solution_gradients[q_point])
-                                             * old_solution_gradients[q_point]))
-                                           * fe_values.JxW(q_point));
+                    cell_matrix(i, j)
+                      += (((fe_values.shape_grad(i, q_point) * coeff
+                            * fe_values.shape_grad(j, q_point))
+                           - (fe_values.shape_grad(i, q_point) * coeff * coeff
+                              * coeff
+                              * (fe_values.shape_grad(j, q_point)
+                                 * old_solution_gradients[q_point])
+                              * old_solution_gradients[q_point]))
+                          * fe_values.JxW(q_point));
                   }
 
-                cell_rhs(i) -= (fe_values.shape_grad(i, q_point)
-                                * coeff
+                cell_rhs(i) -= (fe_values.shape_grad(i, q_point) * coeff
                                 * old_solution_gradients[q_point]
                                 * fe_values.JxW(q_point));
               }
           }
 
-        cell->get_dof_indices (local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell->get_dof_indices(local_dof_indices);
+        for(unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              system_matrix.add (local_dof_indices[i],
-                                 local_dof_indices[j],
-                                 cell_matrix(i,j));
+            for(unsigned int j = 0; j < dofs_per_cell; ++j)
+              system_matrix.add(
+                local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
             system_rhs(local_dof_indices[i]) += cell_rhs(i);
           }
@@ -328,21 +328,15 @@ namespace Step15
     // Finally, we remove hanging nodes from the system and apply zero
     // boundary values to the linear system that defines the Newton updates
     // $\delta u^n$:
-    hanging_node_constraints.condense (system_matrix);
-    hanging_node_constraints.condense (system_rhs);
+    hanging_node_constraints.condense(system_matrix);
+    hanging_node_constraints.condense(system_rhs);
 
-    std::map<types::global_dof_index,double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Functions::ZeroFunction<dim>(),
-                                              boundary_values);
-    MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix,
-                                        newton_update,
-                                        system_rhs);
+    std::map<types::global_dof_index, double> boundary_values;
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
+    MatrixTools::apply_boundary_values(
+      boundary_values, system_matrix, newton_update, system_rhs);
   }
-
-
 
   // @sect4{MinimalSurfaceProblem::solve}
 
@@ -350,24 +344,23 @@ namespace Step15
   // process we update the current solution by setting
   // $u^{n+1}=u^n+\alpha^n\;\delta u^n$.
   template <int dim>
-  void MinimalSurfaceProblem<dim>::solve ()
+  void
+  MinimalSurfaceProblem<dim>::solve()
   {
-    SolverControl solver_control (system_rhs.size(),
-                                  system_rhs.l2_norm()*1e-6);
-    SolverCG<>    solver (solver_control);
+    SolverControl solver_control(system_rhs.size(),
+                                 system_rhs.l2_norm() * 1e-6);
+    SolverCG<>    solver(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    solver.solve (system_matrix, newton_update, system_rhs,
-                  preconditioner);
+    solver.solve(system_matrix, newton_update, system_rhs, preconditioner);
 
-    hanging_node_constraints.distribute (newton_update);
+    hanging_node_constraints.distribute(newton_update);
 
     const double alpha = determine_step_length();
-    present_solution.add (alpha, newton_update);
+    present_solution.add(alpha, newton_update);
   }
-
 
   // @sect4{MinimalSurfaceProblem::refine_mesh}
 
@@ -376,19 +369,19 @@ namespace Step15
   // one which we do with the help of the SolutionTransfer class. The process
   // is slightly convoluted, so let us describe it in detail:
   template <int dim>
-  void MinimalSurfaceProblem<dim>::refine_mesh ()
+  void
+  MinimalSurfaceProblem<dim>::refine_mesh()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(3),
-                                        typename FunctionMap<dim>::type(),
-                                        present_solution,
-                                        estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim - 1>(3),
+                                       typename FunctionMap<dim>::type(),
+                                       present_solution,
+                                       estimated_error_per_cell);
 
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.03);
+    GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
 
     // Then we need an additional step: if, for example, you flag a cell that
     // is once more refined than its neighbor, and that neighbor is not
@@ -407,7 +400,7 @@ namespace Step15
     // needs to know the final set of cells that will be coarsened or refined
     // in order to store the data from the old mesh and transfer to the new
     // one. Thus, we call the function by hand:
-    triangulation.prepare_coarsening_and_refinement ();
+    triangulation.prepare_coarsening_and_refinement();
 
     // With this out of the way, we initialize a SolutionTransfer object with
     // the present DoFHandler and attach the solution vector to it, followed
@@ -435,7 +428,7 @@ namespace Step15
     solution_transfer.interpolate(present_solution, tmp);
     present_solution = tmp;
 
-    set_boundary_values ();
+    set_boundary_values();
 
     // On the new mesh, there are different hanging nodes, which we have to
     // compute again. To ensure there are no hanging nodes of the old mesh in
@@ -449,16 +442,14 @@ namespace Step15
                                             hanging_node_constraints);
     hanging_node_constraints.close();
 
-    hanging_node_constraints.distribute (present_solution);
+    hanging_node_constraints.distribute(present_solution);
 
     // We end the function by updating all the remaining data structures,
     // indicating to <code>setup_dofs()</code> that this is not the first
     // go-around and that it needs to preserve the content of the solution
     // vector:
-    setup_system (false);
+    setup_system(false);
   }
-
-
 
   // @sect4{MinimalSurfaceProblem::set_boundary_values}
 
@@ -470,19 +461,18 @@ namespace Step15
   // values. This is fixed up by setting all boundary nodes explicit to the
   // right value:
   template <int dim>
-  void MinimalSurfaceProblem<dim>::set_boundary_values ()
+  void
+  MinimalSurfaceProblem<dim>::set_boundary_values()
   {
     std::map<types::global_dof_index, double> boundary_values;
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              BoundaryValues<dim>(),
-                                              boundary_values);
-    for (std::map<types::global_dof_index, double>::const_iterator
-         p = boundary_values.begin();
-         p != boundary_values.end(); ++p)
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, BoundaryValues<dim>(), boundary_values);
+    for(std::map<types::global_dof_index, double>::const_iterator p
+        = boundary_values.begin();
+        p != boundary_values.end();
+        ++p)
       present_solution(p->first) = p->second;
   }
-
 
   // @sect4{MinimalSurfaceProblem::compute_residual}
 
@@ -502,60 +492,57 @@ namespace Step15
   // is followed by the same boilerplate code we use for all integration
   // operations:
   template <int dim>
-  double MinimalSurfaceProblem<dim>::compute_residual (const double alpha) const
+  double
+  MinimalSurfaceProblem<dim>::compute_residual(const double alpha) const
   {
-    Vector<double> residual (dof_handler.n_dofs());
+    Vector<double> residual(dof_handler.n_dofs());
 
-    Vector<double> evaluation_point (dof_handler.n_dofs());
+    Vector<double> evaluation_point(dof_handler.n_dofs());
     evaluation_point = present_solution;
-    evaluation_point.add (alpha, newton_update);
+    evaluation_point.add(alpha, newton_update);
 
-    const QGauss<dim>  quadrature_formula(3);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_gradients         |
-                             update_quadrature_points |
-                             update_JxW_values);
+    const QGauss<dim> quadrature_formula(3);
+    FEValues<dim>     fe_values(fe,
+                            quadrature_formula,
+                            update_gradients | update_quadrature_points
+                              | update_JxW_values);
 
-    const unsigned int           dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int           n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    Vector<double>               cell_residual (dofs_per_cell);
-    std::vector<Tensor<1, dim> > gradients(n_q_points);
+    Vector<double>              cell_residual(dofs_per_cell);
+    std::vector<Tensor<1, dim>> gradients(n_q_points);
 
-    std::vector<types::global_dof_index>    local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
         cell_residual = 0;
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
 
         // The actual computation is much as in
         // <code>assemble_system()</code>. We first evaluate the gradients of
         // $u^n+\alpha^n\,\delta u^n$ at the quadrature points, then compute
         // the coefficient $a_n$, and then plug it all into the formula for
         // the residual:
-        fe_values.get_function_gradients (evaluation_point,
-                                          gradients);
+        fe_values.get_function_gradients(evaluation_point, gradients);
 
-
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
-            const double coeff = 1/std::sqrt(1 +
-                                             gradients[q_point] *
-                                             gradients[q_point]);
+            const double coeff
+              = 1 / std::sqrt(1 + gradients[q_point] * gradients[q_point]);
 
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              cell_residual(i) -= (fe_values.shape_grad(i, q_point)
-                                   * coeff
-                                   * gradients[q_point]
-                                   * fe_values.JxW(q_point));
+            for(unsigned int i = 0; i < dofs_per_cell; ++i)
+              cell_residual(i)
+                -= (fe_values.shape_grad(i, q_point) * coeff
+                    * gradients[q_point] * fe_values.JxW(q_point));
           }
 
-        cell->get_dof_indices (local_dof_indices);
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        cell->get_dof_indices(local_dof_indices);
+        for(unsigned int i = 0; i < dofs_per_cell; ++i)
           residual(local_dof_indices[i]) += cell_residual(i);
       }
 
@@ -574,21 +561,18 @@ namespace Step15
     // of freedom do in fact belong to the boundary and then loop over all of
     // those and set the residual entry to zero. This happens in the following
     // lines which we have already seen used in step-11:
-    hanging_node_constraints.condense (residual);
+    hanging_node_constraints.condense(residual);
 
-    std::vector<bool> boundary_dofs (dof_handler.n_dofs());
-    DoFTools::extract_boundary_dofs (dof_handler,
-                                     ComponentMask(),
-                                     boundary_dofs);
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
+    std::vector<bool> boundary_dofs(dof_handler.n_dofs());
+    DoFTools::extract_boundary_dofs(
+      dof_handler, ComponentMask(), boundary_dofs);
+    for(unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+      if(boundary_dofs[i] == true)
         residual(i) = 0;
 
     // At the end of the function, we return the norm of the residual:
     return residual.l2_norm();
   }
-
-
 
   // @sect4{MinimalSurfaceProblem::determine_step_length}
 
@@ -604,12 +588,11 @@ namespace Step15
   // convergence of Newton's method. We will discuss better strategies below
   // in the results section.
   template <int dim>
-  double MinimalSurfaceProblem<dim>::determine_step_length() const
+  double
+  MinimalSurfaceProblem<dim>::determine_step_length() const
   {
     return 0.1;
   }
-
-
 
   // @sect4{MinimalSurfaceProblem::run}
 
@@ -618,7 +601,8 @@ namespace Step15
   // indicates whether this is the first time we solve for a Newton update and
   // one that indicates the refinement level of the mesh:
   template <int dim>
-  void MinimalSurfaceProblem<dim>::run ()
+  void
+  MinimalSurfaceProblem<dim>::run()
   {
     unsigned int refinement = 0;
     bool         first_step = true;
@@ -626,7 +610,7 @@ namespace Step15
     // As described in the introduction, the domain is the unit disk around
     // the origin, created in the same way as shown in step-6. The mesh is
     // globally refined twice followed later on by several adaptive cycles:
-    GridGenerator::hyper_ball (triangulation);
+    GridGenerator::hyper_ball(triangulation);
     triangulation.refine_global(2);
 
     // The Newton iteration starts next. During the first step we do not have
@@ -640,24 +624,22 @@ namespace Step15
     // Newton iterate already has the correct boundary values. In all
     // following mesh refinement loops, the mesh will be refined adaptively.
     double previous_res = 0;
-    while (first_step || (previous_res>1e-3))
+    while(first_step || (previous_res > 1e-3))
       {
-        if (first_step == true)
+        if(first_step == true)
           {
             std::cout << "******** Initial mesh "
-                      << " ********"
-                      << std::endl;
+                      << " ********" << std::endl;
 
-            setup_system (true);
-            set_boundary_values ();
+            setup_system(true);
+            set_boundary_values();
 
             first_step = false;
           }
         else
           {
             ++refinement;
-            std::cout << "******** Refined mesh " << refinement
-                      << " ********"
+            std::cout << "******** Refined mesh " << refinement << " ********"
                       << std::endl;
 
             refine_mesh();
@@ -672,20 +654,17 @@ namespace Step15
         // stop the iterations. We then solve the linear system (the function
         // also updates $u^{n+1}=u^n+\alpha^n\;\delta u^n$) and output the
         // residual at the end of this Newton step:
-        std::cout << "  Initial residual: "
-                  << compute_residual(0)
-                  << std::endl;
+        std::cout << "  Initial residual: " << compute_residual(0) << std::endl;
 
-        for (unsigned int inner_iteration=0; inner_iteration<5; ++inner_iteration)
+        for(unsigned int inner_iteration = 0; inner_iteration < 5;
+            ++inner_iteration)
           {
-            assemble_system ();
+            assemble_system();
             previous_res = system_rhs.l2_norm();
 
-            solve ();
+            solve();
 
-            std::cout << "  Residual: "
-                      << compute_residual(0)
-                      << std::endl;
+            std::cout << "  Residual: " << compute_residual(0) << std::endl;
           }
 
         // Every fifth iteration, i.e., just before we refine the mesh again,
@@ -693,28 +672,28 @@ namespace Step15
         // as in all programs before:
         DataOut<dim> data_out;
 
-        data_out.attach_dof_handler (dof_handler);
-        data_out.add_data_vector (present_solution, "solution");
-        data_out.add_data_vector (newton_update, "update");
-        data_out.build_patches ();
-        const std::string filename = "solution-" +
-                                     Utilities::int_to_string (refinement, 2) +
-                                     ".vtk";
-        std::ofstream output (filename);
+        data_out.attach_dof_handler(dof_handler);
+        data_out.add_data_vector(present_solution, "solution");
+        data_out.add_data_vector(newton_update, "update");
+        data_out.build_patches();
+        const std::string filename
+          = "solution-" + Utilities::int_to_string(refinement, 2) + ".vtk";
+        std::ofstream         output(filename);
         DataOutBase::VtkFlags vtk_flags;
-        vtk_flags.compression_level =
-          DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+        vtk_flags.compression_level
+          = DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
         data_out.set_flags(vtk_flags);
-        data_out.write_vtu (output);
+        data_out.write_vtu(output);
       }
   }
-}
+} // namespace Step15
 
 // @sect4{The main function}
 
 // Finally the main function. This follows the scheme of all other main
 // functions:
-int main ()
+int
+main()
 {
   try
     {
@@ -722,11 +701,12 @@ int main ()
       using namespace Step15;
 
       MinimalSurfaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      laplace_problem_2d.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -737,9 +717,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

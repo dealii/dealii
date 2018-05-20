@@ -15,14 +15,14 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/utilities.h>
 
-#include <string>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
@@ -38,92 +38,90 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace deal_II_exceptions
 {
-
   std::string additional_assert_output;
 
-  void set_additional_assert_output (const char *const p)
+  void
+  set_additional_assert_output(const char* const p)
   {
     additional_assert_output = p;
   }
 
   bool show_stacktrace = true;
 
-  void suppress_stacktrace_in_exceptions ()
+  void
+  suppress_stacktrace_in_exceptions()
   {
     show_stacktrace = false;
   }
 
   bool abort_on_exception = true;
 
-  void disable_abort_on_exception ()
+  void
+  disable_abort_on_exception()
   {
     abort_on_exception = false;
   }
 
-}
+} // namespace deal_II_exceptions
 
-
-
-ExceptionBase::ExceptionBase ()
-  :
-  file(""),
-  line(0),
-  function(""),
-  cond(""),
-  exc(""),
-  stacktrace (nullptr),
-  n_stacktrace_frames (0),
-  what_str("")
+ExceptionBase::ExceptionBase()
+  : file(""),
+    line(0),
+    function(""),
+    cond(""),
+    exc(""),
+    stacktrace(nullptr),
+    n_stacktrace_frames(0),
+    what_str("")
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i=0; i<sizeof(raw_stacktrace)/sizeof(raw_stacktrace[0]); ++i)
+  for(unsigned int i = 0;
+      i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
+      ++i)
     raw_stacktrace[i] = nullptr;
 #endif
 }
 
-
-
-ExceptionBase::ExceptionBase (const ExceptionBase &exc)
-  :
-  file(exc.file),
-  line(exc.line),
-  function(exc.function),
-  cond(exc.cond),
-  exc(exc.exc),
-  stacktrace (nullptr), // don't copy stacktrace to avoid double de-allocation problem
-  n_stacktrace_frames (0),
-  what_str("") // don't copy the error message, it gets generated dynamically by what()
+ExceptionBase::ExceptionBase(const ExceptionBase& exc)
+  : file(exc.file),
+    line(exc.line),
+    function(exc.function),
+    cond(exc.cond),
+    exc(exc.exc),
+    stacktrace(
+      nullptr), // don't copy stacktrace to avoid double de-allocation problem
+    n_stacktrace_frames(0),
+    what_str(
+      "") // don't copy the error message, it gets generated dynamically by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i=0; i<sizeof(raw_stacktrace)/sizeof(raw_stacktrace[0]); ++i)
+  for(unsigned int i = 0;
+      i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
+      ++i)
     raw_stacktrace[i] = nullptr;
 #endif
 }
 
-
-
-ExceptionBase::~ExceptionBase () noexcept
+ExceptionBase::~ExceptionBase() noexcept
 {
-  free (stacktrace); // free(NULL) is allowed
+  free(stacktrace); // free(NULL) is allowed
   stacktrace = nullptr;
 }
 
-
-
-void ExceptionBase::set_fields (const char *f,
-                                const int  l,
-                                const char *func,
-                                const char *c,
-                                const char *e)
+void
+ExceptionBase::set_fields(const char* f,
+                          const int   l,
+                          const char* func,
+                          const char* c,
+                          const char* e)
 {
-  file = f;
-  line = l;
+  file     = f;
+  line     = l;
   function = func;
-  cond = c;
-  exc  = e;
+  cond     = c;
+  exc      = e;
 
   // If the system supports this, get a stacktrace how we got here:
   // Note that we defer the symbol lookup done by backtrace_symbols()
@@ -135,10 +133,11 @@ void ExceptionBase::set_fields (const char *f,
 #endif
 }
 
-const char *ExceptionBase::what() const noexcept
+const char*
+ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
-  if (what_str == "")
+  if(what_str == "")
     {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
       // We have deferred the symbol lookup to this point to avoid costly
@@ -146,7 +145,7 @@ const char *ExceptionBase::what() const noexcept
       // backtrace_symbols.
 
       // first delete old stacktrace if necessary
-      free (stacktrace); // free(NULL) is allowed
+      free(stacktrace); // free(NULL) is allowed
       stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
 #endif
 
@@ -156,22 +155,20 @@ const char *ExceptionBase::what() const noexcept
   return what_str.c_str();
 }
 
-
-const char *ExceptionBase::get_exc_name () const
+const char*
+ExceptionBase::get_exc_name() const
 {
   return exc;
 }
 
-
-
-void ExceptionBase::print_exc_data (std::ostream &out) const
+void
+ExceptionBase::print_exc_data(std::ostream& out) const
 {
   // print a header for the exception
-  out << "An error occurred in line <" << line
-      << "> of file <" << file
+  out << "An error occurred in line <" << line << "> of file <" << file
       << "> in function" << std::endl
       << "    " << function << std::endl
-      << "The violated condition was: "<< std::endl
+      << "The violated condition was: " << std::endl
       << "    " << cond << std::endl;
 
   // print the way the additional information message was generated.
@@ -186,63 +183,59 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
   // between numerous "..."-enclosed strings that the preprocessor
   // collates into a single string, making it awkward to read. Consequently,
   // elide this text if the message was generated via an ExcMessage object
-  if (std::strstr(cond, "dealii::ExcMessage") != nullptr)
+  if(std::strstr(cond, "dealii::ExcMessage") != nullptr)
     out << "The name and call sequence of the exception was:" << std::endl
-        << "    " << exc  << std::endl;
+        << "    " << exc << std::endl;
 
   // finally print the additional information the exception provides:
   out << "Additional information: " << std::endl;
 }
 
-
-
-void ExceptionBase::print_info (std::ostream &out) const
+void
+ExceptionBase::print_info(std::ostream& out) const
 {
   out << "    (none)" << std::endl;
 }
 
-
-
-void ExceptionBase::print_stack_trace (std::ostream &out) const
+void
+ExceptionBase::print_stack_trace(std::ostream& out) const
 {
-  if (n_stacktrace_frames == 0)
+  if(n_stacktrace_frames == 0)
     return;
 
-  if (deal_II_exceptions::show_stacktrace == false)
+  if(deal_II_exceptions::show_stacktrace == false)
     return;
 
   // if there is a stackframe stored, print it
   out << std::endl;
-  out << "Stacktrace:" << std::endl
-      << "-----------" << std::endl;
+  out << "Stacktrace:" << std::endl << "-----------" << std::endl;
 
   // print the stacktrace. first omit all those frames that have
   // ExceptionBase or deal_II_exceptions in their names, as these
   // correspond to the exception raising mechanism themselves, rather than
   // the place where the exception was triggered
   int frame = 0;
-  while ((frame < n_stacktrace_frames)
-         &&
-         ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
-          ||
-          (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
+  while((frame < n_stacktrace_frames)
+        && ((std::string(stacktrace[frame]).find("ExceptionBase")
+             != std::string::npos)
+            || (std::string(stacktrace[frame]).find("deal_II_exceptions")
+                != std::string::npos)))
     ++frame;
 
   // output the rest
   const unsigned int first_significant_frame = frame;
-  for (; frame < n_stacktrace_frames; ++frame)
+  for(; frame < n_stacktrace_frames; ++frame)
     {
-      out << '#' << frame - first_significant_frame
-          << "  ";
+      out << '#' << frame - first_significant_frame << "  ";
 
       // the stacktrace frame is actually of the format
       // "filename(functionname+offset) [address]". let's try to get the
       // mangled functionname out:
-      std::string stacktrace_entry (stacktrace[frame]);
+      std::string        stacktrace_entry(stacktrace[frame]);
       const unsigned int pos_start = stacktrace_entry.find('('),
                          pos_end   = stacktrace_entry.find('+');
-      std::string functionname = stacktrace_entry.substr (pos_start+1,
-                                                          pos_end-pos_start-1);
+      std::string functionname
+        = stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
 
       stacktrace_entry = stacktrace_entry.substr(0, pos_start);
       stacktrace_entry += ": ";
@@ -252,10 +245,11 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       // differently, since it is apparently demangled as "unsigned int"
       // for unknown reasons :-) if we can, demangle the function name
 #ifdef DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
-      int         status;
-      char *p = abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
+      int   status;
+      char* p
+        = abi::__cxa_demangle(functionname.c_str(), nullptr, nullptr, &status);
 
-      if ((status == 0) && (functionname != "main"))
+      if((status == 0) && (functionname != "main"))
         {
           std::string realname(p);
           // in MT mode, one often gets backtraces spanning several lines
@@ -264,17 +258,17 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
           // tuples are actually unused boost::tuples::null_type, so we
           // should split them off if they are trailing a template argument
           // list
-          while (realname.find (", boost::tuples::null_type>")
-                 != std::string::npos)
-            realname.erase (realname.find (", boost::tuples::null_type>"),
-                            std::string (", boost::tuples::null_type").size());
+          while(realname.find(", boost::tuples::null_type>")
+                != std::string::npos)
+            realname.erase(realname.find(", boost::tuples::null_type>"),
+                           std::string(", boost::tuples::null_type").size());
 
           stacktrace_entry += realname;
         }
       else
         stacktrace_entry += functionname;
 
-      free (p);
+      free(p);
 
 #else
 
@@ -282,18 +276,16 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 #endif
 
       // then output what we have
-      out << stacktrace_entry
-          << std::endl;
+      out << stacktrace_entry << std::endl;
 
       // stop if we're in main()
-      if (functionname == "main")
+      if(functionname == "main")
         break;
     }
 }
 
-
-
-void ExceptionBase::generate_message () const
+void
+ExceptionBase::generate_message() const
 {
   // build up a c_string with the error message.
   // Guard this procedure with a try block, we shall not throw at this
@@ -307,17 +299,17 @@ void ExceptionBase::generate_message () const
                 << std::endl;
 
       // print out general data
-      print_exc_data (converter);
+      print_exc_data(converter);
       // print out exception specific data
-      print_info (converter);
-      print_stack_trace (converter);
+      print_info(converter);
+      print_stack_trace(converter);
 
-      if (!deal_II_exceptions::additional_assert_output.empty())
+      if(!deal_II_exceptions::additional_assert_output.empty())
         {
-          converter << "--------------------------------------------------------"
-                    << std::endl
-                    << deal_II_exceptions::additional_assert_output
-                    << std::endl;
+          converter
+            << "--------------------------------------------------------"
+            << std::endl
+            << deal_II_exceptions::additional_assert_output << std::endl;
         }
 
       converter << "--------------------------------------------------------"
@@ -325,75 +317,69 @@ void ExceptionBase::generate_message () const
 
       what_str = converter.str();
     }
-  catch (...)
+  catch(...)
     {
       // On error, resume next. There is nothing better we can do...
       what_str = "ExceptionBase::generate_message () failed";
     }
 }
 
-
-
 #ifdef DEAL_II_WITH_MPI
 namespace StandardExceptions
 {
-  ExcMPI::ExcMPI (const int error_code)
-    :
-    error_code (error_code)
+  ExcMPI::ExcMPI(const int error_code) : error_code(error_code)
   {}
 
-  void ExcMPI::print_info (std::ostream &out) const
+  void
+  ExcMPI::print_info(std::ostream& out) const
   {
     char error_name[MPI_MAX_ERROR_STRING];
-    error_name[0] = '\0';
+    error_name[0]        = '\0';
     int resulting_length = MPI_MAX_ERROR_STRING;
 
     bool error_name_known = false;
     // workaround for Open MPI 1.6.5 not accepting
     // MPI_ERR_LASTCODE in MPI_Error_class
-    if (error_code < MPI_ERR_LASTCODE)
+    if(error_code < MPI_ERR_LASTCODE)
       {
         // get the string name of the error code by first converting it to an
         // error class.
-        int error_class = 0;
-        int ierr = MPI_Error_class (error_code, &error_class);
+        int error_class  = 0;
+        int ierr         = MPI_Error_class(error_code, &error_class);
         error_name_known = (ierr == MPI_SUCCESS);
 
         // Check the output of the error printing functions. If either MPI
         // function fails we should just print a less descriptive message.
-        if (error_name_known)
+        if(error_name_known)
           {
-            ierr = MPI_Error_string (error_class, error_name, &resulting_length);
+            ierr = MPI_Error_string(error_class, error_name, &resulting_length);
             error_name_known = error_name_known && (ierr == MPI_SUCCESS);
           }
       }
 
     out << "deal.II encountered an error while calling an MPI function."
         << std::endl;
-    if (error_name_known)
+    if(error_name_known)
       {
         out << "The description of the error provided by MPI is \""
-            << error_name
-            << "\"."
-            << std::endl;
+            << error_name << "\"." << std::endl;
       }
     else
       {
-        out << "This error code is not equal to any of the standard MPI error codes."
-            << std::endl;
+        out
+          << "This error code is not equal to any of the standard MPI error codes."
+          << std::endl;
       }
-    out << "The numerical value of the original error code is "
-        << error_code
-        << "."
-        << std::endl;
+    out << "The numerical value of the original error code is " << error_code
+        << "." << std::endl;
   }
-}
+} // namespace StandardExceptions
 #endif // DEAL_II_WITH_MPI
 
 namespace
 {
-  [[noreturn]]
-  void internal_abort (const ExceptionBase &exc) noexcept
+  [[noreturn]] void
+  internal_abort(const ExceptionBase& exc) noexcept
   {
     // first print the error
     std::cerr << exc.what() << std::endl;
@@ -413,37 +399,39 @@ namespace
 #ifdef DEAL_II_WITH_MPI
     int is_initialized;
     MPI_Initialized(&is_initialized);
-    if (is_initialized)
+    if(is_initialized)
       {
         // do the same as in Utilities::MPI::n_mpi_processes() here,
         // but without error checking to not throw again.
-        int n_proc=1;
-        MPI_Comm_size (MPI_COMM_WORLD, &n_proc);
-        if (n_proc>1)
+        int n_proc = 1;
+        MPI_Comm_size(MPI_COMM_WORLD, &n_proc);
+        if(n_proc > 1)
           {
-            std::cerr << "Calling MPI_Abort now.\n"
-            << "To break execution in a GDB session, execute 'break MPI_Abort' before "
-            << "running. You can also put the following into your ~/.gdbinit:\n"
-            << "  set breakpoint pending on\n"
-            << "  break MPI_Abort\n"
-            << "  set breakpoint pending auto" << std::endl;
+            std::cerr
+              << "Calling MPI_Abort now.\n"
+              << "To break execution in a GDB session, execute 'break MPI_Abort' before "
+              << "running. You can also put the following into your ~/.gdbinit:\n"
+              << "  set breakpoint pending on\n"
+              << "  break MPI_Abort\n"
+              << "  set breakpoint pending auto" << std::endl;
 
-            MPI_Abort (MPI_COMM_WORLD,
-            /* return code = */ 255);
+            MPI_Abort(MPI_COMM_WORLD,
+                      /* return code = */ 255);
           }
       }
 #endif
     std::abort();
   }
-}
+} // namespace
 
 namespace deal_II_exceptions
 {
   namespace internals
   {
-    void do_issue_error_nothrow (const ExceptionBase &exc) noexcept
+    void
+    do_issue_error_nothrow(const ExceptionBase& exc) noexcept
     {
-      if (dealii::deal_II_exceptions::abort_on_exception)
+      if(dealii::deal_II_exceptions::abort_on_exception)
         internal_abort(exc);
       else
         {
@@ -454,12 +442,9 @@ namespace deal_II_exceptions
         }
     }
 
-
-
-    [[noreturn]]
-    void abort (const ExceptionBase &exc)
-    {
-      if (dealii::deal_II_exceptions::abort_on_exception)
+    [[noreturn]] void
+    abort(const ExceptionBase& exc) {
+      if(dealii::deal_II_exceptions::abort_on_exception)
         internal_abort(exc);
       else
         {
@@ -468,91 +453,88 @@ namespace deal_II_exceptions
         }
     }
 
-
-
 #ifdef DEAL_II_WITH_CUDA
     std::string get_cusparse_error_string(const cusparseStatus_t error_code)
     {
-      switch (error_code)
+      switch(error_code)
         {
-        case CUSPARSE_STATUS_NOT_INITIALIZED:
-        {
-          return "The cuSPARSE library was not initialized";
-        }
-        case CUSPARSE_STATUS_ALLOC_FAILED:
-        {
-          return "Resource allocation failed inside the cuSPARSE library";
-        }
-        case CUSPARSE_STATUS_INVALID_VALUE:
-        {
-          return "An unsupported value of parameter was passed to the function";
-        }
-        case CUSPARSE_STATUS_ARCH_MISMATCH:
-        {
-          return "The function requires a feature absent from the device architecture";
-        }
-        case CUSPARSE_STATUS_MAPPING_ERROR:
-        {
-          return "An access to GPU memory space failed";
-        }
-        case CUSPARSE_STATUS_EXECUTION_FAILED:
-        {
-          return "The GPU program failed to execute";
-        }
-        case CUSPARSE_STATUS_INTERNAL_ERROR:
-        {
-          return "An internal cuSPARSE operation failed";
-        }
-        case CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
-        {
-          return "The matrix type is not supported by this function";
-        }
-        default:
-        {
-          return "Unknown error";
-        }
+          case CUSPARSE_STATUS_NOT_INITIALIZED:
+            {
+              return "The cuSPARSE library was not initialized";
+            }
+          case CUSPARSE_STATUS_ALLOC_FAILED:
+            {
+              return "Resource allocation failed inside the cuSPARSE library";
+            }
+          case CUSPARSE_STATUS_INVALID_VALUE:
+            {
+              return "An unsupported value of parameter was passed to the function";
+            }
+          case CUSPARSE_STATUS_ARCH_MISMATCH:
+            {
+              return "The function requires a feature absent from the device architecture";
+            }
+          case CUSPARSE_STATUS_MAPPING_ERROR:
+            {
+              return "An access to GPU memory space failed";
+            }
+          case CUSPARSE_STATUS_EXECUTION_FAILED:
+            {
+              return "The GPU program failed to execute";
+            }
+          case CUSPARSE_STATUS_INTERNAL_ERROR:
+            {
+              return "An internal cuSPARSE operation failed";
+            }
+          case CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+            {
+              return "The matrix type is not supported by this function";
+            }
+          default:
+            {
+              return "Unknown error";
+            }
         }
     }
 
-
-
-    std::string get_cusolver_error_string(cusolverStatus_t error_code)
+    std::string
+    get_cusolver_error_string(cusolverStatus_t error_code)
     {
       std::string message;
-      switch (error_code)
+      switch(error_code)
         {
-        case CUSOLVER_STATUS_NOT_INITIALIZED:
-        {
-          return "The cuSolver library was not initialized";
-        }
-        case CUSOLVER_STATUS_ALLOC_FAILED:
-        {
-          return "Resource allocation failed inside the cuSolver library";
-        }
-        case CUSOLVER_STATUS_INVALID_VALUE:
-        {
-          return "An unsupported value of a parameter was passed to the function";
-        }
-        case CUSOLVER_STATUS_ARCH_MISMATCH:
-        {
-          return "The function requires a feature absent from the device architecture";
-        }
-        case CUSOLVER_STATUS_EXECUTION_FAILED:
-        {
-          return "The GPU program failed to execute";
-        }
-        case CUSOLVER_STATUS_INTERNAL_ERROR:
-        {
-          return "An internal cuSolver operation failed";
-        }
-        case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
-        {
-          return "The matrix type is not supported by this function";
-        }
-        default:
-        {
-          return "Unknown error";
-        }
+          case CUSOLVER_STATUS_NOT_INITIALIZED:
+            {
+              return "The cuSolver library was not initialized";
+            }
+          case CUSOLVER_STATUS_ALLOC_FAILED:
+            {
+              return "Resource allocation failed inside the cuSolver library";
+            }
+          case CUSOLVER_STATUS_INVALID_VALUE:
+            {
+              return "An unsupported value of a parameter was passed to the function";
+            }
+          case CUSOLVER_STATUS_ARCH_MISMATCH:
+            {
+              return "The function requires a feature absent from the device architecture";
+            }
+          case CUSOLVER_STATUS_EXECUTION_FAILED:
+            {
+              return "The GPU program failed to execute";
+            }
+          case CUSOLVER_STATUS_INTERNAL_ERROR:
+            {
+              return "An internal cuSolver operation failed";
+            }
+          case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+            {
+              return "The matrix type is not supported by this function";
+            }
+          default:
+            {
+              return "Unknown error";
+            }
         }
     }
 #endif
@@ -560,11 +542,7 @@ namespace deal_II_exceptions
   } /*namespace internals*/
 } /*namespace deal_II_exceptions*/
 
-
-
 DEAL_II_NAMESPACE_CLOSE
-
-
 
 // Newer versions of gcc have a very nice feature: you can set a verbose
 // terminate handler, that not only aborts a program when an exception is
@@ -577,7 +555,8 @@ DEAL_II_NAMESPACE_CLOSE
 #ifdef DEAL_II_HAVE_VERBOSE_TERMINATE
 namespace __gnu_cxx
 {
-  extern void __verbose_terminate_handler ();
+  extern void
+  __verbose_terminate_handler();
 }
 
 namespace
@@ -591,5 +570,5 @@ namespace
   };
 
   static preload_terminate_dummy dummy;
-}
+} // namespace
 #endif

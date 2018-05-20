@@ -22,90 +22,91 @@
 #include "../tests.h"
 #include <deal.II/base/point.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <sstream>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <list>
 #include <set>
+#include <sstream>
 
-
-void test ()
+void
+test()
 {
-
-  unsigned int np = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const int dim = 2;
+  unsigned int np   = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const int    dim  = 2;
   // Setup system
-  dealii::parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+  dealii::parallel::distributed::Triangulation<dim> triangulation(
+    MPI_COMM_WORLD);
 
-  GridGenerator::hyper_rectangle (triangulation,
-                                  Point<dim>(0,0),
-                                  Point<dim>(1,1),
-                                  true);
+  GridGenerator::hyper_rectangle(
+    triangulation, Point<dim>(0, 0), Point<dim>(1, 1), true);
 
   triangulation.refine_global(1);
   // Extra refinement to generate hanging nodes
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (cell->center()(0) > 0.49)
-      cell->set_refine_flag ();
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active();
+      cell != triangulation.end();
+      ++cell)
+    if(cell->center()(0) > 0.49)
+      cell->set_refine_flag();
 
   triangulation.prepare_coarsening_and_refinement();
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
   triangulation.repartition();
 
-  const FESystem<dim> fe_system (FE_Q<dim>(2),1,
-                                 FE_DGQ<dim>(2),1);
+  const FESystem<dim> fe_system(FE_Q<dim>(2), 1, FE_DGQ<dim>(2), 1);
 
-  DoFHandler<dim> dh (triangulation);
+  DoFHandler<dim> dh(triangulation);
 
-  dh.distribute_dofs (fe_system);
+  dh.distribute_dofs(fe_system);
 
   // Couple the internal DoFs of both finite elements.
   // Only couple the face terms of the discontinuous element.
-  Table<2,DoFTools::Coupling> coupling (2, 2);
-  Table<2,DoFTools::Coupling> flux_coupling (2, 2);
+  Table<2, DoFTools::Coupling> coupling(2, 2);
+  Table<2, DoFTools::Coupling> flux_coupling(2, 2);
 
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
+  for(unsigned int i = 0; i < 2; ++i)
+    for(unsigned int j = 0; j < 2; ++j)
       {
-        coupling[i][j] = DoFTools::none;
+        coupling[i][j]      = DoFTools::none;
         flux_coupling[i][j] = DoFTools::none;
       }
 
-  coupling[0][0] = DoFTools::always;
-  coupling[1][1] = DoFTools::always;
+  coupling[0][0]      = DoFTools::always;
+  coupling[1][1]      = DoFTools::always;
   flux_coupling[1][1] = DoFTools::always;
 
-  IndexSet relevant_partitioning (dh.n_dofs());
-  DoFTools::extract_locally_relevant_dofs (dh, relevant_partitioning);
+  IndexSet relevant_partitioning(dh.n_dofs());
+  DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
 
   // Generate hanging node constraints
   ConstraintMatrix constraints;
   constraints.clear();
-  DoFTools::make_hanging_node_constraints (dh,
-                                           constraints);
+  DoFTools::make_hanging_node_constraints(dh, constraints);
   constraints.close();
 
   // Generate sparsity pattern
-  DynamicSparsityPattern sp (relevant_partitioning);
-  DoFTools::make_flux_sparsity_pattern (dh, sp,
-                                        constraints, false,
-                                        coupling,
-                                        flux_coupling,
-                                        Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
-  SparsityTools::distribute_sparsity_pattern (sp,
-                                              dh.n_locally_owned_dofs_per_processor(),
-                                              MPI_COMM_WORLD,
-                                              relevant_partitioning);
+  DynamicSparsityPattern sp(relevant_partitioning);
+  DoFTools::make_flux_sparsity_pattern(
+    dh,
+    sp,
+    constraints,
+    false,
+    coupling,
+    flux_coupling,
+    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  SparsityTools::distribute_sparsity_pattern(
+    sp,
+    dh.n_locally_owned_dofs_per_processor(),
+    MPI_COMM_WORLD,
+    relevant_partitioning);
 
   // Output
   MPI_Barrier(MPI_COMM_WORLD);
@@ -117,14 +118,15 @@ void test ()
   sp.print_gnuplot(deallog.get_file_stream());
 
   MPI_Barrier(MPI_COMM_WORLD);
-
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
+  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  MPILogInitAll      log;
 
   deallog.push(Utilities::int_to_string(myid));
 

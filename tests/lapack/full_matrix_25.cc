@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test LAPACKFullMatrix::solve() for Cholesky factorization
 
 /* MWE for size=3 in Octave:
@@ -30,30 +29,29 @@ ans =
 
 #include "../tests.h"
 #include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
-
 
 template <typename NumberType>
 void
 test()
 {
-  const unsigned int size = 3;
+  const unsigned int           size = 3;
   LAPACKFullMatrix<NumberType> M(size);
   M.set_property(LAPACKSupport::symmetric);
 
-  M(0,0) = 10;
-  M(0,1) = 2;
-  M(1,0) = 2;
-  M(0,2) = 3;
-  M(2,0) = 3;
-  M(1,1) = 20;
-  M(1,2) = 6;
-  M(2,1) = 6;
-  M(2,2) = 90;
+  M(0, 0) = 10;
+  M(0, 1) = 2;
+  M(1, 0) = 2;
+  M(0, 2) = 3;
+  M(2, 0) = 3;
+  M(1, 1) = 20;
+  M(1, 2) = 6;
+  M(2, 1) = 6;
+  M(2, 2) = 90;
 
   Vector<NumberType> x(size), y(size);
   x[0] = 2;
@@ -66,14 +64,13 @@ test()
   y.print(deallog.get_file_stream(), 6, false);
 }
 
-
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
   test<double>();
-
 }

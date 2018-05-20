@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparseMatrix::Tvmult, Tvmult_add with distributed deal.II vector
 
 #include "../tests.h"
@@ -24,65 +22,65 @@
 #include <iostream>
 #include <vector>
 
-
-void test (LinearAlgebra::distributed::Vector<double> &v,
-           LinearAlgebra::distributed::Vector<double> &w)
+void
+test(LinearAlgebra::distributed::Vector<double>& v,
+     LinearAlgebra::distributed::Vector<double>& w)
 {
-  TrilinosWrappers::SparseMatrix m(v.size(),w.size(),w.size());
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      m.set (i,j, i+2*j);
+  TrilinosWrappers::SparseMatrix m(v.size(), w.size(), w.size());
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.n(); ++j)
+      m.set(i, j, i + 2 * j);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     v(i) = i;
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // w:=Mv
-  m.Tvmult (w,v);
+  m.Tvmult(w, v);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<m.n(); ++i)
+  for(unsigned int i = 0; i < m.n(); ++i)
     {
       double result = 0;
-      for (unsigned int j=0; j<m.m(); ++j)
-        result += (j+2*i)*j;
-      AssertThrow (w(i) == result, ExcInternalError());
+      for(unsigned int j = 0; j < m.m(); ++j)
+        result += (j + 2 * i) * j;
+      AssertThrow(w(i) == result, ExcInternalError());
     }
 
-  m.Tvmult_add (w, v);
+  m.Tvmult_add(w, v);
   // make sure we get the expected result
-  for (unsigned int i=0; i<m.n(); ++i)
+  for(unsigned int i = 0; i < m.n(); ++i)
     {
       double result = 0;
-      for (unsigned int j=0; j<m.m(); ++j)
-        result += (j+2*i)*j;
-      AssertThrow (w(i) == result+result, ExcInternalError());
+      for(unsigned int j = 0; j < m.m(); ++j)
+        result += (j + 2 * i) * j;
+      AssertThrow(w(i) == result + result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
-        LinearAlgebra::distributed::Vector<double> v (95);
-        LinearAlgebra::distributed::Vector<double> w (100);
-        test (v,w);
+        LinearAlgebra::distributed::Vector<double> v(95);
+        LinearAlgebra::distributed::Vector<double> w(100);
+        test(v, w);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -93,9 +91,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::interpolate with a component mask works for
 // FE_System(FE_Q(p)) elements correctly on an adaptively refined mesh for
 // functions of degree q
@@ -24,125 +22,118 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <vector>
 
-
 template <int dim>
-class F :  public Function<dim>
+class F : public Function<dim>
 {
 public:
-  F (const unsigned int q, const double adj) : Function<dim>(3), q(q), adj(adj) {}
+  F(const unsigned int q, const double adj) : Function<dim>(3), q(q), adj(adj)
+  {}
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<double>   &v) const
+  virtual void
+  vector_value(const Point<dim>& p, Vector<double>& v) const
   {
-    for (unsigned int c=0; c<v.size(); ++c)
+    for(unsigned int c = 0; c < v.size(); ++c)
       {
         v(c) = 0;
-        for (unsigned int d=0; d<dim; ++d)
-          for (unsigned int i=0; i<=q; ++i)
-            v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c+adj;
+        for(unsigned int d = 0; d < dim; ++d)
+          for(unsigned int i = 0; i <= q; ++i)
+            v(c) += (d + 1) * (i + 1) * std::pow(p[d], 1. * i) + c + adj;
       }
   }
 
 private:
   const unsigned int q;
-  const double adj;
+  const double       adj;
 };
 
-
-
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (1);
-  triangulation.begin_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
-  triangulation.refine_global (1);
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(1);
+  triangulation.begin_active()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
+  triangulation.refine_global(1);
 
-  for (unsigned int p=1; p<6-dim; ++p)
+  for(unsigned int p = 1; p < 6 - dim; ++p)
     {
-      FE_Q<dim> fe1(p);
-      FE_Q<dim> fe2(p+1);
-      FESystem<dim> fe(fe1, 2, fe2, 1);
+      FE_Q<dim>       fe1(p);
+      FE_Q<dim>       fe2(p + 1);
+      FESystem<dim>   fe(fe1, 2, fe2, 1);
       DoFHandler<dim> dof_handler(triangulation);
-      dof_handler.distribute_dofs (fe);
+      dof_handler.distribute_dofs(fe);
 
-      const double adj1 = 0.3;
-      ComponentSelectFunction<dim> select_mask1(0,3);
-      ComponentMask mask1(3, false);
+      const double                 adj1 = 0.3;
+      ComponentSelectFunction<dim> select_mask1(0, 3);
+      ComponentMask                mask1(3, false);
       mask1.set(0, true);
 
-      const double adj2 = 1.7;
-      ComponentSelectFunction<dim> select_mask2(std::make_pair(1,3),3);
-      ComponentMask mask2(3, false);
+      const double                 adj2 = 1.7;
+      ComponentSelectFunction<dim> select_mask2(std::make_pair(1, 3), 3);
+      ComponentMask                mask2(3, false);
       mask2.set(1, true);
       mask2.set(2, true);
 
       ConstraintMatrix constraints;
-      DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-      constraints.close ();
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints.close();
 
-      Vector<double> interpolant (dof_handler.n_dofs());
-      Vector<float>  error (triangulation.n_active_cells());
-      for (unsigned int q=0; q<=p+2; ++q)
+      Vector<double> interpolant(dof_handler.n_dofs());
+      Vector<float>  error(triangulation.n_active_cells());
+      for(unsigned int q = 0; q <= p + 2; ++q)
         {
           // interpolate the function
-          VectorTools::interpolate (dof_handler,
-                                    F<dim> (q, adj1),
-                                    interpolant,
-                                    mask1);
-          VectorTools::interpolate (dof_handler,
-                                    F<dim> (q, adj2),
-                                    interpolant,
-                                    mask2);
-          constraints.distribute (interpolant);
-
+          VectorTools::interpolate(
+            dof_handler, F<dim>(q, adj1), interpolant, mask1);
+          VectorTools::interpolate(
+            dof_handler, F<dim>(q, adj2), interpolant, mask2);
+          constraints.distribute(interpolant);
 
           // then compute the interpolation error for mask 1
-          VectorTools::integrate_difference (dof_handler,
-                                             interpolant,
-                                             F<dim> (q, adj1),
-                                             error,
-                                             QGauss<dim>(q+2),
-                                             VectorTools::L2_norm,
-                                             &select_mask1);
-          if (q<=p)
-            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-                    ExcInternalError());
+          VectorTools::integrate_difference(dof_handler,
+                                            interpolant,
+                                            F<dim>(q, adj1),
+                                            error,
+                                            QGauss<dim>(q + 2),
+                                            VectorTools::L2_norm,
+                                            &select_mask1);
+          if(q <= p)
+            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                   ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 1, P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
                   << std::endl;
 
           // then compute the interpolation error for mask 2
-          VectorTools::integrate_difference (dof_handler,
-                                             interpolant,
-                                             F<dim> (q, adj2),
-                                             error,
-                                             QGauss<dim>(q+2),
-                                             VectorTools::L2_norm,
-                                             &select_mask2);
-          if (q<=p)
-            Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
-                    ExcInternalError());
+          VectorTools::integrate_difference(dof_handler,
+                                            interpolant,
+                                            F<dim>(q, adj2),
+                                            error,
+                                            QGauss<dim>(q + 2),
+                                            VectorTools::L2_norm,
+                                            &select_mask2);
+          if(q <= p)
+            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                   ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 2, P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
@@ -151,12 +142,11 @@ void test ()
     }
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision (3);
+  deallog << std::setprecision(3);
 
   deallog.attach(logfile);
 
@@ -164,4 +154,3 @@ int main ()
   test<2>();
   test<3>();
 }
-

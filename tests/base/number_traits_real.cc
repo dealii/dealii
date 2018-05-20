@@ -13,51 +13,44 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check numbers::NumberTraits for real data types
 
 #include "../tests.h"
 #include <limits>
 #include <typeinfo>
 
-
 template <typename number>
-void check (const number &x)
+void
+check(const number& x)
 {
-  deallog << "typeid(x).name() = " << typeid(x).name()
-          << std::endl;
+  deallog << "typeid(x).name() = " << typeid(x).name() << std::endl;
 
   deallog << "typeid(NumberTraits<number>::real_type).name() = "
           << typeid(typename numbers::NumberTraits<number>::real_type).name()
           << std::endl;
 
-  deallog << numbers::NumberTraits<number>::conjugate (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::conjugate(x) << std::endl;
 
-  deallog << numbers::NumberTraits<number>::abs_square (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::abs_square(x) << std::endl;
 
-  deallog << numbers::NumberTraits<number>::abs (x)
-          << std::endl;
+  deallog << numbers::NumberTraits<number>::abs(x) << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check ((float)1.5);
-  check ((float)-1.5);
+  check((float) 1.5);
+  check((float) -1.5);
 
-  check ((double)1.5);
-  check ((double)-1.5);
+  check((double) 1.5);
+  check((double) -1.5);
 
-  check ((long double)1.5);
-  check ((long double)-1.5);
+  check((long double) 1.5);
+  check((long double) -1.5);
 
   return 0;
 }
-

@@ -13,16 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_prolongation_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_SYS1(FE_DGQ<2>(2),2,2);
+  CHECK_SYS1(FE_DGQ<2>(2), 2, 2);
 }

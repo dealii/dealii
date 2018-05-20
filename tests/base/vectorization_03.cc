@@ -13,53 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
 // expression from step-48 that was computed in a wrong way for gcc-4.6.3 with
 // vectorization
-
 
 #include "../tests.h"
 
 #include <deal.II/base/vectorization.h>
 #include <deal.II/lac/vector.h>
 
-
 struct Evaluation
 {
-  VectorizedArray<double> get_value(const unsigned int index) const
+  VectorizedArray<double>
+  get_value(const unsigned int index) const
   {
     return values[index];
   }
 
-  void submit_value(const VectorizedArray<double> val,
-                    const unsigned int index)
+  void
+  submit_value(const VectorizedArray<double> val, const unsigned int index)
   {
-    if (is_cartesian)
+    if(is_cartesian)
       values[index] = val * cartesian_weight * jac_weight[index];
     else
       values[index] = val * general_weight[index];
   }
 
-  bool is_cartesian;
+  bool                    is_cartesian;
   VectorizedArray<double> cartesian_weight;
   VectorizedArray<double> jac_weight[1];
   VectorizedArray<double> general_weight[1];
   VectorizedArray<double> values[1];
 };
 
-
-void initialize(Evaluation &eval)
+void
+initialize(Evaluation& eval)
 {
-  eval.is_cartesian = true;
+  eval.is_cartesian     = true;
   eval.cartesian_weight = random_value<double>();
-  for (unsigned int i=0; i<4; ++i)
-    eval.cartesian_weight = std::max(eval.cartesian_weight, eval.cartesian_weight * eval.cartesian_weight);
+  for(unsigned int i = 0; i < 4; ++i)
+    eval.cartesian_weight = std::max(
+      eval.cartesian_weight, eval.cartesian_weight * eval.cartesian_weight);
   eval.general_weight[0] = 0.2313342 * eval.cartesian_weight;
-  eval.jac_weight[0] = random_value<double>();
+  eval.jac_weight[0]     = random_value<double>();
 }
 
-
-void test()
+void
+test()
 {
   Evaluation current, old;
   initialize(current);
@@ -68,33 +67,36 @@ void test()
   weight = random_value<double>();
 
   VectorizedArray<double> vec;
-  for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
+  for(unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
     vec[v] = random_value<double>();
 
   current.values[0] = vec;
-  old.values[0] = vec * 1.112 - std::max(2.*vec - 1., VectorizedArray<double>());
+  old.values[0]
+    = vec * 1.112 - std::max(2. * vec - 1., VectorizedArray<double>());
 
   Vector<double> vector(200);
   vector = 1.2;
 
   VectorizedArray<double> cur = current.get_value(0);
-  VectorizedArray<double> ol =  old.get_value(0);
+  VectorizedArray<double> ol  = old.get_value(0);
   current.submit_value(2. * cur - ol - weight * std::sin(cur), 0);
 
-  vector *= 2.*current.get_value(0)[0];
+  vector *= 2. * current.get_value(0)[0];
 
   double error = 0;
-  for (unsigned int v=0; v<VectorizedArray<double>::n_array_elements; ++v)
-    error += std::abs(current.get_value(0)[v]/(current.cartesian_weight[v]*current.jac_weight[0][0])-(2.*vec[v]-ol[v]-weight[v]*std::sin(vec[v])));
+  for(unsigned int v = 0; v < VectorizedArray<double>::n_array_elements; ++v)
+    error
+      += std::abs(current.get_value(0)[v]
+                    / (current.cartesian_weight[v] * current.jac_weight[0][0])
+                  - (2. * vec[v] - ol[v] - weight[v] * std::sin(vec[v])));
   deallog << "error: " << error << std::endl;
 }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog << std::setprecision(4);
 
   test();
 }
-

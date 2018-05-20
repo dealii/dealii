@@ -52,71 +52,75 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Sebastian Pauletti, 2011, Luca Heltai, 2015
  */
-template <int order, int dim, int spacedim, typename Number=double>
+template <int order, int dim, int spacedim, typename Number = double>
 class DerivativeForm
 {
 public:
   /**
    * Constructor. Initialize all entries to zero.
    */
-  DerivativeForm ();
+  DerivativeForm();
 
   /**
    * Constructor from a tensor.
    */
-  DerivativeForm (const Tensor<order+1,dim,Number> &);
+  DerivativeForm(const Tensor<order + 1, dim, Number>&);
 
   /**
    * Read-Write access operator.
    */
-  Tensor<order,dim,Number> &operator [] (const unsigned int i);
+  Tensor<order, dim, Number>& operator[](const unsigned int i);
 
   /**
    * Read-only access operator.
    */
-  const Tensor<order,dim,Number> &operator [] (const unsigned int i) const;
+  const Tensor<order, dim, Number>& operator[](const unsigned int i) const;
 
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const Tensor<order+1,dim, Number> &);
+  DerivativeForm&
+  operator=(const Tensor<order + 1, dim, Number>&);
 
   /**
    * Assignment operator.
    */
-  DerivativeForm   &operator = (const Tensor<1,dim, Number> &);
+  DerivativeForm&
+  operator=(const Tensor<1, dim, Number>&);
 
   /**
    * Converts a DerivativeForm <order,dim,dim> to Tensor<order+1,dim,Number>.
    * In particular, if order==1 and the derivative is the Jacobian of F, then
    * Tensor[i] = grad(F^i).
    */
-  operator Tensor<order+1,dim,Number>() const;
+  operator Tensor<order + 1, dim, Number>() const;
 
   /**
    * Converts a DerivativeForm <1, dim, 1> to Tensor<1,dim,Number>.
    */
-  operator Tensor<1,dim,Number>() const;
+  operator Tensor<1, dim, Number>() const;
 
   /**
    * Return the transpose of a rectangular DerivativeForm, that is to say
    * viewed as a two dimensional matrix.
    */
-  DerivativeForm<1, spacedim, dim, Number> transpose () const;
+  DerivativeForm<1, spacedim, dim, Number>
+  transpose() const;
 
   /**
    * Compute the Frobenius norm of this form, i.e., the expression
    * $\sqrt{\sum_{ij} |DF_{ij}|^2}$.
    */
   typename numbers::NumberTraits<Number>::real_type
-  norm () const;
+  norm() const;
 
   /**
    * Compute the volume element associated with the jacobian of the
    * transformation F. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T * DF)}$.
    */
-  Number determinant () const;
+  Number
+  determinant() const;
 
   /**
    * Assuming that the current object stores the Jacobian of a mapping
@@ -126,265 +130,221 @@ public:
    * {\mathbb R}^n \mapsto {\mathbb R}^n$), then this function
    * simplifies to computing $\nabla F^{-T}$.
    */
-  DerivativeForm<1, dim, spacedim, Number> covariant_form() const;
+  DerivativeForm<1, dim, spacedim, Number>
+  covariant_form() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  static std::size_t memory_consumption ();
+  static std::size_t
+  memory_consumption();
 
   /**
    * Exception.
    */
-  DeclException1 (ExcInvalidTensorIndex,
-                  int,
-                  << "Invalid DerivativeForm index " << arg1);
+  DeclException1(ExcInvalidTensorIndex,
+                 int,
+                 << "Invalid DerivativeForm index " << arg1);
 
 private:
   /**
    * Auxiliary function that computes (*this) * $T^{T}$
    */
-  DerivativeForm<1, dim, spacedim, Number> times_T_t (const Tensor<2,dim,Number> &T) const;
-
+  DerivativeForm<1, dim, spacedim, Number>
+  times_T_t(const Tensor<2, dim, Number>& T) const;
 
   /**
    * Array of tensors holding the subelements.
    */
-  Tensor<order,dim,Number> tensor[spacedim];
+  Tensor<order, dim, Number> tensor[spacedim];
 };
-
 
 /*--------------------------- Inline functions -----------------------------*/
 
 #ifndef DOXYGEN
 
-
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number>::DerivativeForm  ()
+inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm()
 {
-// default constructor. not specifying an initializer list calls
-// the default constructor of the subobjects, which initialize them
-// selves. therefore, the tensor array  is set to zero this way
+  // default constructor. not specifying an initializer list calls
+  // the default constructor of the subobjects, which initialize them
+  // selves. therefore, the tensor array  is set to zero this way
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(const Tensor<order+1,dim,Number> &T)
+inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(
+  const Tensor<order + 1, dim, Number>& T)
 {
-  Assert( (dim == spacedim),
-          ExcMessage("Only allowed for forms with dim==spacedim."));
-  if (dim == spacedim)
-    for (unsigned int j=0; j<dim; ++j)
+  Assert((dim == spacedim),
+         ExcMessage("Only allowed for forms with dim==spacedim."));
+  if(dim == spacedim)
+    for(unsigned int j = 0; j < dim; ++j)
       (*this)[j] = T[j];
 }
 
-
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number> &DerivativeForm<order, dim, spacedim, Number>::
-operator = (const Tensor<order+1,dim,Number> &ta)
+inline DerivativeForm<order, dim, spacedim, Number>&
+DerivativeForm<order, dim, spacedim, Number>::
+operator=(const Tensor<order + 1, dim, Number>& ta)
 {
-  Assert( (dim == spacedim),
-          ExcMessage("Only allowed when dim==spacedim."));
+  Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
 
-  if (dim == spacedim)
-    for (unsigned int j=0; j<dim; ++j)
+  if(dim == spacedim)
+    for(unsigned int j = 0; j < dim; ++j)
       (*this)[j] = ta[j];
   return *this;
-
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number> &DerivativeForm<order, dim, spacedim, Number>::
-operator = (const Tensor<1,dim,Number> &T)
+inline DerivativeForm<order, dim, spacedim, Number>&
+DerivativeForm<order, dim, spacedim, Number>::
+operator=(const Tensor<1, dim, Number>& T)
 {
-  Assert( (1 == spacedim) && (order==1),
-          ExcMessage("Only allowed for spacedim==1 and order==1."));
+  Assert((1 == spacedim) && (order == 1),
+         ExcMessage("Only allowed for spacedim==1 and order==1."));
 
   (*this)[0] = T;
 
   return *this;
-
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-Tensor<order,dim,Number> &DerivativeForm<order, dim, spacedim, Number>::
-operator[] (const unsigned int i)
+inline Tensor<order, dim, Number>&
+  DerivativeForm<order, dim, spacedim, Number>::operator[](const unsigned int i)
 {
-  Assert (i<spacedim, ExcIndexRange(i, 0, spacedim));
+  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
 
   return tensor[i];
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-const Tensor<order,dim,Number> &DerivativeForm<order, dim, spacedim, Number>::
-operator[] (const unsigned int i) const
+inline const Tensor<order, dim, Number>&
+  DerivativeForm<order, dim, spacedim, Number>::
+  operator[](const unsigned int i) const
 {
-  Assert (i<spacedim, ExcIndexRange(i, 0, spacedim));
+  Assert(i < spacedim, ExcIndexRange(i, 0, spacedim));
 
   return tensor[i];
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number>::operator Tensor<1,dim,Number>() const
+inline DerivativeForm<order, dim, spacedim, Number>::
+operator Tensor<1, dim, Number>() const
 {
-  Assert( (1 == spacedim) && (order==1),
-          ExcMessage("Only allowed for spacedim==1."));
+  Assert((1 == spacedim) && (order == 1),
+         ExcMessage("Only allowed for spacedim==1."));
 
   return (*this)[0];
-
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<order, dim, spacedim, Number>::operator Tensor<order+1,dim,Number>() const
+inline DerivativeForm<order, dim, spacedim, Number>::
+operator Tensor<order + 1, dim, Number>() const
 {
-  Assert( (dim == spacedim),
-          ExcMessage("Only allowed when dim==spacedim."));
+  Assert((dim == spacedim), ExcMessage("Only allowed when dim==spacedim."));
 
-  Tensor<order+1,dim,Number> t;
+  Tensor<order + 1, dim, Number> t;
 
-  if (dim == spacedim)
-    for (unsigned int j=0; j<dim; ++j)
+  if(dim == spacedim)
+    for(unsigned int j = 0; j < dim; ++j)
       t[j] = (*this)[j];
 
   return t;
-
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<1,spacedim,dim,Number>
-DerivativeForm<order,dim,spacedim,Number>::
-transpose () const
+inline DerivativeForm<1, spacedim, dim, Number>
+DerivativeForm<order, dim, spacedim, Number>::transpose() const
 {
-  Assert(order==1, ExcMessage("Only for rectangular DerivativeForm."));
-  DerivativeForm<1,spacedim,dim,Number> tt;
+  Assert(order == 1, ExcMessage("Only for rectangular DerivativeForm."));
+  DerivativeForm<1, spacedim, dim, Number> tt;
 
-  for (unsigned int i=0; i<spacedim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for(unsigned int i = 0; i < spacedim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       tt[j][i] = (*this)[i][j];
 
   return tt;
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<1, dim, spacedim,Number>
-DerivativeForm<order,dim,spacedim,Number>::times_T_t (const Tensor<2,dim,Number> &T) const
+inline DerivativeForm<1, dim, spacedim, Number>
+DerivativeForm<order, dim, spacedim, Number>::times_T_t(
+  const Tensor<2, dim, Number>& T) const
 {
-  Assert( order==1, ExcMessage("Only for order == 1."));
-  DerivativeForm<1,dim, spacedim,Number> dest;
-  for (unsigned int i=0; i<spacedim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  Assert(order == 1, ExcMessage("Only for order == 1."));
+  DerivativeForm<1, dim, spacedim, Number> dest;
+  for(unsigned int i = 0; i < spacedim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       dest[i][j] = (*this)[i] * T[j];
 
   return dest;
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-typename numbers::NumberTraits<Number>::real_type
-DerivativeForm<order,dim,spacedim,Number>::norm () const
+inline typename numbers::NumberTraits<Number>::real_type
+DerivativeForm<order, dim, spacedim, Number>::norm() const
 {
   typename numbers::NumberTraits<Number>::real_type sum_of_squares = 0;
-  for (unsigned int i=0; i<spacedim; ++i)
+  for(unsigned int i = 0; i < spacedim; ++i)
     sum_of_squares += tensor[i].norm_square();
   return std::sqrt(sum_of_squares);
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-Number DerivativeForm<order, dim, spacedim, Number>::determinant() const
+inline Number
+DerivativeForm<order, dim, spacedim, Number>::determinant() const
 {
-  Assert( order==1, ExcMessage("Only for order == 1."));
-  if (dim == spacedim)
+  Assert(order == 1, ExcMessage("Only for order == 1."));
+  if(dim == spacedim)
     {
-      const Tensor<2,dim,Number> T = static_cast<Tensor<2,dim,Number> >(*this);
+      const Tensor<2, dim, Number> T
+        = static_cast<Tensor<2, dim, Number>>(*this);
       return dealii::determinant(T);
     }
   else
     {
-      Assert( spacedim>dim, ExcMessage("Only for spacedim>dim."));
-      const DerivativeForm<1,spacedim,dim,Number> DF_t = this->transpose();
-      Tensor<2,dim,Number> G; //First fundamental form
-      for (unsigned int i=0; i<dim; ++i)
-        for (unsigned int j=0; j<dim; ++j)
+      Assert(spacedim > dim, ExcMessage("Only for spacedim>dim."));
+      const DerivativeForm<1, spacedim, dim, Number> DF_t = this->transpose();
+      Tensor<2, dim, Number>                         G; //First fundamental form
+      for(unsigned int i = 0; i < dim; ++i)
+        for(unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
 
-      return ( sqrt(dealii::determinant(G)) );
+      return (sqrt(dealii::determinant(G)));
     }
 }
 
-
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-DerivativeForm<1,dim,spacedim,Number>
-DerivativeForm<order,dim,spacedim,Number>::covariant_form() const
+inline DerivativeForm<1, dim, spacedim, Number>
+DerivativeForm<order, dim, spacedim, Number>::covariant_form() const
 {
-  if (dim == spacedim)
+  if(dim == spacedim)
     {
-      const Tensor<2,dim,Number> DF_t
-        = dealii::transpose (invert (static_cast<Tensor<2,dim,Number> >(*this)));
-      return DerivativeForm<1,dim, spacedim> (DF_t);
+      const Tensor<2, dim, Number> DF_t
+        = dealii::transpose(invert(static_cast<Tensor<2, dim, Number>>(*this)));
+      return DerivativeForm<1, dim, spacedim>(DF_t);
     }
   else
     {
-      const DerivativeForm<1,spacedim,dim> DF_t = this->transpose();
-      Tensor<2,dim,Number> G; //First fundamental form
-      for (unsigned int i=0; i<dim; ++i)
-        for (unsigned int j=0; j<dim; ++j)
+      const DerivativeForm<1, spacedim, dim> DF_t = this->transpose();
+      Tensor<2, dim, Number>                 G; //First fundamental form
+      for(unsigned int i = 0; i < dim; ++i)
+        for(unsigned int j = 0; j < dim; ++j)
           G[i][j] = DF_t[i] * DF_t[j];
 
       return (this->times_T_t(invert(G)));
     }
 }
 
-
 template <int order, int dim, int spacedim, typename Number>
-inline
-std::size_t
-DerivativeForm<order, dim, spacedim, Number>::memory_consumption ()
+inline std::size_t
+DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
 {
   return sizeof(DerivativeForm<order, dim, spacedim, Number>);
 }
 
 #endif // DOXYGEN
-
-
-
-
 
 /**
  * One of the uses of DerivativeForm is to apply it as a transformation. This
@@ -395,18 +355,15 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption ()
  * @author Sebastian Pauletti, 2011
  */
 template <int spacedim, int dim, typename Number>
-inline
-Tensor<1,spacedim,Number>
-apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF,
-                      const Tensor<1,dim,Number>               &T)
+inline Tensor<1, spacedim, Number>
+apply_transformation(const DerivativeForm<1, dim, spacedim, Number>& DF,
+                     const Tensor<1, dim, Number>&                   T)
 {
-  Tensor<1,spacedim,Number> dest;
-  for (unsigned int i=0; i<spacedim; ++i)
+  Tensor<1, spacedim, Number> dest;
+  for(unsigned int i = 0; i < spacedim; ++i)
     dest[i] = DF[i] * T;
   return dest;
 }
-
-
 
 /**
  * Similar to previous apply_transformation. It computes $T*DF^{T}$.
@@ -416,14 +373,12 @@ apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF,
  */
 //rank=2
 template <int spacedim, int dim, typename Number>
-inline
-DerivativeForm<1, spacedim, dim>
-apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF,
-                      const Tensor<2,dim,Number>               &T)
+inline DerivativeForm<1, spacedim, dim>
+apply_transformation(const DerivativeForm<1, dim, spacedim, Number>& DF,
+                     const Tensor<2, dim, Number>&                   T)
 {
-
   DerivativeForm<1, spacedim, dim> dest;
-  for (unsigned int i=0; i<dim; ++i)
+  for(unsigned int i = 0; i < dim; ++i)
     dest[i] = apply_transformation(DF, T[i]);
 
   return dest;
@@ -436,19 +391,17 @@ apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF,
  * @author Sebastian Pauletti, 2011
  */
 template <int spacedim, int dim, typename Number>
-inline
-Tensor<2,spacedim,Number>
-apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF1,
-                      const DerivativeForm<1,dim,spacedim,Number> &DF2)
+inline Tensor<2, spacedim, Number>
+apply_transformation(const DerivativeForm<1, dim, spacedim, Number>& DF1,
+                     const DerivativeForm<1, dim, spacedim, Number>& DF2)
 {
-  Tensor<2,spacedim,Number> dest;
+  Tensor<2, spacedim, Number> dest;
 
-  for (unsigned int i=0; i<spacedim; ++i)
+  for(unsigned int i = 0; i < spacedim; ++i)
     dest[i] = apply_transformation(DF1, DF2[i]);
 
   return dest;
 }
-
 
 /**
  * Transpose of a rectangular DerivativeForm DF, mostly for compatibility
@@ -458,15 +411,13 @@ apply_transformation (const DerivativeForm<1,dim,spacedim,Number> &DF1,
  * @author Sebastian Pauletti, 2011
  */
 template <int dim, int spacedim, typename Number>
-inline
-DerivativeForm<1,spacedim,dim,Number>
-transpose (const DerivativeForm<1,dim,spacedim,Number> &DF)
+inline DerivativeForm<1, spacedim, dim, Number>
+transpose(const DerivativeForm<1, dim, spacedim, Number>& DF)
 {
-  DerivativeForm<1,spacedim,dim,Number> tt;
+  DerivativeForm<1, spacedim, dim, Number> tt;
   tt = DF.transpose();
   return tt;
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

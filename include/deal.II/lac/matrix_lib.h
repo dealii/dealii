@@ -17,19 +17,21 @@
 #define dealii_matrix_lib_h
 
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class Vector;
-template <typename number> class BlockVector;
-template <typename number> class SparseMatrix;
+template <typename number>
+class Vector;
+template <typename number>
+class BlockVector;
+template <typename number>
+class SparseMatrix;
 
 /*! @addtogroup Matrix2
  *@{
  */
-
 
 /**
  * Mean value filter.  The vmult() functions of this matrix filter out mean
@@ -68,56 +70,59 @@ public:
    * Subtract mean value from @p v.
    */
   template <typename number>
-  void filter (Vector<number> &v) const;
+  void
+  filter(Vector<number>& v) const;
 
   /**
    * Subtract mean value from @p v.
    */
   template <typename number>
-  void filter (BlockVector<number> &v) const;
+  void
+  filter(BlockVector<number>& v) const;
 
   /**
    * Return the source vector with subtracted mean value.
    */
   template <typename number>
-  void vmult (Vector<number>       &dst,
-              const Vector<number> &src) const;
+  void
+  vmult(Vector<number>& dst, const Vector<number>& src) const;
 
   /**
    * Add source vector with subtracted mean value to dest.
    */
   template <typename number>
-  void vmult_add (Vector<number>       &dst,
-                  const Vector<number> &src) const;
+  void
+  vmult_add(Vector<number>& dst, const Vector<number>& src) const;
 
   /**
    * Return the source vector with subtracted mean value in selected
    * component.
    */
   template <typename number>
-  void vmult (BlockVector<number>       &dst,
-              const BlockVector<number> &src) const;
+  void
+  vmult(BlockVector<number>& dst, const BlockVector<number>& src) const;
 
   /**
    * Add a source to dest, where the mean value in the selected component is
    * subtracted.
    */
   template <typename number>
-  void vmult_add (BlockVector<number>       &dst,
-                  const BlockVector<number> &src) const;
-
-
-  /**
-   * Not implemented.
-   */
-  template <typename VectorType>
-  void Tvmult(VectorType &, const VectorType &) const;
+  void
+  vmult_add(BlockVector<number>& dst, const BlockVector<number>& src) const;
 
   /**
    * Not implemented.
    */
   template <typename VectorType>
-  void Tvmult_add(VectorType &, const VectorType &) const;
+  void
+  Tvmult(VectorType&, const VectorType&) const;
+
+  /**
+   * Not implemented.
+   */
+  template <typename VectorType>
+  void
+  Tvmult_add(VectorType&, const VectorType&) const;
 
 private:
   /**
@@ -126,27 +131,22 @@ private:
   const size_type component;
 };
 
-
-
 /*@}*/
 //---------------------------------------------------------------------------
 
-
 template <typename VectorType>
 inline void
-MeanValueFilter::Tvmult(VectorType &, const VectorType &) const
+MeanValueFilter::Tvmult(VectorType&, const VectorType&) const
 {
   Assert(false, ExcNotImplemented());
 }
 
-
 template <typename VectorType>
 inline void
-MeanValueFilter::Tvmult_add(VectorType &, const VectorType &) const
+MeanValueFilter::Tvmult_add(VectorType&, const VectorType&) const
 {
   Assert(false, ExcNotImplemented());
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

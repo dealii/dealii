@@ -16,12 +16,11 @@
 #ifndef dealii_solver_relaxation_h
 #define dealii_solver_relaxation_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/base/subscriptor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -53,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat
  * @date 2010
  */
-template <typename VectorType = Vector<double> >
+template <typename VectorType = Vector<double>>
 class SolverRelaxation : public Solver<VectorType>
 {
 public:
@@ -61,18 +60,19 @@ public:
    * Standardized data struct to pipe additional data to the solver. There is
    * no data in here for relaxation methods.
    */
-  struct AdditionalData {};
+  struct AdditionalData
+  {};
 
   /**
    * Constructor.
    */
-  SolverRelaxation (SolverControl        &cn,
-                    const AdditionalData &data=AdditionalData());
+  SolverRelaxation(SolverControl&        cn,
+                   const AdditionalData& data = AdditionalData());
 
   /**
    * Virtual destructor.
    */
-  virtual ~SolverRelaxation ();
+  virtual ~SolverRelaxation();
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
@@ -81,74 +81,69 @@ public:
    */
   template <typename MatrixType, class RelaxationType>
   void
-  solve (const MatrixType     &A,
-         VectorType           &x,
-         const VectorType     &b,
-         const RelaxationType &R);
+  solve(const MatrixType&     A,
+        VectorType&           x,
+        const VectorType&     b,
+        const RelaxationType& R);
 };
 
 //----------------------------------------------------------------------//
 
 template <class VectorType>
-SolverRelaxation<VectorType>::SolverRelaxation (SolverControl        &cn,
-                                                const AdditionalData &)
-  :
-  Solver<VectorType> (cn)
+SolverRelaxation<VectorType>::SolverRelaxation(SolverControl& cn,
+                                               const AdditionalData&)
+  : Solver<VectorType>(cn)
 {}
-
-
 
 template <class VectorType>
 SolverRelaxation<VectorType>::~SolverRelaxation()
 {}
 
-
 template <class VectorType>
 template <typename MatrixType, class RelaxationType>
 void
-SolverRelaxation<VectorType>::solve (const MatrixType     &A,
-                                     VectorType           &x,
-                                     const VectorType     &b,
-                                     const RelaxationType &R)
+SolverRelaxation<VectorType>::solve(const MatrixType&     A,
+                                    VectorType&           x,
+                                    const VectorType&     b,
+                                    const RelaxationType& R)
 {
   GrowingVectorMemory<VectorType> mem;
-  SolverControl::State conv=SolverControl::iterate;
+  SolverControl::State            conv = SolverControl::iterate;
 
   // Memory allocation
   typename VectorMemory<VectorType>::Pointer Vr(mem);
-  VectorType &r  = *Vr;
+  VectorType&                                r = *Vr;
   r.reinit(x);
   typename VectorMemory<VectorType>::Pointer Vd(mem);
-  VectorType &d  = *Vd;
+  VectorType&                                d = *Vd;
   d.reinit(x);
 
   LogStream::Prefix prefix("Relaxation");
 
-  int iter=0;
+  int iter = 0;
   // Main loop
-  for (; conv==SolverControl::iterate; iter++)
+  for(; conv == SolverControl::iterate; iter++)
     {
       // Compute residual
-      A.vmult(r,x);
-      r.sadd(-1.,1.,b);
+      A.vmult(r, x);
+      r.sadd(-1., 1., b);
 
       // The required norm of the
       // (preconditioned)
       // residual is computed in
       // criterion() and stored
       // in res.
-      conv = this->iteration_status (iter, r.l2_norm(), x);
-      if (conv != SolverControl::iterate)
+      conv = this->iteration_status(iter, r.l2_norm(), x);
+      if(conv != SolverControl::iterate)
         break;
-      R.step(x,b);
+      R.step(x, b);
     }
 
   // in case of failure: throw exception
   AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence (iter, r.l2_norm()));
+              SolverControl::NoConvergence(iter, r.l2_norm()));
   // otherwise exit as normal
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

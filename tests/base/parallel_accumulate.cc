@@ -13,32 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test parallel::accumulate_from_subranges
 
 #include "../tests.h"
 
 #include <deal.II/base/parallel.h>
 
-
-int sum (const int begin,
-         const int end)
+int
+sum(const int begin, const int end)
 {
-  int s=0;
-  for (int i=begin; i<end; ++i)
+  int s = 0;
+  for(int i = begin; i < end; ++i)
     s += i;
   return s;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 
   const int N = 10000;
-  const int s = parallel::accumulate_from_subranges<int> (&sum, 0, N, 10);
+  const int s = parallel::accumulate_from_subranges<int>(&sum, 0, N, 10);
 
-  Assert (s == N*(N-1)/2, ExcInternalError());
+  Assert(s == N * (N - 1) / 2, ExcInternalError());
 
   deallog << s << std::endl;
 }

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // make sure that block vector copies correctly to a serial vector
 
 #include "../tests.h"
@@ -23,27 +21,31 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <iostream>
 
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
-  typedef BlockVector<double> BlockVectorLocal;
+  typedef BlockVector<double>                BlockVectorLocal;
   typedef TrilinosWrappers::MPI::BlockVector BlockVector;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
-  const unsigned int this_mpi_process = Utilities::MPI::this_mpi_process(mpi_communicator);
-  const unsigned int n_mpi_processes = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  const MPI_Comm&    mpi_communicator = MPI_COMM_WORLD;
+  const unsigned int this_mpi_process
+    = Utilities::MPI::this_mpi_process(mpi_communicator);
+  const unsigned int n_mpi_processes
+    = Utilities::MPI::n_mpi_processes(mpi_communicator);
 
-  const unsigned int n_blocks = 2;
+  const unsigned int n_blocks         = 2;
   const unsigned int n_dofs_per_block = 10;
 
-  std::vector<IndexSet> locally_owned_partitioning (n_blocks);
-  for (unsigned int b=0; b<n_blocks; ++b)
+  std::vector<IndexSet> locally_owned_partitioning(n_blocks);
+  for(unsigned int b = 0; b < n_blocks; ++b)
     {
       locally_owned_partitioning[b].set_size(n_dofs_per_block);
-      locally_owned_partitioning[b].add_range(this_mpi_process*(n_dofs_per_block/2),(this_mpi_process+1)*(n_dofs_per_block/2));
+      locally_owned_partitioning[b].add_range(
+        this_mpi_process * (n_dofs_per_block / 2),
+        (this_mpi_process + 1) * (n_dofs_per_block / 2));
     }
 
   BlockVector parallel_vector;
@@ -52,16 +54,16 @@ int main (int argc,char **argv)
   parallel_vector.locally_owned_elements().print(deallog.get_file_stream());
 
   // Set entries in parallel vector
-  for (auto idx : parallel_vector.locally_owned_elements())
+  for(auto idx : parallel_vector.locally_owned_elements())
     {
-      parallel_vector[idx] = 10.0*idx;
+      parallel_vector[idx] = 10.0 * idx;
     }
   deallog << "Parallel vector" << std::endl;
   parallel_vector.print(deallog.get_file_stream());
 
   // Copy distributed vector to local vector
   deallog << "Localized vector (copy constructor)" << std::endl;
-  const BlockVectorLocal local_vector_1 (parallel_vector);
+  const BlockVectorLocal local_vector_1(parallel_vector);
   local_vector_1.print(deallog.get_file_stream());
 
   // Copy distributed vector to local vector

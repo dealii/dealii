@@ -13,24 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check creation and output of a matrix
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m, n;
-  make_matrix (m);
-  make_matrix (n);
-  deallog << (m==n) << std::endl;
+  make_matrix(m);
+  make_matrix(n);
+  deallog << (m == n) << std::endl;
 }
-

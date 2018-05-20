@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // LAPACKFullMatrix::compute_lu_factorization
 // LAPACKFullMatrix::apply_lu_factorization
 
@@ -23,22 +22,16 @@
 
 #include <iostream>
 
-
 // Fill a matrix with the values of the Hilbert matrix
 template <typename number>
 void
-hilbert (LAPACKFullMatrix<number> &M,
-         const bool nonsymmetric)
+hilbert(LAPACKFullMatrix<number>& M, const bool nonsymmetric)
 {
   const unsigned int n = M.n_rows();
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      M(i,j) = 1./(i+j+1.)
-               * (nonsymmetric
-                  ? ((i<j) ? -1. : 1.)
-                  : 1.);
+  for(unsigned int i = 0; i < n; ++i)
+    for(unsigned int j = 0; j < n; ++j)
+      M(i, j) = 1. / (i + j + 1.) * (nonsymmetric ? ((i < j) ? -1. : 1.) : 1.);
 }
-
 
 // Multiply some vectors with the matrix and its transpose, then
 // compute and apply LU factorization and see if the results are equal
@@ -55,13 +48,13 @@ test(const unsigned int size, const bool nonsymmetric)
   Vector<double> x(size);
   Vector<double> y(size);
 
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     {
-      u(i) = i+2.;
-      x(i) = i+2.;
+      u(i) = i + 2.;
+      x(i) = i + 2.;
     }
-  M.vmult(v,u);
-  M.Tvmult(y,x);
+  M.vmult(v, u);
+  M.Tvmult(y, x);
   M.compute_lu_factorization();
   M.apply_lu_factorization(v, false);
   M.apply_lu_factorization(y, true);
@@ -73,11 +66,11 @@ test(const unsigned int size, const bool nonsymmetric)
   deallog << y.l2_norm() << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test extracted originally from coarsening_02 on the
 // branch_distributed_grids. we have a triangulation with
 // Triangulation<dim>::limit_level_difference_at_vertices set, but produce a
@@ -23,122 +21,115 @@
 // the current test is the 1d version. this case is in a separate test since
 // it uses different code paths
 
-
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/intergrid_map.h>
-#include <deal.II/base/utilities.h>
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
 bool
-satisfies_level1_at_vertex_rule (const Triangulation<dim> &tr)
+satisfies_level1_at_vertex_rule(const Triangulation<dim>& tr)
 {
-  std::vector<unsigned int> min_adjacent_cell_level (tr.n_vertices(),
-                                                     tr.n_levels());
-  std::vector<unsigned int> max_adjacent_cell_level (tr.n_vertices(),
-                                                     0);
+  std::vector<unsigned int> min_adjacent_cell_level(tr.n_vertices(),
+                                                    tr.n_levels());
+  std::vector<unsigned int> max_adjacent_cell_level(tr.n_vertices(), 0);
 
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tr.begin_active();
-       cell != tr.end(); ++cell)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = tr.begin_active();
+      cell != tr.end();
+      ++cell)
+    for(unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        min_adjacent_cell_level[cell->vertex_index(v)]
-          = std::min<unsigned int>
-            (min_adjacent_cell_level[cell->vertex_index(v)],
-             cell->level());
-        max_adjacent_cell_level[cell->vertex_index(v)]
-          = std::max<unsigned int> (min_adjacent_cell_level[cell->vertex_index(v)],
-                                    cell->level());
+        min_adjacent_cell_level[cell->vertex_index(v)] = std::min<unsigned int>(
+          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
+        max_adjacent_cell_level[cell->vertex_index(v)] = std::max<unsigned int>(
+          min_adjacent_cell_level[cell->vertex_index(v)], cell->level());
       }
 
-  for (unsigned int k=0; k<tr.n_vertices(); ++k)
-    if (tr.vertex_used(k))
-      if (max_adjacent_cell_level[k] -
-          min_adjacent_cell_level[k] > 1)
+  for(unsigned int k = 0; k < tr.n_vertices(); ++k)
+    if(tr.vertex_used(k))
+      if(max_adjacent_cell_level[k] - min_adjacent_cell_level[k] > 1)
         return false;
   return true;
 }
 
-
 template <int dim>
-void test()
+void
+test()
 {
-  Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> triangulation(
+    Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global (2);
+  triangulation.refine_global(2);
 
-  for (unsigned int i=0; i<20; ++i)
+  for(unsigned int i = 0; i < 20; ++i)
     {
       // refine one-fifth of cells randomly
-      std::vector<bool> flags (triangulation.n_active_cells(), false);
-      for (unsigned int k=0; k<flags.size()/5 + 1; ++k)
+      std::vector<bool> flags(triangulation.n_active_cells(), false);
+      for(unsigned int k = 0; k < flags.size() / 5 + 1; ++k)
         flags[Testing::rand() % flags.size()] = true;
       // make sure there's at least one that
       // will be refined
       flags[0] = true;
 
       // refine triangulation
-      unsigned int index=0;
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active();
-           cell != triangulation.end(); ++cell, ++index)
-        if (flags[index])
+      unsigned int index = 0;
+      for(typename Triangulation<dim>::active_cell_iterator cell
+          = triangulation.begin_active();
+          cell != triangulation.end();
+          ++cell, ++index)
+        if(flags[index])
           cell->set_refine_flag();
-      Assert (index == triangulation.n_active_cells(), ExcInternalError());
+      Assert(index == triangulation.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
       // some of them will actually be
       // coarsened)
-      index=0;
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active();
-           cell != triangulation.end(); ++cell, ++index)
-        if (!flags[index])
+      index = 0;
+      for(typename Triangulation<dim>::active_cell_iterator cell
+          = triangulation.begin_active();
+          cell != triangulation.end();
+          ++cell, ++index)
+        if(!flags[index])
           cell->set_coarsen_flag();
 
       GridOut go;
-      go.write_gnuplot (triangulation, deallog.get_file_stream());
+      go.write_gnuplot(triangulation, deallog.get_file_stream());
 
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active();
-           cell != triangulation.end(); ++cell)
-        if (cell->refine_flag_set())
+      for(typename Triangulation<dim>::active_cell_iterator cell
+          = triangulation.begin_active();
+          cell != triangulation.end();
+          ++cell)
+        if(cell->refine_flag_set())
           {
             deallog << cell->center() << ' ' << cell->level() << std::endl;
             deallog << cell->center() << ' ' << 0 << std::endl;
             deallog << std::endl;
           }
 
-
-
-      triangulation.execute_coarsening_and_refinement ();
+      triangulation.execute_coarsening_and_refinement();
 
       // verify that none of the cells
       // violates the level-1-at-vertex rule
-      AssertThrow (satisfies_level1_at_vertex_rule (triangulation),
-                   ExcInternalError());
-
+      AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
+                  ExcInternalError());
 
       deallog << "Iteration " << i
-              << ": cells=" << triangulation.n_active_cells()
-              << std::endl;
+              << ": cells=" << triangulation.n_active_cells() << std::endl;
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

@@ -13,40 +13,38 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // like grid_in_out but test persistent triangulation
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/persistent_tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/persistent_tria.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 #include <string>
 
 std::ofstream logfile("output");
 
 template <int dim, int spacedim>
-void test(std::string filename)
+void
+test(std::string filename)
 {
-  logfile << " Tria<" << dim << "," << spacedim << ">: "
-          << std::endl;
+  logfile << " Tria<" << dim << "," << spacedim << ">: " << std::endl;
   Triangulation<dim, spacedim> tria;
-  GridIn<dim, spacedim> gi;
-  gi.attach_triangulation (tria);
-  std::ifstream in (filename.c_str());
-  gi.read_ucd (in);
+  GridIn<dim, spacedim>        gi;
+  gi.attach_triangulation(tria);
+  std::ifstream in(filename.c_str());
+  gi.read_ucd(in);
 
-  PersistentTriangulation<dim, spacedim> ptria(tria);
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  PersistentTriangulation<dim, spacedim>                      ptria(tria);
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
   ptria.restore();
-  for (unsigned int i=0; i<2; ++i)
+  for(unsigned int i = 0; i < 2; ++i)
     {
-      for (cell=ptria.begin_active(); cell != ptria.end(); ++cell)
-        if (cell->center()[0]<.5)
+      for(cell = ptria.begin_active(); cell != ptria.end(); ++cell)
+        if(cell->center()[0] < .5)
           cell->set_refine_flag();
       ptria.execute_coarsening_and_refinement();
     }
@@ -54,13 +52,13 @@ void test(std::string filename)
   ptria.write_flags(logfile);
 }
 
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 
-  test<2,3>(SOURCE_DIR "/grids/square.inp");
-  test<2,3>(SOURCE_DIR "/grids/sphere_1.inp");
+  test<2, 3>(SOURCE_DIR "/grids/square.inp");
+  test<2, 3>(SOURCE_DIR "/grids/sphere_1.inp");
 
   return 0;
 }
-

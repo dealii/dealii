@@ -16,19 +16,17 @@
 #ifndef dealii_tensor_product_polynomials_const_h
 #define dealii_tensor_product_polynomials_const_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * @addtogroup Polynomials
@@ -59,7 +57,7 @@ public:
    * be copied element by element into a private variable.
    */
   template <class Pol>
-  TensorProductPolynomialsConst (const std::vector<Pol> &pols);
+  TensorProductPolynomialsConst(const std::vector<Pol>& pols);
 
   /**
    * Compute the value and the first and second derivatives of each tensor
@@ -73,12 +71,13 @@ public:
    * compute_grad() or compute_grad_grad() functions, see below, in a loop
    * over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<double>         &values,
-                std::vector<Tensor<1,dim> > &grads,
-                std::vector<Tensor<2,dim> > &grad_grads,
-                std::vector<Tensor<3,dim> > &third_derivatives,
-                std::vector<Tensor<4,dim> > &fourth_derivatives) const;
+  void
+  compute(const Point<dim>&            unit_point,
+          std::vector<double>&         values,
+          std::vector<Tensor<1, dim>>& grads,
+          std::vector<Tensor<2, dim>>& grad_grads,
+          std::vector<Tensor<3, dim>>& third_derivatives,
+          std::vector<Tensor<4, dim>>& fourth_derivatives) const;
 
   /**
    * Compute the value of the <tt>i</tt>th tensor product polynomial at
@@ -92,8 +91,8 @@ public:
    * <tt>values.size()==</tt>n() to get the point values of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  double compute_value (const unsigned int i,
-                        const Point<dim> &p) const;
+  double
+  compute_value(const unsigned int i, const Point<dim>& p) const;
 
   /**
    * Compute the <tt>order</tt>th derivative of the <tt>i</tt>th tensor
@@ -110,8 +109,8 @@ public:
    * @tparam order The derivative order.
    */
   template <int order>
-  Tensor<order,dim> compute_derivative (const unsigned int i,
-                                        const Point<dim> &p) const;
+  Tensor<order, dim>
+  compute_derivative(const unsigned int i, const Point<dim>& p) const;
 
   /**
    * Compute the grad of the <tt>i</tt>th tensor product polynomial at
@@ -125,8 +124,8 @@ public:
    * <tt>grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<1,dim> compute_grad (const unsigned int i,
-                              const Point<dim> &p) const;
+  Tensor<1, dim>
+  compute_grad(const unsigned int i, const Point<dim>& p) const;
 
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th tensor
@@ -140,18 +139,18 @@ public:
    * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
    */
-  Tensor<2,dim> compute_grad_grad (const unsigned int i,
-                                   const Point<dim> &p) const;
+  Tensor<2, dim>
+  compute_grad_grad(const unsigned int i, const Point<dim>& p) const;
 
   /**
    * Return the number of tensor product polynomials plus the constant
    * function. For <i>n</i> 1d polynomials this is <i>n<sup>dim</sup>+1</i>.
    */
-  unsigned int n () const;
+  unsigned int
+  n() const;
 };
 
 /** @} */
-
 
 /* ---------------- template and inline functions ---------- */
 
@@ -159,32 +158,24 @@ public:
 
 template <int dim>
 template <class Pol>
-inline
-TensorProductPolynomialsConst<dim>::
-TensorProductPolynomialsConst(const std::vector<Pol> &pols)
-  :
-  TensorProductPolynomials<dim>(pols)
+inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
+  const std::vector<Pol>& pols)
+  : TensorProductPolynomials<dim>(pols)
 {
   // append index for renumbering
   this->index_map.push_back(this->n_tensor_pols);
   this->index_map_inverse.push_back(this->n_tensor_pols);
 }
 
-
-
 template <int dim>
-inline
-unsigned int
+inline unsigned int
 TensorProductPolynomialsConst<dim>::n() const
 {
-  return this->n_tensor_pols+1;
+  return this->n_tensor_pols + 1;
 }
 
-
-
 template <>
-inline
-unsigned int
+inline unsigned int
 TensorProductPolynomialsConst<0>::n() const
 {
   return numbers::invalid_unsigned_int;
@@ -192,21 +183,22 @@ TensorProductPolynomialsConst<0>::n() const
 
 template <int dim>
 template <int order>
-Tensor<order,dim>
-TensorProductPolynomialsConst<dim>::compute_derivative (const unsigned int i,
-                                                        const Point<dim> &p) const
+Tensor<order, dim>
+TensorProductPolynomialsConst<dim>::compute_derivative(
+  const unsigned int i,
+  const Point<dim>&  p) const
 {
   const unsigned int max_indices = this->n_tensor_pols;
-  Assert (i<=max_indices, ExcInternalError());
+  Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
-  if (i<max_indices)
-    return this->TensorProductPolynomials<dim>::template compute_derivative<order>(i,p);
+  if(i < max_indices)
+    return this
+      ->TensorProductPolynomials<dim>::template compute_derivative<order>(i, p);
   else
     // this is for the constant function
-    return Tensor<order,dim>();
+    return Tensor<order, dim>();
 }
-
 
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE

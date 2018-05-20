@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check the copy constructor of ChunkSparsityPattern
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   initlog();
 

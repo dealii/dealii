@@ -17,11 +17,11 @@
 #define dealii_fe_raviart_thomas_bubbles_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/polynomials_rt_bubbles.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_rt_bubbles.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
 
@@ -85,31 +85,30 @@ DEAL_II_NAMESPACE_OPEN
  * @author Eldar Khattatov, 2018
  */
 template <int dim>
-class FE_RT_Bubbles
-  :
-  public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
+class FE_RT_Bubbles : public FE_PolyTensor<PolynomialsRT_Bubbles<dim>, dim>
 {
 public:
   /**
    * Constructor for the RT_Bubbles element of degree @p k.
    */
-  FE_RT_Bubbles (const unsigned int k);
+  FE_RT_Bubbles(const unsigned int k);
 
   /**
    * Returns a string that uniquely identifies a finite element. This class
    * returns <tt>FE_RT_Bubbles<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual std::unique_ptr<FiniteElement<dim,dim> >
-  clone () const override;
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
+  clone() const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double> &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>>& support_point_values,
+    std::vector<double>&               nodal_values) const override;
 
 private:
   /**
@@ -119,14 +118,14 @@ private:
    * FiniteElementData.
    */
   static std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree);
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Compute the vector used for the @p restriction_is_additive field passed
    * to the base class's constructor.
    */
   static std::vector<bool>
-  get_ria_vector (const unsigned int degree);
+  get_ria_vector(const unsigned int degree);
 
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
@@ -137,9 +136,9 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int rt_degree);
+  void
+  initialize_support_points(const unsigned int rt_degree);
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 

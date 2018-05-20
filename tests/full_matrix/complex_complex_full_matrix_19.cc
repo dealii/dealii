@@ -13,38 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::determinant. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors; this time we actually store complex values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  for (unsigned int n=1; n<=3; ++n)
+  for(unsigned int n = 1; n <= 3; ++n)
     {
-      const std::complex<number> array[] = { std::complex<number>(1.0, 5.0),
-                                             std::complex<number>(2.0, 3.0),
-                                             std::complex<number>(4.0, 1.0),
-                                             std::complex<number>(3.0, 7.0),
-                                             std::complex<number>(5.0, 5.0),
-                                             std::complex<number>(7.0, 3.0),
-                                             std::complex<number>(1.0, 4.0),
-                                             std::complex<number>(3.0, 2.0),
-                                             std::complex<number>(5.0, 1.0)
-                                           };
+      const std::complex<number> array[] = {std::complex<number>(1.0, 5.0),
+                                            std::complex<number>(2.0, 3.0),
+                                            std::complex<number>(4.0, 1.0),
+                                            std::complex<number>(3.0, 7.0),
+                                            std::complex<number>(5.0, 5.0),
+                                            std::complex<number>(7.0, 3.0),
+                                            std::complex<number>(1.0, 4.0),
+                                            std::complex<number>(3.0, 2.0),
+                                            std::complex<number>(5.0, 1.0)};
 
-      FullMatrix<std::complex<number> > m(n,n, array);
-      print_matrix (m);
-      deallog << m.determinant () << std::endl;
+      FullMatrix<std::complex<number>> m(n, n, array);
+      print_matrix(m);
+      deallog << m.determinant() << std::endl;
     }
 }

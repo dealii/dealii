@@ -13,23 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check querying the number of nonzero elements in
 // ChunkSparseMatrix when we don't store the diagonal elements explicitly
 
 #include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
-
-void test (const unsigned int chunk_size)
+void
+test(const unsigned int chunk_size)
 {
-  ChunkSparsityPattern sp (5,5,3,chunk_size);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  ChunkSparsityPattern sp(5, 5, 3, chunk_size);
+  for(unsigned int i = 0; i < 5; ++i)
+    for(unsigned int j = 0; j < 5; ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
   ChunkSparseMatrix<double> m(sp);
 
@@ -38,47 +36,44 @@ void test (const unsigned int chunk_size)
   // matrices we also always store the
   // diagonal element
   unsigned int counter = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      if (((i+2*j+1) % 3 == 0) || (i==j))
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.n(); ++j)
+      if(((i + 2 * j + 1) % 3 == 0) || (i == j))
         {
-          m.set (i,j, i*j*.5+.5);
+          m.set(i, j, i * j * .5 + .5);
           ++counter;
         }
 
   deallog << m.n_nonzero_elements() << std::endl;
 
-  if (chunk_size == 1)
+  if(chunk_size == 1)
     {
-      AssertThrow (m.n_nonzero_elements() == counter,
-                   ExcInternalError());
+      AssertThrow(m.n_nonzero_elements() == counter, ExcInternalError());
     }
   else
     {
-      AssertThrow (m.n_nonzero_elements() >= counter,
-                   ExcInternalError());
+      AssertThrow(m.n_nonzero_elements() >= counter, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
-      for (unsigned int i=0;
-           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
-           ++i)
-        test (chunk_sizes[i]);
+      const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
+      for(unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
+          ++i)
+        test(chunk_sizes[i]);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -89,9 +84,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -31,87 +31,91 @@ namespace LinearAlgebra
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  float atomicAdd_wrapper(float *address, float val)
+    inline __device__ float
+    atomicAdd_wrapper(float* address, float val)
     {
-      return atomicAdd(address,val);
+      return atomicAdd(address, val);
     }
-
-
 
     /**
      * Provide atomicAdd for doubles.
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__ double atomicAdd_wrapper(double *address, double val)
+    inline __device__ double
+    atomicAdd_wrapper(double* address, double val)
     {
       // Use native instruction for CUDA 8 on Pascal or newer architecture
-#if  __CUDACC_VER_MAJOR__  >= 8 && ( !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600 )
-      return atomicAdd(address,val);
-#else
+#  if __CUDACC_VER_MAJOR__ >= 8 \
+    && (!defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 600)
+      return atomicAdd(address, val);
+#  else
 
-      unsigned long long int *address_as_ull =
-        reinterpret_cast<unsigned long long int *>(address);
+      unsigned long long int* address_as_ull
+        = reinterpret_cast<unsigned long long int*>(address);
       unsigned long long int old = *address_as_ull, assumed;
       do
         {
           assumed = old;
-          old = atomicCAS(address_as_ull, assumed,
-                          __double_as_longlong(val + __longlong_as_double(assumed)));
+          old     = atomicCAS(
+            address_as_ull,
+            assumed,
+            __double_as_longlong(val + __longlong_as_double(assumed)));
         }
-      while (assumed != old);
+      while(assumed != old);
 
       return __longlong_as_double(old);
-#endif
+#  endif
     }
-
-
 
     /**
      * Provide atomicMax for floats.
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  float atomicMax_wrapper(float *address, float val)
+    inline __device__ float
+    atomicMax_wrapper(float* address, float val)
     {
-      int *address_as_int = reinterpret_cast<int *>(address);
-      int old = *address_as_int, assumed;
+      int* address_as_int = reinterpret_cast<int*>(address);
+      int  old            = *address_as_int, assumed;
       do
         {
           assumed = old;
-          old = atomicCAS(address_as_int, assumed,
+          old     = atomicCAS(address_as_int,
+                          assumed,
                           atomicMax(address_as_int, __float_as_int(val)));
         }
-      while (assumed != old);
+      while(assumed != old);
 
       return __longlong_as_double(old);
     }
-
-
 
     /**
      * Provide atomicMax for doubles.
      *
      * @ingroup CUDAWrappers
      */
-    inline __device__  double atomicMax_wrapper(double *address, double val)
+    inline __device__ double
+    atomicMax_wrapper(double* address, double val)
     {
-      unsigned long long int *address_as_ull =
-        reinterpret_cast<unsigned long long int *>(address);
+      unsigned long long int* address_as_ull
+        = reinterpret_cast<unsigned long long int*>(address);
       unsigned long long int old = *address_as_ull, assumed;
       do
         {
           assumed = old;
-          old = atomicCAS(address_as_ull, assumed,
+          old     = atomicCAS(address_as_ull,
+                          assumed,
                           atomicMax(address_as_ull,
-                                    static_cast<unsigned long long int>(__double_as_longlong(val))));
+                                    static_cast<unsigned long long int>(
+                                      __double_as_longlong(val))));
         }
-      while (assumed != old);
+      while(assumed != old);
 
       return __longlong_as_double(old);
     }
-  }
-}
+  } // namespace CUDAWrappers
+} // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -14,56 +14,58 @@
 // ---------------------------------------------------------------------
 
 #include "../tests.h"
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/geometry_info.h>
-#include<deal.II/dofs/dof_handler.h>
-#include<deal.II/dofs/dof_accessor.h>
-#include<deal.II/dofs/dof_tools.h>
-#include<deal.II/fe/fe_q.h>
-#include<deal.II/fe/fe_values.h>
-#include<deal.II/fe/fe_system.h>
-#include<deal.II/fe/mapping_q1_eulerian.h>
-#include<deal.II/fe/mapping_q1.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe_field.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q1_eulerian.h>
 #include <deal.II/grid/grid_generator.h>
-#include<deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
-template<int dim, int spacedim>
-void test()
+template <int dim, int spacedim>
+void
+test()
 {
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
 
-  FESystem<dim,spacedim> fe(FE_Q<dim,spacedim>(1), spacedim);
-  DoFHandler<dim,spacedim> dh(tria);
+  FESystem<dim, spacedim>   fe(FE_Q<dim, spacedim>(1), spacedim);
+  DoFHandler<dim, spacedim> dh(tria);
 
   dh.distribute_dofs(fe);
 
   deallog << "dim, spacedim: " << dim << ", " << spacedim << std::endl
-          << "cells: " << tria.n_active_cells() << ", dofs: "
-          << dh.n_dofs() <<std::endl;
+          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs()
+          << std::endl;
 
   // Create a Mapping
   Vector<double> map_vector(dh.n_dofs());
   VectorTools::get_position_vector(dh, map_vector);
-  MappingFEField<dim,spacedim> mapping(dh, map_vector);
+  MappingFEField<dim, spacedim> mapping(dh, map_vector);
 
-  tria.refine_global (1);
+  tria.refine_global(1);
 
   dh.distribute_dofs(fe);
 
   deallog << "After refine:" << std::endl
-          << "cells: " << tria.n_active_cells() << ", dofs: "
-          << dh.n_dofs() <<std::endl;
+          << "cells: " << tria.n_active_cells() << ", dofs: " << dh.n_dofs()
+          << std::endl;
 }
 
 using namespace dealii;
-int main()
+int
+main()
 {
   initlog();
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 }

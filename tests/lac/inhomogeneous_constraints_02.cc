@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // We take one cell and create the system_matrix and the
 // right-hand-side-vector.  But we have a few inhomogeneous
 // constraints and want to test if the
@@ -24,36 +22,37 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
-#include <iostream>
 #include <complex>
+#include <iostream>
 
 std::ofstream logfile("output");
 
 using namespace dealii;
 
-void test(bool use_inhomogeneity_for_rhs)
+void
+test(bool use_inhomogeneity_for_rhs)
 {
   ConstraintMatrix cm;
 
@@ -67,39 +66,38 @@ void test(bool use_inhomogeneity_for_rhs)
   cm.close();
   cm.print(logfile);
 
-
-  DynamicSparsityPattern csp(5,5);
-  for (unsigned int i=0; i<5; ++i)
-    csp.add(i,i);
+  DynamicSparsityPattern csp(5, 5);
+  for(unsigned int i = 0; i < 5; ++i)
+    csp.add(i, i);
 
   SparsityPattern sp;
   sp.copy_from(csp);
   SparseMatrix<double> mat(sp);
-  Vector<double> rhs(5);
+  Vector<double>       rhs(5);
 
   std::vector<types::global_dof_index> local_dofs;
-  for (unsigned int i=0; i<5; ++i)
+  for(unsigned int i = 0; i < 5; ++i)
     local_dofs.push_back(i);
 
-  FullMatrix<double> local_mat(5,5);
-  Vector<double> local_vec(5);
-  for (unsigned int i=0; i<5; ++i)
-    local_mat(i,i)=2.0;
+  FullMatrix<double> local_mat(5, 5);
+  Vector<double>     local_vec(5);
+  for(unsigned int i = 0; i < 5; ++i)
+    local_mat(i, i) = 2.0;
 
   local_vec = 0;
 
-  cm.distribute_local_to_global(local_mat, local_vec, local_dofs, mat, rhs, use_inhomogeneity_for_rhs);
+  cm.distribute_local_to_global(
+    local_mat, local_vec, local_dofs, mat, rhs, use_inhomogeneity_for_rhs);
 
   mat.print(logfile);
   rhs.print(logfile);
-
 }
 
-
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   deallog.attach(logfile);
 
   // Use the constraints for the right-hand-side

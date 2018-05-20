@@ -13,53 +13,49 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // continuous projection of a function on the surface of a hypersphere
 
 #include "../tests.h"
 
 // all include files needed for the program
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/data_out.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/base/quadrature_lib.h>
 
 #include <string>
 
-
 std::ofstream logfile("output");
 
-
 template <int dim, int spacedim>
-void test(std::string filename, unsigned int n)
+void
+test(std::string filename, unsigned int n)
 {
-
   Triangulation<dim, spacedim> triangulation;
-  GridIn<dim, spacedim> gi;
+  GridIn<dim, spacedim>        gi;
 
-  gi.attach_triangulation (triangulation);
-  std::ifstream in (filename.c_str());
-  gi.read_ucd (in);
+  gi.attach_triangulation(triangulation);
+  std::ifstream in(filename.c_str());
+  gi.read_ucd(in);
 
-  FE_Q<dim,spacedim>     fe (n);
-  DoFHandler<dim,spacedim> dof_handler (triangulation);
+  FE_Q<dim, spacedim>       fe(n);
+  DoFHandler<dim, spacedim> dof_handler(triangulation);
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
   // Now we project the constant function on the mesh, and check
   // that this is consistent with what we expect.
@@ -67,30 +63,29 @@ void test(std::string filename, unsigned int n)
   Vector<double> error(dof_handler.n_dofs());
 
   Functions::CosineFunction<spacedim> cosine;
-  QGauss<dim> quad(5);
-  ConstraintMatrix constraints;
+  QGauss<dim>                         quad(5);
+  ConstraintMatrix                    constraints;
   constraints.close();
   VectorTools::project(dof_handler, constraints, quad, cosine, projected_one);
 
-  DataOut<dim, DoFHandler<dim,spacedim> > dataout;
+  DataOut<dim, DoFHandler<dim, spacedim>> dataout;
   dataout.add_data_vector(dof_handler, projected_one, "projection");
   dataout.build_patches();
   dataout.write_vtk(logfile);
 }
 
-
-
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 
-  for (unsigned int n=1; n<5; n++)
+  for(unsigned int n = 1; n < 5; n++)
     {
       deallog << "Test<1,2>, continuous finite element q_" << n << std::endl;
-      test<1,2>(SOURCE_DIR "/grids/circle_2.inp",n);
+      test<1, 2>(SOURCE_DIR "/grids/circle_2.inp", n);
 
       deallog << "Test<2,3>, continuous finite element q_" << n << std::endl;
-      test<2,3>(SOURCE_DIR "/grids/sphere_2.inp",n);
+      test<2, 3>(SOURCE_DIR "/grids/sphere_2.inp", n);
     }
   return 0;
 }

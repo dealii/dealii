@@ -13,41 +13,33 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the BlockMask class
 //
 // here: BlockMask::represents_n_blocks
 
-
 #include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   // test for an initialized mask
-  AssertThrow (BlockMask(12,false).represents_n_blocks(12) == true,
-               ExcInternalError());
-  AssertThrow (BlockMask(12,false).represents_n_blocks(13) == false,
-               ExcInternalError());
+  AssertThrow(BlockMask(12, false).represents_n_blocks(12) == true,
+              ExcInternalError());
+  AssertThrow(BlockMask(12, false).represents_n_blocks(13) == false,
+              ExcInternalError());
   // test for an empty mask
-  AssertThrow (BlockMask().represents_n_blocks(12) == true,
-               ExcInternalError());
-  AssertThrow (BlockMask().represents_n_blocks(13) == true,
-               ExcInternalError());
+  AssertThrow(BlockMask().represents_n_blocks(12) == true, ExcInternalError());
+  AssertThrow(BlockMask().represents_n_blocks(13) == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

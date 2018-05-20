@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // this test is sparse_matrix_iterator_10 for a ChunkSparseMatrix and the same
 // test as chunk_sparse_matrix_iterator_09 with postfix operator++ instead of
 // prefix
@@ -22,43 +20,42 @@
 #include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
-
-void test (const unsigned int chunk_size)
+void
+test(const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
 
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
   // not quadratic)
-  ChunkSparsityPattern sparsity(4,5,1,chunk_size);
-  sparsity.add (1,1);
-  sparsity.add (3,1);
-  sparsity.compress ();
+  ChunkSparsityPattern sparsity(4, 5, 1, chunk_size);
+  sparsity.add(1, 1);
+  sparsity.add(3, 1);
+  sparsity.compress();
 
   // attach a sparse matrix to it
   ChunkSparseMatrix<double> A(sparsity);
 
   // and loop over the elements of it
-  for (ChunkSparseMatrix<double>::const_iterator k=A.begin();
-       k!=A.end(); k++)
-    deallog << k->row() << ' ' << k->column() << ' ' << k->value()
-            << std::endl;
+  for(ChunkSparseMatrix<double>::const_iterator k = A.begin(); k != A.end();
+      k++)
+    deallog << k->row() << ' ' << k->column() << ' ' << k->value() << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test (1);
-      test (3);
+      test(1);
+      test(3);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -69,9 +66,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -13,56 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-
-
+#include <deal.II/hp/dof_handler.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   // create 2 triangulations with the
   // same coarse grid, and refine
   // them differently
   Triangulation<dim> tria[2];
 
-  GridGenerator::hyper_cube (tria[0]);
-  GridGenerator::hyper_cube (tria[1]);
+  GridGenerator::hyper_cube(tria[0]);
+  GridGenerator::hyper_cube(tria[1]);
 
-  tria[0].refine_global (2);
-  tria[1].refine_global (2);
+  tria[0].refine_global(2);
+  tria[1].refine_global(2);
 
   tria[0].begin_active()->set_refine_flag();
-  tria[0].execute_coarsening_and_refinement ();
+  tria[0].execute_coarsening_and_refinement();
 
   tria[1].last_active()->set_refine_flag();
-  tria[1].execute_coarsening_and_refinement ();
+  tria[1].execute_coarsening_and_refinement();
 
   tria[1].last_active()->set_refine_flag();
-  tria[1].execute_coarsening_and_refinement ();
+  tria[1].execute_coarsening_and_refinement();
 
-  typedef
-  std::list<std::pair<typename Triangulation<dim>::cell_iterator,
-      typename Triangulation<dim>::cell_iterator> >
-      CellList;
+  typedef std::list<std::pair<typename Triangulation<dim>::cell_iterator,
+                              typename Triangulation<dim>::cell_iterator>>
+    CellList;
 
   const CellList cell_list
-    = GridTools::get_finest_common_cells (tria[0], tria[1]);
-  for (typename CellList::const_iterator cell_pair = cell_list.begin();
-       cell_pair != cell_list.end(); ++cell_pair)
-    deallog << cell_pair->first << ' ' << cell_pair->second
-            << std::endl;
+    = GridTools::get_finest_common_cells(tria[0], tria[1]);
+  for(typename CellList::const_iterator cell_pair = cell_list.begin();
+      cell_pair != cell_list.end();
+      ++cell_pair)
+    deallog << cell_pair->first << ' ' << cell_pair->second << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

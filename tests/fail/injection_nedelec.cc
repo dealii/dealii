@@ -13,21 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 char logname[] = "output";
-
 
 #include "../fe/injection_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  if (dim == 1)
+  if(dim == 1)
     return;
 
-  for (unsigned int i=1; i<4; ++i)
-    for (unsigned int j=i; j<4; ++j)
-      do_check (FE_Nedelec<dim>(i), FE_Nedelec<dim>(j));
+  for(unsigned int i = 1; i < 4; ++i)
+    for(unsigned int j = i; j < 4; ++j)
+      do_check(FE_Nedelec<dim>(i), FE_Nedelec<dim>(j));
 }

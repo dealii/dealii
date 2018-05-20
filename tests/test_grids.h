@@ -13,10 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 /**
  * A set of test meshes for the deal.II test suite.
@@ -59,33 +59,38 @@ namespace TestGrids
    * only negative coordinates.
    */
   template <int dim>
-  void hypercube(Triangulation<dim> &tr,
-                 unsigned int refinement = 0,
-                 bool local = false)
+  void
+  hypercube(Triangulation<dim>& tr,
+            unsigned int        refinement = 0,
+            bool                local      = false)
   {
     GridGenerator::hyper_cube(tr, -1., 1.);
-    if (refinement && !local)
+    if(refinement && !local)
       tr.refine_global(refinement);
-    if (refinement && local)
+    if(refinement && local)
       {
         tr.refine_global(1);
-        for (unsigned int i=1; i<refinement; ++i)
+        for(unsigned int i = 1; i < refinement; ++i)
           {
-            for (typename Triangulation<dim>::active_cell_iterator
-                 cell = tr.begin_active(); cell != tr.end(); ++cell)
+            for(typename Triangulation<dim>::active_cell_iterator cell
+                = tr.begin_active();
+                cell != tr.end();
+                ++cell)
               {
-                const Point<dim> &p = cell->center();
-                bool negative = true;
-                for (unsigned int d=0; d<dim; ++d)
-                  if (p(d) >= 0.)negative = false;
-                if (negative)
+                const Point<dim>& p        = cell->center();
+                bool              negative = true;
+                for(unsigned int d = 0; d < dim; ++d)
+                  if(p(d) >= 0.)
+                    negative = false;
+                if(negative)
                   cell->set_refine_flag();
               }
             tr.execute_coarsening_and_refinement();
           }
       }
-    deallog << "Triangulation hypercube " << dim << "D refinement " << refinement;
-    if (local)
+    deallog << "Triangulation hypercube " << dim << "D refinement "
+            << refinement;
+    if(local)
       deallog << " local ";
     deallog << " steps " << tr.n_active_cells() << " active cells "
             << tr.n_cells() << " total cells " << std::endl;
@@ -106,24 +111,28 @@ namespace TestGrids
    * of the coarse cells.
    */
   template <int dim>
-  void star_shaped(Triangulation<dim> &tr,
-                   unsigned int refinement = 0,
-                   bool local = false);
+  void
+  star_shaped(Triangulation<dim>& tr,
+              unsigned int        refinement = 0,
+              bool                local      = false);
   /**
    * Local refinement of every other
    * cell in a checkerboard fashion.
    */
   template <int dim>
-  void checkers(Triangulation<dim> &tr);
+  void
+  checkers(Triangulation<dim>& tr);
   /**
    * Islands of local refinement
    */
   template <int dim>
-  void islands(Triangulation<dim> &tr);
+  void
+  islands(Triangulation<dim>& tr);
   /**
    * Local refinement with an
    * unrefined hole.
    */
   template <int dim>
-  void laguna(Triangulation<dim> &tr);
-}
+  void
+  laguna(Triangulation<dim>& tr);
+} // namespace TestGrids

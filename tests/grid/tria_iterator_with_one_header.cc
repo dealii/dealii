@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // It used to be that if you wanted to use
 // Triangulation::active_cell_iterator in a context where that type
 // was actually used, you also had to #include
@@ -22,32 +21,30 @@
 // no longer only forward declared. test that this continues to work
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-
+#include <deal.II/grid/tria.h>
 
 std::ofstream logfile("output");
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   deallog << tria.begin_active()->center() << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   return 0;
 }
-

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that if we take an locally refined mesh, refine it globally once,
 // then coarsen it globally again, that we get the same mesh
 //
@@ -24,64 +22,60 @@
 #include "../tests.h"
 
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-
-
-
 
 template <int dim>
-void check ()
+void
+check()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global (2);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(2);
   tria.begin_active()->set_refine_flag();
-  tria.execute_coarsening_and_refinement ();
+  tria.execute_coarsening_and_refinement();
 
   // store which cells we have here
   std::vector<typename Triangulation<dim>::active_cell_iterator> cells;
-  for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-       cell != tria.end(); ++cell)
-    cells.push_back (cell);
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = tria.begin_active();
+      cell != tria.end();
+      ++cell)
+    cells.push_back(cell);
 
   const unsigned int n_cells = tria.n_active_cells();
   deallog << n_cells << std::endl;
 
   // refine the mesh globally, then coarsen
   // it again globally
-  tria.refine_global (1);
+  tria.refine_global(1);
 
-  for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-       cell != tria.end(); ++cell)
-    cell->set_coarsen_flag ();
-  tria.execute_coarsening_and_refinement ();
-
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = tria.begin_active();
+      cell != tria.end();
+      ++cell)
+    cell->set_coarsen_flag();
+  tria.execute_coarsening_and_refinement();
 
   // verify that we get the same cells again
-  deallog << n_cells << ' ' << tria.n_active_cells()
-          << std::endl;
+  deallog << n_cells << ' ' << tria.n_active_cells() << std::endl;
 
-  Assert (tria.n_active_cells() == n_cells,
-          ExcInternalError());
+  Assert(tria.n_active_cells() == n_cells, ExcInternalError());
 
   unsigned int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-       cell != tria.end(); ++cell, ++index)
-    AssertThrow (cells[index] == cell,
-                 ExcInternalError());
-
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = tria.begin_active();
+      cell != tria.end();
+      ++cell, ++index)
+    AssertThrow(cells[index] == cell, ExcInternalError());
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check<2> ();
+  check<2>();
 }
-
-
-

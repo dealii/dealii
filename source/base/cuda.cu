@@ -27,7 +27,8 @@ namespace Utilities
   {
     Handle::Handle()
     {
-      cusolverStatus_t cusolver_error_code = cusolverDnCreate(&cusolver_dn_handle);
+      cusolverStatus_t cusolver_error_code
+        = cusolverDnCreate(&cusolver_dn_handle);
       AssertCusolver(cusolver_error_code);
 
       cusolver_error_code = cusolverSpCreate(&cusolver_sp_handle);
@@ -37,16 +38,15 @@ namespace Utilities
       AssertCusparse(cusparse_error_code);
     }
 
-
-
     Handle::~Handle()
     {
-      dealii::GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>
-          ::release_unused_memory();
-      dealii::GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>
-          ::release_unused_memory();
+      dealii::GrowingVectorMemory<
+        LinearAlgebra::CUDAWrappers::Vector<float>>::release_unused_memory();
+      dealii::GrowingVectorMemory<
+        LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
 
-      cusolverStatus_t cusolver_error_code = cusolverDnDestroy(cusolver_dn_handle);
+      cusolverStatus_t cusolver_error_code
+        = cusolverDnDestroy(cusolver_dn_handle);
       AssertCusolver(cusolver_error_code);
 
       cusolver_error_code = cusolverSpDestroy(cusolver_sp_handle);
@@ -55,7 +55,7 @@ namespace Utilities
       cusparseStatus_t cusparse_error_code = cusparseDestroy(cusparse_handle);
       AssertCusparse(cusparse_error_code);
     }
-  }
-}
+  } // namespace CUDA
+} // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

@@ -17,13 +17,14 @@
 // be executed with exactly two threads.
 
 #include <deal.II/grid/tria.h>
-#include <sched.h>
-#include <mpi.h>
 #include <iostream>
+#include <mpi.h>
+#include <sched.h>
 
-int main(int argc, char *argv[] )
+int
+main(int argc, char* argv[])
 {
-  MPI_Init( &argc, &argv );
+  MPI_Init(&argc, &argv);
 
   int myrank, nproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -31,7 +32,7 @@ int main(int argc, char *argv[] )
 
   std::cout << " Hi from " << myrank << "/" << nproc << std::endl;
 
-  if (nproc != 2)
+  if(nproc != 2)
     {
       std::cerr << "ERROR: process does not see nproc=2!" << std::endl;
       return -1;
@@ -39,33 +40,31 @@ int main(int argc, char *argv[] )
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  int err = MPI_SUCCESS;
+  int err   = MPI_SUCCESS;
   int value = myrank;
 
-  if (myrank==1)
+  if(myrank == 1)
     err = MPI_Send(&value, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-  else if (myrank==0)
+  else if(myrank == 0)
     err = MPI_Recv(&value, 1, MPI_INT, 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-  if (err != MPI_SUCCESS)
+  if(err != MPI_SUCCESS)
     {
-      std::cerr << "MPI_Send/Recv error code = "
-                << err
-                << std::endl;
-      abort ();
+      std::cerr << "MPI_Send/Recv error code = " << err << std::endl;
+      abort();
     }
 
-  if (myrank==0 && value!=1)
+  if(myrank == 0 && value != 1)
     {
       std::cerr << "ERROR: MPI_Send/Recv did not work!" << std::endl;
       return -1;
     }
 
-  value = 1;
+  value      = 1;
   int output = 0;
 
   MPI_Allreduce(&value, &output, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  if (output != nproc)
+  if(output != nproc)
     {
       std::cerr << "ERROR: MPI_Allreduce doesn't seem to work!" << std::endl;
       return -1;

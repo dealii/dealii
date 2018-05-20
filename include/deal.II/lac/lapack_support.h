@@ -16,7 +16,6 @@
 #ifndef dealii_lapack_support_h
 #define dealii_lapack_support_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
@@ -35,7 +34,7 @@ namespace types
    */
   typedef int blas_int;
 #endif
-}
+} // namespace types
 
 /**
  * A namespace containing constants, exceptions, enumerations, and other
@@ -76,28 +75,29 @@ namespace LAPACKSupport
   /**
    * Function printing the name of a State.
    */
-  inline const char *state_name(State s)
+  inline const char*
+  state_name(State s)
   {
-    switch (s)
+    switch(s)
       {
-      case matrix:
-        return "matrix";
-      case inverse_matrix:
-        return "inverse matrix";
-      case lu:
-        return "lu decomposition";
-      case cholesky:
-        return "cholesky decomposition";
-      case eigenvalues:
-        return "eigenvalues";
-      case svd:
-        return "svd";
-      case inverse_svd:
-        return "inverse_svd";
-      case unusable:
-        return "unusable";
-      default:
-        return "unknown";
+        case matrix:
+          return "matrix";
+        case inverse_matrix:
+          return "inverse matrix";
+        case lu:
+          return "lu decomposition";
+        case cholesky:
+          return "cholesky decomposition";
+        case eigenvalues:
+          return "eigenvalues";
+        case svd:
+          return "svd";
+        case inverse_svd:
+          return "inverse_svd";
+        case unusable:
+          return "unusable";
+        default:
+          return "unknown";
       }
   }
 
@@ -124,25 +124,26 @@ namespace LAPACKSupport
   /**
    * Function printing the name of a Property.
    */
-  inline const char *property_name(const Property s)
+  inline const char*
+  property_name(const Property s)
   {
-    switch (s)
+    switch(s)
       {
-      case general:
-        return "general";
-      case symmetric:
-        return "symmetric";
-      case upper_triangular:
-        return "upper triangular";
-      case lower_triangular:
-        return "lower triangular";
-      case diagonal:
-        return "diagonal";
-      case hessenberg:
-        return "Hessenberg";
+        case general:
+          return "general";
+        case symmetric:
+          return "symmetric";
+        case upper_triangular:
+          return "upper triangular";
+        case lower_triangular:
+          return "lower triangular";
+        case diagonal:
+          return "diagonal";
+        case hessenberg:
+          return "Hessenberg";
       }
 
-    Assert (false, ExcNotImplemented());
+    Assert(false, ExcNotImplemented());
     return "invalid";
   }
 
@@ -182,42 +183,47 @@ namespace LAPACKSupport
   /**
    * A LAPACK function returned an error code.
    */
-  DeclException2(ExcErrorCode, char *, types::blas_int,
-                 << "The function " << arg1 << " returned with an error code " << arg2);
+  DeclException2(ExcErrorCode,
+                 char*,
+                 types::blas_int,
+                 << "The function " << arg1 << " returned with an error code "
+                 << arg2);
 
   /**
    * Exception thrown when a matrix is not in a suitable state for an
    * operation. For instance, a LAPACK routine may have left the matrix in an
    * unusable state, then vmult does not make sense anymore.
    */
-  DeclException1(ExcState, State,
-                 << "The function cannot be called while the matrix is in state "
-                 << state_name(arg1));
+  DeclException1(
+    ExcState,
+    State,
+    << "The function cannot be called while the matrix is in state "
+    << state_name(arg1));
 
   /**
    * Exception thrown when a matrix does not have suitable properties for an
    * operation.
    */
-  DeclException1(ExcProperty, Property,
+  DeclException1(ExcProperty,
+                 Property,
                  << "The function cannot be called with a "
-                 << property_name(arg1)
-                 << " matrix.");
+                 << property_name(arg1) << " matrix.");
 
   /**
    * This exception is thrown if a certain LAPACK function is not available
    * because no LAPACK installation was detected during configuration.
    */
-  DeclException1(ExcMissing, char *,
-                 << "When you ran 'cmake' during installation of deal.II, "
-                 << "no suitable installation of the BLAS or LAPACK library could "
-                 << "be found. Consequently, the function <"
-                 << arg1
-                 << "> can not be called. Refer to the doc/readme.html "
-                 << "file for information on how to ensure that deal.II "
-                 << "picks up an existing BLAS and LAPACK installation at "
-                 << "configuration time.");
-}
-
+  DeclException1(
+    ExcMissing,
+    char*,
+    << "When you ran 'cmake' during installation of deal.II, "
+    << "no suitable installation of the BLAS or LAPACK library could "
+    << "be found. Consequently, the function <" << arg1
+    << "> can not be called. Refer to the doc/readme.html "
+    << "file for information on how to ensure that deal.II "
+    << "picks up an existing BLAS and LAPACK installation at "
+    << "configuration time.");
+} // namespace LAPACKSupport
 
 DEAL_II_NAMESPACE_CLOSE
 

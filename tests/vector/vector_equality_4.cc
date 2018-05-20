@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<double>::operator!=(Vector<double>) for vectors that are
 // equal
 
@@ -22,41 +20,40 @@
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<double> &v,
-           Vector<double> &w)
+void
+test(Vector<double>& v, Vector<double>& w)
 {
   // set only certain elements of each
   // vector
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      if (i%3 == 0)
-        w(i) = i+1.;
+      if(i % 3 == 0)
+        w(i) = i + 1.;
     }
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  AssertThrow (! (v.operator != (w)), ExcInternalError());
+  AssertThrow(!(v.operator!=(w)), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      Vector<double> w (100);
-      test (v,w);
+      Vector<double> v(100);
+      Vector<double> w(100);
+      test(v, w);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -67,9 +64,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

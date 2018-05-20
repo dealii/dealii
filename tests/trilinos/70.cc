@@ -13,25 +13,23 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check TrilinosScalar
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-
-  if (typeid(TrilinosScalar)==typeid(double))
+  if(typeid(TrilinosScalar) == typeid(double))
     deallog << "double" << std::endl;
-  else if (typeid(TrilinosScalar)==typeid(float))
+  else if(typeid(TrilinosScalar) == typeid(float))
     deallog << "float" << std::endl;
   else
     Assert(false, ExcNotImplemented());

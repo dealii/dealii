@@ -14,25 +14,27 @@
 //-----------------------------------------------------------
 
 #include "../tests.h"
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/parameter_acceptor.h>
 #include <boost/core/demangle.hpp>
+#include <deal.II/base/parameter_acceptor.h>
+#include <deal.II/base/utilities.h>
 
-template<int dim>
+template <int dim>
 class Test : public ParameterAcceptor
 {
 public:
   Test()
   {
     add_parameter("A double", a);
-    add_parameter("An int"  , b);
+    add_parameter("An int", b);
     add_parameter("A string", c);
-    add_parameter("A bool"  , d);
+    add_parameter("A bool", d);
   };
 
-  void log_info()
+  void
+  log_info()
   {
-    deallog << "My type: " << boost::core::demangle(typeid(*this).name()) << std::endl
+    deallog << "My type: " << boost::core::demangle(typeid(*this).name())
+            << std::endl
             << "a: " << a << std::endl
             << "b: " << b << std::endl
             << "c: " << c << std::endl
@@ -40,21 +42,20 @@ public:
   }
 
 private:
-  double a = 1.0;
-  int b = 2;
+  double      a = 1.0;
+  int         b = 2;
   std::string c = "Ciao";
-  bool d = true;
-
+  bool        d = true;
 };
 
-
-int main ()
+int
+main()
 {
   initlog();
   Test<1> a;
   Test<2> b;
 
-  auto &prm = ParameterAcceptor::prm;
+  auto& prm = ParameterAcceptor::prm;
 
   ParameterAcceptor::declare_all_parameters();
   ParameterAcceptor::parse_all_parameters();
@@ -76,5 +77,4 @@ int main ()
 
   a.log_info();
   b.log_info();
-
 }

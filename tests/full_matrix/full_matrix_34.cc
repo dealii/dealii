@@ -13,23 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::swap_col
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
-  m.swap_col (2, 3);
-  print_matrix (m);
+  make_matrix(m);
+  m.swap_col(2, 3);
+  print_matrix(m);
 }

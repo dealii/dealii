@@ -13,28 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check SymmetricTensor<2,dim>::operator= (double)
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/lac/vector.h>
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const unsigned int dim=3;
-  SymmetricTensor<2,dim> t;
+  const unsigned int      dim = 3;
+  SymmetricTensor<2, dim> t;
   t[0][0] = t[1][0] = t[1][1] = t[2][2] = 3;
 
   deallog << t.norm() << std::endl;
   t = 0;
   deallog << t.norm() << std::endl;
 
-  Assert (t.norm() == 0, ExcInternalError());
+  Assert(t.norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

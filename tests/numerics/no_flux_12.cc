@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // add test for ExcNotImplemented() error in compute_no_normal_flux_constraints.
 // reported by Keith Galvin, mailing list, 2013/10/13. Simplified.
 // note that the cylinder boundary is not even the problem here!
@@ -53,26 +51,27 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_generator.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/function.h>
-
+#include <deal.II/numerics/vector_tools.h>
 
 template <int dim>
-void run()
+void
+run()
 {
   Triangulation<dim> tria;
 
   // indicator 6 = cylinder
-  GridGenerator::hyper_cube_with_cylindrical_hole (tria, 0.25, 0.5, 0.5, 1, true);
+  GridGenerator::hyper_cube_with_cylindrical_hole(
+    tria, 0.25, 0.5, 0.5, 1, true);
   tria.reset_manifold(0);
 
   /*  std::string filename = "Mesh.eps";
@@ -81,19 +80,17 @@ void run()
   grid_out.write_eps (tria, output);
   */
 
-  FESystem<dim> fe(FE_Q<dim>(1), dim);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FESystem<dim>   fe(FE_Q<dim>(1), dim);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
+  ConstraintMatrix             constraints;
   std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert (0); // x=0
-  no_normal_flux_boundaries.insert (5); // z=1
+  no_normal_flux_boundaries.insert(0); // x=0
+  no_normal_flux_boundaries.insert(5); // z=1
 
-  VectorTools::compute_no_normal_flux_constraints
-  (dof_handler, 0,
-   no_normal_flux_boundaries,
-   constraints);
+  VectorTools::compute_no_normal_flux_constraints(
+    dof_handler, 0, no_normal_flux_boundaries, constraints);
 
   constraints.print(deallog.get_file_stream());
 
@@ -103,13 +100,13 @@ void run()
   deallog << "OK" << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  logfile.precision (7);
+  std::ofstream logfile("output");
+  logfile.precision(7);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
 
-  run<3> ();
+  run<3>();
 }

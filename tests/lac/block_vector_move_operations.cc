@@ -13,16 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/lac/block_vector.h>
 
-#define PRINTME(name, var) \
+#define PRINTME(name, var)                              \
   deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i) \
+  for(unsigned int i = 0; i < var.n_blocks(); ++i)      \
     deallog << "[block " << i << " ]  " << var.block(i);
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -36,9 +36,9 @@ int main()
 
   {
     BlockVector<double> u(5, 2);
-    for (unsigned int i = 0; i < 5; ++i)
-      for (unsigned int j = 0; j < 2; ++j)
-        u.block(i)[j] = (double)(10 * i + j);
+    for(unsigned int i = 0; i < 5; ++i)
+      for(unsigned int j = 0; j < 2; ++j)
+        u.block(i)[j] = (double) (10 * i + j);
 
     PRINTME("BlockVector", u);
 
@@ -59,5 +59,3 @@ int main()
     deallog << "old object size: " << v.n_blocks() << std::endl;
   }
 }
-
-

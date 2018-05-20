@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 //strange hang/crash in find_active_cell_around_point depending on which
 //mapping is used
 
@@ -45,53 +43,53 @@
 
 #include "../tests.h"
 
-
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/base/function.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
-
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
 #include <list>
-#include <string>
 #include <sstream>
+#include <string>
 #include <time.h>
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
-  Triangulation<2>     triangulation;
+  Triangulation<2> triangulation;
 
   GridIn<2> grid_in1;
-  grid_in1.attach_triangulation (triangulation);
+  grid_in1.attach_triangulation(triangulation);
   std::ifstream input_file1(SOURCE_DIR "/grids/mesh.msh");
   grid_in1.read_msh(input_file1);
 
-  Point< 2 > ePos;
+  Point<2> ePos;
   ePos(0) = 0.0653630060373507487669897386695;
   ePos(1) = 1125.59175030825804242340382189;
 
-  MappingQ<2> mapping(1);
-  MappingQGeneric<2> &mapping2 = StaticMappingQ1< 2 >::mapping;
+  MappingQ<2>         mapping(1);
+  MappingQGeneric<2>& mapping2 = StaticMappingQ1<2>::mapping;
   deallog << "1:" << std::endl;
-  GridTools::find_active_cell_around_point (mapping, triangulation, ePos);
+  GridTools::find_active_cell_around_point(mapping, triangulation, ePos);
   deallog << "2:" << std::endl;
   //this second call seems to hang/crash:
-  GridTools::find_active_cell_around_point (mapping2, triangulation, ePos);
+  GridTools::find_active_cell_around_point(mapping2, triangulation, ePos);
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 

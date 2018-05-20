@@ -16,21 +16,18 @@
 #ifndef dealii_std_cxx11_shared_ptr_h
 #define dealii_std_cxx11_shared_ptr_h
 
-
 #include <deal.II/base/config.h>
 
-
-#  include <memory>
+#include <memory>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {
-  using std::shared_ptr;
+  using std::dynamic_pointer_cast;
   using std::enable_shared_from_this;
   using std::make_shared;
-  using std::dynamic_pointer_cast;
-}
+  using std::shared_ptr;
+} // namespace std_cxx11
 DEAL_II_NAMESPACE_CLOSE
-
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

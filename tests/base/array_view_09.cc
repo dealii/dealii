@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test the make_array_view functions that create ArrayViews from iterators
 
 #include "../tests.h"
@@ -25,33 +24,32 @@
 #include <type_traits>
 
 template <typename T>
-constexpr
-bool
+constexpr bool
 is_const_reference()
 {
-  return std::is_reference<T>::value &&
-         std::is_const<typename std::remove_reference<T>::type>::value;
+  return std::is_reference<T>::value
+         && std::is_const<typename std::remove_reference<T>::type>::value;
 }
 
-void test ()
+void
+test()
 {
   // test on a built-in array
   {
-    int v[10];
+    int  v[10];
     auto a = make_array_view(std::begin(v) + 1, std::end(v));
-    AssertThrow (a.begin() == v + 1, ExcInternalError());
-    AssertThrow (a.end() == v + sizeof(v)/sizeof(v[0]),
-                 ExcInternalError());
-    AssertThrow (a.begin() + 2 == &v[3], ExcInternalError());
+    AssertThrow(a.begin() == v + 1, ExcInternalError());
+    AssertThrow(a.end() == v + sizeof(v) / sizeof(v[0]), ExcInternalError());
+    AssertThrow(a.begin() + 2 == &v[3], ExcInternalError());
     a[2] = 42;
-    AssertThrow (v[3] == 42, ExcInternalError());
+    AssertThrow(v[3] == 42, ExcInternalError());
 
     // check that we cannot create a backwards array
     try
       {
         make_array_view(std::end(v), std::begin(v));
       }
-    catch (const ExceptionBase &exc)
+    catch(const ExceptionBase& exc)
       {
         deallog << exc.get_exc_name() << std::endl;
       }
@@ -61,8 +59,8 @@ void test ()
   {
     std::array<double, 10> v;
     std::fill(v.begin(), v.end(), 42.0);
-    const std::array<double, 10> &v2 = v;
-    const auto a = make_array_view(v2.begin(), v2.end());
+    const std::array<double, 10>& v2 = v;
+    const auto                    a  = make_array_view(v2.begin(), v2.end());
     static_assert(is_const_reference<decltype(*a.begin())>(),
                   "type should be const");
     static_assert(is_const_reference<decltype(*a.end())>(),
@@ -119,30 +117,31 @@ void test ()
       {
         make_array_view(std::end(v), std::begin(v));
       }
-    catch (const ExceptionBase &exc)
+    catch(const ExceptionBase& exc)
       {
         deallog << exc.get_exc_name() << std::endl;
       }
-    // we only trigger the exception in debug mode
-    // just output the expected error message in release mode
-    // to make CTest happy
+      // we only trigger the exception in debug mode
+      // just output the expected error message in release mode
+      // to make CTest happy
 #ifndef DEBUG
-    deallog <<  "ExcMessage(\"The beginning of the array view should be before the end.\")"
-            << std::endl;
-    deallog <<  "ExcMessage(\"The beginning of the array view should be before the end.\")"
-            << std::endl;
+    deallog
+      << "ExcMessage(\"The beginning of the array view should be before the end.\")"
+      << std::endl;
+    deallog
+      << "ExcMessage(\"The beginning of the array view should be before the end.\")"
+      << std::endl;
 #endif
   }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
   deal_II_exceptions::disable_abort_on_exception();
-  test ();
+  test();
 }

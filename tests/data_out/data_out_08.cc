@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // this test documents two unrelated bugs in DataOut when used with a Filter (by deriving from DataOut):
 // 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or an Assert after adding that):
 /*
@@ -28,51 +27,44 @@
 // 2. DataOut used begi_active() instead of first_cell() in two places which caused a wrong patch to be generated when the first active cell is not picked by the filter.
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>
-#include <deal.II/numerics/data_out.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/fe/fe_dgq.h>
-
+#include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/numerics/data_out.h>
 
 template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:
-  FilteredDataOut (const unsigned int subdomain_id)
-    :
-    subdomain_id (subdomain_id)
+  FilteredDataOut(const unsigned int subdomain_id) : subdomain_id(subdomain_id)
   {}
 
   virtual typename DataOut<dim>::cell_iterator
-  first_cell ()
+  first_cell()
   {
-    typename DataOut<dim>::active_cell_iterator
-    cell = this->dofs->begin_active();
-    while ((cell != this->dofs->end()) &&
-           (cell->subdomain_id() != subdomain_id))
+    typename DataOut<dim>::active_cell_iterator cell
+      = this->dofs->begin_active();
+    while((cell != this->dofs->end()) && (cell->subdomain_id() != subdomain_id))
       ++cell;
 
     return cell;
   }
 
   virtual typename DataOut<dim>::cell_iterator
-  next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
+  next_cell(const typename DataOut<dim>::cell_iterator& old_cell)
   {
-    if (old_cell != this->dofs->end())
+    if(old_cell != this->dofs->end())
       {
-        const IteratorFilters::SubdomainEqualTo
-        predicate(subdomain_id);
+        const IteratorFilters::SubdomainEqualTo predicate(subdomain_id);
 
-        return
-          ++(FilteredIterator
-             <typename DataOut<dim>::active_cell_iterator>
-             (predicate,old_cell));
+        return ++(FilteredIterator<typename DataOut<dim>::active_cell_iterator>(
+          predicate, old_cell));
       }
     else
       return old_cell;
@@ -82,27 +74,26 @@ private:
   const unsigned int subdomain_id;
 };
 
-
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global (1);
+  tria.refine_global(1);
 
   Vector<double> cell_data(4);
-  for (unsigned int i=0; i<4; ++i)
-    cell_data(i)=i*1.0;
+  for(unsigned int i = 0; i < 4; ++i)
+    cell_data(i) = i * 1.0;
 
   // this should skip the first cell
   typename Triangulation<dim>::active_cell_iterator it = tria.begin_active();
   //++it;
   it->set_subdomain_id(1);
 
-  FE_DGQ<dim> fe(0);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FE_DGQ<dim>     fe(0);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   //  DataOut<dim> data_out;
 
@@ -111,20 +102,21 @@ check ()
   FilteredDataOut<dim> data_out(0);
   data_out.attach_dof_handler(dof_handler);
 
-  data_out.add_data_vector (cell_data, "cell_data", DataOut<dim>::type_cell_data);
-  data_out.build_patches ();
+  data_out.add_data_vector(
+    cell_data, "cell_data", DataOut<dim>::type_cell_data);
+  data_out.build_patches();
 
-  data_out.write_deal_II_intermediate (deallog.get_file_stream());
+  data_out.write_deal_II_intermediate(deallog.get_file_stream());
 
   deallog << "OK" << std::endl;
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   deallog.attach(logfile);
 
   check<2>();

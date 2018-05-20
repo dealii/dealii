@@ -22,8 +22,8 @@
 #include <deal.II/sundials/ida.h>
 #include <deal.II/sundials/kinsol.h>
 
-
-int main()
+int
+main()
 {
   initlog();
 
@@ -41,4 +41,3 @@ int main()
 
   return 0;
 }
-

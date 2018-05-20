@@ -21,7 +21,6 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector_memory.templates.h>
 
-
 using namespace dealii;
 
 // Dummy vectors with different, non convertible types:
@@ -29,33 +28,39 @@ using namespace dealii;
 struct LeftVector
 {
   typedef double value_type;
-  value_type value;
+  value_type     value;
 
-  LeftVector &operator = (value_type new_value)
+  LeftVector&
+  operator=(value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  LeftVector &operator *= (value_type scale)
+  LeftVector&
+  operator*=(value_type scale)
   {
     value *= scale;
     return *this;
   }
-  LeftVector &operator /= (value_type scale)
+  LeftVector&
+  operator/=(value_type scale)
   {
     value /= scale;
     return *this;
   }
-  LeftVector &operator += (const LeftVector &u)
+  LeftVector&
+  operator+=(const LeftVector& u)
   {
     value += u.value;
     return *this;
   }
-  int size() const
+  int
+  size() const
   {
     return 1;
   }
-  std::size_t memory_consumption () const
+  std::size_t
+  memory_consumption() const
   {
     return 1;
   }
@@ -64,39 +69,46 @@ struct LeftVector
 struct RightVector
 {
   typedef double value_type;
-  value_type value;
+  value_type     value;
 
-  RightVector &operator = (value_type new_value)
+  RightVector&
+  operator=(value_type new_value)
   {
     value = new_value;
     return *this;
   }
-  RightVector &operator *= (value_type scale)
+  RightVector&
+  operator*=(value_type scale)
   {
     value *= scale;
     return *this;
   }
-  RightVector &operator /= (value_type scale)
+  RightVector&
+  operator/=(value_type scale)
   {
     value /= scale;
     return *this;
   }
-  RightVector &operator += (const RightVector &u)
+  RightVector&
+  operator+=(const RightVector& u)
   {
     value += u.value;
     return *this;
   }
-  int size() const
+  int
+  size() const
   {
     return 1;
   }
-  std::size_t memory_consumption () const
+  std::size_t
+  memory_consumption() const
   {
     return 1;
   }
 };
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -104,52 +116,31 @@ int main()
 
   typedef dealii::internal::LinearOperatorImplementation::EmptyPayload Payload;
   LinearOperator<LeftVector, RightVector, Payload> multiply2;
-  multiply2.vmult = [](LeftVector &v, const RightVector &u)
-  {
-    v.value = 2 * u.value;
-  };
-  multiply2.vmult_add = [](LeftVector &v, const RightVector &u)
-  {
-    v.value += 2 * u.value;
-  };
-  multiply2.Tvmult = [](RightVector &v, const LeftVector &u)
-  {
-    v.value = 2 * u.value;
-  };
-  multiply2.Tvmult_add = [](RightVector &v, const LeftVector &u)
-  {
-    v.value += 2 * u.value;
-  };
-  multiply2.reinit_range_vector = [](LeftVector &, bool)
-  {
-  };
-  multiply2.reinit_domain_vector = [](RightVector &, bool)
-  {
-  };
+  multiply2.vmult
+    = [](LeftVector& v, const RightVector& u) { v.value = 2 * u.value; };
+  multiply2.vmult_add
+    = [](LeftVector& v, const RightVector& u) { v.value += 2 * u.value; };
+  multiply2.Tvmult
+    = [](RightVector& v, const LeftVector& u) { v.value = 2 * u.value; };
+  multiply2.Tvmult_add
+    = [](RightVector& v, const LeftVector& u) { v.value += 2 * u.value; };
+  multiply2.reinit_range_vector  = [](LeftVector&, bool) {};
+  multiply2.reinit_domain_vector = [](RightVector&, bool) {};
 
   auto multiply4 = multiply2;
-  multiply4.vmult = [](LeftVector &v, const RightVector &u)
-  {
-    v.value = 4 * u.value;
-  };
-  multiply4.vmult_add = [](LeftVector &v, const RightVector &u)
-  {
-    v.value += 4 * u.value;
-  };
-  multiply4.Tvmult = [](RightVector &v, const LeftVector &u)
-  {
-    v.value = 4 * u.value;
-  };
-  multiply4.Tvmult_add = [](RightVector &v, const LeftVector &u)
-  {
-    v.value += 4 * u.value;
-  };
-
+  multiply4.vmult
+    = [](LeftVector& v, const RightVector& u) { v.value = 4 * u.value; };
+  multiply4.vmult_add
+    = [](LeftVector& v, const RightVector& u) { v.value += 4 * u.value; };
+  multiply4.Tvmult
+    = [](RightVector& v, const LeftVector& u) { v.value = 4 * u.value; };
+  multiply4.Tvmult_add
+    = [](RightVector& v, const LeftVector& u) { v.value += 4 * u.value; };
 
   // Small unit tests for all functions:
 
-  RightVector u = { 4. };
-  LeftVector v = { 0. };
+  RightVector u = {4.};
+  LeftVector  v = {0.};
 
   // vmult, vmult_add
 
@@ -216,8 +207,8 @@ int main()
 
   // operator* and transpose
 
-  auto test2 = transpose_operator(multiply2) * multiply4;
-  RightVector w = { 0. };
+  auto        test2 = transpose_operator(multiply2) * multiply4;
+  RightVector w     = {0.};
   test2.vmult(w, u);
   deallog << "(2 * 4) * " << u.value << " = " << w.value << std::endl;
 
@@ -236,5 +227,4 @@ int main()
   auto test4 = null_operator(test2);
   test4.vmult(w, u);
   deallog << " 0 * " << u.value << " = " << w.value << std::endl;
-
 }

@@ -16,30 +16,28 @@
 // check PointerMatrix:checkConstructor2
 
 #include "../tests.h"
-#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
 
 template <typename number>
 void
-checkConstructor2(FullMatrix<number> &A)
+checkConstructor2(FullMatrix<number>& A)
 {
   deallog << "Init with matrix A" << std::endl;
-  PointerMatrix<FullMatrix<number>, Vector<number> > P(&A);
+  PointerMatrix<FullMatrix<number>, Vector<number>> P(&A);
   deallog << "Is matrix empty:" << P.empty() << std::endl;
 }
 
 int
 main()
 {
-
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  const double Adata[] =
-  { 2, 3, 4, 5 };
+  const double Adata[] = {2, 3, 4, 5};
 
   FullMatrix<double> A(2, 2);
   A.fill(Adata);

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Utilities::int_to_string produced wrong results with numbers larger
 // than 10 digits (including padding)
 
@@ -21,26 +20,24 @@
 
 #include <deal.II/base/utilities.h>
 
-
-void test ()
+void
+test()
 {
-  deallog << Utilities::int_to_string (9,10) << std::endl;
-  deallog << Utilities::int_to_string (99,10) << std::endl;
-  deallog << Utilities::int_to_string (999,10) << std::endl;
-  deallog << Utilities::int_to_string (9999,10) << std::endl;
-  deallog << Utilities::int_to_string (99999,10) << std::endl;
-  deallog << Utilities::int_to_string (999999,10) << std::endl;
-  deallog << Utilities::int_to_string (9999999,10) << std::endl;
-  deallog << Utilities::int_to_string (99999999,10) << std::endl;
-  deallog << Utilities::int_to_string (999999999,10) << std::endl;
+  deallog << Utilities::int_to_string(9, 10) << std::endl;
+  deallog << Utilities::int_to_string(99, 10) << std::endl;
+  deallog << Utilities::int_to_string(999, 10) << std::endl;
+  deallog << Utilities::int_to_string(9999, 10) << std::endl;
+  deallog << Utilities::int_to_string(99999, 10) << std::endl;
+  deallog << Utilities::int_to_string(999999, 10) << std::endl;
+  deallog << Utilities::int_to_string(9999999, 10) << std::endl;
+  deallog << Utilities::int_to_string(99999999, 10) << std::endl;
+  deallog << Utilities::int_to_string(999999999, 10) << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

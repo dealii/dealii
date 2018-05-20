@@ -16,8 +16,8 @@
 #ifndef dealii_sparse_mic_h
 #define dealii_sparse_mic_h
 
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_decomposition.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -56,7 +56,7 @@ public:
    * Constructor. Does nothing, so you have to call @p decompose sometimes
    * afterwards.
    */
-  SparseMIC ();
+  SparseMIC();
 
   /**
    * Destructor.
@@ -67,15 +67,14 @@ public:
    * Deletes all member variables. Leaves the class in the state that it had
    * directly after calling the constructor
    */
-  virtual void clear() override;
+  virtual void
+  clear() override;
 
   /**
    * Make the @p AdditionalData type in the base class accessible to this
    * class as well.
    */
-  typedef
-  typename SparseLUDecomposition<number>::AdditionalData
-  AdditionalData;
+  typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
 
   /**
    * Perform the incomplete LU factorization of the given matrix.
@@ -95,8 +94,9 @@ public:
    * After this function is called the preconditioner is ready to be used.
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData &parameters = AdditionalData());
+  void
+  initialize(const SparseMatrix<somenumber>& matrix,
+             const AdditionalData&           parameters = AdditionalData());
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -105,8 +105,8 @@ public:
    * Call @p initialize before calling this function.
    */
   template <typename somenumber>
-  void vmult (Vector<somenumber>       &dst,
-              const Vector<somenumber> &src) const;
+  void
+  vmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Apply the transpose of the incomplete decomposition, i.e. do one forward-
@@ -118,14 +118,15 @@ public:
    *
    */
   template <typename somenumber>
-  void Tvmult (Vector<somenumber>       &dst,
-               const Vector<somenumber> &src) const;
+  void
+  Tvmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const override;
+  std::size_t
+  memory_consumption() const override;
 
   /**
    * @addtogroup Exceptions
@@ -135,20 +136,22 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcStrengthenDiagonalTooSmall);
+  DeclException0(ExcStrengthenDiagonalTooSmall);
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidStrengthening,
-                  double,
-                  << "The strengthening parameter " << arg1
-                  << " is not greater or equal than zero!");
+  DeclException1(ExcInvalidStrengthening,
+                 double,
+                 << "The strengthening parameter " << arg1
+                 << " is not greater or equal than zero!");
   /**
    * Exception
    */
-  DeclException2(ExcDecompositionNotStable, int, double,
-                 << "The diagonal element (" <<arg1<<","<<arg1<<") is "
-                 << arg2 <<", but must be positive");
+  DeclException2(ExcDecompositionNotStable,
+                 int,
+                 double,
+                 << "The diagonal element (" << arg1 << "," << arg1 << ") is "
+                 << arg2 << ", but must be positive");
 
   //@}
 private:
@@ -171,11 +174,12 @@ private:
   /**
    * Compute the row-th "inner sum".
    */
-  number get_rowsum (const size_type row) const;
+  number
+  get_rowsum(const size_type row) const;
 };
 
 /*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif  // dealii_
+#endif // dealii_

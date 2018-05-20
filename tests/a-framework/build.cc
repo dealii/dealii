@@ -13,14 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the testsuite framework. this test is supposed to miscompile
 
 #include "../tests.h"
 
-
-int main ()
+int
+main()
 {
   initlog();
 
@@ -28,4 +26,3 @@ int main ()
 
   deallog << "OK" << std::endl;
 }
-

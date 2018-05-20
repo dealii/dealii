@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // we crash when building hanging nodes. however, as elucidated by the
 // _02 testcase, the reason is actually somewhere entirely different:
 // upon refinement of one cell, we forget who the neighbors of another
@@ -22,53 +20,54 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   const unsigned int spacedim = 3;
-  const unsigned int dim = spacedim-1;
+  const unsigned int dim      = spacedim - 1;
 
-  Triangulation<dim,spacedim> boundary_mesh;
+  Triangulation<dim, spacedim> boundary_mesh;
 
   /*****************************************************************/
   // Create Surface Mesh:  Boundary of hypercube without one face
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    Triangulation<spacedim>::active_cell_iterator
-    cell = volume_mesh.begin_active();
+    Triangulation<spacedim>::active_cell_iterator cell
+      = volume_mesh.begin_active();
 
-    cell->face(0)->set_all_boundary_ids (1);
+    cell->face(0)->set_all_boundary_ids(1);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
-    GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh, boundary_ids);
+    GridGenerator::extract_boundary_mesh(
+      volume_mesh, boundary_mesh, boundary_ids);
   }
-  boundary_mesh.begin_active()->set_refine_flag ();
-  boundary_mesh.execute_coarsening_and_refinement ();
+  boundary_mesh.begin_active()->set_refine_flag();
+  boundary_mesh.execute_coarsening_and_refinement();
 
   /*****************************************************************/
-  FE_Q<dim,spacedim> fe(1);
-  DoFHandler<dim,spacedim>  dh (boundary_mesh);
-  ConstraintMatrix     hanging_node_constraints;
+  FE_Q<dim, spacedim>       fe(1);
+  DoFHandler<dim, spacedim> dh(boundary_mesh);
+  ConstraintMatrix          hanging_node_constraints;
 
   dh.distribute_dofs(fe);
-  hanging_node_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dh,hanging_node_constraints);
-  hanging_node_constraints.close ();
+  hanging_node_constraints.clear();
+  DoFTools::make_hanging_node_constraints(dh, hanging_node_constraints);
+  hanging_node_constraints.close();
 
-  hanging_node_constraints.print (deallog.get_file_stream());
+  hanging_node_constraints.print(deallog.get_file_stream());
 
   return 0;
 }

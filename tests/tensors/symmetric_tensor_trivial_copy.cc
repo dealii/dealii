@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Verify that SymmetricTensor is trivially copyable.
 
 // TODO not all compilers that support enough of a subset of C++11 to compile
@@ -29,47 +28,45 @@
 #include "../tests.h"
 
 template <typename Number>
-void test()
+void
+test()
 {
   deallog << "SymmetricTensor<2, 1> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<2, 1, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<2, 1, Number>>::value
           << std::endl;
   deallog << "SymmetricTensor<2, 2> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<2, 2, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<2, 2, Number>>::value
           << std::endl;
   deallog << "SymmetricTensor<2, 3> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<2, 3, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<2, 3, Number>>::value
           << std::endl;
 
   deallog << "SymmetricTensor<4, 1> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<4, 1, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<4, 1, Number>>::value
           << std::endl;
   deallog << "SymmetricTensor<4, 2> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<4, 2, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<4, 2, Number>>::value
           << std::endl;
   deallog << "SymmetricTensor<4, 3> is trivially copyable: "
-          << boost::has_trivial_copy<SymmetricTensor<4, 3, Number> >::value
+          << boost::has_trivial_copy<SymmetricTensor<4, 3, Number>>::value
           << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
   deallog << std::boolalpha;
-  deallog << "testing float"
-          << std::endl;
+  deallog << "testing float" << std::endl;
   test<float>();
 
-  deallog << "testing double"
-          << std::endl;
+  deallog << "testing double" << std::endl;
   test<double>();
 
-  deallog << "testing std::complex<float>"
-          << std::endl;
-  test<std::complex<float> >();
+  deallog << "testing std::complex<float>" << std::endl;
+  test<std::complex<float>>();
 
-  deallog << "testing std::complex<double>"
-          << std::endl;
-  test<std::complex<double> >();
+  deallog << "testing std::complex<double>" << std::endl;
+  test<std::complex<double>>();
 }

@@ -13,39 +13,44 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check comparators in numbers namespace
 
 #include "../tests.h"
 
 #include <deal.II/base/numbers.h>
 
-
 template <typename Number>
-void check (const Number &a, const Number &b)
+void
+check(const Number& a, const Number& b)
 {
-  AssertThrow((numbers::values_are_equal(a,b)) == (a == b), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::values_are_not_equal(a,b)) == (a != b), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_zero(a)) == (a == 0.0), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_zero(b)) == (b == 0.0), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_less_than(a,b)) == (a < b), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_less_than_or_equal_to(a,b)) == (a <= b), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_greater_than(a,b)) == (a > b), ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_greater_than_or_equal_to(a,b)) == (a >= b), ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::values_are_equal(a, b)) == (a == b),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::values_are_not_equal(a, b)) == (a != b),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_zero(a)) == (a == 0.0),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_zero(b)) == (b == 0.0),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_less_than(a, b)) == (a < b),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_less_than_or_equal_to(a, b)) == (a <= b),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_greater_than(a, b)) == (a > b),
+              ExcMessage("Comparator is incorrect."));
+  AssertThrow((numbers::value_is_greater_than_or_equal_to(a, b)) == (a >= b),
+              ExcMessage("Comparator is incorrect."));
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check (0.0, 2.5);
-  check (2.5, 1.5);
-  check (1.5, 1.5);
+  check(0.0, 2.5);
+  check(2.5, 1.5);
+  check(1.5, 1.5);
 
   deallog << "OK" << std::endl;
 
   return 0;
 }
-

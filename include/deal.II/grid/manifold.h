@@ -16,22 +16,22 @@
 #ifndef dealii_tria_manifold_h
 #define dealii_tria_manifold_h
 
-
 /*----------------------------   manifold.h     ---------------------------*/
 
-#include <deal.II/base/config.h>
 #include <deal.II/base/array_view.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/point.h>
+#include <deal.II/base/config.h>
 #include <deal.II/base/derivative_form.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
-template <int, typename> class Table;
+template <int, typename>
+class Table;
 
 /**
  * We collect here some helper functions used in the Manifold<dim,spacedim>
@@ -46,15 +46,19 @@ namespace Manifolds
    * Manifolds::get_default_points_and_weights() for more information.
    */
   template <typename MeshIteratorType>
-  inline
-  constexpr std::size_t n_default_points_per_cell()
+  inline constexpr std::size_t
+  n_default_points_per_cell()
   {
     // Note that in C++11 a constexpr function can only have a return
     // statement, so we cannot alias the structure dimension
-    return GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::vertices_per_cell
-           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::lines_per_cell
-           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::quads_per_cell
-           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::hexes_per_cell
+    return GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::
+             vertices_per_cell
+           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::
+               lines_per_cell
+           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::
+               quads_per_cell
+           + GeometryInfo<MeshIteratorType::AccessorType::structure_dimension>::
+               hexes_per_cell
            - 1; // don't count the cell itself, just the bounding objects
   }
 
@@ -101,10 +105,9 @@ namespace Manifolds
    *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
    */
   template <typename MeshIteratorType>
-  DEAL_II_DEPRECATED
-  Quadrature<MeshIteratorType::AccessorType::space_dimension>
-  get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_interpolation = false);
+  DEAL_II_DEPRECATED Quadrature<MeshIteratorType::AccessorType::space_dimension>
+                     get_default_quadrature(const MeshIteratorType& iterator,
+                                            const bool              with_interpolation = false);
 
   /**
    * Given a general mesh iterator, construct arrays of quadrature points and
@@ -150,11 +153,11 @@ namespace Manifolds
    */
   template <typename MeshIteratorType>
   std::pair<std::array<Point<MeshIteratorType::AccessorType::space_dimension>,
-      n_default_points_per_cell<MeshIteratorType>()>,
-      std::array<double, n_default_points_per_cell<MeshIteratorType>()> >
-      get_default_points_and_weights(const MeshIteratorType &iterator,
-                                     const bool              with_interpolation = false);
-}
+                       n_default_points_per_cell<MeshIteratorType>()>,
+            std::array<double, n_default_points_per_cell<MeshIteratorType>()>>
+  get_default_points_and_weights(const MeshIteratorType& iterator,
+                                 const bool with_interpolation = false);
+} // namespace Manifolds
 
 /**
  * Manifolds are used to describe the geometry of boundaries of domains as
@@ -319,16 +322,14 @@ namespace Manifolds
  * @ingroup manifold
  * @author Luca Heltai, Wolfgang Bangerth, 2014, 2016
  */
-template <int dim, int spacedim=dim>
+template <int dim, int spacedim = dim>
 class Manifold : public Subscriptor
 {
 public:
-
   // explicitly check for sensible template arguments
-  static_assert (dim<=spacedim,
-                 "The dimension <dim> of a Manifold must be less than or "
-                 "equal to the space dimension <spacedim> in which it lives.");
-
+  static_assert(dim <= spacedim,
+                "The dimension <dim> of a Manifold must be less than or "
+                "equal to the space dimension <spacedim> in which it lives.");
 
   /**
    * Type keeping information about the normals at the vertices of a face of a
@@ -341,21 +342,22 @@ public:
    *
    * For obvious reasons, this type is not useful in 1d.
    */
-  typedef Tensor<1,spacedim> FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
-
+  typedef Tensor<1, spacedim>
+    FaceVertexNormals[GeometryInfo<dim>::vertices_per_face];
 
   /**
    * Destructor. Does nothing here, but needs to be declared virtual to make
    * class hierarchies derived from this class possible.
    */
-  virtual ~Manifold () override = default;
+  virtual ~Manifold() override = default;
 
   /**
    * Return a copy of this manifold.
    *
    * Every derived class should implement this operation in a sensible manner.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const = 0;
+  virtual std::unique_ptr<Manifold<dim, spacedim>>
+  clone() const = 0;
 
   /**
    * @name Computing the location of points.
@@ -379,11 +381,10 @@ public:
    * and `p2`. User classes can get away by simply implementing the
    * project_to_manifold() method.
    */
-  virtual
-  Point<spacedim>
-  get_intermediate_point (const Point<spacedim> &p1,
-                          const Point<spacedim> &p2,
-                          const double w) const;
+  virtual Point<spacedim>
+  get_intermediate_point(const Point<spacedim>& p1,
+                         const Point<spacedim>& p2,
+                         const double           w) const;
 
   /**
    * Return the point which shall become the new vertex surrounded by the
@@ -401,11 +402,9 @@ public:
    * arguments. For simple situations you may get away by implementing
    * only the project_to_manifold() function.
    */
-  virtual
-  Point<spacedim>
-  get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const ArrayView<const double>          &weights) const;
-
+  virtual Point<spacedim>
+  get_new_point(const ArrayView<const Point<spacedim>>& surrounding_points,
+                const ArrayView<const double>&          weights) const;
 
   /**
    * Compute a new set of points that interpolate between the given points @p
@@ -427,11 +426,10 @@ public:
    * @p new_points to point to the same array, so make sure to pass different
    * objects into the function.
    */
-  virtual
-  void
-  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
-                  const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const;
+  virtual void
+  get_new_points(const ArrayView<const Point<spacedim>>& surrounding_points,
+                 const Table<2, double>&                 weights,
+                 ArrayView<Point<spacedim>>              new_points) const;
 
   /**
    * Given a point which lies close to the given manifold, it modifies it and
@@ -444,9 +442,10 @@ public:
    * If your manifold is simple, you could implement this function only, and
    * the default behavior should work out of the box.
    */
-  virtual
-  Point<spacedim> project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                                       const Point<spacedim>                  &candidate) const;
+  virtual Point<spacedim>
+  project_to_manifold(
+    const ArrayView<const Point<spacedim>>& surrounding_points,
+    const Point<spacedim>&                  candidate) const;
 
   /**
    * Backward compatibility interface.  Return the point which shall become
@@ -461,9 +460,9 @@ public:
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
-  virtual
-  Point<spacedim>
-  get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
+  virtual Point<spacedim>
+  get_new_point_on_line(
+    const typename Triangulation<dim, spacedim>::line_iterator& line) const;
 
   /**
    * Backward compatibility interface. Return the point which shall become the
@@ -482,9 +481,9 @@ public:
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
-  virtual
-  Point<spacedim>
-  get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
+  virtual Point<spacedim>
+  get_new_point_on_quad(
+    const typename Triangulation<dim, spacedim>::quad_iterator& quad) const;
 
   /**
    * Backward compatibility interface.  Return the point which shall become
@@ -504,10 +503,9 @@ public:
    * Manifold<dim,spacedim>::project_to_manifold(), which is called by the
    * default implementation of Manifold<dim,spacedim>::get_new_point().
    */
-  virtual
-  Point<spacedim>
-  get_new_point_on_hex (const typename Triangulation<dim,spacedim>::hex_iterator &hex) const;
-
+  virtual Point<spacedim>
+  get_new_point_on_hex(
+    const typename Triangulation<dim, spacedim>::hex_iterator& hex) const;
 
   /**
    * Backward compatibility interface. Depending on <tt>dim=2</tt> or
@@ -516,8 +514,8 @@ public:
    * <tt>dim=1</tt>. This wrapper allows dimension independent programming.
    */
   Point<spacedim>
-  get_new_point_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face) const;
-
+  get_new_point_on_face(
+    const typename Triangulation<dim, spacedim>::face_iterator& face) const;
 
   /**
    * Backward compatibility interface.  Depending on <tt>dim=1</tt>,
@@ -526,7 +524,8 @@ public:
    * function. This wrapper allows dimension independent programming.
    */
   Point<spacedim>
-  get_new_point_on_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_new_point_on_cell(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell) const;
 
   /// @}
 
@@ -569,10 +568,9 @@ public:
    * @param x2 The second point that describes the geodesic.
    * @return A "direction" vector tangential to the geodesic.
    */
-  virtual
-  Tensor<1,spacedim>
-  get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const;
+  virtual Tensor<1, spacedim>
+  get_tangent_vector(const Point<spacedim>& x1,
+                     const Point<spacedim>& x2) const;
 
   /// @}
 
@@ -626,10 +624,10 @@ public:
    * for points close to one of the vertices, and avoiding tangent directions
    * that are linearly dependent.
    */
-  virtual
-  Tensor<1,spacedim>
-  normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                 const Point<spacedim> &p) const;
+  virtual Tensor<1, spacedim>
+  normal_vector(
+    const typename Triangulation<dim, spacedim>::face_iterator& face,
+    const Point<spacedim>&                                      p) const;
 
   /**
    * Compute the normal vectors to the boundary at each vertex of the
@@ -645,14 +643,13 @@ public:
    * compute the one-sided limits, i.e. limit with respect to points
    * inside the given face.
    */
-  virtual
-  void
-  get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           FaceVertexNormals &face_vertex_normals) const;
+  virtual void
+  get_normals_at_vertices(
+    const typename Triangulation<dim, spacedim>::face_iterator& face,
+    FaceVertexNormals& face_vertex_normals) const;
 
   /// @}
 };
-
 
 /**
  * Specialization of Manifold<dim,spacedim>, which represent a possibly
@@ -665,7 +662,7 @@ public:
  *
  * @author Luca Heltai, 2014
  */
-template <int dim, int spacedim=dim>
+template <int dim, int spacedim = dim>
 class FlatManifold : public Manifold<dim, spacedim>
 {
 public:
@@ -696,13 +693,14 @@ public:
    * guaranteed to lie in the periodicity box plus or minus
    * tolerance*periodicity.norm().
    */
-  FlatManifold (const Tensor<1,spacedim> &periodicity = Tensor<1,spacedim>(),
-                const double tolerance=1e-10);
+  FlatManifold(const Tensor<1, spacedim>& periodicity = Tensor<1, spacedim>(),
+               const double               tolerance   = 1e-10);
 
   /**
    * Return a copy of this manifold.
    */
-  virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+  virtual std::unique_ptr<Manifold<dim, spacedim>>
+  clone() const override;
 
   /**
    * Let the new point be the average sum of surrounding vertices.
@@ -725,11 +723,9 @@ public:
    * the manifold mid point, i.e., as long as the coarse mesh size is small
    * enough.
    */
-  virtual
-  Point<spacedim>
-  get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
-                const ArrayView<const double>          &weights) const override;
-
+  virtual Point<spacedim>
+  get_new_point(const ArrayView<const Point<spacedim>>& surrounding_points,
+                const ArrayView<const double>&          weights) const override;
 
   /**
    * Compute a new set of points that interpolate between the given points @p
@@ -741,11 +737,10 @@ public:
    * @p surrounding_points according to the @p weights is simply performed in
    * Cartesian space.
    */
-  virtual
-  void
-  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
-                  const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const override;
+  virtual void
+  get_new_points(const ArrayView<const Point<spacedim>>& surrounding_points,
+                 const Table<2, double>&                 weights,
+                 ArrayView<Point<spacedim>> new_points) const override;
 
   /**
    * Project to FlatManifold. This is the identity function for flat,
@@ -754,10 +749,9 @@ public:
    * get_new_point() function which are often very similar (if not identical) to
    * the one implemented in this class.
    */
-  virtual
-  Point<spacedim>
-  project_to_manifold (const ArrayView<const Point<spacedim>> &points,
-                       const Point<spacedim>                  &candidate) const override;
+  virtual Point<spacedim>
+  project_to_manifold(const ArrayView<const Point<spacedim>>& points,
+                      const Point<spacedim>& candidate) const override;
 
   /**
    * Return a vector that, at $\mathbf x_1$, is tangential to
@@ -780,10 +774,9 @@ public:
    *   the domain as set in the constructor, to use the "shortest" connection
    *   between the points through the periodic boundary as necessary.
    */
-  virtual
-  Tensor<1,spacedim>
-  get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const override;
+  virtual Tensor<1, spacedim>
+  get_tangent_vector(const Point<spacedim>& x1,
+                     const Point<spacedim>& x2) const override;
 
   /**
    * Return the normal vector to the given face at point p taking into account
@@ -792,10 +785,10 @@ public:
    * bilinear function, and the normal vector is computed by embedding this
    * bilinear form into a Cartesian space with a flat metric.
    */
-  virtual
-  Tensor<1,spacedim>
-  normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                 const Point<spacedim> &p) const override;
+  virtual Tensor<1, spacedim>
+  normal_vector(
+    const typename Triangulation<dim, spacedim>::face_iterator& face,
+    const Point<spacedim>& p) const override;
 
   /**
    * Compute the normal vectors to the boundary at each vertex of the
@@ -805,15 +798,17 @@ public:
    * is computed by embedding this bilinear form into a Cartesian space with
    * a flat metric.
    */
-  virtual
-  void
-  get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
-                           typename Manifold<dim, spacedim>::FaceVertexNormals &face_vertex_normals) const override;
+  virtual void
+  get_normals_at_vertices(
+    const typename Triangulation<dim, spacedim>::face_iterator& face,
+    typename Manifold<dim, spacedim>::FaceVertexNormals& face_vertex_normals)
+    const override;
 
   /**
    * Return the periodicity of this Manifold.
    */
-  const Tensor<1,spacedim> &get_periodicity() const;
+  const Tensor<1, spacedim>&
+  get_periodicity() const;
 
 private:
   /**
@@ -829,11 +824,15 @@ private:
    * A periodicity 0 along one direction means no periodicity. This is the
    * default value for all directions.
    */
-  const Tensor<1,spacedim> periodicity;
+  const Tensor<1, spacedim> periodicity;
 
-  DeclException3(ExcPeriodicBox, int, Point<spacedim>, double,
-                 << "The component number " << arg1 << " of the point [ " << arg2
-                 << " ] is not in the interval [ 0, " << arg3 << "), bailing out.");
+  DeclException3(ExcPeriodicBox,
+                 int,
+                 Point<spacedim>,
+                 double,
+                 << "The component number " << arg1 << " of the point [ "
+                 << arg2 << " ] is not in the interval [ 0, " << arg3
+                 << "), bailing out.");
 
   /**
    * Relative tolerance. This tolerance is used to compute distances in double
@@ -841,7 +840,6 @@ private:
    */
   const double tolerance;
 };
-
 
 /**
  * This class describes mappings that can be expressed in terms of charts.
@@ -931,14 +929,14 @@ private:
  *
  * @author Luca Heltai, 2013, 2014
  */
-template <int dim, int spacedim=dim, int chartdim=dim>
-class ChartManifold : public Manifold<dim,spacedim>
+template <int dim, int spacedim = dim, int chartdim = dim>
+class ChartManifold : public Manifold<dim, spacedim>
 {
 public:
   // explicitly check for sensible template arguments
-  static_assert (dim<=spacedim,
-                 "The dimension <dim> of a ChartManifold must be less than or "
-                 "equal to the space dimension <spacedim> in which it lives.");
+  static_assert(dim <= spacedim,
+                "The dimension <dim> of a ChartManifold must be less than or "
+                "equal to the space dimension <spacedim> in which it lives.");
 
   /**
    * Constructor. The optional argument can be used to specify the periodicity
@@ -954,32 +952,30 @@ public:
    * of (2*pi-eps) and (eps) is not pi, but 2*pi (or zero), since, on the
    * manifold, these two points are at distance 2*eps and not (2*pi-eps)
    */
-  ChartManifold(const Tensor<1,chartdim> &periodicity = Tensor<1,chartdim>());
+  ChartManifold(const Tensor<1, chartdim>& periodicity = Tensor<1, chartdim>());
 
   /**
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~ChartManifold () override = default;
+  virtual ~ChartManifold() override = default;
 
   /**
    * Refer to the general documentation of this class and the documentation of
    * the base class for more information.
    */
-  virtual
-  Point<spacedim>
-  get_intermediate_point (const Point<spacedim> &p1,
-                          const Point<spacedim> &p2,
-                          const double w) const override;
+  virtual Point<spacedim>
+  get_intermediate_point(const Point<spacedim>& p1,
+                         const Point<spacedim>& p2,
+                         const double           w) const override;
 
   /**
    * Refer to the general documentation of this class and the documentation of
    * the base class for more information.
    */
-  virtual
-  Point<spacedim>
-  get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
-                const ArrayView<const double>          &weights) const override;
+  virtual Point<spacedim>
+  get_new_point(const ArrayView<const Point<spacedim>>& surrounding_points,
+                const ArrayView<const double>&          weights) const override;
 
   /**
    * Compute a new set of points that interpolate between the given points @p
@@ -1002,20 +998,18 @@ public:
    * because the former might involve some kind of Newton iteration in
    * non-trivial manifolds.
    */
-  virtual
-  void
-  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
-                  const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const override;
+  virtual void
+  get_new_points(const ArrayView<const Point<spacedim>>& surrounding_points,
+                 const Table<2, double>&                 weights,
+                 ArrayView<Point<spacedim>> new_points) const override;
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim
    * dimensional space.
    *
    * Refer to the general documentation of this class for more information.
    */
-  virtual
-  Point<chartdim>
-  pull_back(const Point<spacedim> &space_point) const = 0;
+  virtual Point<chartdim>
+  pull_back(const Point<spacedim>& space_point) const = 0;
 
   /**
    * Given a point in the chartdim dimensional Euclidean space, this method
@@ -1023,9 +1017,8 @@ public:
    *
    * Refer to the general documentation of this class for more information.
    */
-  virtual
-  Point<spacedim>
-  push_forward(const Point<chartdim> &chart_point) const = 0;
+  virtual Point<spacedim>
+  push_forward(const Point<chartdim>& chart_point) const = 0;
 
   /**
    * Given a point in the chartdim dimensional Euclidean space, this method
@@ -1043,9 +1036,8 @@ public:
    *
    * Refer to the general documentation of this class for more information.
    */
-  virtual
-  DerivativeForm<1,chartdim,spacedim>
-  push_forward_gradient(const Point<chartdim> &chart_point) const;
+  virtual DerivativeForm<1, chartdim, spacedim>
+  push_forward_gradient(const Point<chartdim>& chart_point) const;
 
   /**
    * Return a vector that, at $\mathbf x_1$, is tangential to
@@ -1102,15 +1094,15 @@ public:
    * @param x2 The second point that describes the geodesic.
    * @return A "direction" vector tangential to the geodesic.
    */
-  virtual
-  Tensor<1,spacedim>
-  get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const override;
+  virtual Tensor<1, spacedim>
+  get_tangent_vector(const Point<spacedim>& x1,
+                     const Point<spacedim>& x2) const override;
 
   /**
    * Return the periodicity associated with the submanifold.
    */
-  const Tensor<1,chartdim> &get_periodicity() const;
+  const Tensor<1, chartdim>&
+  get_periodicity() const;
 
 private:
   /**
@@ -1124,9 +1116,8 @@ private:
    * not matter at all since the first (dim) argument of manifolds is,
    * in fact, ignored as far as manifold functionality is concerned.
    */
-  const FlatManifold<chartdim,chartdim> sub_manifold;
+  const FlatManifold<chartdim, chartdim> sub_manifold;
 };
-
 
 /* -------------- declaration of explicit specializations ------------- */
 
@@ -1134,42 +1125,38 @@ private:
 
 template <>
 Point<1>
-Manifold<1,1>::
-get_new_point_on_face (const Triangulation<1,1>::face_iterator &) const;
+Manifold<1, 1>::get_new_point_on_face(
+  const Triangulation<1, 1>::face_iterator&) const;
 
 template <>
 Point<2>
-Manifold<1,2>::
-get_new_point_on_face (const Triangulation<1,2>::face_iterator &) const;
-
+Manifold<1, 2>::get_new_point_on_face(
+  const Triangulation<1, 2>::face_iterator&) const;
 
 template <>
 Point<3>
-Manifold<1,3>::
-get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const;
-
+Manifold<1, 3>::get_new_point_on_face(
+  const Triangulation<1, 3>::face_iterator&) const;
 
 template <>
 Point<1>
-Manifold<1,1>::
-get_new_point_on_quad (const Triangulation<1,1>::quad_iterator &) const;
+Manifold<1, 1>::get_new_point_on_quad(
+  const Triangulation<1, 1>::quad_iterator&) const;
 
 template <>
 Point<2>
-Manifold<1,2>::
-get_new_point_on_quad (const Triangulation<1,2>::quad_iterator &) const;
-
-
-template <>
-Point<3>
-Manifold<1,3>::
-get_new_point_on_quad (const Triangulation<1,3>::quad_iterator &) const;
-
+Manifold<1, 2>::get_new_point_on_quad(
+  const Triangulation<1, 2>::quad_iterator&) const;
 
 template <>
 Point<3>
-Manifold<3,3>::
-get_new_point_on_hex (const Triangulation<3,3>::hex_iterator &) const;
+Manifold<1, 3>::get_new_point_on_quad(
+  const Triangulation<1, 3>::quad_iterator&) const;
+
+template <>
+Point<3>
+Manifold<3, 3>::get_new_point_on_hex(
+  const Triangulation<3, 3>::hex_iterator&) const;
 
 /*---Templated functions---*/
 
@@ -1177,124 +1164,143 @@ namespace Manifolds
 {
   template <typename MeshIteratorType>
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
-  get_default_quadrature(const MeshIteratorType &iterator,
+  get_default_quadrature(const MeshIteratorType& iterator,
                          const bool              with_interpolation)
   {
-    const auto points_and_weights = get_default_points_and_weights(iterator, with_interpolation);
+    const auto points_and_weights
+      = get_default_points_and_weights(iterator, with_interpolation);
     static const int spacedim = MeshIteratorType::AccessorType::space_dimension;
-    return Quadrature<spacedim>
-           (std::vector<Point<spacedim>>(points_and_weights.first.begin(),
-                                         points_and_weights.first.end()),
-            std::vector<double>(points_and_weights.second.begin(),
-                                points_and_weights.second.end()));
+    return Quadrature<spacedim>(
+      std::vector<Point<spacedim>>(points_and_weights.first.begin(),
+                                   points_and_weights.first.end()),
+      std::vector<double>(points_and_weights.second.begin(),
+                          points_and_weights.second.end()));
   }
-
-
 
   template <typename MeshIteratorType>
   std::pair<std::array<Point<MeshIteratorType::AccessorType::space_dimension>,
-      n_default_points_per_cell<MeshIteratorType>()>,
-      std::array<double, n_default_points_per_cell<MeshIteratorType>()> >
-      get_default_points_and_weights(const MeshIteratorType &iterator,
-                                     const bool              with_interpolation)
+                       n_default_points_per_cell<MeshIteratorType>()>,
+            std::array<double, n_default_points_per_cell<MeshIteratorType>()>>
+  get_default_points_and_weights(const MeshIteratorType& iterator,
+                                 const bool              with_interpolation)
   {
-    const int dim = MeshIteratorType::AccessorType::structure_dimension;
+    const int dim      = MeshIteratorType::AccessorType::structure_dimension;
     const int spacedim = MeshIteratorType::AccessorType::space_dimension;
-    constexpr std::size_t points_per_cell = n_default_points_per_cell<MeshIteratorType>();
+    constexpr std::size_t points_per_cell
+      = n_default_points_per_cell<MeshIteratorType>();
 
-    std::pair<std::array<Point<spacedim>, points_per_cell>, std::array<double, points_per_cell> >
-    points_weights;
-
+    std::pair<std::array<Point<spacedim>, points_per_cell>,
+              std::array<double, points_per_cell>>
+      points_weights;
 
     // note that the exact weights are chosen such as to minimize the
     // distortion of the four new quads from the optimal shape; their
     // derivation and values is copied over from the
     // interpolation function in the mapping
-    switch (dim)
+    switch(dim)
       {
-      case 1:
-        Assert(points_weights.first.size() == 2, ExcInternalError());
-        Assert(points_weights.second.size() == 2, ExcInternalError());
-        points_weights.first[0] = iterator->vertex(0);
-        points_weights.second[0] = .5;
-        points_weights.first[1] = iterator->vertex(1);
-        points_weights.second[1] = .5;
-        break;
-      case 2:
-        Assert(points_weights.first.size() == 8, ExcInternalError());
-        Assert(points_weights.second.size() == 8, ExcInternalError());
+        case 1:
+          Assert(points_weights.first.size() == 2, ExcInternalError());
+          Assert(points_weights.second.size() == 2, ExcInternalError());
+          points_weights.first[0]  = iterator->vertex(0);
+          points_weights.second[0] = .5;
+          points_weights.first[1]  = iterator->vertex(1);
+          points_weights.second[1] = .5;
+          break;
+        case 2:
+          Assert(points_weights.first.size() == 8, ExcInternalError());
+          Assert(points_weights.second.size() == 8, ExcInternalError());
 
-        for (unsigned int i=0; i<4; ++i)
+          for(unsigned int i = 0; i < 4; ++i)
+            {
+              points_weights.first[i] = iterator->vertex(i);
+              points_weights.first[4 + i]
+                = (iterator->line(i)->has_children() ?
+                     iterator->line(i)->child(0)->vertex(1) :
+                     iterator->line(i)->get_manifold().get_new_point_on_line(
+                       iterator->line(i)));
+            }
+
+          if(with_interpolation)
+            {
+              std::fill(points_weights.second.begin(),
+                        points_weights.second.begin() + 4,
+                        -0.25);
+              std::fill(points_weights.second.begin() + 4,
+                        points_weights.second.end(),
+                        0.5);
+            }
+          else
+            std::fill(points_weights.second.begin(),
+                      points_weights.second.end(),
+                      1.0 / 8.0);
+          break;
+        case 3:
           {
-            points_weights.first[i] = iterator->vertex(i);
-            points_weights.first[4+i] = ( iterator->line(i)->has_children() ?
-                                          iterator->line(i)->child(0)->vertex(1) :
-                                          iterator->line(i)->get_manifold().get_new_point_on_line(iterator->line(i)) );
-          }
+            TriaIterator<TriaAccessor<3, 3, 3>> hex
+              = static_cast<TriaIterator<TriaAccessor<3, 3, 3>>>(iterator);
+            const unsigned int np = GeometryInfo<dim>::vertices_per_cell
+                                    + GeometryInfo<dim>::lines_per_cell
+                                    + GeometryInfo<dim>::faces_per_cell;
+            Assert(points_weights.first.size() == np, ExcInternalError());
+            Assert(points_weights.second.size() == np, ExcInternalError());
+            auto* sp3 = reinterpret_cast<
+              std::array<Point<3>,
+                         n_default_points_per_cell<decltype(hex)>()>*>(
+              &points_weights.first);
 
-        if (with_interpolation)
-          {
-            std::fill(points_weights.second.begin(), points_weights.second.begin()+4, -0.25);
-            std::fill(points_weights.second.begin()+4, points_weights.second.end(), 0.5);
-          }
-        else
-          std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/8.0);
-        break;
-      case 3:
-      {
-        TriaIterator<TriaAccessor<3, 3, 3> > hex
-          = static_cast<TriaIterator<TriaAccessor<3, 3, 3> > >(iterator);
-        const unsigned int np =
-          GeometryInfo<dim>::vertices_per_cell+
-          GeometryInfo<dim>::lines_per_cell+
-          GeometryInfo<dim>::faces_per_cell;
-        Assert(points_weights.first.size() == np, ExcInternalError());
-        Assert(points_weights.second.size() == np, ExcInternalError());
-        auto *sp3 = reinterpret_cast<std::array<Point<3>, n_default_points_per_cell<decltype(hex)>()> *>
-                    (&points_weights.first);
+            unsigned int j = 0;
 
-        unsigned int j=0;
-
-        // note that the exact weights are chosen such as to minimize the
-        // distortion of the eight new hexes from the optimal shape through
-        // transfinite interpolation from the faces and vertices, see
-        // TransfiniteInterpolationManifold for a deeper explanation of the
-        // mechanisms
-        if (with_interpolation)
-          {
-            for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
+            // note that the exact weights are chosen such as to minimize the
+            // distortion of the eight new hexes from the optimal shape through
+            // transfinite interpolation from the faces and vertices, see
+            // TransfiniteInterpolationManifold for a deeper explanation of the
+            // mechanisms
+            if(with_interpolation)
               {
-                (*sp3)[j] = hex->vertex(i);
-                points_weights.second[j] = 1.0/8.0;
+                for(unsigned int i = 0;
+                    i < GeometryInfo<dim>::vertices_per_cell;
+                    ++i, ++j)
+                  {
+                    (*sp3)[j]                = hex->vertex(i);
+                    points_weights.second[j] = 1.0 / 8.0;
+                  }
+                for(unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell;
+                    ++i, ++j)
+                  {
+                    (*sp3)[j]
+                      = (hex->line(i)->has_children() ?
+                           hex->line(i)->child(0)->vertex(1) :
+                           hex->line(i)->get_manifold().get_new_point_on_line(
+                             hex->line(i)));
+                    points_weights.second[j] = -1.0 / 4.0;
+                  }
+                for(unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell;
+                    ++i, ++j)
+                  {
+                    (*sp3)[j]
+                      = (hex->quad(i)->has_children() ?
+                           hex->quad(i)->isotropic_child(0)->vertex(3) :
+                           hex->quad(i)->get_manifold().get_new_point_on_quad(
+                             hex->quad(i)));
+                    points_weights.second[j] = 1.0 / 2.0;
+                  }
               }
-            for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
-              {
-                (*sp3)[j] = (hex->line(i)->has_children() ?
-                             hex->line(i)->child(0)->vertex(1) :
-                             hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
-                points_weights.second[j] = -1.0/4.0;
-              }
-            for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
-              {
-                (*sp3)[j] = (hex->quad(i)->has_children() ?
-                             hex->quad(i)->isotropic_child(0)->vertex(3) :
-                             hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
-                points_weights.second[j] = 1.0/2.0;
-              }
+            else
+              // Overwrite the weights with 1/np if we don't want to use
+              // interpolation.
+              std::fill(points_weights.second.begin(),
+                        points_weights.second.end(),
+                        1.0 / np);
           }
-        else
-          // Overwrite the weights with 1/np if we don't want to use
-          // interpolation.
-          std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/np);
-      }
-      break;
-      default:
-        Assert(false, ExcInternalError());
-        break;
+          break;
+        default:
+          Assert(false, ExcInternalError());
+          break;
       }
     return points_weights;
   }
-}
+} // namespace Manifolds
 
 #endif // DOXYGEN
 

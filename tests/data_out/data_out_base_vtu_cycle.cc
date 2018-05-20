@@ -13,26 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-
 // like data_out_base_vtu, but output cycle as well
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "patches.h"
 
 // Output data on repetitions of the unit hypercube
 
 template <int dim, int spacedim>
-void check(DataOutBase::VtkFlags flags,
-           std::ostream &out)
+void
+check(DataOutBase::VtkFlags flags, std::ostream& out)
 {
   const unsigned int np = 4;
 
-  std::vector<DataOutBase::Patch<dim, spacedim> > patches(np);
+  std::vector<DataOutBase::Patch<dim, spacedim>> patches(np);
 
   create_patches(patches);
 
@@ -42,34 +41,34 @@ void check(DataOutBase::VtkFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  std::vector<std::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<std::tuple<unsigned int, unsigned int, std::string>> vectors;
   DataOutBase::write_vtu(patches, names, vectors, flags, out);
 }
 
-
 template <int dim, int spacedim>
-void check_all(std::ostream &log)
+void
+check_all(std::ostream& log)
 {
   DataOutBase::VtkFlags flags;
 
   flags.cycle = 42;
 
-  log << "=============================="   << std::endl
-      << dim << spacedim << ".vtu"          << std::endl
-      << "=============================="   << std::endl;
-  check<dim,spacedim>(flags, log);
-
+  log << "==============================" << std::endl
+      << dim << spacedim << ".vtu" << std::endl
+      << "==============================" << std::endl;
+  check<dim, spacedim>(flags, log);
 }
 
-int main()
+int
+main()
 {
   std::stringstream ss;
-  check_all<1,1>(ss);
-  check_all<1,2>(ss);
-  check_all<2,2>(ss);
-  check_all<2,3>(ss);
-  check_all<3,3>(ss);
+  check_all<1, 1>(ss);
+  check_all<1, 2>(ss);
+  check_all<2, 2>(ss);
+  check_all<2, 3>(ss);
+  check_all<3, 3>(ss);
 
   std::ofstream logfile("output");
-  filter_out_xml_key(ss, "DataArray",logfile);
+  filter_out_xml_key(ss, "DataArray", logfile);
 }

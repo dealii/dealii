@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_tools_common.h"
 #include <deal.II/lac/sparsity_pattern.h>
@@ -23,30 +22,26 @@
 // we used to have a bug wherein we did not clear previous content of the matrix
 // passed to this function. check that this is now fixed
 
-
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim>& fe1, const FiniteElement<dim>& fe2)
 {
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really
   // work
-  if ((fe1.get_unit_support_points().size() == 0) ||
-      (fe2.get_unit_support_points().size() == 0))
+  if((fe1.get_unit_support_points().size() == 0)
+     || (fe2.get_unit_support_points().size() == 0))
     return;
   //  likewise for non-primitive elements
-  if (!fe1.is_primitive() || !fe2.is_primitive())
+  if(!fe1.is_primitive() || !fe2.is_primitive())
     return;
 
   // start with a matrix that is nonzero
-  FullMatrix<double> m = IdentityMatrix (fe1.dofs_per_cell);
+  FullMatrix<double> m = IdentityMatrix(fe1.dofs_per_cell);
   m *= numbers::PI;
 
-  FETools::get_interpolation_difference_matrix (fe1, fe2, m);
+  FETools::get_interpolation_difference_matrix(fe1, fe2, m);
 
-  output_matrix (m);
+  output_matrix(m);
 }
-

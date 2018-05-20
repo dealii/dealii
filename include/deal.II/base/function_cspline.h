@@ -19,40 +19,44 @@
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_GSL
-#include <deal.II/base/function.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/thread_management.h>
-#include <gsl/gsl_spline.h>
+#  include <deal.II/base/function.h>
+#  include <deal.II/base/point.h>
+#  include <deal.II/base/thread_management.h>
+#  include <gsl/gsl_spline.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-  DeclException1 (ExcCSplineEmpty,
-                  int,
-                  << "Interpolation points vector size can not be <"<<arg1<<">."
-                 );
+  DeclException1(ExcCSplineEmpty,
+                 int,
+                 << "Interpolation points vector size can not be <" << arg1
+                 << ">.");
 
-  DeclException2 (ExcCSplineSizeMismatch,
-                  int,
-                  int,
-                  << "The size of interpolation points <"<<arg1<<"> is different from the size of interpolation values <" << arg2 <<">."
-                 );
+  DeclException2(ExcCSplineSizeMismatch,
+                 int,
+                 int,
+                 << "The size of interpolation points <" << arg1
+                 << "> is different from the size of interpolation values <"
+                 << arg2 << ">.");
 
+  DeclException3(ExcCSplineOrder,
+                 int,
+                 double,
+                 double,
+                 << "The input interpolation points are not strictly ordered : "
+                 << std::endl
+                 << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
+                 << "] = " << arg3 << ".");
 
-  DeclException3 (ExcCSplineOrder,
-                  int,
-                  double,
-                  double,
-                  << "The input interpolation points are not strictly ordered : " << std::endl << "x[" << arg1 << "] = "<< arg2 <<" >= x["<<(arg1+1)<<"] = "<<arg3 <<"."
-                 );
-
-  DeclException3 (ExcCSplineRange,
-                  double,
-                  double,
-                  double,
-                  << "Spline function can not be evaluated outside of the interpolation range: "<< std::endl << arg1 << " is not in ["<< arg2<<";"<<arg3<<"]."
-                 );
+  DeclException3(
+    ExcCSplineRange,
+    double,
+    double,
+    double,
+    << "Spline function can not be evaluated outside of the interpolation range: "
+    << std::endl
+    << arg1 << " is not in [" << arg2 << ";" << arg3 << "].");
 
   /**
    * The cubic spline function using GNU Scientific Library.
@@ -74,27 +78,32 @@ namespace Functions
      * interpolation is to be done @p interpolation_points and a set of function
      * values @p interpolation_values .
      */
-    CSpline(const std::vector<double> &interpolation_points,
-            const std::vector<double> &interpolation_values);
+    CSpline(const std::vector<double>& interpolation_points,
+            const std::vector<double>& interpolation_values);
 
     /**
      * Virtual destructor.
      */
     virtual ~CSpline() override;
 
-    virtual double value (const Point<dim> &point,
-                          const unsigned int component = 0) const override;
+    virtual double
+    value(const Point<dim>&  point,
+          const unsigned int component = 0) const override;
 
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const override;
+    virtual Tensor<1, dim>
+    gradient(const Point<dim>&  p,
+             const unsigned int component = 0) const override;
 
-    virtual SymmetricTensor<2,dim> hessian (const Point<dim>   &p,
-                                            const unsigned int  component = 0) const override;
+    virtual SymmetricTensor<2, dim>
+    hessian(const Point<dim>&  p,
+            const unsigned int component = 0) const override;
 
-    virtual double laplacian(const Point< dim > &p,
-                             const unsigned int component = 0) const override;
+    virtual double
+    laplacian(const Point<dim>&  p,
+              const unsigned int component = 0) const override;
 
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
   private:
     /**
@@ -110,23 +119,22 @@ namespace Functions
     /**
      * GSL accelerator for spline interpolation
      */
-    gsl_interp_accel *acc;
+    gsl_interp_accel* acc;
 
     /**
      * GSL cubic spline interpolator
      */
-    gsl_spline *cspline;
+    gsl_spline* cspline;
 
     /**
      * A mutex for accelerator object.
      */
     mutable Threads::Mutex acc_mutex;
   };
-}
+} // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
 
 #endif
-

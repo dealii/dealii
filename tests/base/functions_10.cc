@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test InterpolatedTensorProductGridData
 
 #include "../tests.h"
@@ -22,109 +21,108 @@
 // now interpolate the function x*y*z onto points. note that this function is
 // (bi/tri)linear and so we can later know what the correct value is that the
 // function should provide
-Table<1,double> fill (const std::array<std::vector<double>,1> &coordinates)
+Table<1, double>
+fill(const std::array<std::vector<double>, 1>& coordinates)
 {
-  Table<1,double> data(coordinates[0].size());
-  for (unsigned int i=0; i<coordinates[0].size(); ++i)
+  Table<1, double> data(coordinates[0].size());
+  for(unsigned int i = 0; i < coordinates[0].size(); ++i)
     data[i] = coordinates[0][i];
   return data;
 }
 
-Table<2,double> fill (const std::array<std::vector<double>,2> &coordinates)
+Table<2, double>
+fill(const std::array<std::vector<double>, 2>& coordinates)
 {
-  Table<2,double> data(coordinates[0].size(),
-                       coordinates[1].size());
-  for (unsigned int i=0; i<coordinates[0].size(); ++i)
-    for (unsigned int j=0; j<coordinates[1].size(); ++j)
+  Table<2, double> data(coordinates[0].size(), coordinates[1].size());
+  for(unsigned int i = 0; i < coordinates[0].size(); ++i)
+    for(unsigned int j = 0; j < coordinates[1].size(); ++j)
       data[i][j] = coordinates[0][i] * coordinates[1][j];
   return data;
 }
 
-Table<3,double> fill (const std::array<std::vector<double>,3> &coordinates)
+Table<3, double>
+fill(const std::array<std::vector<double>, 3>& coordinates)
 {
-  Table<3,double> data(coordinates[0].size(),
-                       coordinates[1].size(),
-                       coordinates[2].size());
-  for (unsigned int i=0; i<coordinates[0].size(); ++i)
-    for (unsigned int j=0; j<coordinates[1].size(); ++j)
-      for (unsigned int k=0; k<coordinates[2].size(); ++k)
-        data[i][j][k] = coordinates[0][i] *
-                        coordinates[1][j] *
-                        coordinates[2][k];
+  Table<3, double> data(
+    coordinates[0].size(), coordinates[1].size(), coordinates[2].size());
+  for(unsigned int i = 0; i < coordinates[0].size(); ++i)
+    for(unsigned int j = 0; j < coordinates[1].size(); ++j)
+      for(unsigned int k = 0; k < coordinates[2].size(); ++k)
+        data[i][j][k]
+          = coordinates[0][i] * coordinates[1][j] * coordinates[2][k];
   return data;
 }
 
-
 template <int dim>
-void check ()
+void
+check()
 {
   // have coordinate arrays that span an interval starting at d+1
   // d+5 nonuniform intervals
-  std::array<std::vector<double>,dim> coordinates;
-  for (unsigned int d=0; d<dim; ++d)
-    for (unsigned int i=0; i<d+5; ++i)
-      coordinates[d].push_back (d+1 + 1.*i*i);
+  std::array<std::vector<double>, dim> coordinates;
+  for(unsigned int d = 0; d < dim; ++d)
+    for(unsigned int i = 0; i < d + 5; ++i)
+      coordinates[d].push_back(d + 1 + 1. * i * i);
 
-  const Table<dim,double> data = fill(coordinates);
+  const Table<dim, double> data = fill(coordinates);
 
   Functions::InterpolatedTensorProductGridData<dim> f(coordinates, data);
 
   // now choose a number of randomly chosen points inside the box and
   // verify that the function values and gradients returned are correct
-  for (unsigned int i=0; i<10; ++i)
+  for(unsigned int i = 0; i < 10; ++i)
     {
       Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = coordinates[d][0] +
-               (random_value<double>()) * (coordinates[d].back() -
-                                           coordinates[d][0]);
+      for(unsigned int d = 0; d < dim; ++d)
+        p[d] = coordinates[d][0]
+               + (random_value<double>())
+                   * (coordinates[d].back() - coordinates[d][0]);
 
       double exact_value = 1;
-      for (unsigned int d=0; d<dim; ++d)
+      for(unsigned int d = 0; d < dim; ++d)
         exact_value *= p[d];
 
-      AssertThrow (std::fabs (exact_value - f.value(p)) < 1e-12,
-                   ExcInternalError());
+      AssertThrow(std::fabs(exact_value - f.value(p)) < 1e-12,
+                  ExcInternalError());
 
-      Tensor<1,dim> exact_gradient;
-      for (unsigned int d=0; d<dim; ++d)
+      Tensor<1, dim> exact_gradient;
+      for(unsigned int d = 0; d < dim; ++d)
         {
           exact_gradient[d] = 1.0;
-          for (unsigned int k=0; k<dim; ++k)
+          for(unsigned int k = 0; k < dim; ++k)
             exact_gradient[d] *= (k == d) ? 1.0 : p[k];
         }
 
-      AssertThrow ((exact_gradient - f.gradient(p)).norm() < 1e-12,
-                   ExcInternalError());
+      AssertThrow((exact_gradient - f.gradient(p)).norm() < 1e-12,
+                  ExcInternalError());
     }
 
   // now also verify that it computes values outside the box correctly, as
   // documented
   double value_at_bottom_left = 1;
-  for (unsigned int d=0; d<dim; ++d)
+  for(unsigned int d = 0; d < dim; ++d)
     value_at_bottom_left *= coordinates[d][0];
 
-  AssertThrow (std::fabs(f.value(Point<dim>()) - value_at_bottom_left) < 1e-12,
-               ExcInternalError());
+  AssertThrow(std::fabs(f.value(Point<dim>()) - value_at_bottom_left) < 1e-12,
+              ExcInternalError());
 
   Point<dim> top_right;
-  double value_at_top_right = 1;
-  for (unsigned int d=0; d<dim; ++d)
+  double     value_at_top_right = 1;
+  for(unsigned int d = 0; d < dim; ++d)
     {
       top_right[d] = 1000;
       value_at_top_right *= coordinates[d].back();
     }
-  AssertThrow (std::fabs(f.value(top_right) - value_at_top_right) < 1e-12,
-               ExcInternalError());
+  AssertThrow(std::fabs(f.value(top_right) - value_at_top_right) < 1e-12,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
@@ -132,4 +130,3 @@ int main()
   check<2>();
   check<3>();
 }
-

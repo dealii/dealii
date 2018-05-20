@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test internal::extract_dofs_by_component for some corner cases that
 // I was unsure about when refactoring some code in there
 //
@@ -29,60 +27,55 @@
 // accidentally correct whenever there was only one such element; this test
 // verifies the same with two non-primitive elements in one FESystem
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_nedelec.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
-
-
-
-
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr, -1,1);
+  GridGenerator::hyper_cube(tr, -1, 1);
 
-  FESystem<dim> element (FE_Nedelec<dim>(0), 2);
+  FESystem<dim>   element(FE_Nedelec<dim>(0), 2);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
   // use a mask that only has the one
   // component set and cycle over
   // which one that is
-  for (unsigned int comp=0; comp<element.n_components(); ++comp)
+  for(unsigned int comp = 0; comp < element.n_components(); ++comp)
     {
-      std::vector<bool> component_mask (element.n_components(), false);
+      std::vector<bool> component_mask(element.n_components(), false);
       component_mask[comp] = true;
 
-      std::vector<bool> dofs (dof.n_dofs());
-      DoFTools::extract_dofs (dof, ComponentMask(component_mask), dofs);
+      std::vector<bool> dofs(dof.n_dofs());
+      DoFTools::extract_dofs(dof, ComponentMask(component_mask), dofs);
 
-      for (unsigned int d=0; d<dof.n_dofs(); ++d)
+      for(unsigned int d = 0; d < dof.n_dofs(); ++d)
         deallog << dofs[d];
       deallog << std::endl;
     }
 }
 
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
 }

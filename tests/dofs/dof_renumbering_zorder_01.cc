@@ -13,51 +13,51 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Check DoFRenumbering::hierarchical changes nothing for a regular refined mesh
 
 #include "../tests.h"
 #include <deal.II/base/function_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/vector.h>
 
 #include <sstream>
 
-
 template <int dim, class stream>
 void
-print_dofs (const DoFHandler<dim> &dof, stream &out)
+print_dofs(const DoFHandler<dim>& dof, stream& out)
 {
-  const FiniteElement<dim> &fe = dof.get_fe();
-  std::vector<types::global_dof_index> v (fe.dofs_per_cell);
-  std::shared_ptr<FEValues<dim> > fevalues;
+  const FiniteElement<dim>&            fe = dof.get_fe();
+  std::vector<types::global_dof_index> v(fe.dofs_per_cell);
+  std::shared_ptr<FEValues<dim>>       fevalues;
 
-  if (fe.has_support_points())
+  if(fe.has_support_points())
     {
       Quadrature<dim> quad(fe.get_unit_support_points());
-      fevalues = std::shared_ptr<FEValues<dim> >(new FEValues<dim>(fe, quad, update_quadrature_points));
+      fevalues = std::shared_ptr<FEValues<dim>>(
+        new FEValues<dim>(fe, quad, update_quadrature_points));
     }
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
-       cell != dof.end(); ++cell)
+  for(typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+      cell != dof.end();
+      ++cell)
     {
       Point<dim> p = cell->center();
-      if (fevalues.get() != nullptr)
+      if(fevalues.get() != nullptr)
         fevalues->reinit(cell);
 
-      cell->get_dof_indices (v);
-      for (unsigned int i=0; i<v.size(); ++i)
-        if (fevalues.get() != nullptr)
+      cell->get_dof_indices(v);
+      for(unsigned int i = 0; i < v.size(); ++i)
+        if(fevalues.get() != nullptr)
           out << fevalues->quadrature_point(i) << '\t' << v[i] << std::endl;
         else
           out << p << '\t' << v[i] << std::endl;
@@ -65,18 +65,15 @@ print_dofs (const DoFHandler<dim> &dof, stream &out)
     }
 }
 
-
-
-
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, -1., 1.);
-  tr.refine_global (1);
+  tr.refine_global(1);
 
-  FE_Q<dim> fe(1);
+  FE_Q<dim>       fe(1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
@@ -89,25 +86,25 @@ check ()
 
   print_dofs(dof, o2);
 
-  if (o1.str()==o2.str())
+  if(o1.str() == o2.str())
     deallog << "OK" << std::endl;
-
 }
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  deallog.push ("1d");
-  check<1> ();
-  deallog.pop ();
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+  deallog.push("1d");
+  check<1>();
+  deallog.pop();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
+  deallog.push("3d");
+  check<3>();
+  deallog.pop();
 }

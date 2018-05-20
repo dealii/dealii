@@ -13,41 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test parallel::transform
 
 #include "../tests.h"
 
+#include <boost/lambda/lambda.hpp>
 #include <deal.II/base/parallel.h>
 #include <deal.II/lac/vector.h>
-#include <boost/lambda/lambda.hpp>
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  const unsigned int N=10000;
-  Vector<double> x(N), y(N), z(N), a(N);
+  const unsigned int N = 10000;
+  Vector<double>     x(N), y(N), z(N), a(N);
 
-  for (unsigned int i=0; i<N; ++i)
+  for(unsigned int i = 0; i < N; ++i)
     {
       x(i) = i;
-      y(i) = 2*i;
-      z(i) = 3*i;
+      y(i) = 2 * i;
+      z(i) = 3 * i;
     }
 
   // set a=x+y-z, which happens to be
   // zero
-  parallel::transform (x.begin(), x.end(),
-                       y.begin(),
-                       z.begin(),
-                       a.begin(),
-                       (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
-                       10);
+  parallel::transform(
+    x.begin(),
+    x.end(),
+    y.begin(),
+    z.begin(),
+    a.begin(),
+    (boost::lambda::_1 + boost::lambda::_2 - boost::lambda::_3),
+    10);
 
-  AssertThrow (a.l2_norm() == 0, ExcInternalError());
+  AssertThrow(a.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

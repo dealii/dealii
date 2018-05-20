@@ -13,23 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that computation of hp constraints works for DGPNonparametric elements
 // correctly on a uniformly refined mesh for functions of degree q
 
 char logname[] = "output";
 
-
 #include "../hp/hp_constraints_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe;
-  for (unsigned int i=0; i<4; ++i)
-    fe.push_back (FE_DGPNonparametric<dim>(i));
+  for(unsigned int i = 0; i < 4; ++i)
+    fe.push_back(FE_DGPNonparametric<dim>(i));
 
-  test_with_hanging_nodes_random_aniso (fe);
+  test_with_hanging_nodes_random_aniso(fe);
 }

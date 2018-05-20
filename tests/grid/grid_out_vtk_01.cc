@@ -13,45 +13,42 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test GridOut::write_vtk
 
 #include "../tests.h"
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_generator.h>
-
-
 
 template <int dim, int spacedim>
-void test (std::ostream &logfile)
+void
+test(std::ostream& logfile)
 {
-  Triangulation<dim,spacedim> tria;
-  std::vector<unsigned int> legs(2*dim, 1);
-  if (dim > 1)
-    GridGenerator::hyper_cross (tria, legs, true);
+  Triangulation<dim, spacedim> tria;
+  std::vector<unsigned int>    legs(2 * dim, 1);
+  if(dim > 1)
+    GridGenerator::hyper_cross(tria, legs, true);
   else
     GridGenerator::subdivided_hyper_cube(tria, 2);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
   GridOut grid_out;
-  grid_out.write_vtk (tria, logfile);
+  grid_out.write_vtk(tria, logfile);
 }
 
-
-int main ()
+int
+main()
 {
   initlog("output");
-  test<1,1> (deallog.get_file_stream());
-  test<1,2> (deallog.get_file_stream());
-  test<2,2> (deallog.get_file_stream());
-  test<2,3> (deallog.get_file_stream());
-  test<3,3> (deallog.get_file_stream());
+  test<1, 1>(deallog.get_file_stream());
+  test<1, 2>(deallog.get_file_stream());
+  test<2, 2>(deallog.get_file_stream());
+  test<2, 3>(deallog.get_file_stream());
+  test<3, 3>(deallog.get_file_stream());
 }
-

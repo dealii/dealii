@@ -16,7 +16,6 @@
 #ifndef dealii_tria_iterator_base_h
 #define dealii_tria_iterator_base_h
 
-
 #include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,7 +28,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace IteratorState
 {
-
   /**
    * The three states an iterator can be in: valid, past-the-end and invalid.
    */
@@ -42,9 +40,7 @@ namespace IteratorState
     /// Iterator is invalid, probably due to an error
     invalid
   };
-}
-
-
+} // namespace IteratorState
 
 DEAL_II_NAMESPACE_CLOSE
 

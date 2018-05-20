@@ -20,9 +20,9 @@
 #  include <unistd.h>
 #endif
 
-#if (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
-#  include <sys/types.h>
+#if(defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
 #  include <sys/sysctl.h>
+#  include <sys/types.h>
 #endif
 
 #include <algorithm>
@@ -43,27 +43,29 @@ DEAL_II_NAMESPACE_OPEN
    system, please let us know.
  */
 
+#  if defined(__linux__) || defined(__sun__) || defined(__osf__) \
+    || defined(_AIX)
 
-#  if defined(__linux__) ||  defined(__sun__) || defined(__osf__) || defined(_AIX)
-
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return sysconf(_SC_NPROCESSORS_ONLN);
 }
 
-#  elif (defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
+#  elif(defined(__MACH__) && defined(__APPLE__)) || defined(__FreeBSD__)
 // This is only tested on a dual G5 2.5GHz running MacOSX 10.3.6
 // and on an Intel Mac Book Pro.
 // If it doesn't work please contact the mailinglist.
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
-  int mib[2];
-  int n_cpus;
+  int    mib[2];
+  int    n_cpus;
   size_t len;
 
   mib[0] = CTL_HW;
   mib[1] = HW_NCPU;
-  len = sizeof(n_cpus);
+  len    = sizeof(n_cpus);
   sysctl(mib, 2, &n_cpus, &len, NULL, 0);
 
   return n_cpus;
@@ -92,48 +94,55 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 //#error Detection of Processors not supported on this OS. Setting n_cpus=1 by default.
 
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return 1;
 }
 
 #  endif
 
-unsigned int MultithreadInfo::n_cores()
+unsigned int
+MultithreadInfo::n_cores()
 {
   return MultithreadInfo::n_cpus;
 }
 
-
-void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
+void
+MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
   // set the maximal number of threads to the given value as specified
   n_max_threads = max_threads;
 
   // then also see if something was given in the environment
   {
-    const char *penv = getenv ("DEAL_II_NUM_THREADS");
-    if (penv!=nullptr)
+    const char* penv = getenv("DEAL_II_NUM_THREADS");
+    if(penv != nullptr)
       {
         unsigned int max_threads_env = numbers::invalid_unsigned_int;
         try
           {
             max_threads_env = Utilities::string_to_int(std::string(penv));
           }
-        catch (...)
+        catch(...)
           {
-            AssertThrow (false,
-                         ExcMessage (std::string("When specifying the <DEAL_II_NUM_THREADS> environment "
-                                                 "variable, it needs to be something that can be interpreted "
-                                                 "as an integer. The text you have in the environment "
-                                                 "variable is <") + penv + ">"));
+            AssertThrow(
+              false,
+              ExcMessage(
+                std::string(
+                  "When specifying the <DEAL_II_NUM_THREADS> environment "
+                  "variable, it needs to be something that can be interpreted "
+                  "as an integer. The text you have in the environment "
+                  "variable is <")
+                + penv + ">"));
           }
 
-        AssertThrow (max_threads_env>0,
-                     ExcMessage ("When specifying the <DEAL_II_NUM_THREADS> environment "
-                                 "variable, it needs to be a positive number."));
+        AssertThrow(
+          max_threads_env > 0,
+          ExcMessage("When specifying the <DEAL_II_NUM_THREADS> environment "
+                     "variable, it needs to be a positive number."));
 
-        if (n_max_threads != numbers::invalid_unsigned_int)
+        if(n_max_threads != numbers::invalid_unsigned_int)
           n_max_threads = std::min(n_max_threads, max_threads_env);
         else
           n_max_threads = max_threads_env;
@@ -141,91 +150,89 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   }
   // Without restrictions from the user query TBB for the recommended number
   // of threads:
-  if (n_max_threads == numbers::invalid_unsigned_int)
+  if(n_max_threads == numbers::invalid_unsigned_int)
     n_max_threads = tbb::task_scheduler_init::default_num_threads();
 
   // Initialize the scheduler and destroy the old one before doing so
-  static tbb::task_scheduler_init dummy (tbb::task_scheduler_init::deferred);
-  if (dummy.is_active())
+  static tbb::task_scheduler_init dummy(tbb::task_scheduler_init::deferred);
+  if(dummy.is_active())
     dummy.terminate();
   dummy.initialize(n_max_threads);
 }
 
-
-unsigned int MultithreadInfo::n_threads()
+unsigned int
+MultithreadInfo::n_threads()
 {
   Assert(n_max_threads != numbers::invalid_unsigned_int, ExcInternalError());
   return n_max_threads;
 }
 
+#else // not in MT mode
 
-#else                            // not in MT mode
-
-unsigned int MultithreadInfo::get_n_cpus()
+unsigned int
+MultithreadInfo::get_n_cpus()
 {
   return 1;
 }
 
-unsigned int MultithreadInfo::n_cores()
+unsigned int
+MultithreadInfo::n_cores()
 {
   return 1;
 }
 
-unsigned int MultithreadInfo::n_threads()
+unsigned int
+MultithreadInfo::n_threads()
 {
   return 1;
 }
 
-void MultithreadInfo::set_thread_limit(const unsigned int)
-{
-}
+void
+MultithreadInfo::set_thread_limit(const unsigned int)
+{}
 
 #endif
 
-
-bool MultithreadInfo::is_running_single_threaded()
+bool
+MultithreadInfo::is_running_single_threaded()
 {
   return n_threads() == 1;
 }
 
-
 std::size_t
-MultithreadInfo::memory_consumption ()
+MultithreadInfo::memory_consumption()
 {
   // only simple data elements, so
   // use sizeof operator
-  return sizeof (MultithreadInfo);
+  return sizeof(MultithreadInfo);
 }
-
 
 void
 MultithreadInfo::initialize_multithreading()
 {
   static bool done = false;
-  if (done)
+  if(done)
     return;
 
-  MultithreadInfo::set_thread_limit (numbers::invalid_unsigned_int);
+  MultithreadInfo::set_thread_limit(numbers::invalid_unsigned_int);
   done = true;
 }
 
-
-
-const unsigned int MultithreadInfo::n_cpus = MultithreadInfo::get_n_cpus();
+const unsigned int MultithreadInfo::n_cpus  = MultithreadInfo::get_n_cpus();
 unsigned int MultithreadInfo::n_max_threads = numbers::invalid_unsigned_int;
 
 namespace
 {
-// Force the first call to set_thread_limit happen before any tasks in TBB are
-// used. This is necessary as tbb::task_scheduler_init has no effect if TBB
-// got automatically initialized (which happens the first time we use it).
+  // Force the first call to set_thread_limit happen before any tasks in TBB are
+  // used. This is necessary as tbb::task_scheduler_init has no effect if TBB
+  // got automatically initialized (which happens the first time we use it).
   struct DoOnce
   {
-    DoOnce ()
+    DoOnce()
     {
       MultithreadInfo::initialize_multithreading();
     }
   } do_once;
-}
+} // namespace
 
 DEAL_II_NAMESPACE_CLOSE

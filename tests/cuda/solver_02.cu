@@ -15,8 +15,8 @@
 
 // Check that CUDA direct solvers work
 
-#include "../tests.h"
 #include "../testmatrix.h"
+#include "../tests.h"
 
 #include <deal.II/base/cuda.h>
 #include <deal.II/lac/cuda_solver_direct.h>
@@ -26,25 +26,25 @@
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
 
-
-void test(Utilities::CUDA::Handle &cuda_handle)
+void
+test(Utilities::CUDA::Handle& cuda_handle)
 {
   // Create the matrix on the host.
-  dealii::SparsityPattern sparsity_pattern;
-  dealii::SparseMatrix<double> matrix;
-  unsigned int const size = 30;
+  dealii::SparsityPattern                sparsity_pattern;
+  dealii::SparseMatrix<double>           matrix;
+  unsigned int const                     size = 30;
   std::vector<std::vector<unsigned int>> column_indices(size);
-  for (unsigned int i = 0; i < size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     {
       unsigned int j_max = std::min(size, i + 2);
       unsigned int j_min = (i == 0) ? 0 : i - 1;
-      for (unsigned int j = j_min; j < j_max; ++j)
+      for(unsigned int j = j_min; j < j_max; ++j)
         column_indices[i].emplace_back(j);
     }
-  sparsity_pattern.copy_from(size, size, column_indices.begin(),
-                             column_indices.end());
+  sparsity_pattern.copy_from(
+    size, size, column_indices.begin(), column_indices.end());
   matrix.reinit(sparsity_pattern);
-  for (unsigned int i = 0; i < size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     {
       unsigned int j_max = std::min(size - 1, i + 1);
       unsigned int j_min = (i == 0) ? 0 : i - 1;
@@ -55,8 +55,8 @@ void test(Utilities::CUDA::Handle &cuda_handle)
 
   // Generate a random solution and then compute the rhs
   dealii::Vector<double> sol_ref(size);
-  for (auto &val : sol_ref)
-    val = random_value(5.,15.);
+  for(auto& val : sol_ref)
+    val = random_value(5., 15.);
 
   dealii::Vector<double> rhs(size);
   matrix.vmult(rhs, sol_ref);
@@ -65,21 +65,22 @@ void test(Utilities::CUDA::Handle &cuda_handle)
   CUDAWrappers::SparseMatrix<double> matrix_dev(cuda_handle, matrix);
 
   LinearAlgebra::CUDAWrappers::Vector<double> rhs_dev(size);
-  LinearAlgebra::ReadWriteVector<double> rhs_host(size);
+  LinearAlgebra::ReadWriteVector<double>      rhs_host(size);
   std::copy(rhs.begin(), rhs.end(), rhs_host.begin());
   rhs_dev.import(rhs_host, VectorOperation::insert);
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
-  const std::array<std::string,3> solver_names {"Cholesky", "LU_dense", "LU_host"};
+  const std::array<std::string, 3>            solver_names{
+    "Cholesky", "LU_dense", "LU_host"};
 
-  for (auto solver_type: solver_names)
+  for(auto solver_type : solver_names)
     {
       // Solve on the device
       CUDAWrappers::SolverDirect<double>::AdditionalData data(solver_type);
-      SolverControl solver_control;
+      SolverControl                                      solver_control;
 
-      CUDAWrappers::SolverDirect<double> solver(cuda_handle, solver_control,
-                                                data);
+      CUDAWrappers::SolverDirect<double> solver(
+        cuda_handle, solver_control, data);
       solver.solve(matrix_dev, solution_dev, rhs_dev);
 
       // Move the result back to the host
@@ -87,14 +88,15 @@ void test(Utilities::CUDA::Handle &cuda_handle)
       solution_host.import(solution_dev, VectorOperation::insert);
 
       // Check the result
-      for (unsigned int i = 0; i < size; ++i)
+      for(unsigned int i = 0; i < size; ++i)
         AssertThrow(std::abs(solution_host[i] - sol_ref[i]) < 1e-12,
                     ExcInternalError());
       deallog << solver_type << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);
@@ -102,7 +104,7 @@ int main()
   Utilities::CUDA::Handle cuda_handle;
   test(cuda_handle);
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }

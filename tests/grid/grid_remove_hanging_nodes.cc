@@ -14,30 +14,30 @@
 // ---------------------------------------------------------------------
 
 #include "../tests.h"
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
 
-std::ofstream logfile ("output");
+std::ofstream logfile("output");
 
-void check_remove_hanging_nodes ()
+void
+check_remove_hanging_nodes()
 {
   Point<2> corners[2];
 
-  corners[0] = Point<2> (1, 0);
-  corners[1] = Point<2> (0, 4);
+  corners[0]                        = Point<2>(1, 0);
+  corners[1]                        = Point<2>(0, 4);
   const unsigned int n_subdivisions = 1;
 
-
   Triangulation<2> tria;
-  GridGenerator::subdivided_parallelepiped (tria, n_subdivisions, corners);
+  GridGenerator::subdivided_parallelepiped(tria, n_subdivisions, corners);
 
   tria.refine_global();
 
@@ -49,12 +49,13 @@ void check_remove_hanging_nodes ()
   dealii::GridTools::remove_hanging_nodes(tria, /*isotropic=*/false);
 
   GridOut grid_out;
-  grid_out.write_vtk (tria, logfile);
+  grid_out.write_vtk(tria, logfile);
 
-  tria.clear ();
+  tria.clear();
 }
 
-int main ()
+int
+main()
 {
   check_remove_hanging_nodes();
 }

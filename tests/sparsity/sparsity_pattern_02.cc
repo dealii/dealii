@@ -13,21 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparsityPattern::print_gnuplot
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  print_gnuplot<SparsityPattern> ();
+  print_gnuplot<SparsityPattern>();
 }
-
-
-

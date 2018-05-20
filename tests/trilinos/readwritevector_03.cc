@@ -17,34 +17,35 @@
 
 #include "../tests.h"
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <vector>
 
-void test()
+void
+test()
 {
-  IndexSet is(8);
+  IndexSet     is(8);
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  if (rank==0)
-    is.add_range(0,4);
-  if (rank==1)
-    is.add_range(4,8);
+  if(rank == 0)
+    is.add_range(0, 4);
+  if(rank == 1)
+    is.add_range(4, 8);
   is.compress();
 
   deallog << "is: ";
   is.print(deallog);
 
   IndexSet is_ghosted(8);
-  is_ghosted.add_range(2,6);
+  is_ghosted.add_range(2, 6);
   deallog << "is_ghosted: ";
   is_ghosted.print(deallog);
 
   TrilinosWrappers::MPI::Vector tril_vector(is);
   TrilinosWrappers::MPI::Vector tril_vector_ghosted;
   tril_vector_ghosted.reinit(is, is_ghosted, MPI_COMM_WORLD);
-  for (unsigned int i=0; i<8; ++i)
+  for(unsigned int i = 0; i < 8; ++i)
     tril_vector[i] = i;
 
   tril_vector.compress(VectorOperation::insert);
@@ -56,8 +57,7 @@ void test()
   deallog << "trilinos vec ghosted:" << std::endl;
   tril_vector_ghosted.print(deallog.get_file_stream());
 
-
-  IndexSet readwrite_is (tril_vector_ghosted.vector_partitioner());
+  IndexSet readwrite_is(tril_vector_ghosted.vector_partitioner());
   deallog << "ghosted IS: ";
   readwrite_is.print(deallog);
 
@@ -79,12 +79,14 @@ void test()
     readwrite.print(deallog.get_file_stream());
   }
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll log;
 

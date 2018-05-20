@@ -13,16 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_SYS3(FE_DGQ<2>(2),2,FE_DGQ<2>(2),2,FE_Q<2>(QIterated<1>(QTrapez<1>(),3)),3,2);
+  CHECK_SYS3(FE_DGQ<2>(2),
+             2,
+             FE_DGQ<2>(2),
+             2,
+             FE_Q<2>(QIterated<1>(QTrapez<1>(), 3)),
+             3,
+             2);
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // cell->set_dof_values_by_interpolation can not work properly in the hp
 // context when called on non-active cells because these do not have a
 // finite element associated with them
@@ -24,21 +23,21 @@
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/lac/vector.h>
 
-#include <vector>
 #include <string>
-
+#include <vector>
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << dim << "D" << std::endl;
 
@@ -47,50 +46,51 @@ void test ()
   // elements
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
-  tr.refine_global (2);
+  tr.refine_global(2);
 
   hp::FECollection<dim> fe;
-  for (unsigned int i=1; i<5; ++i)
-    fe.push_back (FE_Q<dim>(QIterated<1>(QTrapez<1>(),i)));
+  for(unsigned int i = 1; i < 5; ++i)
+    fe.push_back(FE_Q<dim>(QIterated<1>(QTrapez<1>(), i)));
 
   hp::DoFHandler<dim> dof_handler(tr);
-  for (typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
-       cell!=dof_handler.end(); ++cell)
-    if (cell->has_children() == false)
-      cell->set_active_fe_index (cell->index() % fe.size());
+  for(typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
+      cell != dof_handler.end();
+      ++cell)
+    if(cell->has_children() == false)
+      cell->set_active_fe_index(cell->index() % fe.size());
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
   Vector<double> solution(dof_handler.n_dofs());
 
   // do the test where we set data on the coarsest cell with an
   // explicit Q1 space
-  typename hp::DoFHandler<dim>::cell_iterator cell=dof_handler.begin(0);
-  Vector<double> local (fe[0].dofs_per_cell);
-  for (unsigned int i=0; i<local.size(); ++i)
+  typename hp::DoFHandler<dim>::cell_iterator cell = dof_handler.begin(0);
+  Vector<double>                              local(fe[0].dofs_per_cell);
+  for(unsigned int i = 0; i < local.size(); ++i)
     local(i) = i;
-  cell->set_dof_values_by_interpolation (local, solution,
-                                         0);
+  cell->set_dof_values_by_interpolation(local, solution, 0);
 
   // for comparison purposes, also output the values of DoFs on all cells
-  for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
+  for(typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active();
+      cell != dof_handler.end();
+      ++cell)
     {
-      Vector<double> x (cell->get_fe().dofs_per_cell);
-      cell->get_dof_values (solution, x);
+      Vector<double> x(cell->get_fe().dofs_per_cell);
+      cell->get_dof_values(solution, x);
       deallog << "cell =" << cell << ":  ";
-      for (unsigned int i=0; i<x.size(); ++i)
+      for(unsigned int i = 0; i < x.size(); ++i)
         deallog << x[i] << ' ';
       deallog << std::endl;
     }
 }
 
-
 int
 main()
 {
-  std::ofstream logfile ("output");
-  logfile.precision (1);
+  std::ofstream logfile("output");
+  logfile.precision(1);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
 

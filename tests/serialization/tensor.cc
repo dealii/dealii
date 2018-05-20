@@ -13,46 +13,38 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check serialization for Tensor<1,dim>
 
 #include "../tests.h"
 #include "serialization.h"
-#include <deal.II/base/tensor.h>
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <deal.II/base/tensor.h>
 #include <sstream>
 
-
-
-void test ()
+void
+test()
 {
-  const unsigned int dim=3;
-  const unsigned int rank=2;
+  const unsigned int dim  = 3;
+  const unsigned int rank = 2;
 
-  double a1[3][3] = {{1., 2., 3.},
-    {4., 5., 6.},
-    {7., 8., 9.}
-  };
-  Tensor<rank,dim> t1(a1);
+  double            a1[3][3] = {{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}};
+  Tensor<rank, dim> t1(a1);
 
-  double a2[3][3] = {{10., 11., 12.},
-    {13., 14., 15.},
-    {16., 17., 18.}
-  };
-  Tensor<rank,dim> t2(a2);
+  double a2[3][3] = {{10., 11., 12.}, {13., 14., 15.}, {16., 17., 18.}};
+  Tensor<rank, dim> t2(a2);
 
-  verify (t1, t2);
+  verify(t1, t2);
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "dof_tools_common.h"
 #include <deal.II/lac/vector.h>
@@ -21,19 +20,13 @@
 // check
 //   FiniteElement::n_dofs_per_object
 
-
-
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim>& dof_handler)
 {
-  const FiniteElement<dim> &fe = dof_handler.get_fe();
-  deallog << fe.dofs_per_vertex << ' '
-          << fe.dofs_per_line << ' '
-          << fe.dofs_per_quad << ' '
-          << fe.dofs_per_hex << std::endl;
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  deallog << fe.dofs_per_vertex << ' ' << fe.dofs_per_line << ' '
+          << fe.dofs_per_quad << ' ' << fe.dofs_per_hex << std::endl;
   deallog << fe.template n_dofs_per_object<0>() << ' '
           << fe.template n_dofs_per_object<1>() << ' '
           << fe.template n_dofs_per_object<2>() << ' '

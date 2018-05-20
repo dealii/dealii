@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test that objects that can't be copied aren't copied when passed to a new
 // thread by reference
 //
@@ -26,70 +25,75 @@
 
 struct X
 {
-  X(int i) : i(i) {}
+  X(int i) : i(i)
+  {}
   int i;
 
-  void execute ()
+  void
+  execute()
   {
-    Assert (false, ExcInternalError());
+    Assert(false, ExcInternalError());
   }
 
-  void execute () const
+  void
+  execute() const
   {
-    Assert (i == 42, ExcInternalError());
+    Assert(i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 
 private:
-  X(const X &);
-  X &operator= (const X &);
+  X(const X&);
+  X&
+  operator=(const X&);
 };
 
-
-void test1 ()
+void
+test1()
 {
-  const X x(42);
-  Threads::Thread<void> t = Threads::new_thread (&X::execute, x);
-  t.join ();
+  const X               x(42);
+  Threads::Thread<void> t = Threads::new_thread(&X::execute, x);
+  t.join();
 }
-
 
 struct Y
 {
-  Y(int i) : i(i) {}
+  Y(int i) : i(i)
+  {}
   int i;
 
-  void execute ()
+  void
+  execute()
   {
-    Assert (i == 42, ExcInternalError());
+    Assert(i == 42, ExcInternalError());
     deallog << "OK" << std::endl;
   }
 
-  void execute () const
+  void
+  execute() const
   {
-    Assert (false, ExcInternalError());
+    Assert(false, ExcInternalError());
   }
 
 private:
-  Y(const Y &);
-  Y &operator= (const Y &);
+  Y(const Y&);
+  Y&
+  operator=(const Y&);
 };
 
-
-void test2 ()
+void
+test2()
 {
-  Y y(42);
-  Threads::Thread<void> t = Threads::new_thread (&Y::execute, y);
-  t.join ();
+  Y                     y(42);
+  Threads::Thread<void> t = Threads::new_thread(&Y::execute, y);
+  t.join();
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test1 ();
-  test2 ();
+  test1();
+  test2();
 }

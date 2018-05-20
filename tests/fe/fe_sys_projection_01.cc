@@ -13,22 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
 /*
  * Project the function [1,1] onto a deformed grid and see whether the
  * FESystem elements can represent it exactly. This shouldn't be a surprise,
  * but it is nice to compare with the RT and ABF elements
  */
 
-
-
 char logname[] = "output";
 #include "deformed_projection.h"
 
-
-void test ()
+void
+test()
 {
-  FESystem<2> fe (FE_Q<2>(3), 2);
-  const std::array<unsigned int,3> min_convergence_steps = {{12,12,12}};
-  check (fe, min_convergence_steps);
+  FESystem<2>                       fe(FE_Q<2>(3), 2);
+  const std::array<unsigned int, 3> min_convergence_steps = {{12, 12, 12}};
+  check(fe, min_convergence_steps);
 }

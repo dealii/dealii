@@ -13,17 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
 // like matrix_out_02.cc, but test for PETSc matrices
-
 
 #include "../tests.h"
 #include <deal.II/lac/matrix_out.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -32,25 +32,25 @@ int main (int argc, char **argv)
 
   // test for a rectangular sparse
   // matrix
-  if (true)
+  if(true)
     {
-      DynamicSparsityPattern sparsity (4,8);
-      for (unsigned int i=0; i<4; ++i)
-        for (unsigned int j=0; j<8; ++j)
-          if (i==j+1)
-            sparsity.add (i,j);
-      sparsity.compress ();
+      DynamicSparsityPattern sparsity(4, 8);
+      for(unsigned int i = 0; i < 4; ++i)
+        for(unsigned int j = 0; j < 8; ++j)
+          if(i == j + 1)
+            sparsity.add(i, j);
+      sparsity.compress();
 
       PETScWrappers::SparseMatrix sparse_matrix(sparsity);
-      for (unsigned int i=0; i<4; ++i)
-        for (unsigned int j=0; j<8; ++j)
-          if (i==j+1)
-            sparse_matrix.set(i,j, i+3*j);
+      for(unsigned int i = 0; i < 4; ++i)
+        for(unsigned int j = 0; j < 8; ++j)
+          if(i == j + 1)
+            sparse_matrix.set(i, j, i + 3 * j);
       sparse_matrix.compress(VectorOperation::insert);
 
       MatrixOut matrix_out;
-      matrix_out.build_patches (sparse_matrix, "sparse_matrix",
-                                MatrixOut::Options (true, 1, true));
-      matrix_out.write_gnuplot (logfile);
+      matrix_out.build_patches(
+        sparse_matrix, "sparse_matrix", MatrixOut::Options(true, 1, true));
+      matrix_out.write_gnuplot(logfile);
     }
 }

@@ -13,58 +13,59 @@
 //
 // ---------------------------------------------------------------------
 
-
 // testing serialize function for class BoundingBox
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/bounding_box.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
 template <int spacedim>
-void test(const unsigned int &size)
+void
+test(const unsigned int& size)
 {
-  std::vector< BoundingBox<spacedim> > b_boxes(size);
+  std::vector<BoundingBox<spacedim>> b_boxes(size);
 
-  for (auto &b : b_boxes)
+  for(auto& b : b_boxes)
     {
       auto p1 = random_point<spacedim>();
       auto p2 = p1;
-      for (unsigned int i=0; i<spacedim; ++i)
+      for(unsigned int i = 0; i < spacedim; ++i)
         p2[i] += i;
-      b = BoundingBox<spacedim>( std::make_pair(p1,p2) );
+      b = BoundingBox<spacedim>(std::make_pair(p1, p2));
     }
 
   auto buffer = Utilities::pack(b_boxes);
 
-  auto unpacked = Utilities::unpack<std::vector< BoundingBox<spacedim> > >(buffer);
+  auto unpacked = Utilities::unpack<std::vector<BoundingBox<spacedim>>>(buffer);
 
-  unsigned int i=0;
-  bool ok = true;
-  for (auto &b : b_boxes)
+  unsigned int i  = 0;
+  bool         ok = true;
+  for(auto& b : b_boxes)
     {
-      const auto &b_points = b.get_boundary_points();
-      const auto &u_points = unpacked[i++].get_boundary_points();
-      if (b_points.first.distance(u_points.first) > 1e-12)
+      const auto& b_points = b.get_boundary_points();
+      const auto& u_points = unpacked[i++].get_boundary_points();
+      if(b_points.first.distance(u_points.first) > 1e-12)
         {
-          deallog << "NOT OK: "
-                  << b_points.first << " != " << u_points.first << std::endl;
+          deallog << "NOT OK: " << b_points.first << " != " << u_points.first
+                  << std::endl;
           ok = false;
         }
-      else if ( b_points.second.distance(u_points.second) > 1e-12 )
+      else if(b_points.second.distance(u_points.second) > 1e-12)
         {
-          deallog << "NOT OK: "
-                  << b_points.second << " != " << u_points.second << std::endl;
+          deallog << "NOT OK: " << b_points.second << " != " << u_points.second
+                  << std::endl;
           ok = false;
         }
     }
 
-  if (ok)
+  if(ok)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

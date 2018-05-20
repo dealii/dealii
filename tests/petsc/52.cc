@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check setting elements in a petsc matrix using
 // PETScWrappers::SparseMatrix::set(). like petsc_01, but use a different
 // constructor for the sparse matrix
@@ -23,56 +21,55 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <iostream>
 
-
-void test (PETScWrappers::SparseMatrix &m)
+void
+test(PETScWrappers::SparseMatrix& m)
 {
   // first set a few entries
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.m(); ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // then make sure we retrieve the same ones
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.m(); ++j)
+      if((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow (m(i,j) == i*j*.5+.5, ExcInternalError());
-          AssertThrow (m.el(i,j) == i*j*.5+.5, ExcInternalError());
+          AssertThrow(m(i, j) == i * j * .5 + .5, ExcInternalError());
+          AssertThrow(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
         }
       else
         {
-          AssertThrow (m(i,j) == 0, ExcInternalError());
-          AssertThrow (m.el(i,j) == 0, ExcInternalError());
+          AssertThrow(m(i, j) == 0, ExcInternalError());
+          AssertThrow(m.el(i, j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         typedef PETScWrappers::SparseMatrix::size_type size_type;
 
-        std::vector<size_type> row_lengths (5, 3U);
+        std::vector<size_type> row_lengths(5, 3U);
         row_lengths.back() = 2;
-        PETScWrappers::SparseMatrix m (5,5,row_lengths);
-        test (m);
+        PETScWrappers::SparseMatrix m(5, 5, row_lengths);
+        test(m);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -83,9 +80,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

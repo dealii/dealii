@@ -21,8 +21,8 @@
 #include <deal.II/base/synchronous_iterator.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/mapping.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/lac/vector.h>
 #ifdef _MSC_VER
 #  include <deal.II/dofs/dof_accessor.h>
 #endif
@@ -169,24 +169,30 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>
+  template <int dim,
+            template <int, int> class DoFHandlerType,
+            class InputVector,
+            int spacedim>
   void
-  approximate_gradient (const Mapping<dim,spacedim>        &mapping,
-                        const DoFHandlerType<dim,spacedim> &dof,
-                        const InputVector                  &solution,
-                        Vector<float>                      &derivative_norm,
-                        const unsigned int                  component = 0);
+  approximate_gradient(const Mapping<dim, spacedim>&        mapping,
+                       const DoFHandlerType<dim, spacedim>& dof,
+                       const InputVector&                   solution,
+                       Vector<float>&                       derivative_norm,
+                       const unsigned int                   component = 0);
 
   /**
    * Call the @p interpolate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>
+  template <int dim,
+            template <int, int> class DoFHandlerType,
+            class InputVector,
+            int spacedim>
   void
-  approximate_gradient (const DoFHandlerType<dim,spacedim> &dof,
-                        const InputVector                  &solution,
-                        Vector<float>                      &derivative_norm,
-                        const unsigned int                  component = 0);
+  approximate_gradient(const DoFHandlerType<dim, spacedim>& dof,
+                       const InputVector&                   solution,
+                       Vector<float>&                       derivative_norm,
+                       const unsigned int                   component = 0);
 
   /**
    * This function is the analogue to the one above, computing finite
@@ -205,24 +211,30 @@ namespace DerivativeApproximation
    * In a parallel computation the @p solution vector needs to contain the
    * locally relevant unknowns.
    */
-  template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>
+  template <int dim,
+            template <int, int> class DoFHandlerType,
+            class InputVector,
+            int spacedim>
   void
-  approximate_second_derivative (const Mapping<dim,spacedim>        &mapping,
-                                 const DoFHandlerType<dim,spacedim> &dof,
-                                 const InputVector                  &solution,
-                                 Vector<float>                      &derivative_norm,
-                                 const unsigned int                  component = 0);
+  approximate_second_derivative(const Mapping<dim, spacedim>&        mapping,
+                                const DoFHandlerType<dim, spacedim>& dof,
+                                const InputVector&                   solution,
+                                Vector<float>&     derivative_norm,
+                                const unsigned int component = 0);
 
   /**
    * Call the @p interpolate function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
-  template <int dim, template <int, int> class DoFHandlerType, class InputVector, int spacedim>
+  template <int dim,
+            template <int, int> class DoFHandlerType,
+            class InputVector,
+            int spacedim>
   void
-  approximate_second_derivative (const DoFHandlerType<dim,spacedim> &dof,
-                                 const InputVector                  &solution,
-                                 Vector<float>                      &derivative_norm,
-                                 const unsigned int                  component = 0);
+  approximate_second_derivative(const DoFHandlerType<dim, spacedim>& dof,
+                                const InputVector&                   solution,
+                                Vector<float>&     derivative_norm,
+                                const unsigned int component = 0);
 
   /**
    * This function calculates the <tt>order</tt>-th order approximate
@@ -239,62 +251,65 @@ namespace DerivativeApproximation
    */
   template <typename DoFHandlerType, class InputVector, int order>
   void
-  approximate_derivative_tensor
-  (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &mapping,
-   const DoFHandlerType                                                       &dof,
-   const InputVector                                                          &solution,
+  approximate_derivative_tensor(
+    const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>&
+                          mapping,
+    const DoFHandlerType& dof,
+    const InputVector&    solution,
 #ifndef _MSC_VER
-   const typename DoFHandlerType::active_cell_iterator                        &cell,
+    const typename DoFHandlerType::active_cell_iterator& cell,
 #else
-   const TriaActiveIterator <dealii::DoFCellAccessor<DoFHandlerType, false> > &cell,
+    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>&
+      cell,
 #endif
-   Tensor<order, DoFHandlerType::dimension>                                   &derivative,
-   const unsigned int                                                         component = 0);
+    Tensor<order, DoFHandlerType::dimension>& derivative,
+    const unsigned int                        component = 0);
 
   /**
    * Same as above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <typename DoFHandlerType, class InputVector, int order>
   void
-  approximate_derivative_tensor
-  (const DoFHandlerType                                &dof,
-   const InputVector                                   &solution,
+  approximate_derivative_tensor(
+    const DoFHandlerType& dof,
+    const InputVector&    solution,
 #ifndef _MSC_VER
-   const typename DoFHandlerType::active_cell_iterator &cell,
+    const typename DoFHandlerType::active_cell_iterator& cell,
 #else
-   const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false> > &cell,
+    const TriaActiveIterator<dealii::DoFCellAccessor<DoFHandlerType, false>>&
+      cell,
 #endif
-   Tensor<order, DoFHandlerType::dimension>            &derivative,
-   const unsigned int                                   component = 0);
+    Tensor<order, DoFHandlerType::dimension>& derivative,
+    const unsigned int                        component = 0);
 
   /**
    * Return the norm of the derivative.
    */
   template <int dim, int order>
   double
-  derivative_norm (const Tensor<order,dim> &derivative);
+  derivative_norm(const Tensor<order, dim>& derivative);
 
   /**
    * Exception
    */
-  DeclException2 (ExcVectorLengthVsNActiveCells,
-                  int, int,
-                  << "The output vector needs to have a size equal "
-                  "to the number of active cells of your triangulation "
-                  "but has length " << arg1 << "There are "
-                  << arg2 << " active cells in your triangulation.");
+  DeclException2(ExcVectorLengthVsNActiveCells,
+                 int,
+                 int,
+                 << "The output vector needs to have a size equal "
+                    "to the number of active cells of your triangulation "
+                    "but has length "
+                 << arg1 << "There are " << arg2
+                 << " active cells in your triangulation.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcInsufficientDirections,
-                    "We have encountered a cell on which the number of linearly "
-                    "independent directions that span the matrix Y (discussed "
-                    "in the documentation of the DerivativeApproximation "
-                    "class) is not equal to dim. The matrix Y then is "
-                    "rank deficient and can not be inverted.");
-}
-
-
+  DeclExceptionMsg(ExcInsufficientDirections,
+                   "We have encountered a cell on which the number of linearly "
+                   "independent directions that span the matrix Y (discussed "
+                   "in the documentation of the DerivativeApproximation "
+                   "class) is not equal to dim. The matrix Y then is "
+                   "rank deficient and can not be inverted.");
+} // namespace DerivativeApproximation
 
 DEAL_II_NAMESPACE_CLOSE
 

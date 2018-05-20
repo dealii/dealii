@@ -13,41 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check CellId
 
 #include "../tests.h"
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
-
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 template <class TRIA>
-void check (TRIA &tr)
+void
+check(TRIA& tr)
 {
-  typename TRIA::cell_iterator cell = tr.begin(),
-                               endc = tr.end();
+  typename TRIA::cell_iterator cell = tr.begin(), endc = tr.end();
 
-  for (; cell!=endc; ++cell)
+  for(; cell != endc; ++cell)
     {
-      deallog << cell->level() << " " << cell->index() << " " << cell->id() << " " << cell->id().to_string() << std::endl;
+      deallog << cell->level() << " " << cell->index() << " " << cell->id()
+              << " " << cell->id().to_string() << std::endl;
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   // Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
@@ -56,8 +52,8 @@ int main (int argc, char *argv[])
 
   {
     Triangulation<2> tria;
-    GridGenerator::hyper_cube (tria);
-    tria.refine_global (2);
+    GridGenerator::hyper_cube(tria);
+    tria.refine_global(2);
     tria.begin_active()->set_refine_flag();
     tria.execute_coarsening_and_refinement();
     check(tria);
@@ -65,13 +61,8 @@ int main (int argc, char *argv[])
 
   {
     Triangulation<3> tria;
-    GridGenerator::subdivided_hyper_cube (tria, 3);
-    tria.refine_global (1);
+    GridGenerator::subdivided_hyper_cube(tria, 3);
+    tria.refine_global(1);
     check(tria);
   }
-
-
 }
-
-
-

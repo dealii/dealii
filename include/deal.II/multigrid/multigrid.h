@@ -16,16 +16,15 @@
 #ifndef dealii_multigrid_h
 #define dealii_multigrid_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
-#include <deal.II/base/mg_level_object.h>
-#include <deal.II/distributed/tria.h>
 
 #include <vector>
 
@@ -51,50 +50,55 @@ namespace mg
      * false) the call to MGTransfer::copy_to_mg which transfers the vector
      * given to it to a multi-level vector.
      */
-    boost::signals2::signal<void (const bool before)> transfer_to_mg;
+    boost::signals2::signal<void(const bool before)> transfer_to_mg;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to MGTransfer::copy_from_mg which transfers the
      * multi-level vector given to it to a normal vector.
      */
-    boost::signals2::signal<void (const bool before)> transfer_to_global;
+    boost::signals2::signal<void(const bool before)> transfer_to_global;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to the coarse solver on @p level.
      */
-    boost::signals2::signal<void (const bool before, const unsigned int level)> coarse_solve;
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      coarse_solve;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to MGTransfer::restrict_and_add() which restricts a
      * vector from @p level to the next coarser one (@p level - 1).
      */
-    boost::signals2::signal<void (const bool before, const unsigned int level)> restriction;
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      restriction;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to MGTransfer::prolongate() which prolongs a vector to
      * @p level from the next coarser one (@p level - 1).
      */
-    boost::signals2::signal<void (const bool before, const unsigned int level)> prolongation;
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      prolongation;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to a pre-smoothing step via MGPreSmoother::apply() on
      * @p level.
      */
-    boost::signals2::signal<void (const bool before, const unsigned int level)> pre_smoother_step;
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      pre_smoother_step;
 
     /**
      * This signal is triggered before (@p before is true) and after (@p before is
      * false) the call to a post-smoothing step via MGPostSmoother::apply() on
      * @p level.
      */
-    boost::signals2::signal<void (const bool before, const unsigned int level)> post_smoother_step;
+    boost::signals2::signal<void(const bool before, const unsigned int level)>
+      post_smoother_step;
   };
-}
+} // namespace mg
 
 /**
  * Implementation of the multigrid method. The implementation supports both
@@ -137,7 +141,7 @@ public:
     f_cycle
   };
 
-  typedef VectorType vector_type;
+  typedef VectorType       vector_type;
   typedef const VectorType const_vector_type;
 
   /**
@@ -159,15 +163,15 @@ public:
 #ifndef _MSC_VER
   DEAL_II_DEPRECATED
 #endif
-  Multigrid(const DoFHandler<dim>              &mg_dof_handler,
-            const MGMatrixBase<VectorType>     &matrix,
-            const MGCoarseGridBase<VectorType> &coarse,
-            const MGTransferBase<VectorType>   &transfer,
-            const MGSmootherBase<VectorType>   &pre_smooth,
-            const MGSmootherBase<VectorType>   &post_smooth,
-            const unsigned int                 minlevel = 0,
-            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
-            Cycle                              cycle = v_cycle);
+  Multigrid(const DoFHandler<dim>&              mg_dof_handler,
+            const MGMatrixBase<VectorType>&     matrix,
+            const MGCoarseGridBase<VectorType>& coarse,
+            const MGTransferBase<VectorType>&   transfer,
+            const MGSmootherBase<VectorType>&   pre_smooth,
+            const MGSmootherBase<VectorType>&   post_smooth,
+            const unsigned int                  minlevel = 0,
+            const unsigned int maxlevel = numbers::invalid_unsigned_int,
+            Cycle              cycle    = v_cycle);
 
   /**
    * Constructor. <tt>transfer</tt> is an object performing prolongation and
@@ -178,26 +182,27 @@ public:
    * the course of the computations. You should therefore create objects of
    * this type as late as possible.
    */
-  Multigrid(const MGMatrixBase<VectorType>     &matrix,
-            const MGCoarseGridBase<VectorType> &coarse,
-            const MGTransferBase<VectorType>   &transfer,
-            const MGSmootherBase<VectorType>   &pre_smooth,
-            const MGSmootherBase<VectorType>   &post_smooth,
-            const unsigned int                 minlevel = 0,
-            const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
-            Cycle                              cycle = v_cycle);
+  Multigrid(const MGMatrixBase<VectorType>&     matrix,
+            const MGCoarseGridBase<VectorType>& coarse,
+            const MGTransferBase<VectorType>&   transfer,
+            const MGSmootherBase<VectorType>&   pre_smooth,
+            const MGSmootherBase<VectorType>&   post_smooth,
+            const unsigned int                  minlevel = 0,
+            const unsigned int maxlevel = numbers::invalid_unsigned_int,
+            Cycle              cycle    = v_cycle);
 
   /**
    * Reinit this class according to #minlevel and #maxlevel.
    */
-  void reinit (const unsigned int minlevel,
-               const unsigned int maxlevel);
+  void
+  reinit(const unsigned int minlevel, const unsigned int maxlevel);
 
   /**
    * Execute one multigrid cycle. The type of cycle is selected by the
    * constructor argument cycle. See the enum Cycle for available types.
    */
-  void cycle ();
+  void
+  cycle();
 
   /**
    * Execute one step of the V-cycle algorithm.  This function assumes, that
@@ -209,7 +214,8 @@ public:
    *
    * The actual work for this function is done in level_v_step().
    */
-  void vcycle ();
+  void
+  vcycle();
 
   /**
    * Set additional matrices to correct residual computation at refinement
@@ -223,8 +229,9 @@ public:
    * <tt>edge_in</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_matrices (const MGMatrixBase<VectorType> &edge_out,
-                          const MGMatrixBase<VectorType> &edge_in);
+  void
+  set_edge_matrices(const MGMatrixBase<VectorType>& edge_out,
+                    const MGMatrixBase<VectorType>& edge_in);
 
   /**
    * Set additional matrices to correct residual computation at refinement
@@ -238,25 +245,29 @@ public:
    * <tt>edge_up</tt>. In particular, for symmetric operators, both arguments
    * can refer to the same matrix, saving assembling of one of them.
    */
-  void set_edge_flux_matrices (const MGMatrixBase<VectorType> &edge_down,
-                               const MGMatrixBase<VectorType> &edge_up);
+  void
+  set_edge_flux_matrices(const MGMatrixBase<VectorType>& edge_down,
+                         const MGMatrixBase<VectorType>& edge_up);
 
   /**
    * Return the finest level for multigrid.
    */
-  unsigned int get_maxlevel() const;
+  unsigned int
+  get_maxlevel() const;
 
   /**
    * Return the coarsest level for multigrid.
    */
-  unsigned int get_minlevel() const;
+  unsigned int
+  get_minlevel() const;
 
   /**
    * Set the highest level for which the multilevel method is performed. By
    * default, this is the finest level of the Triangulation. Accepted are
    * values not smaller than the current #minlevel.
    */
-  void set_maxlevel (const unsigned int);
+  void
+  set_maxlevel(const unsigned int);
 
   /**
    * Set the coarsest level for which the multilevel method is performed. By
@@ -273,8 +284,8 @@ public:
    * @note If #minlevel is set to a nonzero value, do not forget to adjust
    * your coarse grid solver!
    */
-  void set_minlevel (const unsigned int level,
-                     bool relative = false);
+  void
+  set_minlevel(const unsigned int level, bool relative = false);
 
   /**
    * Chance #cycle_type used in cycle().
@@ -288,40 +299,45 @@ public:
    * during the multigrid cycles.
    */
   DEAL_II_DEPRECATED
-  void set_debug (const unsigned int);
+  void
+  set_debug(const unsigned int);
 
   /**
    * Connect a function to mg::Signals::coarse_solve.
    */
   boost::signals2::connection
-  connect_coarse_solve(const std::function<void (const bool, const unsigned int)> &slot);
+  connect_coarse_solve(
+    const std::function<void(const bool, const unsigned int)>& slot);
 
   /**
    * Connect a function to mg::Signals::restriction.
    */
   boost::signals2::connection
-  connect_restriction(const std::function<void (const bool, const unsigned int)> &slot);
+  connect_restriction(
+    const std::function<void(const bool, const unsigned int)>& slot);
 
   /**
    * Connect a function to mg::Signals::prolongation.
    */
   boost::signals2::connection
-  connect_prolongation(const std::function<void (const bool, const unsigned int)> &slot);
+  connect_prolongation(
+    const std::function<void(const bool, const unsigned int)>& slot);
 
   /**
    * Connect a function to mg::Signals::pre_smoother_step.
    */
   boost::signals2::connection
-  connect_pre_smoother_step(const std::function<void (const bool, const unsigned int)> &slot);
+  connect_pre_smoother_step(
+    const std::function<void(const bool, const unsigned int)>& slot);
 
   /**
    * Connect a function to mg::Signals::post_smoother_step.
    */
   boost::signals2::connection
-  connect_post_smoother_step(const std::function<void (const bool, const unsigned int)> &slot);
+  connect_post_smoother_step(
+    const std::function<void(const bool, const unsigned int)>& slot);
 
 private:
-
   /**
    * Signals for the various actions that the Multigrid algorithm uses.
     */
@@ -333,7 +349,8 @@ private:
    * but will then call itself recursively for <tt>level-1</tt>, unless we are
    * on #minlevel where the coarse grid solver solves the problem exactly.
    */
-  void level_v_step (const unsigned int level);
+  void
+  level_v_step(const unsigned int level);
 
   /**
    * The actual W-cycle or F-cycle multigrid method. <tt>level</tt> is the
@@ -342,7 +359,8 @@ private:
    * <tt>level-1</tt>, unless we are on #minlevel where the coarse grid solver
    * solves the problem exactly.
    */
-  void level_step (const unsigned int level, Cycle cycle);
+  void
+  level_step(const unsigned int level, Cycle cycle);
 
   /**
    * Cycle type performed by the method cycle().
@@ -382,38 +400,41 @@ private:
    */
   MGLevelObject<VectorType> defect2;
 
+  /**
+   * The matrix for each level.
+   */
+  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> matrix;
 
   /**
    * The matrix for each level.
    */
-  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > matrix;
-
-  /**
-   * The matrix for each level.
-   */
-  SmartPointer<const MGCoarseGridBase<VectorType>,Multigrid<VectorType> > coarse;
+  SmartPointer<const MGCoarseGridBase<VectorType>, Multigrid<VectorType>>
+    coarse;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const MGTransferBase<VectorType>,Multigrid<VectorType> > transfer;
+  SmartPointer<const MGTransferBase<VectorType>, Multigrid<VectorType>>
+    transfer;
 
   /**
    * The pre-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > pre_smooth;
+  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+    pre_smooth;
 
   /**
    * The post-smoothing object.
    */
-  SmartPointer<const MGSmootherBase<VectorType>,Multigrid<VectorType> > post_smooth;
+  SmartPointer<const MGSmootherBase<VectorType>, Multigrid<VectorType>>
+    post_smooth;
 
   /**
    * Edge matrix from the interior of the refined part to the refinement edge.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType> > edge_out;
+  SmartPointer<const MGMatrixBase<VectorType>> edge_out;
 
   /**
    * Transpose edge matrix from the refinement edge to the interior of the
@@ -421,30 +442,30 @@ private:
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType> > edge_in;
+  SmartPointer<const MGMatrixBase<VectorType>> edge_in;
 
   /**
    * Edge matrix from fine to coarse.
    *
    * @note Only <tt>vmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > edge_down;
+  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_down;
 
   /**
    * Transpose edge matrix from coarse to fine.
    *
    * @note Only <tt>Tvmult</tt> is used for these matrices.
    */
-  SmartPointer<const MGMatrixBase<VectorType>,Multigrid<VectorType> > edge_up;
+  SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
 
   /**
    * Level for debug output. Defaults to zero and can be set by set_debug().
    */
   unsigned int debug;
 
-  template <int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
+  template <int dim, class OtherVectorType, class TRANSFER>
+  friend class PreconditionMG;
 };
-
 
 /**
  * Multi-level preconditioner. Here, we collect all information needed for
@@ -470,22 +491,23 @@ public:
    * Constructor. Arguments are the multigrid object, pre-smoother, post-
    * smoother and coarse grid solver.
    */
-  PreconditionMG(const DoFHandler<dim> &dof_handler,
-                 Multigrid<VectorType> &mg,
-                 const TRANSFER        &transfer);
+  PreconditionMG(const DoFHandler<dim>& dof_handler,
+                 Multigrid<VectorType>& mg,
+                 const TRANSFER&        transfer);
 
   /**
    * Same as above in case every component of a block vector
    * uses its own DoFHandler.
    */
-  PreconditionMG(const std::vector<const DoFHandler<dim>*> &dof_handler,
-                 Multigrid<VectorType> &mg,
-                 const TRANSFER        &transfer);
+  PreconditionMG(const std::vector<const DoFHandler<dim>*>& dof_handler,
+                 Multigrid<VectorType>&                     mg,
+                 const TRANSFER&                            transfer);
 
   /**
    * Dummy function needed by other classes.
    */
-  bool empty () const;
+  bool
+  empty() const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
@@ -494,16 +516,16 @@ public:
    * This is the operator used by LAC iterative solvers.
    */
   template <class OtherVectorType>
-  void vmult (OtherVectorType       &dst,
-              const OtherVectorType &src) const;
+  void
+  vmult(OtherVectorType& dst, const OtherVectorType& src) const;
 
   /**
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
   template <class OtherVectorType>
-  void vmult_add (OtherVectorType       &dst,
-                  const OtherVectorType &src) const;
+  void
+  vmult_add(OtherVectorType& dst, const OtherVectorType& src) const;
 
   /**
    * Transposed preconditioning operator.
@@ -511,8 +533,8 @@ public:
    * Not implemented, but the definition may be needed.
    */
   template <class OtherVectorType>
-  void Tvmult (OtherVectorType       &dst,
-               const OtherVectorType &src) const;
+  void
+  Tvmult(OtherVectorType& dst, const OtherVectorType& src) const;
 
   /**
    * Transposed preconditioning operator.
@@ -520,8 +542,8 @@ public:
    * Not implemented, but the definition may be needed.
    */
   template <class OtherVectorType>
-  void Tvmult_add (OtherVectorType       &dst,
-                   const OtherVectorType &src) const;
+  void
+  Tvmult_add(OtherVectorType& dst, const OtherVectorType& src) const;
 
   /**
    * Return the partitioning of the range space of this preconditioner, i.e.,
@@ -529,7 +551,8 @@ public:
    * By default, the respective information for the first DoFHandler object
    * are returned.
    */
-  IndexSet locally_owned_range_indices(const unsigned int block=0) const;
+  IndexSet
+  locally_owned_range_indices(const unsigned int block = 0) const;
 
   /**
    * Return the partitioning of the domain space of this preconditioner, i.e.,
@@ -537,30 +560,34 @@ public:
    * By default, the respective information for the first DoFHandler object
    * are returned.
    */
-  IndexSet locally_owned_domain_indices(const unsigned int block=0) const;
+  IndexSet
+  locally_owned_domain_indices(const unsigned int block = 0) const;
 
   /**
    * Return the MPI communicator object in use with this preconditioner.
    */
-  MPI_Comm get_mpi_communicator() const;
+  MPI_Comm
+  get_mpi_communicator() const;
 
   /**
    * Connect a function to mg::Signals::transfer_to_mg.
    */
   boost::signals2::connection
-  connect_transfer_to_mg(const std::function<void (bool)> &slot);
+  connect_transfer_to_mg(const std::function<void(bool)>& slot);
 
   /**
    * Connect a function to mg::Signals::transfer_to_global.
    */
   boost::signals2::connection
-  connect_transfer_to_global(const std::function<void (bool)> &slot);
+  connect_transfer_to_global(const std::function<void(bool)>& slot);
 
 private:
   /**
    * Associated @p DoFHandler.
    */
-  std::vector<SmartPointer<const DoFHandler<dim>,PreconditionMG<dim,VectorType,TRANSFER> > > dof_handler_vector;
+  std::vector<SmartPointer<const DoFHandler<dim>,
+                           PreconditionMG<dim, VectorType, TRANSFER>>>
+    dof_handler_vector;
 
   /**
    * Storage for the pointers to the DoFHandler objects
@@ -571,12 +598,14 @@ private:
   /**
    * The multigrid object.
    */
-  SmartPointer<Multigrid<VectorType>,PreconditionMG<dim,VectorType,TRANSFER> > multigrid;
+  SmartPointer<Multigrid<VectorType>, PreconditionMG<dim, VectorType, TRANSFER>>
+    multigrid;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const TRANSFER,PreconditionMG<dim,VectorType,TRANSFER> > transfer;
+  SmartPointer<const TRANSFER, PreconditionMG<dim, VectorType, TRANSFER>>
+    transfer;
 
   /**
    * Flag to indicate if the object is initialized with a single DoFHandler
@@ -595,33 +624,31 @@ private:
 #ifndef DOXYGEN
 /* --------------------------- inline functions --------------------- */
 
-
 template <typename VectorType>
 template <int dim>
-Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_handler,
-                                  const MGMatrixBase<VectorType>     &matrix,
-                                  const MGCoarseGridBase<VectorType> &coarse,
-                                  const MGTransferBase<VectorType>   &transfer,
-                                  const MGSmootherBase<VectorType>   &pre_smooth,
-                                  const MGSmootherBase<VectorType>   &post_smooth,
-                                  const unsigned int                 min_level,
-                                  const unsigned int                 max_level,
-                                  Cycle                              cycle)
-  :
-  cycle_type(cycle),
-  minlevel(min_level),
-  matrix(&matrix, typeid(*this).name()),
-  coarse(&coarse, typeid(*this).name()),
-  transfer(&transfer, typeid(*this).name()),
-  pre_smooth(&pre_smooth, typeid(*this).name()),
-  post_smooth(&post_smooth, typeid(*this).name()),
-  edge_down(nullptr, typeid(*this).name()),
-  edge_up(nullptr, typeid(*this).name()),
-  debug(0)
+Multigrid<VectorType>::Multigrid(const DoFHandler<dim>&          mg_dof_handler,
+                                 const MGMatrixBase<VectorType>& matrix,
+                                 const MGCoarseGridBase<VectorType>& coarse,
+                                 const MGTransferBase<VectorType>&   transfer,
+                                 const MGSmootherBase<VectorType>&   pre_smooth,
+                                 const MGSmootherBase<VectorType>& post_smooth,
+                                 const unsigned int                min_level,
+                                 const unsigned int                max_level,
+                                 Cycle                             cycle)
+  : cycle_type(cycle),
+    minlevel(min_level),
+    matrix(&matrix, typeid(*this).name()),
+    coarse(&coarse, typeid(*this).name()),
+    transfer(&transfer, typeid(*this).name()),
+    pre_smooth(&pre_smooth, typeid(*this).name()),
+    post_smooth(&post_smooth, typeid(*this).name()),
+    edge_down(nullptr, typeid(*this).name()),
+    edge_up(nullptr, typeid(*this).name()),
+    debug(0)
 {
   const unsigned int dof_handler_max_level
-    = mg_dof_handler.get_triangulation().n_global_levels()-1;
-  if (max_level == numbers::invalid_unsigned_int)
+    = mg_dof_handler.get_triangulation().n_global_levels() - 1;
+  if(max_level == numbers::invalid_unsigned_int)
     maxlevel = dof_handler_max_level;
   else
     maxlevel = max_level;
@@ -629,228 +656,211 @@ Multigrid<VectorType>::Multigrid (const DoFHandler<dim>              &mg_dof_han
   reinit(minlevel, maxlevel);
 }
 
-
-
 template <typename VectorType>
-Multigrid<VectorType>::Multigrid (const MGMatrixBase<VectorType>        &matrix,
-                                  const MGCoarseGridBase<VectorType>    &coarse,
-                                  const MGTransferBase<VectorType>      &transfer,
-                                  const MGSmootherBase<VectorType>      &pre_smooth,
-                                  const MGSmootherBase<VectorType>      &post_smooth,
-                                  const unsigned int                    min_level,
-                                  const unsigned int                    max_level,
-                                  Cycle                                 cycle)
-  :
-  cycle_type(cycle),
-  matrix(&matrix, typeid(*this).name()),
-  coarse(&coarse, typeid(*this).name()),
-  transfer(&transfer, typeid(*this).name()),
-  pre_smooth(&pre_smooth, typeid(*this).name()),
-  post_smooth(&post_smooth, typeid(*this).name()),
-  edge_out(nullptr, typeid(*this).name()),
-  edge_in(nullptr, typeid(*this).name()),
-  edge_down(nullptr, typeid(*this).name()),
-  edge_up(nullptr, typeid(*this).name()),
-  debug(0)
+Multigrid<VectorType>::Multigrid(const MGMatrixBase<VectorType>&     matrix,
+                                 const MGCoarseGridBase<VectorType>& coarse,
+                                 const MGTransferBase<VectorType>&   transfer,
+                                 const MGSmootherBase<VectorType>&   pre_smooth,
+                                 const MGSmootherBase<VectorType>& post_smooth,
+                                 const unsigned int                min_level,
+                                 const unsigned int                max_level,
+                                 Cycle                             cycle)
+  : cycle_type(cycle),
+    matrix(&matrix, typeid(*this).name()),
+    coarse(&coarse, typeid(*this).name()),
+    transfer(&transfer, typeid(*this).name()),
+    pre_smooth(&pre_smooth, typeid(*this).name()),
+    post_smooth(&post_smooth, typeid(*this).name()),
+    edge_out(nullptr, typeid(*this).name()),
+    edge_in(nullptr, typeid(*this).name()),
+    edge_down(nullptr, typeid(*this).name()),
+    edge_up(nullptr, typeid(*this).name()),
+    debug(0)
 {
-  if (max_level == numbers::invalid_unsigned_int)
+  if(max_level == numbers::invalid_unsigned_int)
     maxlevel = matrix.get_maxlevel();
   else
     maxlevel = max_level;
   reinit(min_level, maxlevel);
 }
 
-
-
 template <typename VectorType>
-inline
-unsigned int
-Multigrid<VectorType>::get_maxlevel () const
+inline unsigned int
+Multigrid<VectorType>::get_maxlevel() const
 {
   return maxlevel;
 }
 
-
-
 template <typename VectorType>
-inline
-unsigned int
-Multigrid<VectorType>::get_minlevel () const
+inline unsigned int
+Multigrid<VectorType>::get_minlevel() const
 {
   return minlevel;
 }
 
-
 /* --------------------------- inline functions --------------------- */
-
 
 namespace internal
 {
   namespace PreconditionMGImplementation
   {
-    template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
+    template <int dim,
+              typename VectorType,
+              class TRANSFER,
+              typename OtherVectorType>
     typename std::enable_if<TRANSFER::supports_dof_handler_vector>::type
-    vmult(const std::vector<const dealii::DoFHandler<dim>*> &dof_handler_vector,
-          dealii::Multigrid<VectorType>  &multigrid,
-          const TRANSFER &transfer,
-          OtherVectorType       &dst,
-          const OtherVectorType &src,
-          const bool uses_dof_handler_vector,
-          const typename dealii::mg::Signals &signals, int)
+    vmult(const std::vector<const dealii::DoFHandler<dim>*>& dof_handler_vector,
+          dealii::Multigrid<VectorType>&                     multigrid,
+          const TRANSFER&                                    transfer,
+          OtherVectorType&                                   dst,
+          const OtherVectorType&                             src,
+          const bool                          uses_dof_handler_vector,
+          const typename dealii::mg::Signals& signals,
+          int)
     {
       signals.transfer_to_mg(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_to_mg(dof_handler_vector,
-                            multigrid.defect,
-                            src);
+      if(uses_dof_handler_vector)
+        transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
       else
-        transfer.copy_to_mg(*dof_handler_vector[0],
-                            multigrid.defect,
-                            src);
+        transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
       signals.transfer_to_mg(false);
 
       multigrid.cycle();
 
       signals.transfer_to_global(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_from_mg(dof_handler_vector,
-                              dst,
-                              multigrid.solution);
+      if(uses_dof_handler_vector)
+        transfer.copy_from_mg(dof_handler_vector, dst, multigrid.solution);
       else
-        transfer.copy_from_mg(*dof_handler_vector[0],
-                              dst,
-                              multigrid.solution);
+        transfer.copy_from_mg(*dof_handler_vector[0], dst, multigrid.solution);
       signals.transfer_to_global(false);
     }
 
-    template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
+    template <int dim,
+              typename VectorType,
+              class TRANSFER,
+              typename OtherVectorType>
     void
-    vmult(const std::vector<const dealii::DoFHandler<dim>*> &dof_handler_vector,
-          dealii::Multigrid<VectorType>  &multigrid,
-          const TRANSFER &transfer,
-          OtherVectorType       &dst,
-          const OtherVectorType &src,
-          const bool uses_dof_handler_vector,
-          const typename dealii::mg::Signals &signals, ...)
+    vmult(const std::vector<const dealii::DoFHandler<dim>*>& dof_handler_vector,
+          dealii::Multigrid<VectorType>&                     multigrid,
+          const TRANSFER&                                    transfer,
+          OtherVectorType&                                   dst,
+          const OtherVectorType&                             src,
+          const bool                          uses_dof_handler_vector,
+          const typename dealii::mg::Signals& signals,
+          ...)
     {
       (void) uses_dof_handler_vector;
-      Assert (!uses_dof_handler_vector, ExcInternalError());
+      Assert(!uses_dof_handler_vector, ExcInternalError());
 
       signals.transfer_to_mg(true);
-      transfer.copy_to_mg(*dof_handler_vector[0],
-                          multigrid.defect,
-                          src);
+      transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
       signals.transfer_to_mg(false);
 
       multigrid.cycle();
 
       signals.transfer_to_global(true);
-      transfer.copy_from_mg(*dof_handler_vector[0],
-                            dst,
-                            multigrid.solution);
+      transfer.copy_from_mg(*dof_handler_vector[0], dst, multigrid.solution);
       signals.transfer_to_global(false);
     }
 
-    template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
+    template <int dim,
+              typename VectorType,
+              class TRANSFER,
+              typename OtherVectorType>
     typename std::enable_if<TRANSFER::supports_dof_handler_vector>::type
-    vmult_add(const std::vector<const dealii::DoFHandler<dim>*> &dof_handler_vector,
-              dealii::Multigrid<VectorType>  &multigrid,
-              const TRANSFER &transfer,
-              OtherVectorType       &dst,
-              const OtherVectorType &src,
-              const bool uses_dof_handler_vector,
-              const typename dealii::mg::Signals &signals, int)
+    vmult_add(
+      const std::vector<const dealii::DoFHandler<dim>*>& dof_handler_vector,
+      dealii::Multigrid<VectorType>&                     multigrid,
+      const TRANSFER&                                    transfer,
+      OtherVectorType&                                   dst,
+      const OtherVectorType&                             src,
+      const bool                          uses_dof_handler_vector,
+      const typename dealii::mg::Signals& signals,
+      int)
     {
       signals.transfer_to_mg(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_to_mg(dof_handler_vector,
-                            multigrid.defect,
-                            src);
+      if(uses_dof_handler_vector)
+        transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
       else
-        transfer.copy_to_mg(*dof_handler_vector[0],
-                            multigrid.defect,
-                            src);
+        transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
       signals.transfer_to_mg(false);
 
       multigrid.cycle();
 
       signals.transfer_to_global(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_from_mg_add(dof_handler_vector,
-                                  dst,
-                                  multigrid.solution);
+      if(uses_dof_handler_vector)
+        transfer.copy_from_mg_add(dof_handler_vector, dst, multigrid.solution);
       else
-        transfer.copy_from_mg_add(*dof_handler_vector[0],
-                                  dst,
-                                  multigrid.solution);
+        transfer.copy_from_mg_add(
+          *dof_handler_vector[0], dst, multigrid.solution);
       signals.transfer_to_global(false);
     }
 
-    template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
+    template <int dim,
+              typename VectorType,
+              class TRANSFER,
+              typename OtherVectorType>
     void
-    vmult_add(const std::vector<const dealii::DoFHandler<dim>*> &dof_handler_vector,
-              dealii::Multigrid<VectorType>  &multigrid,
-              const TRANSFER &transfer,
-              OtherVectorType       &dst,
-              const OtherVectorType &src,
-              const bool uses_dof_handler_vector,
-              const typename dealii::mg::Signals &signals, ...)
+    vmult_add(
+      const std::vector<const dealii::DoFHandler<dim>*>& dof_handler_vector,
+      dealii::Multigrid<VectorType>&                     multigrid,
+      const TRANSFER&                                    transfer,
+      OtherVectorType&                                   dst,
+      const OtherVectorType&                             src,
+      const bool                          uses_dof_handler_vector,
+      const typename dealii::mg::Signals& signals,
+      ...)
     {
       (void) uses_dof_handler_vector;
-      Assert (!uses_dof_handler_vector, ExcInternalError());
+      Assert(!uses_dof_handler_vector, ExcInternalError());
 
       signals.transfer_to_mg(true);
-      transfer.copy_to_mg(*dof_handler_vector[0],
-                          multigrid.defect,
-                          src);
+      transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
       signals.transfer_to_mg(false);
 
       multigrid.cycle();
 
       signals.transfer_to_global(true);
-      transfer.copy_from_mg_add(*dof_handler_vector[0],
-                                dst,
-                                multigrid.solution);
+      transfer.copy_from_mg_add(
+        *dof_handler_vector[0], dst, multigrid.solution);
       signals.transfer_to_global(false);
     }
-  }
-}
+  } // namespace PreconditionMGImplementation
+} // namespace internal
 
 template <int dim, typename VectorType, class TRANSFER>
-PreconditionMG<dim, VectorType, TRANSFER>
-::PreconditionMG(const DoFHandler<dim>  &dof_handler,
-                 Multigrid<VectorType>  &mg,
-                 const TRANSFER         &transfer)
-  :
-  dof_handler_vector(1,&dof_handler),
-  dof_handler_vector_raw(1,&dof_handler),
-  multigrid(&mg),
-  transfer(&transfer),
-  uses_dof_handler_vector(false)
+PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
+  const DoFHandler<dim>& dof_handler,
+  Multigrid<VectorType>& mg,
+  const TRANSFER&        transfer)
+  : dof_handler_vector(1, &dof_handler),
+    dof_handler_vector_raw(1, &dof_handler),
+    multigrid(&mg),
+    transfer(&transfer),
+    uses_dof_handler_vector(false)
 {}
 
 template <int dim, typename VectorType, class TRANSFER>
-PreconditionMG<dim, VectorType, TRANSFER>
-::PreconditionMG(const std::vector<const DoFHandler<dim>*>  &dof_handler,
-                 Multigrid<VectorType>  &mg,
-                 const TRANSFER         &transfer)
-  :
-  dof_handler_vector(dof_handler.size()),
-  dof_handler_vector_raw(dof_handler.size()),
-  multigrid(&mg),
-  transfer(&transfer),
-  uses_dof_handler_vector(true)
+PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
+  const std::vector<const DoFHandler<dim>*>& dof_handler,
+  Multigrid<VectorType>&                     mg,
+  const TRANSFER&                            transfer)
+  : dof_handler_vector(dof_handler.size()),
+    dof_handler_vector_raw(dof_handler.size()),
+    multigrid(&mg),
+    transfer(&transfer),
+    uses_dof_handler_vector(true)
 {
-  for (unsigned int i = 0; i< dof_handler.size() ; ++i)
+  for(unsigned int i = 0; i < dof_handler.size(); ++i)
     {
-      dof_handler_vector[i] = dof_handler[i];
+      dof_handler_vector[i]     = dof_handler[i];
       dof_handler_vector_raw[i] = dof_handler[i];
     }
 }
 
 template <int dim, typename VectorType, class TRANSFER>
 inline bool
-PreconditionMG<dim, VectorType, TRANSFER>::empty () const
+PreconditionMG<dim, VectorType, TRANSFER>::empty() const
 {
   return false;
 }
@@ -858,34 +868,37 @@ PreconditionMG<dim, VectorType, TRANSFER>::empty () const
 template <int dim, typename VectorType, class TRANSFER>
 template <class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult
-(OtherVectorType       &dst,
- const OtherVectorType &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult(
+  OtherVectorType&       dst,
+  const OtherVectorType& src) const
 {
-  internal::PreconditionMGImplementation::vmult(dof_handler_vector_raw,*multigrid,*transfer,
-                                                dst,src,uses_dof_handler_vector,
-                                                this->signals, 0);
+  internal::PreconditionMGImplementation::vmult(dof_handler_vector_raw,
+                                                *multigrid,
+                                                *transfer,
+                                                dst,
+                                                src,
+                                                uses_dof_handler_vector,
+                                                this->signals,
+                                                0);
 }
-
 
 template <int dim, typename VectorType, class TRANSFER>
 IndexSet
-PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices(const unsigned int block) const
+PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices(
+  const unsigned int block) const
 {
-  AssertIndexRange(block,dof_handler_vector.size());
+  AssertIndexRange(block, dof_handler_vector.size());
   return dof_handler_vector[block]->locally_owned_dofs();
 }
-
 
 template <int dim, typename VectorType, class TRANSFER>
 IndexSet
-PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(const unsigned int block) const
+PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
+  const unsigned int block) const
 {
-  AssertIndexRange(block,dof_handler_vector.size());
+  AssertIndexRange(block, dof_handler_vector.size());
   return dof_handler_vector[block]->locally_owned_dofs();
 }
-
-
 
 template <int dim, typename VectorType, class TRANSFER>
 MPI_Comm
@@ -893,65 +906,61 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
   // currently parallel GMG works with distributed Triangulation only,
   // so it should be a safe bet to use it to query MPI communicator:
-  const Triangulation<dim> &tria = dof_handler_vector[0]->get_triangulation();
-  const parallel::distributed::Triangulation<dim> *ptria = dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
-  Assert (ptria != nullptr, ExcInternalError());
-  return ptria->get_communicator ();
+  const Triangulation<dim>& tria = dof_handler_vector[0]->get_triangulation();
+  const parallel::distributed::Triangulation<dim>* ptria
+    = dynamic_cast<const parallel::distributed::Triangulation<dim>*>(&tria);
+  Assert(ptria != nullptr, ExcInternalError());
+  return ptria->get_communicator();
 }
-
-
 
 template <int dim, typename VectorType, class TRANSFER>
 boost::signals2::connection
-PreconditionMG<dim, VectorType, TRANSFER>::
-connect_transfer_to_mg(const std::function<void (bool)> &slot)
+PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_mg(
+  const std::function<void(bool)>& slot)
 {
   return this->signals.transfer_to_mg.connect(slot);
 }
 
-
-
 template <int dim, typename VectorType, class TRANSFER>
 boost::signals2::connection
-PreconditionMG<dim, VectorType, TRANSFER>::
-connect_transfer_to_global(
-  const std::function<void (bool)> &slot)
+PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_global(
+  const std::function<void(bool)>& slot)
 {
   return this->signals.transfer_to_global.connect(slot);
 }
 
-
-
 template <int dim, typename VectorType, class TRANSFER>
 template <class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
-(OtherVectorType       &dst,
- const OtherVectorType &src) const
+PreconditionMG<dim, VectorType, TRANSFER>::vmult_add(
+  OtherVectorType&       dst,
+  const OtherVectorType& src) const
 {
-  internal::PreconditionMGImplementation::vmult_add(dof_handler_vector_raw,*multigrid,*transfer,
-                                                    dst,src,uses_dof_handler_vector,
-                                                    this->signals, 0);
+  internal::PreconditionMGImplementation::vmult_add(dof_handler_vector_raw,
+                                                    *multigrid,
+                                                    *transfer,
+                                                    dst,
+                                                    src,
+                                                    uses_dof_handler_vector,
+                                                    this->signals,
+                                                    0);
 }
 
-
 template <int dim, typename VectorType, class TRANSFER>
 template <class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
-(OtherVectorType &,
- const OtherVectorType &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult(OtherVectorType&,
+                                                  const OtherVectorType&) const
 {
   Assert(false, ExcNotImplemented());
 }
 
-
 template <int dim, typename VectorType, class TRANSFER>
 template <class OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add
-(OtherVectorType &,
- const OtherVectorType &) const
+PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
+  OtherVectorType&,
+  const OtherVectorType&) const
 {
   Assert(false, ExcNotImplemented());
 }

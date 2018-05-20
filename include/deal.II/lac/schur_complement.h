@@ -18,10 +18,9 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
-
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -222,28 +221,29 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Range_2, typename Domain_2,
+template <typename Range_1,
+          typename Domain_1,
+          typename Range_2,
+          typename Domain_2,
           typename Payload>
 LinearOperator<Range_2, Domain_2, Payload>
-schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
-                 const LinearOperator<Range_1, Domain_2, Payload> &B,
-                 const LinearOperator<Range_2, Domain_1, Payload> &C,
-                 const LinearOperator<Range_2, Domain_2, Payload> &D)
+schur_complement(const LinearOperator<Domain_1, Range_1, Payload>& A_inv,
+                 const LinearOperator<Range_1, Domain_2, Payload>& B,
+                 const LinearOperator<Range_2, Domain_1, Payload>& C,
+                 const LinearOperator<Range_2, Domain_2, Payload>& D)
 {
   // We return the result of the compound LinearOperator
   // directly, so as to ensure that the underlying Payload
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  if (D.is_null_operator == false)
-    return D - C*A_inv*B;
+  if(D.is_null_operator == false)
+    return D - C * A_inv * B;
   else
-    return -1.0*C*A_inv*B;
+    return -1.0 * C * A_inv * B;
 }
 
 //@}
-
 
 /**
  * @name Creation of PackagedOperation objects related to the Schur Complement
@@ -272,20 +272,22 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Range_2, typename Payload>
+template <typename Range_1,
+          typename Domain_1,
+          typename Range_2,
+          typename Payload>
 PackagedOperation<Range_2>
-condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
-                    const LinearOperator<Range_2, Domain_1, Payload> &C,
-                    const Range_1                                    &f,
-                    const Range_2                                    &g)
+condense_schur_rhs(const LinearOperator<Range_1, Domain_1, Payload>& A_inv,
+                   const LinearOperator<Range_2, Domain_1, Payload>& C,
+                   const Range_1&                                    f,
+                   const Range_2&                                    g)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  return g - C*A_inv*f;
+  return g - C * A_inv * f;
 }
 
 /**
@@ -309,20 +311,23 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
  *
  * @ingroup LAOperators
  */
-template <typename Range_1, typename Domain_1,
-          typename Domain_2, typename Payload>
+template <typename Range_1,
+          typename Domain_1,
+          typename Domain_2,
+          typename Payload>
 PackagedOperation<Domain_1>
-postprocess_schur_solution (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
-                            const LinearOperator<Range_1, Domain_2, Payload> &B,
-                            const Domain_2                                   &y,
-                            const Range_1                                    &f)
+postprocess_schur_solution(
+  const LinearOperator<Range_1, Domain_1, Payload>& A_inv,
+  const LinearOperator<Range_1, Domain_2, Payload>& B,
+  const Domain_2&                                   y,
+  const Range_1&                                    f)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload
   // definition aligns with the operations expressed here.
   // All of the memory allocations etc. are taken care of
   // internally.
-  return A_inv*(f - B*y);
+  return A_inv * (f - B * y);
 }
 
 //@}

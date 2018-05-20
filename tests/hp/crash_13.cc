@@ -13,26 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // this is reduced from hp_constraints_q_system_x_01, where we test that we
 // can deal with FESystem(FE_Q(p),FE_DGQ(q)) for different p,q. note that for
 // fixed p but varying q, neither of the two elements will dominate the other
 
 char logname[] = "output";
 
-
 #include "hp_constraints_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe;
-  fe.push_back (FESystem<dim>(FE_Q<dim>(1), 1,
-                              FE_DGQ<dim>(0), 1));
-  fe.push_back (FESystem<dim>(FE_Q<dim>(1), 1,
-                              FE_DGQ<dim>(1), 1));
+  fe.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_DGQ<dim>(0), 1));
+  fe.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_DGQ<dim>(1), 1));
 
-  test_no_hanging_nodes (fe);
+  test_no_hanging_nodes(fe);
 }

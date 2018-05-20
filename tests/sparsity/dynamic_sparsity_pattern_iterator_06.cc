@@ -13,48 +13,45 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // investigate performance for DynamicSparsityPattern::begin(r) if the
 // SP is empty
 
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-
-void test (bool have_set)
+void
+test(bool have_set)
 {
-  const int size = 100000000;
-  const int my_start = size/3;
+  const int size     = 100000000;
+  const int my_start = size / 3;
 
   IndexSet empty_set;
   IndexSet owned(size);
-  owned.add_range(my_start, my_start+5);
+  owned.add_range(my_start, my_start + 5);
 
-  DynamicSparsityPattern sp (size, 5, have_set?owned:empty_set);
+  DynamicSparsityPattern sp(size, 5, have_set ? owned : empty_set);
 
-  for (unsigned int i=my_start; i<my_start+5; ++i)
-    for (DynamicSparsityPattern::iterator p=sp.begin(i);
-         p != sp.end(i); ++p)
+  for(unsigned int i = my_start; i < my_start + 5; ++i)
+    for(DynamicSparsityPattern::iterator p = sp.begin(i); p != sp.end(i); ++p)
       deallog << p->row() << ' ' << p->column() << std::endl;
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test (false);
-      test (true);
+      test(false);
+      test(true);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -65,9 +62,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

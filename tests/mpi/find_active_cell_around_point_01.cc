@@ -13,31 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // make sure only one processor finds a locally-owned cell around a point
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
-
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (true)
+  if(true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -48,43 +44,36 @@ void test()
       // choose a point that is guaranteed to lie in the domain but not
       // at the interface between cells
       Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = 1./3;
+      for(unsigned int d = 0; d < dim; ++d)
+        p[d] = 1. / 3;
 
       typename parallel::distributed::Triangulation<dim>::active_cell_iterator
-      cell = GridTools::find_active_cell_around_point (tr, p);
+        cell
+        = GridTools::find_active_cell_around_point(tr, p);
 
-      const unsigned int
-      n_locally_owned
-        = Utilities::MPI::sum (cell->is_locally_owned() ? 1 : 0,
-                               MPI_COMM_WORLD);
+      const unsigned int n_locally_owned
+        = Utilities::MPI::sum(cell->is_locally_owned() ? 1 : 0, MPI_COMM_WORLD);
 
-      const unsigned int
-      n_locally_owned_or_ghost
-        = Utilities::MPI::sum (!cell->is_artificial() ? 1 : 0,
-                               MPI_COMM_WORLD);
+      const unsigned int n_locally_owned_or_ghost
+        = Utilities::MPI::sum(!cell->is_artificial() ? 1 : 0, MPI_COMM_WORLD);
 
-      if (myid == 0)
-        deallog << "Locally owned: "
-                << n_locally_owned
-                << std::endl
-                << "Locally owned or ghost: "
-                << n_locally_owned_or_ghost
+      if(myid == 0)
+        deallog << "Locally owned: " << n_locally_owned << std::endl
+                << "Locally owned or ghost: " << n_locally_owned_or_ghost
                 << std::endl;
     }
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
 

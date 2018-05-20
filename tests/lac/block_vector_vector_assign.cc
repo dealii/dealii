@@ -13,30 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check assignment between block vectors and regular vectors
 
 #include "../tests.h"
-#include <deal.II/lac/block_vector.h>
-#include <vector>
 #include <algorithm>
+#include <deal.II/lac/block_vector.h>
 #include <numeric>
 #include <utility>
+#include <vector>
 
 template <typename Vector1, typename Vector2>
-bool operator == (const Vector1 &v1,
-                  const Vector2 &v2)
+bool
+operator==(const Vector1& v1, const Vector2& v2)
 {
-  if (v1.size() != v2.size())
+  if(v1.size() != v2.size())
     return false;
-  for (unsigned int i=0; i<v1.size(); ++i)
-    if (v1(i) != v2(i))
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    if(v1(i) != v2(i))
       return false;
   return true;
 }
 
-
-void test ()
+void
+test()
 {
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
@@ -45,27 +44,24 @@ void test ()
   ivector[3] = 5;
 
   BlockVector<double> v1(ivector);
-  Vector<double> v2(v1.size());
+  Vector<double>      v2(v1.size());
 
-  for (unsigned int i=0; i<v1.size(); ++i)
-    v1(i) = 1+i*i;
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    v1(i) = 1 + i * i;
 
   v2 = v1;
-  AssertThrow (v1==v2, ExcInternalError());
+  AssertThrow(v1 == v2, ExcInternalError());
 
-  BlockVector<double> v3 (ivector);
+  BlockVector<double> v3(ivector);
   v3 = v2;
-  AssertThrow (v3==v2, ExcInternalError());
-  AssertThrow (v3==v1, ExcInternalError());
+  AssertThrow(v3 == v2, ExcInternalError());
+  AssertThrow(v3 == v1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
@@ -74,11 +70,12 @@ int main ()
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &e)
+  catch(std::exception& e)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << e.what() << std::endl
@@ -88,9 +85,10 @@ int main ()
       // abort
       return 2;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl
@@ -101,7 +99,5 @@ int main ()
       return 3;
     };
 
-
   return 0;
 }
-

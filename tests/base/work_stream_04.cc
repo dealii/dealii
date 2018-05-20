@@ -13,56 +13,53 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test WorkStream with empty functions
 
 #include "../tests.h"
 
 #include <deal.II/base/work_stream.h>
 
-
 struct ScratchData
 {};
 
+void
+foo(const std::vector<unsigned int>::iterator, ScratchData&, unsigned int&)
+{}
 
-void foo (const std::vector<unsigned int>::iterator,
-          ScratchData &,
-          unsigned int &)
-{
-}
+void
+bar(const unsigned int&)
+{}
 
-void bar (const unsigned int &)
-{
-}
-
-void test ()
+void
+test()
 {
   std::vector<unsigned int> v;
-  for (unsigned int i=0; i<20; ++i)
-    v.push_back (i);
+  for(unsigned int i = 0; i < 20; ++i)
+    v.push_back(i);
 
   // first run with only a worker
-  WorkStream::run (v.begin(), v.end(),
-                   &foo,
-                   std::function<void(const unsigned int &)>(),
-                   ScratchData(),
-                   0U);
+  WorkStream::run(v.begin(),
+                  v.end(),
+                  &foo,
+                  std::function<void(const unsigned int&)>(),
+                  ScratchData(),
+                  0U);
 
   // next run with only a copier
-  WorkStream::run (v.begin(), v.end(),
-                   std::function<void(const std::vector<unsigned int>::iterator,
-                                      ScratchData &,unsigned int &)>(),
-                   &bar,
-                   ScratchData(),
-                   0U);
+  WorkStream::run(v.begin(),
+                  v.end(),
+                  std::function<void(const std::vector<unsigned int>::iterator,
+                                     ScratchData&,
+                                     unsigned int&)>(),
+                  &bar,
+                  ScratchData(),
+                  0U);
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

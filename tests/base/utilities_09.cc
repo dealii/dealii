@@ -13,44 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Utilities::split_string_list with an empty string
 
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
 
-
-void test ()
+void
+test()
 {
   // test an empty string -- should yield a list of zero elements with
   // any delimiter
   {
-    const char *p = "";
-    deallog << Utilities::split_string_list (p).size()
-            << std::endl;
-    deallog << Utilities::split_string_list (p, ' ').size()
-            << std::endl;
+    const char* p = "";
+    deallog << Utilities::split_string_list(p).size() << std::endl;
+    deallog << Utilities::split_string_list(p, ' ').size() << std::endl;
   }
 
   // also test a string that consists only of whitespace. this should
   // yield a list of zero elements even if (maybe not very usefully)
   // the delimiter is chosen as a whitespace itself
   {
-    const char *p = "  ";
-    deallog << Utilities::split_string_list (p).size()
-            << std::endl;
-    deallog << Utilities::split_string_list (p, ' ').size()
-            << std::endl;
+    const char* p = "  ";
+    deallog << Utilities::split_string_list(p).size() << std::endl;
+    deallog << Utilities::split_string_list(p, ' ').size() << std::endl;
   }
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

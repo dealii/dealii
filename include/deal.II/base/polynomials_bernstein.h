@@ -16,11 +16,9 @@
 #ifndef dealii_polynomials_bernstein_h
 #define dealii_polynomials_bernstein_h
 
-
 #include <deal.II/base/polynomial.h>
 #include <fstream>
 #include <iostream>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -58,19 +56,15 @@ public:
    * @param index
    * @param degree
    */
-  PolynomialsBernstein (
-    const unsigned int index,
-    const unsigned int degree);
+  PolynomialsBernstein(const unsigned int index, const unsigned int degree);
 };
 
-
 template <typename number>
-std::vector<Polynomials::Polynomial<number> >
-generate_complete_bernstein_basis (
-  const unsigned int degree)
+std::vector<Polynomials::Polynomial<number>>
+generate_complete_bernstein_basis(const unsigned int degree)
 {
-  std::vector<Polynomials::Polynomial<number> > v;
-  for (unsigned int i = 0; i < degree + 1; ++i)
+  std::vector<Polynomials::Polynomial<number>> v;
+  for(unsigned int i = 0; i < degree + 1; ++i)
     v.push_back(PolynomialsBernstein<number>(i, degree));
   return v;
 }

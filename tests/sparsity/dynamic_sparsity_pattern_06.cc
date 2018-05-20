@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check DynamicSparsityPattern::print_gnuplot. since we create quite some
 // output here, choose smaller number of rows and entries than in the other
 // tests
@@ -22,28 +20,27 @@
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-
 std::ofstream logfile("output");
 
-void test ()
+void
+test()
 {
-  const unsigned int N = 100;
-  DynamicSparsityPattern csp (N,N);
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<10; ++j)
-      csp.add (i, (i+(i+1)*(j*j+i))%N);
-  csp.symmetrize ();
+  const unsigned int     N = 100;
+  DynamicSparsityPattern csp(N, N);
+  for(unsigned int i = 0; i < N; ++i)
+    for(unsigned int j = 0; j < 10; ++j)
+      csp.add(i, (i + (i + 1) * (j * j + i)) % N);
+  csp.symmetrize();
 
-  csp.print_gnuplot (logfile);
+  csp.print_gnuplot(logfile);
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   deallog.attach(logfile);
 
-  test ();
+  test();
   return 0;
 }

@@ -13,24 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // like the _02 test, but project to the faces of a distorted cell
-
-
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim=" << dim << std::endl;
 
@@ -38,8 +33,8 @@ void test ()
 
   GridGenerator::hyper_cube(tria, 0, 1);
 
-  const typename Triangulation<dim>::active_cell_iterator
-  cell=tria.begin_active();
+  const typename Triangulation<dim>::active_cell_iterator cell
+    = tria.begin_active();
 
   // distort the cell a bit. all
   // faces but face 0 stay planar;
@@ -49,29 +44,28 @@ void test ()
   cell->vertex(2)[0] += 0.25;
   cell->vertex(4)[0] += 0.25;
 
-
-  for (unsigned int point=0; point<9; ++point)
+  for(unsigned int point = 0; point < 9; ++point)
     {
       // choose the 8 vertices of the
       // original unit cell as well
       // as the center point
-      const Point<dim> trial_point = (point < 8
-                                      ?
-                                      GeometryInfo<dim>::unit_cell_vertex(point)
-                                      :
-                                      Point<dim>(.5,.5,.5));
+      const Point<dim> trial_point
+        = (point < 8 ? GeometryInfo<dim>::unit_cell_vertex(point) :
+                       Point<dim>(.5, .5, .5));
 
       deallog << "Trial point = " << trial_point << std::endl;
 
-      for (unsigned int e=0; e<GeometryInfo<dim>::quads_per_cell; ++e)
+      for(unsigned int e = 0; e < GeometryInfo<dim>::quads_per_cell; ++e)
         {
-          const typename Triangulation<dim>::quad_iterator
-          quad = (dim > 2 ? cell->quad(e) :
-                  *reinterpret_cast<const typename Triangulation<dim>::quad_iterator *>(&cell));
+          const typename Triangulation<dim>::quad_iterator quad
+            = (dim > 2 ?
+                 cell->quad(e) :
+                 *reinterpret_cast<
+                   const typename Triangulation<dim>::quad_iterator*>(&cell));
 
           deallog << "    Quad " << e << ", projected point=";
 
-          const Point<dim> p = GridTools::project_to_object (quad, trial_point);
+          const Point<dim> p = GridTools::project_to_object(quad, trial_point);
           deallog << p;
           deallog << "  (quad is from ";
           deallog << quad->vertex(0);
@@ -87,22 +81,20 @@ void test ()
           // indeed closer to
           // trial_point than any of
           // the vertices of the quad
-          for (unsigned int v=0; v<4; ++v)
-            AssertThrow (p.distance (trial_point) <=
-                         quad->vertex(v).distance (trial_point),
-                         ExcInternalError());
+          for(unsigned int v = 0; v < 4; ++v)
+            AssertThrow(p.distance(trial_point)
+                          <= quad->vertex(v).distance(trial_point),
+                        ExcInternalError());
         }
       deallog << std::endl;
     }
 }
 
-
-
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (3);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(3);
   deallog << std::fixed;
   deallog.attach(logfile);
 

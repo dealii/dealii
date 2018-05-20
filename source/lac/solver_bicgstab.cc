@@ -13,22 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/lac/solver_bicgstab.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-internal::SolverBicgstabData::SolverBicgstabData ()
-  :
-  alpha(0.),
-  beta(0.),
-  omega(0.),
-  rho(0.),
-  rhobar(0.),
-  step(numbers::invalid_unsigned_int),
-  res(numbers::signaling_nan<double>())
+internal::SolverBicgstabData::SolverBicgstabData()
+  : alpha(0.),
+    beta(0.),
+    omega(0.),
+    rho(0.),
+    rhobar(0.),
+    step(numbers::invalid_unsigned_int),
+    res(numbers::signaling_nan<double>())
 {}
-
 
 DEAL_II_NAMESPACE_CLOSE

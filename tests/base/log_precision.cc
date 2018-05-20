@@ -13,13 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test that we can set the precision of LogStream objects
 
 #include "../tests.h"
 #include <limits>
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -37,4 +37,3 @@ int main ()
 
   return 0;
 }
-

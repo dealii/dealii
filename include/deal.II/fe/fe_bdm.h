@@ -17,11 +17,11 @@
 #define dealii_fe_bdm_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/polynomials_bdm.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_poly_tensor.h>
 
@@ -55,32 +55,30 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup fe
  */
 template <int dim>
-class FE_BDM
-  :
-  public FE_PolyTensor<PolynomialsBDM<dim>, dim>
+class FE_BDM : public FE_PolyTensor<PolynomialsBDM<dim>, dim>
 {
 public:
   /**
    * Constructor for the BDM element of degree @p p.
    */
-  FE_BDM (const unsigned int p);
+  FE_BDM(const unsigned int p);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_BDM<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,dim> >
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
   clone() const override;
 
   // documentation inherited from the base class
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>>& support_point_values,
+    std::vector<double>&               nodal_values) const override;
 
 private:
   /**
@@ -90,14 +88,14 @@ private:
    * FiniteElementData.
    */
   static std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree);
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Compute the vector used for the @p restriction_is_additive field passed
    * to the base class's constructor.
    */
   static std::vector<bool>
-  get_ria_vector (const unsigned int degree);
+  get_ria_vector(const unsigned int degree);
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
@@ -105,19 +103,20 @@ private:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  void initialize_support_points (const unsigned int bdm_degree);
+  void
+  initialize_support_points(const unsigned int bdm_degree);
   /**
    * The values in the face support points of the polynomials needed as test
    * functions. The outer vector is indexed by quadrature points, the inner by
    * the test function. The test function space is PolynomialsP<dim-1>.
    */
-  std::vector<std::vector<double> > test_values_face;
+  std::vector<std::vector<double>> test_values_face;
   /**
    * The values in the interior support points of the polynomials needed as
    * test functions. The outer vector is indexed by quadrature points, the
    * inner by the test function. The test function space is PolynomialsP<dim>.
    */
-  std::vector<std::vector<double> > test_values_cell;
+  std::vector<std::vector<double>> test_values_cell;
 };
 
 DEAL_II_NAMESPACE_CLOSE

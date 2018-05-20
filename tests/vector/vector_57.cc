@@ -13,54 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector::is_non_zero
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<double> &v)
+void
+test(Vector<double>& v)
 {
   // set only certain elements of the
   // vector. they are all positive
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) += i;
       pattern[i] = true;
     }
 
-  v.compress ();
+  v.compress();
 
   // check that the vector is really
   // non-negative
-  AssertThrow (v.is_non_negative() == true, ExcInternalError());
+  AssertThrow(v.is_non_negative() == true, ExcInternalError());
 
   // then set a single element to a negative
   // value and check again
-  v(v.size()/2) = -1;
-  AssertThrow (v.is_non_negative() == false, ExcInternalError());
+  v(v.size() / 2) = -1;
+  AssertThrow(v.is_non_negative() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -71,9 +69,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_occ_manifold_lib_h
 #define dealii_occ_manifold_lib_h
 
@@ -21,15 +20,15 @@
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
-#include <deal.II/opencascade/utilities.h>
-#include <deal.II/grid/manifold.h>
+#  include <deal.II/grid/manifold.h>
+#  include <deal.II/opencascade/utilities.h>
 
 // opencascade needs "HAVE_CONFIG_H" to be exported...
-#define HAVE_CONFIG_H
-#include <Adaptor3d_Curve.hxx>
-#include <Adaptor3d_HCurve.hxx>
-#include <BRepAdaptor_Curve.hxx>
-#undef HAVE_CONFIG_H
+#  define HAVE_CONFIG_H
+#  include <Adaptor3d_Curve.hxx>
+#  include <Adaptor3d_HCurve.hxx>
+#  include <BRepAdaptor_Curve.hxx>
+#  undef HAVE_CONFIG_H
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -62,10 +61,9 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class NormalProjectionManifold : public FlatManifold<dim,spacedim>
+  class NormalProjectionManifold : public FlatManifold<dim, spacedim>
   {
   public:
-
     /**
      * The standard constructor takes a generic TopoDS_Shape @p sh, and a
      * tolerance used to compute distances internally.
@@ -73,13 +71,14 @@ namespace OpenCASCADE
      * The TopoDS_Shape can be arbitrary, i.e., a collection of shapes, faces,
      * edges or a single face or edge.
      */
-    NormalProjectionManifold(const TopoDS_Shape &sh,
-                             const double tolerance=1e-7);
+    NormalProjectionManifold(const TopoDS_Shape& sh,
+                             const double        tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim, spacedim>>
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -91,9 +90,9 @@ namespace OpenCASCADE
      * algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const override;
-
+    project_to_manifold(
+      const ArrayView<const Point<spacedim>>& surrounding_points,
+      const Point<spacedim>&                  candidate) const override;
 
   protected:
     /**
@@ -132,21 +131,22 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class DirectionalProjectionManifold : public FlatManifold<dim,spacedim>
+  class DirectionalProjectionManifold : public FlatManifold<dim, spacedim>
   {
   public:
     /**
      * Construct a Manifold object which will project points on the
      * TopoDS_Shape @p sh, along the given @p direction.
      */
-    DirectionalProjectionManifold(const TopoDS_Shape &sh,
-                                  const Tensor<1,spacedim> &direction,
-                                  const double tolerance=1e-7);
+    DirectionalProjectionManifold(const TopoDS_Shape&        sh,
+                                  const Tensor<1, spacedim>& direction,
+                                  const double               tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim, spacedim>>
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -158,8 +158,9 @@ namespace OpenCASCADE
      * projection algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const override;
+    project_to_manifold(
+      const ArrayView<const Point<spacedim>>& surrounding_points,
+      const Point<spacedim>&                  candidate) const override;
 
   protected:
     /**
@@ -180,7 +181,6 @@ namespace OpenCASCADE
      */
     const double tolerance;
   };
-
 
   /**
    * A Manifold object based on OpenCASCADE TopoDS_Shape where new points are
@@ -227,7 +227,7 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class NormalToMeshProjectionManifold : public FlatManifold<dim,spacedim>
+  class NormalToMeshProjectionManifold : public FlatManifold<dim, spacedim>
   {
   public:
     /**
@@ -235,13 +235,14 @@ namespace OpenCASCADE
      * TopoDS_Shape @p sh, along a direction which is approximately normal to
      * the mesh cell.
      */
-    NormalToMeshProjectionManifold(const TopoDS_Shape &sh,
-                                   const double tolerance=1e-7);
+    NormalToMeshProjectionManifold(const TopoDS_Shape& sh,
+                                   const double        tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim, spacedim>>
+    clone() const override;
 
     /**
      * Perform the actual projection onto the manifold. This function, in
@@ -250,8 +251,9 @@ namespace OpenCASCADE
      * exception is thrown.
      */
     virtual Point<spacedim>
-    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
-                         const Point<spacedim>                  &candidate) const override;
+    project_to_manifold(
+      const ArrayView<const Point<spacedim>>& surrounding_points,
+      const Point<spacedim>&                  candidate) const override;
 
   protected:
     /**
@@ -288,19 +290,20 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class ArclengthProjectionLineManifold : public  ChartManifold<dim,spacedim,1>
+  class ArclengthProjectionLineManifold : public ChartManifold<dim, spacedim, 1>
   {
   public:
     /**
      * Default constructor with a TopoDS_Edge.
      */
-    ArclengthProjectionLineManifold(const TopoDS_Shape &sh,
-                                    const double tolerance=1e-7);
+    ArclengthProjectionLineManifold(const TopoDS_Shape& sh,
+                                    const double        tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim, spacedim>>
+    clone() const override;
 
     /**
      * Given a point on real space, find its arclength parameter. Throws an
@@ -308,13 +311,13 @@ namespace OpenCASCADE
      * construction time.
      */
     virtual Point<1>
-    pull_back(const Point<spacedim> &space_point) const override;
+    pull_back(const Point<spacedim>& space_point) const override;
 
     /**
      * Given an arclength parameter, find its image in real space.
      */
     virtual Point<spacedim>
-    push_forward(const Point<1> &chart_point) const override;
+    push_forward(const Point<1>& chart_point) const override;
 
   protected:
     /**
@@ -356,26 +359,27 @@ namespace OpenCASCADE
      * @p tolerance. This class uses the interval OpenCASCADE variables @var u,
      * @var v to descrive the manifold.
      */
-    NURBSPatchManifold(const TopoDS_Face &face, const double tolerance = 1e-7);
+    NURBSPatchManifold(const TopoDS_Face& face, const double tolerance = 1e-7);
 
     /**
      * Clone the current Manifold.
      */
-    virtual std::unique_ptr<Manifold<dim,spacedim> > clone() const override;
+    virtual std::unique_ptr<Manifold<dim, spacedim>>
+    clone() const override;
 
     /**
      * Pull back the given point from the Euclidean space. Will return the uv
      * coordinates associated with the point @p space_point.
      */
     virtual Point<2>
-    pull_back(const Point<spacedim> &space_point) const override;
+    pull_back(const Point<spacedim>& space_point) const override;
 
     /**
      * Given a @p chart_point in the uv coordinate system, this method returns the
      * Euclidean coordinates associated.
      */
     virtual Point<spacedim>
-    push_forward(const Point<2> &chart_point) const override;
+    push_forward(const Point<2>& chart_point) const override;
 
     /**
      * Given a point in the spacedim dimensional Euclidean space, this
@@ -389,9 +393,8 @@ namespace OpenCASCADE
      *
      * Refer to the general documentation of this class for more information.
      */
-    virtual
-    DerivativeForm<1,2,spacedim>
-    push_forward_gradient(const Point<2> &chart_point) const override;
+    virtual DerivativeForm<1, 2, spacedim>
+    push_forward_gradient(const Point<2>& chart_point) const override;
 
   protected:
     /**
@@ -413,12 +416,11 @@ namespace OpenCASCADE
     double tolerance;
   };
 
-}
+} // namespace OpenCASCADE
 
 /*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
-
 
 #endif // DEAL_II_WITH_OPENCASCADE
 #endif // dealii_occ_manifold_lib_h

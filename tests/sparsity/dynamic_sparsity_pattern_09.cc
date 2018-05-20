@@ -13,32 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check DynamicSparsityPattern::empty
 
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-
-void test ()
+void
+test()
 {
-  const unsigned int N = 1000;
+  const unsigned int     N = 1000;
   DynamicSparsityPattern csp;
-  AssertThrow (csp.empty() == true, ExcInternalError());
+  AssertThrow(csp.empty() == true, ExcInternalError());
 
-  csp.reinit (N, N);
-  AssertThrow (csp.empty() == false, ExcInternalError());
+  csp.reinit(N, N);
+  AssertThrow(csp.empty() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   return 0;
 }

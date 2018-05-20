@@ -13,28 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::forward
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
   Vector<number> x, y;
-  make_range_vector (x);
-  make_range_vector (y);
+  make_range_vector(x);
+  make_range_vector(y);
 
-  m.forward (x, y);
-  print_vector (x);
-  print_vector (y);
+  m.forward(x, y);
+  print_vector(x);
+  print_vector(y);
 }

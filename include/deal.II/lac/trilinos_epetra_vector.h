@@ -16,21 +16,20 @@
 #ifndef dealii_trilinos_epetra_vector_h
 #define dealii_trilinos_epetra_vector_h
 
-
 #include <deal.II/base/config.h>
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
 
-#include <deal.II/base/index_set.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/lac/trilinos_epetra_communication_pattern.h>
-#include <deal.II/lac/vector_operation.h>
-#include <deal.II/lac/vector_space_vector.h>
-#include <deal.II/lac/vector_type_traits.h>
-#include <memory>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
+#  include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/vector_space_vector.h>
+#  include <deal.II/lac/vector_type_traits.h>
+#  include <memory>
 
-#  include <mpi.h>
 #  include <Epetra_FEVector.h>
+#  include <mpi.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -64,7 +63,7 @@ namespace LinearAlgebra
        * Copy constructor. Sets the dimension and the partitioning to that of
        * the given vector and copies all elements.
        */
-      Vector(const Vector &V);
+      Vector(const Vector& V);
 
       /**
        * This constructor takes an IndexSet that defines how to distribute the
@@ -72,8 +71,8 @@ namespace LinearAlgebra
        * includes information about the size of the vector, this is all we
        * need to generate a %parallel vector.
        */
-      explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm &communicator);
+      explicit Vector(const IndexSet& parallel_partitioner,
+                      const MPI_Comm& communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -81,29 +80,33 @@ namespace LinearAlgebra
        * <tt>omit_zeroing_entries</tt> determines whether the vector should be
        * filled with zero (false) or left untouched (true).
        */
-      void reinit (const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator,
-                   const bool      omit_zeroing_entries = false);
+      void
+      reinit(const IndexSet& parallel_partitioner,
+             const MPI_Comm& communicator,
+             const bool      omit_zeroing_entries = false);
 
       /**
        * Change the dimension to that of the vector V. The elements of V are not
        * copied.
        */
-      virtual void reinit(const VectorSpaceVector<double> &V,
-                          const bool omit_zeroing_entries = false) override;
+      virtual void
+      reinit(const VectorSpaceVector<double>& V,
+             const bool omit_zeroing_entries = false) override;
 
       /**
        * Copy function. This function takes a Vector and copies all the
        * elements. The Vector will have the same parallel distribution as @p
        * V.
        */
-      Vector &operator= (const Vector &V);
+      Vector&
+      operator=(const Vector& V);
 
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is
        * only allowed if @p s is equal to zero.
        */
-      virtual Vector &operator= (const double s) override;
+      virtual Vector&
+      operator=(const double s) override;
 
       /**
        * Imports all the elements present in the vector's IndexSet from the input
@@ -113,61 +116,75 @@ namespace LinearAlgebra
        * communication pattern is used multiple times. This can be used to improve
        * performance.
        */
-      virtual void import(const ReadWriteVector<double>  &V,
-                          VectorOperation::values         operation,
-                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std::shared_ptr<const CommunicationPatternBase> ()) override;
+      virtual void
+      import(
+        const ReadWriteVector<double>&                  V,
+        VectorOperation::values                         operation,
+        std::shared_ptr<const CommunicationPatternBase> communication_pattern
+        = std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual Vector &operator*= (const double factor) override;
+      virtual Vector&
+      operator*=(const double factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector &operator/= (const double factor) override;
+      virtual Vector&
+      operator/=(const double factor) override;
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector &operator+= (const VectorSpaceVector<double> &V) override;
+      virtual Vector&
+      operator+=(const VectorSpaceVector<double>& V) override;
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector &operator-= (const VectorSpaceVector<double> &V) override;
+      virtual Vector&
+      operator-=(const VectorSpaceVector<double>& V) override;
 
       /**
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
-      virtual double operator* (const VectorSpaceVector<double> &V) const override;
+      virtual double
+      operator*(const VectorSpaceVector<double>& V) const override;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
        */
-      virtual void add(const double a) override;
+      virtual void
+      add(const double a) override;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
        * a*V</tt>. The vectors need to have the same layout.
        */
-      virtual void add(const double a, const VectorSpaceVector<double> &V) override;
+      virtual void
+      add(const double a, const VectorSpaceVector<double>& V) override;
 
       /**
        * Multiple addition of multiple of a vector, i.e. <tt>*this> +=
        * a*V+b*W</tt>. The vectors need to have the same layout.
        */
-      virtual void add(const double a, const VectorSpaceVector<double> &V,
-                       const double b, const VectorSpaceVector<double> &W) override;
+      virtual void
+      add(const double                     a,
+          const VectorSpaceVector<double>& V,
+          const double                     b,
+          const VectorSpaceVector<double>& W) override;
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this
        * = s*(*this)+a*V</tt>.
        */
-      virtual void sadd(const double s, const double a,
-                        const VectorSpaceVector<double> &V) override;
+      virtual void
+      sadd(const double                     s,
+           const double                     a,
+           const VectorSpaceVector<double>& V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -175,40 +192,47 @@ namespace LinearAlgebra
        * (and immediate re-assignment) by a diagonal scaling matrix. The
        * vectors need to have the same layout.
        */
-      virtual void scale(const VectorSpaceVector<double> &scaling_factors) override;
+      virtual void
+      scale(const VectorSpaceVector<double>& scaling_factors) override;
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
-      virtual void equ(const double a, const VectorSpaceVector<double> &V) override;
+      virtual void
+      equ(const double a, const VectorSpaceVector<double>& V) override;
 
       /**
        * Return whether the vector contains only elements with value zero.
        */
-      virtual bool all_zero() const override;
+      virtual bool
+      all_zero() const override;
 
       /**
        * Return the mean value of the element of this vector.
        */
-      virtual double mean_value() const override;
+      virtual double
+      mean_value() const override;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual double l1_norm() const override;
+      virtual double
+      l1_norm() const override;
 
       /**
        * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual double l2_norm() const override;
+      virtual double
+      l2_norm() const override;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual double linfty_norm() const override;
+      virtual double
+      linfty_norm() const override;
 
       /**
        * Performs a combined operation of a vector addition and a subsequent
@@ -231,25 +255,29 @@ namespace LinearAlgebra
        * For complex-valued vectors, the scalar product in the second step is implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual double add_and_dot(const double a,
-                                 const VectorSpaceVector<double> &V,
-                                 const VectorSpaceVector<double> &W) override;
+      virtual double
+      add_and_dot(const double                     a,
+                  const VectorSpaceVector<double>& V,
+                  const VectorSpaceVector<double>& W) override;
       /**
        * This function always returns false and is present only for backward
        * compatibility.
        */
-      bool has_ghost_elements() const;
+      bool
+      has_ghost_elements() const;
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
        * locally owned indices among all processors.
        */
-      virtual size_type size() const override;
+      virtual size_type
+      size() const override;
 
       /**
        * Return the MPI communicator object in use with this object.
        */
-      MPI_Comm get_mpi_communicator() const;
+      MPI_Comm
+      get_mpi_communicator() const;
 
       /**
        * Return an index set that describes which elements of this vector are
@@ -261,32 +289,37 @@ namespace LinearAlgebra
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode
        */
-      virtual ::dealii::IndexSet locally_owned_elements() const override;
+      virtual ::dealii::IndexSet
+      locally_owned_elements() const override;
 
       /**
        * Return a const reference to the underlying Trilinos
        * Epetra_FEVector class.
        */
-      const Epetra_FEVector &trilinos_vector() const;
+      const Epetra_FEVector&
+      trilinos_vector() const;
 
       /**
        * Return a (modifyable) reference to the underlying Trilinos
        * Epetra_FEVector class.
        */
-      Epetra_FEVector &trilinos_vector();
+      Epetra_FEVector&
+      trilinos_vector();
 
       /**
        * Prints the vector to the output stream @p out.
        */
-      virtual void print(std::ostream &out,
-                         const unsigned int precision=3,
-                         const bool scientific=true,
-                         const bool across=true) const override;
+      virtual void
+      print(std::ostream&      out,
+            const unsigned int precision  = 3,
+            const bool         scientific = true,
+            const bool         across     = true) const override;
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      virtual std::size_t memory_consumption() const override;
+      virtual std::size_t
+      memory_consumption() const override;
 
       /**
        * The vectors have different partitioning, i.e. they have use different
@@ -306,10 +339,10 @@ namespace LinearAlgebra
        *
        * @ingroup Exceptions
        */
-      DeclException1 (ExcTrilinosError,
-                      int,
-                      << "An error with error number " << arg1
-                      << " occurred while calling a Trilinos function");
+      DeclException1(ExcTrilinosError,
+                     int,
+                     << "An error with error number " << arg1
+                     << " occurred while calling a Trilinos function");
 
     private:
       /**
@@ -317,8 +350,9 @@ namespace LinearAlgebra
        * IndexSet @p source_index_set and the current vector based
        * on the communicator @p mpi_comm.
        */
-      void create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                      const MPI_Comm &mpi_comm);
+      void
+      create_epetra_comm_pattern(const IndexSet& source_index_set,
+                                 const MPI_Comm& mpi_comm);
 
       /**
        * Pointer to the actual Epetra vector object.
@@ -337,23 +371,20 @@ namespace LinearAlgebra
       std::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
     };
 
-
-    inline
-    bool Vector::has_ghost_elements() const
+    inline bool
+    Vector::has_ghost_elements() const
     {
       return false;
     }
-  }
-}
-
+  } // namespace EpetraWrappers
+} // namespace LinearAlgebra
 
 /**
  * Declare dealii::LinearAlgebra::EpetraWrappers::Vector as distributed vector.
  */
 template <>
 struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
-{
-};
+{};
 
 DEAL_II_NAMESPACE_CLOSE
 

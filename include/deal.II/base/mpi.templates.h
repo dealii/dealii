@@ -19,12 +19,12 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 
@@ -40,347 +40,337 @@ namespace Utilities
       /**
        * Return the corresponding MPI data type id for the argument given.
        */
-      inline MPI_Datatype mpi_type_id (const int *)
+      inline MPI_Datatype
+      mpi_type_id(const int*)
       {
         return MPI_INT;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const long int *)
+      inline MPI_Datatype
+      mpi_type_id(const long int*)
       {
         return MPI_LONG;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned int *)
+      inline MPI_Datatype
+      mpi_type_id(const unsigned int*)
       {
         return MPI_UNSIGNED;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned long int *)
+      inline MPI_Datatype
+      mpi_type_id(const unsigned long int*)
       {
         return MPI_UNSIGNED_LONG;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const unsigned long long int *)
+      inline MPI_Datatype
+      mpi_type_id(const unsigned long long int*)
       {
         return MPI_UNSIGNED_LONG_LONG;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const float *)
+      inline MPI_Datatype
+      mpi_type_id(const float*)
       {
         return MPI_FLOAT;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const double *)
+      inline MPI_Datatype
+      mpi_type_id(const double*)
       {
         return MPI_DOUBLE;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const long double *)
+      inline MPI_Datatype
+      mpi_type_id(const long double*)
       {
         return MPI_LONG_DOUBLE;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const std::complex<float> *)
+      inline MPI_Datatype
+      mpi_type_id(const std::complex<float>*)
       {
         return MPI_COMPLEX;
       }
 
-
-
-      inline MPI_Datatype mpi_type_id (const std::complex<double> *)
+      inline MPI_Datatype
+      mpi_type_id(const std::complex<double>*)
       {
         return MPI_DOUBLE_COMPLEX;
       }
 #endif
 
-
       template <typename T>
-      void all_reduce (const MPI_Op             &mpi_op,
-                       const ArrayView<const T> &values,
-                       const MPI_Comm           &mpi_communicator,
-                       const ArrayView<T>       &output)
+      void
+      all_reduce(const MPI_Op&             mpi_op,
+                 const ArrayView<const T>& values,
+                 const MPI_Comm&           mpi_communicator,
+                 const ArrayView<T>&       output)
       {
         AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
+        if(job_supports_mpi())
           {
-#ifdef DEBUG
+#  ifdef DEBUG
             {
-              const unsigned int rank = this_mpi_process(mpi_communicator);
-              unsigned int size = values.size();
-              unsigned int size_min = 0;
-              unsigned int size_max = 0;
-              int ierr2 = 0;
-              ierr2 = MPI_Reduce(&size, &size_min, 1, MPI_UNSIGNED, MPI_MIN, 0, mpi_communicator);
+              const unsigned int rank     = this_mpi_process(mpi_communicator);
+              unsigned int       size     = values.size();
+              unsigned int       size_min = 0;
+              unsigned int       size_max = 0;
+              int                ierr2    = 0;
+              ierr2                       = MPI_Reduce(&size,
+                                 &size_min,
+                                 1,
+                                 MPI_UNSIGNED,
+                                 MPI_MIN,
+                                 0,
+                                 mpi_communicator);
               AssertThrowMPI(ierr2);
-              ierr2 = MPI_Reduce(&size, &size_max, 1, MPI_UNSIGNED, MPI_MAX, 0, mpi_communicator);
+              ierr2 = MPI_Reduce(&size,
+                                 &size_max,
+                                 1,
+                                 MPI_UNSIGNED,
+                                 MPI_MAX,
+                                 0,
+                                 mpi_communicator);
               AssertThrowMPI(ierr2);
-              if (rank==0)
-                Assert (size_min == size_max, ExcMessage("values has different size across MPI processes."));
+              if(rank == 0)
+                Assert(size_min == size_max,
+                       ExcMessage(
+                         "values has different size across MPI processes."));
             }
-#endif
-            const int ierr = MPI_Allreduce
-                             (values != output
-                              ?
-                              // TODO This const_cast is only needed for older
-                              // (e.g., openMPI 1.6, released in 2012)
-                              // implementations of MPI-2. It is not needed as
-                              // of MPI-3 and we should remove it at some
-                              // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values.data()))
-                              :
-                              MPI_IN_PLACE,
-                              static_cast<void *>(output.data()),
-                              static_cast<int>(values.size()),
-                              internal::mpi_type_id(values.data()),
-                              mpi_op,
-                              mpi_communicator);
+#  endif
+            const int ierr = MPI_Allreduce(
+              values != output ?
+                // TODO This const_cast is only needed for older
+                // (e.g., openMPI 1.6, released in 2012)
+                // implementations of MPI-2. It is not needed as
+                // of MPI-3 and we should remove it at some
+                // point in the future.
+                const_cast<void*>(static_cast<const void*>(values.data())) :
+                MPI_IN_PLACE,
+              static_cast<void*>(output.data()),
+              static_cast<int>(values.size()),
+              internal::mpi_type_id(values.data()),
+              mpi_op,
+              mpi_communicator);
             AssertThrowMPI(ierr);
           }
         else
 #endif
           {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            if (values != output)
+            (void) mpi_op;
+            (void) mpi_communicator;
+            if(values != output)
               std::copy(values.begin(), values.end(), output.begin());
           }
       }
 
-
-
       template <typename T>
-      void all_reduce (const MPI_Op                           &mpi_op,
-                       const ArrayView<const std::complex<T>> &values,
-                       const MPI_Comm                         &mpi_communicator,
-                       const ArrayView<std::complex<T>>       &output)
+      void
+      all_reduce(const MPI_Op&                           mpi_op,
+                 const ArrayView<const std::complex<T>>& values,
+                 const MPI_Comm&                         mpi_communicator,
+                 const ArrayView<std::complex<T>>&       output)
       {
         AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
-        if (job_supports_mpi())
+        if(job_supports_mpi())
           {
-            const int ierr = MPI_Allreduce
-                             (values != output
-                              ?
-                              // TODO This const_cast is only needed for older
-                              // (e.g., openMPI 1.6, released in 2012)
-                              // implementations of MPI-2. It is not needed as
-                              // of MPI-3 and we should remove it at some
-                              // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values.data()))
-                              :
-                              MPI_IN_PLACE,
-                              static_cast<void *>(output.data()),
-                              static_cast<int>(values.size()*2),
-                              internal::mpi_type_id(static_cast<T *>(nullptr)),
-                              mpi_op,
-                              mpi_communicator);
+            const int ierr = MPI_Allreduce(
+              values != output ?
+                // TODO This const_cast is only needed for older
+                // (e.g., openMPI 1.6, released in 2012)
+                // implementations of MPI-2. It is not needed as
+                // of MPI-3 and we should remove it at some
+                // point in the future.
+                const_cast<void*>(static_cast<const void*>(values.data())) :
+                MPI_IN_PLACE,
+              static_cast<void*>(output.data()),
+              static_cast<int>(values.size() * 2),
+              internal::mpi_type_id(static_cast<T*>(nullptr)),
+              mpi_op,
+              mpi_communicator);
             AssertThrowMPI(ierr);
           }
         else
 #endif
           {
-            (void)mpi_op;
-            (void)mpi_communicator;
-            if (values != output)
+            (void) mpi_op;
+            (void) mpi_communicator;
+            if(values != output)
               std::copy(values.begin(), values.end(), output.begin());
           }
       }
-    }
-
-
+    } // namespace internal
 
     template <typename T>
-    T sum (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    sum(const T& t, const MPI_Comm& mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(&t,1),
-                           mpi_communicator, ArrayView<T>(&return_value,1));
+      internal::all_reduce(MPI_SUM,
+                           ArrayView<const T>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
-
-
     template <typename T, typename U>
-    void sum (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &sums)
+    void
+    sum(const T& values, const MPI_Comm& mpi_communicator, U& sums)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
-                    typename std::decay<U>::type>::value,
+                                 typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
-      sum(static_cast<const_type> (array_view_values),
+      using const_type
+        = ArrayView<const typename decltype(array_view_values)::value_type>;
+      sum(static_cast<const_type>(array_view_values),
           mpi_communicator,
           make_array_view(sums));
     }
 
-
-
     template <typename T>
-    void sum (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &sums)
+    void
+    sum(const ArrayView<const T>& values,
+        const MPI_Comm&           mpi_communicator,
+        const ArrayView<T>&       sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
-
-
     template <int rank, int dim, typename Number>
-    Tensor<rank,dim,Number>
-    sum (const Tensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator)
+    Tensor<rank, dim, Number>
+    sum(const Tensor<rank, dim, Number>& local,
+        const MPI_Comm&                  mpi_communicator)
     {
       Tensor<rank, dim, Number> sums;
       sum(local, mpi_communicator, sums);
       return sums;
     }
 
-
-
     template <int rank, int dim, typename Number>
-    SymmetricTensor<rank,dim,Number>
-    sum (const SymmetricTensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator)
+    SymmetricTensor<rank, dim, Number>
+    sum(const SymmetricTensor<rank, dim, Number>& local,
+        const MPI_Comm&                           mpi_communicator)
     {
-      const unsigned int n_entries = SymmetricTensor<rank,dim,Number>::n_independent_components;
-      Number entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
+      const unsigned int n_entries
+        = SymmetricTensor<rank, dim, Number>::n_independent_components;
+      Number
+        entries[SymmetricTensor<rank, dim, Number>::n_independent_components];
 
-      for (unsigned int i=0; i< n_entries; ++i)
-        entries[i] = local[ local.unrolled_to_component_indices(i) ];
+      for(unsigned int i = 0; i < n_entries; ++i)
+        entries[i] = local[local.unrolled_to_component_indices(i)];
 
-      Number global_entries[ SymmetricTensor<rank,dim,Number>::n_independent_components ];
-      sum( entries, mpi_communicator, global_entries );
+      Number global_entries
+        [SymmetricTensor<rank, dim, Number>::n_independent_components];
+      sum(entries, mpi_communicator, global_entries);
 
-      SymmetricTensor<rank,dim,Number> global;
-      for (unsigned int i=0; i< n_entries; ++i)
-        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
+      SymmetricTensor<rank, dim, Number> global;
+      for(unsigned int i = 0; i < n_entries; ++i)
+        global[global.unrolled_to_component_indices(i)] = global_entries[i];
 
       return global;
     }
 
-
-
     template <typename Number>
     void
-    sum (const SparseMatrix<Number> &local,
-         const MPI_Comm &mpi_communicator,
-         SparseMatrix<Number> &global)
+    sum(const SparseMatrix<Number>& local,
+        const MPI_Comm&             mpi_communicator,
+        SparseMatrix<Number>&       global)
     {
-      Assert(local.get_sparsity_pattern() == global.get_sparsity_pattern(),
-             ExcMessage("The sparsity pattern of the local and the global matrices should match."));
+      Assert(
+        local.get_sparsity_pattern() == global.get_sparsity_pattern(),
+        ExcMessage(
+          "The sparsity pattern of the local and the global matrices should match."));
 #ifdef DEAL_II_WITH_MPI
       // makes use of the fact that the matrix stores its data in a
       // contiguous array.
-      sum(ArrayView<const Number> (&local.val[0], local.n_nonzero_elements()),
+      sum(ArrayView<const Number>(&local.val[0], local.n_nonzero_elements()),
           mpi_communicator,
           ArrayView<Number>(&global.val[0], global.n_nonzero_elements()));
 #else
-      (void)mpi_communicator;
-      if (!PointerComparison::equal (&local, &global))
+      (void) mpi_communicator;
+      if(!PointerComparison::equal(&local, &global))
         global = local;
 #endif
     }
 
-
-
     template <typename T>
-    T max (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    max(const T& t, const MPI_Comm& mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_MAX, ArrayView<const T>(&t,1),
-                           mpi_communicator, ArrayView<T> (&return_value,1));
+      internal::all_reduce(MPI_MAX,
+                           ArrayView<const T>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
-
-
     template <typename T, typename U>
-    void max (const T         &values,
-              const MPI_Comm  &mpi_communicator,
-              U               &maxima)
+    void
+    max(const T& values, const MPI_Comm& mpi_communicator, U& maxima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
-                    typename std::decay<U>::type>::value,
+                                 typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
-      max(static_cast<const_type> (array_view_values),
+      using const_type
+        = ArrayView<const typename decltype(array_view_values)::value_type>;
+      max(static_cast<const_type>(array_view_values),
           mpi_communicator,
           make_array_view(maxima));
     }
 
-
-
     template <typename T>
-    void max (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &maxima)
+    void
+    max(const ArrayView<const T>& values,
+        const MPI_Comm&           mpi_communicator,
+        const ArrayView<T>&       maxima)
     {
       internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
 
-
-
     template <typename T>
-    T min (const T &t,
-           const MPI_Comm &mpi_communicator)
+    T
+    min(const T& t, const MPI_Comm& mpi_communicator)
     {
       T return_value;
-      internal::all_reduce(MPI_MIN, ArrayView<const T>(&t,1),
-                           mpi_communicator, ArrayView<T>(&return_value,1));
+      internal::all_reduce(MPI_MIN,
+                           ArrayView<const T>(&t, 1),
+                           mpi_communicator,
+                           ArrayView<T>(&return_value, 1));
       return return_value;
     }
 
-
-
     template <typename T, typename U>
-    void min (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &minima)
+    void
+    min(const T& values, const MPI_Comm& mpi_communicator, U& minima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
-                    typename std::decay<U>::type>::value,
+                                 typename std::decay<U>::type>::value,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
-      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
-      min(static_cast<const_type> (array_view_values),
+      using const_type
+        = ArrayView<const typename decltype(array_view_values)::value_type>;
+      min(static_cast<const_type>(array_view_values),
           mpi_communicator,
           make_array_view(minima));
     }
 
-
-
     template <typename T>
-    void min (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &minima)
+    void
+    min(const ArrayView<const T>& values,
+        const MPI_Comm&           mpi_communicator,
+        const ArrayView<T>&       minima)
     {
       internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }
   } // end of namespace MPI
 } // end of namespace Utilities
-
 
 DEAL_II_NAMESPACE_CLOSE
 

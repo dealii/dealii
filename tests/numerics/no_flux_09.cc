@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Currently fails. We get this crash in 3d with the quarter shell and no normal flux conditions:
 //
 //An error occurred in line <2571> of file </w/heister/deal-trunk/deal.II/include/deal.II/numerics/vectors.templates.h> in function
@@ -26,55 +24,50 @@
 //Additional Information:
 //(none)
 
-
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/numerics/vector_tools.h>
-
 
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tr;
-  GridGenerator::quarter_hyper_shell (tr,
-                                      Point<dim>(),
-                                      0.5, 1.0,
-                                      3, true);
+  GridGenerator::quarter_hyper_shell(tr, Point<dim>(), 0.5, 1.0, 3, true);
   tr.reset_manifold(0);
 
   ConstraintMatrix cm;
-  MappingQ<dim> mapping(1);
+  MappingQ<dim>    mapping(1);
 
-  FESystem<dim> fe(FE_Q<dim>(1),dim);
+  FESystem<dim>   fe(FE_Q<dim>(1), dim);
   DoFHandler<dim> dofh(tr);
 
-  dofh.distribute_dofs (fe);
+  dofh.distribute_dofs(fe);
 
   std::set<types::boundary_id> no_normal_flux_boundaries;
-  no_normal_flux_boundaries.insert (1);
+  no_normal_flux_boundaries.insert(1);
   //  no_normal_flux_boundaries.insert (2); // not required for the crash for now, please test with it later!
-  no_normal_flux_boundaries.insert (3);
-  no_normal_flux_boundaries.insert (4);
-  VectorTools::compute_no_normal_flux_constraints (dofh, 0, no_normal_flux_boundaries, cm, mapping);
+  no_normal_flux_boundaries.insert(3);
+  no_normal_flux_boundaries.insert(4);
+  VectorTools::compute_no_normal_flux_constraints(
+    dofh, 0, no_normal_flux_boundaries, cm, mapping);
 
-  cm.print (deallog.get_file_stream ());
+  cm.print(deallog.get_file_stream());
 }
 
-
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  logfile.precision (4);
+  std::ofstream logfile("output");
+  logfile.precision(4);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
 
-  check<3> ();
+  check<3>();
 }

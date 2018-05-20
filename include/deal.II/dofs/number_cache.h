@@ -21,7 +21,6 @@
 
 #include <vector>
 
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -37,19 +36,19 @@ namespace internal
       /**
        * Default constructor.
        */
-      NumberCache ();
+      NumberCache();
 
       /**
        * Copy constructor. Simply copy all members of the referenced
        * object to the current object.
        */
-      NumberCache (const NumberCache &) = default;
+      NumberCache(const NumberCache&) = default;
 
       /**
        * Move constructor. Simply move all members of the referenced
        * object to the current object.
        */
-      NumberCache (NumberCache &&) = default;
+      NumberCache(NumberCache&&) = default;
 
       /**
        * Create a NumberCache object that corresponds to a sequential
@@ -60,8 +59,7 @@ namespace internal
        * processes but the Triangulation on which this DoFHandler builds
        * works only on one MPI process.)
        */
-      NumberCache (const types::global_dof_index n_global_dofs);
-
+      NumberCache(const types::global_dof_index n_global_dofs);
 
       /**
        * Create a NumberCache object that corresponds to a parallel
@@ -76,31 +74,37 @@ namespace internal
        * All other fields stored by the current object can be and are computed
        * from the argument.
        */
-      NumberCache (const std::vector<IndexSet> &locally_owned_dofs_per_processor,
-                   const unsigned int           my_rank);
+      NumberCache(const std::vector<IndexSet>& locally_owned_dofs_per_processor,
+                  const unsigned int           my_rank);
 
       /**
        * Copy operator. Simply copy all members of the referenced
        * object to the current object.
        */
-      NumberCache &operator= (const NumberCache &) = default;
+      NumberCache&
+      operator=(const NumberCache&)
+        = default;
 
       /**
        * Move assignment operator. Simply move all members of the referenced
        * object to the current object.
        */
-      NumberCache &operator= (NumberCache &&) = default;
+      NumberCache&
+      operator=(NumberCache&&)
+        = default;
 
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * This function resets all the stored information.
        */
-      void clear ();
+      void
+      clear();
 
       /**
        * Total number of dofs, accumulated over all processors that may
@@ -156,25 +160,22 @@ namespace internal
        * purpose of serialization
        */
       template <class Archive>
-      void serialize (Archive &ar,
-                      const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
-
 
     template <class Archive>
     void
-    NumberCache::serialize (Archive &ar,
-                            const unsigned int /*version*/)
+    NumberCache::serialize(Archive& ar, const unsigned int /*version*/)
     {
-      ar &n_global_dofs &n_locally_owned_dofs;
-      ar &locally_owned_dofs;
-      ar &n_locally_owned_dofs_per_processor;
-      ar &locally_owned_dofs_per_processor;
+      ar& n_global_dofs& n_locally_owned_dofs;
+      ar&                locally_owned_dofs;
+      ar&                n_locally_owned_dofs_per_processor;
+      ar&                locally_owned_dofs_per_processor;
     }
 
-  }
-}
-
+  } // namespace DoFHandlerImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -13,42 +13,38 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Read a file in iges format, and write it out again in the same
 // format.
 
 #include "../tests.h"
 
-#include <deal.II/opencascade/utilities.h>
+#include <Standard_Stream.hxx>
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
-#include <Standard_Stream.hxx>
+#include <deal.II/opencascade/utilities.h>
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/wigley.step", 1.0);
   write_STEP(sh, "tmp.step");
   std::ifstream in("tmp.step");
   std::ofstream out("output");
-  std::string line;
-  unsigned int counter = 0;
+  std::string   line;
+  unsigned int  counter = 0;
 
-  while (std::getline(in,line))
+  while(std::getline(in, line))
     {
       counter++;
-      if ( (counter == 4) ||
-           (counter == 5) ||
-           (counter == 6) ||
-           (counter == 18) ||
-           (counter == 19)   )
+      if((counter == 4) || (counter == 5) || (counter == 6) || (counter == 18)
+         || (counter == 19))
         {
         }
       else
         out << line << std::endl;
     }
-
 
   in.close();
   out.close();

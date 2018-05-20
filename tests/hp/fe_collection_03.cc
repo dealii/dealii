@@ -13,30 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the results of FECollection::n_blocks()
 
-
 #include "../tests.h"
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-
-
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/hp/fe_collection.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   // test things with a collection of
   // primitive elements
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-    AssertThrow (fe_collection.n_components() == dim,
-                 ExcInternalError());
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
+    AssertThrow(fe_collection.n_components() == dim, ExcInternalError());
   }
 
   // now the same with one of the elements
@@ -44,30 +39,29 @@ void test ()
   // then not simply be a FESystem but must
   // in fact be an FESystem of FESystem to
   // hide multiple components in one block
-  if (dim > 1)
+  if(dim > 1)
     {
       hp::FECollection<dim> fe_collection;
-      fe_collection.push_back (FESystem<dim>(FESystem<dim>(FE_Q<dim>(2),dim),1));
-      fe_collection.push_back (FE_RaviartThomas<dim>(1));
-      AssertThrow (fe_collection.n_blocks() == 1,
-                   ExcInternalError());
+      fe_collection.push_back(
+        FESystem<dim>(FESystem<dim>(FE_Q<dim>(2), dim), 1));
+      fe_collection.push_back(FE_RaviartThomas<dim>(1));
+      AssertThrow(fe_collection.n_blocks() == 1, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

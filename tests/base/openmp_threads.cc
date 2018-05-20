@@ -13,25 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Ensure that, when executing test suite programs, the environment variable
 // OMP_NUM_THREADS is set to 2.
 
 #include "../tests.h"
 
-
-int main()
+int
+main()
 {
   initlog();
 
   // This might not work on Windows; always pass if we don't have getenv
   // available
 #ifdef _POSIX_C_SOURCE
-  const char *omp_env_variable = getenv("OMP_NUM_THREADS");
+  const char* omp_env_variable = getenv("OMP_NUM_THREADS");
   AssertThrow(omp_env_variable != nullptr,
               ExcMessage("The environment variable OMP_NUM_THREADS should be "
                          "defined when running the test suite."));
-  if (std::string(omp_env_variable) == "2")
+  if(std::string(omp_env_variable) == "2")
     {
       deallog << "OK" << std::endl;
     }

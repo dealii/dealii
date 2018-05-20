@@ -15,45 +15,45 @@
 
 // Test DoFTools::make_cell_patches with parallel::distributed::Triangulation
 
-
 #include "block_list.h"
 
 template <int dim>
 void
-test_block_list(const parallel::distributed::Triangulation<dim> &tr, const FiniteElement<dim> &fe)
+test_block_list(const parallel::distributed::Triangulation<dim>& tr,
+                const FiniteElement<dim>&                        fe)
 {
   deallog << fe.get_name() << std::endl;
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs (fe);
+  dof.distribute_mg_dofs(fe);
 
-  for (unsigned int level=0; level<tr.n_global_levels(); ++level)
+  for(unsigned int level = 0; level < tr.n_global_levels(); ++level)
     {
       SparsityPattern bl;
       DoFTools::make_cell_patches(bl, dof, level);
       bl.compress();
 
-      for (unsigned int i=0; i<bl.n_rows(); ++i)
+      for(unsigned int i = 0; i < bl.n_rows(); ++i)
         {
           deallog << "Level " << level << " Block " << std::setw(3) << i;
           std::vector<unsigned int> entries;
-          for (SparsityPattern::iterator b = bl.begin(i); b != bl.end(i); ++b)
+          for(SparsityPattern::iterator b = bl.begin(i); b != bl.end(i); ++b)
             entries.push_back(b->column());
 
           std::sort(entries.begin(), entries.end());
 
-          for (unsigned int i=0; i<entries.size(); ++i)
+          for(unsigned int i = 0; i < entries.size(); ++i)
             deallog << ' ' << std::setw(4) << entries[i];
           deallog << std::endl;
         }
     }
 }
 
-
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll all;
   deallog.push("2D");

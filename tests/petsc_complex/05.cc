@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check querying the number of nonzero elements in
 // PETScWrappers::SparseMatrix
 
@@ -21,30 +20,29 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <iostream>
 
-
-void test (PETScWrappers::SparseMatrix &m)
+void
+test(PETScWrappers::SparseMatrix& m)
 {
   // first set a few entries. count how many entries we have
   unsigned int counter = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.m(); ++j)
+      if((i + 2 * j + 1) % 3 == 0)
         {
-          m.set (i,j, std::complex<double> (0.,i*j*.5+.5));
+          m.set(i, j, std::complex<double>(0., i * j * .5 + .5));
           ++counter;
         }
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
-  AssertThrow (m.n_nonzero_elements() == counter,
-               ExcInternalError());
+  AssertThrow(m.n_nonzero_elements() == counter, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -53,16 +51,16 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::SparseMatrix m (5,5,3);
-        test (m);
+        PETScWrappers::SparseMatrix m(5, 5, 3);
+        test(m);
 
         deallog << "OK" << std::endl;
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -73,9 +71,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

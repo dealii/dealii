@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test that all of the Sacado number traits return the correct information
 // Nested Sacado::Rad::ADvar<Sacado::Fad::DFad>
 
@@ -29,68 +28,91 @@
 using namespace dealii;
 namespace AD = Differentiation::AD;
 
-template<typename NumberTraitsType>
-void print_info ()
+template <typename NumberTraitsType>
+void
+print_info()
 {
-  deallog
-      << "type_code: "
-      << static_cast<std::underlying_type<AD::NumberTypes>::type>(NumberTraitsType::type_code)
-      << std::endl;
+  deallog << "type_code: "
+          << static_cast<std::underlying_type<AD::NumberTypes>::type>(
+               NumberTraitsType::type_code)
+          << std::endl;
   deallog << "is_taped: " << NumberTraitsType::is_taped << std::endl;
   deallog << "is_tapeless: " << NumberTraitsType::is_tapeless << std::endl;
-  deallog << "is_real_valued: " << NumberTraitsType::is_real_valued << std::endl;
-  deallog << "is_complex_valued: " << NumberTraitsType::is_complex_valued << std::endl;
-  deallog << "n_supported_derivative_levels: " << NumberTraitsType::n_supported_derivative_levels << std::endl;
+  deallog << "is_real_valued: " << NumberTraitsType::is_real_valued
+          << std::endl;
+  deallog << "is_complex_valued: " << NumberTraitsType::is_complex_valued
+          << std::endl;
+  deallog << "n_supported_derivative_levels: "
+          << NumberTraitsType::n_supported_derivative_levels << std::endl;
 
-  deallog << "is_ad_number: " << AD::is_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
-  deallog << "is_sacado_number: " << AD::is_sacado_number<typename NumberTraitsType::ad_type>::value << std::endl;
-  deallog << "is_taped_ad_number: " << AD::is_taped_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
-  deallog << "is_tapeless_ad_number: " << AD::is_tapeless_ad_number<typename NumberTraitsType::ad_type>::value << std::endl;
+  deallog << "is_ad_number: "
+          << AD::is_ad_number<typename NumberTraitsType::ad_type>::value
+          << std::endl;
+  deallog << "is_sacado_number: "
+          << AD::is_sacado_number<typename NumberTraitsType::ad_type>::value
+          << std::endl;
+  deallog << "is_taped_ad_number: "
+          << AD::is_taped_ad_number<typename NumberTraitsType::ad_type>::value
+          << std::endl;
+  deallog
+    << "is_tapeless_ad_number: "
+    << AD::is_tapeless_ad_number<typename NumberTraitsType::ad_type>::value
+    << std::endl;
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
   deallog.push("NumberTraits");
 
   deallog.push("float");
-  print_info<AD::NumberTraits<float,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<AD::NumberTraits<float, AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
   deallog.push("std::complex<float>");
-  print_info<AD::NumberTraits<std::complex<float>,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<
+    AD::NumberTraits<std::complex<float>, AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 #endif
 
   deallog.push("double");
-  print_info<AD::NumberTraits<double,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<AD::NumberTraits<double, AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
   deallog.push("std::complex<double>");
-  print_info<AD::NumberTraits<std::complex<double>,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<
+    AD::NumberTraits<std::complex<double>, AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 #endif
 
   deallog.push("Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >");
-  print_info<AD::NumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<AD::NumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>,
+                              AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
   deallog.push("std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >");
-  print_info<AD::NumberTraits<std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<
+    AD::NumberTraits<std::complex<Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>>,
+                     AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 #endif
 
   deallog.push("Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >");
-  print_info<AD::NumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >,AD::NumberTypes::sacado_rad_dfad> >();
+  print_info<AD::NumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>,
+                              AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-  deallog.push("std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >");
-  print_info<AD::NumberTraits<std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >,AD::NumberTypes::sacado_rad_dfad> >();
+  deallog.push(
+    "std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >");
+  print_info<AD::NumberTraits<
+    std::complex<Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>>,
+    AD::NumberTypes::sacado_rad_dfad>>();
   deallog.pop();
 #endif
 
@@ -101,22 +123,27 @@ int main ()
   deallog.push("ADNumberTraits");
 
   deallog.push("Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >");
-  print_info<AD::ADNumberTraits< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > > >();
+  print_info<
+    AD::ADNumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
   deallog.push("std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >");
-  print_info<AD::ADNumberTraits<std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > > > >();
+  print_info<AD::ADNumberTraits<
+    std::complex<Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>>>>();
   deallog.pop();
 #endif
 
   deallog.push("Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >");
-  print_info<AD::ADNumberTraits< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > > >();
+  print_info<
+    AD::ADNumberTraits<Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>>>();
   deallog.pop();
 
 #ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-  deallog.push("std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >");
-  print_info<AD::ADNumberTraits<std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > > > >();
+  deallog.push(
+    "std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >");
+  print_info<AD::ADNumberTraits<
+    std::complex<Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>>>>();
   deallog.pop();
 #endif
 

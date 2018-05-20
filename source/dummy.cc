@@ -20,8 +20,9 @@
  * the generated Xcode project.
  */
 
-const int global_symbol_42 {42};
-void use_global_symbol_42()
+const int global_symbol_42{42};
+void
+use_global_symbol_42()
 {
   (void) global_symbol_42;
 }

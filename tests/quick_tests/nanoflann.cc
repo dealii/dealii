@@ -21,39 +21,43 @@
 
 using namespace dealii;
 
-
-int main ()
+int
+main()
 {
   KDTree<2> kdtree;
 
-  std::vector<Point<2> > points;
+  std::vector<Point<2>> points;
 
   // Add four points
-  points.emplace_back(0,0);
-  points.emplace_back(0,1);
-  points.emplace_back(1,0);
-  points.emplace_back(1,1);
+  points.emplace_back(0, 0);
+  points.emplace_back(0, 1);
+  points.emplace_back(1, 0);
+  points.emplace_back(1, 1);
 
   deallog << "Distance from unit square:" << std::endl;
 
-  std::vector<Point<2> > test_points;
+  std::vector<Point<2>> test_points;
   test_points.emplace_back(.5, .5);
   test_points.emplace_back(2, 0);
   test_points.emplace_back(2, 2);
 
   kdtree.set_points(points);
 
-  for (auto &p : test_points)
+  for(auto& p : test_points)
     {
-      auto res = kdtree.get_closest_points(p,1)[0];
-      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+      auto res = kdtree.get_closest_points(p, 1)[0];
+      deallog << "P: " << p << ", distance: " << res.second
+              << ", index: " << res.first << std::endl;
     }
 
-  deallog << "Consistency checking: the following are all the points in the set." << std::endl;
-  for (auto &p : points)
+  deallog
+    << "Consistency checking: the following are all the points in the set."
+    << std::endl;
+  for(auto& p : points)
     {
-      auto res = kdtree.get_closest_points(p,1)[0];
-      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+      auto res = kdtree.get_closest_points(p, 1)[0];
+      deallog << "P: " << p << ", distance: " << res.second
+              << ", index: " << res.first << std::endl;
       Assert(res.second < 1e-10, ExcMessage("Should be zero!"));
     }
 }

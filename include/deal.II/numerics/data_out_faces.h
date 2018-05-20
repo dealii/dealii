@@ -16,7 +16,6 @@
 #ifndef dealii_data_out_faces_h
 #define dealii_data_out_faces_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/numerics/data_out.h>
 
@@ -24,7 +23,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace internal
 {
@@ -36,20 +34,22 @@ namespace internal
      * documentation of the WorkStream context.
      */
     template <int dim, int spacedim>
-    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim,spacedim>
+    struct ParallelData
+      : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
     {
-      ParallelData (const unsigned int n_datasets,
-                    const unsigned int n_subdivisions,
-                    const std::vector<unsigned int> &n_postprocessor_outputs,
-                    const Mapping<dim,spacedim> &mapping,
-                    const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
-                    const UpdateFlags update_flags);
+      ParallelData(const unsigned int               n_datasets,
+                   const unsigned int               n_subdivisions,
+                   const std::vector<unsigned int>& n_postprocessor_outputs,
+                   const Mapping<dim, spacedim>&    mapping,
+                   const std::vector<
+                     std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>&
+                                     finite_elements,
+                   const UpdateFlags update_flags);
 
-      std::vector<Point<spacedim> > patch_evaluation_points;
+      std::vector<Point<spacedim>> patch_evaluation_points;
     };
-  }
-}
-
+  } // namespace DataOutFacesImplementation
+} // namespace internal
 
 /**
  * This class generates output from faces of a triangulation. It might be used
@@ -109,9 +109,10 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
-template <int dim, typename DoFHandlerType=DoFHandler<dim> >
-class DataOutFaces : public DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension-1,
-  DoFHandlerType::dimension>
+template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+class DataOutFaces : public DataOut_DoFData<DoFHandlerType,
+                                            DoFHandlerType::dimension - 1,
+                                            DoFHandlerType::dimension>
 {
 public:
   /**
@@ -130,14 +131,14 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType,dimension-1,
-          dimension>::cell_iterator cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType, dimension - 1, dimension>::
+    cell_iterator cell_iterator;
 
   /**
    * Constructor determining whether a surface mesh (default) or the whole
    * wire basket is written.
    */
-  DataOutFaces (const bool surface_only = true);
+  DataOutFaces(const bool surface_only = true);
 
   /**
    * This is the central function of this class since it builds the list of
@@ -154,7 +155,7 @@ public:
    * description of this parameter.
    */
   virtual void
-  build_patches (const unsigned int n_subdivisions = 0);
+  build_patches(const unsigned int n_subdivisions = 0);
 
   /**
    * Same as above, except that the additional first parameter defines a
@@ -176,8 +177,9 @@ public:
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<dimension> &mapping,
-                              const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches(const Mapping<dimension>& mapping,
+                const unsigned int        n_subdivisions = 0);
 
   /**
    * Declare a way to describe a face which we would like to generate output
@@ -187,8 +189,7 @@ public:
    * of a cell and the number of the face. This pair is here aliased to a name
    * that is better to type.
    */
-  typedef typename std::pair<cell_iterator,unsigned int> FaceDescriptor;
-
+  typedef typename std::pair<cell_iterator, unsigned int> FaceDescriptor;
 
   /**
    * Return the first face which we want output for. The default
@@ -197,7 +198,8 @@ public:
    *
    * For more general sets, overload this function in a derived class.
    */
-  virtual FaceDescriptor first_face ();
+  virtual FaceDescriptor
+  first_face();
 
   /**
    * Return the next face after which we want output for. If there are no more
@@ -215,7 +217,8 @@ public:
    * is also used from the default implementation. Overloading only one of the
    * two functions should be done with care.
    */
-  virtual FaceDescriptor next_face (const FaceDescriptor &face);
+  virtual FaceDescriptor
+  next_face(const FaceDescriptor& face);
 
 private:
   /**
@@ -226,11 +229,13 @@ private:
   /**
    * Build one patch. This function is called in a WorkStream context.
    */
-  void build_one_patch (const FaceDescriptor *cell_and_face,
-                        internal::DataOutFacesImplementation::ParallelData<dimension, dimension> &data,
-                        DataOutBase::Patch<dimension-1,space_dimension> &patch);
+  void
+  build_one_patch(
+    const FaceDescriptor* cell_and_face,
+    internal::DataOutFacesImplementation::ParallelData<dimension, dimension>&
+                                                        data,
+    DataOutBase::Patch<dimension - 1, space_dimension>& patch);
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 

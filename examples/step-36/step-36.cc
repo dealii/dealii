@@ -24,32 +24,32 @@
 // slightly revised version of step-4. As a consequence, most of the following
 // include files are as used there, or at least as used already in previous
 // tutorial programs:
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // IndexSet is used to set the size of each PETScWrappers::MPI::Vector:
 #include <deal.II/base/index_set.h>
 
 // PETSc appears here because SLEPc depends on this library:
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 
 // And then we need to actually import the interfaces for solvers that SLEPc
 // provides:
@@ -74,14 +74,19 @@ namespace Step36
   class EigenvalueProblem
   {
   public:
-    EigenvalueProblem (const std::string &prm_file);
-    void run ();
+    EigenvalueProblem(const std::string& prm_file);
+    void
+    run();
 
   private:
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    unsigned int solve ();
-    void output_results () const;
+    void
+    make_grid_and_dofs();
+    void
+    assemble_system();
+    unsigned int
+    solve();
+    void
+    output_results() const;
 
     Triangulation<dim> triangulation;
     FE_Q<dim>          fe;
@@ -117,27 +122,28 @@ namespace Step36
   // their values from the input file whose name is specified as an argument
   // to this function:
   template <int dim>
-  EigenvalueProblem<dim>::EigenvalueProblem (const std::string &prm_file)
-    :
-    fe (1),
-    dof_handler (triangulation)
+  EigenvalueProblem<dim>::EigenvalueProblem(const std::string& prm_file)
+    : fe(1), dof_handler(triangulation)
   {
-//TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
-    parameters.declare_entry ("Global mesh refinement steps", "5",
-                              Patterns::Integer (0, 20),
-                              "The number of times the 1-cell coarse mesh should "
-                              "be refined globally for our computations.");
-    parameters.declare_entry ("Number of eigenvalues/eigenfunctions", "5",
-                              Patterns::Integer (0, 100),
-                              "The number of eigenvalues/eigenfunctions "
-                              "to be computed.");
-    parameters.declare_entry ("Potential", "0",
-                              Patterns::Anything(),
-                              "A functional description of the potential.");
+    //TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
+    parameters.declare_entry(
+      "Global mesh refinement steps",
+      "5",
+      Patterns::Integer(0, 20),
+      "The number of times the 1-cell coarse mesh should "
+      "be refined globally for our computations.");
+    parameters.declare_entry("Number of eigenvalues/eigenfunctions",
+                             "5",
+                             Patterns::Integer(0, 100),
+                             "The number of eigenvalues/eigenfunctions "
+                             "to be computed.");
+    parameters.declare_entry("Potential",
+                             "0",
+                             Patterns::Anything(),
+                             "A functional description of the potential.");
 
-    parameters.parse_input (prm_file);
+    parameters.parse_input(prm_file);
   }
-
 
   // @sect4{EigenvalueProblem::make_grid_and_dofs}
 
@@ -178,21 +184,23 @@ namespace Step36
   // necessary. That said, since this is not a time critical part, this whole
   // affair is of no further importance.
   template <int dim>
-  void EigenvalueProblem<dim>::make_grid_and_dofs ()
+  void
+  EigenvalueProblem<dim>::make_grid_and_dofs()
   {
-    GridGenerator::hyper_cube (triangulation, -1, 1);
-    triangulation.refine_global (parameters.get_integer ("Global mesh refinement steps"));
-    dof_handler.distribute_dofs (fe);
+    GridGenerator::hyper_cube(triangulation, -1, 1);
+    triangulation.refine_global(
+      parameters.get_integer("Global mesh refinement steps"));
+    dof_handler.distribute_dofs(fe);
 
-    DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
-    constraints.close ();
+    DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
+    constraints.close();
 
-    stiffness_matrix.reinit (dof_handler.n_dofs(),
-                             dof_handler.n_dofs(),
-                             dof_handler.max_couplings_between_dofs());
-    mass_matrix.reinit (dof_handler.n_dofs(),
-                        dof_handler.n_dofs(),
-                        dof_handler.max_couplings_between_dofs());
+    stiffness_matrix.reinit(dof_handler.n_dofs(),
+                            dof_handler.n_dofs(),
+                            dof_handler.max_couplings_between_dofs());
+    mass_matrix.reinit(dof_handler.n_dofs(),
+                       dof_handler.n_dofs(),
+                       dof_handler.max_couplings_between_dofs());
 
     // The next step is to take care of the eigenspectrum. In this case, the
     // outputs are eigenvalues and eigenfunctions, so we set the size of the
@@ -205,15 +213,14 @@ namespace Step36
     // an IndexSet where every valid index is part of the set. Note that this
     // program can only be run sequentially and will throw an exception if used
     // in parallel.
-    IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs ();
-    eigenfunctions
-    .resize (parameters.get_integer ("Number of eigenvalues/eigenfunctions"));
-    for (unsigned int i=0; i<eigenfunctions.size (); ++i)
-      eigenfunctions[i].reinit (eigenfunction_index_set, MPI_COMM_WORLD);
+    IndexSet eigenfunction_index_set = dof_handler.locally_owned_dofs();
+    eigenfunctions.resize(
+      parameters.get_integer("Number of eigenvalues/eigenfunctions"));
+    for(unsigned int i = 0; i < eigenfunctions.size(); ++i)
+      eigenfunctions[i].reinit(eigenfunction_index_set, MPI_COMM_WORLD);
 
-    eigenvalues.resize (eigenfunctions.size ());
+    eigenvalues.resize(eigenfunctions.size());
   }
-
 
   // @sect4{EigenvalueProblem::assemble_system}
 
@@ -229,81 +236,75 @@ namespace Step36
   // seen how to evaluate function objects (see, for example the coefficient
   // in step-5), the code here will also look rather familiar.
   template <int dim>
-  void EigenvalueProblem<dim>::assemble_system ()
+  void
+  EigenvalueProblem<dim>::assemble_system()
   {
-    QGauss<dim>   quadrature_formula(2);
+    QGauss<dim> quadrature_formula(2);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients
+                              | update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_stiffness_matrix (dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_stiffness_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_mass_matrix(dofs_per_cell, dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     FunctionParser<dim> potential;
-    potential.initialize (FunctionParser<dim>::default_variable_names (),
-                          parameters.get ("Potential"),
-                          typename FunctionParser<dim>::ConstMap());
+    potential.initialize(FunctionParser<dim>::default_variable_names(),
+                         parameters.get("Potential"),
+                         typename FunctionParser<dim>::ConstMap());
 
-    std::vector<double> potential_values (n_q_points);
+    std::vector<double> potential_values(n_q_points);
 
-
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active (),
-    endc = dof_handler.end ();
-    for (; cell!=endc; ++cell)
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
         cell_stiffness_matrix = 0;
         cell_mass_matrix      = 0;
 
-        potential.value_list (fe_values.get_quadrature_points(),
-                              potential_values);
+        potential.value_list(fe_values.get_quadrature_points(),
+                             potential_values);
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
+            for(unsigned int j = 0; j < dofs_per_cell; ++j)
               {
-                cell_stiffness_matrix (i, j)
-                += (fe_values.shape_grad (i, q_point) *
-                    fe_values.shape_grad (j, q_point)
-                    +
-                    potential_values[q_point] *
-                    fe_values.shape_value (i, q_point) *
-                    fe_values.shape_value (j, q_point)
-                   ) * fe_values.JxW (q_point);
+                cell_stiffness_matrix(i, j)
+                  += (fe_values.shape_grad(i, q_point)
+                        * fe_values.shape_grad(j, q_point)
+                      + potential_values[q_point]
+                          * fe_values.shape_value(i, q_point)
+                          * fe_values.shape_value(j, q_point))
+                     * fe_values.JxW(q_point);
 
-                cell_mass_matrix (i, j)
-                += (fe_values.shape_value (i, q_point) *
-                    fe_values.shape_value (j, q_point)
-                   ) * fe_values.JxW (q_point);
+                cell_mass_matrix(i, j) += (fe_values.shape_value(i, q_point)
+                                           * fe_values.shape_value(j, q_point))
+                                          * fe_values.JxW(q_point);
               }
 
         // Now that we have the local matrix contributions, we transfer them
         // into the global objects and take care of zero boundary constraints:
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
-        constraints
-        .distribute_local_to_global (cell_stiffness_matrix,
-                                     local_dof_indices,
-                                     stiffness_matrix);
-        constraints
-        .distribute_local_to_global (cell_mass_matrix,
-                                     local_dof_indices,
-                                     mass_matrix);
+        constraints.distribute_local_to_global(
+          cell_stiffness_matrix, local_dof_indices, stiffness_matrix);
+        constraints.distribute_local_to_global(
+          cell_mass_matrix, local_dof_indices, mass_matrix);
       }
 
     // At the end of the function, we tell PETSc that the matrices have now
     // been fully assembled and that the sparse matrix representation can now
     // be compressed as no more entries will be added:
-    stiffness_matrix.compress (VectorOperation::add);
-    mass_matrix.compress (VectorOperation::add);
-
+    stiffness_matrix.compress(VectorOperation::add);
+    mass_matrix.compress(VectorOperation::add);
 
     // Before leaving the function, we calculate spurious eigenvalues,
     // introduced to the system by zero Dirichlet constraints. As
@@ -317,20 +318,18 @@ namespace Step36
     double min_spurious_eigenvalue = std::numeric_limits<double>::max(),
            max_spurious_eigenvalue = -std::numeric_limits<double>::max();
 
-    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
-      if (constraints.is_constrained(i))
+    for(unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
+      if(constraints.is_constrained(i))
         {
-          const double ev = stiffness_matrix(i,i)/mass_matrix(i,i);
-          min_spurious_eigenvalue = std::min (min_spurious_eigenvalue, ev);
-          max_spurious_eigenvalue = std::max (max_spurious_eigenvalue, ev);
+          const double ev         = stiffness_matrix(i, i) / mass_matrix(i, i);
+          min_spurious_eigenvalue = std::min(min_spurious_eigenvalue, ev);
+          max_spurious_eigenvalue = std::max(max_spurious_eigenvalue, ev);
         }
 
     std::cout << "   Spurious eigenvalues are all in the interval "
-              << "[" << min_spurious_eigenvalue << "," << max_spurious_eigenvalue << "]"
-              << std::endl;
-
+              << "[" << min_spurious_eigenvalue << ","
+              << max_spurious_eigenvalue << "]" << std::endl;
   }
-
 
   // @sect4{EigenvalueProblem::solve}
 
@@ -342,12 +341,13 @@ namespace Step36
   // the kind of solver we want. Here we choose the Krylov-Schur solver of
   // SLEPc, a pretty fast and robust choice for this kind of problem:
   template <int dim>
-  unsigned int EigenvalueProblem<dim>::solve ()
+  unsigned int
+  EigenvalueProblem<dim>::solve()
   {
     // We start here, as we normally do, by assigning convergence control we
     // want:
-    SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
-    SLEPcWrappers::SolverKrylovSchur eigensolver (solver_control);
+    SolverControl                    solver_control(dof_handler.n_dofs(), 1e-9);
+    SLEPcWrappers::SolverKrylovSchur eigensolver(solver_control);
 
     // Before we actually solve for the eigenfunctions and -values, we have to
     // also select which set of eigenvalues to solve for. Lets select those
@@ -355,13 +355,15 @@ namespace Step36
     // part (in fact, the problem we solve here is symmetric and so the
     // eigenvalues are purely real). After that, we can actually let SLEPc do
     // its work:
-    eigensolver.set_which_eigenpairs (EPS_SMALLEST_REAL);
+    eigensolver.set_which_eigenpairs(EPS_SMALLEST_REAL);
 
-    eigensolver.set_problem_type (EPS_GHEP);
+    eigensolver.set_problem_type(EPS_GHEP);
 
-    eigensolver.solve (stiffness_matrix, mass_matrix,
-                       eigenvalues, eigenfunctions,
-                       eigenfunctions.size());
+    eigensolver.solve(stiffness_matrix,
+                      mass_matrix,
+                      eigenvalues,
+                      eigenfunctions,
+                      eigenfunctions.size());
 
     // The output of the call above is a set of vectors and values. In
     // eigenvalue problems, the eigenfunctions are only determined up to a
@@ -384,13 +386,12 @@ namespace Step36
     // does not necessarily have to be attained at a node, and so
     // $\max_{\mathbf x}\phi_i(\mathbf x)\ge\max_j (\Phi_i)_j$ (although the
     // equality is usually nearly true).
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
+    for(unsigned int i = 0; i < eigenfunctions.size(); ++i)
+      eigenfunctions[i] /= eigenfunctions[i].linfty_norm();
 
     // Finally return the number of iterations it took to converge:
-    return solver_control.last_step ();
+    return solver_control.last_step();
   }
-
 
   // @sect4{EigenvalueProblem::output_results}
 
@@ -400,16 +401,17 @@ namespace Step36
   //
   // The whole collection of functions is then output as a single VTK file.
   template <int dim>
-  void EigenvalueProblem<dim>::output_results () const
+  void
+  EigenvalueProblem<dim>::output_results() const
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
+    data_out.attach_dof_handler(dof_handler);
 
-    for (unsigned int i=0; i<eigenfunctions.size(); ++i)
-      data_out.add_data_vector (eigenfunctions[i],
-                                std::string("eigenfunction_") +
-                                Utilities::int_to_string(i));
+    for(unsigned int i = 0; i < eigenfunctions.size(); ++i)
+      data_out.add_data_vector(eigenfunctions[i],
+                               std::string("eigenfunction_")
+                                 + Utilities::int_to_string(i));
 
     // The only thing worth discussing may be that because the potential is
     // specified as a function expression in the input file, it would be nice
@@ -419,57 +421,55 @@ namespace Step36
     // then we interpolate this continuous function onto the finite element
     // space. The result we also attach to the DataOut object for
     // visualization.
-    Vector<double> projected_potential (dof_handler.n_dofs());
+    Vector<double> projected_potential(dof_handler.n_dofs());
     {
       FunctionParser<dim> potential;
-      potential.initialize (FunctionParser<dim>::default_variable_names (),
-                            parameters.get ("Potential"),
-                            typename FunctionParser<dim>::ConstMap());
-      VectorTools::interpolate (dof_handler, potential, projected_potential);
+      potential.initialize(FunctionParser<dim>::default_variable_names(),
+                           parameters.get("Potential"),
+                           typename FunctionParser<dim>::ConstMap());
+      VectorTools::interpolate(dof_handler, potential, projected_potential);
     }
-    data_out.add_data_vector (projected_potential, "interpolated_potential");
+    data_out.add_data_vector(projected_potential, "interpolated_potential");
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
-    std::ofstream output ("eigenvectors.vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("eigenvectors.vtk");
+    data_out.write_vtk(output);
   }
-
 
   // @sect4{EigenvalueProblem::run}
 
   // This is the function which has the top-level control over everything. It
   // is almost exactly the same as in step-4:
   template <int dim>
-  void EigenvalueProblem<dim>::run ()
+  void
+  EigenvalueProblem<dim>::run()
   {
-    make_grid_and_dofs ();
+    make_grid_and_dofs();
 
     std::cout << "   Number of active cells:       "
-              << triangulation.n_active_cells ()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs ()
+              << triangulation.n_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
-    assemble_system ();
+    assemble_system();
 
-    const unsigned int n_iterations = solve ();
-    std::cout << "   Solver converged in " << n_iterations
-              << " iterations." << std::endl;
+    const unsigned int n_iterations = solve();
+    std::cout << "   Solver converged in " << n_iterations << " iterations."
+              << std::endl;
 
-    output_results ();
+    output_results();
 
     std::cout << std::endl;
-    for (unsigned int i=0; i<eigenvalues.size(); ++i)
-      std::cout << "      Eigenvalue " << i
-                << " : " << eigenvalues[i]
+    for(unsigned int i = 0; i < eigenvalues.size(); ++i)
+      std::cout << "      Eigenvalue " << i << " : " << eigenvalues[i]
                 << std::endl;
   }
-}
+} // namespace Step36
 
 // @sect3{The <code>main</code> function}
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   try
     {
@@ -478,20 +478,21 @@ int main (int argc, char **argv)
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-                  ExcMessage("This program can only be run in serial, use ./step-36"));
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-36"));
 
-      EigenvalueProblem<2> problem ("step-36.prm");
-      problem.run ();
+      EigenvalueProblem<2> problem("step-36.prm");
+      problem.run();
     }
 
   // All the while, we are watching out if any exceptions should have been
   // generated. If that is so, we panic...
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -502,9 +503,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -516,9 +518,7 @@ int main (int argc, char **argv)
 
   // If no exceptions are thrown, then we tell the program to stop monkeying
   // around and exit nicely:
-  std::cout << std::endl
-            << "   Job done."
-            << std::endl;
+  std::cout << std::endl << "   Job done." << std::endl;
 
   return 0;
 }

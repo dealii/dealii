@@ -14,20 +14,18 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_filtered_iterator_h
-#define dealii_filtered_iterator_h
+#  define dealii_filtered_iterator_h
 
+#  include <deal.II/base/config.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/iterator_range.h>
+#  include <deal.II/base/std_cxx14/memory.h>
+#  include <deal.II/grid/tria_iterator_base.h>
 
-#include <deal.II/base/std_cxx14/memory.h>
-#include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/iterator_range.h>
-#include <deal.II/grid/tria_iterator_base.h>
-
-#include <set>
-#include <tuple>
+#  include <set>
+#  include <tuple>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * In this namespace a number of classes is declared that may be used as
@@ -61,7 +59,8 @@ namespace IteratorFilters
      * the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
 
   /**
@@ -80,9 +79,9 @@ namespace IteratorFilters
      * or past the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
-
 
   /**
    * Filter that evaluates to true if either the iterator points to an object
@@ -99,9 +98,9 @@ namespace IteratorFilters
      * flag or past the end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
-
 
   /**
    * Filter for iterators that evaluates to true if either the iterator is
@@ -117,7 +116,7 @@ namespace IteratorFilters
      * Constructor. Store the level which iterators shall have to be evaluated
      * to true.
      */
-    LevelEqualTo (const unsigned int level);
+    LevelEqualTo(const unsigned int level);
 
     /**
      * Evaluation operator. Returns true if either the level of the object
@@ -125,7 +124,8 @@ namespace IteratorFilters
      * end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
 
   protected:
     /**
@@ -133,8 +133,6 @@ namespace IteratorFilters
      */
     const unsigned int level;
   };
-
-
 
   /**
    * Filter for iterators that evaluates to true if either the iterator is
@@ -151,7 +149,7 @@ namespace IteratorFilters
      * Constructor. Store the subdomain which iterators shall have to be
      * evaluated to true.
      */
-    SubdomainEqualTo (const types::subdomain_id subdomain_id);
+    SubdomainEqualTo(const types::subdomain_id subdomain_id);
 
     /**
      * Evaluation operator. Returns true if either the subdomain of the object
@@ -159,7 +157,8 @@ namespace IteratorFilters
      * end.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
 
   protected:
     /**
@@ -167,8 +166,6 @@ namespace IteratorFilters
      */
     const types::subdomain_id subdomain_id;
   };
-
-
 
   /**
    * Filter for iterators that evaluates to true if a cell is owned by the
@@ -188,10 +185,9 @@ namespace IteratorFilters
      * Evaluation operator. Returns true if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
-
-
 
   /**
    * Filter for iterators that evaluates to true if the level subdomain id of
@@ -207,9 +203,9 @@ namespace IteratorFilters
      * is equal to the current processor id.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
-
 
   /**
    * Filter for iterators that evaluates to true if the iterator of the object
@@ -227,16 +223,16 @@ namespace IteratorFilters
      * Constructor. Store the material id which iterators shall have to be
      * evaluated to true and state if the iterator must be locally owned.
      */
-    MaterialIdEqualTo (const types::material_id material_id,
-                       const bool only_locally_owned = false);
+    MaterialIdEqualTo(const types::material_id material_id,
+                      const bool               only_locally_owned = false);
 
     /**
      * Constructor. Store a collection of material ids which iterators shall
      * have to be evaluated to true and state if the iterator must be locally
      * owned.
      */
-    MaterialIdEqualTo (const std::set<types::material_id> &material_ids,
-                       const bool only_locally_owned = false);
+    MaterialIdEqualTo(const std::set<types::material_id>& material_ids,
+                      const bool only_locally_owned = false);
 
     /**
      * Evaluation operator. Returns true if the material id of the object
@@ -244,7 +240,8 @@ namespace IteratorFilters
      * and, if required, if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
 
   protected:
     /**
@@ -273,16 +270,16 @@ namespace IteratorFilters
      * Constructor. Store the active FE index which iterators shall have to be
      * evaluated to true and state if the iterator must be locally owned.
      */
-    ActiveFEIndexEqualTo (const unsigned int active_fe_index,
-                          const bool only_locally_owned = false);
+    ActiveFEIndexEqualTo(const unsigned int active_fe_index,
+                         const bool         only_locally_owned = false);
 
     /**
      * Constructor. Store a collection of active FE indices which iterators
      * shall have to be evaluated to true and state if the iterator must be
      * locally owned.
      */
-    ActiveFEIndexEqualTo (const std::set<unsigned int> &active_fe_indices,
-                          const bool only_locally_owned = false);
+    ActiveFEIndexEqualTo(const std::set<unsigned int>& active_fe_indices,
+                         const bool only_locally_owned = false);
 
     /**
      * Evaluation operator. Returns true if the active FE index of the object
@@ -290,7 +287,8 @@ namespace IteratorFilters
      * and, if required, if the cell is locally owned.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
 
   protected:
     /**
@@ -318,10 +316,10 @@ namespace IteratorFilters
      * Evaluate the iterator and return true if the object at the boundary.
      */
     template <class Iterator>
-    bool operator () (const Iterator &i) const;
+    bool
+    operator()(const Iterator& i) const;
   };
-}
-
+} // namespace IteratorFilters
 
 /**
  * This class provides a certain view on a range of triangulation or
@@ -522,7 +520,7 @@ public:
    * predicate for filtering subsequent assignment and iteration.
    */
   template <typename Predicate>
-  FilteredIterator (Predicate p);
+  FilteredIterator(Predicate p);
 
   /**
    * Constructor. Use the given predicate for filtering and initialize the
@@ -542,19 +540,18 @@ public:
    * advanced to the first cell that has.
    */
   template <typename Predicate>
-  FilteredIterator (Predicate           p,
-                    const BaseIterator &bi);
+  FilteredIterator(Predicate p, const BaseIterator& bi);
 
   /**
    * Copy constructor. Copy the predicate and iterator value of the given
    * argument.
    */
-  FilteredIterator (const FilteredIterator &fi);
+  FilteredIterator(const FilteredIterator& fi);
 
   /**
    * Destructor.
    */
-  ~FilteredIterator ();
+  ~FilteredIterator();
 
   /**
    * Assignment operator. Copy the iterator value of the argument, but as
@@ -562,14 +559,16 @@ public:
    * not copied. The iterator value underlying the argument has to satisfy the
    * predicate of the object assigned to, as given at its construction time.
    */
-  FilteredIterator &operator = (const FilteredIterator &fi);
+  FilteredIterator&
+  operator=(const FilteredIterator& fi);
 
   /**
    * Assignment operator. Copy the iterator value of the argument, and keep
    * the predicate of this object. The given iterator value has to satisfy the
    * predicate of the object assigned to, as given at its construction time.
    */
-  FilteredIterator &operator = (const BaseIterator &fi);
+  FilteredIterator&
+  operator=(const BaseIterator& fi);
 
   /**
    * Search for the next iterator from @p bi onwards that satisfies the
@@ -579,8 +578,8 @@ public:
    * base iterator type, you can also give a filtered iterator as argument to
    * this function.
    */
-  FilteredIterator &
-  set_to_next_positive (const BaseIterator &bi);
+  FilteredIterator&
+  set_to_next_positive(const BaseIterator& bi);
 
   /**
    * As above, but search for the previous iterator from @p bi backwards that
@@ -590,8 +589,8 @@ public:
    * base iterator type, you can also give a filtered iterator as argument to
    * this function.
    */
-  FilteredIterator &
-  set_to_previous_positive (const BaseIterator &bi);
+  FilteredIterator&
+  set_to_previous_positive(const BaseIterator& bi);
 
   /**
    * Compare for equality of the underlying iterator values of this and the
@@ -599,7 +598,8 @@ public:
    *
    * We do not compare for equality of the predicates.
    */
-  bool operator == (const FilteredIterator &fi) const;
+  bool
+  operator==(const FilteredIterator& fi) const;
 
   /**
    * Compare for equality of the underlying iterator value of this object with
@@ -607,7 +607,8 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator == (const BaseIterator &fi) const;
+  bool
+  operator==(const BaseIterator& fi) const;
 
   /**
    * Compare for inequality of the underlying iterator values of this and the
@@ -615,7 +616,8 @@ public:
    *
    * We do not compare for equality of the predicates.
    */
-  bool operator != (const FilteredIterator &fi) const;
+  bool
+  operator!=(const FilteredIterator& fi) const;
 
   /**
    * Compare for inequality of the underlying iterator value of this object
@@ -623,7 +625,8 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator != (const BaseIterator &fi) const;
+  bool
+  operator!=(const BaseIterator& fi) const;
 
   /**
    * Compare for ordering of the underlying iterator values of this and the
@@ -631,7 +634,8 @@ public:
    *
    * We do not compare the predicates.
    */
-  bool operator <  (const FilteredIterator &fi) const;
+  bool
+  operator<(const FilteredIterator& fi) const;
 
   /**
    * Compare for ordering of the underlying iterator value of this object with
@@ -639,43 +643,48 @@ public:
    *
    * The predicate of this object is irrelevant for this operation.
    */
-  bool operator <  (const BaseIterator &fi) const;
+  bool
+  operator<(const BaseIterator& fi) const;
 
   /**
    * Prefix advancement operator: move to the next iterator value satisfying
    * the predicate and return the new iterator value.
    */
-  FilteredIterator &operator ++ ();
+  FilteredIterator&
+  operator++();
 
   /**
    * Postfix advancement operator: move to the next iterator value satisfying
    * the predicate and return the old iterator value.
    */
-  FilteredIterator   operator ++ (int);
+  FilteredIterator
+  operator++(int);
 
   /**
    * Prefix decrement operator: move to the previous iterator value satisfying
    * the predicate and return the new iterator value.
    */
-  FilteredIterator &operator -- ();
+  FilteredIterator&
+  operator--();
 
   /**
    * Postfix advancement operator: move to the previous iterator value
    * satisfying the predicate and return the old iterator value.
    */
-  FilteredIterator   operator -- (int);
+  FilteredIterator
+  operator--(int);
 
   /**
    * Exception.
    */
-  DeclException1 (ExcInvalidElement,
-                  BaseIterator,
-                  << "The element " << arg1
-                  << " with which you want to compare or which you want to"
-                  << " assign from is invalid since it does not satisfy the predicate.");
+  DeclException1(
+    ExcInvalidElement,
+    BaseIterator,
+    << "The element " << arg1
+    << " with which you want to compare or which you want to"
+    << " assign from is invalid since it does not satisfy the predicate.");
 
 private:
-
   /**
    * Base class to encapsulate a predicate object. Since predicates can be of
    * different types and we do not want to code these types into the template
@@ -692,21 +701,22 @@ private:
      * Mark the destructor virtual to allow destruction through pointers to
      * the base class.
      */
-    virtual ~PredicateBase () = default;
+    virtual ~PredicateBase() = default;
 
     /**
      * Abstract function which in derived classes denotes the evaluation of
      * the predicate on the given iterator.
      */
-    virtual bool operator () (const BaseIterator &bi) const = 0;
+    virtual bool
+    operator()(const BaseIterator& bi) const = 0;
 
     /**
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual std::unique_ptr<PredicateBase> clone () const = 0;
+    virtual std::unique_ptr<PredicateBase>
+    clone() const = 0;
   };
-
 
   /**
    * Actual implementation of the above abstract base class. Use a template
@@ -723,18 +733,20 @@ private:
     /**
      * Constructor. Take a predicate and store a copy of it.
      */
-    PredicateTemplate (const Predicate &predicate);
+    PredicateTemplate(const Predicate& predicate);
 
     /**
      * Evaluate the iterator with the stored copy of the predicate.
      */
-    virtual bool operator () (const BaseIterator &bi) const override;
+    virtual bool
+    operator()(const BaseIterator& bi) const override;
 
     /**
      * Generate a copy of this object, i.e. of the actual type of this
      * pointer.
      */
-    virtual std::unique_ptr<PredicateBase> clone () const override;
+    virtual std::unique_ptr<PredicateBase>
+    clone() const override;
 
   private:
     /**
@@ -748,10 +760,7 @@ private:
    * predicate given to the constructor.
    */
   std::unique_ptr<const PredicateBase> predicate;
-
 };
-
-
 
 /**
  * Create an object of type FilteredIterator given the base iterator and
@@ -764,15 +773,12 @@ private:
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>
-make_filtered_iterator (const BaseIterator &i,
-                        const Predicate    &p)
+make_filtered_iterator(const BaseIterator& i, const Predicate& p)
 {
   FilteredIterator<BaseIterator> fi(p);
-  fi.set_to_next_positive (i);
+  fi.set_to_next_positive(i);
   return fi;
 }
-
-
 
 namespace internal
 {
@@ -786,21 +792,21 @@ namespace internal
     struct NestFilteredIterators;
 
     template <typename BaseIterator, typename Predicate>
-    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate> >
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate>>
     {
       typedef ::dealii::FilteredIterator<BaseIterator> type;
     };
 
     template <typename BaseIterator, typename Predicate, typename... Targs>
-    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...> >
+    struct NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>
     {
-      typedef ::dealii::FilteredIterator<typename NestFilteredIterators<BaseIterator,
-              std::tuple<Targs...> >::type> type;
+      typedef ::dealii::FilteredIterator<
+        typename NestFilteredIterators<BaseIterator,
+                                       std::tuple<Targs...>>::type>
+        type;
     };
-  }
-}
-
-
+  } // namespace FilteredIteratorImplementation
+} // namespace internal
 
 /**
  * Filter the  given range of iterators using a Predicate. This allows to
@@ -834,17 +840,14 @@ namespace internal
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
-IteratorRange<FilteredIterator<BaseIterator> >
-filter_iterators (IteratorRange<BaseIterator> i,
-                  const Predicate &p)
+IteratorRange<FilteredIterator<BaseIterator>>
+filter_iterators(IteratorRange<BaseIterator> i, const Predicate& p)
 {
   FilteredIterator<BaseIterator> fi(p, *(i.begin()));
   FilteredIterator<BaseIterator> fi_end(p, *(i.end()));
 
-  return IteratorRange<FilteredIterator<BaseIterator> > (fi, fi_end);
+  return IteratorRange<FilteredIterator<BaseIterator>>(fi, fi_end);
 }
-
-
 
 /**
  * Filter the given range of iterators through an arbitrary number of
@@ -882,485 +885,344 @@ filter_iterators (IteratorRange<BaseIterator> i,
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
-IteratorRange<typename internal::FilteredIteratorImplementation::
-NestFilteredIterators<BaseIterator,std::tuple<Predicate, Targs...> >::type>
-filter_iterators (IteratorRange<BaseIterator> i,
-                  const Predicate &p,
-                  const Targs... args)
+IteratorRange<
+  typename internal::FilteredIteratorImplementation::
+    NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::type>
+filter_iterators(IteratorRange<BaseIterator> i,
+                 const Predicate&            p,
+                 const Targs... args)
 {
   // Recursively create filtered iterators, one predicate at a time
-  auto fi = filter_iterators(i,p);
+  auto fi = filter_iterators(i, p);
   return filter_iterators(fi, args...);
 }
 
-
 /* ------------------ Inline functions and templates ------------ */
 
-
 template <typename BaseIterator>
 template <typename Predicate>
-inline
-FilteredIterator<BaseIterator>::
-FilteredIterator (Predicate p)
-  :
-  predicate (new PredicateTemplate<Predicate>(p))
+inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p)
+  : predicate(new PredicateTemplate<Predicate>(p))
 {}
 
-
-
 template <typename BaseIterator>
 template <typename Predicate>
-inline
-FilteredIterator<BaseIterator>::
-FilteredIterator (Predicate          p,
-                  const BaseIterator &bi)
-  :
-  BaseIterator (bi),
-  predicate (new PredicateTemplate<Predicate>(p))
+inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate           p,
+                                                        const BaseIterator& bi)
+  : BaseIterator(bi), predicate(new PredicateTemplate<Predicate>(p))
 {
-  if ((this->state() == IteratorState::valid) &&
-      ! (*predicate) (*this))
-    set_to_next_positive (bi);
+  if((this->state() == IteratorState::valid) && !(*predicate)(*this))
+    set_to_next_positive(bi);
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator>::
-FilteredIterator (const FilteredIterator &fi)
-  :
-// this construction looks strange, but without going through the
-// address of fi, GCC would not cast fi to the base class of type
-// BaseIterator but tries to go through constructing a new
-// BaseIterator with an Accessor.
-  BaseIterator (*(BaseIterator *)(&fi)),
-  predicate (fi.predicate->clone ())
+inline FilteredIterator<BaseIterator>::FilteredIterator(
+  const FilteredIterator& fi)
+  : // this construction looks strange, but without going through the
+    // address of fi, GCC would not cast fi to the base class of type
+    // BaseIterator but tries to go through constructing a new
+    // BaseIterator with an Accessor.
+    BaseIterator(*(BaseIterator*) (&fi)),
+    predicate(fi.predicate->clone())
 {}
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator>::
-~FilteredIterator ()
+inline FilteredIterator<BaseIterator>::~FilteredIterator()
 {
   predicate.reset();
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-operator = (const FilteredIterator &fi)
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::operator=(const FilteredIterator& fi)
 {
   // Using equivalent code to the one for 'operator=(const BaseIterator &bi)'
   // below, some compiler would not cast fi to the base class of type
   // BaseIterator but try to go through constructing a new Accessor from fi
   // which fails. Hence, we just use an explicit upcast and call the above-
   // mentioned method.
-  const BaseIterator &bi = fi;
-  return operator = (bi);
+  const BaseIterator& bi      = fi;
+  return              operator=(bi);
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-operator = (const BaseIterator &bi)
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::operator=(const BaseIterator& bi)
 {
-  Assert ((bi.state() != IteratorState::valid) || (*predicate)(bi),
-          ExcInvalidElement(bi));
-  BaseIterator::operator = (bi);
+  Assert((bi.state() != IteratorState::valid) || (*predicate)(bi),
+         ExcInvalidElement(bi));
+  BaseIterator::operator=(bi);
   return *this;
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-set_to_next_positive (const BaseIterator &bi)
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::set_to_next_positive(const BaseIterator& bi)
 {
-  BaseIterator::operator = (bi);
-  while ((this->state() == IteratorState::valid) &&
-         ( ! (*predicate)(*this)))
-    BaseIterator::operator++ ();
+  BaseIterator::operator=(bi);
+  while((this->state() == IteratorState::valid) && (!(*predicate)(*this)))
+    BaseIterator::operator++();
 
   return *this;
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-set_to_previous_positive (const BaseIterator &bi)
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::set_to_previous_positive(const BaseIterator& bi)
 {
-  BaseIterator::operator = (bi);
-  while ((this->state() == IteratorState::valid) &&
-         ( ! (*predicate)(*this)))
-    BaseIterator::operator-- ();
+  BaseIterator::operator=(bi);
+  while((this->state() == IteratorState::valid) && (!(*predicate)(*this)))
+    BaseIterator::operator--();
 
   return *this;
 }
 
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator == (const FilteredIterator &fi) const
+inline bool
+FilteredIterator<BaseIterator>::operator==(const FilteredIterator& fi) const
 {
-  return (static_cast<const BaseIterator &>(*this)
-          ==
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator&>(*this)
+          == static_cast<const BaseIterator&>(fi));
 }
 
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator != (const FilteredIterator &fi) const
+inline bool
+FilteredIterator<BaseIterator>::operator!=(const FilteredIterator& fi) const
 {
-  return (static_cast<const BaseIterator &>(*this)
-          !=
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator&>(*this)
+          != static_cast<const BaseIterator&>(fi));
 }
 
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator < (const FilteredIterator &fi) const
+inline bool
+FilteredIterator<BaseIterator>::operator<(const FilteredIterator& fi) const
 {
-  return (static_cast<const BaseIterator &>(*this)
-          <
-          static_cast<const BaseIterator &>(fi));
+  return (static_cast<const BaseIterator&>(*this)
+          < static_cast<const BaseIterator&>(fi));
 }
 
-
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator == (const BaseIterator &bi) const
+inline bool
+FilteredIterator<BaseIterator>::operator==(const BaseIterator& bi) const
 {
-  return (static_cast<const BaseIterator &>(*this) == bi);
+  return (static_cast<const BaseIterator&>(*this) == bi);
 }
 
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator != (const BaseIterator &bi) const
+inline bool
+FilteredIterator<BaseIterator>::operator!=(const BaseIterator& bi) const
 {
-  return (static_cast<const BaseIterator &>(*this) != bi);
+  return (static_cast<const BaseIterator&>(*this) != bi);
 }
 
-
-
 template <typename BaseIterator>
-inline
-bool
-FilteredIterator<BaseIterator>::
-operator < (const BaseIterator &bi) const
+inline bool
+FilteredIterator<BaseIterator>::operator<(const BaseIterator& bi) const
 {
-  return (static_cast<const BaseIterator &>(*this) < bi);
+  return (static_cast<const BaseIterator&>(*this) < bi);
 }
 
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-operator ++ ()
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::operator++()
 {
-  if (this->state() == IteratorState::valid)
+  if(this->state() == IteratorState::valid)
     do
-      BaseIterator::operator++ ();
-    while ((this->state() == IteratorState::valid) &&
-           !(*predicate) (*this));
+      BaseIterator::operator++();
+    while((this->state() == IteratorState::valid) && !(*predicate)(*this));
   return *this;
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator>
-FilteredIterator<BaseIterator>::
-operator ++ (int)
+inline FilteredIterator<BaseIterator>
+FilteredIterator<BaseIterator>::operator++(int)
 {
   const FilteredIterator old_state = *this;
 
-  if (this->state() == IteratorState::valid)
+  if(this->state() == IteratorState::valid)
     do
-      BaseIterator::operator++ ();
-    while ((this->state() == IteratorState::valid) &&
-           !(*predicate) (*this));
+      BaseIterator::operator++();
+    while((this->state() == IteratorState::valid) && !(*predicate)(*this));
   return old_state;
 }
 
-
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator> &
-FilteredIterator<BaseIterator>::
-operator -- ()
+inline FilteredIterator<BaseIterator>&
+FilteredIterator<BaseIterator>::operator--()
 {
-  if (this->state() == IteratorState::valid)
+  if(this->state() == IteratorState::valid)
     do
-      BaseIterator::operator-- ();
-    while ((this->state() == IteratorState::valid) &&
-           !(*predicate) (*this));
+      BaseIterator::operator--();
+    while((this->state() == IteratorState::valid) && !(*predicate)(*this));
   return *this;
 }
 
-
-
 template <typename BaseIterator>
-inline
-FilteredIterator<BaseIterator>
-FilteredIterator<BaseIterator>::
-operator -- (int)
+inline FilteredIterator<BaseIterator>
+FilteredIterator<BaseIterator>::operator--(int)
 {
   const FilteredIterator old_state = *this;
 
-  if (this->state() == IteratorState::valid)
+  if(this->state() == IteratorState::valid)
     do
-      BaseIterator::operator-- ();
-    while ((this->state() == IteratorState::valid) &&
-           !(*predicate) (*this));
+      BaseIterator::operator--();
+    while((this->state() == IteratorState::valid) && !(*predicate)(*this));
   return old_state;
 }
-
-
 
 template <typename BaseIterator>
 template <typename Predicate>
-inline
-FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
-PredicateTemplate (const Predicate &predicate)
-  :
-  predicate (predicate)
+inline FilteredIterator<BaseIterator>::PredicateTemplate<
+  Predicate>::PredicateTemplate(const Predicate& predicate)
+  : predicate(predicate)
 {}
 
-
-
 template <typename BaseIterator>
 template <typename Predicate>
 bool
 FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
-operator () (const BaseIterator &bi) const
+operator()(const BaseIterator& bi) const
 {
   return predicate(bi);
 }
 
-
-
 template <typename BaseIterator>
 template <typename Predicate>
 std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
-FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::
-clone () const
+FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
 {
-  return std_cxx14::make_unique<PredicateTemplate> (predicate);
+  return std_cxx14::make_unique<PredicateTemplate>(predicate);
 }
-
-
 
 namespace IteratorFilters
 {
-
-// ---------------- IteratorFilters::Active ---------
+  // ---------------- IteratorFilters::Active ---------
 
   template <class Iterator>
-  inline
-  bool
-  Active::operator () (const Iterator &i) const
+  inline bool
+  Active::operator()(const Iterator& i) const
   {
     return (i->active());
   }
 
-
-// ---------------- IteratorFilters::UserFlagSet ---------
+  // ---------------- IteratorFilters::UserFlagSet ---------
 
   template <class Iterator>
-  inline
-  bool
-  UserFlagSet::operator () (const Iterator &i) const
+  inline bool
+  UserFlagSet::operator()(const Iterator& i) const
   {
     return (i->user_flag_set());
   }
 
-
-// ---------------- IteratorFilters::UserFlagNotSet ---------
+  // ---------------- IteratorFilters::UserFlagNotSet ---------
 
   template <class Iterator>
-  inline
-  bool
-  UserFlagNotSet::operator () (const Iterator &i) const
+  inline bool
+  UserFlagNotSet::operator()(const Iterator& i) const
   {
-    return (! i->user_flag_set());
+    return (!i->user_flag_set());
   }
 
-
-// ---------------- IteratorFilters::LevelEqualTo ---------
-  inline
-  LevelEqualTo::LevelEqualTo (const unsigned int level)
-    :
-    level (level)
+  // ---------------- IteratorFilters::LevelEqualTo ---------
+  inline LevelEqualTo::LevelEqualTo(const unsigned int level) : level(level)
   {}
 
-
-
   template <class Iterator>
-  inline
-  bool
-  LevelEqualTo::operator () (const Iterator &i) const
+  inline bool
+  LevelEqualTo::operator()(const Iterator& i) const
   {
     return (static_cast<unsigned int>(i->level()) == level);
   }
 
-
-
-// ---------------- IteratorFilters::SubdomainEqualTo ---------
-  inline
-  SubdomainEqualTo::SubdomainEqualTo (const types::subdomain_id subdomain_id)
-    :
-    subdomain_id (subdomain_id)
+  // ---------------- IteratorFilters::SubdomainEqualTo ---------
+  inline SubdomainEqualTo::SubdomainEqualTo(
+    const types::subdomain_id subdomain_id)
+    : subdomain_id(subdomain_id)
   {}
 
-
-
   template <class Iterator>
-  inline
-  bool
-  SubdomainEqualTo::operator () (const Iterator &i) const
+  inline bool
+  SubdomainEqualTo::operator()(const Iterator& i) const
   {
     return (i->subdomain_id() == subdomain_id);
   }
 
-
-
-// ---------------- IteratorFilters::LocallyOwnedCell ---------
+  // ---------------- IteratorFilters::LocallyOwnedCell ---------
 
   template <class Iterator>
-  inline
-  bool
-  LocallyOwnedCell::operator () (const Iterator &i) const
+  inline bool
+  LocallyOwnedCell::operator()(const Iterator& i) const
   {
     return (i->is_locally_owned());
   }
 
-
-// ---------------- IteratorFilters::LocallyOwnedLevelCell ---------
+  // ---------------- IteratorFilters::LocallyOwnedLevelCell ---------
 
   template <class Iterator>
-  inline
-  bool
-  LocallyOwnedLevelCell::operator () (const Iterator &i) const
+  inline bool
+  LocallyOwnedLevelCell::operator()(const Iterator& i) const
   {
     return (i->is_locally_owned_on_level());
   }
 
-
-
-// ---------------- IteratorFilters::MaterialIdEqualTo ---------
-  inline
-  MaterialIdEqualTo::MaterialIdEqualTo (const types::material_id material_id,
-                                        const bool only_locally_owned)
-    :
-    material_ids {material_id},
-               only_locally_owned (only_locally_owned)
+  // ---------------- IteratorFilters::MaterialIdEqualTo ---------
+  inline MaterialIdEqualTo::MaterialIdEqualTo(
+    const types::material_id material_id,
+    const bool               only_locally_owned)
+    : material_ids{material_id}, only_locally_owned(only_locally_owned)
   {}
 
-
-
-  inline
-  MaterialIdEqualTo::MaterialIdEqualTo (const std::set<types::material_id> &material_ids,
-                                        const bool only_locally_owned)
-    :
-    material_ids (material_ids),
-    only_locally_owned (only_locally_owned)
+  inline MaterialIdEqualTo::MaterialIdEqualTo(
+    const std::set<types::material_id>& material_ids,
+    const bool                          only_locally_owned)
+    : material_ids(material_ids), only_locally_owned(only_locally_owned)
   {}
-
-
 
   template <class Iterator>
-  inline
-  bool
-  MaterialIdEqualTo::operator () (const Iterator &i) const
+  inline bool
+  MaterialIdEqualTo::operator()(const Iterator& i) const
   {
     return only_locally_owned == true ?
-           (material_ids.find(i->material_id()) != material_ids.end() && i->is_locally_owned()):
-           material_ids.find(i->material_id()) != material_ids.end();
+             (material_ids.find(i->material_id()) != material_ids.end()
+              && i->is_locally_owned()) :
+             material_ids.find(i->material_id()) != material_ids.end();
   }
 
-
-
-// ---------------- IteratorFilters::ActiveFEIndexEqualTo ---------
-  inline
-  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const unsigned int active_fe_index,
-                                              const bool only_locally_owned)
-    :
-    active_fe_indices {active_fe_index},
-                    only_locally_owned (only_locally_owned)
+  // ---------------- IteratorFilters::ActiveFEIndexEqualTo ---------
+  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
+    const unsigned int active_fe_index,
+    const bool         only_locally_owned)
+    : active_fe_indices{active_fe_index}, only_locally_owned(only_locally_owned)
   {}
 
-
-
-  inline
-  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const std::set<unsigned int> &active_fe_indices,
-                                              const bool only_locally_owned)
-    :
-    active_fe_indices (active_fe_indices),
-    only_locally_owned (only_locally_owned)
+  inline ActiveFEIndexEqualTo::ActiveFEIndexEqualTo(
+    const std::set<unsigned int>& active_fe_indices,
+    const bool                    only_locally_owned)
+    : active_fe_indices(active_fe_indices),
+      only_locally_owned(only_locally_owned)
   {}
-
-
 
   template <class Iterator>
-  inline
-  bool
-  ActiveFEIndexEqualTo::operator () (const Iterator &i) const
+  inline bool
+  ActiveFEIndexEqualTo::operator()(const Iterator& i) const
   {
     return only_locally_owned == true ?
-           (active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end() && i->is_locally_owned()):
-           active_fe_indices.find(i->active_fe_index()) != active_fe_indices.end();
+             (active_fe_indices.find(i->active_fe_index())
+                != active_fe_indices.end()
+              && i->is_locally_owned()) :
+             active_fe_indices.find(i->active_fe_index())
+               != active_fe_indices.end();
   }
 
-
-
-// ---------------- IteratorFilters::AtBoundary ---------
+  // ---------------- IteratorFilters::AtBoundary ---------
 
   template <class Iterator>
-  inline
-  bool
-  AtBoundary::operator () (const Iterator &i) const
+  inline bool
+  AtBoundary::operator()(const Iterator& i) const
   {
     return (i->at_boundary());
   }
-}
-
+} // namespace IteratorFilters
 
 DEAL_II_NAMESPACE_CLOSE
 

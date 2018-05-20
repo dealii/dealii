@@ -13,15 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test ParameterHandler::set(., bool) which was broken, see bug #49
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-
-int main ()
+int
+main()
 {
   try
     {
@@ -30,36 +28,34 @@ int main ()
 
       // same as parameter_handler_3
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("bool",
-                         "true",
-                         Patterns::Bool(),
-                         "docs 1");
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("bool", "true", Patterns::Bool(), "docs 1");
+      prm.leave_subsection();
 
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_6_bool.prm");
 
       // now set the parameter to a different
       // value
-      prm.enter_subsection ("Testing");
-      prm.set ("bool", true);
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.set("bool", true);
+      prm.leave_subsection();
 
       // then write
-      prm.print_parameters (logfile, ParameterHandler::Text);
+      prm.print_parameters(logfile, ParameterHandler::Text);
 
       // and do it again with the opposite
       // value
-      prm.enter_subsection ("Testing");
-      prm.set ("bool", false);
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.set("bool", false);
+      prm.leave_subsection();
 
       // then write
-      prm.print_parameters (logfile, ParameterHandler::Text);
+      prm.print_parameters(logfile, ParameterHandler::Text);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -70,9 +66,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

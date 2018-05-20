@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that ConstraintMatrix.distribute() is not doing anything in a
 // distributed computation for a vector that already has the entries set
 // correctly
@@ -23,87 +21,84 @@
 #include <deal.II/base/function.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/fe/fe_q.h>
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 template <int dim>
-void test()
+void
+test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);
 
-  tr.refine_global (1);
-  tr.begin_active()->set_refine_flag ();
-  tr.execute_coarsening_and_refinement ();
+  tr.refine_global(1);
+  tr.begin_active()->set_refine_flag();
+  tr.execute_coarsening_and_refinement();
 
   DoFHandler<dim> dofh(tr);
 
   static FE_Q<dim> fe(1);
 
-  dofh.distribute_dofs (fe);
+  dofh.distribute_dofs(fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
 
   IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
+  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
 
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
-  VectorTools::interpolate(dofh,
-                           Functions::ConstantFunction<dim> (1.),
-                           x_ref);
+  VectorTools::interpolate(dofh, Functions::ConstantFunction<dim>(1.), x_ref);
 
-  TrilinosWrappers::MPI::Vector x1 (x_ref);
+  TrilinosWrappers::MPI::Vector x1(x_ref);
 
   // we have interpolated values, so
   // ConstraintMatrix::distribute should not do
   // anything
   x1 = x_ref;
   ConstraintMatrix cm(relevant_set);
-  DoFTools::make_hanging_node_constraints (dofh, cm);
-  cm.close ();
+  DoFTools::make_hanging_node_constraints(dofh, cm);
+  cm.close();
   cm.distribute(x1);
 
   x1 -= x_ref;
   double err = x1.linfty_norm();
-  if (err>1.0e-12)
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(err > 1.0e-12)
+    if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
 
   // now test the same thing with a fresh vector
   // that we manually fill with ones, not by a
   // function in interpolate
-  TrilinosWrappers::MPI::Vector x2 (owned_set, MPI_COMM_WORLD);
+  TrilinosWrappers::MPI::Vector x2(owned_set, MPI_COMM_WORLD);
   x2 = 1;
   cm.distribute(x2);
   x2 -= x_ref;
   err = x2.linfty_norm();
-  if (err>1.0e-12)
-    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(err > 1.0e-12)
+    if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
 
@@ -113,5 +108,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

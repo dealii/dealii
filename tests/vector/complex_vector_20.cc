@@ -13,55 +13,54 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<std::complex<double> >::operator *=
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<std::complex<double> > &v)
+void
+test(Vector<std::complex<double>>& v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
   // actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
-      v(i) = std::complex<double> (i+1., i+2.);
+      v(i)       = std::complex<double>(i + 1., i + 2.);
       pattern[i] = true;
     }
-  v.compress ();
+  v.compress();
 
   // multiply v with 5/4
-  v *= 5./4.;
+  v *= 5. / 4.;
 
   // check that the entries are ok
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (((pattern[i] == true) && (v(i) == std::complex<double> (i+1., i+2.)*5./4.))
-                 ||
-                 ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
-                 ExcInternalError());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(
+      ((pattern[i] == true)
+       && (v(i) == std::complex<double>(i + 1., i + 2.) * 5. / 4.))
+        || ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
+      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      test (v);
+      Vector<std::complex<double>> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -72,9 +71,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

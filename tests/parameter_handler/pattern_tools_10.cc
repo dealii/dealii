@@ -20,18 +20,20 @@
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 
-  auto a = std::make_tuple(Point<3>(), double(3.5), std::string("ciao"));
-  const auto &pattern = Patterns::Tools::Convert<decltype(a)>::to_pattern();
+  auto        a = std::make_tuple(Point<3>(), double(3.5), std::string("ciao"));
+  const auto& pattern = Patterns::Tools::Convert<decltype(a)>::to_pattern();
 
   deallog << pattern->description() << std::endl;
 
   deallog << Patterns::Tools::Convert<decltype(a)>::to_string(a) << std::endl;
 
-  a = Patterns::Tools::Convert<decltype(a)>::to_value("1.0, 2.0, 3.0 : 3.14 : mondo");
+  a = Patterns::Tools::Convert<decltype(a)>::to_value(
+    "1.0, 2.0, 3.0 : 3.14 : mondo");
 
   deallog << Patterns::Tools::Convert<decltype(a)>::to_string(a) << std::endl;
 }

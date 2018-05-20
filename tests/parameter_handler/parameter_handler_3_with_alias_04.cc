@@ -13,16 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // like _with_alias_02 but read an input file that references both the old and
 // the new parameter (in the opposite order of the _with_alias_03 test)
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-
-int main ()
+int
+main()
 {
   try
     {
@@ -30,29 +28,24 @@ int main ()
       deallog.attach(logfile);
 
       ParameterHandler prm;
-      prm.enter_subsection ("Testing");
-      prm.declare_entry ("string list",
-                         "a",
-                         Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
-                         "docs 1");
-      prm.declare_entry ("int_alias",
-                         "1",
-                         Patterns::Integer());
-      prm.declare_entry ("double",
-                         "3.1415926",
-                         Patterns::Double(),
-                         "docs 3");
-      prm.declare_alias ("int_alias",
-                         "int");
-      prm.leave_subsection ();
+      prm.enter_subsection("Testing");
+      prm.declare_entry("string list",
+                        "a",
+                        Patterns::List(Patterns::Selection("a|b|c|d|e|f|g|h")),
+                        "docs 1");
+      prm.declare_entry("int_alias", "1", Patterns::Integer());
+      prm.declare_entry("double", "3.1415926", Patterns::Double(), "docs 3");
+      prm.declare_alias("int_alias", "int");
+      prm.leave_subsection();
 
       // read and then write parameters
       prm.parse_input(SOURCE_DIR "/prm/parameter_handler_3_with_alias_04.prm");
-      prm.print_parameters (logfile, ParameterHandler::Text);
+      prm.print_parameters(logfile, ParameterHandler::Text);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -63,9 +56,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

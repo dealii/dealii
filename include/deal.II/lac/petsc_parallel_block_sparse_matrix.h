@@ -16,28 +16,24 @@
 #ifndef dealii_petsc_parallel_block_sparse_matrix_h
 #define dealii_petsc_parallel_block_sparse_matrix_h
 
-
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_PETSC
 
+#  include <cmath>
 #  include <deal.II/base/table.h>
 #  include <deal.II/lac/block_matrix_base.h>
 #  include <deal.II/lac/block_sparsity_pattern.h>
-#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#  include <deal.II/lac/petsc_parallel_block_vector.h>
 #  include <deal.II/lac/exceptions.h>
-#  include <cmath>
+#  include <deal.II/lac/petsc_parallel_block_vector.h>
+#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-
 
 namespace PETScWrappers
 {
   namespace MPI
   {
-
     /*! @addtogroup PETScWrappers
      *@{
      */
@@ -76,7 +72,7 @@ namespace PETScWrappers
       /**
        * Typedef the type of the underlying matrix.
        */
-      typedef BaseClass::BlockType  BlockType;
+      typedef BaseClass::BlockType BlockType;
 
       /**
        * Import the typedefs from the base class.
@@ -101,19 +97,19 @@ namespace PETScWrappers
        * reinit(BlockSparsityPattern). The number of blocks per row and column
        * are then determined by that function.
        */
-      BlockSparseMatrix () = default;
+      BlockSparseMatrix() = default;
 
       /**
        * Destructor.
        */
-      ~BlockSparseMatrix () override = default;
+      ~BlockSparseMatrix() override = default;
 
       /**
        * Pseudo copy operator only copying empty objects. The sizes of the
        * block matrices need to be the same.
        */
-      BlockSparseMatrix &
-      operator = (const BlockSparseMatrix &);
+      BlockSparseMatrix&
+      operator=(const BlockSparseMatrix&);
 
       /**
        * This operator assigns a scalar to a matrix. Since this does usually
@@ -124,8 +120,8 @@ namespace PETScWrappers
        * <tt>matrix=0</tt>, which sets all elements of the matrix to zero, but
        * keep the sparsity pattern previously used.
        */
-      BlockSparseMatrix &
-      operator = (const double d);
+      BlockSparseMatrix&
+      operator=(const double d);
 
       /**
        * Resize the matrix, by setting the number of block rows and columns.
@@ -140,9 +136,8 @@ namespace PETScWrappers
        * SparsityPattern class here but rather let the user call whatever
        * function she desires.
        */
-      void reinit (const size_type n_block_rows,
-                   const size_type n_block_columns);
-
+      void
+      reinit(const size_type n_block_rows, const size_type n_block_columns);
 
       /**
        * Efficiently reinit the block matrix for a parallel computation. Only
@@ -153,77 +148,76 @@ namespace PETScWrappers
        * For a symmetric structure hand in the same vector for the first two
        * arguments.
        */
-      void reinit(const std::vector<IndexSet> &rows,
-                  const std::vector<IndexSet> &cols,
-                  const BlockDynamicSparsityPattern &bdsp,
-                  const MPI_Comm &com);
-
+      void
+      reinit(const std::vector<IndexSet>&       rows,
+             const std::vector<IndexSet>&       cols,
+             const BlockDynamicSparsityPattern& bdsp,
+             const MPI_Comm&                    com);
 
       /**
        * Same as above but for a symmetric structure only.
        */
-      void reinit(const std::vector<IndexSet> &sizes,
-                  const BlockDynamicSparsityPattern &bdsp,
-                  const MPI_Comm &com);
-
-
+      void
+      reinit(const std::vector<IndexSet>&       sizes,
+             const BlockDynamicSparsityPattern& bdsp,
+             const MPI_Comm&                    com);
 
       /**
        * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
        * matrix.
        */
-      void vmult (BlockVector       &dst,
-                  const BlockVector &src) const;
+      void
+      vmult(BlockVector& dst, const BlockVector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block column.
        */
-      void vmult (BlockVector          &dst,
-                  const Vector &src) const;
+      void
+      vmult(BlockVector& dst, const Vector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block row.
        */
-      void vmult (Vector    &dst,
-                  const BlockVector &src) const;
+      void
+      vmult(Vector& dst, const BlockVector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block.
        */
-      void vmult (Vector       &dst,
-                  const Vector &src) const;
+      void
+      vmult(Vector& dst, const Vector& src) const;
 
       /**
        * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
        * matrix. This function does the same as vmult() but takes the
        * transposed matrix.
        */
-      void Tvmult (BlockVector       &dst,
-                   const BlockVector &src) const;
+      void
+      Tvmult(BlockVector& dst, const BlockVector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block row.
        */
-      void Tvmult (BlockVector  &dst,
-                   const Vector &src) const;
+      void
+      Tvmult(BlockVector& dst, const Vector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block column.
        */
-      void Tvmult (Vector    &dst,
-                   const BlockVector &src) const;
+      void
+      Tvmult(Vector& dst, const BlockVector& src) const;
 
       /**
        * Matrix-vector multiplication. Just like the previous function, but
        * only applicable if the matrix has only one block.
        */
-      void Tvmult (Vector       &dst,
-                   const Vector &src) const;
+      void
+      Tvmult(Vector& dst, const Vector& src) const;
 
       /**
        * This function collects the sizes of the sub-objects and stores them
@@ -232,26 +226,30 @@ namespace PETScWrappers
        * function each time after you have changed the size of the sub-
        * objects.
        */
-      void collect_sizes ();
+      void
+      collect_sizes();
 
       /**
        * Return the partitioning of the domain space of this matrix, i.e., the
        * partitioning of the vectors this matrix has to be multiplied with.
        */
-      std::vector< IndexSet > locally_owned_domain_indices() const;
+      std::vector<IndexSet>
+      locally_owned_domain_indices() const;
 
       /**
        * Return the partitioning of the range space of this matrix, i.e., the
        * partitioning of the vectors that are result from matrix-vector
        * products.
        */
-      std::vector< IndexSet > locally_owned_range_indices() const;
+      std::vector<IndexSet>
+      locally_owned_range_indices() const;
 
       /**
        * Return a reference to the MPI communicator object in use with this
        * matrix.
        */
-      const MPI_Comm &get_mpi_communicator () const;
+      const MPI_Comm&
+      get_mpi_communicator() const;
 
       /**
        * Make the clear() function in the base class visible, though it is
@@ -260,112 +258,76 @@ namespace PETScWrappers
       using BlockMatrixBase<SparseMatrix>::clear;
     };
 
-
-
     /*@}*/
 
-// ------------- inline and template functions -----------------
+    // ------------- inline and template functions -----------------
 
-    inline
-    BlockSparseMatrix &
-    BlockSparseMatrix::operator = (const double d)
+    inline BlockSparseMatrix&
+    BlockSparseMatrix::operator=(const double d)
     {
-      Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+      Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
-      for (size_type r=0; r<this->n_block_rows(); ++r)
-        for (size_type c=0; c<this->n_block_cols(); ++c)
-          this->block(r,c) = d;
+      for(size_type r = 0; r < this->n_block_rows(); ++r)
+        for(size_type c = 0; c < this->n_block_cols(); ++c)
+          this->block(r, c) = d;
 
       return *this;
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::vmult (BlockVector       &dst,
-                              const BlockVector &src) const
+    inline void
+    BlockSparseMatrix::vmult(BlockVector& dst, const BlockVector& src) const
     {
-      BaseClass::vmult_block_block (dst, src);
+      BaseClass::vmult_block_block(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::vmult (BlockVector  &dst,
-                              const Vector &src) const
+    inline void
+    BlockSparseMatrix::vmult(BlockVector& dst, const Vector& src) const
     {
-      BaseClass::vmult_block_nonblock (dst, src);
+      BaseClass::vmult_block_nonblock(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::vmult (Vector            &dst,
-                              const BlockVector &src) const
+    inline void
+    BlockSparseMatrix::vmult(Vector& dst, const BlockVector& src) const
     {
-      BaseClass::vmult_nonblock_block (dst, src);
+      BaseClass::vmult_nonblock_block(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::vmult (Vector       &dst,
-                              const Vector &src) const
+    inline void
+    BlockSparseMatrix::vmult(Vector& dst, const Vector& src) const
     {
-      BaseClass::vmult_nonblock_nonblock (dst, src);
+      BaseClass::vmult_nonblock_nonblock(dst, src);
     }
 
-
-    inline
-    void
-    BlockSparseMatrix::Tvmult (BlockVector       &dst,
-                               const BlockVector &src) const
+    inline void
+    BlockSparseMatrix::Tvmult(BlockVector& dst, const BlockVector& src) const
     {
-      BaseClass::Tvmult_block_block (dst, src);
+      BaseClass::Tvmult_block_block(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::Tvmult (BlockVector  &dst,
-                               const Vector &src) const
+    inline void
+    BlockSparseMatrix::Tvmult(BlockVector& dst, const Vector& src) const
     {
-      BaseClass::Tvmult_block_nonblock (dst, src);
+      BaseClass::Tvmult_block_nonblock(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::Tvmult (Vector            &dst,
-                               const BlockVector &src) const
+    inline void
+    BlockSparseMatrix::Tvmult(Vector& dst, const BlockVector& src) const
     {
-      BaseClass::Tvmult_nonblock_block (dst, src);
+      BaseClass::Tvmult_nonblock_block(dst, src);
     }
 
-
-
-    inline
-    void
-    BlockSparseMatrix::Tvmult (Vector       &dst,
-                               const Vector &src) const
+    inline void
+    BlockSparseMatrix::Tvmult(Vector& dst, const Vector& src) const
     {
-      BaseClass::Tvmult_nonblock_nonblock (dst, src);
+      BaseClass::Tvmult_nonblock_nonblock(dst, src);
     }
 
-  }
+  } // namespace MPI
 
-}
-
+} // namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
+#endif // DEAL_II_WITH_PETSC
 
-#endif    // DEAL_II_WITH_PETSC
-
-#endif    // dealii_petsc_parallel_block_sparse_matrix_h
+#endif // dealii_petsc_parallel_block_sparse_matrix_h

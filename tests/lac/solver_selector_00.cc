@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // I managed to break solver selector once by making some variables in the
 // AdditionalData structures of the solvers const. This test simply
 // instantiates that class, to make sure it still compiles
@@ -26,7 +25,8 @@ DEAL_II_NAMESPACE_OPEN
 template class SolverSelector<>;
 DEAL_II_NAMESPACE_CLOSE
 
-int main ()
+int
+main()
 {
   initlog();
 

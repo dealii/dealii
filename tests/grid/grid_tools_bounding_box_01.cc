@@ -16,20 +16,21 @@
 // Short test to validate compute_bounding_box()
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 template <int dim>
 bool
-pred_mat_id(const typename Triangulation<dim>::active_cell_iterator &cell)
+pred_mat_id(const typename Triangulation<dim>::active_cell_iterator& cell)
 {
   return cell->material_id() == 2;
 }
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim = " << dim << std::endl;
 
@@ -40,43 +41,40 @@ void test ()
   typedef typename Triangulation<dim>::active_cell_iterator cell_iterator;
 
   // Mark a small block at the corner of the hypercube
-  cell_iterator
-  cell = tria.begin_active(),
-  endc = tria.end();
-  for (; cell != endc; ++cell)
+  cell_iterator cell = tria.begin_active(), endc = tria.end();
+  for(; cell != endc; ++cell)
     {
       bool mark = true;
-      for (unsigned int d=0; d < dim; ++d)
-        if (cell->center()[d] > 0.33 )
+      for(unsigned int d = 0; d < dim; ++d)
+        if(cell->center()[d] > 0.33)
           {
             mark = false;
             break;
           }
 
-      if (mark == true)
+      if(mark == true)
         cell->set_material_id(2);
       else
         cell->set_material_id(1);
     }
 
-  std::function<bool (const cell_iterator &)> predicate = pred_mat_id<dim>;
+  std::function<bool(const cell_iterator&)> predicate = pred_mat_id<dim>;
 
   // Find bounding box that surrounds cells with material id 2
   auto bounding_box
     = GridTools::compute_bounding_box(tria, predicate); // General predicate
 
   deallog << bounding_box.first << " " << bounding_box.second << std::endl;
-
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   return 0;
 }

@@ -13,31 +13,32 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 
 #include <deal.II/base/polynomial.h>
 
 using namespace Polynomials;
 
-void plot(const std::vector<Polynomial<double> > &polynomials)
+void
+plot(const std::vector<Polynomial<double>>& polynomials)
 {
   LogStream::Prefix("plot");
-  const unsigned int n=8;
-  for (unsigned int i=0; i<=n; ++i)
+  const unsigned int n = 8;
+  for(unsigned int i = 0; i <= n; ++i)
     {
-      const double x = 1.*i/n;
+      const double x = 1. * i / n;
       deallog << x;
-      for (unsigned int p=0; p<polynomials.size(); ++p)
+      for(unsigned int p = 0; p < polynomials.size(); ++p)
         deallog << '\t' << polynomials[p].value(x);
       deallog << std::endl;
     }
 }
 
-void interpolation_conditions(const std::vector<Polynomial<double> > &polynomials)
+void
+interpolation_conditions(const std::vector<Polynomial<double>>& polynomials)
 {
   std::vector<double> values(2);
-  for (unsigned int i=0; i<polynomials.size(); ++i)
+  for(unsigned int i = 0; i < polynomials.size(); ++i)
     {
       polynomials[i].value(0., values);
       deallog << i << "\t 0:\t" << values[0] << '\t' << values[1] << std::endl;
@@ -46,10 +47,10 @@ void interpolation_conditions(const std::vector<Polynomial<double> > &polynomial
     }
 }
 
-
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 

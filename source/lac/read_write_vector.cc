@@ -22,21 +22,22 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
-// do a few functions that currently don't fit the scheme because they have
-// two template arguments that need to be different (the case of same
-// arguments is covered by the default copy constructor and copy operator that
-// is declared separately)
+  // do a few functions that currently don't fit the scheme because they have
+  // two template arguments that need to be different (the case of same
+  // arguments is covered by the default copy constructor and copy operator that
+  // is declared separately)
 
-#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                           \
-  template ReadWriteVector<S1>& ReadWriteVector<S1>::operator=<S2> (const ReadWriteVector<S2> &)
+#define TEMPL_COPY_CONSTRUCTOR(S1, S2)                              \
+  template ReadWriteVector<S1>& ReadWriteVector<S1>::operator=<S2>( \
+    const ReadWriteVector<S2>&)
 
-  TEMPL_COPY_CONSTRUCTOR(double,float);
-  TEMPL_COPY_CONSTRUCTOR(float,double);
+  TEMPL_COPY_CONSTRUCTOR(double, float);
+  TEMPL_COPY_CONSTRUCTOR(float, double);
 
-  TEMPL_COPY_CONSTRUCTOR(std::complex<double>,std::complex<float>);
-  TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<double>);
+  TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
+  TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
 
 #undef TEMPL_COPY_CONSTRUCTOR
-}
+} // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE

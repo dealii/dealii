@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // when updating BOOST to 1.56 in the summer of 2014, we thought we
 // could get rid of BOOST.fusion. but this doesn't work for some users
 // since boost/math/special_functions/erf.hpp uses it. this test is a
@@ -23,10 +22,10 @@
 
 #include <boost/math/special_functions/erf.hpp>
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  deallog << boost::math::erf (0.5) << std::endl;
+  deallog << boost::math::erf(0.5) << std::endl;
 }

@@ -13,21 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparsityPattern::copy_from
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  copy_from_2<SparsityPattern, DynamicSparsityPattern> ();
+  copy_from_2<SparsityPattern, DynamicSparsityPattern>();
 }
-
-
-

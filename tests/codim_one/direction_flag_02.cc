@@ -13,58 +13,56 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test direction flags in a 2d mesh embedded in 3d
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 using namespace std;
 
-
-void test ()
+void
+test()
 {
   const unsigned int spacedim = 3;
-  const unsigned int dim = spacedim-1;
+  const unsigned int dim      = spacedim - 1;
 
-  Triangulation<dim,spacedim> boundary_mesh;
-  Triangulation<spacedim> volume_mesh;
+  Triangulation<dim, spacedim> boundary_mesh;
+  Triangulation<spacedim>      volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
-  GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
-  for (Triangulation<dim,spacedim>::active_cell_iterator
-       cell = boundary_mesh.begin_active();
-       cell != boundary_mesh.end(); ++cell)
+  GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+  for(Triangulation<dim, spacedim>::active_cell_iterator cell
+      = boundary_mesh.begin_active();
+      cell != boundary_mesh.end();
+      ++cell)
     {
       deallog << "Cell=" << cell;
       deallog << ", direction flag="
-              << (cell->direction_flag() ? "true" : "false")
-              << std::endl;
+              << (cell->direction_flag() ? "true" : "false") << std::endl;
     }
 
   boundary_mesh.refine_global(1);
 
-  for (Triangulation<dim,spacedim>::active_cell_iterator
-       cell = boundary_mesh.begin_active();
-       cell != boundary_mesh.end(); ++cell)
+  for(Triangulation<dim, spacedim>::active_cell_iterator cell
+      = boundary_mesh.begin_active();
+      cell != boundary_mesh.end();
+      ++cell)
     {
       deallog << "Cell=" << cell << std::endl;
       deallog << ", direction flag="
-              << (cell->direction_flag() ? "true" : "false")
-              << std::endl;
+              << (cell->direction_flag() ? "true" : "false") << std::endl;
     }
 }
 
-
-
-int main ()
+int
+main()
 {
   ofstream logfile("output");
   deallog.attach(logfile);
 
-  test ();
+  test();
 }

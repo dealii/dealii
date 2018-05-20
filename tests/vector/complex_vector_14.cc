@@ -13,60 +13,58 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<std::complex<double> >::operator() in set/add-mode alternatingly
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<std::complex<double> > &v)
+void
+test(Vector<std::complex<double>>& v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
   // actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  bool flag = false;
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  bool              flag = false;
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
-      if (flag == true)
-        v(i) += std::complex<double> (i+1., i+2.);
+      if(flag == true)
+        v(i) += std::complex<double>(i + 1., i + 2.);
       else
-        v(i) = std::complex<double> (i+1., i+2.);
+        v(i) = std::complex<double>(i + 1., i + 2.);
       flag = !flag;
 
       pattern[i] = true;
     }
 
-  v.compress ();
+  v.compress();
 
   // check that they are ok, and this time
   // all of them
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (((pattern[i] == true) && (v(i) == std::complex<double> (i+1., i+2.)))
-                 ||
-                 ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
-                 ExcInternalError());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(
+      ((pattern[i] == true) && (v(i) == std::complex<double>(i + 1., i + 2.)))
+        || ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
+      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      test (v);
+      Vector<std::complex<double>> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -77,9 +75,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -16,25 +16,23 @@
 #ifndef dealii_parallel_h
 #define dealii_parallel_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/synchronous_iterator.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/thread_management.h>
 
 #include <cstddef>
-#include <tuple>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <tuple>
 
 #ifdef DEAL_II_WITH_THREADS
+#  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
-#  include <tbb/blocked_range.h>
 #endif
-
 
 //TODO[WB]: allow calling functions to pass along a tbb::affinity_partitioner object to ensure that subsequent calls use the same cache lines
 
@@ -66,8 +64,6 @@ namespace parallel
     };
 #endif
 
-
-
     /**
      * Convert a function object of type F into an object that can be applied
      * to all elements of a range of synchronous iterators.
@@ -78,18 +74,16 @@ namespace parallel
       /**
        * Constructor. Take and package the given function object.
        */
-      Body (const F &f)
-        :
-        f (f)
+      Body(const F& f) : f(f)
       {}
 
       template <typename Range>
       void
-      operator () (const Range &range) const
+      operator()(const Range& range) const
       {
-        for (typename Range::const_iterator p=range.begin();
-             p != range.end(); ++p)
-          apply (f, *p);
+        for(typename Range::const_iterator p = range.begin(); p != range.end();
+            ++p)
+          apply(f, *p);
       }
 
     private:
@@ -102,43 +96,32 @@ namespace parallel
        * Apply F to a set of iterators with two elements.
        */
       template <typename I1, typename I2>
-      static
-      void
-      apply (const F &f,
-             const std::tuple<I1,I2> &p)
+      static void
+      apply(const F& f, const std::tuple<I1, I2>& p)
       {
-        *std::get<1>(p) = f (*std::get<0>(p));
+        *std::get<1>(p) = f(*std::get<0>(p));
       }
 
       /**
        * Apply F to a set of iterators with three elements.
        */
       template <typename I1, typename I2, typename I3>
-      static
-      void
-      apply (const F &f,
-             const std::tuple<I1,I2,I3> &p)
+      static void
+      apply(const F& f, const std::tuple<I1, I2, I3>& p)
       {
-        *std::get<2>(p) = f (*std::get<0>(p),
-                             *std::get<1>(p));
+        *std::get<2>(p) = f(*std::get<0>(p), *std::get<1>(p));
       }
 
       /**
        * Apply F to a set of iterators with three elements.
        */
-      template <typename I1, typename I2,
-                typename I3, typename I4>
-      static
-      void
-      apply (const F &f,
-             const std::tuple<I1,I2,I3,I4> &p)
+      template <typename I1, typename I2, typename I3, typename I4>
+      static void
+      apply(const F& f, const std::tuple<I1, I2, I3, I4>& p)
       {
-        *std::get<3>(p) = f (*std::get<0>(p),
-                             *std::get<1>(p),
-                             *std::get<2>(p));
+        *std::get<3>(p) = f(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
       }
     };
-
 
     /**
      * Take a function object and create a Body object from it. We do this in
@@ -147,11 +130,12 @@ namespace parallel
      * extraordinarily complicated.
      */
     template <typename F>
-    Body<F> make_body(const F &f)
+    Body<F>
+    make_body(const F& f)
     {
       return Body<F>(f);
     }
-  }
+  } // namespace internal
 
   /**
    * An algorithm that performs the action <code>*out++ =
@@ -176,36 +160,32 @@ namespace parallel
    * @ref threads "Parallel computing with multiple processors"
    * module.
    */
-  template <typename InputIterator,
-            typename OutputIterator,
-            typename Predicate>
-  void transform (const InputIterator &begin_in,
-                  const InputIterator &end_in,
-                  OutputIterator       out,
-                  Predicate           &predicate,
-                  const unsigned int   grainsize)
+  template <typename InputIterator, typename OutputIterator, typename Predicate>
+  void
+  transform(const InputIterator& begin_in,
+            const InputIterator& end_in,
+            OutputIterator       out,
+            Predicate&           predicate,
+            const unsigned int   grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
     // warnings about unused arguments
     (void) grainsize;
 
-    for (OutputIterator in = begin_in; in != end_in;)
-      *out++ = predicate (*in++);
+    for(OutputIterator in = begin_in; in != end_in;)
+      *out++ = predicate(*in++);
 #else
-    typedef std::tuple<InputIterator,OutputIterator> Iterators;
-    typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators x_begin (begin_in, out);
-    Iterators x_end (end_in, OutputIterator());
-    tbb::parallel_for (tbb::blocked_range<SyncIterators>(x_begin,
-                                                         x_end,
-                                                         grainsize),
-                       internal::make_body (predicate),
-                       tbb::auto_partitioner());
+    typedef std::tuple<InputIterator, OutputIterator> Iterators;
+    typedef SynchronousIterators<Iterators>           SyncIterators;
+    Iterators                                         x_begin(begin_in, out);
+    Iterators x_end(end_in, OutputIterator());
+    tbb::parallel_for(
+      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+      internal::make_body(predicate),
+      tbb::auto_partitioner());
 #endif
   }
-
-
 
   /**
    * An algorithm that performs the action <code>*out++ = predicate(*in1++,
@@ -234,36 +214,33 @@ namespace parallel
             typename InputIterator2,
             typename OutputIterator,
             typename Predicate>
-  void transform (const InputIterator1 &begin_in1,
-                  const InputIterator1 &end_in1,
-                  InputIterator2        in2,
-                  OutputIterator        out,
-                  Predicate            &predicate,
-                  const unsigned int    grainsize)
+  void
+  transform(const InputIterator1& begin_in1,
+            const InputIterator1& end_in1,
+            InputIterator2        in2,
+            OutputIterator        out,
+            Predicate&            predicate,
+            const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
     // warnings about unused arguments
     (void) grainsize;
 
-    for (OutputIterator in1 = begin_in1; in1 != end_in1;)
-      *out++ = predicate (*in1++, *in2++);
+    for(OutputIterator in1 = begin_in1; in1 != end_in1;)
+      *out++ = predicate(*in1++, *in2++);
 #else
-    typedef
-    std::tuple<InputIterator1,InputIterator2,OutputIterator>
-    Iterators;
+    typedef std::tuple<InputIterator1, InputIterator2, OutputIterator>
+                                            Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators x_begin (begin_in1, in2, out);
-    Iterators x_end (end_in1, InputIterator2(), OutputIterator());
-    tbb::parallel_for (tbb::blocked_range<SyncIterators>(x_begin,
-                                                         x_end,
-                                                         grainsize),
-                       internal::make_body (predicate),
-                       tbb::auto_partitioner());
+    Iterators                               x_begin(begin_in1, in2, out);
+    Iterators x_end(end_in1, InputIterator2(), OutputIterator());
+    tbb::parallel_for(
+      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+      internal::make_body(predicate),
+      tbb::auto_partitioner());
 #endif
   }
-
-
 
   /**
    * An algorithm that performs the action <code>*out++ = predicate(*in1++,
@@ -293,37 +270,36 @@ namespace parallel
             typename InputIterator3,
             typename OutputIterator,
             typename Predicate>
-  void transform (const InputIterator1 &begin_in1,
-                  const InputIterator1 &end_in1,
-                  InputIterator2        in2,
-                  InputIterator3        in3,
-                  OutputIterator        out,
-                  Predicate            &predicate,
-                  const unsigned int    grainsize)
+  void
+  transform(const InputIterator1& begin_in1,
+            const InputIterator1& end_in1,
+            InputIterator2        in2,
+            InputIterator3        in3,
+            OutputIterator        out,
+            Predicate&            predicate,
+            const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
     // warnings about unused arguments
     (void) grainsize;
 
-    for (OutputIterator in1 = begin_in1; in1 != end_in1;)
-      *out++ = predicate (*in1++, *in2++, *in3++);
+    for(OutputIterator in1 = begin_in1; in1 != end_in1;)
+      *out++ = predicate(*in1++, *in2++, *in3++);
 #else
-    typedef
-    std::tuple<InputIterator1,InputIterator2,InputIterator3,OutputIterator>
-    Iterators;
+    typedef std::
+      tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>
+                                            Iterators;
     typedef SynchronousIterators<Iterators> SyncIterators;
-    Iterators x_begin (begin_in1, in2, in3, out);
-    Iterators x_end (end_in1, InputIterator2(),
-                     InputIterator3(), OutputIterator());
-    tbb::parallel_for (tbb::blocked_range<SyncIterators>(x_begin,
-                                                         x_end,
-                                                         grainsize),
-                       internal::make_body (predicate),
-                       tbb::auto_partitioner());
+    Iterators                               x_begin(begin_in1, in2, in3, out);
+    Iterators                               x_end(
+      end_in1, InputIterator2(), InputIterator3(), OutputIterator());
+    tbb::parallel_for(
+      tbb::blocked_range<SyncIterators>(x_begin, x_end, grainsize),
+      internal::make_body(predicate),
+      tbb::auto_partitioner());
 #endif
   }
-
 
   namespace internal
   {
@@ -333,14 +309,14 @@ namespace parallel
      * end.
      */
     template <typename RangeType, typename Function>
-    void apply_to_subranges (const tbb::blocked_range<RangeType> &range,
-                             const Function  &f)
+    void
+    apply_to_subranges(const tbb::blocked_range<RangeType>& range,
+                       const Function&                      f)
     {
-      f (range.begin(), range.end());
+      f(range.begin(), range.end());
     }
 #endif
-  }
-
+  } // namespace internal
 
   /**
    * This function applies the given function argument @p f to all elements in
@@ -414,10 +390,11 @@ namespace parallel
    * module.
    */
   template <typename RangeType, typename Function>
-  void apply_to_subranges (const RangeType                          &begin,
-                           const typename identity<RangeType>::type &end,
-                           const Function                           &f,
-                           const unsigned int                        grainsize)
+  void
+  apply_to_subranges(const RangeType&                          begin,
+                     const typename identity<RangeType>::type& end,
+                     const Function&                           f,
+                     const unsigned int                        grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
@@ -425,24 +402,22 @@ namespace parallel
     (void) grainsize;
 
 #  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    f (begin, end);
+    f(begin, end);
 #  else
     // work around a problem with MS VC++ where there is no const
     // operator() in 'Function' if 'Function' is the result of std::bind
     Function ff = f;
-    ff (begin, end);
+    ff(begin, end);
 #  endif
 #else
-    tbb::parallel_for (tbb::blocked_range<RangeType>
-                       (begin, end, grainsize),
-                       std::bind (&internal::apply_to_subranges<RangeType,Function>,
-                                  std::placeholders::_1,
-                                  std::cref(f)),
-                       tbb::auto_partitioner());
+    tbb::parallel_for(
+      tbb::blocked_range<RangeType>(begin, end, grainsize),
+      std::bind(&internal::apply_to_subranges<RangeType, Function>,
+                std::placeholders::_1,
+                std::cref(f)),
+      tbb::auto_partitioner());
 #endif
   }
-
-
 
   /**
    * This is a class specialized to for loops with a fixed range given by
@@ -477,7 +452,7 @@ namespace parallel
      * Destructor. Made virtual to ensure that derived classes also have
      * virtual destructors.
      */
-    virtual ~ParallelForInteger () = default;
+    virtual ~ParallelForInteger() = default;
 
     /**
      * This function runs the for loop over the given range
@@ -487,9 +462,10 @@ namespace parallel
      * inherently not be thread-safe when several threads work with the same
      * data simultaneously.
      */
-    void apply_parallel (const std::size_t begin,
-                         const std::size_t end,
-                         const std::size_t minimum_parallel_grain_size) const;
+    void
+    apply_parallel(const std::size_t begin,
+                   const std::size_t end,
+                   const std::size_t minimum_parallel_grain_size) const;
 
     /**
      * Virtual function for working on subrange to be defined in a derived
@@ -497,11 +473,9 @@ namespace parallel
      * changes the data of a derived class will inherently not be thread-safe
      * when several threads work with the same data simultaneously.
      */
-    virtual void apply_to_subrange (const std::size_t,
-                                    const std::size_t) const = 0;
+    virtual void
+    apply_to_subrange(const std::size_t, const std::size_t) const = 0;
   };
-
-
 
   namespace internal
   {
@@ -512,8 +486,7 @@ namespace parallel
      * on which the reduction is to be done. The second denotes the type of
      * the function object that shall be called for each subrange.
      */
-    template <typename ResultType,
-              typename Function>
+    template <typename ResultType, typename Function>
     struct ReductionOnSubranges
     {
       /**
@@ -531,33 +504,31 @@ namespace parallel
        * std::plus<int>().
        */
       template <typename Reductor>
-      ReductionOnSubranges (const Function &f,
-                            const Reductor &reductor,
-                            const ResultType neutral_element = ResultType())
-        :
-        result (neutral_element),
-        f (f),
-        neutral_element (neutral_element),
-        reductor (reductor)
+      ReductionOnSubranges(const Function&  f,
+                           const Reductor&  reductor,
+                           const ResultType neutral_element = ResultType())
+        : result(neutral_element),
+          f(f),
+          neutral_element(neutral_element),
+          reductor(reductor)
       {}
 
       /**
        * Splitting constructor. See the TBB book for more details about this.
        */
-      ReductionOnSubranges (const ReductionOnSubranges &r,
-                            tbb::split)
-        :
-        result (r.neutral_element),
-        f (r.f),
-        neutral_element (r.neutral_element),
-        reductor (r.reductor)
+      ReductionOnSubranges(const ReductionOnSubranges& r, tbb::split)
+        : result(r.neutral_element),
+          f(r.f),
+          neutral_element(r.neutral_element),
+          reductor(r.reductor)
       {}
 
       /**
        * Join operation: merge the results from computations on different sub-
        * intervals.
        */
-      void join (const ReductionOnSubranges &r)
+      void
+      join(const ReductionOnSubranges& r)
       {
         result = reductor(result, r.result);
       }
@@ -566,10 +537,10 @@ namespace parallel
        * Execute the given function on the specified range.
        */
       template <typename RangeType>
-      void operator () (const tbb::blocked_range<RangeType> &range)
+      void
+      operator()(const tbb::blocked_range<RangeType>& range)
       {
-        result = reductor(result,
-                          f (range.begin(), range.end()));
+        result = reductor(result, f(range.begin(), range.end()));
       }
 
     private:
@@ -589,11 +560,10 @@ namespace parallel
        * The function object to be used to reduce the result of two calls into
        * one number.
        */
-      const std::function<ResultType (ResultType, ResultType)> reductor;
+      const std::function<ResultType(ResultType, ResultType)> reductor;
     };
 #endif
-  }
-
+  } // namespace internal
 
   /**
    * This function works a lot like the apply_to_subranges(), but it allows to
@@ -655,10 +625,11 @@ namespace parallel
    * module.
    */
   template <typename ResultType, typename RangeType, typename Function>
-  ResultType accumulate_from_subranges (const Function &f,
-                                        const RangeType                          &begin,
-                                        const typename identity<RangeType>::type &end,
-                                        const unsigned int grainsize)
+  ResultType
+  accumulate_from_subranges(const Function&                           f,
+                            const RangeType&                          begin,
+                            const typename identity<RangeType>::type& end,
+                            const unsigned int                        grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
@@ -666,25 +637,24 @@ namespace parallel
     (void) grainsize;
 
 #  ifndef DEAL_II_BIND_NO_CONST_OP_PARENTHESES
-    return f (begin, end);
+    return f(begin, end);
 #  else
     // work around a problem with MS VC++ where there is no const
     // operator() in 'Function' if 'Function' is the result of std::bind
     Function ff = f;
-    return ff (begin, end);
+    return ff(begin, end);
 #  endif
 #else
-    internal::ReductionOnSubranges<ResultType,Function>
-    reductor (f, std::plus<ResultType>(), 0);
-    tbb::parallel_reduce (tbb::blocked_range<RangeType>(begin, end, grainsize),
-                          reductor,
-                          tbb::auto_partitioner());
+    internal::ReductionOnSubranges<ResultType, Function> reductor(
+      f, std::plus<ResultType>(), 0);
+    tbb::parallel_reduce(tbb::blocked_range<RangeType>(begin, end, grainsize),
+                         reductor,
+                         tbb::auto_partitioner());
     return reductor.result;
 #endif
   }
 
-
-// --------------------- for loop affinity partitioner -----------------------
+  // --------------------- for loop affinity partitioner -----------------------
 
   /**
    * A class that wraps a TBB affinity partitioner in a thread-safe way. In
@@ -726,7 +696,8 @@ namespace parallel
        * acquire_one_partitioner(), this call makes the partitioner available
        * again.
        */
-      void release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p);
+      void
+      release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner>& p);
 
     private:
       /**
@@ -747,9 +718,8 @@ namespace parallel
       dealii::Threads::Mutex mutex;
 #endif
     };
-  }
-}
-
+  } // namespace internal
+} // namespace parallel
 
 namespace internal
 {
@@ -770,8 +740,7 @@ namespace internal
      * parallel operations.
      */
     extern unsigned int minimum_parallel_grain_size;
-  }
-
+  } // namespace VectorImplementation
 
   namespace SparseMatrixImplementation
   {
@@ -780,16 +749,14 @@ namespace internal
      * the number of rows of a matrix that should be worked on as a minimum.
      */
     extern unsigned int minimum_parallel_grain_size;
-  }
+  } // namespace SparseMatrixImplementation
 
 } // end of namespace internal
-
 
 /* --------------------------- inline functions ------------------------- */
 
 namespace parallel
 {
-
 #ifdef DEAL_II_WITH_THREADS
 
   namespace internal
@@ -800,41 +767,40 @@ namespace parallel
      */
     struct ParallelForWrapper
     {
-      ParallelForWrapper (const parallel::ParallelForInteger &worker)
-        :
-        worker_ (worker)
+      ParallelForWrapper(const parallel::ParallelForInteger& worker)
+        : worker_(worker)
       {}
 
-      void operator() (const tbb::blocked_range<std::size_t> &range) const
+      void
+      operator()(const tbb::blocked_range<std::size_t>& range) const
       {
-        worker_.apply_to_subrange (range.begin(), range.end());
+        worker_.apply_to_subrange(range.begin(), range.end());
       }
 
-      const parallel::ParallelForInteger &worker_;
+      const parallel::ParallelForInteger& worker_;
     };
-  }
+  } // namespace internal
 
 #endif
 
-
-  inline
-  void
-  ParallelForInteger::apply_parallel (const std::size_t begin,
-                                      const std::size_t end,
-                                      const std::size_t minimum_parallel_grain_size) const
+  inline void
+  ParallelForInteger::apply_parallel(
+    const std::size_t begin,
+    const std::size_t end,
+    const std::size_t minimum_parallel_grain_size) const
   {
 #ifndef DEAL_II_WITH_THREADS
     // make sure we don't get compiler
     // warnings about unused arguments
     (void) minimum_parallel_grain_size;
 
-    apply_to_subrange (begin, end);
+    apply_to_subrange(begin, end);
 #else
     internal::ParallelForWrapper worker(*this);
-    tbb::parallel_for (tbb::blocked_range<std::size_t>
-                       (begin, end, minimum_parallel_grain_size),
-                       worker,
-                       tbb::auto_partitioner());
+    tbb::parallel_for(
+      tbb::blocked_range<std::size_t>(begin, end, minimum_parallel_grain_size),
+      worker,
+      tbb::auto_partitioner());
 #endif
   }
 

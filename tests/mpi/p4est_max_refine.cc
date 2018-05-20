@@ -13,53 +13,51 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // recursively refine a 2d mesh to a very high level
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 #include <ostream>
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (true)
+  if(true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::hyper_cube(tr);
-//      tr.refine_global(1);
+      //      tr.refine_global(1);
 
       int level = 0;
 
-      for (int i=0; i<29; ++i)
+      for(int i = 0; i < 29; ++i)
         {
-          if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-            deallog << "refine_loop... level=" << level  << std::endl;
+          if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+            deallog << "refine_loop... level=" << level << std::endl;
 
-          if (myid==0)
+          if(myid == 0)
             tr.begin_active(level)->set_refine_flag();
 
           deallog.push("crap");
-          tr.execute_coarsening_and_refinement ();
+          tr.execute_coarsening_and_refinement();
           deallog.pop();
 
-
-          if (myid == 0)
+          if(myid == 0)
             {
               deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
             }
@@ -68,21 +66,20 @@ void test()
         }
     }
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
       deallog.depth_file(3);
@@ -93,5 +90,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

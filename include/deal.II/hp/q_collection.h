@@ -17,13 +17,13 @@
 #define dealii_q_collection_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/quadrature.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/fe/fe.h>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,7 +50,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    QCollection () = default;
+    QCollection() = default;
 
     /**
      * Conversion constructor. This constructor creates a QCollection from a
@@ -58,7 +58,7 @@ namespace hp
      * push_back(), if desired, though it would probably be clearer to add all
      * mappings the same way.
      */
-    explicit QCollection (const Quadrature<dim> &quadrature);
+    explicit QCollection(const Quadrature<dim>& quadrature);
 
     /**
      * Adds a new quadrature rule to the QCollection. In most cases, you will
@@ -84,7 +84,8 @@ namespace hp
      * is later destroyed by this object upon destruction of the entire
      * collection.
      */
-    void push_back (const Quadrature<dim> &new_quadrature);
+    void
+    push_back(const Quadrature<dim>& new_quadrature);
 
     /**
      * Return a reference to the quadrature rule specified by the argument.
@@ -92,13 +93,13 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const Quadrature<dim> &
-    operator[] (const unsigned int index) const;
+    const Quadrature<dim>& operator[](const unsigned int index) const;
 
     /**
      * Return the number of quadrature pointers stored in this object.
      */
-    unsigned int size () const;
+    unsigned int
+    size() const;
 
     /**
      * Return the maximum number of quadrature points over all the elements of
@@ -106,100 +107,84 @@ namespace hp
      * the maximum amount of memory that may be used when re-sizing later on
      * to a articular quadrature formula from within this collection.
      */
-    unsigned int max_n_quadrature_points () const;
+    unsigned int
+    max_n_quadrature_points() const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
     /**
      * Exception
      */
-    DeclException0 (ExcNoQuadrature);
+    DeclException0(ExcNoQuadrature);
 
   private:
     /**
      * The real container, which stores pointers to the different quadrature
      * objects.
      */
-    std::vector<std::shared_ptr<const Quadrature<dim> > > quadratures;
+    std::vector<std::shared_ptr<const Quadrature<dim>>> quadratures;
   };
-
-
 
   /* --------------- inline functions ------------------- */
 
   template <int dim>
-  inline
-  unsigned int
-  QCollection<dim>::size () const
+  inline unsigned int
+  QCollection<dim>::size() const
   {
     return quadratures.size();
   }
 
-
-
   template <int dim>
-  inline
-  unsigned int
-  QCollection<dim>::max_n_quadrature_points () const
+  inline unsigned int
+  QCollection<dim>::max_n_quadrature_points() const
   {
-    Assert (quadratures.size() > 0,
-            ExcMessage ("You can't call this function for an empty collection"));
+    Assert(quadratures.size() > 0,
+           ExcMessage("You can't call this function for an empty collection"));
 
     unsigned int m = 0;
-    for (unsigned int i=0; i<quadratures.size(); ++i)
-      if (quadratures[i]->size() > m)
+    for(unsigned int i = 0; i < quadratures.size(); ++i)
+      if(quadratures[i]->size() > m)
         m = quadratures[i]->size();
 
     return m;
   }
 
-
-
   template <int dim>
-  inline
-  const Quadrature<dim> &
-  QCollection<dim>::operator[] (const unsigned int index) const
+  inline const Quadrature<dim>& QCollection<dim>::
+                                operator[](const unsigned int index) const
   {
-    Assert (index < quadratures.size (),
-            ExcIndexRange (index, 0, quadratures.size ()));
+    Assert(index < quadratures.size(),
+           ExcIndexRange(index, 0, quadratures.size()));
     return *quadratures[index];
   }
 
-
-
   template <int dim>
-  inline
-  QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
+  inline QCollection<dim>::QCollection(const Quadrature<dim>& quadrature)
   {
-    quadratures.push_back (std::make_shared<const Quadrature<dim> >(quadrature));
+    quadratures.push_back(std::make_shared<const Quadrature<dim>>(quadrature));
   }
 
-
-
   template <int dim>
-  inline
-  std::size_t
-  QCollection<dim>::memory_consumption () const
+  inline std::size_t
+  QCollection<dim>::memory_consumption() const
   {
-    return (sizeof(*this) +
-            MemoryConsumption::memory_consumption (quadratures));
+    return (sizeof(*this) + MemoryConsumption::memory_consumption(quadratures));
   }
 
-
   template <int dim>
-  inline
-  void
-  QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
+  inline void
+  QCollection<dim>::push_back(const Quadrature<dim>& new_quadrature)
   {
-    quadratures.push_back (std::make_shared<const Quadrature<dim> >(new_quadrature));
+    quadratures.push_back(
+      std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 
 } // namespace hp
-
 
 DEAL_II_NAMESPACE_CLOSE
 

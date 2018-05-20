@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "dof_tools_common.h"
 #include <deal.II/lac/vector.h>
@@ -22,16 +21,12 @@
 //   FE::hp_constraints_are_implemented
 // a bit like fe_tools_14, but works on a different set of elements
 
-
-
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim>& dof_handler)
 {
-  deallog << dof_handler.get_fe().get_name()
-          << ": "
-          << (dof_handler.get_fe().hp_constraints_are_implemented() ? "true" : "false")
+  deallog << dof_handler.get_fe().get_name() << ": "
+          << (dof_handler.get_fe().hp_constraints_are_implemented() ? "true" :
+                                                                      "false")
           << std::endl;
 }

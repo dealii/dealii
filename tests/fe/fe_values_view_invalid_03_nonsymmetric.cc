@@ -13,70 +13,62 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // make sure FEValuesExtractors::Tensor can be default-constructed
 // but that it produces an invalid, unusable object
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-
-
-
+#include <deal.II/grid/grid_generator.h>
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim> fe_values (fe, quadrature,
-                           update_values);
-  fe_values.reinit (dof.begin_active());
+  FEValues<dim>     fe_values(fe, quadrature, update_values);
+  fe_values.reinit(dof.begin_active());
 
   FEValuesExtractors::Tensor<2> extr; // invalid object
   try
     {
-      fe_values[extr];             // invalid access
+      fe_values[extr]; // invalid access
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
       goto ok;
     }
 
-  Assert (false, ExcMessage ("No exception!?"));
+  Assert(false, ExcMessage("No exception!?"));
 
-ok:
-  ;
+ok:;
 }
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  FESystem<dim> fe (FE_Q<dim>(1), dim*dim);
+  FESystem<dim> fe(FE_Q<dim>(1), dim * dim);
   test(tr, fe);
 }
 
-
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
 
   deallog.attach(logfile);
 

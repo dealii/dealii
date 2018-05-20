@@ -16,13 +16,12 @@
 #ifndef dealii_matrix_tools_h
 #define dealii_matrix_tools_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/base/function.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/function_map.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 #include <map>
 
@@ -32,28 +31,36 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
 // forward declarations
-template <int dim> class Quadrature;
+template <int dim>
+class Quadrature;
 
+template <typename number>
+class Vector;
+template <typename number>
+class FullMatrix;
+template <typename number>
+class SparseMatrix;
 
-template <typename number> class Vector;
-template <typename number> class FullMatrix;
-template <typename number> class SparseMatrix;
+template <typename number>
+class BlockSparseMatrix;
+template <typename Number>
+class BlockVector;
 
-template <typename number> class BlockSparseMatrix;
-template <typename Number> class BlockVector;
-
-template <int dim, int spacedim> class Mapping;
-template <int dim, int spacedim> class DoFHandler;
+template <int dim, int spacedim>
+class Mapping;
+template <int dim, int spacedim>
+class DoFHandler;
 
 namespace hp
 {
-  template <int> class QCollection;
-  template <int, int> class MappingCollection;
-  template <int, int> class DoFHandler;
-}
-
+  template <int>
+  class QCollection;
+  template <int, int>
+  class MappingCollection;
+  template <int, int>
+  class DoFHandler;
+} // namespace hp
 
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
@@ -64,8 +71,8 @@ namespace PETScWrappers
   {
     class BlockSparseMatrix;
     class BlockVector;
-  }
-}
+  } // namespace MPI
+} // namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -77,10 +84,9 @@ namespace TrilinosWrappers
   {
     class Vector;
     class BlockVector;
-  }
-}
+  } // namespace MPI
+} // namespace TrilinosWrappers
 #endif
-
 
 /**
  * This namespace provides functions that assemble certain standard matrices
@@ -236,23 +242,25 @@ namespace MatrixCreator
    * See the general documentation of this namespace for more information.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
-                           const DoFHandler<dim,spacedim>    &dof,
-                           const Quadrature<dim>    &q,
-                           SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(const Mapping<dim, spacedim>&           mapping,
+                     const DoFHandler<dim, spacedim>&        dof,
+                     const Quadrature<dim>&                  q,
+                     SparseMatrix<number>&                   matrix,
+                     const Function<spacedim, number>* const a = nullptr,
+                     const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-                           const Quadrature<dim>    &q,
-                           SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(const DoFHandler<dim, spacedim>&        dof,
+                     const Quadrature<dim>&                  q,
+                     SparseMatrix<number>&                   matrix,
+                     const Function<spacedim, number>* const a = nullptr,
+                     const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Assemble the mass matrix and a right hand side vector. If no coefficient
@@ -274,74 +282,91 @@ namespace MatrixCreator
    * See the general documentation of this namespace for more information.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const Mapping<dim, spacedim>   &mapping,
-                           const DoFHandler<dim,spacedim> &dof,
-                           const Quadrature<dim>    &q,
-                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                           const Function<spacedim,number> &rhs,
-                           Vector<number>           &rhs_vector,
-                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(
+    const Mapping<dim, spacedim>&                                    mapping,
+    const DoFHandler<dim, spacedim>&                                 dof,
+    const Quadrature<dim>&                                           q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const Function<spacedim, number>&                                rhs,
+    Vector<number>&                                                  rhs_vector,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Call the create_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const DoFHandler<dim,spacedim> &dof,
-                           const Quadrature<dim>    &q,
-                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                           const Function<spacedim,number> &rhs,
-                           Vector<number>           &rhs_vector,
-                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(
+    const DoFHandler<dim, spacedim>&                                 dof,
+    const Quadrature<dim>&                                           q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const Function<spacedim, number>&                                rhs,
+    Vector<number>&                                                  rhs_vector,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-                           const hp::DoFHandler<dim,spacedim>    &dof,
-                           const hp::QCollection<dim>    &q,
-                           SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(const hp::MappingCollection<dim, spacedim>& mapping,
+                     const hp::DoFHandler<dim, spacedim>&        dof,
+                     const hp::QCollection<dim>&                 q,
+                     SparseMatrix<number>&                       matrix,
+                     const Function<spacedim, number>* const     a = nullptr,
+                     const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-                           const hp::QCollection<dim>    &q,
-                           SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(const hp::DoFHandler<dim, spacedim>&    dof,
+                     const hp::QCollection<dim>&             q,
+                     SparseMatrix<number>&                   matrix,
+                     const Function<spacedim, number>* const a = nullptr,
+                     const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
-                           const hp::DoFHandler<dim,spacedim> &dof,
-                           const hp::QCollection<dim> &q,
-                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                           const Function<spacedim,number> &rhs,
-                           Vector<number>           &rhs_vector,
-                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_mass_matrix(
+    const hp::MappingCollection<dim, spacedim>&                      mapping,
+    const hp::DoFHandler<dim, spacedim>&                             dof,
+    const hp::QCollection<dim>&                                      q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const Function<spacedim, number>&                                rhs,
+    Vector<number>&                                                  rhs_vector,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
-                           const hp::QCollection<dim> &q,
-                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                           const Function<spacedim,number> &rhs,
-                           Vector<number>           &rhs_vector,
-                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                           const ConstraintMatrix   &constraints = ConstraintMatrix());
-
+  void
+  create_mass_matrix(
+    const hp::DoFHandler<dim, spacedim>&                             dof,
+    const hp::QCollection<dim>&                                      q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const Function<spacedim, number>&                                rhs,
+    Vector<number>&                                                  rhs_vector,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    const ConstraintMatrix& constraints = ConstraintMatrix());
 
   /**
    * Assemble the mass matrix and a right hand side vector along the boundary.
@@ -369,57 +394,77 @@ namespace MatrixCreator
    * shape functions.
    */
   template <int dim, int spacedim, typename number>
-  void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
-                                    const DoFHandler<dim,spacedim>    &dof,
-                                    const Quadrature<dim-1>  &q,
-                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
-                                    Vector<number>           &rhs_vector,
-                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const weight = 0,
-                                    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
-
+  void
+  create_boundary_mass_matrix(
+    const Mapping<dim, spacedim>&                                    mapping,
+    const DoFHandler<dim, spacedim>&                                 dof,
+    const Quadrature<dim - 1>&                                       q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const std::map<types::boundary_id, const Function<spacedim, number>*>&
+                                          boundary_functions,
+    Vector<number>&                       rhs_vector,
+    std::vector<types::global_dof_index>& dof_to_boundary_mapping,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const
+      weight
+    = 0,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Call the create_boundary_mass_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim, typename number>
-  void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-                                    const Quadrature<dim-1>  &q,
-                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
-                                    Vector<number>           &rhs_vector,
-                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                                    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+  void
+  create_boundary_mass_matrix(
+    const DoFHandler<dim, spacedim>&                                 dof,
+    const Quadrature<dim - 1>&                                       q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const std::map<types::boundary_id, const Function<spacedim, number>*>&
+                                          boundary_functions,
+    Vector<number>&                       rhs_vector,
+    std::vector<types::global_dof_index>& dof_to_boundary_mapping,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-                                    const hp::DoFHandler<dim,spacedim>    &dof,
-                                    const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
-                                    Vector<number>           &rhs_vector,
-                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                                    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+  void
+  create_boundary_mass_matrix(
+    const hp::MappingCollection<dim, spacedim>&                      mapping,
+    const hp::DoFHandler<dim, spacedim>&                             dof,
+    const hp::QCollection<dim - 1>&                                  q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const std::map<types::boundary_id, const Function<spacedim, number>*>&
+                                          boundary_functions,
+    Vector<number>&                       rhs_vector,
+    std::vector<types::global_dof_index>& dof_to_boundary_mapping,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Same function as above, but for hp objects.
    */
   template <int dim, int spacedim, typename number>
-  void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-                                    const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
-                                    const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
-                                    Vector<number>           &rhs_vector,
-                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
-                                    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
+  void
+  create_boundary_mass_matrix(
+    const hp::DoFHandler<dim, spacedim>&                             dof,
+    const hp::QCollection<dim - 1>&                                  q,
+    SparseMatrix<typename numbers::NumberTraits<number>::real_type>& matrix,
+    const std::map<types::boundary_id, const Function<spacedim, number>*>&
+                                          boundary_functions,
+    Vector<number>&                       rhs_vector,
+    std::vector<types::global_dof_index>& dof_to_boundary_mapping,
+    const Function<spacedim,
+                   typename numbers::NumberTraits<number>::real_type>* const a
+    = nullptr,
+    std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Assemble the Laplace matrix. If no coefficient is given (i.e., if the
@@ -441,23 +486,27 @@ namespace MatrixCreator
    * See the general documentation of this namespace for more information.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const Mapping<dim, spacedim>   &mapping,
-                              const DoFHandler<dim,spacedim> &dof,
-                              const Quadrature<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const Mapping<dim, spacedim>&    mapping,
+                        const DoFHandler<dim, spacedim>& dof,
+                        const Quadrature<dim>&           q,
+                        SparseMatrix<double>&            matrix,
+                        const Function<spacedim>* const  a = nullptr,
+                        const ConstraintMatrix&          constraints
+                        = ConstraintMatrix());
 
   /**
    * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,
-                              const Quadrature<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const DoFHandler<dim, spacedim>& dof,
+                        const Quadrature<dim>&           q,
+                        SparseMatrix<double>&            matrix,
+                        const Function<spacedim>* const  a = nullptr,
+                        const ConstraintMatrix&          constraints
+                        = ConstraintMatrix());
 
   /**
    * Assemble the Laplace matrix and a right hand side vector. If no
@@ -478,93 +527,103 @@ namespace MatrixCreator
    * See the general documentation of this namespace for more information.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const Mapping<dim, spacedim>   &mapping,
-                              const DoFHandler<dim,spacedim> &dof,
-                              const Quadrature<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> &rhs,
-                              Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const Mapping<dim, spacedim>&    mapping,
+                        const DoFHandler<dim, spacedim>& dof,
+                        const Quadrature<dim>&           q,
+                        SparseMatrix<double>&            matrix,
+                        const Function<spacedim>&        rhs,
+                        Vector<double>&                  rhs_vector,
+                        const Function<spacedim>* const  a = nullptr,
+                        const ConstraintMatrix&          constraints
+                        = ConstraintMatrix());
 
   /**
    * Call the create_laplace_matrix() function, see above, with
    * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,
-                              const Quadrature<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> &rhs,
-                              Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const DoFHandler<dim, spacedim>& dof,
+                        const Quadrature<dim>&           q,
+                        SparseMatrix<double>&            matrix,
+                        const Function<spacedim>&        rhs,
+                        Vector<double>&                  rhs_vector,
+                        const Function<spacedim>* const  a = nullptr,
+                        const ConstraintMatrix&          constraints
+                        = ConstraintMatrix());
 
   /**
    * Like the functions above, but for hp dof handlers, mappings, and
    * quadrature collections.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
-                              const hp::DoFHandler<dim,spacedim> &dof,
-                              const hp::QCollection<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const hp::MappingCollection<dim, spacedim>& mapping,
+                        const hp::DoFHandler<dim, spacedim>&        dof,
+                        const hp::QCollection<dim>&                 q,
+                        SparseMatrix<double>&                       matrix,
+                        const Function<spacedim>* const             a = nullptr,
+                        const ConstraintMatrix&                     constraints
+                        = ConstraintMatrix());
 
   /**
    * Like the functions above, but for hp dof handlers, mappings, and
    * quadrature collections.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const hp::DoFHandler<dim,spacedim> &dof,
-                              const hp::QCollection<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const hp::DoFHandler<dim, spacedim>& dof,
+                        const hp::QCollection<dim>&          q,
+                        SparseMatrix<double>&                matrix,
+                        const Function<spacedim>* const      a = nullptr,
+                        const ConstraintMatrix&              constraints
+                        = ConstraintMatrix());
 
   /**
    * Like the functions above, but for hp dof handlers, mappings, and
    * quadrature collections.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
-                              const hp::DoFHandler<dim,spacedim> &dof,
-                              const hp::QCollection<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim>      &rhs,
-                              Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const hp::MappingCollection<dim, spacedim>& mapping,
+                        const hp::DoFHandler<dim, spacedim>&        dof,
+                        const hp::QCollection<dim>&                 q,
+                        SparseMatrix<double>&                       matrix,
+                        const Function<spacedim>&                   rhs,
+                        Vector<double>&                             rhs_vector,
+                        const Function<spacedim>* const             a = nullptr,
+                        const ConstraintMatrix&                     constraints
+                        = ConstraintMatrix());
 
   /**
    * Like the functions above, but for hp dof handlers, mappings, and
    * quadrature collections.
    */
   template <int dim, int spacedim>
-  void create_laplace_matrix (const hp::DoFHandler<dim,spacedim> &dof,
-                              const hp::QCollection<dim>    &q,
-                              SparseMatrix<double>     &matrix,
-                              const Function<spacedim>      &rhs,
-                              Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const a = nullptr,
-                              const ConstraintMatrix   &constraints = ConstraintMatrix());
+  void
+  create_laplace_matrix(const hp::DoFHandler<dim, spacedim>& dof,
+                        const hp::QCollection<dim>&          q,
+                        SparseMatrix<double>&                matrix,
+                        const Function<spacedim>&            rhs,
+                        Vector<double>&                      rhs_vector,
+                        const Function<spacedim>* const      a = nullptr,
+                        const ConstraintMatrix&              constraints
+                        = ConstraintMatrix());
 
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcComponentMismatch,
-                    "You are providing either a right hand side function or a "
-                    "coefficient with a number of vector components that is "
-                    "inconsistent with the rest of the arguments. If you do "
-                    "provide a coefficient or right hand side function, then "
-                    "it either needs to have as many components as the finite "
-                    "element in use, or only a single vector component. In "
-                    "the latter case, the same value will be taken for "
-                    "each vector component of the finite element.");
-}
-
-
+  DeclExceptionMsg(ExcComponentMismatch,
+                   "You are providing either a right hand side function or a "
+                   "coefficient with a number of vector components that is "
+                   "inconsistent with the rest of the arguments. If you do "
+                   "provide a coefficient or right hand side function, then "
+                   "it either needs to have as many components as the finite "
+                   "element in use, or only a single vector component. In "
+                   "the latter case, the same value will be taken for "
+                   "each vector component of the finite element.");
+} // namespace MatrixCreator
 
 /**
  * Provide a collection of functions operating on matrices. These include the
@@ -772,11 +831,12 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
-                         SparseMatrix<number>  &matrix,
-                         Vector<number>        &solution,
-                         Vector<number>        &right_hand_side,
-                         const bool             eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, number>& boundary_values,
+    SparseMatrix<number>&                            matrix,
+    Vector<number>&                                  solution,
+    Vector<number>&                                  right_hand_side,
+    const bool                                       eliminate_columns = true);
 
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
@@ -785,11 +845,12 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
-                         BlockSparseMatrix<number>           &matrix,
-                         BlockVector<number>                 &solution,
-                         BlockVector<number>                 &right_hand_side,
-                         const bool           eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, number>& boundary_values,
+    BlockSparseMatrix<number>&                       matrix,
+    BlockVector<number>&                             solution,
+    BlockVector<number>&                             right_hand_side,
+    const bool                                       eliminate_columns = true);
 
 #ifdef DEAL_II_WITH_PETSC
   /**
@@ -828,22 +889,23 @@ namespace MatrixTools
    * rows.
    */
   void
-  apply_boundary_values
-  (const std::map<types::global_dof_index,PetscScalar> &boundary_values,
-   PETScWrappers::MatrixBase                           &matrix,
-   PETScWrappers::VectorBase                           &solution,
-   PETScWrappers::VectorBase                           &right_hand_side,
-   const bool                                           eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, PetscScalar>& boundary_values,
+    PETScWrappers::MatrixBase&                            matrix,
+    PETScWrappers::VectorBase&                            solution,
+    PETScWrappers::VectorBase&                            right_hand_side,
+    const bool eliminate_columns = true);
 
   /**
    * Same as above but for the parallel BlockSparseMatrix.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,PetscScalar>  &boundary_values,
-                         PETScWrappers::MPI::BlockSparseMatrix &matrix,
-                         PETScWrappers::MPI::BlockVector        &solution,
-                         PETScWrappers::MPI::BlockVector        &right_hand_side,
-                         const bool       eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, PetscScalar>& boundary_values,
+    PETScWrappers::MPI::BlockSparseMatrix&                matrix,
+    PETScWrappers::MPI::BlockVector&                      solution,
+    PETScWrappers::MPI::BlockVector&                      right_hand_side,
+    const bool eliminate_columns = true);
 
 #endif
 
@@ -882,22 +944,24 @@ namespace MatrixTools
    * rows.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
-                         TrilinosWrappers::SparseMatrix  &matrix,
-                         TrilinosWrappers::MPI::Vector   &solution,
-                         TrilinosWrappers::MPI::Vector   &right_hand_side,
-                         const bool             eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, TrilinosScalar>& boundary_values,
+    TrilinosWrappers::SparseMatrix&                          matrix,
+    TrilinosWrappers::MPI::Vector&                           solution,
+    TrilinosWrappers::MPI::Vector&                           right_hand_side,
+    const bool eliminate_columns = true);
 
   /**
    * This function does the same as the one above, except now working on block
    * structures.
    */
   void
-  apply_boundary_values (const std::map<types::global_dof_index,TrilinosScalar> &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix  &matrix,
-                         TrilinosWrappers::MPI::BlockVector   &solution,
-                         TrilinosWrappers::MPI::BlockVector   &right_hand_side,
-                         const bool                eliminate_columns = true);
+  apply_boundary_values(
+    const std::map<types::global_dof_index, TrilinosScalar>& boundary_values,
+    TrilinosWrappers::BlockSparseMatrix&                     matrix,
+    TrilinosWrappers::MPI::BlockVector&                      solution,
+    TrilinosWrappers::MPI::BlockVector&                      right_hand_side,
+    const bool eliminate_columns = true);
 #endif
 
   /**
@@ -920,23 +984,22 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  local_apply_boundary_values (const std::map<types::global_dof_index,number> &boundary_values,
-                               const std::vector<types::global_dof_index> &local_dof_indices,
-                               FullMatrix<number> &local_matrix,
-                               Vector<number>     &local_rhs,
-                               const bool          eliminate_columns);
+  local_apply_boundary_values(
+    const std::map<types::global_dof_index, number>& boundary_values,
+    const std::vector<types::global_dof_index>&      local_dof_indices,
+    FullMatrix<number>&                              local_matrix,
+    Vector<number>&                                  local_rhs,
+    const bool                                       eliminate_columns);
 
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcBlocksDontMatch,
-                    "You are providing a matrix whose subdivision into "
-                    "blocks in either row or column direction does not use "
-                    "the same blocks sizes as the solution vector or "
-                    "right hand side vectors, respectively.");
-}
-
-
+  DeclExceptionMsg(ExcBlocksDontMatch,
+                   "You are providing a matrix whose subdivision into "
+                   "blocks in either row or column direction does not use "
+                   "the same blocks sizes as the solution vector or "
+                   "right hand side vectors, respectively.");
+} // namespace MatrixTools
 
 DEAL_II_NAMESPACE_CLOSE
 

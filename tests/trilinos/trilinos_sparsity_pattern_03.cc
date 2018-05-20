@@ -13,41 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Tests IndexSet retrieval of Trilinos sparsity patterns
 
 #include "../tests.h"
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-
-void test ()
+void
+test()
 {
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   TrilinosWrappers::SparsityPattern sp;
 
   deallog << "Creating entries..." << std::endl;
 
-  IndexSet rows(2*n_procs);
-  rows.add_range(2*myid, 2*myid+2);
+  IndexSet rows(2 * n_procs);
+  rows.add_range(2 * myid, 2 * myid + 2);
   rows.compress();
-  IndexSet columns(3*n_procs);
-  columns.add_range(3*myid, 3*myid+3);
+  IndexSet columns(3 * n_procs);
+  columns.add_range(3 * myid, 3 * myid + 3);
   columns.compress();
 
   sp.reinit(rows, columns, MPI_COMM_WORLD, 0u);
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
-  for (unsigned int i=2*myid; i<2*myid+2; ++i)
-    for (unsigned int j=0; j<3*n_procs; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
+  for(unsigned int i = 2 * myid; i < 2 * myid + 2; ++i)
+    for(unsigned int j = 0; j < 3 * n_procs; ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
 
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
 
-  sp.compress ();
+  sp.compress();
 
   deallog << "SP::is_compressed(): " << sp.is_compressed() << std::endl;
   deallog << "Number of entries: " << sp.n_nonzero_elements() << std::endl;
@@ -60,8 +58,10 @@ void test ()
   AssertThrow(stored_rows == rows, ExcInternalError());
   AssertThrow(stored_cols == columns, ExcInternalError());
 
-  const unsigned int stored_n_procs = Utilities::MPI::n_mpi_processes(sp.get_mpi_communicator());
-  const unsigned int stored_myid = Utilities::MPI::this_mpi_process(sp.get_mpi_communicator());
+  const unsigned int stored_n_procs
+    = Utilities::MPI::n_mpi_processes(sp.get_mpi_communicator());
+  const unsigned int stored_myid
+    = Utilities::MPI::this_mpi_process(sp.get_mpi_communicator());
 
   AssertThrow(stored_n_procs == n_procs, ExcInternalError());
   AssertThrow(stored_myid == myid, ExcInternalError());
@@ -69,19 +69,19 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      std::ofstream logfile ("output");
-      deallog.attach (logfile);
+      std::ofstream logfile("output");
+      deallog.attach(logfile);
 
       test();
     }

@@ -13,54 +13,47 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check periodic boundary conditions for a simple enough case where we know
 // the exact set of constraints
 //
 // this test simply uses two hypercubes and matches the faces at the far ends
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-
-
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   // create a 2x1 (or 2x1x1) mesh
-  Triangulation<dim> triangulation;
-  std::vector<unsigned int> repetitions (dim, 1);
+  Triangulation<dim>        triangulation;
+  std::vector<unsigned int> repetitions(dim, 1);
   repetitions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                             repetitions,
-                                             Point<dim>(),
-                                             (dim == 2 ?
-                                              Point<dim>(2,1) :
-                                              Point<dim>(2,1,1)));
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation,
+    repetitions,
+    Point<dim>(),
+    (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1)));
 
-  FE_Q<dim>          fe(1);
-  DoFHandler<dim>    dof_handler (triangulation);
-  dof_handler.distribute_dofs (fe);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
 
   ConstraintMatrix cm;
-  DoFTools::make_periodicity_constraints (dof_handler.begin(0)->face(0),
-                                          (++dof_handler.begin(0))->face(1),
-                                          cm);
-  cm.print (deallog.get_file_stream());
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0), (++dof_handler.begin(0))->face(1), cm);
+  cm.print(deallog.get_file_stream());
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 

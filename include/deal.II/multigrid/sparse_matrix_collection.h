@@ -16,12 +16,12 @@
 #ifndef dealii_mg_sparse_matrix_collection_h
 #define dealii_mg_sparse_matrix_collection_h
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_tools.h>
-#include <deal.II/base/mg_level_object.h>
 
 #include <memory>
 
@@ -40,33 +40,36 @@ namespace mg
   class SparseMatrixCollection : public Subscriptor
   {
   public:
-    void resize(const unsigned int minlevel, const unsigned  int maxlevel);
+    void
+    resize(const unsigned int minlevel, const unsigned int maxlevel);
 
     template <typename DoFHandlerType>
-    void reinit(const DoFHandlerType &dof_handler);
+    void
+    reinit(const DoFHandlerType& dof_handler);
 
-    void set_zero();
+    void
+    set_zero();
 
     MGLevelObject<SparsityPattern> sparsity;
     MGLevelObject<SparsityPattern> sparsity_edge;
 
-    MGLevelObject<SparseMatrix<number> > matrix;
-    MGLevelObject<SparseMatrix<number> > matrix_down;
-    MGLevelObject<SparseMatrix<number> > matrix_up;
-    MGLevelObject<SparseMatrix<number> > matrix_in;
-    MGLevelObject<SparseMatrix<number> > matrix_out;
+    MGLevelObject<SparseMatrix<number>> matrix;
+    MGLevelObject<SparseMatrix<number>> matrix_down;
+    MGLevelObject<SparseMatrix<number>> matrix_up;
+    MGLevelObject<SparseMatrix<number>> matrix_in;
+    MGLevelObject<SparseMatrix<number>> matrix_out;
   };
-
 
   template <typename number>
   void
-  SparseMatrixCollection<number>::resize(const unsigned int minlevel, const unsigned  int maxlevel)
+  SparseMatrixCollection<number>::resize(const unsigned int minlevel,
+                                         const unsigned int maxlevel)
   {
     matrix.resize(minlevel, maxlevel);
     matrix.clear_elements();
-    matrix_up.resize(minlevel+1, maxlevel);
+    matrix_up.resize(minlevel + 1, maxlevel);
     matrix_up.clear_elements();
-    matrix_down.resize(minlevel+1, maxlevel);
+    matrix_down.resize(minlevel + 1, maxlevel);
     matrix_down.clear_elements();
     matrix_in.resize(minlevel, maxlevel);
     matrix_in.clear_elements();
@@ -76,16 +79,17 @@ namespace mg
     sparsity_edge.resize(minlevel, maxlevel);
   }
 
-
   template <typename number>
   template <typename DoFHandlerType>
   void
-  SparseMatrixCollection<number>::reinit(const DoFHandlerType &dof_handler)
+  SparseMatrixCollection<number>::reinit(const DoFHandlerType& dof_handler)
   {
-    AssertIndexRange(sparsity.max_level(), dof_handler.get_triangulation().n_levels());
+    AssertIndexRange(sparsity.max_level(),
+                     dof_handler.get_triangulation().n_levels());
 
-    for (unsigned int level=sparsity.min_level();
-         level<=sparsity.max_level(); ++level)
+    for(unsigned int level = sparsity.min_level();
+        level <= sparsity.max_level();
+        ++level)
       {
         DynamicSparsityPattern dsp(dof_handler.n_dofs(level));
         MGTools::make_flux_sparsity_pattern(dof_handler, dsp, level);
@@ -93,11 +97,13 @@ namespace mg
         matrix[level].reinit(sparsity[level]);
         matrix_in[level].reinit(sparsity[level]);
         matrix_out[level].reinit(sparsity[level]);
-        if (level>0)
+        if(level > 0)
           {
             DynamicSparsityPattern ci_sparsity;
-            ci_sparsity.reinit(dof_handler.n_dofs(level-1), dof_handler.n_dofs(level));
-            MGTools::make_flux_sparsity_pattern_edge(dof_handler, ci_sparsity, level);
+            ci_sparsity.reinit(dof_handler.n_dofs(level - 1),
+                               dof_handler.n_dofs(level));
+            MGTools::make_flux_sparsity_pattern_edge(
+              dof_handler, ci_sparsity, level);
             sparsity_edge[level].copy_from(ci_sparsity);
             matrix_up[level].reinit(sparsity_edge[level]);
             matrix_down[level].reinit(sparsity_edge[level]);
@@ -109,14 +115,14 @@ namespace mg
   void
   SparseMatrixCollection<number>::set_zero()
   {
-    matrix = 0.;
-    matrix_in = 0.;
-    matrix_out = 0.;
-    matrix_up = 0.;
+    matrix      = 0.;
+    matrix_in   = 0.;
+    matrix_out  = 0.;
+    matrix_up   = 0.;
     matrix_down = 0.;
   }
 
-}
+} // namespace mg
 
 DEAL_II_NAMESPACE_CLOSE
 

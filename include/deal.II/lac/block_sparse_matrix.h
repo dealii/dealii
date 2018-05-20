@@ -16,24 +16,21 @@
 #ifndef dealii_block_sparse_matrix_h
 #define dealii_block_sparse_matrix_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/lac/block_matrix_base.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 /*! @addtogroup Matrix1
  *@{
  */
-
 
 /**
  * Blocked sparse matrix based on the SparseMatrix class. This class
@@ -47,18 +44,18 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename number>
-class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
+class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number>>
 {
 public:
   /**
    * Typedef the base class for simpler access to its own typedefs.
    */
-  typedef BlockMatrixBase<SparseMatrix<number> > BaseClass;
+  typedef BlockMatrixBase<SparseMatrix<number>> BaseClass;
 
   /**
    * Typedef the type of the underlying matrix.
    */
-  typedef typename BaseClass::BlockType  BlockType;
+  typedef typename BaseClass::BlockType BlockType;
 
   /**
    * Import the typedefs from the base class.
@@ -75,7 +72,7 @@ public:
   /**
    * @name Constructors and initialization
    */
-//@{
+  //@{
   /**
    * Constructor; initializes the matrix to be empty, without any structure,
    * i.e.  the matrix is not usable at all. This constructor is therefore only
@@ -87,7 +84,7 @@ public:
    * reinit(BlockSparsityPattern). The number of blocks per row and column are
    * then determined by that function.
    */
-  BlockSparseMatrix () = default;
+  BlockSparseMatrix() = default;
 
   /**
    * Constructor. Takes the given matrix sparsity structure to represent the
@@ -101,21 +98,19 @@ public:
    * least as long as that of this matrix or as long as reinit() is not called
    * with a new sparsity structure.
    */
-  BlockSparseMatrix (const BlockSparsityPattern &sparsity);
+  BlockSparseMatrix(const BlockSparsityPattern& sparsity);
 
   /**
    * Destructor.
    */
-  virtual ~BlockSparseMatrix () override;
-
-
+  virtual ~BlockSparseMatrix() override;
 
   /**
    * Pseudo copy operator only copying empty objects. The sizes of the block
    * matrices need to be the same.
    */
-  BlockSparseMatrix &
-  operator = (const BlockSparseMatrix &);
+  BlockSparseMatrix&
+  operator=(const BlockSparseMatrix&);
 
   /**
    * This operator assigns a scalar to a matrix. Since this does usually not
@@ -125,8 +120,8 @@ public:
    * allow for the obvious notation <tt>matrix=0</tt>, which sets all elements
    * of the matrix to zero, but keep the sparsity pattern previously used.
    */
-  BlockSparseMatrix &
-  operator = (const double d);
+  BlockSparseMatrix&
+  operator=(const double d);
 
   /**
    * Release all memory and return to a state just like after having called
@@ -136,7 +131,8 @@ public:
    * This calls SparseMatrix::clear on all sub-matrices and then resets this
    * object to have no blocks at all.
    */
-  void clear ();
+  void
+  clear();
 
   /**
    * Reinitialize the sparse matrix with the given sparsity pattern. The
@@ -152,37 +148,42 @@ public:
    *
    * The elements of the matrix are set to zero by this function.
    */
-  virtual void reinit (const BlockSparsityPattern &sparsity);
-//@}
+  virtual void
+  reinit(const BlockSparsityPattern& sparsity);
+  //@}
 
   /**
    * @name Information on the matrix
    */
-//@{
+  //@{
   /**
    * Return whether the object is empty. It is empty if either both dimensions
    * are zero or no BlockSparsityPattern is associated.
    */
-  bool empty () const;
+  bool
+  empty() const;
 
   /**
    * Return the number of entries in a specific row.
    */
-  size_type get_row_length (const size_type row) const;
+  size_type
+  get_row_length(const size_type row) const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
    * returns the number of entries in the sparsity pattern; if any of the
    * entries should happen to be zero, it is counted anyway.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements() const;
 
   /**
    * Return the number of actually nonzero elements. Just counts the number of
    * actually nonzero elements (with absolute value larger than threshold) of
    * all the blocks.
    */
-  size_type n_actually_nonzero_elements (const double threshold = 0.0) const;
+  size_type
+  n_actually_nonzero_elements(const double threshold = 0.0) const;
 
   /**
    * Return a (constant) reference to the underlying sparsity pattern of this
@@ -192,53 +193,55 @@ public:
    * that it may change if you call any nonconstant function of objects which
    * operate on it.
    */
-  const BlockSparsityPattern &
-  get_sparsity_pattern () const;
+  const BlockSparsityPattern&
+  get_sparsity_pattern() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
-//@}
+  std::size_t
+  memory_consumption() const;
+  //@}
 
   /**
    * @name Multiplications
    */
-//@{
+  //@{
   /**
    * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
    * matrix.
    */
   template <typename block_number>
-  void vmult (BlockVector<block_number>       &dst,
-              const BlockVector<block_number> &src) const;
+  void
+  vmult(BlockVector<block_number>&       dst,
+        const BlockVector<block_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block column.
    */
-  template <typename block_number,
-            typename nonblock_number>
-  void vmult (BlockVector<block_number>          &dst,
-              const Vector<nonblock_number> &src) const;
+  template <typename block_number, typename nonblock_number>
+  void
+  vmult(BlockVector<block_number>&     dst,
+        const Vector<nonblock_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block row.
    */
-  template <typename block_number,
-            typename nonblock_number>
-  void vmult (Vector<nonblock_number>    &dst,
-              const BlockVector<block_number> &src) const;
+  template <typename block_number, typename nonblock_number>
+  void
+  vmult(Vector<nonblock_number>&         dst,
+        const BlockVector<block_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block.
    */
   template <typename nonblock_number>
-  void vmult (Vector<nonblock_number>       &dst,
-              const Vector<nonblock_number> &src) const;
+  void
+  vmult(Vector<nonblock_number>& dst, const Vector<nonblock_number>& src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -246,40 +249,42 @@ public:
    * matrix.
    */
   template <typename block_number>
-  void Tvmult (BlockVector<block_number>       &dst,
-               const BlockVector<block_number> &src) const;
+  void
+  Tvmult(BlockVector<block_number>&       dst,
+         const BlockVector<block_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block row.
    */
-  template <typename block_number,
-            typename nonblock_number>
-  void Tvmult (BlockVector<block_number>  &dst,
-               const Vector<nonblock_number> &src) const;
+  template <typename block_number, typename nonblock_number>
+  void
+  Tvmult(BlockVector<block_number>&     dst,
+         const Vector<nonblock_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block column.
    */
-  template <typename block_number,
-            typename nonblock_number>
-  void Tvmult (Vector<nonblock_number>    &dst,
-               const BlockVector<block_number> &src) const;
+  template <typename block_number, typename nonblock_number>
+  void
+  Tvmult(Vector<nonblock_number>&         dst,
+         const BlockVector<block_number>& src) const;
 
   /**
    * Matrix-vector multiplication. Just like the previous function, but only
    * applicable if the matrix has only one block.
    */
   template <typename nonblock_number>
-  void Tvmult (Vector<nonblock_number>       &dst,
-               const Vector<nonblock_number> &src) const;
-//@}
+  void
+  Tvmult(Vector<nonblock_number>&       dst,
+         const Vector<nonblock_number>& src) const;
+  //@}
 
   /**
    * @name Preconditioning methods
    */
-//@{
+  //@{
   /**
    * Apply the Jacobi preconditioner, which multiplies every element of the
    * <tt>src</tt> vector by the inverse of the respective diagonal element and
@@ -288,9 +293,10 @@ public:
    * All diagonal blocks must be square matrices for this operation.
    */
   template <class BlockVectorType>
-  void precondition_Jacobi (BlockVectorType       &dst,
-                            const BlockVectorType &src,
-                            const number           omega = 1.) const;
+  void
+  precondition_Jacobi(BlockVectorType&       dst,
+                      const BlockVectorType& src,
+                      const number           omega = 1.) const;
 
   /**
    * Apply the Jacobi preconditioner to a simple vector.
@@ -298,15 +304,16 @@ public:
    * The matrix must be a single square block for this.
    */
   template <typename number2>
-  void precondition_Jacobi (Vector<number2>       &dst,
-                            const Vector<number2> &src,
-                            const number           omega = 1.) const;
-//@}
+  void
+  precondition_Jacobi(Vector<number2>&       dst,
+                      const Vector<number2>& src,
+                      const number           omega = 1.) const;
+  //@}
 
   /**
    * @name Input/Output
    */
-//@{
+  //@{
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
@@ -327,13 +334,14 @@ public:
    * @attention This function may produce <b>large</b> amounts of output if
    * applied to a large matrix!
    */
-  void print_formatted (std::ostream       &out,
-                        const unsigned int  precision   = 3,
-                        const bool          scientific  = true,
-                        const unsigned int  width       = 0,
-                        const char         *zero_string = " ",
-                        const double        denominator = 1.) const;
-//@}
+  void
+  print_formatted(std::ostream&      out,
+                  const unsigned int precision   = 3,
+                  const bool         scientific  = true,
+                  const unsigned int width       = 0,
+                  const char*        zero_string = " ",
+                  const double       denominator = 1.) const;
+  //@}
   /**
    * @addtogroup Exceptions
    * @{
@@ -342,7 +350,7 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcBlockDimensionMismatch);
+  DeclException0(ExcBlockDimensionMismatch);
   //@}
 
 private:
@@ -351,182 +359,139 @@ private:
    * guarantee that it is not deleted while still in use, we subscribe to it
    * using the SmartPointer class.
    */
-  SmartPointer<const BlockSparsityPattern,BlockSparseMatrix<number> > sparsity_pattern;
+  SmartPointer<const BlockSparsityPattern, BlockSparseMatrix<number>>
+    sparsity_pattern;
 };
-
-
 
 /*@}*/
 /* ------------------------- Template functions ---------------------- */
 
-
-
 template <typename number>
-inline
-BlockSparseMatrix<number> &
-BlockSparseMatrix<number>::operator = (const double d)
+inline BlockSparseMatrix<number>&
+BlockSparseMatrix<number>::operator=(const double d)
 {
-  Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
+  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
-  for (size_type r=0; r<this->n_block_rows(); ++r)
-    for (size_type c=0; c<this->n_block_cols(); ++c)
-      this->block(r,c) = d;
+  for(size_type r = 0; r < this->n_block_rows(); ++r)
+    for(size_type c = 0; c < this->n_block_cols(); ++c)
+      this->block(r, c) = d;
 
   return *this;
 }
 
-
-
 template <typename number>
 template <typename block_number>
-inline
-void
-BlockSparseMatrix<number>::vmult (BlockVector<block_number>       &dst,
-                                  const BlockVector<block_number> &src) const
+inline void
+BlockSparseMatrix<number>::vmult(BlockVector<block_number>&       dst,
+                                 const BlockVector<block_number>& src) const
 {
-  BaseClass::vmult_block_block (dst, src);
+  BaseClass::vmult_block_block(dst, src);
 }
-
-
 
 template <typename number>
-template <typename block_number,
-          typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::vmult (BlockVector<block_number>     &dst,
-                                  const Vector<nonblock_number> &src) const
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrix<number>::vmult(BlockVector<block_number>&     dst,
+                                 const Vector<nonblock_number>& src) const
 {
-  BaseClass::vmult_block_nonblock (dst, src);
+  BaseClass::vmult_block_nonblock(dst, src);
 }
-
-
 
 template <typename number>
-template <typename block_number,
-          typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::vmult (Vector<nonblock_number>         &dst,
-                                  const BlockVector<block_number> &src) const
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrix<number>::vmult(Vector<nonblock_number>&         dst,
+                                 const BlockVector<block_number>& src) const
 {
-  BaseClass::vmult_nonblock_block (dst, src);
+  BaseClass::vmult_nonblock_block(dst, src);
 }
-
-
 
 template <typename number>
 template <typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::vmult (Vector<nonblock_number>       &dst,
-                                  const Vector<nonblock_number> &src) const
+inline void
+BlockSparseMatrix<number>::vmult(Vector<nonblock_number>&       dst,
+                                 const Vector<nonblock_number>& src) const
 {
-  BaseClass::vmult_nonblock_nonblock (dst, src);
+  BaseClass::vmult_nonblock_nonblock(dst, src);
 }
-
-
 
 template <typename number>
 template <typename block_number>
-inline
-void
-BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>       &dst,
-                                   const BlockVector<block_number> &src) const
+inline void
+BlockSparseMatrix<number>::Tvmult(BlockVector<block_number>&       dst,
+                                  const BlockVector<block_number>& src) const
 {
-  BaseClass::Tvmult_block_block (dst, src);
+  BaseClass::Tvmult_block_block(dst, src);
 }
-
-
 
 template <typename number>
-template <typename block_number,
-          typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::Tvmult (BlockVector<block_number>     &dst,
-                                   const Vector<nonblock_number> &src) const
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrix<number>::Tvmult(BlockVector<block_number>&     dst,
+                                  const Vector<nonblock_number>& src) const
 {
-  BaseClass::Tvmult_block_nonblock (dst, src);
+  BaseClass::Tvmult_block_nonblock(dst, src);
 }
-
-
 
 template <typename number>
-template <typename block_number,
-          typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>         &dst,
-                                   const BlockVector<block_number> &src) const
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number>&         dst,
+                                  const BlockVector<block_number>& src) const
 {
-  BaseClass::Tvmult_nonblock_block (dst, src);
+  BaseClass::Tvmult_nonblock_block(dst, src);
 }
-
-
 
 template <typename number>
 template <typename nonblock_number>
-inline
-void
-BlockSparseMatrix<number>::Tvmult (Vector<nonblock_number>       &dst,
-                                   const Vector<nonblock_number> &src) const
+inline void
+BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number>&       dst,
+                                  const Vector<nonblock_number>& src) const
 {
-  BaseClass::Tvmult_nonblock_nonblock (dst, src);
+  BaseClass::Tvmult_nonblock_nonblock(dst, src);
 }
-
-
 
 template <typename number>
 template <class BlockVectorType>
-inline
-void
-BlockSparseMatrix<number>::
-precondition_Jacobi (BlockVectorType       &dst,
-                     const BlockVectorType &src,
-                     const number           omega) const
+inline void
+BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType&       dst,
+                                               const BlockVectorType& src,
+                                               const number omega) const
 {
-  Assert (this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
-  Assert (dst.n_blocks() == this->n_block_rows(),
-          ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
-  Assert (src.n_blocks() == this->n_block_cols(),
-          ExcDimensionMismatch(src.n_blocks(), this->n_block_cols()));
+  Assert(this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
+  Assert(dst.n_blocks() == this->n_block_rows(),
+         ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
+  Assert(src.n_blocks() == this->n_block_cols(),
+         ExcDimensionMismatch(src.n_blocks(), this->n_block_cols()));
 
   // do a diagonal preconditioning. uses only
   // the diagonal blocks of the matrix
-  for (size_type i=0; i<this->n_block_rows(); ++i)
-    this->block(i,i).precondition_Jacobi (dst.block(i),
-                                          src.block(i),
-                                          omega);
+  for(size_type i = 0; i < this->n_block_rows(); ++i)
+    this->block(i, i).precondition_Jacobi(dst.block(i), src.block(i), omega);
 }
-
-
 
 template <typename number>
 template <typename number2>
-inline
-void
-BlockSparseMatrix<number>::
-precondition_Jacobi (Vector<number2>       &dst,
-                     const Vector<number2> &src,
-                     const number           omega) const
+inline void
+BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2>&       dst,
+                                               const Vector<number2>& src,
+                                               const number omega) const
 {
   // check number of blocks. the sizes of the
   // single block is checked in the function
   // we call
-  Assert (this->n_block_cols() == 1,
-          ExcMessage ("This function only works if the matrix has "
-                      "a single block"));
-  Assert (this->n_block_rows() == 1,
-          ExcMessage ("This function only works if the matrix has "
-                      "a single block"));
+  Assert(this->n_block_cols() == 1,
+         ExcMessage("This function only works if the matrix has "
+                    "a single block"));
+  Assert(this->n_block_rows() == 1,
+         ExcMessage("This function only works if the matrix has "
+                    "a single block"));
 
   // do a diagonal preconditioning. uses only
   // the diagonal blocks of the matrix
-  this->block(0,0).precondition_Jacobi (dst, src, omega);
+  this->block(0, 0).precondition_Jacobi(dst, src, omega);
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif    // dealii_block_sparse_matrix_h
+#endif // dealii_block_sparse_matrix_h

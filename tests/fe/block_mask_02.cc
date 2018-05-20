@@ -13,38 +13,32 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the BlockMask class
 //
 // here: test that creating a mask from a vector<bool> works
 
-
 #include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   std::vector<bool> v(12);
-  for (unsigned int i=0; i<v.size(); ++i)
-    v[i] = (i%3 == 0);
+  for(unsigned int i = 0; i < v.size(); ++i)
+    v[i] = (i % 3 == 0);
 
   BlockMask m(v);
 
   // verify equality
-  for (unsigned int i=0; i<v.size(); ++i)
-    Assert (m[i] == v[i], ExcInternalError());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    Assert(m[i] == v[i], ExcInternalError());
 
   // this needs to throw an exception
   try
     {
       m[v.size()];
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
@@ -52,13 +46,13 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

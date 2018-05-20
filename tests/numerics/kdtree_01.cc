@@ -19,40 +19,44 @@
 #include "../tests.h"
 #include <deal.II/numerics/kdtree.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   KDTree<2> kdtree;
 
-  std::vector<Point<2> > points;
+  std::vector<Point<2>> points;
 
   // Add four points
-  points.push_back(Point<2>(0,0));
-  points.push_back(Point<2>(0,1));
-  points.push_back(Point<2>(1,0));
-  points.push_back(Point<2>(1,1));
+  points.push_back(Point<2>(0, 0));
+  points.push_back(Point<2>(0, 1));
+  points.push_back(Point<2>(1, 0));
+  points.push_back(Point<2>(1, 1));
 
   deallog << "Distance from unit square:" << std::endl;
 
-  std::vector<Point<2> > test_points;
+  std::vector<Point<2>> test_points;
   test_points.push_back(Point<2>(.5, .5));
   test_points.push_back(Point<2>(2, 0));
   test_points.push_back(Point<2>(2, 2));
 
   kdtree.set_points(points);
 
-  for (auto &p : test_points)
+  for(auto& p : test_points)
     {
-      auto res = kdtree.get_closest_points(p,1)[0];
-      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+      auto res = kdtree.get_closest_points(p, 1)[0];
+      deallog << "P: " << p << ", distance: " << res.second
+              << ", index: " << res.first << std::endl;
     }
 
-  deallog << "Consistency checking: the following are all the points in the set." << std::endl;
-  for (auto &p : points)
+  deallog
+    << "Consistency checking: the following are all the points in the set."
+    << std::endl;
+  for(auto& p : points)
     {
-      auto res = kdtree.get_closest_points(p,1)[0];
-      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+      auto res = kdtree.get_closest_points(p, 1)[0];
+      deallog << "P: " << p << ", distance: " << res.second
+              << ", index: " << res.first << std::endl;
     }
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/read_write_vector.h>
@@ -23,29 +22,30 @@
 
 // Check LinearAlgebra::EpetraWrappers::Vector all_zero.
 
-void test()
+void
+test()
 {
-  IndexSet parallel_partitioner(10);
+  IndexSet     parallel_partitioner(10);
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  if (rank==0)
-    parallel_partitioner.add_range(0,5);
+  if(rank == 0)
+    parallel_partitioner.add_range(0, 5);
   else
-    parallel_partitioner.add_range(5,10);
+    parallel_partitioner.add_range(5, 10);
   parallel_partitioner.compress();
   LinearAlgebra::EpetraWrappers::Vector a(parallel_partitioner, MPI_COMM_WORLD);
 
   AssertThrow(a.all_zero() == true, ExcInternalError());
 
-  IndexSet read_write_index_set(10);
+  IndexSet                               read_write_index_set(10);
   LinearAlgebra::ReadWriteVector<double> read_write(parallel_partitioner);
-  if (rank==0)
+  if(rank == 0)
     read_write[0] = 1.;
   a.import(read_write, VectorOperation::insert);
   AssertThrow(a.all_zero() == false, ExcInternalError());
 }
 
-
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -54,8 +54,7 @@ int main(int argc, char **argv)
 
   test();
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }
-

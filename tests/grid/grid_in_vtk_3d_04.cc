@@ -13,64 +13,61 @@
 //
 // ---------------------------------------------------------------------
 
-
 // read a 3d file in the VTK format
 
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <string>
 
 std::ofstream logfile("output");
 
-
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file(const std::string name, typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
   gi.read(name, format);
-  deallog << '\t' << tria.n_vertices()
-          << '\t' << tria.n_cells()
-          << std::endl;
+  deallog << '\t' << tria.n_vertices() << '\t' << tria.n_cells() << std::endl;
 
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 
   // now also output boundary ids for all boundary faces. this is
   // where the bug was for which this test was written
   deallog << "Face boundary_ids:" << std::endl;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = tria.begin_active();
-       cell != tria.end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->at_boundary(f))
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = tria.begin_active();
+      cell != tria.end();
+      ++cell)
+    for(unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->at_boundary(f))
         deallog << cell << ' ' << f << ": "
-                << (int)cell->face(f)->boundary_id()
-                << std::endl;
+                << (int) cell->face(f)->boundary_id() << std::endl;
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
-  check_file<3> (std::string(SOURCE_DIR "/grid_in_vtk_3d_04.vtk"), GridIn<3>::vtk);
+  check_file<3>(std::string(SOURCE_DIR "/grid_in_vtk_3d_04.vtk"),
+                GridIn<3>::vtk);
 }
 
-
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
+  deallog << std::setprecision(2);
+  logfile << std::setprecision(2);
   deallog.attach(logfile);
 
   filename_resolution();
 }
-

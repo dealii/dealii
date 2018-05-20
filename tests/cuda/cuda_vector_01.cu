@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Check LinearAlgebra::CUDAWrappers::Vector assignment and import
 
 #include "../tests.h"
@@ -23,96 +22,96 @@
 #include <fstream>
 #include <iostream>
 
-void test()
+void
+test()
 {
-  const unsigned int size = 100;
+  const unsigned int                          size = 100;
   LinearAlgebra::CUDAWrappers::Vector<double> a;
   LinearAlgebra::CUDAWrappers::Vector<double> b(size);
   LinearAlgebra::CUDAWrappers::Vector<double> c(b);
   LinearAlgebra::CUDAWrappers::Vector<double> d;
   d.reinit(c);
 
-  AssertThrow(a.size()==0, ExcMessage("Vector has the wrong size."));
-  AssertThrow(b.size()==size, ExcMessage("Vector has the wrong size."));
-  AssertThrow(c.size()==size, ExcMessage("Vector has the wrong size."));
-  AssertThrow(d.size()==size, ExcMessage("Vector has the wrong size."));
+  AssertThrow(a.size() == 0, ExcMessage("Vector has the wrong size."));
+  AssertThrow(b.size() == size, ExcMessage("Vector has the wrong size."));
+  AssertThrow(c.size() == size, ExcMessage("Vector has the wrong size."));
+  AssertThrow(d.size() == size, ExcMessage("Vector has the wrong size."));
 
   a.reinit(size);
-  AssertThrow(a.size()==size, ExcMessage("Vector has the wrong size."));
-
+  AssertThrow(a.size() == size, ExcMessage("Vector has the wrong size."));
 
   LinearAlgebra::ReadWriteVector<double> read_write_1(size);
   LinearAlgebra::ReadWriteVector<double> read_write_2(size);
   LinearAlgebra::ReadWriteVector<double> read_write_3(size);
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     {
       read_write_1[i] = i;
-      read_write_2[i] = 5.+i;
+      read_write_2[i] = 5. + i;
     }
 
   a.import(read_write_2, VectorOperation::insert);
   b.import(read_write_1, VectorOperation::insert);
   c.import(read_write_2, VectorOperation::insert);
 
-
   read_write_3.import(a, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_2[i] == read_write_3[i],
                 ExcMessage("Vector a has been modified."));
 
   read_write_3.import(b, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_1[i] == read_write_3[i],
                 ExcMessage("Vector b has been modified."));
 
   read_write_3.import(c, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
     AssertThrow(read_write_2[i] == read_write_3[i],
                 ExcMessage("Vector c has been modified."));
 
   a *= 2.;
   read_write_3.import(a, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(2.*read_write_2[i]==read_write_3[i],
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(2. * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in operator *=."));
 
   c /= 2.;
   read_write_3.import(c, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(0.5*read_write_2[i]==read_write_3[i],
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
                 ExcMessage("Problem in operator /=."));
 
   b += a;
   read_write_3.import(b, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(2.*read_write_2[i]+read_write_1[i]==read_write_3[i],
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(2. * read_write_2[i] + read_write_1[i] == read_write_3[i],
                 ExcMessage("Problem in operator +=."));
 
   b -= c;
   read_write_3.import(b, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(1.5*read_write_2[i]+read_write_1[i]==read_write_3[i],
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(1.5 * read_write_2[i] + read_write_1[i] == read_write_3[i],
                 ExcMessage("Problem in operator -=."));
 
   b.import(read_write_1, VectorOperation::insert);
   c.import(read_write_1, VectorOperation::insert);
-  const double val = b*c;
-  AssertThrow(val==328350., ExcMessage("Problem in operator *."));
+  const double val = b * c;
+  AssertThrow(val == 328350., ExcMessage("Problem in operator *."));
 
   b = 0.;
   read_write_3.import(b, VectorOperation::insert);
-  for (unsigned int i=0; i<size; ++i)
-    AssertThrow(read_write_3[i] == 0.,ExcMessage("Problem in operator =."));
+  for(unsigned int i = 0; i < size; ++i)
+    AssertThrow(read_write_3[i] == 0., ExcMessage("Problem in operator =."));
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
 
   test();
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }

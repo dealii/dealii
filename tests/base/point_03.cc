@@ -13,27 +13,26 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test for Point::distance_square() for VectorizedArray numbers
 
 #include "../tests.h"
 #include <deal.II/base/point.h>
 #include <deal.II/base/vectorization.h>
 
-
 template <int dim, typename number>
-void check ()
+void
+check()
 {
-  VectorizedArray<number> distance_vec;
+  VectorizedArray<number>             distance_vec;
   Point<dim, VectorizedArray<number>> p1_vec, p2_vec;
 
-  for (unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
+  for(unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
     {
-      Point<dim,number> p1, p2;
-      for (unsigned int i=0; i<dim; ++i)
+      Point<dim, number> p1, p2;
+      for(unsigned int i = 0; i < dim; ++i)
         {
           p1[i] = 10.0 + 0.12345 * i + 0.987 * v;
-          p1[i] = 0.5 + 0.6789   * i - 0.543 * v;
+          p1[i] = 0.5 + 0.6789 * i - 0.543 * v;
 
           p1_vec[i][v] = p1[i];
           p2_vec[i][v] = p2[i];
@@ -46,7 +45,7 @@ void check ()
   distance_vec -= distance_vec2;
   number diff = 0.;
 
-  for (unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
+  for(unsigned int v = 0; v < VectorizedArray<number>::n_array_elements; ++v)
     diff += std::abs(distance_vec[v]);
 
   AssertThrow(diff < 100 * std::numeric_limits<number>::epsilon(),
@@ -55,18 +54,18 @@ void check ()
   deallog << "Ok" << std::endl;
 }
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check<1,float>();
-  check<2,float>();
-  check<3,float>();
+  check<1, float>();
+  check<2, float>();
+  check<3, float>();
 
-  check<1,double>();
-  check<2,double>();
-  check<3,double>();
-
+  check<1, double>();
+  check<2, double>();
+  check<3, double>();
 }

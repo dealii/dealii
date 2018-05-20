@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MPI::Vector::operator = (const ::Vector &)
 
 #include "../tests.h"
@@ -24,59 +22,58 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::MPI::Vector &v)
+void
+test(PETScWrappers::MPI::Vector& v)
 {
   // set only certain elements of the
   // vector.
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) += i;
       pattern[i] = true;
     }
 
-  v.compress (VectorOperation::add);
+  v.compress(VectorOperation::add);
 
   Vector<double> w;
-  w=v;
-  Vector<float>  x;
-  x=v;
+  w = v;
+  Vector<float> x;
+  x = v;
 
   PETScWrappers::MPI::Vector w1(MPI_COMM_WORLD, v.size(), v.size());
-  w1=w;
+  w1 = w;
   PETScWrappers::MPI::Vector x1(MPI_COMM_WORLD, v.size(), v.size());
-  x1=x;
+  x1 = x;
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w1(i) == w(i), ExcInternalError());
-      AssertThrow (x1(i) == x(i), ExcInternalError());
+      AssertThrow(w1(i) == w(i), ExcInternalError());
+      AssertThrow(x1(i) == x(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
         PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
         test(v);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -87,9 +84,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

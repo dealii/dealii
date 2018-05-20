@@ -16,21 +16,19 @@
 #ifndef dealii_solver_cg_h
 #define dealii_solver_cg_h
 
-
+#include <cmath>
 #include <deal.II/base/config.h>
-#include <deal.II/lac/tridiagonal_matrix.h>
-#include <deal.II/lac/solver.h>
-#include <deal.II/lac/solver_control.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
-#include <cmath>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/tridiagonal_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
 class PreconditionIdentity;
-
 
 /*!@addtogroup Solvers */
 /*@{*/
@@ -89,7 +87,7 @@ class PreconditionIdentity;
  *
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
-template <typename VectorType = Vector<double> >
+template <typename VectorType = Vector<double>>
 class SolverCG : public Solver<VectorType>
 {
 public:
@@ -103,36 +101,36 @@ public:
    * Here, it doesn't store anything but just exists for consistency
    * with the other solver classes.
    */
-  struct AdditionalData {};
+  struct AdditionalData
+  {};
 
   /**
    * Constructor.
    */
-  SolverCG (SolverControl            &cn,
-            VectorMemory<VectorType> &mem,
-            const AdditionalData     &data = AdditionalData());
+  SolverCG(SolverControl&            cn,
+           VectorMemory<VectorType>& mem,
+           const AdditionalData&     data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverCG (SolverControl        &cn,
-            const AdditionalData &data=AdditionalData());
+  SolverCG(SolverControl& cn, const AdditionalData& data = AdditionalData());
 
   /**
    * Virtual destructor.
    */
-  virtual ~SolverCG () override = default;
+  virtual ~SolverCG() override = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType         &A,
-         VectorType               &x,
-         const VectorType         &b,
-         const PreconditionerType &preconditioner);
+  solve(const MatrixType&         A,
+        VectorType&               x,
+        const VectorType&         b,
+        const PreconditionerType& preconditioner);
 
   /**
    * Connect a slot to retrieve the CG coefficients. The slot will be called
@@ -141,8 +139,7 @@ public:
    * for Sparse Linear Systems", section 6.7. Called once per iteration
    */
   boost::signals2::connection
-  connect_coefficients_slot(
-    const std::function<void (double,double)> &slot);
+  connect_coefficients_slot(const std::function<void(double, double)>& slot);
 
   /**
    * Connect a slot to retrieve the estimated condition number. Called on each
@@ -151,8 +148,8 @@ public:
    * divergence has been detected).
    */
   boost::signals2::connection
-  connect_condition_number_slot(const std::function<void (double)> &slot,
-                                const bool every_iteration=false);
+  connect_condition_number_slot(const std::function<void(double)>& slot,
+                                const bool every_iteration = false);
 
   /**
    * Connect a slot to retrieve the estimated eigenvalues. Called on each
@@ -162,8 +159,8 @@ public:
    */
   boost::signals2::connection
   connect_eigenvalues_slot(
-    const std::function<void (const std::vector<double> &)> &slot,
-    const bool every_iteration=false);
+    const std::function<void(const std::vector<double>&)>& slot,
+    const bool every_iteration = false);
 
 protected:
   /**
@@ -171,10 +168,11 @@ protected:
    * vector, the residual and the update vector in each step. It can be used
    * for graphical output of the convergence history.
    */
-  virtual void print_vectors(const unsigned int step,
-                             const VectorType   &x,
-                             const VectorType   &r,
-                             const VectorType   &d) const;
+  virtual void
+  print_vectors(const unsigned int step,
+                const VectorType&  x,
+                const VectorType&  r,
+                const VectorType&  d) const;
 
   /**
    * Estimates the eigenvalues from diagonal and offdiagonal. Uses these
@@ -183,10 +181,11 @@ protected:
    */
   static void
   compute_eigs_and_cond(
-    const std::vector<double> &diagonal,
-    const std::vector<double> &offdiagonal,
-    const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
-    const boost::signals2::signal<void (double)> &cond_signal);
+    const std::vector<double>& diagonal,
+    const std::vector<double>& offdiagonal,
+    const boost::signals2::signal<void(const std::vector<double>&)>&
+                                                 eigenvalues_signal,
+    const boost::signals2::signal<void(double)>& cond_signal);
 
   /**
    * Additional parameters.
@@ -196,31 +195,32 @@ protected:
   /**
    * Signal used to retrieve the CG coefficients. Called on each iteration.
    */
-  boost::signals2::signal<void (double,double)> coefficients_signal;
+  boost::signals2::signal<void(double, double)> coefficients_signal;
 
   /**
    * Signal used to retrieve the estimated condition number. Called once when
    * all iterations are ended.
    */
-  boost::signals2::signal<void (double)> condition_number_signal;
+  boost::signals2::signal<void(double)> condition_number_signal;
 
   /**
    * Signal used to retrieve the estimated condition numbers. Called on each
    * iteration.
    */
-  boost::signals2::signal<void (double)> all_condition_numbers_signal;
+  boost::signals2::signal<void(double)> all_condition_numbers_signal;
 
   /**
    * Signal used to retrieve the estimated eigenvalues. Called once when all
    * iterations are ended.
    */
-  boost::signals2::signal<void (const std::vector<double> &)> eigenvalues_signal;
+  boost::signals2::signal<void(const std::vector<double>&)> eigenvalues_signal;
 
   /**
    * Signal used to retrieve the estimated eigenvalues. Called on each
    * iteration.
    */
-  boost::signals2::signal<void (const std::vector<double> &)> all_eigenvalues_signal;
+  boost::signals2::signal<void(const std::vector<double>&)>
+    all_eigenvalues_signal;
 };
 
 /*@}*/
@@ -230,87 +230,74 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
-SolverCG<VectorType>::SolverCG (SolverControl        &cn,
-                                VectorMemory<VectorType> &mem,
-                                const AdditionalData     &data)
-  :
-  Solver<VectorType>(cn,mem),
-  additional_data(data)
+SolverCG<VectorType>::SolverCG(SolverControl&            cn,
+                               VectorMemory<VectorType>& mem,
+                               const AdditionalData&     data)
+  : Solver<VectorType>(cn, mem), additional_data(data)
 {}
-
-
 
 template <typename VectorType>
-SolverCG<VectorType>::SolverCG (SolverControl        &cn,
-                                const AdditionalData &data)
-  :
-  Solver<VectorType>(cn),
-  additional_data(data)
+SolverCG<VectorType>::SolverCG(SolverControl& cn, const AdditionalData& data)
+  : Solver<VectorType>(cn), additional_data(data)
 {}
-
-
 
 template <typename VectorType>
 void
 SolverCG<VectorType>::print_vectors(const unsigned int,
-                                    const VectorType &,
-                                    const VectorType &,
-                                    const VectorType &) const
+                                    const VectorType&,
+                                    const VectorType&,
+                                    const VectorType&) const
 {}
-
-
 
 template <typename VectorType>
 inline void
-SolverCG<VectorType>::compute_eigs_and_cond
-(const std::vector<double> &diagonal,
- const std::vector<double> &offdiagonal,
- const boost::signals2::signal<void (const std::vector<double> &)> &eigenvalues_signal,
- const boost::signals2::signal<void (double)>                      &cond_signal)
+SolverCG<VectorType>::compute_eigs_and_cond(
+  const std::vector<double>& diagonal,
+  const std::vector<double>& offdiagonal,
+  const boost::signals2::signal<void(const std::vector<double>&)>&
+                                               eigenvalues_signal,
+  const boost::signals2::signal<void(double)>& cond_signal)
 {
   //Avoid computing eigenvalues unless they are needed.
-  if (!cond_signal.empty()|| !eigenvalues_signal.empty())
+  if(!cond_signal.empty() || !eigenvalues_signal.empty())
     {
       TridiagonalMatrix<double> T(diagonal.size(), true);
-      for (size_type i=0; i<diagonal.size(); ++i)
+      for(size_type i = 0; i < diagonal.size(); ++i)
         {
-          T(i,i) = diagonal[i];
-          if (i< diagonal.size()-1)
-            T(i,i+1) = offdiagonal[i];
+          T(i, i) = diagonal[i];
+          if(i < diagonal.size() - 1)
+            T(i, i + 1) = offdiagonal[i];
         }
       T.compute_eigenvalues();
       //Need two eigenvalues to estimate the condition number.
-      if (diagonal.size()>1)
+      if(diagonal.size() > 1)
         {
-          double condition_number=T.eigenvalue(T.n()-1)/T.eigenvalue(0);
+          double condition_number = T.eigenvalue(T.n() - 1) / T.eigenvalue(0);
           cond_signal(condition_number);
         }
       //Avoid copying the eigenvalues of T to a vector unless a signal is
       //connected.
-      if (!eigenvalues_signal.empty())
+      if(!eigenvalues_signal.empty())
         {
           std::vector<double> eigenvalues(T.n());
-          for (unsigned int j = 0; j < T.n(); ++j)
+          for(unsigned int j = 0; j < T.n(); ++j)
             {
-              eigenvalues.at(j)=T.eigenvalue(j);
+              eigenvalues.at(j) = T.eigenvalue(j);
             }
           eigenvalues_signal(eigenvalues);
         }
     }
-
 }
-
-
 
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverCG<VectorType>::solve (const MatrixType         &A,
-                             VectorType               &x,
-                             const VectorType         &b,
-                             const PreconditionerType &preconditioner)
+SolverCG<VectorType>::solve(const MatrixType&         A,
+                            VectorType&               x,
+                            const VectorType&         b,
+                            const PreconditionerType& preconditioner)
 {
-  SolverControl::State conv=SolverControl::iterate;
+  SolverControl::State conv = SolverControl::iterate;
 
   LogStream::Prefix prefix("cg");
 
@@ -320,22 +307,21 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
   typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
 
   // define some aliases for simpler access
-  VectorType &g = *g_pointer;
-  VectorType &d = *d_pointer;
-  VectorType &h = *h_pointer;
+  VectorType& g = *g_pointer;
+  VectorType& d = *d_pointer;
+  VectorType& h = *h_pointer;
 
   // Should we build the matrix for eigenvalue computations?
-  const bool do_eigenvalues = !condition_number_signal.empty()
-                              ||!all_condition_numbers_signal.empty()
-                              ||!eigenvalues_signal.empty()
-                              ||!all_eigenvalues_signal.empty();
+  const bool do_eigenvalues
+    = !condition_number_signal.empty() || !all_condition_numbers_signal.empty()
+      || !eigenvalues_signal.empty() || !all_eigenvalues_signal.empty();
 
   // vectors used for eigenvalue
   // computations
   std::vector<double> diagonal;
   std::vector<double> offdiagonal;
 
-  int  it=0;
+  int    it  = 0;
   double res = -std::numeric_limits<double>::max();
 
   double eigen_beta_alpha = 0;
@@ -347,118 +333,115 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
   d.reinit(x, true);
   h.reinit(x, true);
 
-  double gh,beta;
+  double gh, beta;
 
   // compute residual. if vector is
   // zero, then short-circuit the
   // full computation
-  if (!x.all_zero())
+  if(!x.all_zero())
     {
-      A.vmult(g,x);
-      g.add(-1.,b);
+      A.vmult(g, x);
+      g.add(-1., b);
     }
   else
-    g.equ(-1.,b);
+    g.equ(-1., b);
   res = g.l2_norm();
 
   conv = this->iteration_status(0, res, x);
-  if (conv != SolverControl::iterate)
+  if(conv != SolverControl::iterate)
     return;
 
-  if (std::is_same<PreconditionerType,PreconditionIdentity>::value == false)
+  if(std::is_same<PreconditionerType, PreconditionIdentity>::value == false)
     {
-      preconditioner.vmult(h,g);
+      preconditioner.vmult(h, g);
 
-      d.equ(-1.,h);
+      d.equ(-1., h);
 
-      gh = g*h;
+      gh = g * h;
     }
   else
     {
-      d.equ(-1.,g);
-      gh = res*res;
+      d.equ(-1., g);
+      gh = res * res;
     }
 
-  while (conv == SolverControl::iterate)
+  while(conv == SolverControl::iterate)
     {
       it++;
-      A.vmult(h,d);
+      A.vmult(h, d);
 
-      double alpha = d*h;
+      double alpha = d * h;
       Assert(alpha != 0., ExcDivideByZero());
-      alpha = gh/alpha;
+      alpha = gh / alpha;
 
-      x.add(alpha,d);
+      x.add(alpha, d);
       res = std::sqrt(g.add_and_dot(alpha, h, g));
 
       print_vectors(it, x, g, d);
 
       conv = this->iteration_status(it, res, x);
-      if (conv != SolverControl::iterate)
+      if(conv != SolverControl::iterate)
         break;
 
-      if (std::is_same<PreconditionerType,PreconditionIdentity>::value
-          == false)
+      if(std::is_same<PreconditionerType, PreconditionIdentity>::value == false)
         {
-          preconditioner.vmult(h,g);
+          preconditioner.vmult(h, g);
 
           beta = gh;
           Assert(beta != 0., ExcDivideByZero());
-          gh   = g*h;
-          beta = gh/beta;
-          d.sadd(beta,-1.,h);
+          gh   = g * h;
+          beta = gh / beta;
+          d.sadd(beta, -1., h);
         }
       else
         {
           beta = gh;
-          gh = res*res;
-          beta = gh/beta;
-          d.sadd(beta,-1.,g);
+          gh   = res * res;
+          beta = gh / beta;
+          d.sadd(beta, -1., g);
         }
 
-      this->coefficients_signal(alpha,beta);
+      this->coefficients_signal(alpha, beta);
       // set up the vectors
       // containing the diagonal
       // and the off diagonal of
       // the projected matrix.
-      if (do_eigenvalues)
+      if(do_eigenvalues)
         {
-          diagonal.push_back(1./alpha + eigen_beta_alpha);
-          eigen_beta_alpha = beta/alpha;
-          offdiagonal.push_back(std::sqrt(beta)/alpha);
+          diagonal.push_back(1. / alpha + eigen_beta_alpha);
+          eigen_beta_alpha = beta / alpha;
+          offdiagonal.push_back(std::sqrt(beta) / alpha);
         }
-      compute_eigs_and_cond(diagonal,offdiagonal,all_eigenvalues_signal,
+      compute_eigs_and_cond(diagonal,
+                            offdiagonal,
+                            all_eigenvalues_signal,
                             all_condition_numbers_signal);
     }
 
-  compute_eigs_and_cond(diagonal,offdiagonal,eigenvalues_signal,
-                        condition_number_signal);
+  compute_eigs_and_cond(
+    diagonal, offdiagonal, eigenvalues_signal, condition_number_signal);
 
   // in case of failure: throw exception
-  if (conv != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence (it, res));
+  if(conv != SolverControl::success)
+    AssertThrow(false, SolverControl::NoConvergence(it, res));
   // otherwise exit as normal
 }
 
-
-
 template <typename VectorType>
 boost::signals2::connection
-SolverCG<VectorType>::connect_coefficients_slot
-(const std::function<void(double,double)> &slot)
+SolverCG<VectorType>::connect_coefficients_slot(
+  const std::function<void(double, double)>& slot)
 {
   return coefficients_signal.connect(slot);
 }
 
-
-
 template <typename VectorType>
 boost::signals2::connection
-SolverCG<VectorType>::connect_condition_number_slot
-(const std::function<void(double)> &slot,
- const bool                              every_iteration)
+SolverCG<VectorType>::connect_condition_number_slot(
+  const std::function<void(double)>& slot,
+  const bool                         every_iteration)
 {
-  if (every_iteration)
+  if(every_iteration)
     {
       return all_condition_numbers_signal.connect(slot);
     }
@@ -468,15 +451,13 @@ SolverCG<VectorType>::connect_condition_number_slot
     }
 }
 
-
-
 template <typename VectorType>
 boost::signals2::connection
-SolverCG<VectorType>::connect_eigenvalues_slot
-(const std::function<void (const std::vector<double> &)> &slot,
- const bool                                                    every_iteration)
+SolverCG<VectorType>::connect_eigenvalues_slot(
+  const std::function<void(const std::vector<double>&)>& slot,
+  const bool                                             every_iteration)
 {
-  if (every_iteration)
+  if(every_iteration)
     {
       return all_eigenvalues_signal.connect(slot);
     }
@@ -485,8 +466,6 @@ SolverCG<VectorType>::connect_eigenvalues_slot
       return eigenvalues_signal.connect(slot);
     }
 }
-
-
 
 #endif // DOXYGEN
 

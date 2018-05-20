@@ -13,13 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_quadrature_selector_h
 #define dealii_quadrature_selector_h
 
-
-#include <deal.II/base/quadrature.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/quadrature.h>
 
 #include <string>
 
@@ -45,48 +43,46 @@ public:
    * "milne", "weddle", etc) and, if it is "gauss", the number of quadrature
    * points in each coordinate direction.
    */
-  QuadratureSelector (const std::string &s,
-                      const unsigned int order=0);
+  QuadratureSelector(const std::string& s, const unsigned int order = 0);
 
   /**
    * This function returns all possible names for quadratures as a list
    * separated by <tt>|</tt>, so that you can use it for the definition of
    * parameter files (see ParameterHandler for details).
    */
-  static std::string get_quadrature_names();
+  static std::string
+  get_quadrature_names();
 
   /**
    * @addtogroup Exceptions
    * @{
    */
 
-
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidQGaussOrder,
-                  int,
-                  << "You tried to generate a QGauss object with an invalid "
-                  << "number " << arg1
-                  << " of quadrature points in each coordinate "
-                  << "direction. This number must be greater than or equal "
-                  << "to 1.");
+  DeclException1(ExcInvalidQGaussOrder,
+                 int,
+                 << "You tried to generate a QGauss object with an invalid "
+                 << "number " << arg1
+                 << " of quadrature points in each coordinate "
+                 << "direction. This number must be greater than or equal "
+                 << "to 1.");
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidOrder,
-                  std::string,
-                  unsigned int,
-                  << "You tried to generate a " << arg1
-                  << " object; no order is needed for objects of this kind, but "
-                  << arg2 << " was given as argument.");
+  DeclException2(ExcInvalidOrder,
+                 std::string,
+                 unsigned int,
+                 << "You tried to generate a " << arg1
+                 << " object; no order is needed for objects of this kind, but "
+                 << arg2 << " was given as argument.");
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidQuadrature,
-                  std::string,
-                  << arg1
-                  << " is not a valid name for a quadrature rule.");
+  DeclException1(ExcInvalidQuadrature,
+                 std::string,
+                 << arg1 << " is not a valid name for a quadrature rule.");
   //@}
 private:
   /**
@@ -94,10 +90,8 @@ private:
    * given as a string, and the appropriate order (if the name is "gauss"). It
    * is called from the constructor.
    */
-  static
-  Quadrature<dim>
-  create_quadrature (const std::string &s,
-                     const unsigned int order);
+  static Quadrature<dim>
+  create_quadrature(const std::string& s, const unsigned int order);
 };
 DEAL_II_NAMESPACE_CLOSE
 

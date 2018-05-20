@@ -13,6 +13,5 @@
 //
 // ---------------------------------------------------------------------
 
-
 #define SPLIT_INSTANTIATIONS_INDEX 1
 #include "mapping_fe_field.cc"

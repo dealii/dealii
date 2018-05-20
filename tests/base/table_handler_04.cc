@@ -13,26 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 // pad columns if we don't fill them in each iteration
-
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
-  table.set_auto_fill_mode (true);
+  table.set_auto_fill_mode(true);
 
-  std::string keys[3] = { "key1", "key2", "key3" };
+  std::string keys[3] = {"key1", "key2", "key3"};
 
   table.add_value(keys[0], 0);
   table.add_value(keys[0], 1);

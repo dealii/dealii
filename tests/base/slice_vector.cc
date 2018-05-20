@@ -18,18 +18,18 @@
 
 #include <vector>
 
-void f(const std::vector<int> &v)
+void
+f(const std::vector<int>& v)
 {
-  const VectorSlice<const std::vector<int> >
-  s = make_slice(v,2,3);
+  const VectorSlice<const std::vector<int>> s = make_slice(v, 2, 3);
 
-  for (unsigned int i=0; i<s.size(); ++i)
+  for(unsigned int i = 0; i < s.size(); ++i)
     deallog << '\t' << s[i];
   deallog << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -37,15 +37,15 @@ int main()
 
   std::vector<int> v(7);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     v[i] = i;
 
-  VectorSlice<std::vector<int> > s(v, 3, 4);
+  VectorSlice<std::vector<int>> s(v, 3, 4);
 
-  for (unsigned int i=0; i<s.size(); ++i)
+  for(unsigned int i = 0; i < s.size(); ++i)
     s[i] = i;
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     deallog << '\t' << v[i];
   deallog << std::endl;
 
@@ -55,7 +55,7 @@ int main()
     {
       make_slice(v, 3, 5);
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
     }

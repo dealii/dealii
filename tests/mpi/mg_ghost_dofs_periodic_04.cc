@@ -19,91 +19,97 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,
-                                                 Triangulation<dim>:: limit_level_difference_at_vertices,
-                                                 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  parallel::distributed::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   std::vector<unsigned int> subdivisions(dim);
-  Point<dim> p1, p2;
-  for (unsigned int d=0; d<dim; ++d)
+  Point<dim>                p1, p2;
+  for(unsigned int d = 0; d < dim; ++d)
     {
-      if (dim == 2)
+      if(dim == 2)
         {
-          p2[d] = dim-d;
-          subdivisions[d] = 2-d;
+          p2[d]           = dim - d;
+          subdivisions[d] = 2 - d;
         }
       else
         {
-          p2[d] = 1;
+          p2[d]           = 1;
           subdivisions[d] = 1;
         }
     }
   GridGenerator::subdivided_hyper_rectangle(tria, subdivisions, p1, p2);
-  for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
-       cell != tria.end(); ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->at_boundary(face))
+  for(typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      cell != tria.end();
+      ++cell)
+    for(unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+      if(cell->at_boundary(face))
         {
-          if (face >= 2)
+          if(face >= 2)
             cell->face(face)->set_all_boundary_ids(face);
           else
             cell->face(face)->set_all_boundary_ids(0);
         }
 
-  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> >
-  periodic_faces;
-  for (unsigned int d=1; d<dim; ++d)
-    GridTools::collect_periodic_faces(tria, 2*d, 2*d+1, d, periodic_faces);
+  std::vector<
+    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+    periodic_faces;
+  for(unsigned int d = 1; d < dim; ++d)
+    GridTools::collect_periodic_faces(
+      tria, 2 * d, 2 * d + 1, d, periodic_faces);
   tria.add_periodicity(periodic_faces);
 
-  tria.refine_global(5-dim);
-  if (tria.begin(tria.n_global_levels()-1)->subdomain_id() ==
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
-    tria.begin(tria.n_global_levels()-1)->set_refine_flag();
-  if (tria.last()->subdomain_id() ==
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+  tria.refine_global(5 - dim);
+  if(tria.begin(tria.n_global_levels() - 1)->subdomain_id()
+     == Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+    tria.begin(tria.n_global_levels() - 1)->set_refine_flag();
+  if(tria.last()->subdomain_id()
+     == Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
     tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  FE_Q<dim> fe(1);
+  FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
   dof_handler.distribute_mg_dofs(fe);
 
   std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
-  for (unsigned int level=0; level<tria.n_global_levels(); ++level)
+  for(unsigned int level = 0; level < tria.n_global_levels(); ++level)
     {
       deallog << "Level " << level << std::endl;
-      for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin(level);
-           cell != dof_handler.end(level); ++cell)
-        if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
+      for(typename DoFHandler<dim>::cell_iterator cell
+          = dof_handler.begin(level);
+          cell != dof_handler.end(level);
+          ++cell)
+        if(cell->level_subdomain_id() != numbers::artificial_subdomain_id)
           {
             deallog << "Cell with center: " << cell->center() << ", owned by "
                     << cell->level_subdomain_id() << ": ";
             cell->get_mg_dof_indices(dof_indices);
-            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+            for(unsigned int i = 0; i < fe.dofs_per_cell; ++i)
               deallog << dof_indices[i] << " ";
             deallog << std::endl;
           }
     }
 }
 
-
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   using namespace dealii;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
   MPILogInitAll log;
   deallog << std::setprecision(4);
 
@@ -112,9 +118,10 @@ int main(int argc, char *argv[])
       test<2>();
       test<3>();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -124,9 +131,10 @@ int main(int argc, char *argv[])
                 << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

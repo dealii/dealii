@@ -21,7 +21,8 @@
 
 #include <numeric>
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -30,25 +31,17 @@ int main()
   // test a non-empty rectangular table
   TransposeTable<double> table(3, 4);
   std::iota(table.begin(), table.end(), 1.0);
-  for (const auto entry : table)
+  for(const auto entry : table)
     {
-      deallog << entry.row()
-              << ", "
-              << entry.column()
-              << ", "
-              << entry.value()
+      deallog << entry.row() << ", " << entry.column() << ", " << entry.value()
               << std::endl;
     }
 
   deallog << "backwards order:" << std::endl;
   auto it = table.end() - 1;
-  for (; it >= table.begin(); --it)
+  for(; it >= table.begin(); --it)
     {
-      deallog << it->row()
-              << ", "
-              << it->column()
-              << ", "
-              << it->value()
+      deallog << it->row() << ", " << it->column() << ", " << it->value()
               << std::endl;
     }
   deallog << "iterator is one before the beginning: "
@@ -56,40 +49,36 @@ int main()
 
   deallog << "every other entry:" << std::endl;
   it = table.begin();
-  for (; it < table.end(); it += 2)
+  for(; it < table.end(); it += 2)
     {
-      deallog << it->row()
-              << ", "
-              << it->column()
-              << ", "
-              << it->value()
+      deallog << it->row() << ", " << it->column() << ", " << it->value()
               << std::endl;
     }
 
   // print every other entry
   it = table.end() - 1;
   deallog << "every other entry:" << std::endl;
-  for (; it >= table.begin(); it -= 2)
+  for(; it >= table.begin(); it -= 2)
     {
-      deallog << it->row()
-              << ", "
-              << it->column()
-              << ", "
-              << it->value()
+      deallog << it->row() << ", " << it->column() << ", " << it->value()
               << std::endl;
     }
 
   // test some type equalities
-  static_assert(std::is_same<decltype(table.begin()->value()), double &>::value,
-                "The iterator value for a non-const table should not be const.");
-  static_assert(std::is_same<decltype(table.end()->value()), double &>::value,
-                "The iterator value for a non-const table should not be const.");
+  static_assert(
+    std::is_same<decltype(table.begin()->value()), double&>::value,
+    "The iterator value for a non-const table should not be const.");
+  static_assert(
+    std::is_same<decltype(table.end()->value()), double&>::value,
+    "The iterator value for a non-const table should not be const.");
 
-  const TransposeTable<double> &ref = table;
-  static_assert(std::is_same<decltype(ref.begin()->value()), const double &>::value,
-                "The iterator value for a constant table should be const.");
-  static_assert(std::is_same<decltype(ref.end()->value()), const double &>::value,
-                "The iterator value for a constant table should be const.");
+  const TransposeTable<double>& ref = table;
+  static_assert(
+    std::is_same<decltype(ref.begin()->value()), const double&>::value,
+    "The iterator value for a constant table should be const.");
+  static_assert(
+    std::is_same<decltype(ref.end()->value()), const double&>::value,
+    "The iterator value for a constant table should be const.");
 
   deallog << "OK" << std::endl;
 }

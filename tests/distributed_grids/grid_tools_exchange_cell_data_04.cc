@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test GridTools::exchange_cell_data_to_ghosts
 //
 // this test works just like the _01 test, but it skips those cells
@@ -23,80 +22,70 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <algorithm>
 
 template <int dim>
-void test ()
+void
+test()
 {
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm& mpi_communicator = MPI_COMM_WORLD;
   deallog << "dim = " << dim << std::endl;
 
-  parallel::distributed::Triangulation<dim> tria (mpi_communicator);
+  parallel::distributed::Triangulation<dim> tria(mpi_communicator);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
   std::set<std::string> output;
 
-  typedef typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell_iterator;
+  typedef
+    typename parallel::distributed::Triangulation<dim>::active_cell_iterator
+                 cell_iterator;
   typedef double DT;
-  int counter = 0;
-  GridTools::exchange_cell_data_to_ghosts<
-  DT,
-  parallel::distributed::Triangulation<dim>>
-  (tria,
-   [&](const cell_iterator& cell) -> boost::optional<DT>
-  {
-    ++counter;
-    if (counter % 2 == 0)
-      {
-        DT value = counter;
+  int            counter = 0;
+  GridTools::
+    exchange_cell_data_to_ghosts<DT, parallel::distributed::Triangulation<dim>>(
+      tria,
+      [&](const cell_iterator& cell) -> boost::optional<DT> {
+        ++counter;
+        if(counter % 2 == 0)
+          {
+            DT value = counter;
 
-        deallog << "pack "
-        << cell->id()
-        << " "
-        << value << std::endl;
-        return value;
-      }
-    else
-      {
-        deallog << "skipping "
-        << cell->id()
-        << ' ' << counter
-        << std::endl;
-        return boost::optional<DT>();
-      }
-  },
-  [&](const cell_iterator& cell, const DT& data)
-  {
-    std::ostringstream oss;
-    oss << "unpack "
-        << cell->id()
-        << " "
-        << data
-        << " from "
-        << cell->subdomain_id();
+            deallog << "pack " << cell->id() << " " << value << std::endl;
+            return value;
+          }
+        else
+          {
+            deallog << "skipping " << cell->id() << ' ' << counter << std::endl;
+            return boost::optional<DT>();
+          }
+      },
+      [&](const cell_iterator& cell, const DT& data) {
+        std::ostringstream oss;
+        oss << "unpack " << cell->id() << " " << data << " from "
+            << cell->subdomain_id();
 
-    output.insert(oss.str());
-  });
+        output.insert(oss.str());
+      });
 
   // sort the output because it will come in in random order
-  for (auto &it : output)
+  for(auto& it : output)
     deallog << it << std::endl;
 }
 
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   return 0;
 }

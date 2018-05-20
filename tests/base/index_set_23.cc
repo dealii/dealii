@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // we managed to get a function as simple as IndexSet::operator== wrong -- who
 // knew?
 
@@ -22,13 +21,13 @@
 
 #include <deal.II/base/index_set.h>
 
-
-void test ()
+void
+test()
 {
-  IndexSet is1 (100), is2 (100);
+  IndexSet is1(100), is2(100);
 
-  is1.add_range (0,10);
-  is2.add_range (0,20);
+  is1.add_range(0, 10);
+  is2.add_range(0, 20);
 
   Assert((is1 == is2) == false, ExcInternalError());
   Assert((is1 != is2) == true, ExcInternalError());
@@ -36,12 +35,10 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

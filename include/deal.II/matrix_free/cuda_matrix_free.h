@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_cuda_matrix_free_h
 #define dealii_cuda_matrix_free_h
 
@@ -21,16 +20,15 @@
 
 #ifdef DEAL_II_WITH_CUDA
 
-#include <deal.II/base/quadrature.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/fe_update_flags.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/cuda_vector.h>
-#include <cuda_runtime_api.h>
-
+#  include <cuda_runtime_api.h>
+#  include <deal.II/base/quadrature.h>
+#  include <deal.II/base/tensor.h>
+#  include <deal.II/dofs/dof_handler.h>
+#  include <deal.II/fe/fe_update_flags.h>
+#  include <deal.II/fe/mapping.h>
+#  include <deal.II/fe/mapping_q1.h>
+#  include <deal.II/lac/constraint_matrix.h>
+#  include <deal.II/lac/cuda_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -69,11 +67,11 @@ namespace CUDAWrappers
    *
    * @ingroup CUDAWrappers
    */
-  template <int dim, typename Number=double>
+  template <int dim, typename Number = double>
   class MatrixFree : public Subscriptor
   {
   public:
-    typedef Tensor<2, dim, Tensor<1,dim,Number>> jacobian_type;
+    typedef Tensor<2, dim, Tensor<1, dim, Number>> jacobian_type;
     // TODO this should really be a CUDAWrappers::Point
     typedef Tensor<1, dim, Number> point_type;
 
@@ -86,16 +84,20 @@ namespace CUDAWrappers
      * of degrees of freedom) or parallel_over_elem (parallelism at the level of
      * cells)
      */
-    enum ParallelizationScheme {parallel_in_elem, parallel_over_elem};
+    enum ParallelizationScheme
+    {
+      parallel_in_elem,
+      parallel_over_elem
+    };
 
     struct AdditionalData
     {
-      AdditionalData (
-        const ParallelizationScheme parallelization_scheme = parallel_in_elem,
-        const UpdateFlags mapping_update_flags = update_gradients | update_JxW_values)
-        :
-        parallelization_scheme(parallelization_scheme),
-        mapping_update_flags(mapping_update_flags)
+      AdditionalData(const ParallelizationScheme parallelization_scheme
+                     = parallel_in_elem,
+                     const UpdateFlags mapping_update_flags
+                     = update_gradients | update_JxW_values)
+        : parallelization_scheme(parallelization_scheme),
+          mapping_update_flags(mapping_update_flags)
       {}
 
       /**
@@ -125,14 +127,14 @@ namespace CUDAWrappers
      */
     struct Data
     {
-      point_type *q_points;
-      unsigned int *local_to_global;
-      Number *inv_jacobian;
-      Number *JxW;
-      unsigned int n_cells;
-      unsigned int padding_length;
-      unsigned int row_start;
-      unsigned int *constraint_mask;
+      point_type*   q_points;
+      unsigned int* local_to_global;
+      Number*       inv_jacobian;
+      Number*       JxW;
+      unsigned int  n_cells;
+      unsigned int  padding_length;
+      unsigned int  row_start;
+      unsigned int* constraint_mask;
     };
 
     /**
@@ -140,7 +142,8 @@ namespace CUDAWrappers
      */
     MatrixFree();
 
-    unsigned int get_padding_length() const;
+    unsigned int
+    get_padding_length() const;
 
     /**
      * Extracts the information needed to perform loops over cells. The
@@ -149,48 +152,56 @@ namespace CUDAWrappers
      * unit to real cell, and the finite element underlying the DoFHandler
      * together with the quadrature formula describe the local operations.
      */
-    void reinit(const Mapping<dim> &mapping,
-                const DoFHandler<dim> &dof_handler,
-                const ConstraintMatrix &constraints,
-                const Quadrature<1> &quad,
-                const AdditionalData additional_data = AdditionalData());
+    void
+    reinit(const Mapping<dim>&     mapping,
+           const DoFHandler<dim>&  dof_handler,
+           const ConstraintMatrix& constraints,
+           const Quadrature<1>&    quad,
+           const AdditionalData    additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
      */
-    void reinit(const DoFHandler<dim> &dof_handler,
-                const ConstraintMatrix &constraints,
-                const Quadrature<1> &quad,
-                const AdditionalData AdditionalData = AdditionalData());
+    void
+    reinit(const DoFHandler<dim>&  dof_handler,
+           const ConstraintMatrix& constraints,
+           const Quadrature<1>&    quad,
+           const AdditionalData    AdditionalData = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
      */
-    Data get_data(unsigned int color) const;
+    Data
+    get_data(unsigned int color) const;
 
     /**
      * This method runs the loop over all cells and apply the local operation on
      * each element in parallel. @p func is a functor which is appplied on each color.
      */
     template <typename functor>
-    void cell_loop(const functor &func,
-                   const CUDAVector<Number> &src,
-                   CUDAVector<Number> &dst) const;
+    void
+    cell_loop(const functor&            func,
+              const CUDAVector<Number>& src,
+              CUDAVector<Number>&       dst) const;
 
-    void copy_constrained_values(const CUDAVector<Number> &src,
-                                 CUDAVector<Number> &dst) const;
+    void
+    copy_constrained_values(const CUDAVector<Number>& src,
+                            CUDAVector<Number>&       dst) const;
 
-    void set_constrained_values(const Number val, CUDAVector<Number> &dst) const;
+    void
+    set_constrained_values(const Number val, CUDAVector<Number>& dst) const;
 
     /**
      * Free all the memory allocated.
      */
-    void free();
+    void
+    free();
 
     /**
      * Return an approximation of the memory consumption of this class in bytes.
      */
-    std::size_t memory_consumption() const;
+    std::size_t
+    memory_consumption() const;
 
   private:
     /**
@@ -226,26 +237,26 @@ namespace CUDAWrappers
      * Vector of pointers to the quadrature points associated to the cells of
      * each color.
      */
-    std::vector<point_type *> q_points;
+    std::vector<point_type*> q_points;
     /**
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<unsigned int *> local_to_global;
+    std::vector<unsigned int*> local_to_global;
     /**
      * Vector of pointer to the inverse Jacobian associated to the cells of each
      * color.
      */
-    std::vector<Number *> inv_jacobian;
+    std::vector<Number*> inv_jacobian;
     /**
      * Vector of pointer to the Jacobian time the weights associated to the
      * cells of each color.
      */
-    std::vector<Number *> JxW;
+    std::vector<Number*> JxW;
 
     // Constraints
-    unsigned int *constrained_dofs;
-    std::vector<unsigned int *> constraint_mask;
+    unsigned int*              constrained_dofs;
+    std::vector<unsigned int*> constraint_mask;
     /**
      * Grid dimensions associated to the different colors. The grid dimensions
      * are used to launch the CUDA kernels.
@@ -259,53 +270,46 @@ namespace CUDAWrappers
 
     // Parallelization parameter
     unsigned int cells_per_block;
-    dim3 constraint_grid_dim;
-    dim3 constraint_block_dim;
+    dim3         constraint_grid_dim;
+    dim3         constraint_block_dim;
 
-    unsigned int padding_length;
+    unsigned int              padding_length;
     std::vector<unsigned int> row_start;
 
-    friend class internal::ReinitHelper<dim,Number>;
+    friend class internal::ReinitHelper<dim, Number>;
   };
-
-
 
   // TODO find a better place to put these things
   // Structure to pass the shared memory into a general user function.
   template <int dim, typename Number>
   struct SharedData
   {
-    __device__ SharedData(Number *vd,
-                          Number *gq[dim])
-      :
-      values(vd)
+    __device__
+    SharedData(Number* vd, Number* gq[dim])
+      : values(vd)
     {
-      for (int d=0; d<dim; ++d)
+      for(int d = 0; d < dim; ++d)
         gradients[d] = gq[d];
     }
 
-    Number *values;
-    Number *gradients[dim];
+    Number* values;
+    Number* gradients[dim];
   };
-
-
 
   // This function determines the number of cells per block, possibly at compile
   // time
   // TODO this function should be rewritten using meta-programming
-  __host__ __device__ constexpr unsigned int cells_per_block_shmem(int dim,
-      int fe_degree)
+  __host__ __device__ constexpr unsigned int
+           cells_per_block_shmem(int dim, int fe_degree)
   {
-    return dim==2 ? (fe_degree==1 ? 32 :
-                     fe_degree==2 ? 8 :
-                     fe_degree==3 ? 4 :
-                     fe_degree==4 ? 4 :
-                     1) :
-           dim==3 ? (fe_degree==1 ? 8 :
-                     fe_degree==2 ? 2 :
-                     1) : 1;
+    return dim == 2 ?
+             (fe_degree == 1 ?
+                32 :
+                fe_degree == 2 ? 8 :
+                                 fe_degree == 3 ? 4 : fe_degree == 4 ? 4 : 1) :
+             dim == 3 ? (fe_degree == 1 ? 8 : fe_degree == 2 ? 2 : 1) : 1;
   }
-}
+} // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

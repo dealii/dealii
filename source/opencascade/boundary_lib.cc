@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/opencascade/boundary_lib.h>
 
 #ifdef DEAL_II_WITH_OPENCASCADE
@@ -23,35 +22,32 @@ DEAL_II_NAMESPACE_OPEN
 namespace OpenCASCADE
 {
   template <int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  NormalProjectionBoundary<dim,spacedim>::clone() const
+  std::unique_ptr<Manifold<dim, spacedim>>
+  NormalProjectionBoundary<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim,spacedim> >(
-             new NormalProjectionBoundary(this->sh, this->tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new NormalProjectionBoundary(this->sh, this->tolerance));
   }
 
-
-
   template <int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  DirectionalProjectionBoundary<dim,spacedim>::clone() const
+  std::unique_ptr<Manifold<dim, spacedim>>
+  DirectionalProjectionBoundary<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim,spacedim> >(
-             new DirectionalProjectionBoundary(this->sh, this->direction, this->tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new DirectionalProjectionBoundary(
+        this->sh, this->direction, this->tolerance));
   }
 
-
-
   template <int dim, int spacedim>
-  std::unique_ptr<Manifold<dim, spacedim> >
-  NormalToMeshProjectionBoundary<dim,spacedim>::clone() const
+  std::unique_ptr<Manifold<dim, spacedim>>
+  NormalToMeshProjectionBoundary<dim, spacedim>::clone() const
   {
-    return std::unique_ptr<Manifold<dim,spacedim> >(
-             new NormalToMeshProjectionBoundary(this->sh, this->tolerance));
+    return std::unique_ptr<Manifold<dim, spacedim>>(
+      new NormalToMeshProjectionBoundary(this->sh, this->tolerance));
   }
 // Explicit instantiations
-#include "boundary_lib.inst"
-}
+#  include "boundary_lib.inst"
+} // namespace OpenCASCADE
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -16,24 +16,24 @@
 // Test operator[] and norm_square of cuda_tensor.
 
 #include "../tests.h"
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
 #include <fstream>
 #include <iomanip>
 
-void test_cpu()
+void
+test_cpu()
 {
-  double a[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-  const unsigned int dim=3;
-  Tensor<2,dim> t;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  double             a[3][3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+  const unsigned int dim     = 3;
+  Tensor<2, dim>     t;
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       t[i][j] = a[i][j];
 
-
   deallog.push("values");
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       deallog << t[i][j] << std::endl;
   deallog.pop();
 
@@ -42,42 +42,42 @@ void test_cpu()
   deallog.pop();
 }
 
-__global__ void init_kernel(Tensor<2,3> *t,
-                            const unsigned int N)
+__global__ void init_kernel(Tensor<2, 3>* t, const unsigned int N)
 {
   const unsigned int i = threadIdx.y;
   const unsigned int j = threadIdx.x;
-  if ((i < N) && (j < N))
-    (*t)[i][j] = j + i*N + 1.;
+  if((i < N) && (j < N))
+    (*t)[i][j] = j + i * N + 1.;
 }
 
-__global__ void norm_kernel(Tensor<2,3> *t, double *norm)
+__global__ void norm_kernel(Tensor<2, 3>* t, double* norm)
 {
-  if (threadIdx.x == 0)
+  if(threadIdx.x == 0)
     *norm = t->norm_square();
 }
 
-void test_gpu()
+void
+test_gpu()
 {
-  const unsigned int dim=3;
-  double *norm_dev;
-  double norm_host;
-  Tensor<2,dim> *t_dev;
+  const unsigned int dim = 3;
+  double*            norm_dev;
+  double             norm_host;
+  Tensor<2, dim>*    t_dev;
 
   // Allocate objects on the device
-  cudaError_t cuda_error = cudaMalloc(&t_dev, sizeof(Tensor<2,dim>));
+  cudaError_t cuda_error = cudaMalloc(&t_dev, sizeof(Tensor<2, dim>));
   AssertCuda(cuda_error);
   cuda_error = cudaMalloc(&norm_dev, sizeof(double));
   AssertCuda(cuda_error);
 
   // Launch the kernels.
   dim3 block_dim(dim, dim);
-  init_kernel<<<1,block_dim>>>(t_dev, dim);
-  norm_kernel<<<1,1>>>(t_dev, norm_dev);
+  init_kernel<<<1, block_dim>>>(t_dev, dim);
+  norm_kernel<<<1, 1>>>(t_dev, norm_dev);
 
   // Copy the result to the device
-  cuda_error = cudaMemcpy(&norm_host, norm_dev, sizeof(double),
-                          cudaMemcpyDeviceToHost);
+  cuda_error
+    = cudaMemcpy(&norm_host, norm_dev, sizeof(double), cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error);
 
   // Free memory
@@ -91,7 +91,8 @@ void test_gpu()
   deallog << norm_host << std::endl;
 }
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(5);

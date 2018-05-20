@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MPI::Vector::reinit(fast)
 
 #include "../tests.h"
@@ -22,36 +20,35 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::MPI::Vector &v)
+void
+test(PETScWrappers::MPI::Vector& v)
 {
-  v.reinit (MPI_COMM_WORLD, 13, 13, true);
+  v.reinit(MPI_COMM_WORLD, 13, 13, true);
 
-  AssertThrow (v.size() == 13, ExcInternalError());
+  AssertThrow(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
         PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
         test(v);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -62,9 +59,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

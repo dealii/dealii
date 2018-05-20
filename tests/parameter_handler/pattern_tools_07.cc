@@ -13,12 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
+#include <boost/core/demangle.hpp>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/numbers.h>
-#include <boost/core/demangle.hpp>
 
 #include <memory>
 
@@ -28,26 +27,28 @@ using namespace Patterns::Tools;
 // Try conversion on arbitrary container types
 
 template <class T>
-void test(T t)
+void
+test(T t)
 {
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
   deallog << "To String: " << s << std::endl;
-  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s)) << std::endl;
-
+  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s))
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  std::vector            <unsigned int> t00;
-  std::deque             <unsigned int> t01;
-  std::list              <unsigned int> t02;
-  std::set               <unsigned int> t03;
-  std::multiset          <unsigned int> t04;
-  std::unordered_set     <unsigned int> t05;
+  std::vector<unsigned int>             t00;
+  std::deque<unsigned int>              t01;
+  std::list<unsigned int>               t02;
+  std::set<unsigned int>                t03;
+  std::multiset<unsigned int>           t04;
+  std::unordered_set<unsigned int>      t05;
   std::unordered_multiset<unsigned int> t06;
 
   t00.insert(t00.end(), 0);
@@ -57,7 +58,6 @@ int main()
   t04.insert(t04.end(), 4);
   t05.insert(t05.end(), 5);
   t06.insert(t06.end(), 6);
-
 
   t00.insert(t00.end(), 1);
   t01.insert(t01.end(), 2);

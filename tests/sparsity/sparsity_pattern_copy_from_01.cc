@@ -13,34 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // SparsityPattern::copy_from crashed when the number of rows or columns
 // was zero
 
-#include "../tests.h"
-#include <deal.II/lac/sparsity_pattern.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include "../testmatrix.h"
+#include "../tests.h"
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <list>
 #include <set>
 
-
 int
-main ()
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  DynamicSparsityPattern csp (10, 0);
+  DynamicSparsityPattern csp(10, 0);
 
   SparsityPattern sp;
-  sp.copy_from (csp);
+  sp.copy_from(csp);
 
   deallog << "OK" << std::endl;
 }
-
-
-

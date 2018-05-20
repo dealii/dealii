@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Create a Triangulation, interpolate its boundary points to a close
 // smooth BSpline, and use that as a Boundary Descriptor.
 
@@ -21,38 +20,41 @@
 
 #include <deal.II/opencascade/utilities.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_tools.h>
 
 using namespace OpenCASCADE;
 
-void remove_iges_header(const std::string &in_filename,
-                        const std::string &out_filename)
+void
+remove_iges_header(const std::string& in_filename,
+                   const std::string& out_filename)
 {
   std::ifstream in(in_filename);
   std::ofstream out(out_filename);
-  std::string line;
-  unsigned int counter = 5;
-  while (counter--) std::getline(in,line);
-  while (std::getline(in,line))
+  std::string   line;
+  unsigned int  counter = 5;
+  while(counter--)
+    std::getline(in, line);
+  while(std::getline(in, line))
     out << line << std::endl;
   in.close();
   out.close();
 }
 
-template<int spacedim>
-void test()
+template <int spacedim>
+void
+test()
 {
   deallog << "Testing <2," << spacedim << ">" << std::endl;
 
-  Triangulation<2,spacedim> tria1;
-  Triangulation<2,spacedim> tria2;
-  Triangulation<2,spacedim> tria3;
+  Triangulation<2, spacedim> tria1;
+  Triangulation<2, spacedim> tria2;
+  Triangulation<2, spacedim> tria3;
 
   GridGenerator::hyper_cube(tria1, 0, 1);
   GridGenerator::hyper_cube(tria2, 2, 3);
@@ -64,24 +66,24 @@ void test()
   auto v1 = create_curves_from_triangulation_boundary(tria1);
   auto v3 = create_curves_from_triangulation_boundary(tria3);
 
-  if (spacedim == 3)
+  if(spacedim == 3)
     {
-      Triangulation<2,3> tria4;
+      Triangulation<2, 3> tria4;
       GridGenerator::hyper_sphere(tria4);
       auto v4 = create_curves_from_triangulation_boundary(tria4);
 
-      if (v4.size() != 0)
+      if(v4.size() != 0)
         deallog << "Not OK!: size is " << v4.size() << std::endl;
       else
         deallog << "OK" << std::endl;
     }
 
-  if (v1.size() != 1)
+  if(v1.size() != 1)
     deallog << "Not OK: size is " << v1.size() << std::endl;
   else
     deallog << "OK" << std::endl;
 
-  if (v3.size() != 2)
+  if(v3.size() != 2)
     deallog << "Not OK!: size is " << v3.size() << std::endl;
   else
     deallog << "OK" << std::endl;
@@ -99,7 +101,8 @@ void test()
   cat_file("edge31_noheader.iges");
 }
 
-int main ()
+int
+main()
 {
   initlog();
 

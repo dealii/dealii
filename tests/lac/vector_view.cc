@@ -13,44 +13,45 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_view.h>
 
-const unsigned int N=10;
-unsigned int check_point = 0;
+const unsigned int N           = 10;
+unsigned int       check_point = 0;
 
 template <typename number>
-void print (const Vector<number> &v)
+void
+print(const Vector<number>& v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     deallog << v(i) << '\t';
   deallog << std::endl;
 }
 
 template <typename T>
-void fill( T &a)
+void
+fill(T& a)
 {
-  for (unsigned int i=0; i<a.size(); ++i)
+  for(unsigned int i = 0; i < a.size(); ++i)
     a(i) = i;
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
 
-  Vector<double>  v1(N);
+  Vector<double> v1(N);
   fill(v1);
 
   deallog << "Vector" << std::endl;
   print(v1);
 
-  VectorView<double> v2(N, v1.begin() );
+  VectorView<double> v2(N, v1.begin());
   deallog << "Vector View" << std::endl;
   print(v2);
 
@@ -75,5 +76,3 @@ int main()
   v4.reinit(N, v1.begin());
   v4.reinit(N, v3.begin());
 }
-
-

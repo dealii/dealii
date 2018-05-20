@@ -13,30 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::precondition_Jacobi. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors, even though we only store real values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_square_matrix (m);
-  Vector<std::complex<number> > v, w;
-  make_range_vector (v);
-  make_range_vector (w);
+  FullMatrix<std::complex<number>> m;
+  make_square_matrix(m);
+  Vector<std::complex<number>> v, w;
+  make_range_vector(v);
+  make_range_vector(w);
 
-  m.precondition_Jacobi (v, w, 3.141);
-  print_vector (v);
-  print_vector (w);
+  m.precondition_Jacobi(v, w, 3.141);
+  print_vector(v);
+  print_vector(w);
 }

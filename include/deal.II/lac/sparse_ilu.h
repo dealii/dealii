@@ -13,15 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_sparse_ilu_h
 #define dealii_sparse_ilu_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparse_decomposition.h>
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/sparse_decomposition.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -71,15 +69,13 @@ public:
    * Call the @p initialize function before using this object as
    * preconditioner.
    */
-  SparseILU () = default;
+  SparseILU() = default;
 
   /**
    * Make SparseLUDecomposition::AdditionalData accessible to this class as
    * well.
    */
-  typedef
-  typename SparseLUDecomposition<number>::AdditionalData
-  AdditionalData;
+  typedef typename SparseLUDecomposition<number>::AdditionalData AdditionalData;
 
   /**
    * Perform the incomplete LU factorization of the given matrix.
@@ -99,8 +95,9 @@ public:
    * After this function is called the preconditioner is ready to be used.
    */
   template <typename somenumber>
-  void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData &parameters = AdditionalData());
+  void
+  initialize(const SparseMatrix<somenumber>& matrix,
+             const AdditionalData&           parameters = AdditionalData());
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step
@@ -109,9 +106,8 @@ public:
    * The initialize() function needs to be called before.
    */
   template <typename somenumber>
-  void vmult (Vector<somenumber>       &dst,
-              const Vector<somenumber> &src) const;
-
+  void
+  vmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Apply the transpose of the incomplete decomposition, i.e. do one forward-
@@ -120,15 +116,15 @@ public:
    * The initialize() function needs to be called before.
    */
   template <typename somenumber>
-  void Tvmult (Vector<somenumber>       &dst,
-               const Vector<somenumber> &src) const;
-
+  void
+  Tvmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const override;
+  std::size_t
+  memory_consumption() const override;
 
   /**
    * @addtogroup Exceptions
@@ -138,27 +134,26 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcInvalidStrengthening,
-                  double,
-                  << "The strengthening parameter " << arg1
-                  << " is not greater or equal than zero!");
+  DeclException1(ExcInvalidStrengthening,
+                 double,
+                 << "The strengthening parameter " << arg1
+                 << " is not greater or equal than zero!");
   /**
    * Exception
    */
-  DeclException1 (ExcZeroPivot,
-                  size_type,
-                  << "While computing the ILU decomposition, the algorithm "
-                  "found a zero pivot on the diagonal of row "
-                  << arg1
-                  << ". This must stop the ILU algorithm because it means "
-                  "that the matrix for which you try to compute a "
-                  "decomposition is singular.");
+  DeclException1(ExcZeroPivot,
+                 size_type,
+                 << "While computing the ILU decomposition, the algorithm "
+                    "found a zero pivot on the diagonal of row "
+                 << arg1
+                 << ". This must stop the ILU algorithm because it means "
+                    "that the matrix for which you try to compute a "
+                    "decomposition is singular.");
   //@}
 };
 
 /*@}*/
 //---------------------------------------------------------------------------
-
 
 DEAL_II_NAMESPACE_CLOSE
 

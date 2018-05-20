@@ -13,61 +13,61 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/multigrid/mg_transfer.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-
-#define TEST(dim, l, el, deg) { el<dim> fe(deg); \
-    deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
-    print_matrix(tr ## dim, l, fe, #el); }
+#define TEST(dim, l, el, deg)                                        \
+  {                                                                  \
+    el<dim> fe(deg);                                                 \
+    deallog << #el << '<' << dim << ">(" << deg << ')' << std::endl; \
+    print_matrix(tr##dim, l, fe, #el);                               \
+  }
 
 template <int dim>
 inline void
-print_matrix(Triangulation<dim> &tr,
-             unsigned int level,
-             const FiniteElement<dim> &finel,
-             const char * /*name*/)
+print_matrix(Triangulation<dim>&       tr,
+             unsigned int              level,
+             const FiniteElement<dim>& finel,
+             const char* /*name*/)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(finel);
   dof.distribute_mg_dofs(finel);
 
-  MGTransferPrebuilt<Vector<double> > transfer;
+  MGTransferPrebuilt<Vector<double>> transfer;
   transfer.build_matrices(dof);
 
-  unsigned int n_coarse = dof.n_dofs(level-1);
-  unsigned int n_fine = dof.n_dofs(level);
+  unsigned int   n_coarse = dof.n_dofs(level - 1);
+  unsigned int   n_fine   = dof.n_dofs(level);
   Vector<double> in(n_fine);
   Vector<double> out(n_coarse);
 
-  for (unsigned int i=0; i<n_fine; ++i)
+  for(unsigned int i = 0; i < n_fine; ++i)
     {
-      in = 0.;
-      out = 0.;
+      in    = 0.;
+      out   = 0.;
       in(i) = 1.;
-      transfer.restrict_and_add(level,out,in);
-      for (unsigned int k=0; k<out.size(); ++k)
+      transfer.restrict_and_add(level, out, in);
+      for(unsigned int k = 0; k < out.size(); ++k)
         deallog << '\t' << out(k);
       deallog << std::endl;
     }
   deallog << std::endl;
 }
-
 
 int
 main()
@@ -88,7 +88,7 @@ main()
   TEST(2, 1, FE_Q, 1);
   TEST(2, 1, FE_Q, 2);
   TEST(2, 1, FE_Q, 3);
-//  TEST(2, 1, FE_Q, 4);
+  //  TEST(2, 1, FE_Q, 4);
 
   TEST(2, 1, FE_DGQ, 0);
   TEST(2, 1, FE_DGQ, 1);

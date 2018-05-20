@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check VectorTools::project_parallel() of quadrature data for
 // FE_Q on a mesh without hanging nodes.
 
@@ -26,19 +25,20 @@ namespace LA
 }
 
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=1; p<7-dim; ++p)
-    test_no_hanging_nodes<LA::MPI::Vector> (FE_Q<dim>(p), p);
+  for(unsigned int p = 1; p < 7 - dim; ++p)
+    test_no_hanging_nodes<LA::MPI::Vector>(FE_Q<dim>(p), p);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
 
   test<2>();
   test<3>();
 }
-

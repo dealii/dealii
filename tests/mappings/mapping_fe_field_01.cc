@@ -15,46 +15,47 @@
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_bernstein.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/fe/mapping_fe_field.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/fe/mapping_cartesian.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/mapping_fe_field.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe.h>
-#include <deal.II/fe/fe_bernstein.h>
-#include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #define PRECISION 2
 
 template <int dim, int spacedim>
-void test(const unsigned int degree)
+void
+test(const unsigned int degree)
 {
   deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;
   deallog << "degree = " << degree << std::endl;
 
-  Triangulation<dim,spacedim> tria;
+  Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global (2);
+  tria.refine_global(2);
 
-  FE_Bernstein<dim,spacedim> fe(degree);
+  FE_Bernstein<dim, spacedim> fe(degree);
   //FE_Q<dim> fe(degree);
-  FESystem<dim,spacedim> fe_sys(fe, spacedim);
+  FESystem<dim, spacedim> fe_sys(fe, spacedim);
 
   // DoFHandler<dim> dof(tria);
-  DoFHandler<dim,spacedim> dof_sys(tria);
+  DoFHandler<dim, spacedim> dof_sys(tria);
   // dof.distribute_dofs(fe);
   dof_sys.distribute_dofs(fe_sys);
 
@@ -63,34 +64,33 @@ void test(const unsigned int degree)
   const ComponentMask mask(spacedim, true);
 
   VectorTools::get_position_vector(dof_sys, euler, mask);
-  MappingFEField<dim,spacedim> map_fe(dof_sys, euler, mask);
+  MappingFEField<dim, spacedim> map_fe(dof_sys, euler, mask);
 
   QIterated<dim> quadrature_formula(QTrapez<1>(), fe.degree);
 
-  FEValues<dim,spacedim>    fe_values ( map_fe, fe_sys,
-                                        quadrature_formula,
-                                        update_values   |
-                                        update_JxW_values);
+  FEValues<dim, spacedim> fe_values(
+    map_fe, fe_sys, quadrature_formula, update_values | update_JxW_values);
 
-  typename DoFHandler<dim,spacedim>::active_cell_iterator
-  cell = dof_sys.begin_active(),
-  endc = dof_sys.end();
+  typename DoFHandler<dim, spacedim>::active_cell_iterator cell
+    = dof_sys.begin_active(),
+    endc = dof_sys.end();
 
-  for (; cell!=endc; ++cell)
+  for(; cell != endc; ++cell)
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
       deallog << "Cell " << cell << ": OK" << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  for (unsigned int d=1; d<4; ++d)
+  for(unsigned int d = 1; d < 4; ++d)
     {
-      test<2,2>(d);
-      test<2,3>(d);
-      test<3,3>(d);
+      test<2, 2>(d);
+      test<2, 3>(d);
+      test<3, 3>(d);
     }
 }

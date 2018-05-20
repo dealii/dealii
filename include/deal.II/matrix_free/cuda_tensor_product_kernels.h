@@ -13,15 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_cuda_tensor_product_kernels_h
 #define dealii_cuda_tensor_product_kernels_h
 
 #include <deal.II/base/config.h>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace CUDAWrappers
 {
@@ -41,18 +38,18 @@ namespace CUDAWrappers
       evaluate_evenodd
     };
 
-
-
     /**
      * Generic evaluator framework.
      *
      * @ingroup CUDAWrappers
      */
-    template <EvaluatorVariant variant, int dim, int fe_degree, int n_q_points_1d, typename Number>
+    template <EvaluatorVariant variant,
+              int              dim,
+              int              fe_degree,
+              int              n_q_points_1d,
+              typename Number>
     struct EvaluatorTensorProduct
     {};
-
-
 
     /**
      * Internal evaluator for 1d-3d shape function using the tensor product form
@@ -61,332 +58,354 @@ namespace CUDAWrappers
      * @ingroup CUDAWrappers
      */
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    struct EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-      n_q_points_1d, Number>
+    struct EvaluatorTensorProduct<evaluate_general,
+                                  dim,
+                                  fe_degree,
+                                  n_q_points_1d,
+                                  Number>
     {
-      static constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-      static constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
+      static constexpr unsigned int dofs_per_cell
+        = Utilities::pow(fe_degree + 1, dim);
+      static constexpr unsigned int n_q_points
+        = Utilities::pow(n_q_points_1d, dim);
 
-      __device__ EvaluatorTensorProduct();
+      __device__
+      EvaluatorTensorProduct();
 
       /**
        * Evaluate the values of a finite element function at the quadrature
        * points.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void values(const Number *in, Number *out) const;
+      __device__ void
+      values(const Number* in, Number* out) const;
 
       /**
        * Evaluate the gradient of a finite element function at the quadrature
        * points for a given @p direction.
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void gradients(const Number *in, Number *out) const;
+      __device__ void
+      gradients(const Number* in, Number* out) const;
 
       /**
        * Helper function for values() and gradients().
        */
       template <int direction, bool dof_to_quad, bool add, bool in_place>
-      __device__ void apply(Number shape_data[],
-                            const Number *in,
-                            Number       *out) const;
+      __device__ void
+      apply(Number shape_data[], const Number* in, Number* out) const;
 
       /**
        * Evaluate the finite element function at the quadrature points.
        */
-      __device__ void value_at_quad_pts(Number *u);
+      __device__ void
+      value_at_quad_pts(Number* u);
 
       /**
        * Helper function for integrate(). Integrate the finite element function.
        */
-      __device__ void integrate_value(Number *u);
+      __device__ void
+      integrate_value(Number* u);
 
       /**
        * Evaluate the gradients of the finite element function at the quadrature
        * points.
        */
-      __device__ void gradient_at_quad_pts(const Number *const u,
-                                           Number *grad_u[dim]);
+      __device__ void
+      gradient_at_quad_pts(const Number* const u, Number* grad_u[dim]);
 
       /**
        * Helper function for integrate(). Integrate the gradients of the finite
        * element function.
        */
       template <bool add>
-      __device__ void integrate_gradient(Number *u,
-                                         Number *grad_u[dim]);
+      __device__ void
+      integrate_gradient(Number* u, Number* grad_u[dim]);
     };
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    __device__ EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::EvaluatorTensorProduct()
+    __device__
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::EvaluatorTensorProduct()
     {}
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::values(const Number *in,
-                                              Number *out) const
+    __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::values(const Number* in, Number* out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(global_shape_values, in, out);
+      apply<direction, dof_to_quad, add, in_place>(
+        global_shape_values, in, out);
     }
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::gradients(const Number *in,
-                                                 Number *out) const
+    __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::gradients(const Number* in,
+                                              Number*       out) const
     {
-      apply<direction, dof_to_quad, add, in_place>(global_shape_gradients, in, out);
+      apply<direction, dof_to_quad, add, in_place>(
+        global_shape_gradients, in, out);
     }
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <int direction, bool dof_to_quad, bool add, bool in_place>
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::apply(Number shape_data[],
-                                             const Number *in,
-                                             Number       *out) const
+    __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::apply(Number        shape_data[],
+                                          const Number* in,
+                                          Number*       out) const
     {
-      const unsigned int i = (dim == 1) ? 0 : threadIdx.x%n_q_points_1d;
+      const unsigned int i = (dim == 1) ? 0 : threadIdx.x % n_q_points_1d;
       const unsigned int j = (dim == 3) ? threadIdx.y : 0;
-      const unsigned int q =
-        (dim == 1) ? (threadIdx.x%n_q_points_1d) :
-        (dim == 2) ? threadIdx.y :
-        threadIdx.z;
+      const unsigned int q = (dim == 1) ?
+                               (threadIdx.x % n_q_points_1d) :
+                               (dim == 2) ? threadIdx.y : threadIdx.z;
 
       // This loop simply multiply the shape function at the quadrature point by
       // the value finite element coefficient.
       Number t = 0;
-      for (int k=0; k<n_q_points_1d; ++k)
+      for(int k = 0; k < n_q_points_1d; ++k)
         {
-          const unsigned int shape_idx = dof_to_quad ? (q+k*n_q_points_1d) :
-                                         (k+q*n_q_points_1d);
-          const unsigned int source_idx =
-            (direction == 0) ? (k + n_q_points_1d*(i + n_q_points_1d*j)) :
-            (direction == 1) ? (i + n_q_points_1d*(k + n_q_points_1d*j)) :
-            (i + n_q_points_1d*(j + n_q_points_1d*k));
-          t += shape_data[shape_idx] * (in_place ? out[source_idx] : in[source_idx]);
+          const unsigned int shape_idx
+            = dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
+          const unsigned int source_idx
+            = (direction == 0) ? (k + n_q_points_1d * (i + n_q_points_1d * j)) :
+                                 (direction == 1) ?
+                                 (i + n_q_points_1d * (k + n_q_points_1d * j)) :
+                                 (i + n_q_points_1d * (j + n_q_points_1d * k));
+          t += shape_data[shape_idx]
+               * (in_place ? out[source_idx] : in[source_idx]);
         }
 
-      if (in_place)
+      if(in_place)
         __syncthreads();
 
-      const unsigned int destination_idx =
-        (direction == 0) ? (q + n_q_points_1d*(i + n_q_points_1d*j)) :
-        (direction == 1) ? (i + n_q_points_1d*(q + n_q_points_1d*j)) :
-        (i + n_q_points_1d*(j + n_q_points_1d*q));
+      const unsigned int destination_idx
+        = (direction == 0) ?
+            (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+            (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                               (i + n_q_points_1d * (j + n_q_points_1d * q));
 
-      if (add)
+      if(add)
         out[destination_idx] += t;
       else
         out[destination_idx] = t;
     }
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::value_at_quad_pts(Number *u)
+    inline __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::value_at_quad_pts(Number* u)
     {
-      switch (dim)
+      switch(dim)
         {
-        case 1:
-        {
-          values<0, true, false, true>(u, u);
+          case 1:
+            {
+              values<0, true, false, true>(u, u);
 
-          break;
-        }
-        case 2:
-        {
-          values<0, true, false, true>(u, u);
-          __syncthreads();
-          values<1, true, false, true>(u, u);
+              break;
+            }
+          case 2:
+            {
+              values<0, true, false, true>(u, u);
+              __syncthreads();
+              values<1, true, false, true>(u, u);
 
-          break;
-        }
-        case 3:
-        {
-          values<0, true, false, true>(u, u);
-          __syncthreads();
-          values<1, true, false, true>(u, u);
-          __syncthreads();
-          values<2, true, false, true>(u, u);
+              break;
+            }
+          case 3:
+            {
+              values<0, true, false, true>(u, u);
+              __syncthreads();
+              values<1, true, false, true>(u, u);
+              __syncthreads();
+              values<2, true, false, true>(u, u);
 
-          break;
-        }
-        default:
-        {
-          // Do nothing. We should throw but we can't from a __device__ function.
-        }
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__ function.
+            }
         }
     }
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::integrate_value(Number *u)
+    inline __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::integrate_value(Number* u)
     {
-      switch (dim)
+      switch(dim)
         {
-        case 1:
-        {
-          values<0, false, false, true> (u,u);
+          case 1:
+            {
+              values<0, false, false, true>(u, u);
 
-          break;
-        }
-        case 2:
-        {
-          values<0, false, false, true> (u,u);
-          __syncthreads();
-          values<1, false, false, true> (u,u);
+              break;
+            }
+          case 2:
+            {
+              values<0, false, false, true>(u, u);
+              __syncthreads();
+              values<1, false, false, true>(u, u);
 
-          break;
-        }
-        case 3:
-        {
-          values<0, false, false, true> (u,u);
-          __syncthreads();
-          values<1, false, false, true> (u,u);
-          __syncthreads();
-          values<2, false, false, true> (u,u);
+              break;
+            }
+          case 3:
+            {
+              values<0, false, false, true>(u, u);
+              __syncthreads();
+              values<1, false, false, true>(u, u);
+              __syncthreads();
+              values<2, false, false, true>(u, u);
 
-          break;
-        }
-        default:
-        {
-          // Do nothing. We should throw but we can't from a __device__ function.
-        }
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__ function.
+            }
         }
     }
 
-
-
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
-    inline
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::gradient_at_quad_pts(
-                 const Number *const u,
-                 Number *grad_u[dim])
+    inline __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::gradient_at_quad_pts(const Number* const u,
+                                                         Number* grad_u[dim])
     {
-      switch (dim)
+      switch(dim)
         {
-        case 1:
-        {
-          gradients<0, true, false, false>(u, grad_u[0]);
+          case 1:
+            {
+              gradients<0, true, false, false>(u, grad_u[0]);
 
-          break;
-        }
-        case 2:
-        {
-          gradients<0, true, false, false>(u, grad_u[0]);
-          values<0, true, false, false>(u, grad_u[1]);
+              break;
+            }
+          case 2:
+            {
+              gradients<0, true, false, false>(u, grad_u[0]);
+              values<0, true, false, false>(u, grad_u[1]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<1, true, false, true>(grad_u[0], grad_u[0]);
-          gradients<1, true, false, true>(grad_u[1], grad_u[1]);
+              values<1, true, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
 
-          break;
-        }
-        case 3:
-        {
-          gradients<0, true, false, false>(u, grad_u[0]);
-          values<0, true, false, false>(u, grad_u[1]);
-          values<0, true, false, false>(u, grad_u[2]);
+              break;
+            }
+          case 3:
+            {
+              gradients<0, true, false, false>(u, grad_u[0]);
+              values<0, true, false, false>(u, grad_u[1]);
+              values<0, true, false, false>(u, grad_u[2]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<1, true, false, true>(grad_u[0], grad_u[0]);
-          gradients<1, true, false, true>(grad_u[1], grad_u[1]);
-          values<1, true, false, true>(grad_u[2], grad_u[2]);
+              values<1, true, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, true, false, true>(grad_u[1], grad_u[1]);
+              values<1, true, false, true>(grad_u[2], grad_u[2]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<2, true, false, true>(grad_u[0], grad_u[0]);
-          values<2, true, false, true>(grad_u[1], grad_u[1]);
-          gradients<2, true, false, true>(grad_u[2], grad_u[2]);
+              values<2, true, false, true>(grad_u[0], grad_u[0]);
+              values<2, true, false, true>(grad_u[1], grad_u[1]);
+              gradients<2, true, false, true>(grad_u[2], grad_u[2]);
 
-          break;
-        }
-        default:
-        {
-          // Do nothing. We should throw but we can't from a __device__ function.
-        }
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__ function.
+            }
         }
     }
-
-
 
     template <int dim, int fe_degree, int n_q_points_1d, typename Number>
     template <bool add>
-    inline
-    __device__ void EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
-               n_q_points_1d, Number>::integrate_gradient(
-                 Number *u,
-                 Number *grad_u[dim])
+    inline __device__ void
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           fe_degree,
+                           n_q_points_1d,
+                           Number>::integrate_gradient(Number* u,
+                                                       Number* grad_u[dim])
     {
-      switch (dim)
+      switch(dim)
         {
-        case 1:
-        {
-          gradients<0, false, add, false> (grad_u[dim], u);
+          case 1:
+            {
+              gradients<0, false, add, false>(grad_u[dim], u);
 
-          break;
-        }
-        case 2:
-        {
-          gradients<0, false, false, true> (grad_u[0], grad_u[0]);
-          values<0, false, false, true> (grad_u[1], grad_u[1]);
+              break;
+            }
+          case 2:
+            {
+              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
+              values<0, false, false, true>(grad_u[1], grad_u[1]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<1, false, add, false> (grad_u[0], u);
-          __syncthreads();
-          gradients<1, false, true, false> (grad_u[1], u);
+              values<1, false, add, false>(grad_u[0], u);
+              __syncthreads();
+              gradients<1, false, true, false>(grad_u[1], u);
 
-          break;
-        }
-        case 3:
-        {
-          gradients<0, false, false, true> (grad_u[0], grad_u[0]);
-          values<0, false, false, true> (grad_u[1], grad_u[1]);
-          values<0, false, false, true> (grad_u[2], grad_u[2]);
+              break;
+            }
+          case 3:
+            {
+              gradients<0, false, false, true>(grad_u[0], grad_u[0]);
+              values<0, false, false, true>(grad_u[1], grad_u[1]);
+              values<0, false, false, true>(grad_u[2], grad_u[2]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<1, false, false, true> (grad_u[0], grad_u[0]);
-          gradients<1, false, false, true> (grad_u[1], grad_u[1]);
-          values<1, false, false, true> (grad_u[2], grad_u[2]);
+              values<1, false, false, true>(grad_u[0], grad_u[0]);
+              gradients<1, false, false, true>(grad_u[1], grad_u[1]);
+              values<1, false, false, true>(grad_u[2], grad_u[2]);
 
-          __syncthreads();
+              __syncthreads();
 
-          values<2, false, add, false> (grad_u[0], u);
-          __syncthreads();
-          values<2, false, true, false> (grad_u[1], u);
-          __syncthreads();
-          gradients<2, false, true, false> (grad_u[2], u);
+              values<2, false, add, false>(grad_u[0], u);
+              __syncthreads();
+              values<2, false, true, false>(grad_u[1], u);
+              __syncthreads();
+              gradients<2, false, true, false>(grad_u[2], u);
 
-          break;
-        }
-        default:
-        {
-          // Do nothing. We should throw but we can't from a __device__ function.
-        }
+              break;
+            }
+          default:
+            {
+              // Do nothing. We should throw but we can't from a __device__ function.
+            }
         }
     }
-  }
-}
+  } // namespace internal
+} // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

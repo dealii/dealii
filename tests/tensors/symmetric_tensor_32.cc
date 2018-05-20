@@ -18,47 +18,46 @@
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 
-
 template <int rank, int dim>
-void check ()
+void
+check()
 {
   // build a regular tensor
-  SymmetricTensor<rank,dim> t;
+  SymmetricTensor<rank, dim> t;
 
   // build one in which all numbers are the same but purely imaginary
-  SymmetricTensor<rank,dim,std::complex<double> > ti;
+  SymmetricTensor<rank, dim, std::complex<double>> ti;
 
   // build one in which all numbers have both real and imaginary components
-  SymmetricTensor<rank,dim,std::complex<double> > tc;
+  SymmetricTensor<rank, dim, std::complex<double>> tc;
 
-  for (unsigned int i=0; i<t.n_independent_components; ++i)
+  for(unsigned int i = 0; i < t.n_independent_components; ++i)
     {
-      t.access_raw_entry(i)  = 1.0 * (i+1);
-      ti.access_raw_entry(i) = std::complex<double>(0,1.0*(i+1));
-      tc.access_raw_entry(i) = std::complex<double>(1.0*(i+1),1.0*(i+1));
+      t.access_raw_entry(i)  = 1.0 * (i + 1);
+      ti.access_raw_entry(i) = std::complex<double>(0, 1.0 * (i + 1));
+      tc.access_raw_entry(i)
+        = std::complex<double>(1.0 * (i + 1), 1.0 * (i + 1));
     }
 
-  deallog << t.norm() << ' '
-          << ti.norm() << ' '
-          << tc.norm() << std::endl;
+  deallog << t.norm() << ' ' << ti.norm() << ' ' << tc.norm() << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
   deallog << "check rank 2 tensors" << std::endl;
-  check<2,1>();
-  check<2,2>();
-  check<2,3>();
+  check<2, 1>();
+  check<2, 2>();
+  check<2, 3>();
 
   deallog << "check rank 4 tensors" << std::endl;
-  check<4,1>();
-  check<4,2>();
-  check<4,3>();
+  check<4, 1>();
+  check<4, 2>();
+  check<4, 3>();
 
   deallog << "OK" << std::endl;
 }

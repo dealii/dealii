@@ -13,22 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 /**
  * @file Test whether Assembler::MatrixSimple writes the local blocks
  * into the right global positions
  */
 
 #include "../tests.h"
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/block_indices.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/meshworker/local_results.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/local_results.h>
 #include <deal.II/meshworker/simple.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -39,25 +38,27 @@
 using namespace dealii;
 
 template <typename number>
-void fill_matrices(MeshWorker::LocalResults<number> &results, bool face)
+void
+fill_matrices(MeshWorker::LocalResults<number>& results, bool face)
 {
-  for (unsigned int k=0; k<results.n_matrices(); ++k)
+  for(unsigned int k = 0; k < results.n_matrices(); ++k)
     {
-      FullMatrix<number> &M = results.matrix(k, false).matrix;
-      double base = 1000*(results.matrix(k).row+1) + 100*(results.matrix(k).column+1);
-      for (unsigned int i=0; i<M.m(); ++i)
-        for (unsigned int j=0; j<M.n(); ++j)
+      FullMatrix<number>& M    = results.matrix(k, false).matrix;
+      double              base = 1000 * (results.matrix(k).row + 1)
+                    + 100 * (results.matrix(k).column + 1);
+      for(unsigned int i = 0; i < M.m(); ++i)
+        for(unsigned int j = 0; j < M.n(); ++j)
           {
-            M(i,j) = base + 10*i+j;
-            if (face)
-              results.matrix(k, true).matrix(i,j) = base + 10*i+j;
+            M(i, j) = base + 10 * i + j;
+            if(face)
+              results.matrix(k, true).matrix(i, j) = base + 10 * i + j;
           }
     }
 }
 
-
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -72,11 +73,11 @@ void test(FiniteElement<dim> &fe)
 
   deallog << "DoFs " << dof.n_dofs() << std::endl;
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  typename DoFHandler<dim>::face_iterator face = cell->face(1);
+  typename DoFHandler<dim>::active_cell_iterator cell     = dof.begin_active();
+  typename DoFHandler<dim>::face_iterator        face     = cell->face(1);
   typename DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(1);
 
-  DynamicSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
+  DynamicSparsityPattern csp(dof.n_dofs(), dof.n_dofs());
   DoFTools::make_flux_sparsity_pattern(dof, csp);
   TrilinosWrappers::SparsityPattern sparsity;
   sparsity.copy_from(csp);
@@ -106,15 +107,17 @@ void test(FiniteElement<dim> &fe)
   M.print(deallog.get_file_stream());
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
   initlog();
 
-  FE_DGP<2> p0(0);
-  FE_DGP<2> p1(1);
+  FE_DGP<2>           p0(0);
+  FE_DGP<2>           p1(1);
   FE_RaviartThomas<2> rt0(0);
-  FE_Q<2> q2(2);
+  FE_Q<2>             q2(2);
 
   FESystem<2> sys1(p0, 2, p1, 1);
   FESystem<2> sys2(p0, 2, rt0, 1);

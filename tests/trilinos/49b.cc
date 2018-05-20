@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // like 49, but do the test for
 //  TrilinosWrappers::MPI::BlockVector
 //         ::operator = (dealii::BlockVector<TrilinosScalar>)
@@ -22,50 +20,47 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <iostream>
 #include <vector>
 
-
-void test (TrilinosWrappers::MPI::BlockVector &v)
+void
+test(TrilinosWrappers::MPI::BlockVector& v)
 {
-  std::vector<types::global_dof_index> sizes (2, 3);
-  dealii::BlockVector<TrilinosScalar> w (sizes);
+  std::vector<types::global_dof_index> sizes(2, 3);
+  dealii::BlockVector<TrilinosScalar>  w(sizes);
 
-  for (unsigned int i=0; i<w.size(); ++i)
+  for(unsigned int i = 0; i < w.size(); ++i)
     w(i) = i;
 
   v = w;
 
-
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i, ExcInternalError());
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
     }
 
   // now also check the reverse assignment
   w = v;
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i, ExcInternalError());
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
     }
-
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
@@ -74,12 +69,13 @@ int main (int argc,char **argv)
 
         TrilinosWrappers::MPI::BlockVector v;
         v.reinit(sizes, MPI_COMM_WORLD);
-        test (v);
+        test(v);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -90,9 +86,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

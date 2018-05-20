@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Create a circle, a Triangulation, and try to project normally on
 // it.
 
@@ -21,43 +20,42 @@
 
 #include <deal.II/opencascade/boundary_lib.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
-#include <gp_Pnt.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Ax2.hxx>
-#include <GC_MakeCircle.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
-#include <TopoDS_Wire.hxx>
+#include <BRepPrimAPI_MakeSphere.hxx>
+#include <GC_MakeCircle.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
-#include <BRepPrimAPI_MakeSphere.hxx>
+#include <TopoDS_Wire.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
 
-  gp_Pnt center(.5,.5,.5);
+  gp_Pnt        center(.5, .5, .5);
   Standard_Real radius(Point<3>().distance(point<3>(center)));
-
 
   TopoDS_Face face = BRepPrimAPI_MakeSphere(center, radius);
 
   // Create a boundary projector.
-  NormalProjectionBoundary<3,3> sphere(face);
-
+  NormalProjectionBoundary<3, 3> sphere(face);
 
   // The unit cube.
-  Triangulation<3,3> tria;
+  Triangulation<3, 3> tria;
   GridGenerator::hyper_cube(tria);
 
   // Set the exterior boundary
@@ -71,10 +69,9 @@ int main ()
 
   tria.refine_global(2);
 
-
   // You can open the generated file with gmsh
   GridOut gridout;
-  gridout.write_msh (tria, logfile);
+  gridout.write_msh(tria, logfile);
 
   return 0;
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test that if multiple threads are waiting for one single thread, all of the
 // waiting ones will be woken up.
 
@@ -22,42 +21,40 @@
 
 #include <deal.II/base/thread_management.h>
 
-
-void worker ()
+void
+worker()
 {
   deallog << "Worker thread is starting." << std::endl;
-  sleep (3);
+  sleep(3);
   deallog << "Worker thread is finished." << std::endl;
 }
 
 Threads::Thread<> worker_thread;
 
-void waiter (int i)
+void
+waiter(int i)
 {
-  worker_thread.join ();
+  worker_thread.join();
 
-  deallog << "Waiting thread " << i << " was woken up."
-          << std::endl;
+  deallog << "Waiting thread " << i << " was woken up." << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  worker_thread = Threads::new_thread (worker);
+  worker_thread = Threads::new_thread(worker);
 
   Threads::ThreadGroup<> waiter_threads;
-  for (unsigned int i=0; i<20; ++i)
-    waiter_threads += Threads::new_thread (waiter, i);
+  for(unsigned int i = 0; i < 20; ++i)
+    waiter_threads += Threads::new_thread(waiter, i);
 
-  waiter_threads.join_all ();
+  waiter_threads.join_all();
   deallog << "All waiting threads finished." << std::endl;
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

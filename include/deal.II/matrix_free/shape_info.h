@@ -13,16 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_matrix_free_shape_info_h
 #define dealii_matrix_free_shape_info_h
 
-
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/aligned_vector.h>
 #include <deal.II/fe/fe.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -91,15 +88,15 @@ namespace internal
       /**
        * Empty constructor. Does nothing.
        */
-      ShapeInfo ();
+      ShapeInfo();
 
       /**
        * Constructor that initializes the data fields using the reinit method.
        */
       template <int dim>
-      ShapeInfo (const Quadrature<1> &quad,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int base_element = 0);
+      ShapeInfo(const Quadrature<1>&      quad,
+                const FiniteElement<dim>& fe,
+                const unsigned int        base_element = 0);
 
       /**
        * Initializes the data fields. Takes a one-dimensional quadrature
@@ -110,14 +107,16 @@ namespace internal
        * function in zero evaluates to one.
        */
       template <int dim>
-      void reinit (const Quadrature<1> &quad,
-                   const FiniteElement<dim> &fe_dim,
-                   const unsigned int base_element = 0);
+      void
+      reinit(const Quadrature<1>&      quad,
+             const FiniteElement<dim>& fe_dim,
+             const unsigned int        base_element = 0);
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Encodes the type of element detected at construction. FEEvaluation
@@ -295,7 +294,7 @@ namespace internal
        * @note This object is only filled in case @p nodal_at_cell_boundaries
        * evaluates to @p true.
        */
-      dealii::Table<2,unsigned int> face_to_cell_index_nodal;
+      dealii::Table<2, unsigned int> face_to_cell_index_nodal;
 
       /**
        * The @p face_to_cell_index_nodal provides a shortcut for the
@@ -335,13 +334,14 @@ namespace internal
        * @note This object is only filled in case @p element_type evaluates to
        * @p tensor_symmetric_hermite.
        */
-      dealii::Table<2,unsigned int> face_to_cell_index_hermite;
+      dealii::Table<2, unsigned int> face_to_cell_index_hermite;
 
       /**
        * Check whether we have symmetries in the shape values. In that case,
        * also fill the shape_???_eo fields.
        */
-      bool check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
+      bool
+      check_1d_shapes_symmetric(const unsigned int n_q_points_1d);
 
       /**
        * Check whether symmetric 1D basis functions are such that the shape
@@ -349,30 +349,27 @@ namespace internal
        * with the quadrature points. This allows for specialized algorithms
        * that save some operations in the evaluation.
        */
-      bool check_1d_shapes_collocation();
+      bool
+      check_1d_shapes_collocation();
     };
-
-
 
     // ------------------------------------------ inline functions
 
     template <typename Number>
     template <int dim>
-    inline
-    ShapeInfo<Number>::ShapeInfo (const Quadrature<1> &quad,
-                                  const FiniteElement<dim> &fe_in,
-                                  const unsigned int base_element_number)
-      :
-      element_type(tensor_general),
-      fe_degree (0),
-      n_q_points_1d (0),
-      n_q_points (0),
-      dofs_per_component_on_cell (0),
-      n_q_points_face (0),
-      dofs_per_component_on_face (0),
-      nodal_at_cell_boundaries (false)
+    inline ShapeInfo<Number>::ShapeInfo(const Quadrature<1>&      quad,
+                                        const FiniteElement<dim>& fe_in,
+                                        const unsigned int base_element_number)
+      : element_type(tensor_general),
+        fe_degree(0),
+        n_q_points_1d(0),
+        n_q_points(0),
+        dofs_per_component_on_cell(0),
+        n_q_points_face(0),
+        dofs_per_component_on_face(0),
+        nodal_at_cell_boundaries(false)
     {
-      reinit (quad, fe_in, base_element_number);
+      reinit(quad, fe_in, base_element_number);
     }
 
   } // end of namespace MatrixFreeFunctions

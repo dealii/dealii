@@ -13,16 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::project works for DGQ elements correctly
 
 #include "project_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=0; p<6-dim; ++p)
-    test_no_hanging_nodes (FE_DGQ<dim>(p), p);
+  for(unsigned int p = 0; p < 6 - dim; ++p)
+    test_no_hanging_nodes(FE_DGQ<dim>(p), p);
 }

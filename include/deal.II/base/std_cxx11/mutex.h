@@ -16,10 +16,9 @@
 #ifndef dealii_std_cxx11_mutex_h
 #define dealii_std_cxx11_mutex_h
 
-
 #include <deal.II/base/config.h>
 
-#  include <mutex>
+#include <mutex>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {

@@ -13,66 +13,56 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/hp/mapping_collection.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace hp
 {
   template <int dim, int spacedim>
-  MappingCollection<dim,spacedim>::
-  MappingCollection (const Mapping<dim,spacedim> &mapping)
+  MappingCollection<dim, spacedim>::MappingCollection(
+    const Mapping<dim, spacedim>& mapping)
   {
-    mappings
-    .push_back (std::shared_ptr<const Mapping<dim,spacedim> >(mapping.clone()));
+    mappings.push_back(
+      std::shared_ptr<const Mapping<dim, spacedim>>(mapping.clone()));
   }
 
-
-
   template <int dim, int spacedim>
-  MappingCollection<dim,spacedim>::
-  MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection)
-    :
-    Subscriptor (),
-    // copy the array
-    // of shared
-    // pointers. nothing
-    // bad should
-    // happen -- they
-    // simply all point
-    // to the same
-    // objects, and the
-    // last one to die
-    // will delete the
-    // mappings
-    mappings (mapping_collection.mappings)
+  MappingCollection<dim, spacedim>::MappingCollection(
+    const MappingCollection<dim, spacedim>& mapping_collection)
+    : Subscriptor(),
+      // copy the array
+      // of shared
+      // pointers. nothing
+      // bad should
+      // happen -- they
+      // simply all point
+      // to the same
+      // objects, and the
+      // last one to die
+      // will delete the
+      // mappings
+      mappings(mapping_collection.mappings)
   {}
-
-
 
   template <int dim, int spacedim>
   std::size_t
-  MappingCollection<dim,spacedim>::memory_consumption () const
+  MappingCollection<dim, spacedim>::memory_consumption() const
   {
-    return (sizeof(*this) +
-            MemoryConsumption::memory_consumption (mappings));
+    return (sizeof(*this) + MemoryConsumption::memory_consumption(mappings));
   }
-
-
 
   template <int dim, int spacedim>
   void
-  MappingCollection<dim,spacedim>::push_back (const Mapping<dim,spacedim> &new_mapping)
+  MappingCollection<dim, spacedim>::push_back(
+    const Mapping<dim, spacedim>& new_mapping)
   {
-    mappings
-    .push_back (std::shared_ptr<const Mapping<dim,spacedim> >(new_mapping.clone()));
+    mappings.push_back(
+      std::shared_ptr<const Mapping<dim, spacedim>>(new_mapping.clone()));
   }
 
-//---------------------------------------------------------------------------
-
+  //---------------------------------------------------------------------------
 
   namespace
   {
@@ -86,25 +76,22 @@ namespace hp
      * this function is called.
      */
     template <int dim, int spacedim>
-    MappingQGeneric<dim,spacedim> &
+    MappingQGeneric<dim, spacedim>&
     get_static_mapping_q1()
     {
-      static MappingQ1<dim,spacedim> mapping;
+      static MappingQ1<dim, spacedim> mapping;
       return mapping;
     }
-  }
+  } // namespace
 
   template <int dim, int spacedim>
-  MappingCollection<dim,spacedim>
-  StaticMappingQ1<dim,spacedim>::mapping_collection
-    = MappingCollection<dim,spacedim>(get_static_mapping_q1<dim,spacedim>());
+  MappingCollection<dim, spacedim>
+    StaticMappingQ1<dim, spacedim>::mapping_collection
+    = MappingCollection<dim, spacedim>(get_static_mapping_q1<dim, spacedim>());
 
-}
-
-
+} // namespace hp
 
 // explicit instantiations
 #include "mapping_collection.inst"
-
 
 DEAL_II_NAMESPACE_CLOSE

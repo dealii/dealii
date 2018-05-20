@@ -29,15 +29,12 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 
-#define PRINTME(name, var) \
-  deallog \
-      << "RHS vector: " << name << ": " \
-      << var;
+#define PRINTME(name, var) deallog << "RHS vector: " << name << ": " << var;
 
 using namespace dealii;
 
-
-int main()
+int
+main()
 {
   initlog();
   deallog.depth_console(0);
@@ -45,7 +42,6 @@ int main()
 
   // deal.II SparseMatrix
   {
-
     deallog << "Schur complement" << std::endl;
     deallog.push("SC_SparseMatrix");
 
@@ -78,24 +74,24 @@ int main()
 
        */
 
-      const unsigned int rc=1;
-      SparsityPattern sparsity_pattern (rc, rc, 0);
+      const unsigned int rc = 1;
+      SparsityPattern    sparsity_pattern(rc, rc, 0);
       sparsity_pattern.compress();
 
-      SparseMatrix<double> A (sparsity_pattern);
-      SparseMatrix<double> B (sparsity_pattern);
-      SparseMatrix<double> C (sparsity_pattern);
-      SparseMatrix<double> D (sparsity_pattern);
-      Vector<double> y (rc);
-      Vector<double> g (rc);
-      for (unsigned int i=0; i < rc; ++i)
+      SparseMatrix<double> A(sparsity_pattern);
+      SparseMatrix<double> B(sparsity_pattern);
+      SparseMatrix<double> C(sparsity_pattern);
+      SparseMatrix<double> D(sparsity_pattern);
+      Vector<double>       y(rc);
+      Vector<double>       g(rc);
+      for(unsigned int i = 0; i < rc; ++i)
         {
-          A.diag_element(i) = 1.0*(i+1);
-          B.diag_element(i) = 2.0*(i+1);
-          C.diag_element(i) = 3.0*(i+1);
-          D.diag_element(i) = 4.0*(i+1);
-          y(i) = 6.0*(i+1);
-          g(i) = 2.0*(i+1);
+          A.diag_element(i) = 1.0 * (i + 1);
+          B.diag_element(i) = 2.0 * (i + 1);
+          C.diag_element(i) = 3.0 * (i + 1);
+          D.diag_element(i) = 4.0 * (i + 1);
+          y(i)              = 6.0 * (i + 1);
+          g(i)              = 2.0 * (i + 1);
         }
 
       const auto lo_A = linear_operator(A);
@@ -103,30 +99,26 @@ int main()
       const auto lo_C = linear_operator(C);
       const auto lo_D = linear_operator(D);
 
-      SolverControl solver_control_A (100, 1.0e-10);
-      SolverCG< Vector<double> > solver_A (solver_control_A);
-      PreconditionJacobi< SparseMatrix<double> > preconditioner_A;
+      SolverControl                            solver_control_A(100, 1.0e-10);
+      SolverCG<Vector<double>>                 solver_A(solver_control_A);
+      PreconditionJacobi<SparseMatrix<double>> preconditioner_A;
       preconditioner_A.initialize(A);
-      const auto lo_A_inv = inverse_operator(lo_A,
-                                             solver_A,
-                                             preconditioner_A);
+      const auto lo_A_inv = inverse_operator(lo_A, solver_A, preconditioner_A);
 
-      const auto lo_S = schur_complement(lo_A_inv,lo_B,
-                                         lo_C,lo_D);
+      const auto lo_S   = schur_complement(lo_A_inv, lo_B, lo_C, lo_D);
       const auto lo_S_t = transpose_operator(lo_S);
 
-      const Vector<double> g1 = lo_S*y;
-      const Vector<double> g2 = lo_S_t *y;
-      const Vector<double> g3 = lo_S*y + g;
-      const Vector<double> g4 = lo_S_t *y + g;
+      const Vector<double> g1 = lo_S * y;
+      const Vector<double> g2 = lo_S_t * y;
+      const Vector<double> g3 = lo_S * y + g;
+      const Vector<double> g4 = lo_S_t * y + g;
 
-      PRINTME("g1",g1);
-      PRINTME("g2",g2);
-      PRINTME("g3",g3);
-      PRINTME("g4",g4);
+      PRINTME("g1", g1);
+      PRINTME("g2", g2);
+      PRINTME("g3", g3);
+      PRINTME("g4", g4);
     }
 
     deallog << "SparseMatrix OK" << std::endl;
   }
-
 }

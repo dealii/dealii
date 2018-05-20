@@ -19,12 +19,13 @@
 #include "../tests.h"
 
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -34,8 +35,8 @@ int main()
 
   Triangulation<2> tria;
 
-  Point<2> center(1.0, 2.0);
-  const SphericalManifold<2,2> manifold(center);
+  Point<2>                      center(1.0, 2.0);
+  const SphericalManifold<2, 2> manifold(center);
 
   GridGenerator::hyper_ball(tria, center);
   GridTools::copy_boundary_to_manifold_id(tria);

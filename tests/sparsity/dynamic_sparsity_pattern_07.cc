@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check DynamicSparsityPattern::exists. since we create quite some
 // output here, choose smaller number of rows and entries than in the other
 // tests
@@ -22,31 +20,30 @@
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-
-void test ()
+void
+test()
 {
-  const unsigned int N = 100;
-  DynamicSparsityPattern csp (N,N);
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<10; ++j)
-      csp.add (i, (i+(i+1)*(j*j+i))%N);
-  csp.symmetrize ();
+  const unsigned int     N = 100;
+  DynamicSparsityPattern csp(N, N);
+  for(unsigned int i = 0; i < N; ++i)
+    for(unsigned int j = 0; j < 10; ++j)
+      csp.add(i, (i + (i + 1) * (j * j + i)) % N);
+  csp.symmetrize();
 
-  for (unsigned int i=0; i<N; ++i)
+  for(unsigned int i = 0; i < N; ++i)
     {
       deallog << i << ' ';
-      for (unsigned int j=0; j<N; ++j)
-        deallog << (csp.exists(i,j) ? 'x' : ' ');
+      for(unsigned int j = 0; j < N; ++j)
+        deallog << (csp.exists(i, j) ? 'x' : ' ');
       deallog << std::endl;
     }
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   return 0;
 }

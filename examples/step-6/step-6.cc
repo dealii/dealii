@@ -17,21 +17,20 @@
  * Author: Wolfgang Bangerth, University of Heidelberg, 2000
  */
 
-
 // @sect3{Include files}
 
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
@@ -58,7 +57,6 @@
 // <code>grid_in.h</code>:
 #include <deal.II/grid/grid_out.h>
 
-
 // When using locally refined grids, we will get so-called <code>hanging
 // nodes</code>. However, the standard finite element methods assumes that the
 // discrete solution spaces be continuous, so we need to make sure that the
@@ -82,7 +80,6 @@
 // Finally, this is as in previous programs:
 using namespace dealii;
 
-
 // @sect3{The <code>Step6</code> class template}
 
 // The main class is again almost unchanged. Two additions, however, are made:
@@ -95,28 +92,33 @@ template <int dim>
 class Step6
 {
 public:
-  Step6 ();
-  ~Step6 ();
+  Step6();
+  ~Step6();
 
-  void run ();
+  void
+  run();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system();
+  void
+  assemble_system();
+  void
+  solve();
+  void
+  refine_grid();
+  void
+  output_results(const unsigned int cycle) const;
 
   Triangulation<dim> triangulation;
 
-  FE_Q<dim>          fe;
-  DoFHandler<dim>    dof_handler;
-
+  FE_Q<dim>       fe;
+  DoFHandler<dim> dof_handler;
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
-  ConstraintMatrix     constraints;
+  ConstraintMatrix constraints;
 
   // The sparsity pattern and sparse matrix are deliberately declared in the
   // opposite of the order used in step-2 through step-5 to demonstrate the
@@ -124,25 +126,23 @@ private:
   SparseMatrix<double> system_matrix;
   SparsityPattern      sparsity_pattern;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
-
 
 // @sect3{Nonconstant coefficients}
 
 // The implementation of nonconstant coefficients is copied verbatim from
 // step-5:
 template <int dim>
-double coefficient (const Point<dim> &p)
+double
+coefficient(const Point<dim>& p)
 {
-  if (p.square() < 0.5*0.5)
+  if(p.square() < 0.5 * 0.5)
     return 20;
   else
     return 1;
 }
-
-
 
 // @sect3{The <code>Step6</code> class implementation}
 
@@ -153,12 +153,8 @@ double coefficient (const Point<dim> &p)
 // constructor argument (which was <code>1</code> in all previous examples) by
 // the desired polynomial degree (here <code>2</code>):
 template <int dim>
-Step6<dim>::Step6 ()
-  :
-  fe (2),
-  dof_handler (triangulation)
+Step6<dim>::Step6() : fe(2), dof_handler(triangulation)
 {}
-
 
 // @sect4{Step6::~Step6}
 
@@ -218,11 +214,10 @@ Step6<dim>::Step6 ()
 // We show the output of the other case (where we do not call
 // SparseMatrix::clear()) in the results section below.
 template <int dim>
-Step6<dim>::~Step6 ()
+Step6<dim>::~Step6()
 {
   system_matrix.clear();
 }
-
 
 // @sect4{Step6::setup_system}
 
@@ -243,20 +238,19 @@ Step6<dim>::~Step6 ()
 // entries per row now, since there are now 9 degrees of freedom per cell
 // (rather than only four), that can couple with each other.
 template <int dim>
-void Step6<dim>::setup_system ()
+void
+Step6<dim>::setup_system()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit(dof_handler.n_dofs());
+  system_rhs.reinit(dof_handler.n_dofs());
 
   // We may now populate the ConstraintMatrix with the hanging node
   // constraints. Since we will call this function in a loop we first clear
   // the current set of constraints from the last system and then compute new ones:
-  constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           constraints);
-
+  constraints.clear();
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   // Now we are ready to interpolate the boundary values with indicator 0 (the
   // whole boundary) and store the resulting constraints in our
@@ -266,16 +260,14 @@ void Step6<dim>::setup_system ()
   // can add constraints to the ConstraintMatrix in either order: if two
   // constraints conflict then the constraint matrix either abort or throw an
   // exception via the Assert macro.
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            Functions::ZeroFunction<dim>(),
-                                            constraints);
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
 
   // After all constraints have been added, they need to be sorted and
   // rearranged to perform some actions more efficiently. This postprocessing
   // is done using the <code>close()</code> function, after which no further
   // constraints may be added any more:
-  constraints.close ();
+  constraints.close();
 
   // Now we first build our compressed sparsity pattern like we did in the
   // previous examples. Nevertheless, we do not copy it to the final sparsity
@@ -302,9 +294,8 @@ void Step6<dim>::setup_system ()
   sparsity_pattern.copy_from(dsp);
 
   // We may now, finally, initialize the sparse matrix:
-  system_matrix.reinit (sparsity_pattern);
+  system_matrix.reinit(sparsity_pattern);
 }
-
 
 // @sect4{Step6::assemble_system}
 
@@ -335,58 +326,56 @@ void Step6<dim>::setup_system ()
 // than linear, in each coordinate variable. Again, however, this is something
 // that is completely handled by the library.
 template <int dim>
-void Step6<dim>::assemble_system ()
+void
+Step6<dim>::assemble_system()
 {
-  const QGauss<dim>  quadrature_formula(3);
+  const QGauss<dim> quadrature_formula(3);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values    |  update_gradients |
-                           update_quadrature_points  |  update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients
+                            | update_quadrature_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
-  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell
+    = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for(; cell != endc; ++cell)
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
+      for(unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient = coefficient<dim>
-                                             (fe_values.quadrature_point (q_index));
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          const double current_coefficient
+            = coefficient<dim>(fe_values.quadrature_point(q_index));
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (current_coefficient *
-                                     fe_values.shape_grad(i,q_index) *
-                                     fe_values.shape_grad(j,q_index) *
-                                     fe_values.JxW(q_index));
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j)
+                  += (current_coefficient * fe_values.shape_grad(i, q_index)
+                      * fe_values.shape_grad(j, q_index)
+                      * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                              1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0
+                              * fe_values.JxW(q_index));
             }
         }
 
       // Finally, transfer the contributions from @p cell_matrix and
       // @p cell_rhs into the global objects.
-      cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global (cell_matrix,
-                                              cell_rhs,
-                                              local_dof_indices,
-                                              system_matrix,
-                                              system_rhs);
+      cell->get_dof_indices(local_dof_indices);
+      constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
   // Now we are done assembling the linear system. The constraint matrix took
   // care of applying the boundary conditions and also eliminated hanging node
@@ -398,7 +387,6 @@ void Step6<dim>::assemble_system ()
   // correct values for these nodes at the end of the <code>solve</code>
   // function.
 }
-
 
 // @sect4{Step6::solve}
 
@@ -417,20 +405,19 @@ void Step6<dim>::assemble_system ()
 // that you find at the end of this function:
 
 template <int dim>
-void Step6<dim>::solve ()
+void
+Step6<dim>::solve()
 {
-  SolverControl      solver_control (1000, 1e-12);
-  SolverCG<>         solver (solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  solver.solve (system_matrix, solution, system_rhs,
-                preconditioner);
+  solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-  constraints.distribute (solution);
+  constraints.distribute(solution);
 }
-
 
 // @sect4{Step6::refine_grid}
 
@@ -490,15 +477,16 @@ void Step6<dim>::solve ()
 // typically use a vector of floats instead of a vector of doubles to represent
 // error indicators.
 template <int dim>
-void Step6<dim>::refine_grid ()
+void
+Step6<dim>::refine_grid()
 {
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(3),
-                                      typename FunctionMap<dim>::type(),
-                                      solution,
-                                      estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(dof_handler,
+                                     QGauss<dim - 1>(3),
+                                     typename FunctionMap<dim>::type(),
+                                     solution,
+                                     estimated_error_per_cell);
 
   // The above function returned one error indicator value for each cell in
   // the <code>estimated_error_per_cell</code> array. Refinement is now done
@@ -527,9 +515,8 @@ void Step6<dim>::refine_grid ()
   // method described above. It is from a class that implements several
   // different algorithms to refine a triangulation based on cell-wise error
   // indicators.
-  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                   estimated_error_per_cell,
-                                                   0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(
+    triangulation, estimated_error_per_cell, 0.3, 0.03);
 
   // After the previous function has exited, some cells are flagged for
   // refinement, and some other for coarsening. The refinement or coarsening
@@ -537,9 +524,8 @@ void Step6<dim>::refine_grid ()
   // further modifications of these flags is useful. Here, we don't want to do
   // any such thing, so we can tell the triangulation to perform the actions
   // for which the cells are flagged:
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 }
-
 
 // @sect4{Step6::output_results}
 
@@ -557,25 +543,25 @@ void Step6<dim>::refine_grid ()
 // We also output the solution in the same way as we did before, with
 // a similarly constructed file name.
 template <int dim>
-void Step6<dim>::output_results (const unsigned int cycle) const
+void
+Step6<dim>::output_results(const unsigned int cycle) const
 {
   {
-    GridOut grid_out;
-    std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
-    grid_out.write_eps (triangulation, output);
+    GridOut       grid_out;
+    std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
+    grid_out.write_eps(triangulation, output);
   }
 
   {
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+    data_out.build_patches();
 
-    std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
+    data_out.write_vtk(output);
   }
 }
-
 
 // @sect4{Step6::run}
 
@@ -604,37 +590,34 @@ void Step6<dim>::output_results (const unsigned int cycle) const
 //
 // The rest of the loop looks as before:
 template <int dim>
-void Step6<dim>::run ()
+void
+Step6<dim>::run()
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for(unsigned int cycle = 0; cycle < 8; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
-      if (cycle == 0)
+      if(cycle == 0)
         {
-          GridGenerator::hyper_ball (triangulation);
-          triangulation.refine_global (1);
+          GridGenerator::hyper_ball(triangulation);
+          triangulation.refine_global(1);
         }
       else
-        refine_grid ();
-
+        refine_grid();
 
       std::cout << "   Number of active cells:       "
-                << triangulation.n_active_cells()
+                << triangulation.n_active_cells() << std::endl;
+
+      setup_system();
+
+      std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                 << std::endl;
 
-      setup_system ();
-
-      std::cout << "   Number of degrees of freedom: "
-                << dof_handler.n_dofs()
-                << std::endl;
-
-      assemble_system ();
-      solve ();
-      output_results (cycle);
+      assemble_system();
+      solve();
+      output_results(cycle);
     }
 }
-
 
 // @sect3{The <code>main</code> function}
 
@@ -656,15 +639,15 @@ void Step6<dim>::run ()
 // program in this way, and you can do so by more or less copying this
 // function except for the <code>try</code> block that actually encodes the
 // functionality particular to the present application.
-int main ()
+int
+main()
 {
-
   // The general idea behind the layout of this function is as follows: let's
   // try to run the program as we did before...
   try
     {
       Step6<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      laplace_problem_2d.run();
     }
   // ...and if this should fail, try to gather as much information as
   // possible. Specifically, if the exception that was thrown is an object of
@@ -685,9 +668,10 @@ int main ()
   // Apart from this, there isn't much that we can do except exiting the
   // program with an error code (this is what the <code>return 1;</code>
   // does):
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -701,9 +685,10 @@ int main ()
   // If the exception that was thrown somewhere was not an object of a class
   // derived from the standard <code>exception</code> class, then we can't do
   // anything at all. We then simply print an error message and exit.
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

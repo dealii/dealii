@@ -13,38 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
 
 std::ofstream logfile("output");
 
-
 template <int dim>
-void test (const std::string &infilename)
+void
+test(const std::string& infilename)
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
-  gi.read (infilename);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
+  gi.read(infilename);
 
-  logfile<<"------------------------------------------"<<std::endl;
+  logfile << "------------------------------------------" << std::endl;
 
   GridOut grid_out;
-  grid_out.set_flags (GridOutFlags::Ucd(true));
-  grid_out.write_ucd (tria, logfile);
+  grid_out.set_flags(GridOutFlags::Ucd(true));
+  grid_out.write_ucd(tria, logfile);
 }
 
-int main ()
+int
+main()
 {
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
 }
-

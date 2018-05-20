@@ -13,37 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 
-#include <deal.II/opencascade/utilities.h>
-#include <deal.II/opencascade/boundary_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/opencascade/boundary_lib.h>
+#include <deal.II/opencascade/utilities.h>
 
+#include <Standard_Stream.hxx>
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
-#include <Standard_Stream.hxx>
 
 // Create a Triangulation, interpolate its boundary points to a smooth
 // BSpline, and use that as an arlength Boundary Descriptor.
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
 
   // Create a bspline passign through the points
-  std::vector<Point<2> > pts;
-  pts.push_back(Point<2>(0,0));
-  pts.push_back(Point<2>(0,1));
-  pts.push_back(Point<2>(1,1));
-  pts.push_back(Point<2>(1,0));
+  std::vector<Point<2>> pts;
+  pts.push_back(Point<2>(0, 0));
+  pts.push_back(Point<2>(0, 1));
+  pts.push_back(Point<2>(1, 1));
+  pts.push_back(Point<2>(1, 0));
 
-  TopoDS_Edge edge = interpolation_curve(pts, Tensor<1,2>(), true);
-  ArclengthProjectionLineManifold<2,2> manifold(edge);
+  TopoDS_Edge edge = interpolation_curve(pts, Tensor<1, 2>(), true);
+  ArclengthProjectionLineManifold<2, 2> manifold(edge);
 
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria);

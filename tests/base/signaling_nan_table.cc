@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check Table<2,double> with elements numbers::signaling_nan<double>
 //
 // the test only checks that the function can be called. It would have
@@ -27,28 +26,27 @@
 #include <deal.II/base/table.h>
 #include <limits>
 
-
 template <typename T>
-void check ()
+void
+check()
 {
-  Table<2,T> t;
+  Table<2, T> t;
 
-  t.reinit (2,3);
-  t.fill (numbers::signaling_nan<T>());
+  t.reinit(2, 3);
+  t.fill(numbers::signaling_nan<T>());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  check<float> ();
-  check<double> ();
+  check<float>();
+  check<double>();
 
   return 0;
 }
-

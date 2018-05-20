@@ -13,59 +13,57 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check correct behaviour of reinit of Trilinos vectors
 
 #include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <iostream>
 #include <vector>
 
-
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
-
+  if(myid == 0)
+    deallog << "numproc=" << numproc << std::endl;
 
   TrilinosWrappers::MPI::Vector test1, test2;
 
-  AssertThrow (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-               ExcInternalError());
+  AssertThrow(test1.vector_partitioner().SameAs(test2.vector_partitioner()),
+              ExcInternalError());
 
   // first processor owns 2 indices, second
   // processor owns none
   IndexSet local_owned(2);
-  if (myid == 0)
-    local_owned.add_range (0,2);
+  if(myid == 0)
+    local_owned.add_range(0, 2);
 
-  test1.reinit (local_owned, MPI_COMM_WORLD);
+  test1.reinit(local_owned, MPI_COMM_WORLD);
 
   // reinit Trilinos vector from other vector
-  test2.reinit (test1, true);
+  test2.reinit(test1, true);
 
-  AssertThrow (test1.vector_partitioner().SameAs(test2.vector_partitioner()),
-               ExcInternalError());
+  AssertThrow(test1.vector_partitioner().SameAs(test2.vector_partitioner()),
+              ExcInternalError());
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
       deallog << std::setprecision(4);
@@ -74,5 +72,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

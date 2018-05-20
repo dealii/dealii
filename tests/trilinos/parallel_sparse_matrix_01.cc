@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // TrilinosWrappers::SparseMatrix::reinit(DynamicSparsityPattern) should
 // create a matrix that, when filled with elements that match the sparsity
 // pattern, doesn't require any more memory allocation any more. This is
@@ -28,94 +26,95 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 
-
-void test ()
+void
+test()
 {
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,
   // the third one 30, and so on
-  unsigned int N = 0;
-  std::vector<unsigned int> local_rows_per_process
-  (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
-  std::vector<unsigned int> start_row
-  (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
-  for (unsigned int i=0;
-       i<Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
-       ++i)
+  unsigned int              N = 0;
+  std::vector<unsigned int> local_rows_per_process(
+    Utilities::Trilinos::get_n_mpi_processes(
+      Utilities::Trilinos::comm_world()));
+  std::vector<unsigned int> start_row(Utilities::Trilinos::get_n_mpi_processes(
+    Utilities::Trilinos::comm_world()));
+  for(unsigned int i = 0; i < Utilities::Trilinos::get_n_mpi_processes(
+                                Utilities::Trilinos::comm_world());
+      ++i)
     {
-      N += (i+1)*10;
-      local_rows_per_process[i] = (i+1)*10;
-      start_row[i] += i*10;
+      N += (i + 1) * 10;
+      local_rows_per_process[i] = (i + 1) * 10;
+      start_row[i] += i * 10;
     }
 
   // here is a sparsity pattern for which we
   // used to allocate additional memory for 2
   // processes. note that only one of the
   // four blocks uses Inodes
-  DynamicSparsityPattern csp (N,N);
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<N; ++j)
+  DynamicSparsityPattern csp(N, N);
+  for(unsigned int i = 0; i < N; ++i)
+    for(unsigned int j = 0; j < N; ++j)
       {
-        csp.add (i,i);
-        if (i+local_rows_per_process.back() < N)
-          csp.add (i,i+local_rows_per_process.back());
-        if (i > local_rows_per_process.back())
-          csp.add (i,i-local_rows_per_process.back());
+        csp.add(i, i);
+        if(i + local_rows_per_process.back() < N)
+          csp.add(i, i + local_rows_per_process.back());
+        if(i > local_rows_per_process.back())
+          csp.add(i, i - local_rows_per_process.back());
       }
 
   // here is a sparsity pattern for which no
   // Inodes are used, but it doesn't allocate
   // additional memory
-//   for (unsigned int bi=0; bi<get_n_mpi_processes(); ++bi)
-//     for (unsigned int bj=0; bj<get_n_mpi_processes(); ++bj)
-//       for (unsigned int i=0; i<local_rows_per_process[bi]; ++i)
-//         for (unsigned int k=0; k<6; ++k)
-//           csp.add (start_row[bi] + i,
-//                    start_row[bj] + (i+2*k) % local_rows_per_process[bj]);
-
-
+  //   for (unsigned int bi=0; bi<get_n_mpi_processes(); ++bi)
+  //     for (unsigned int bj=0; bj<get_n_mpi_processes(); ++bj)
+  //       for (unsigned int i=0; i<local_rows_per_process[bi]; ++i)
+  //         for (unsigned int k=0; k<6; ++k)
+  //           csp.add (start_row[bi] + i,
+  //                    start_row[bj] + (i+2*k) % local_rows_per_process[bj]);
 
   // now create a matrix with this sparsity
   // pattern
-  Epetra_Map map (TrilinosWrappers::types::int_type(-1),
-                  TrilinosWrappers::types::int_type
-                  (local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
-                                          (Utilities::Trilinos::comm_world())]),
-                  0, Utilities::Trilinos::comm_world());
+  Epetra_Map map(
+    TrilinosWrappers::types::int_type(-1),
+    TrilinosWrappers::types::int_type(
+      local_rows_per_process[Utilities::Trilinos::get_this_mpi_process(
+        Utilities::Trilinos::comm_world())]),
+    0,
+    Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix m;
-  m.reinit (map, csp);
+  m.reinit(map, csp);
   // now write into the exact same matrix
   // entries as have been created by the
   // sparsity pattern above
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<csp.row_length(i); ++j)
-      m.add (i, csp.column_number(i,j), 1.);
+  for(unsigned int i = 0; i < N; ++i)
+    for(unsigned int j = 0; j < csp.row_length(i); ++j)
+      m.add(i, csp.column_number(i, j), 1.);
 
-  m.compress (VectorOperation::add);
+  m.compress(VectorOperation::add);
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -126,9 +125,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

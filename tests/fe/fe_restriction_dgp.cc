@@ -13,24 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_ALL(DGP,0,2);
-  CHECK_ALL(DGP,1,2);
-  CHECK_ALL(DGP,2,2);
-  CHECK_ALL(DGP,3,2);
-  CHECK_ALL(DGP,4,2);
+  CHECK_ALL(DGP, 0, 2);
+  CHECK_ALL(DGP, 1, 2);
+  CHECK_ALL(DGP, 2, 2);
+  CHECK_ALL(DGP, 3, 2);
+  CHECK_ALL(DGP, 4, 2);
 
-  CHECK_ALL(DGP,0,3);
-  CHECK_ALL(DGP,1,3);
-  CHECK_ALL(DGP,2,3);
+  CHECK_ALL(DGP, 0, 3);
+  CHECK_ALL(DGP, 1, 3);
+  CHECK_ALL(DGP, 2, 3);
 }

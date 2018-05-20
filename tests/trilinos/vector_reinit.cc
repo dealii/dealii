@@ -17,43 +17,44 @@
 // to test IndexSet::make_trilinos_map(), which contained an MPI-related bug.
 // Namely, a Fortran type MPI_LOGICAL was used instead of MPI_INT.
 
-
 #include "../tests.h"
 
 #include <deal.II/base/index_set.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
 
 using namespace dealii;
 
 static const unsigned int dim = 2;
 
-void test ()
+void
+test()
 {
-  MPI_Comm mpi_communicator (MPI_COMM_WORLD);
+  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
 
-  parallel::distributed::Triangulation<dim> tria(mpi_communicator,
-                                                 typename Triangulation<dim>::MeshSmoothing
-                                                 (Triangulation<dim>::smoothing_on_refinement |
-                                                  Triangulation<dim>::smoothing_on_coarsening));
+  parallel::distributed::Triangulation<dim> tria(
+    mpi_communicator,
+    typename Triangulation<dim>::MeshSmoothing(
+      Triangulation<dim>::smoothing_on_refinement
+      | Triangulation<dim>::smoothing_on_coarsening));
 
-  GridGenerator::hyper_cube (tria, -1,0);
-  tria.refine_global (2);
+  GridGenerator::hyper_cube(tria, -1, 0);
+  tria.refine_global(2);
 
   const unsigned int poly_degree = 1;
-  FE_Q<dim> fe(poly_degree);
+  FE_Q<dim>          fe(poly_degree);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs ();
+  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
 
   TrilinosWrappers::MPI::Vector vector_Re;
   vector_Re.reinit(locally_owned_dofs, mpi_communicator);
@@ -61,14 +62,14 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   initlog();
   deallog.depth_console(0);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-    test ();
+    test();
   }
 }

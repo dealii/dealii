@@ -13,119 +13,110 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
+#include <deal.II/lac/vector.h>
 
-#include <vector>
-#include <sstream>
 #include <deal.II/base/std_cxx14/memory.h>
+#include <sstream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-
-
-
 template <int dim, int spacedim>
-FE_Q_iso_Q1<dim,spacedim>::FE_Q_iso_Q1 (const unsigned int subdivisions)
-  :
-  FE_Q_Base<TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >, dim, spacedim> (
-    TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >
-    (Polynomials::generate_complete_Lagrange_basis_on_subdivisions(subdivisions, 1)),
-    FiniteElementData<dim>(this->get_dpo_vector(subdivisions),
-                           1, subdivisions,
-                           FiniteElementData<dim>::H1),
-    std::vector<bool> (1, false))
+FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
+  : FE_Q_Base<
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
+      dim,
+      spacedim>(
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>(
+        Polynomials::generate_complete_Lagrange_basis_on_subdivisions(
+          subdivisions,
+          1)),
+      FiniteElementData<dim>(this->get_dpo_vector(subdivisions),
+                             1,
+                             subdivisions,
+                             FiniteElementData<dim>::H1),
+      std::vector<bool>(1, false))
 {
-  Assert (subdivisions > 0,
-          ExcMessage ("This element can only be used with a positive number of "
-                      "subelements"));
+  Assert(subdivisions > 0,
+         ExcMessage("This element can only be used with a positive number of "
+                    "subelements"));
 
-  QTrapez<1> trapez;
-  QIterated<1> points (trapez, subdivisions);
+  QTrapez<1>   trapez;
+  QIterated<1> points(trapez, subdivisions);
 
   this->initialize(points.get_points());
 }
 
-
-
 template <int dim, int spacedim>
 std::string
-FE_Q_iso_Q1<dim,spacedim>::get_name () const
+FE_Q_iso_Q1<dim, spacedim>::get_name() const
 {
   // note that the FETools::get_fe_by_name function depends on the
   // particular format of the string this function returns, so they have to be
   // kept in sync
 
   std::ostringstream namebuf;
-  namebuf << "FE_Q_iso_Q1<"
-          << Utilities::dim_string(dim,spacedim)
-          << ">(" << this->degree << ")";
+  namebuf << "FE_Q_iso_Q1<" << Utilities::dim_string(dim, spacedim) << ">("
+          << this->degree << ")";
   return namebuf.str();
 }
 
-
-
 template <int dim, int spacedim>
 void
-FE_Q_iso_Q1<dim,spacedim>::
-convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                        std::vector<double>                &nodal_values) const
+FE_Q_iso_Q1<dim, spacedim>::
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>>& support_point_values,
+    std::vector<double>&               nodal_values) const
 {
-  AssertDimension (support_point_values.size(),
-                   this->get_unit_support_points().size());
-  AssertDimension (support_point_values.size(),
-                   nodal_values.size());
-  AssertDimension (this->dofs_per_cell,
-                   nodal_values.size());
+  AssertDimension(support_point_values.size(),
+                  this->get_unit_support_points().size());
+  AssertDimension(support_point_values.size(), nodal_values.size());
+  AssertDimension(this->dofs_per_cell, nodal_values.size());
 
-  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+  for(unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension (support_point_values[i].size(), 1);
+      AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
 }
 
-
-
 template <int dim, int spacedim>
-std::unique_ptr<FiniteElement<dim,spacedim> >
-FE_Q_iso_Q1<dim,spacedim>::clone() const
+std::unique_ptr<FiniteElement<dim, spacedim>>
+FE_Q_iso_Q1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<FE_Q_iso_Q1<dim,spacedim>>(*this);
+  return std_cxx14::make_unique<FE_Q_iso_Q1<dim, spacedim>>(*this);
 }
-
-
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Q_iso_Q1<dim,spacedim>::
-compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
+FE_Q_iso_Q1<dim, spacedim>::compare_for_face_domination(
+  const FiniteElement<dim, spacedim>& fe_other) const
 {
-  if (const FE_Q_iso_Q1<dim,spacedim> *fe_q_iso_q1_other
-      = dynamic_cast<const FE_Q_iso_Q1<dim,spacedim>*>(&fe_other))
+  if(const FE_Q_iso_Q1<dim, spacedim>* fe_q_iso_q1_other
+     = dynamic_cast<const FE_Q_iso_Q1<dim, spacedim>*>(&fe_other))
     {
       // different behavior as in FE_Q: as FE_Q_iso_Q1(2) is not a subspace of
       // FE_Q_iso_Q1(3), need that the element degrees are multiples of each
       // other
-      if (this->degree < fe_q_iso_q1_other->degree &&
-          fe_q_iso_q1_other->degree % this->degree == 0)
+      if(this->degree < fe_q_iso_q1_other->degree
+         && fe_q_iso_q1_other->degree % this->degree == 0)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_iso_q1_other->degree)
+      else if(this->degree == fe_q_iso_q1_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
-      else if (this->degree > fe_q_iso_q1_other->degree &&
-               this->degree % fe_q_iso_q1_other->degree == 0)
+      else if(this->degree > fe_q_iso_q1_other->degree
+              && this->degree % fe_q_iso_q1_other->degree == 0)
         return FiniteElementDomination::other_element_dominates;
       else
         return FiniteElementDomination::neither_element_dominates;
     }
-  else if (const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
+  else if(const FE_Nothing<dim>* fe_nothing
+          = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
     {
-      if (fe_nothing->is_dominating())
+      if(fe_nothing->is_dominating())
         {
           return FiniteElementDomination::other_element_dominates;
         }
@@ -137,10 +128,9 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
         }
     }
 
-  Assert (false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
-
 
 // explicit instantiations
 #include "fe_q_iso_q1.inst"

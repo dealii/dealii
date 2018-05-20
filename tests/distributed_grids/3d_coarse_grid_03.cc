@@ -13,38 +13,35 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test interaction with p4est with a 3d mesh
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
-
-
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridIn<dim> gi;
-  gi.attach_triangulation (tr);
-  std::ifstream in (SOURCE_DIR "/../bits/gerold_1.inp");
-  gi.read_ucd (in);
+  gi.attach_triangulation(tr);
+  std::ifstream in(SOURCE_DIR "/../bits/gerold_1.inp");
+  gi.read_ucd(in);
 
   write_vtk(tr, "1");
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -52,6 +49,4 @@ int main(int argc, char *argv[])
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();
-
-
 }

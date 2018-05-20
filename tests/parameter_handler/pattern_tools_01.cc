@@ -13,12 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
+#include <boost/core/demangle.hpp>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/numbers.h>
-#include <boost/core/demangle.hpp>
 
 #include <memory>
 
@@ -28,27 +27,29 @@ using namespace Patterns::Tools;
 // Try conversion on elementary types
 
 template <class T>
-void test(T t)
+void
+test(T t)
 {
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
   deallog << "To String: " << s << std::endl;
-  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s)) << std::endl;
-
+  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s))
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  int                 t0 = 1;
-  unsigned int        t1 = 2;
-  unsigned char       t2 = 3;
-  std::string         t3 = "Ciao";
-  double              t4 = 4.0;
-  bool                t5 = true;
-  float               t6 = 5.5;
+  int           t0 = 1;
+  unsigned int  t1 = 2;
+  unsigned char t2 = 3;
+  std::string   t3 = "Ciao";
+  double        t4 = 4.0;
+  bool          t5 = true;
+  float         t6 = 5.5;
 
   test(t0);
   test(t1);

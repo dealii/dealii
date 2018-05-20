@@ -13,16 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::project works for Q elements correctly
 
 #include "project_parallel_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  test_no_hanging_nodes<dim, 2, 1> (FESystem<dim>(FE_Q<dim>(1), 2));
-  test_no_hanging_nodes<dim, 1, 2> (FESystem<dim>(FE_Q<dim>(2), 1));
+  test_no_hanging_nodes<dim, 2, 1>(FESystem<dim>(FE_Q<dim>(1), 2));
+  test_no_hanging_nodes<dim, 1, 2>(FESystem<dim>(FE_Q<dim>(2), 1));
 }

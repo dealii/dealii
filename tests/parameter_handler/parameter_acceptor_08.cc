@@ -13,30 +13,26 @@
 //
 //-----------------------------------------------------------
 
-
-
 #include "../tests.h"
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/parameter_acceptor.h>
+#include <deal.II/base/path_search.h>
 
 // Test subsectioning
 
 class Test : public ParameterAcceptor
 {
 public:
-  Test(const std::string &sec_name  = "First Class",
-       const std::string &par_name  = "Parameter name",
-       const std::string &par_value = "Parameter value"):
-    ParameterAcceptor(sec_name),
-    par_name(par_name),
-    par_value(par_value)
+  Test(const std::string& sec_name  = "First Class",
+       const std::string& par_name  = "Parameter name",
+       const std::string& par_value = "Parameter value")
+    : ParameterAcceptor(sec_name), par_name(par_name), par_value(par_value)
   {
     add_parameter(par_name, this->par_value);
 
     deallog << "Section Name    : " << sec_name << std::endl;
     deallog << "N sections      : " << get_section_path().size() << std::endl;
     deallog << "Sections        : ";
-    for (auto s : get_section_path())
+    for(auto s : get_section_path())
       deallog << "\"" << s << "\"    ";
     deallog << std::endl << std::endl;
   };
@@ -46,17 +42,17 @@ private:
   std::string par_value;
 };
 
-int main ()
+int
+main()
 {
   initlog();
-  auto &prm = ParameterAcceptor::prm;
+  auto& prm = ParameterAcceptor::prm;
 
   // Relative
   Test a("Class A", "Parameter A", "a");
 
   // Absolute (== relative if no other path is added)
   Test c("/Class B", "Parameter C", "c");
-
 
   // Absolute (== relative if no other path is added)
   Test c2("/Class C/", "Parameter C", "c");

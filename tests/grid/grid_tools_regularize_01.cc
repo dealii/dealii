@@ -13,38 +13,36 @@
 //
 // ---------------------------------------------------------------------
 
-
 // GridTools::regularize_corner_cells
 
 #include "../tests.h"
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   const SphericalManifold<dim> m0;
-  Triangulation<dim> tria;
-  GridGenerator::hyper_cube(tria,-1,1);
+  Triangulation<dim>           tria;
+  GridGenerator::hyper_cube(tria, -1, 1);
   tria.set_all_manifold_ids_on_boundary(0);
   tria.set_manifold(0, m0);
 
-  GridTools::regularize_corner_cells (tria);
+  GridTools::regularize_corner_cells(tria);
 
   GridOut grid_out;
-  grid_out.write_msh (tria, deallog.get_file_stream());
+  grid_out.write_msh(tria, deallog.get_file_stream());
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2> ();
+  test<2>();
 
   return 0;
 }
-

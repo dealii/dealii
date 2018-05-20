@@ -13,21 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Verify that FE_ABF(r) returns that its polynomial degree is r+2, not r+1.
 
 #include "../tests.h"
 #include <deal.II/fe/fe_abf.h>
 
-
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog.attach(logfile);
 
   deallog << "dim=2:" << std::endl;
-  for (unsigned int degree=0; degree<2; ++degree)
+  for(unsigned int degree = 0; degree < 2; ++degree)
     deallog << degree << ": " << FE_ABF<2>(degree).degree << std::endl;
 }

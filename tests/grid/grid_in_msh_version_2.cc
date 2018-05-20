@@ -13,54 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
 // read a file in the MSH format used by the GMSH program. test the
 // reader for version 2 of the MSH file format
 
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <string>
 
 std::ofstream logfile("output");
 
-
 template <int dim>
-void check_file (const std::string name,
-                 typename GridIn<dim>::Format format)
+void
+check_file(const std::string name, typename GridIn<dim>::Format format)
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
   gi.read(name, format);
-  deallog << '\t' << tria.n_vertices()
-          << '\t' << tria.n_cells()
-          << std::endl;
+  deallog << '\t' << tria.n_vertices() << '\t' << tria.n_cells() << std::endl;
 
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 }
 
-void filename_resolution()
+void
+filename_resolution()
 {
-  check_file<2> (std::string(SOURCE_DIR "/grid_in_msh_version_2/hole81"), GridIn<2>::msh);
-  check_file<2> (std::string(SOURCE_DIR "/grid_in_msh_version_2/hole8170"), GridIn<2>::msh);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_2/hole81"),
+                GridIn<2>::msh);
+  check_file<2>(std::string(SOURCE_DIR "/grid_in_msh_version_2/hole8170"),
+                GridIn<2>::msh);
 }
 
-
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (5);
-  logfile << std::setprecision (5);
+  deallog << std::setprecision(5);
+  logfile << std::setprecision(5);
   deallog.attach(logfile);
 
   filename_resolution();
 }
-

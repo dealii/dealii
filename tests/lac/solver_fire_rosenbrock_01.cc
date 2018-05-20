@@ -15,12 +15,10 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/solver_fire.h>
-
-
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 // Test to verify correctness of SolverFIRE::sovle()
 // The objective function is the extended Rosenbrock function.
@@ -41,46 +39,40 @@
 //
 // DOI: 10.1007/BF02196600
 
-
 using vector_t = typename dealii::Vector<double>;
 
-
-double compute (vector_t &G, const vector_t &X)
+double
+compute(vector_t& G, const vector_t& X)
 {
-  AssertThrow (X.size() % 2 == 0,
-               ExcInternalError());
+  AssertThrow(X.size() % 2 == 0, ExcInternalError());
 
   double value = 0.;
 
   // Value of the objective function.
-  for (unsigned int i = 0; i < X.size()/2; ++i)
-    value += 100 *
-             dealii::Utilities::fixed_power<2>( X(2*i) * X(2*i) - X(2*i+1) )
-             +
-             dealii::Utilities::fixed_power<2>( X(2*i)          -       1  );
+  for(unsigned int i = 0; i < X.size() / 2; ++i)
+    value += 100
+               * dealii::Utilities::fixed_power<2>(X(2 * i) * X(2 * i)
+                                                   - X(2 * i + 1))
+             + dealii::Utilities::fixed_power<2>(X(2 * i) - 1);
 
   // Gradient of the objective function.
-  for (unsigned int i = 0; i < X.size()/2; ++i)
+  for(unsigned int i = 0; i < X.size() / 2; ++i)
     {
-      G(2*i)   = ( X(2*i) * X(2*i) - X(2*i+1) ) * X(2*i) * 400
-                 +
-                 ( X(2*i)          -       1  ) *            2;
+      G(2 * i) = (X(2 * i) * X(2 * i) - X(2 * i + 1)) * X(2 * i) * 400
+                 + (X(2 * i) - 1) * 2;
 
-      G(2*i+1) = ( X(2*i) * X(2*i) - X(2*i+1) ) *         -200;
+      G(2 * i + 1) = (X(2 * i) * X(2 * i) - X(2 * i + 1)) * -200;
     }
 
   return value;
 }
 
-
-
-void check_value (const unsigned int N,
-                  const double       tol)
+void
+check_value(const unsigned int N, const double tol)
 {
-  AssertThrow (N % 2 == 0,
-               ExcInternalError());
+  AssertThrow(N % 2 == 0, ExcInternalError());
 
-  vector_t X (N);
+  vector_t X(N);
 
   // Use this to initialize DiagonalMatrix
   X = 1.;
@@ -90,18 +82,17 @@ void check_value (const unsigned int N,
   inv_mass.reinit(X);
 
   // Set initial guess.
-  for (unsigned int i=0; i < N/2; i++)
+  for(unsigned int i = 0; i < N / 2; i++)
     {
-      X(2*i)   = -1.2;
-      X(2*i+1) =  1.0;
+      X(2 * i)     = -1.2;
+      X(2 * i + 1) = 1.0;
     }
 
-  auto additional_data =
-    SolverFIRE<vector_t>::AdditionalData(0.1, 1, 1);
+  auto additional_data = SolverFIRE<vector_t>::AdditionalData(0.1, 1, 1);
 
-  SolverControl solver_control (1e5, tol);
+  SolverControl solver_control(1e5, tol);
 
-  SolverFIRE<vector_t> fire (solver_control, additional_data);
+  SolverFIRE<vector_t> fire(solver_control, additional_data);
 
   fire.solve(compute, X, inv_mass);
 
@@ -110,17 +101,15 @@ void check_value (const unsigned int N,
   X.print(deallog);
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
-//  logfile.setf(std::ios::fixed);
+  //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  check_value( 2, 1e-14);
+  check_value(2, 1e-14);
   check_value(10, 1e-14);
   check_value(20, 1e-14);
-
 }

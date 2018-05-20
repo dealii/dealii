@@ -16,13 +16,12 @@
 #ifndef dealii_distributed_grid_refinement_h
 #define dealii_distributed_grid_refinement_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/distributed/tria.h>
 
-#include <vector>
 #include <limits>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -71,12 +70,13 @@ namespace parallel
        */
       template <int dim, typename Number, int spacedim>
       void
-      refine_and_coarsen_fixed_number
-      (parallel::distributed::Triangulation<dim,spacedim> &tria,
-       const dealii::Vector<Number>                       &criteria,
-       const double                                       top_fraction_of_cells,
-       const double                                       bottom_fraction_of_cells,
-       const unsigned int                                 max_n_cells = std::numeric_limits<unsigned int>::max());
+      refine_and_coarsen_fixed_number(
+        parallel::distributed::Triangulation<dim, spacedim>& tria,
+        const dealii::Vector<Number>&                        criteria,
+        const double       top_fraction_of_cells,
+        const double       bottom_fraction_of_cells,
+        const unsigned int max_n_cells
+        = std::numeric_limits<unsigned int>::max());
 
       /**
        * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but
@@ -102,15 +102,14 @@ namespace parallel
        */
       template <int dim, typename Number, int spacedim>
       void
-      refine_and_coarsen_fixed_fraction
-      (parallel::distributed::Triangulation<dim,spacedim> &tria,
-       const dealii::Vector<Number>                       &criteria,
-       const double                                       top_fraction_of_error,
-       const double                                       bottom_fraction_of_error);
-    }
-  }
-}
-
+      refine_and_coarsen_fixed_fraction(
+        parallel::distributed::Triangulation<dim, spacedim>& tria,
+        const dealii::Vector<Number>&                        criteria,
+        const double top_fraction_of_error,
+        const double bottom_fraction_of_error);
+    } // namespace GridRefinement
+  }   // namespace distributed
+} // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 

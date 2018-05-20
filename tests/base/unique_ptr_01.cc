@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <memory>
 
@@ -23,63 +21,61 @@ int counter = 0;
 
 struct X
 {
-  X ()
+  X()
   {
     ++counter;
   }
 
-  X (const X &)
+  X(const X&)
   {
     ++counter;
   }
 
-  ~X ()
+  ~X()
   {
     --counter;
   }
 };
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   // test with plain new/delete
   {
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
     {
-      X *p = new X;
-      AssertThrow (counter == 1, ExcInternalError());
+      X* p = new X;
+      AssertThrow(counter == 1, ExcInternalError());
       delete p;
     }
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
   }
 
   // test with plain unique_ptr
   {
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
     {
-      std::unique_ptr<X> p (new X);
-      AssertThrow (counter == 1, ExcInternalError());
+      std::unique_ptr<X> p(new X);
+      AssertThrow(counter == 1, ExcInternalError());
     }
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
   }
 
   // test with plain unique_ptr, but also copy stuff. this only works
   // with move constructors, so test only in C++11 mode
   {
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
     {
-      std::unique_ptr<X> p (new X);
-      AssertThrow (counter == 1, ExcInternalError());
+      std::unique_ptr<X> p(new X);
+      AssertThrow(counter == 1, ExcInternalError());
 
       std::unique_ptr<X> q = std::move(p);
-      AssertThrow (counter == 1, ExcInternalError());
+      AssertThrow(counter == 1, ExcInternalError());
     }
-    AssertThrow (counter == 0, ExcInternalError());
+    AssertThrow(counter == 0, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;
 }
-

@@ -18,16 +18,15 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/fe/mapping_q1.h>
 #include <deal.II/dofs/dof_handler.h>
-
+#include <deal.II/fe/mapping_q1.h>
 
 #include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename> class Vector;
-
+template <typename>
+class Vector;
 
 /*!@addtogroup mapping */
 /*@{*/
@@ -87,8 +86,8 @@ template <typename> class Vector;
  *
  * @author Michael Stadler, 2001
  */
-template <int dim, typename VectorType = Vector<double>, int spacedim=dim >
-class MappingQ1Eulerian : public MappingQGeneric<dim,spacedim>
+template <int dim, typename VectorType = Vector<double>, int spacedim = dim>
+class MappingQ1Eulerian : public MappingQGeneric<dim, spacedim>
 {
 public:
   /**
@@ -105,8 +104,8 @@ public:
    * interpreted as the displacement we use in defining the mapping, relative
    * to the location of cells of the underlying triangulation.
    */
-  MappingQ1Eulerian (const DoFHandler<dim,spacedim> &euler_dof_handler,
-                     const VectorType               &euler_vector);
+  MappingQ1Eulerian(const DoFHandler<dim, spacedim>& euler_dof_handler,
+                    const VectorType&                euler_vector);
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -114,31 +113,29 @@ public:
    * cell but instead evaluates an externally given displacement field in
    * addition to the geometry of the cell.
    */
-  virtual
-  std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
+  virtual std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
+  get_vertices(const typename Triangulation<dim, spacedim>::cell_iterator& cell)
+    const override;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */
-  virtual
-  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
+  virtual std::unique_ptr<Mapping<dim, spacedim>>
+  clone() const override;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general
    * preserve vertex locations (unless the translation vector happens to
    * provide for zero displacements at vertex locations).
    */
-  virtual
-  bool preserves_vertex_locations () const override;
+  virtual bool
+  preserves_vertex_locations() const override;
 
   /**
    * Exception.
    */
-  DeclException0 (ExcInactiveCell);
-
-
+  DeclException0(ExcInactiveCell);
 
 protected:
   /**
@@ -149,13 +146,14 @@ protected:
    * This function overrides the function in the base class since we cannot
    * use any cell similarity for this class.
    */
-  virtual
-  CellSimilarity::Similarity
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                  const CellSimilarity::Similarity                           cell_similarity,
-                  const Quadrature<dim>                                     &quadrature,
-                  const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const override;
+  virtual CellSimilarity::Similarity
+  fill_fe_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const Quadrature<dim>&                                      quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase&    internal_data,
+    internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>&
+      output_data) const override;
 
   /**
    * Compute the support points of the mapping. For the current class, these
@@ -163,19 +161,23 @@ protected:
    * documentation of MappingQGeneric::compute_mapping_support_points() for
    * more information.
    */
-  virtual
-  std::vector<Point<spacedim> >
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
+  virtual std::vector<Point<spacedim>>
+  compute_mapping_support_points(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell)
+    const override;
 
   /**
    * Reference to the vector of shifts.
    */
-  SmartPointer<const VectorType, MappingQ1Eulerian<dim,VectorType,spacedim> > euler_transform_vectors;
+  SmartPointer<const VectorType, MappingQ1Eulerian<dim, VectorType, spacedim>>
+    euler_transform_vectors;
 
   /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
-  SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VectorType,spacedim> > shiftmap_dof_handler;
+  SmartPointer<const DoFHandler<dim, spacedim>,
+               MappingQ1Eulerian<dim, VectorType, spacedim>>
+    shiftmap_dof_handler;
 };
 
 /*@}*/
@@ -185,9 +187,8 @@ protected:
 #ifndef DOXYGEN
 
 template <int dim, typename VectorType, int spacedim>
-inline
-bool
-MappingQ1Eulerian<dim,VectorType,spacedim>::preserves_vertex_locations () const
+inline bool
+MappingQ1Eulerian<dim, VectorType, spacedim>::preserves_vertex_locations() const
 {
   return false;
 }

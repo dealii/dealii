@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/numerics/vector_tools.templates.h>
 
 DEAL_II_NAMESPACE_OPEN

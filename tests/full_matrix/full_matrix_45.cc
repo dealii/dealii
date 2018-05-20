@@ -13,32 +13,26 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::vmult
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_matrix(m);
   Vector<number> v, w;
-  make_range_vector (v);
-  make_domain_vector (w);
+  make_range_vector(v);
+  make_domain_vector(w);
 
-  m.vmult (v, w, true);
-  print_vector (v);
-  print_vector (w);
+  m.vmult(v, w, true);
+  print_vector(v);
+  print_vector(w);
 
-  m.vmult (v, w, false);
-  print_vector (v);
-  print_vector (w);
+  m.vmult(v, w, false);
+  print_vector(v);
+  print_vector(w);
 }

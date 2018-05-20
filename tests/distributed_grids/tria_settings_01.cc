@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test the setting
 // parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning
 // by looking which order the cells get enumerated. With the flag, the cells
@@ -24,66 +22,61 @@
 #include "../tests.h"
 #include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
-void testit(parallel::distributed::Triangulation<dim> &tr)
+void
+testit(parallel::distributed::Triangulation<dim>& tr)
 {
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
 
   (++tr.begin_active())->set_refine_flag();
-  tr.execute_coarsening_and_refinement ();
+  tr.execute_coarsening_and_refinement();
 
   tr.begin_active()->set_refine_flag();
-  tr.execute_coarsening_and_refinement ();
+  tr.execute_coarsening_and_refinement();
 
-  typename  parallel::distributed::Triangulation<dim>::active_cell_iterator it=tr.begin_active();
-  for (; it!=tr.end(); ++it)
+  typename parallel::distributed::Triangulation<dim>::active_cell_iterator it
+    = tr.begin_active();
+  for(; it != tr.end(); ++it)
     {
       deallog << it->center() << ", ";
     }
   deallog << std::endl;
 }
 
-
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
   {
-
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                                 dealii::Triangulation<dim>::none,
-                                                 parallel::distributed::Triangulation<dim>::default_setting);
+    parallel::distributed::Triangulation<dim> tr(
+      MPI_COMM_WORLD,
+      dealii::Triangulation<dim>::none,
+      parallel::distributed::Triangulation<dim>::default_setting);
     testit(tr);
-
   }
 
   {
-
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                                 dealii::Triangulation<dim>::none,
-                                                 parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning);
+    parallel::distributed::Triangulation<dim> tr(
+      MPI_COMM_WORLD,
+      dealii::Triangulation<dim>::none,
+      parallel::distributed::Triangulation<
+        dim>::mesh_reconstruction_after_repartitioning);
     testit(tr);
-
   }
-
-
-
-
-
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);

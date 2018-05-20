@@ -13,32 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // refine bottom-left cell after one global refinement of a square in 2d and check p4est-output
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/base/utilities.h>
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 
 template <class TRIA>
-void check (TRIA &tr)
+void
+check(TRIA& tr)
 {
-  typename TRIA::cell_iterator cell = tr.begin(),
-                               endc = tr.end();
+  typename TRIA::cell_iterator cell = tr.begin(), endc = tr.end();
 
-  for (; cell!=endc; ++cell)
+  for(; cell != endc; ++cell)
     {
       deallog << "cell level=" << cell->level() << " index=" << cell->index();
-      if (!cell->has_children())
+      if(!cell->has_children())
         deallog << " subdomain: " << cell->subdomain_id();
       deallog << std::endl;
     }
@@ -46,15 +42,15 @@ void check (TRIA &tr)
   deallog << "OK" << std::endl;
 }
 
-
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (true)
+  if(true)
     {
-      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+      if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -63,35 +59,30 @@ void test()
       tr.refine_global(1);
       tr.begin_active()->set_refine_flag();
 
-      tr.execute_coarsening_and_refinement ();
+      tr.execute_coarsening_and_refinement();
 
-      if (myid == 0)
+      if(myid == 0)
         {
           deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
         }
 
-      const unsigned int checksum = tr.get_checksum ();
-      deallog << "Checksum: "
-              << checksum
-              << std::endl;
+      const unsigned int checksum = tr.get_checksum();
+      deallog << "Checksum: " << checksum << std::endl;
 
       check(tr);
     }
 
-
-
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   deallog.push("2d");
   test<2>();
   deallog.pop();
-
 }

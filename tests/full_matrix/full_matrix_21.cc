@@ -13,23 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::print
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
-  m.print (deallog.get_file_stream());
+  make_matrix(m);
+  m.print(deallog.get_file_stream());
 }
-
