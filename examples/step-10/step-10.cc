@@ -17,30 +17,32 @@
  * Authors: Wolfgang Bangerth, Ralf Hartmann, University of Heidelberg, 2001
  */
 
-
 // The first of the following include files are probably well-known by now and
 // need no further explanation.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/convergence_table.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 // This is the only new one: in it, we declare the MappingQ class
 // which we will use for polynomial mappings of arbitrary order:
 #include <deal.II/fe/mapping_q.h>
 
 // And this again is C++:
-#include <iostream>
-#include <fstream>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
 // The last step is as in previous programs:
 namespace Step10

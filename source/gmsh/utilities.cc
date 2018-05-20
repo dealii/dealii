@@ -14,10 +14,11 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/gmsh/utilities.h>
-#include <deal.II/opencascade/utilities.h>
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
+
+#include <deal.II/opencascade/utilities.h>
 
 #include <cstdio>
 

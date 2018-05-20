@@ -16,11 +16,12 @@
 #ifndef dealii_manifold_lib_h
 #define dealii_manifold_lib_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/grid/manifold.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
+
+#include <deal.II/grid/manifold.h>
 
 #include <boost/container/small_vector.hpp>
 
