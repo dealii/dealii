@@ -983,21 +983,36 @@ namespace DoFTools
         std::vector<types::global_dof_index> dofs_on_this_cell(DoFTools::max_dofs_per_cell(dof));
         std::vector<types::global_dof_index> dofs_on_other_cell(DoFTools::max_dofs_per_cell(dof));
 
-        std::vector<Table<2,Coupling> > int_dof_mask (fe.size());
+        const unsigned int n_components = fe.n_components();
+        AssertDimension (int_mask.size(0), n_components);
+        AssertDimension (int_mask.size(1), n_components);
+        AssertDimension (flux_mask.size(0), n_components);
+        AssertDimension (flux_mask.size(1), n_components);
 
-        int_dof_mask = dof_couplings_from_component_couplings (fe, int_mask);
+        // note that we also need to set the respective entries if flux_mask
+        // says so. this is necessary since we need to consider all degrees of
+        // freedom on a cell for interior faces.
+        Table<2,Coupling> int_and_flux_mask (n_components, n_components);
+        for (unsigned int c1=0; c1<n_components; ++c1)
+          for (unsigned int c2=0; c2<n_components; ++c2)
+            if (int_mask(c1,c2) != none || flux_mask(c1,c2) != none)
+              int_and_flux_mask(c1,c2) = always;
 
-        // Convert the int_dof_mask to bool_int_dof_mask so we can pass it
-        // to constraints.add_entries_local_to_global()
-        std::vector<Table<2,bool> > bool_int_dof_mask (fe.size());
+        std::vector<Table<2,Coupling> > int_and_flux_dof_mask
+          = dof_couplings_from_component_couplings (fe, int_and_flux_mask);
+
+        // Convert int_and_flux_dof_mask to bool_int_and_flux_dof_mask so we
+        // can pass it to constraints.add_entries_local_to_global()
+        std::vector<Table<2,bool> > bool_int_and_flux_dof_mask (fe.size());
         for (unsigned int f=0; f<fe.size(); ++f)
           {
-            bool_int_dof_mask[f].reinit (TableIndices<2>(fe[f].dofs_per_cell,fe[f].dofs_per_cell));
-            bool_int_dof_mask[f].fill (false);
+            bool_int_and_flux_dof_mask[f].reinit (TableIndices<2>(fe[f].dofs_per_cell,
+                                                                  fe[f].dofs_per_cell));
+            bool_int_and_flux_dof_mask[f].fill (false);
             for (unsigned int i=0; i<fe[f].dofs_per_cell; ++i)
               for (unsigned int j=0; j<fe[f].dofs_per_cell; ++j)
-                if (int_dof_mask[f](i,j) != none)
-                  bool_int_dof_mask[f](i,j) = true;
+                if (int_and_flux_dof_mask[f](i,j) != none)
+                  bool_int_and_flux_dof_mask[f](i,j) = true;
           }
 
 
@@ -1014,12 +1029,14 @@ namespace DoFTools
               dofs_on_this_cell.resize (cell->get_fe().dofs_per_cell);
               cell->get_dof_indices (dofs_on_this_cell);
 
-              // make sparsity pattern for this cell
+              // make sparsity pattern for this cell also taking into account
+              // the couplings due to face contributions on the same cell
               constraints.add_entries_local_to_global (dofs_on_this_cell,
                                                        sparsity,
                                                        keep_constrained_dofs,
-                                                       bool_int_dof_mask[cell->active_fe_index()]);
-              // Loop over all interior neighbors
+                                                       bool_int_and_flux_dof_mask[cell->active_fe_index()]);
+
+              // Loop over interior faces
               for (unsigned int face = 0;
                    face < GeometryInfo<dim>::faces_per_cell;
                    ++face)
@@ -1029,35 +1046,6 @@ namespace DoFTools
 
                   const bool periodic_neighbor = cell->has_periodic_neighbor (face);
 
-                  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                    {
-                      const unsigned int ii
-                        = (cell->get_fe().is_primitive(i) ?
-                           cell->get_fe().system_to_component_index(i).first
-                           :
-                           cell->get_fe().get_nonzero_components(i).first_selected_component()
-                          );
-
-                      Assert (ii < cell->get_fe().n_components(), ExcInternalError());
-
-                      for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
-                        {
-                          const unsigned int jj
-                            = (cell->get_fe().is_primitive(j) ?
-                               cell->get_fe().system_to_component_index(j).first
-                               :
-                               cell->get_fe().get_nonzero_components(j).first_selected_component()
-                              );
-
-                          Assert (jj < cell->get_fe().n_components(), ExcInternalError());
-
-                          if ((flux_mask(ii,jj) == always)
-                              ||
-                              (flux_mask(ii,jj) == nonzero))
-                            sparsity.add (dofs_on_this_cell[i],
-                                          dofs_on_this_cell[j]);
-                        }
-                    }
                   if ((!cell->at_boundary(face)) || periodic_neighbor)
                     {
                       typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator

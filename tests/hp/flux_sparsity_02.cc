@@ -73,14 +73,75 @@ check ()
   dof_handler.begin_active()->set_active_fe_index(1);
   dof_handler.distribute_dofs(fe_collection);
 
-  DynamicSparsityPattern dsp(dof_handler.n_dofs(),
-                             dof_handler.n_dofs());
+  deallog << "Dimension " << dim << std::endl;
 
-  DoFTools::make_flux_sparsity_pattern (dof_handler, dsp);
-  dsp.compress();
+  {
+    deallog << "cell and face coupling" << std::endl;
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs());
 
-  // Print sparsity pattern, we expect that all dofs couple with each other.
-  dsp.print(deallog.get_file_stream());
+    Table<2, DoFTools::Coupling> cell_coupling(1,1);
+    Table<2, DoFTools::Coupling> face_coupling(1,1);
+    cell_coupling(0,0) = DoFTools::always;
+    face_coupling(0,0) = DoFTools::always;
+
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    dsp.compress();
+
+    // Print sparsity pattern, we expect that all dofs couple with each other.
+    dsp.print(deallog.get_file_stream());
+  }
+
+  {
+    deallog << "cell coupling" << std::endl;
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs());
+
+    Table<2, DoFTools::Coupling> cell_coupling(1,1);
+    Table<2, DoFTools::Coupling> face_coupling(1,1);
+    cell_coupling(0,0) = DoFTools::always;
+    face_coupling(0,0) = DoFTools::none;
+
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    dsp.compress();
+
+    // Print sparsity pattern, we expect no couplings across the face.
+    dsp.print(deallog.get_file_stream());
+  }
+
+  {
+    deallog << "face coupling" << std::endl;
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs());
+
+    Table<2, DoFTools::Coupling> cell_coupling(1,1);
+    Table<2, DoFTools::Coupling> face_coupling(1,1);
+    cell_coupling(0,0) = DoFTools::none;
+    face_coupling(0,0) = DoFTools::always;
+
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    dsp.compress();
+
+    // Print sparsity pattern, we expect that all dofs couple with each other.
+    dsp.print(deallog.get_file_stream());
+  }
+
+  {
+    deallog << "no coupling" << std::endl;
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(),
+                               dof_handler.n_dofs());
+
+    Table<2, DoFTools::Coupling> cell_coupling(1,1);
+    Table<2, DoFTools::Coupling> face_coupling(1,1);
+    cell_coupling(0,0) = DoFTools::none;
+    face_coupling(0,0) = DoFTools::none;
+
+    DoFTools::make_flux_sparsity_pattern (dof_handler, dsp, cell_coupling, face_coupling);
+    dsp.compress();
+
+    // Print sparsity pattern, we expect no couplings.
+    dsp.print(deallog.get_file_stream());
+  }
 }
 
 
