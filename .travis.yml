@@ -13,7 +13,7 @@ cache:
     - programs
 
 install:
-    - ./contrib/utilities/setup_astyle.sh 
+    - ./contrib/utilities/download_clang_format
 
 script: 
     - ./contrib/utilities/check_indentation.sh 
