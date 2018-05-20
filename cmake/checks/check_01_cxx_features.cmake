@@ -176,11 +176,42 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
       "
       DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
 
+    #
+    # Some compilers treat lambdas as constexpr functions when compiling
+    # with C++17 support even if they don't fulfill all the constexpr
+    # function requirements. Consequently, these compilers don't allow
+    # try-blocks or non-literal return types in lambdas. This is a bug.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <string>
+
+      int main()
+      {
+        auto c = []()
+        {
+          return std::string{};
+        }();
+        (void) c;
+
+        return []()
+        {
+          try
+          {}
+          catch(...)
+          {}
+          return 0;
+        }();
+      }
+      "
+      DEAL_II_NON_CONSTEXPR_LAMBDA)
+
     RESET_CMAKE_REQUIRED()
   ENDIF()
 
   IF( DEAL_II_HAVE_CXX17_ATTRIBUTES AND
-      DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR AND
+      DEAL_II_NON_CONSTEXPR_LAMBDA)
     SET(DEAL_II_HAVE_CXX17 TRUE)
   ELSE()
     IF(NOT _user_provided_cxx_version_flag)
