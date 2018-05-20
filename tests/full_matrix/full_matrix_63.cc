@@ -13,27 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check matrix assignment
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_matrix (m);
+  make_matrix(m);
 
   FullMatrix<number> n;
   n = m;
 
-  print_matrix (n);
+  print_matrix(n);
 }
-

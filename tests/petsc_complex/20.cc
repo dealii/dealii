@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MPI::Vector::operator*(Vector) on two vectors that are
 // not orthogonal
 
@@ -23,38 +21,36 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::MPI::Vector &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test(PETScWrappers::MPI::Vector& v, PETScWrappers::MPI::Vector& w)
 {
   // set only certain elements of each
   // vector, and record the expected scalar
   // product
   PetscScalar product = PetscScalar(0);
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      const PetscScalar vi = std::complex<double> (i, (i%2)*2.0);
-      v(i) = vi;
-      if (i%3 == 0)
+      const PetscScalar vi = std::complex<double>(i, (i % 2) * 2.0);
+      v(i)                 = vi;
+      if(i % 3 == 0)
         {
-          const PetscScalar wi = std::complex<double> (5.0-i,2.5*(i%6));
-          w(i) = wi;
-          product += PetscConj(vi)*wi;
+          const PetscScalar wi = std::complex<double>(5.0 - i, 2.5 * (i % 6));
+          w(i)                 = wi;
+          product += PetscConj(vi) * wi;
         }
     }
 
-  v.compress (VectorOperation::insert);
-  w.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
 
   // make sure the scalar product is zero
-  AssertThrow (v*w == product, ExcInternalError());
+  AssertThrow(v * w == product, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -63,15 +59,15 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 100, 100);
-        PETScWrappers::MPI::Vector w (MPI_COMM_WORLD, 100, 100);
-        test (v,w);
+        PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 100, 100);
+        PETScWrappers::MPI::Vector w(MPI_COMM_WORLD, 100, 100);
+        test(v, w);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -82,9 +78,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

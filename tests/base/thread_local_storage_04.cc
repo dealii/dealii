@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test ThreadLocalStorage::operator= (const T&)
 
 #include "../tests.h"
 
-#include <deal.II/base/thread_management.h>
 #include <deal.II/base/thread_local_storage.h>
+#include <deal.II/base/thread_management.h>
 
 int counter = 10;
 
@@ -27,12 +26,11 @@ struct X
 {
   Threads::ThreadLocalStorage<int> tls_data;
 
-  X ()
-    :
-    tls_data (42)
+  X() : tls_data(42)
   {}
 
-  int f ()
+  int
+  f()
   {
     // use TLS::operator=
     tls_data = counter++;
@@ -44,33 +42,29 @@ struct X
   }
 };
 
-
-void test ()
+void
+test()
 {
   X x;
   {
     Threads::Thread<int> t;
-    t = Threads::new_thread (&X::f, x);
-    AssertThrow (t.return_value() == 10,
-                 ExcInternalError());
+    t = Threads::new_thread(&X::f, x);
+    AssertThrow(t.return_value() == 10, ExcInternalError());
   }
   {
     Threads::Thread<int> t;
-    t = Threads::new_thread (&X::f, x);
-    AssertThrow (t.return_value() == 11,
-                 ExcInternalError());
+    t = Threads::new_thread(&X::f, x);
+    AssertThrow(t.return_value() == 11, ExcInternalError());
   }
 
-  AssertThrow (counter == 12, ExcInternalError());
+  AssertThrow(counter == 12, ExcInternalError());
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   deallog << "OK" << std::endl;
 }

@@ -13,25 +13,23 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // SparseMatrix::const_iterator::operator++(int) was declared but not defined
 // for some time, leading to a linker error
 
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
-
-void test ()
+void
+test()
 {
-  SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 3);
+  for(unsigned int i = 0; i < 5; ++i)
+    for(unsigned int j = 0; j < 5; ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
-  SparseMatrix<double> m(sp);
+  SparseMatrix<double>                 m(sp);
   SparseMatrix<double>::const_iterator i = m.begin();
   deallog << i->value() << std::endl;
   ++i;
@@ -42,19 +40,19 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -65,9 +63,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

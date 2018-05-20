@@ -13,11 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-
-#include <deal.II/matrix_free/matrix_free.templates.h>
+#include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/vectorization.h>
-#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/matrix_free/matrix_free.templates.h>
 
 #include <iostream>
 
@@ -27,7 +26,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
 template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>>;
-template struct internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<float>>;
+template struct internal::MatrixFreeFunctions::ShapeInfo<
+  VectorizedArray<double>>;
+template struct internal::MatrixFreeFunctions::ShapeInfo<
+  VectorizedArray<float>>;
 
 DEAL_II_NAMESPACE_CLOSE

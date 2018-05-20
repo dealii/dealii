@@ -19,8 +19,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/signaling_nan.h>
-#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/lapack_support.h>
+#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <array>
@@ -35,7 +35,6 @@ namespace Utilities
    */
   namespace LinearAlgebra
   {
-
     /**
      * Return the elements of a continuous Givens rotation matrix and
      * the norm of the input vector.
@@ -62,9 +61,9 @@ namespace Utilities
      *
      * @author Denis Davydov, 2017
      */
-    template<typename NumberType>
-    std::array<NumberType,3> givens_rotation(const NumberType &x,
-                                             const NumberType &y);
+    template <typename NumberType>
+    std::array<NumberType, 3>
+    givens_rotation(const NumberType& x, const NumberType& y);
 
     /**
      * Return the elements of a hyperbolic rotation matrix.
@@ -94,9 +93,9 @@ namespace Utilities
      *
      * @author Denis Davydov, 2017
      */
-    template<typename NumberType>
-    std::array<NumberType,3> hyperbolic_rotation(const NumberType &x,
-                                                 const NumberType &y);
+    template <typename NumberType>
+    std::array<NumberType, 3>
+    hyperbolic_rotation(const NumberType& x, const NumberType& y);
 
     /**
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
@@ -133,11 +132,12 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    double lanczos_largest_eigenvalue(const OperatorType &H,
-                                      const VectorType &v0,
-                                      const unsigned int k,
-                                      VectorMemory<VectorType> &vector_memory,
-                                      std::vector<double> *eigenvalues = nullptr);
+    double
+    lanczos_largest_eigenvalue(const OperatorType&       H,
+                               const VectorType&         v0,
+                               const unsigned int        k,
+                               VectorMemory<VectorType>& vector_memory,
+                               std::vector<double>*      eigenvalues = nullptr);
 
     /**
      * Apply Chebyshev polynomial of the operator @p H to @p x. For a
@@ -189,17 +189,17 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    void chebyshev_filter(VectorType &x,
-                          const OperatorType &H,
-                          const unsigned int n,
-                          const std::pair<double,double> unwanted_spectrum,
-                          const double tau,
-                          VectorMemory<VectorType> &vector_memory);
+    void
+    chebyshev_filter(VectorType&                     x,
+                     const OperatorType&             H,
+                     const unsigned int              n,
+                     const std::pair<double, double> unwanted_spectrum,
+                     const double                    tau,
+                     VectorMemory<VectorType>&       vector_memory);
 
-  }
+  } // namespace LinearAlgebra
 
-}
-
+} // namespace Utilities
 
 /*------------------------- Implementation ----------------------------*/
 
@@ -209,56 +209,51 @@ namespace Utilities
 {
   namespace LinearAlgebra
   {
-
-    template<typename NumberType>
-    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &/*f*/,
-                                                               const std::complex<NumberType> &/*g*/)
+    template <typename NumberType>
+    std::array<std::complex<NumberType>, 3>
+    hyperbolic_rotation(const std::complex<NumberType>& /*f*/,
+                        const std::complex<NumberType>& /*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
-      std::array<NumberType,3> res;
+      std::array<NumberType, 3> res;
       return res;
     }
 
-
-
-    template<typename NumberType>
-    std::array<NumberType,3> hyperbolic_rotation(const NumberType &f,
-                                                 const NumberType &g)
+    template <typename NumberType>
+    std::array<NumberType, 3>
+    hyperbolic_rotation(const NumberType& f, const NumberType& g)
     {
-      Assert (f != 0, ExcDivideByZero());
-      const NumberType tau = g/f;
-      AssertThrow (std::abs(tau) < 1.,
-                   ExcMessage("real-valued Hyperbolic rotation does not exist for ("+
-                              std::to_string(f) +
-                              "," +
-                              std::to_string(g)+
-                              ")"));
-      const NumberType u = std::copysign(sqrt((1.-tau)*(1.+tau)), f); // <-- more stable than std::sqrt(1.-tau*tau)
-      std::array<NumberType,3> csr;
-      csr[0] = 1./u;          // c
-      csr[1] = csr[0] * tau;  // s
-      csr[2] = f *u;          // r
+      Assert(f != 0, ExcDivideByZero());
+      const NumberType tau = g / f;
+      AssertThrow(
+        std::abs(tau) < 1.,
+        ExcMessage("real-valued Hyperbolic rotation does not exist for ("
+                   + std::to_string(f) + "," + std::to_string(g) + ")"));
+      const NumberType u
+        = std::copysign(sqrt((1. - tau) * (1. + tau)),
+                        f); // <-- more stable than std::sqrt(1.-tau*tau)
+      std::array<NumberType, 3> csr;
+      csr[0] = 1. / u;       // c
+      csr[1] = csr[0] * tau; // s
+      csr[2] = f * u;        // r
       return csr;
     }
 
-
-
-    template<typename NumberType>
-    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &/*f*/,
-                                                           const std::complex<NumberType> &/*g*/)
+    template <typename NumberType>
+    std::array<std::complex<NumberType>, 3>
+    givens_rotation(const std::complex<NumberType>& /*f*/,
+                    const std::complex<NumberType>& /*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
-      std::array<NumberType,3> res;
+      std::array<NumberType, 3> res;
       return res;
     }
 
-
-
-    template<typename NumberType>
-    std::array<NumberType,3> givens_rotation(const NumberType &f,
-                                             const NumberType &g)
+    template <typename NumberType>
+    std::array<NumberType, 3>
+    givens_rotation(const NumberType& f, const NumberType& g)
     {
-      std::array<NumberType,3> res;
+      std::array<NumberType, 3> res;
       // naive calculation for "r" may overflow or underflow:
       // c =  x / \sqrt{x^2+y^2}
       // s = -y / \sqrt{x^2+y^2}
@@ -272,46 +267,45 @@ namespace Utilities
       // December 4, 2000.
       // Algorithm 4
       // We implement the latter below:
-      if (g == NumberType())
+      if(g == NumberType())
         {
           res[0] = std::copysign(1., f);
           res[1] = NumberType();
           res[2] = std::abs(f);
         }
-      else if (f == NumberType())
+      else if(f == NumberType())
         {
           res[0] = NumberType();
           res[1] = std::copysign(1., g);
           res[2] = std::abs(g);
         }
-      else if (std::abs(f) > std::abs(g))
+      else if(std::abs(f) > std::abs(g))
         {
-          const NumberType tau  = g/f;
-          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), f);
-          res[0] = 1./u;          // c
-          res[1] = res[0] * tau;  // s
-          res[2] = f * u;         // r
+          const NumberType tau = g / f;
+          const NumberType u   = std::copysign(std::sqrt(1. + tau * tau), f);
+          res[0]               = 1. / u;       // c
+          res[1]               = res[0] * tau; // s
+          res[2]               = f * u;        // r
         }
       else
         {
-          const NumberType tau  = f/g;
-          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), g);
-          res[1] = 1./u;          // s
-          res[0] = res[1] * tau;  // c
-          res[2] = g * u;         // r
+          const NumberType tau = f / g;
+          const NumberType u   = std::copysign(std::sqrt(1. + tau * tau), g);
+          res[1]               = 1. / u;       // s
+          res[0]               = res[1] * tau; // c
+          res[2]               = g * u;        // r
         }
 
       return res;
     }
 
-
-
     template <typename OperatorType, typename VectorType>
-    double lanczos_largest_eigenvalue(const OperatorType &H,
-                                      const VectorType &v0_,
-                                      const unsigned int k,
-                                      VectorMemory<VectorType> &vector_memory,
-                                      std::vector<double> *eigenvalues)
+    double
+    lanczos_largest_eigenvalue(const OperatorType&       H,
+                               const VectorType&         v0_,
+                               const unsigned int        k,
+                               VectorMemory<VectorType>& vector_memory,
+                               std::vector<double>*      eigenvalues)
     {
       // Do k-step Lanczos:
 
@@ -329,29 +323,29 @@ namespace Utilities
       std::vector<double> subdiagonal;
 
       // 1. Normalize input vector
-      (*v) = v0_;
+      (*v)     = v0_;
       double a = v->l2_norm();
-      Assert (a!=0, ExcDivideByZero());
-      (*v) *= 1./a;
+      Assert(a != 0, ExcDivideByZero());
+      (*v) *= 1. / a;
 
       // 2. Compute f = Hv; a = f*v; f <- f - av; T(0,0)=a;
-      H.vmult(*f,*v);
-      a = (*f)*(*v);
-      f->add(-a,*v);
+      H.vmult(*f, *v);
+      a = (*f) * (*v);
+      f->add(-a, *v);
       diagonal.push_back(a);
 
       // 3. Loop over steps
-      for (unsigned int i = 1; i < k; ++i)
+      for(unsigned int i = 1; i < k; ++i)
         {
           // 4. L2 norm of f
           const double b = f->l2_norm();
-          Assert (b!=0, ExcDivideByZero());
+          Assert(b != 0, ExcDivideByZero());
           // 5. v0 <- v; v <- f/b
           *v0 = *v;
-          *v = *f;
-          (*v) *= 1./b;
+          *v  = *f;
+          (*v) *= 1. / b;
           // 6. f = Hv; f <- f - b v0;
-          H.vmult(*f,*v);
+          H.vmult(*f, *v);
           f->add(-b, *v0);
           // 7. a = f*v; f <- f - a v;
           a = (*f) * (*v);
@@ -361,60 +355,62 @@ namespace Utilities
           subdiagonal.push_back(b);
         }
 
-      Assert (diagonal.size() == k,
-              ExcInternalError());
-      Assert (subdiagonal.size() == k-1,
-              ExcInternalError());
+      Assert(diagonal.size() == k, ExcInternalError());
+      Assert(subdiagonal.size() == k - 1, ExcInternalError());
 
       // Use Lapack dstev to get ||T||_2 norm, i.e. the largest eigenvalue
       // of T
       const types::blas_int n = k;
-      std::vector<double> Z;    // unused for eigenvalues-only ("N") job
+      std::vector<double>   Z;       // unused for eigenvalues-only ("N") job
       const types::blas_int ldz = 1; // ^^   (>=1)
-      std::vector<double> work; // ^^
-      types::blas_int info;
+      std::vector<double>   work;    // ^^
+      types::blas_int       info;
       // call lapack_templates.h wrapper:
-      stev ("N", &n,
-            diagonal.data(), subdiagonal.data(),
-            Z.data(), &ldz, work.data(),
-            &info);
+      stev("N",
+           &n,
+           diagonal.data(),
+           subdiagonal.data(),
+           Z.data(),
+           &ldz,
+           work.data(),
+           &info);
 
-      Assert (info == 0,
-              LAPACKSupport::ExcErrorCode("dstev", info));
+      Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
-      if (eigenvalues != nullptr)
+      if(eigenvalues != nullptr)
         {
           eigenvalues->resize(diagonal.size());
-          std::copy(diagonal.begin(), diagonal.end(),
-                    eigenvalues->begin());
+          std::copy(diagonal.begin(), diagonal.end(), eigenvalues->begin());
         }
 
       // note that the largest eigenvalue of T is below the largest
       // eigenvalue of the operator.
       // return ||T||_2 + ||f||_2, although it is not guaranteed to be an upper bound.
-      return diagonal[k-1] + f->l2_norm();
+      return diagonal[k - 1] + f->l2_norm();
     }
 
-
     template <typename OperatorType, typename VectorType>
-    void chebyshev_filter(VectorType &x,
-                          const OperatorType &op,
-                          const unsigned int degree,
-                          const std::pair<double,double> unwanted_spectrum,
-                          const double a_L,
-                          VectorMemory<VectorType> &vector_memory)
+    void
+    chebyshev_filter(VectorType&                     x,
+                     const OperatorType&             op,
+                     const unsigned int              degree,
+                     const std::pair<double, double> unwanted_spectrum,
+                     const double                    a_L,
+                     VectorMemory<VectorType>&       vector_memory)
     {
       const double a = unwanted_spectrum.first;
       const double b = unwanted_spectrum.second;
-      Assert (degree > 0,
-              ExcMessage ("Only positive degrees make sense."));
+      Assert(degree > 0, ExcMessage("Only positive degrees make sense."));
 
       const bool scale = (a_L < std::numeric_limits<double>::infinity());
-      Assert (a < b,
-              ExcMessage("Lower bound of the unwanted spectrum should be smaller than the upper bound."));
+      Assert(
+        a < b,
+        ExcMessage(
+          "Lower bound of the unwanted spectrum should be smaller than the upper bound."));
 
-      Assert (a_L <= a || a_L >= b || !scale,
-              ExcMessage("Scaling point should be outside of the unwanted spectrum."));
+      Assert(a_L <= a || a_L >= b || !scale,
+             ExcMessage(
+               "Scaling point should be outside of the unwanted spectrum."));
 
       // Setup auxiliary vectors:
       typename VectorMemory<VectorType>::Pointer p_y(vector_memory);
@@ -424,8 +420,8 @@ namespace Utilities
       p_yn->reinit(x);
 
       // convenience to avoid pointers
-      VectorType &y   = *p_y;
-      VectorType &yn  = *p_yn;
+      VectorType& y  = *p_y;
+      VectorType& yn = *p_yn;
 
       // Below is an implementation of
       // Algorithm 3.2 in Zhou et al, Journal of Computational Physics 274 (2014) 770-782
@@ -439,23 +435,24 @@ namespace Utilities
       //   Yt =(H∗Y−c∗Y)∗(2∗σnew/e)−(σ∗σnew)∗X;
       //   X =Y; Y =Yt; σ =σnew;
 
-      const double e = (b-a)/2.;
-      const double c = (a+b)/2.;
-      const double alpha = 1./e;
-      const double beta = - c/e;
+      const double e     = (b - a) / 2.;
+      const double c     = (a + b) / 2.;
+      const double alpha = 1. / e;
+      const double beta  = -c / e;
 
-      const double sigma1 = e/(a_L - c); // BUGFIX which is relevant for odd degrees
-      double sigma = scale ? sigma1 : 1.;
-      const double tau = 2./sigma;
-      op.vmult(y,x);
-      y.sadd(alpha*sigma, beta*sigma, x);
+      const double sigma1
+        = e / (a_L - c); // BUGFIX which is relevant for odd degrees
+      double       sigma = scale ? sigma1 : 1.;
+      const double tau   = 2. / sigma;
+      op.vmult(y, x);
+      y.sadd(alpha * sigma, beta * sigma, x);
 
-      for (unsigned int i = 2; i <= degree; ++i)
+      for(unsigned int i = 2; i <= degree; ++i)
         {
-          const double sigma_new = scale ? 1./(tau-sigma) : 1.;
-          op.vmult(yn,y);
-          yn.sadd(2.*alpha*sigma_new, 2.*beta*sigma_new, y);
-          yn.add(-sigma*sigma_new, x);
+          const double sigma_new = scale ? 1. / (tau - sigma) : 1.;
+          op.vmult(yn, y);
+          yn.sadd(2. * alpha * sigma_new, 2. * beta * sigma_new, y);
+          yn.add(-sigma * sigma_new, x);
           x.swap(y);
           y.swap(yn);
           sigma = sigma_new;
@@ -464,14 +461,11 @@ namespace Utilities
       x.swap(y);
     }
 
-  }
-}
+  } // namespace LinearAlgebra
+} // namespace Utilities
 
 #endif
 
-
-
 DEAL_II_NAMESPACE_CLOSE
-
 
 #endif

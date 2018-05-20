@@ -13,22 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check creation using IdentityMatrix
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<number> m (IdentityMatrix(5));
-  print_matrix (m);
+  FullMatrix<number> m(IdentityMatrix(5));
+  print_matrix(m);
 }
-

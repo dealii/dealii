@@ -13,31 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "block_list.h"
 
 template <int dim>
 void
-test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
+test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs (fe);
+  dof.distribute_mg_dofs(fe);
 
-  const unsigned int level = tr.n_levels()-1;
+  const unsigned int level = tr.n_levels() - 1;
 
   {
     deallog.push("ttttt");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true, true);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, true, true, true, true);
     bl.compress();
     print_patches(bl);
     deallog.push("inv vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -45,14 +45,15 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("ttfft");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, false, false, true);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, true, false, false, true);
     bl.compress();
     print_patches(bl);
     deallog.push("inv vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -60,14 +61,15 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("tffft");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, false, false, false, true);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, false, false, false, true);
     bl.compress();
     print_patches(bl);
     deallog.push("inv vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -75,14 +77,15 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("ftttt");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true, true);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, false, true, true, true, true);
     bl.compress();
     print_patches(bl);
     deallog.push("inv vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -90,14 +93,15 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("fffft");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, false, false, false, false, true);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, false, false, false, false, true);
     bl.compress();
     print_patches(bl);
     deallog.push("inv vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -105,12 +109,13 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("ttttf");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, true, true, true, false);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -118,12 +123,13 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("ttfff");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, true, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, true, false, false, false);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -131,12 +137,13 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("tffff");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, true, false, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, true, false, false, false, false);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -144,12 +151,13 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("ftttf");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, false, true, true, true, false);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -157,12 +165,13 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("fffff");
-    SparsityPattern bl;
+    SparsityPattern           bl;
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, false, false, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, false, false, false, false, false);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for(unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -170,14 +179,14 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
 }
 
-
-int main()
+int
+main()
 {
   initlog();
   deallog.push("2D");
-  test_global_refinement<Triangulation<2> >(&test_block_list<2>);
+  test_global_refinement<Triangulation<2>>(&test_block_list<2>);
   deallog.pop();
   deallog.push("3D");
-  test_global_refinement<Triangulation<3> >(&test_block_list<3>);
+  test_global_refinement<Triangulation<3>>(&test_block_list<3>);
   deallog.pop();
 }

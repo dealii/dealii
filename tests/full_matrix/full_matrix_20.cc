@@ -13,22 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::trace
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
   deallog << m.trace() << std::endl;
 }

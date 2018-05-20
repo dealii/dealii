@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check MGLevelObject::apply()
 
 #include "../tests.h"
@@ -23,27 +22,24 @@
 
 using namespace std;
 
-
 template <class T>
-void check(MGLevelObject<T> &obj)
+void
+check(MGLevelObject<T>& obj)
 {
-  obj.apply([&] (const unsigned int lvl, T & value)
-  {
-    value = (T)lvl;
-  });
+  obj.apply([&](const unsigned int lvl, T& value) { value = (T) lvl; });
 
-  obj.apply([&] (const unsigned int lvl, T & value)
-  {
+  obj.apply([&](const unsigned int lvl, T& value) {
     deallog << "lvl: " << lvl << " value: " << value << std::endl;
   });
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  MGLevelObject<double> o(2,4);
+  MGLevelObject<double> o(2, 4);
   check(o);
-  o.resize(0,1);
+  o.resize(0, 1);
   check(o);
 }

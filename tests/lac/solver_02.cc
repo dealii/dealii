@@ -13,26 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test lucky breakdown in GMRES (and others)
 
-#include "../tests.h"
 #include "../testmatrix.h"
+#include "../tests.h"
+#include <deal.II/base/point.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/solver_gmres.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/base/point.h>
 
 template <typename SolverType>
-void test()
+void
+test()
 {
   const unsigned int size = 3;
-  SparsityPattern sparsity(size, size, 1);
+  SparsityPattern    sparsity(size, size, 1);
   sparsity.compress();
   SparseMatrix<double> mat;
   mat.reinit(sparsity);
@@ -43,24 +42,24 @@ void test()
   solvec.reinit(size);
 
   rhs.reinit(size);
-  rhs(size-1)=1.0;
+  rhs(size - 1) = 1.0;
 
   SolverControl solvctrl(1000, 1e-12, true);
-  SolverType solver(solvctrl);
+  SolverType    solver(solvctrl);
 
   PreconditionIdentity precond;
   solver.solve(mat, solvec, rhs, precond);
   solvec.print(deallog);
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  test<SolverGMRES<Vector<double> > >();
-  test<SolverCG<Vector<double> > >();
-  test<SolverFGMRES<Vector<double> > >();
+  test<SolverGMRES<Vector<double>>>();
+  test<SolverCG<Vector<double>>>();
+  test<SolverFGMRES<Vector<double>>>();
 }
-

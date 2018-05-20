@@ -13,60 +13,47 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/derivative_form.h>
-#include <deal.II/base/quadrature.h>
-#include <deal.II/base/qprojector.h>
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/std_cxx14/memory.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/full_matrix.h>
 
-#include <cmath>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <memory>
-
 
 DEAL_II_NAMESPACE_OPEN
 
-
-
-
 template <int dim, int spacedim>
-MappingQ1<dim,spacedim>::MappingQ1 ()
-  :
-  MappingQGeneric<dim,spacedim> (1)
+MappingQ1<dim, spacedim>::MappingQ1() : MappingQGeneric<dim, spacedim>(1)
 {}
 
-
-
 template <int dim, int spacedim>
-std::unique_ptr<Mapping<dim,spacedim> >
-MappingQ1<dim,spacedim>::clone () const
+std::unique_ptr<Mapping<dim, spacedim>>
+MappingQ1<dim, spacedim>::clone() const
 {
-  return std_cxx14::make_unique<MappingQ1<dim,spacedim>>(*this);
+  return std_cxx14::make_unique<MappingQ1<dim, spacedim>>(*this);
 }
 
 //---------------------------------------------------------------------------
 
-
 template <int dim, int spacedim>
-MappingQGeneric<dim,spacedim>
-StaticMappingQ1<dim,spacedim>::mapping = MappingQGeneric<dim,spacedim>(1);
-
-
+MappingQGeneric<dim, spacedim> StaticMappingQ1<dim, spacedim>::mapping
+  = MappingQGeneric<dim, spacedim>(1);
 
 //--------------------------- Explicit instantiations -----------------------
 #include "mapping_q1.inst"
-
 
 DEAL_II_NAMESPACE_CLOSE

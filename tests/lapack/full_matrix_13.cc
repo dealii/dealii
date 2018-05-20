@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Tests LAPACKFullMatrix::operator*= and operator/=
 
 #include "../tests.h"
@@ -21,16 +20,15 @@
 
 #include <iostream>
 
-
-
-void test()
+void
+test()
 {
-  const unsigned int m=7;
-  const unsigned int n=11;
-  LAPACKFullMatrix<double> A(m,n);
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      A(i,j) = random_value<double>();
+  const unsigned int       m = 7;
+  const unsigned int       n = 11;
+  LAPACKFullMatrix<double> A(m, n);
+  for(unsigned int i = 0; i < m; ++i)
+    for(unsigned int j = 0; j < n; ++j)
+      A(i, j) = random_value<double>();
 
   LAPACKFullMatrix<double> A_check(A);
 
@@ -40,25 +38,28 @@ void test()
   A *= factor;
 
   // test multiplication
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      AssertThrow(std::abs(A(i,j)-factor*A_check(i,j))<1.e-12,ExcInternalError());
+  for(unsigned int i = 0; i < m; ++i)
+    for(unsigned int j = 0; j < n; ++j)
+      AssertThrow(std::abs(A(i, j) - factor * A_check(i, j)) < 1.e-12,
+                  ExcInternalError());
 
   // divide by factor
   A /= factor;
 
   // test division
-  for (unsigned int i=0; i<m; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      AssertThrow(std::abs(A(i,j)-A_check(i,j))<1.e-12,ExcInternalError());
+  for(unsigned int i = 0; i < m; ++i)
+    for(unsigned int j = 0; j < n; ++j)
+      AssertThrow(std::abs(A(i, j) - A_check(i, j)) < 1.e-12,
+                  ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 

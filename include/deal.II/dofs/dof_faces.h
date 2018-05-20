@@ -16,7 +16,6 @@
 #ifndef dealii_dof_faces_h
 #define dealii_dof_faces_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/dofs/dof_objects.h>
@@ -34,7 +33,6 @@ namespace internal
    */
   namespace DoFHandlerImplementation
   {
-
     /**
      *
      * <h4>DoFFaces</h4>
@@ -89,15 +87,16 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
 
     /**
@@ -119,15 +118,16 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
 
     /**
@@ -154,42 +154,39 @@ namespace internal
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive& ar, const unsigned int version);
     };
 
-
-
     template <class Archive>
-    void DoFFaces<1>::serialize (Archive &,
-                                 const unsigned int)
+    void
+    DoFFaces<1>::serialize(Archive&, const unsigned int)
     {}
 
-
     template <class Archive>
-    void DoFFaces<2>::serialize (Archive &ar,
-                                 const unsigned int)
+    void
+    DoFFaces<2>::serialize(Archive& ar, const unsigned int)
     {
-      ar &lines;
+      ar& lines;
     }
 
-
     template <class Archive>
-    void DoFFaces<3>::serialize (Archive &ar,
-                                 const unsigned int)
+    void
+    DoFFaces<3>::serialize(Archive& ar, const unsigned int)
     {
-      ar &lines &quads;
+      ar& lines& quads;
     }
 
-  }
-}
+  } // namespace DoFHandlerImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

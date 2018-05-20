@@ -13,58 +13,51 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the results of FECollection::n_components()
 
-
 #include "../tests.h"
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-
-
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/hp/fe_collection.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   // test things with a collection of
   // primitive elements
   {
     hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-    AssertThrow (fe_collection.n_components() == dim,
-                 ExcInternalError());
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
+    fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
+    AssertThrow(fe_collection.n_components() == dim, ExcInternalError());
   }
 
   // now the same with one of the elements
   // being non-primitive
-  if (dim > 1)
+  if(dim > 1)
     {
       hp::FECollection<dim> fe_collection;
-      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
-      fe_collection.push_back (FE_RaviartThomas<dim>(1));
-      AssertThrow (fe_collection.n_components() == dim,
-                   ExcInternalError());
+      fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
+      fe_collection.push_back(FE_RaviartThomas<dim>(1));
+      AssertThrow(fe_collection.n_components() == dim, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

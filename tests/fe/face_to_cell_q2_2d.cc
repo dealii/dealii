@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // it turns out that FE_Q::face_to_cell_index() had a bug for elements beyond
 // Q2 when using the face flip flag. this test is for the 2d case for the Q2
 // case
@@ -24,36 +23,33 @@
 #include <deal.II/fe/fe_q.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  FE_Q<dim> fe(2);
+  FE_Q<dim>          fe(2);
   const unsigned int dofs_per_face = fe.dofs_per_face;
 
-  for (unsigned int face=0; face<4; ++face)
+  for(unsigned int face = 0; face < 4; ++face)
     {
       deallog << "Face=" << face << std::endl;
 
-      for (int flip=0; flip<2; ++flip)
+      for(int flip = 0; flip < 2; ++flip)
         {
-          deallog << "  flip=" << (flip == 0 ? "false" : "true")
-                  << std::endl
+          deallog << "  flip=" << (flip == 0 ? "false" : "true") << std::endl
                   << "    ";
-          for (unsigned int i = 0; i < dofs_per_face; ++i)
-            deallog << fe.face_to_cell_index(i, face,
-                                             true,
-                                             (flip == 0 ? false : true),
-                                             false) << " - ";
+          for(unsigned int i = 0; i < dofs_per_face; ++i)
+            deallog << fe.face_to_cell_index(
+                         i, face, true, (flip == 0 ? false : true), false)
+                    << " - ";
           deallog << std::endl;
         }
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 
   test<2>();
 }
-
-
-

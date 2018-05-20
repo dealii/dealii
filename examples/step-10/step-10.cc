@@ -17,30 +17,29 @@
  * Authors: Wolfgang Bangerth, Ralf Hartmann, University of Heidelberg, 2001
  */
 
-
 // The first of the following include files are probably well-known by now and
 // need no further explanation.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/convergence_table.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 // This is the only new one: in it, we declare the MappingQ class
 // which we will use for polynomial mappings of arbitrary order:
 #include <deal.II/fe/mapping_q.h>
 
 // And this again is C++:
-#include <iostream>
-#include <fstream>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
 // The last step is as in previous programs:
 namespace Step10
@@ -56,8 +55,6 @@ namespace Step10
   // value as a <code>long double</code> and give it a number of extra digits:
   const long double pi = 3.141592653589793238462643L;
 
-
-
   // Then, the first task will be to generate some output. Since this program
   // is so small, we do not employ object oriented techniques in it and do not
   // declare classes (although, of course, we use the object oriented features
@@ -70,7 +67,8 @@ namespace Step10
   // (hyperball) and outputs the $Q_p$ mapping of its cells for different values
   // of <code>p</code>. Then, we refine the grid once and do so again.
   template <int dim>
-  void gnuplot_output()
+  void
+  gnuplot_output()
   {
     std::cout << "Output of grids into gnuplot files:" << std::endl
               << "===================================" << std::endl;
@@ -81,14 +79,14 @@ namespace Step10
     // (and uses FlatManifold for the interior) so we simply call that
     // function and move on:
     Triangulation<dim> triangulation;
-    GridGenerator::hyper_ball (triangulation);
+    GridGenerator::hyper_ball(triangulation);
 
     // Next generate output for this grid and for a once refined grid. Note
     // that we have hidden the mesh refinement in the loop header, which might
     // be uncommon but nevertheless works. Also it is strangely consistent
     // with incrementing the loop index denoting the refinement level.
-    for (unsigned int refinement=0; refinement<2;
-         ++refinement, triangulation.refine_global(1))
+    for(unsigned int refinement = 0; refinement < 2;
+        ++refinement, triangulation.refine_global(1))
       {
         std::cout << "Refinement level: " << refinement << std::endl;
 
@@ -98,7 +96,7 @@ namespace Step10
         std::string filename_base = "ball_" + Utilities::to_string(refinement);
 
         // Then output the present grid for $Q_1$, $Q_2$, and $Q_3$ mappings:
-        for (unsigned int degree=1; degree<4; ++degree)
+        for(unsigned int degree = 1; degree < 4; ++degree)
           {
             std::cout << "Degree = " << degree << std::endl;
 
@@ -106,7 +104,7 @@ namespace Step10
             // is done using the MappingQ class, which takes as
             // argument to the constructor the polynomial degree which it
             // shall use.
-            const MappingQ<dim> mapping (degree);
+            const MappingQ<dim> mapping(degree);
             // As a side note, for a piecewise linear mapping, you
             // could give a value of <code>1</code> to the constructor
             // of MappingQ, but there is also a class MappingQ1 that
@@ -116,7 +114,6 @@ namespace Step10
             // class that is used implicitly in many places of the
             // library if you do not specify another mapping
             // explicitly.
-
 
             // In degree to actually write out the present grid with this
             // mapping, we set up an object which we will use for output. We
@@ -131,16 +128,14 @@ namespace Step10
             // face is drawn by 30 small lines instead of only one. This is
             // sufficient to give us the impression of seeing a curved line,
             // rather than a set of straight lines.
-            GridOut grid_out;
+            GridOut               grid_out;
             GridOutFlags::Gnuplot gnuplot_flags(false, 60);
             grid_out.set_flags(gnuplot_flags);
 
             // Finally, generate a filename and a file for output:
-            std::string filename = filename_base
-                                   + "_mapping_q_"
-                                   + Utilities::to_string(degree)
-                                   + ".dat";
-            std::ofstream gnuplot_file (filename);
+            std::string filename = filename_base + "_mapping_q_"
+                                   + Utilities::to_string(degree) + ".dat";
+            std::ofstream gnuplot_file(filename);
 
             // Then write out the triangulation to this file. The last
             // argument of the function is a pointer to a mapping object. This
@@ -148,7 +143,7 @@ namespace Step10
             // MappingQ1 object is taken, which we briefly
             // described above. This would then result in a piecewise linear
             // approximation of the true boundary in the output.
-            grid_out.write_gnuplot (triangulation, gnuplot_file, &mapping);
+            grid_out.write_gnuplot(triangulation, gnuplot_file, &mapping);
           }
         std::cout << std::endl;
       }
@@ -178,7 +173,8 @@ namespace Step10
   // constructor of the FEValues object. The actual finite element given to
   // the FEValues object is not used at all, so we could give any.
   template <int dim>
-  void compute_pi_by_area ()
+  void
+  compute_pi_by_area()
   {
     std::cout << "Computation of Pi by the area:" << std::endl
               << "==============================" << std::endl;
@@ -196,16 +192,16 @@ namespace Step10
     const QGauss<dim> quadrature(4);
 
     // Now start by looping over polynomial mapping degrees=1..4:
-    for (unsigned int degree=1; degree<5; ++degree)
+    for(unsigned int degree = 1; degree < 5; ++degree)
       {
         std::cout << "Degree = " << degree << std::endl;
 
         // First generate the triangulation, the boundary and the mapping
         // object as already seen.
         Triangulation<dim> triangulation;
-        GridGenerator::hyper_ball (triangulation);
+        GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping (degree);
+        const MappingQ<dim> mapping(degree);
 
         // We now create a finite element. Unlike the rest of the example
         // programs, we do not actually need to do any computations with shape
@@ -220,7 +216,7 @@ namespace Step10
         // use it, but it will provide us with `active_cell_iterators' that
         // are needed to reinitialize the FEValues object on each cell of the
         // triangulation.
-        DoFHandler<dim> dof_handler (triangulation);
+        DoFHandler<dim> dof_handler(triangulation);
 
         // Now we set up the FEValues object, giving the Mapping, the dummy
         // finite element and the quadrature object to the constructor,
@@ -235,7 +231,7 @@ namespace Step10
         // computation of the mapping from unit to real cell. In previous
         // examples, this argument was omitted, resulting in the implicit use
         // of an object of type MappingQ1.
-        FEValues<dim> fe_values (mapping, fe, quadrature, update_JxW_values);
+        FEValues<dim> fe_values(mapping, fe, quadrature, update_JxW_values);
 
         // We employ an object of the ConvergenceTable class to store all
         // important data like the approximated values for $\pi$ and the error
@@ -245,8 +241,8 @@ namespace Step10
         ConvergenceTable table;
 
         // Now we loop over several refinement steps of the triangulation.
-        for (unsigned int refinement=0; refinement<6;
-             ++refinement, triangulation.refine_global (1))
+        for(unsigned int refinement = 0; refinement < 6;
+            ++refinement, triangulation.refine_global(1))
           {
             // In this loop we first add the number of active cells of the
             // current triangulation to the table. This function automatically
@@ -259,7 +255,7 @@ namespace Step10
             // our special case but we call it to make the DoFHandler happy --
             // otherwise it would throw an assertion in the FEValues::reinit
             // function below.
-            dof_handler.distribute_dofs (fe);
+            dof_handler.distribute_dofs(fe);
 
             // We define the variable area as `long double' like we did for
             // the pi variable before.
@@ -268,14 +264,14 @@ namespace Step10
             // Now we loop over all cells, reinitialize the FEValues object
             // for each cell, and add up all the `JxW' values for this cell to
             // `area'...
-            typename DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
-            for (; cell!=endc; ++cell)
+            typename DoFHandler<dim>::active_cell_iterator cell
+              = dof_handler.begin_active(),
+              endc = dof_handler.end();
+            for(; cell != endc; ++cell)
               {
-                fe_values.reinit (cell);
-                for (unsigned int i=0; i<fe_values.n_quadrature_points; ++i)
-                  area += static_cast<long double>(fe_values.JxW (i));
+                fe_values.reinit(cell);
+                for(unsigned int i = 0; i < fe_values.n_quadrature_points; ++i)
+                  area += static_cast<long double>(fe_values.JxW(i));
               }
 
             // ...and store the resulting area values and the errors in the
@@ -287,8 +283,8 @@ namespace Step10
             // a <code>long double</code>, in contrast to the global namespace
             // where only one such function is declared (which takes and
             // returns a double).
-            table.add_value("eval.pi", static_cast<double> (area));
-            table.add_value("error",   static_cast<double> (std::fabs(area-pi)));
+            table.add_value("eval.pi", static_cast<double>(area));
+            table.add_value("error", static_cast<double>(std::fabs(area - pi)));
           }
 
         // We want to compute the convergence rates of the `error'
@@ -297,7 +293,8 @@ namespace Step10
         // `evaluate_all_convergence_rates'
         table.omit_column_from_convergence_rate_evaluation("cells");
         table.omit_column_from_convergence_rate_evaluation("eval.pi");
-        table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
+        table.evaluate_all_convergence_rates(
+          ConvergenceTable::reduction_rate_log2);
 
         // Finally we set the precision and scientific mode for output of some
         // of the quantities...
@@ -311,13 +308,13 @@ namespace Step10
       }
   }
 
-
   // The following, second function also computes an approximation of $\pi$
   // but this time via the perimeter $2\pi r$ of the domain instead of the
   // area. This function is only a variation of the previous function. So we
   // will mainly give documentation for the differences.
   template <int dim>
-  void compute_pi_by_perimeter ()
+  void
+  compute_pi_by_perimeter()
   {
     std::cout << "Computation of Pi by the perimeter:" << std::endl
               << "===================================" << std::endl;
@@ -325,62 +322,69 @@ namespace Step10
     // We take the same order of quadrature but this time a `dim-1'
     // dimensional quadrature as we will integrate over (boundary) lines
     // rather than over cells.
-    const QGauss<dim-1> quadrature(4);
+    const QGauss<dim - 1> quadrature(4);
 
     // We loop over all degrees, create the triangulation, the boundary, the
     // mapping, the dummy finite element and the DoFHandler object as seen
     // before.
-    for (unsigned int degree=1; degree<5; ++degree)
+    for(unsigned int degree = 1; degree < 5; ++degree)
       {
         std::cout << "Degree = " << degree << std::endl;
         Triangulation<dim> triangulation;
-        GridGenerator::hyper_ball (triangulation);
+        GridGenerator::hyper_ball(triangulation);
 
-        const MappingQ<dim> mapping (degree);
-        const FE_Q<dim>     fe (1);
+        const MappingQ<dim> mapping(degree);
+        const FE_Q<dim>     fe(1);
 
-        DoFHandler<dim> dof_handler (triangulation);
+        DoFHandler<dim> dof_handler(triangulation);
 
         // Then we create a FEFaceValues object instead of a FEValues object
         // as in the previous function. Again, we pass a mapping as first
         // argument.
-        FEFaceValues<dim> fe_face_values (mapping, fe, quadrature,
-                                          update_JxW_values);
+        FEFaceValues<dim> fe_face_values(
+          mapping, fe, quadrature, update_JxW_values);
         ConvergenceTable table;
 
-        for (unsigned int refinement=0; refinement<6;
-             ++refinement, triangulation.refine_global (1))
+        for(unsigned int refinement = 0; refinement < 6;
+            ++refinement, triangulation.refine_global(1))
           {
             table.add_value("cells", triangulation.n_active_cells());
 
-            dof_handler.distribute_dofs (fe);
+            dof_handler.distribute_dofs(fe);
 
             // Now we run over all cells and over all faces of each cell. Only
             // the contributions of the `JxW' values on boundary faces are
             // added to the long double variable `perimeter'.
-            typename DoFHandler<dim>::active_cell_iterator
-            cell = dof_handler.begin_active(),
-            endc = dof_handler.end();
+            typename DoFHandler<dim>::active_cell_iterator cell
+              = dof_handler.begin_active(),
+              endc                = dof_handler.end();
             long double perimeter = 0;
-            for (; cell!=endc; ++cell)
-              for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-                if (cell->face(face_no)->at_boundary())
+            for(; cell != endc; ++cell)
+              for(unsigned int face_no = 0;
+                  face_no < GeometryInfo<dim>::faces_per_cell;
+                  ++face_no)
+                if(cell->face(face_no)->at_boundary())
                   {
                     // We reinit the FEFaceValues object with the cell
                     // iterator and the number of the face.
-                    fe_face_values.reinit (cell, face_no);
-                    for (unsigned int i=0; i<fe_face_values.n_quadrature_points; ++i)
-                      perimeter += static_cast<long double>(fe_face_values.JxW (i));
+                    fe_face_values.reinit(cell, face_no);
+                    for(unsigned int i = 0;
+                        i < fe_face_values.n_quadrature_points;
+                        ++i)
+                      perimeter
+                        += static_cast<long double>(fe_face_values.JxW(i));
                   }
             // Then store the evaluated values in the table...
-            table.add_value("eval.pi", static_cast<double> (perimeter/2.0L));
-            table.add_value("error",   static_cast<double> (std::fabs(perimeter/2.0L-pi)));
+            table.add_value("eval.pi", static_cast<double>(perimeter / 2.0L));
+            table.add_value(
+              "error", static_cast<double>(std::fabs(perimeter / 2.0L - pi)));
           }
 
         // ...and end this function as we did in the previous one:
         table.omit_column_from_convergence_rate_evaluation("cells");
         table.omit_column_from_convergence_rate_evaluation("eval.pi");
-        table.evaluate_all_convergence_rates(ConvergenceTable::reduction_rate_log2);
+        table.evaluate_all_convergence_rates(
+          ConvergenceTable::reduction_rate_log2);
 
         table.set_precision("eval.pi", 16);
         table.set_scientific("error", true);
@@ -390,26 +394,27 @@ namespace Step10
         std::cout << std::endl;
       }
   }
-}
-
+} // namespace Step10
 
 // The following main function just calls the above functions in the order of
 // their appearance. Apart from this, it looks just like the main functions of
 // previous tutorial programs.
-int main ()
+int
+main()
 {
   try
     {
-      std::cout.precision (16);
+      std::cout.precision(16);
 
       Step10::gnuplot_output<2>();
 
-      Step10::compute_pi_by_area<2> ();
-      Step10::compute_pi_by_perimeter<2> ();
+      Step10::compute_pi_by_area<2>();
+      Step10::compute_pi_by_perimeter<2>();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -420,9 +425,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

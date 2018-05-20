@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_polynomials_adini_h
 #define dealii_polynomials_adini_h
 
 #include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -43,7 +42,7 @@ public:
   /**
    * Constructor for the polynomials of the described space
    */
-  PolynomialsAdini ();
+  PolynomialsAdini();
   /**
    * Compute the value and the first and second derivatives of each
    * polynomial at <tt>unit_point</tt>.
@@ -58,10 +57,11 @@ public:
    * compute_grad_grad() functions, see below, in a loop over all polynomials.
    */
 
-  void compute (const Point<2> &unit_point,
-                std::vector<double> &values,
-                std::vector<Tensor<1,2> > &grads,
-                std::vector< Tensor<2,2> > &grad_grads) const;
+  void
+  compute(const Point<2>&            unit_point,
+          std::vector<double>&       values,
+          std::vector<Tensor<1, 2>>& grads,
+          std::vector<Tensor<2, 2>>& grad_grads) const;
 
   /**
    * Compute the value of the <tt>i</tt>th polynomial at <tt>unit_point</tt>.
@@ -69,8 +69,8 @@ public:
    * Consider using compute() instead.
    */
 
-  double compute_value (const unsigned int i,
-                        const Point<2> &p) const;
+  double
+  compute_value(const unsigned int i, const Point<2>& p) const;
 
   /**
    * Compute the gradient of the <tt>i</tt>th polynomial at
@@ -79,8 +79,8 @@ public:
    * Consider using compute() instead.
    */
 
-  Tensor<1,2> compute_grad (const unsigned int i,
-                            const Point<2> &p) const;
+  Tensor<1, 2>
+  compute_grad(const unsigned int i, const Point<2>& p) const;
   /**
    * Compute the second derivative (grad_grad) of the <tt>i</tt>th polynomial
    * at <tt>unit_point</tt>.
@@ -88,8 +88,10 @@ public:
    * Consider using compute() instead.
    */
 
-  Tensor<2,2> compute_grad_grad (const unsigned int i, const Point<2> &p) const;
-  Tensor<2,2> compute_grad_grad_2 (const unsigned int i, const Point<2> &p) const;
+  Tensor<2, 2>
+  compute_grad_grad(const unsigned int i, const Point<2>& p) const;
+  Tensor<2, 2>
+  compute_grad_grad_2(const unsigned int i, const Point<2>& p) const;
 
 private:
   /**
@@ -125,10 +127,7 @@ private:
    * in the order $1,x,y,x^2,y^2,xy,x^3,y^3,xy^2,x^2y,x^3y,xy^3$
    */
   Table<2, double> dxy;
-
 };
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

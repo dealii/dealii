@@ -18,13 +18,13 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
 
-#include <deal.II/base/index_set.h>
+#    include <deal.II/base/index_set.h>
 
-#  include <Epetra_Map.h>
+#    include <Epetra_Map.h>
 
-#include <memory>
+#    include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -32,53 +32,54 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
-    CommunicationPattern::CommunicationPattern(const IndexSet &vector_space_vector_index_set,
-                                               const IndexSet &read_write_vector_index_set,
-                                               const MPI_Comm &communicator)
+    CommunicationPattern::CommunicationPattern(
+      const IndexSet& vector_space_vector_index_set,
+      const IndexSet& read_write_vector_index_set,
+      const MPI_Comm& communicator)
     {
       // virtual functions called in constructors and destructors never use the
       // override in a derived class
       // for clarity be explicit on which function is called
-      CommunicationPattern::reinit(vector_space_vector_index_set, read_write_vector_index_set, communicator);
+      CommunicationPattern::reinit(vector_space_vector_index_set,
+                                   read_write_vector_index_set,
+                                   communicator);
     }
 
-
-
-    void CommunicationPattern::reinit(const IndexSet &vector_space_vector_index_set,
-                                      const IndexSet &read_write_vector_index_set,
-                                      const MPI_Comm &communicator)
+    void
+    CommunicationPattern::reinit(const IndexSet& vector_space_vector_index_set,
+                                 const IndexSet& read_write_vector_index_set,
+                                 const MPI_Comm& communicator)
     {
       comm = std::make_shared<const MPI_Comm>(communicator);
 
-      Epetra_Map vector_space_vector_map = vector_space_vector_index_set.make_trilinos_map(*comm,
-                                           false);
-      Epetra_Map read_write_vector_map = read_write_vector_index_set.make_trilinos_map(*comm,
-                                         true);
+      Epetra_Map vector_space_vector_map
+        = vector_space_vector_index_set.make_trilinos_map(*comm, false);
+      Epetra_Map read_write_vector_map
+        = read_write_vector_index_set.make_trilinos_map(*comm, true);
 
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
       // owned GID.
-      import = std_cxx14::make_unique<Epetra_Import>(read_write_vector_map, vector_space_vector_map);
+      import = std_cxx14::make_unique<Epetra_Import>(read_write_vector_map,
+                                                     vector_space_vector_map);
     }
 
-
-
-    const MPI_Comm &CommunicationPattern::get_mpi_communicator() const
+    const MPI_Comm&
+    CommunicationPattern::get_mpi_communicator() const
     {
       return *comm;
     }
 
-
-
-    const Epetra_Import &CommunicationPattern::get_epetra_import() const
+    const Epetra_Import&
+    CommunicationPattern::get_epetra_import() const
     {
       return *import;
     }
-  }
-}
+  } // namespace EpetraWrappers
+} // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#  endif
 
 #endif

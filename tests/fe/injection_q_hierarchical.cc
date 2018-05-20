@@ -13,20 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 char logname[] = "output";
-
 
 #include "injection_common.h"
 #include <deal.II/fe/fe_q_hierarchical.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
-  deallog << std::setprecision (8);
+  deallog << std::setprecision(8);
 
-  for (unsigned int i=1; i<4; ++i)
-    for (unsigned int j=i; j<4; ++j)
-      do_check (FE_Q_Hierarchical<dim>(i), FE_Q_Hierarchical<dim>(j));
+  for(unsigned int i = 1; i < 4; ++i)
+    for(unsigned int j = i; j < 4; ++j)
+      do_check(FE_Q_Hierarchical<dim>(i), FE_Q_Hierarchical<dim>(j));
 }

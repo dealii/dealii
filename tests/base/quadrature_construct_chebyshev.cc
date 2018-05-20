@@ -13,18 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that the QGaussChebyshev, QGaussRadauChebyshev and QGaussLobattoChebyshev,
 // can be constructed in all dimensions. Previously, this failed since the base class
 // constructor used required the one-dimensional quadrature formula to integrate
 // constants exactly. This is not true for the classes considered here.
 
-
 #include "../tests.h"
 
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
 
 template <int dim>
 void
@@ -38,7 +35,8 @@ construct_quadrature()
   deallog << "QGaussLobattoChebyshev<" << dim << ">: OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -46,4 +44,3 @@ int main()
   construct_quadrature<2>();
   construct_quadrature<3>();
 }
-

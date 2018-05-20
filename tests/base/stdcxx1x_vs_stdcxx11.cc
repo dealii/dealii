@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // ensure that we can refer to symbols using the old namespace
 // std_cxx1x even if we only include the newer base/std_cxx11/*h
 // include files (e.g., if we use the old namespace name but don't
@@ -21,16 +20,14 @@
 // from indirect #includes made in the library which only include
 // base/std_cxx11/*h)
 
-
 #include "../tests.h"
 #include <deal.II/base/std_cxx11/shared_ptr.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   std_cxx1x::shared_ptr<int> p;
   deallog << "OK" << std::endl;
 }
-

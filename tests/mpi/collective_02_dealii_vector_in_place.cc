@@ -13,30 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Utilities::MPI::sum() for dealii::Vector, but with input=output
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   {
     Vector<int> sums(2);
     sums[0] = 1;
     sums[1] = 2;
-    Utilities::MPI::sum (sums,
-                         MPI_COMM_WORLD,
-                         sums);
-    Assert (sums[0] == numprocs, ExcInternalError());
-    Assert (sums[1] == 2*numprocs, ExcInternalError());
+    Utilities::MPI::sum(sums, MPI_COMM_WORLD, sums);
+    Assert(sums[0] == numprocs, ExcInternalError());
+    Assert(sums[1] == 2 * numprocs, ExcInternalError());
 
-    if (myid==0)
+    if(myid == 0)
       deallog << sums[0] << ' ' << sums[1] << std::endl;
   }
 
@@ -44,31 +41,29 @@ void test()
     Vector<double> sums(2);
     sums[0] = 1.5;
     sums[1] = 2.5;
-    Utilities::MPI::sum (sums,
-                         MPI_COMM_WORLD,
-                         sums);
-    Assert (sums[0] == 1.5 * numprocs, ExcInternalError());
-    Assert (sums[1] == 2.5 * numprocs, ExcInternalError());
+    Utilities::MPI::sum(sums, MPI_COMM_WORLD, sums);
+    Assert(sums[0] == 1.5 * numprocs, ExcInternalError());
+    Assert(sums[1] == 2.5 * numprocs, ExcInternalError());
 
-    if (myid==0)
+    if(myid == 0)
       deallog << sums[0] << ' ' << sums[1] << std::endl;
   }
-
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 #else
-  (void)argc;
-  (void)argv;
+  (void) argc;
+  (void) argv;
   compile_time_error;
 
 #endif
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 

@@ -13,49 +13,45 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test FE_Nothing::operator==()
 
-
 #include "../tests.h"
+#include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/base/function.h>
-
-
-
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << std::boolalpha;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(1, false)) << std::endl;
   deallog << (FE_Nothing<dim>(1) == FE_Nothing<dim>(2)) << std::endl;
-  deallog << (FE_Nothing<dim>(2, true) == FE_Nothing<dim>(2, false)) << std::endl;
-  deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true)) << std::endl;
+  deallog << (FE_Nothing<dim>(2, true) == FE_Nothing<dim>(2, false))
+          << std::endl;
+  deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true))
+          << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

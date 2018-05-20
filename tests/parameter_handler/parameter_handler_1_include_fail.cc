@@ -13,26 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that we can do include statements. the current test verifies what
 // happens if such an include statement fails
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+void
+check(const char* p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1,0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3));
+  prm.declare_entry(
+    "test_1", "-1,0", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
 
   std::ifstream in(p);
   try
     {
-      prm.parse_input (in);
+      prm.parse_input(in);
     }
-  catch (ParameterHandler::ExcCannotOpenIncludeStatementFile &exc)
+  catch(ParameterHandler::ExcCannotOpenIncludeStatementFile& exc)
     {
       deallog << exc.get_exc_name() << std::endl;
       exc.print_info(deallog.get_file_stream());
@@ -40,18 +39,18 @@ void check (const char *p)
 
   // Even though the parameter handler failed to finish parsing, it should
   // have still picked up the first statement:
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   // go into the source dir to read files there. this
   // is necessary so that we can include files there
-  chdir (SOURCE_DIR);
-  check ("parameter_handler_1_include_fail.prm");
+  chdir(SOURCE_DIR);
+  check("parameter_handler_1_include_fail.prm");
 
   return 0;
 }

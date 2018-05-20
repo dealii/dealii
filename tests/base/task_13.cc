@@ -13,34 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
 // verify that we can create tasks both via lambdas and via std::bind
 // expressions. this obviously requires C++11
 //
 // this is a small variation of the _12 test
-
 
 #include "../tests.h"
 #include <unistd.h>
 
 #include <deal.II/base/thread_management.h>
 
-
 // return a double, to make sure we correctly identify the return type
 // of the expressions used in new_task(...)
-double test (int i)
+double
+test(int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
-  sleep (1);
+  sleep(1);
   deallog << "Task " << i << " finished!" << std::endl;
 
   return 3.141;
 }
 
-
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -48,14 +44,14 @@ int main()
   Threads::TaskGroup<double> tg;
 
   // use variations of ways we can declare lambdas
-  tg += Threads::new_task ([]() -> double { return test(1); });
-  tg += Threads::new_task ([]() -> double { return (float)test(2); });
+  tg += Threads::new_task([]() -> double { return test(1); });
+  tg += Threads::new_task([]() -> double { return (float) test(2); });
 
-  tg.join_all ();
+  tg.join_all();
 
   deallog << "OK" << std::endl;
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

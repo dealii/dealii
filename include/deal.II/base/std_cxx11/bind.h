@@ -16,11 +16,9 @@
 #ifndef dealii_std_cxx11_bind_h
 #define dealii_std_cxx11_bind_h
 
-
 #include <deal.II/base/config.h>
 
-
-#  include <functional>
+#include <functional>
 
 DEAL_II_NAMESPACE_OPEN
 // In boost, the placeholders _1, _2, ... are in the global namespace. In
@@ -34,14 +32,13 @@ namespace std_cxx11
 {
   using namespace std::placeholders;
   using std::bind;
-  using std::ref;
   using std::cref;
+  using std::ref;
   using std::reference_wrapper;
 
   namespace placeholders = std::placeholders;
-}
+} // namespace std_cxx11
 DEAL_II_NAMESPACE_CLOSE
-
 
 // then allow using the old namespace name instead of the new one
 DEAL_II_NAMESPACE_OPEN

@@ -13,47 +13,47 @@
 //
 // ---------------------------------------------------------------------
 
-
 // plot PolynomialsRaviartThomas on the reference cell
 
 #include "../tests.h"
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 
 using namespace std;
 
 template <int dim>
-void plot(const PolynomialsRaviartThomas<dim> &poly)
+void
+plot(const PolynomialsRaviartThomas<dim>& poly)
 {
-  QTrapez<1> base_quadrature;
-  QIterated<dim> quadrature(base_quadrature, poly.degree()+3);
-  std::vector<Tensor<1,dim> > values(poly.n());
-  std::vector<Tensor<2,dim> > grads;
-  std::vector<Tensor<3,dim> > grads2;
-  std::vector<Tensor<4,dim> > thirds;
-  std::vector<Tensor<5,dim> > fourths;
+  QTrapez<1>                  base_quadrature;
+  QIterated<dim>              quadrature(base_quadrature, poly.degree() + 3);
+  std::vector<Tensor<1, dim>> values(poly.n());
+  std::vector<Tensor<2, dim>> grads;
+  std::vector<Tensor<3, dim>> grads2;
+  std::vector<Tensor<4, dim>> thirds;
+  std::vector<Tensor<5, dim>> fourths;
 
-
-  for (unsigned int k=0; k<quadrature.size(); ++k)
+  for(unsigned int k = 0; k < quadrature.size(); ++k)
     {
-      if (k%(poly.degree()+4) == 0)
+      if(k % (poly.degree() + 4) == 0)
         deallog << "RT" << poly.degree() << '<' << dim << '>' << std::endl;
 
-      deallog << "RT" << poly.degree() << '<' << dim << '>'
-              << '\t' << quadrature.point(k);
+      deallog << "RT" << poly.degree() << '<' << dim << '>' << '\t'
+              << quadrature.point(k);
       poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
 
-      for (unsigned int i=0; i<poly.n(); ++i)
-        for (unsigned int d=0; d<dim; ++d)
+      for(unsigned int i = 0; i < poly.n(); ++i)
+        for(unsigned int d = 0; d < dim; ++d)
           deallog << '\t' << values[i][d];
       deallog << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

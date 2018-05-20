@@ -16,9 +16,8 @@
 #ifndef dealii_template_constraints_h
 #define dealii_template_constraints_h
 
-
-#include <deal.II/base/config.h>
 #include <deal.II/base/complex_overloads.h>
+#include <deal.II/base/config.h>
 
 #include <complex>
 #include <utility>
@@ -30,8 +29,8 @@ namespace internal
   namespace TemplateConstraints
   {
     // helper struct for is_base_of_all and all_same_as
-    template <bool... Values> struct BoolStorage;
-
+    template <bool... Values>
+    struct BoolStorage;
 
     /**
      * A helper class whose `value` member is true or false depending on
@@ -40,12 +39,12 @@ namespace internal
     template <bool... Values>
     struct all_true
     {
-      static constexpr bool value =
-        std::is_same<BoolStorage<Values..., true>,
-        BoolStorage<true, Values...>>::value;
+      static constexpr bool value
+        = std::is_same<BoolStorage<Values..., true>,
+                       BoolStorage<true, Values...>>::value;
     };
-  }
-}
+  } // namespace TemplateConstraints
+} // namespace internal
 
 /**
  * This struct is a generalization of std::is_base_of<Base, Derived>
@@ -56,11 +55,9 @@ namespace internal
 template <class Base, class... Derived>
 struct is_base_of_all
 {
-  static constexpr bool value =
-    internal::TemplateConstraints::all_true<std::is_base_of<Base,Derived>::value...>::value;
+  static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_base_of<Base, Derived>::value...>::value;
 };
-
-
 
 /**
  * This struct is a generalization of std::is_same to template
@@ -71,11 +68,9 @@ struct is_base_of_all
 template <class Type, class... Types>
 struct all_same_as
 {
-  static constexpr bool value =
-    internal::TemplateConstraints::all_true<std::is_same<Type, Types>::value...>::value;
+  static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_same<Type, Types>::value...>::value;
 };
-
-
 
 /*
  * A generalization of `std::enable_if` that only works if
@@ -83,13 +78,12 @@ struct all_same_as
  * true.
  */
 template <bool... Values>
-struct enable_if_all : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
+struct enable_if_all
+  : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
 {};
 
-
-
-template <bool, typename> struct constraint_and_return_value;
-
+template <bool, typename>
+struct constraint_and_return_value;
 
 /**
  * This specialization of the general template for the case of a <tt>true</tt>
@@ -149,12 +143,10 @@ template <bool, typename> struct constraint_and_return_value;
  * @author Wolfgang Bangerth, 2003
  */
 template <typename T>
-struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
+struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
 {
   typedef T type;
 };
-
-
 
 /**
  * A template class that simply exports its template argument as a local
@@ -213,8 +205,6 @@ struct identity
   typedef T type;
 };
 
-
-
 /**
  * A class to perform comparisons of arbitrary pointers for equality. In some
  * circumstances, one would like to make sure that two arguments to a function
@@ -240,11 +230,11 @@ struct PointerComparison
    * two pointers are equal.
    */
   template <typename T>
-  static bool equal (const T *p1, const T *p2)
+  static bool
+  equal(const T* p1, const T* p2)
   {
-    return (p1==p2);
+    return (p1 == p2);
   }
-
 
   /**
    * Comparison function for pointers of different types. The C++ language
@@ -253,14 +243,12 @@ struct PointerComparison
    * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>
-  static bool equal (const T *, const U *)
+  static bool
+  equal(const T*, const U*)
   {
     return false;
   }
-
 };
-
-
 
 namespace internal
 {
@@ -328,7 +316,6 @@ namespace internal
   struct DEAL_II_DEPRECATED int2type
   {};
 
-
   /**
    * The equivalent of the int2type class for boolean arguments.
    *
@@ -339,9 +326,7 @@ namespace internal
   template <bool B>
   struct DEAL_II_DEPRECATED bool2type
   {};
-}
-
-
+} // namespace internal
 
 /**
  * A type that can be used to determine whether two types are equal. It allows
@@ -363,14 +348,11 @@ namespace internal
  * instead of this class.
  */
 template <typename T, typename U>
-struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T,U>
+struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T, U>
 {};
-
-
 
 namespace internal
 {
-
   /**
    * A struct that implements the default product type resulting from the
    * multiplication of two types.
@@ -389,9 +371,7 @@ namespace internal
     typedef decltype(std::declval<T>() * std::declval<U>()) type;
   };
 
-}
-
-
+} // namespace internal
 
 /**
  * A class with a local typedef that represents the type that results from the
@@ -444,57 +424,55 @@ namespace internal
 template <typename T, typename U>
 struct ProductType
 {
-  typedef typename internal::ProductTypeImpl<
-  typename std::decay<T>::type, typename std::decay<U>::type>::type type;
+  typedef
+    typename internal::ProductTypeImpl<typename std::decay<T>::type,
+                                       typename std::decay<U>::type>::type type;
 };
 
 namespace internal
 {
-
   // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
   // other than T (not even in C++11, or C++14). We provide our own overloads
   // in base/complex_overloads.h, but in order for them to work, we have to
   // manually specify all products we want to allow:
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,std::complex<T> >
+  struct ProductTypeImpl<std::complex<T>, std::complex<T>>
   {
     typedef std::complex<T> type;
   };
 
   template <typename T, typename U>
-  struct ProductTypeImpl<std::complex<T>,std::complex<U> >
+  struct ProductTypeImpl<std::complex<T>, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<T,U>::type> type;
+    typedef std::complex<typename ProductType<T, U>::type> type;
   };
 
   template <typename U>
-  struct ProductTypeImpl<double,std::complex<U> >
+  struct ProductTypeImpl<double, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<double,U>::type> type;
+    typedef std::complex<typename ProductType<double, U>::type> type;
   };
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,double>
+  struct ProductTypeImpl<std::complex<T>, double>
   {
-    typedef std::complex<typename ProductType<T,double>::type> type;
+    typedef std::complex<typename ProductType<T, double>::type> type;
   };
 
   template <typename U>
-  struct ProductTypeImpl<float,std::complex<U> >
+  struct ProductTypeImpl<float, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<float,U>::type> type;
+    typedef std::complex<typename ProductType<float, U>::type> type;
   };
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,float>
+  struct ProductTypeImpl<std::complex<T>, float>
   {
-    typedef std::complex<typename ProductType<T,float>::type> type;
+    typedef std::complex<typename ProductType<T, float>::type> type;
   };
 
-}
-
-
+} // namespace internal
 
 /**
  * This class provides a local typedef @p type that is equal to the template
@@ -550,37 +528,41 @@ namespace internal
 template <typename T>
 struct EnableIfScalar;
 
-
-template <> struct EnableIfScalar<double>
+template <>
+struct EnableIfScalar<double>
 {
   typedef double type;
 };
 
-template <> struct EnableIfScalar<float>
+template <>
+struct EnableIfScalar<float>
 {
   typedef float type;
 };
 
-template <> struct EnableIfScalar<long double>
+template <>
+struct EnableIfScalar<long double>
 {
   typedef long double type;
 };
 
-template <> struct EnableIfScalar<int>
+template <>
+struct EnableIfScalar<int>
 {
   typedef int type;
 };
 
-template <> struct EnableIfScalar<unsigned int>
+template <>
+struct EnableIfScalar<unsigned int>
 {
   typedef unsigned int type;
 };
 
-template <typename T> struct EnableIfScalar<std::complex<T> >
+template <typename T>
+struct EnableIfScalar<std::complex<T>>
 {
   typedef std::complex<T> type;
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 

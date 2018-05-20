@@ -13,29 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/mapping_collection.h>
 
 // check
 //   DoFTools::
 //   map_dofs_to_support_points(...);
 // for the hp case
 
-
 using namespace std;
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);
@@ -47,14 +46,14 @@ void test ()
 
   FESystem<dim> fe_system(u, 2, p, 1);
 
-  MappingQ<dim> mapping(2);
+  MappingQ<dim>              mapping(2);
   hp::MappingCollection<dim> mapping_collection(mapping);
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(fe_system);
 
   hp::DoFHandler<dim> hp_dof_handler(triangulation);
-  DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim>     dof_handler(triangulation);
 
   //distribute dofs
   hp_dof_handler.distribute_dofs(fe_collection);
@@ -62,32 +61,33 @@ void test ()
 
   //basically, dof_handler and hp_dof_handler are the same
   //so they should contain the same number of dofs.
-  Assert(hp_dof_handler.n_dofs() == dof_handler.n_dofs(),ExcInternalError());
+  Assert(hp_dof_handler.n_dofs() == dof_handler.n_dofs(), ExcInternalError());
 
   //now map the dofs to the support points and show them on the screen
-  std::vector<Point<dim> > map(dof_handler.n_dofs());
-  std::vector<Point<dim> > hp_map(hp_dof_handler.n_dofs());
+  std::vector<Point<dim>> map(dof_handler.n_dofs());
+  std::vector<Point<dim>> hp_map(hp_dof_handler.n_dofs());
 
   DoFTools::map_dofs_to_support_points(mapping, dof_handler, map);
-  DoFTools::map_dofs_to_support_points(mapping_collection, hp_dof_handler, hp_map);
+  DoFTools::map_dofs_to_support_points(
+    mapping_collection, hp_dof_handler, hp_map);
 
   // output the elements
-  for (unsigned int i=0; i<hp_map.size(); i++)
+  for(unsigned int i = 0; i < hp_map.size(); i++)
     {
       //both maps should contain the same
-      Assert(hp_map[i]==map[i], ExcInternalError());
+      Assert(hp_map[i] == map[i], ExcInternalError());
       deallog << hp_map[i] << " ";
     }
-  deallog<<std::endl;
-
+  deallog << std::endl;
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
   return 0;
 }

@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/cuda_sparse_matrix.h>
 #include <deal.II/base/cuda_size.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/cuda_atomic.h>
+#include <deal.II/lac/cuda_sparse_matrix.h>
 
 #ifdef DEAL_II_WITH_CUDA
 
-#include <cusparse.h>
+#  include <cusparse.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -29,193 +29,219 @@ namespace CUDAWrappers
   namespace internal
   {
     template <typename Number>
-    __global__ void scale(Number                                         *val,
-                          const Number                                    a,
-                          const typename SparseMatrix<Number>::size_type  N)
+    __global__ void
+    scale(Number*                                        val,
+          const Number                                   a,
+          const typename SparseMatrix<Number>::size_type N)
     {
-      const typename SparseMatrix<Number>::size_type idx = threadIdx.x +
-                                                           blockIdx.x * blockDim.x;
-      if (idx<N)
+      const typename SparseMatrix<Number>::size_type idx
+        = threadIdx.x + blockIdx.x * blockDim.x;
+      if(idx < N)
         val[idx] *= a;
     }
 
-
-
-    void csrmv(cusparseHandle_t handle, bool transpose, int m, int n, int nnz,
-               const cusparseMatDescr_t descr, const float *A_val_dev,
-               const int *A_row_ptr_dev, const int *A_column_index_dev,
-               const float *x, bool add,  float *y)
+    void
+    csrmv(cusparseHandle_t         handle,
+          bool                     transpose,
+          int                      m,
+          int                      n,
+          int                      nnz,
+          const cusparseMatDescr_t descr,
+          const float*             A_val_dev,
+          const int*               A_row_ptr_dev,
+          const int*               A_column_index_dev,
+          const float*             x,
+          bool                     add,
+          float*                   y)
     {
-      float alpha = 1.;
-      float beta = add ? 1. : 0.;
-      cusparseOperation_t cusparse_operation = transpose ?
-                                               CUSPARSE_OPERATION_TRANSPOSE :
-                                               CUSPARSE_OPERATION_NON_TRANSPOSE;
+      float               alpha = 1.;
+      float               beta  = add ? 1. : 0.;
+      cusparseOperation_t cusparse_operation
+        = transpose ? CUSPARSE_OPERATION_TRANSPOSE :
+                      CUSPARSE_OPERATION_NON_TRANSPOSE;
 
       // This function performs y = alpha*op(A)*x + beta*y
-      cusparseStatus_t error_code = cusparseScsrmv(handle, cusparse_operation,
-                                                   m, n, nnz, &alpha, descr,
-                                                   A_val_dev, A_row_ptr_dev,
-                                                   A_column_index_dev, x, &beta, y);
+      cusparseStatus_t error_code = cusparseScsrmv(handle,
+                                                   cusparse_operation,
+                                                   m,
+                                                   n,
+                                                   nnz,
+                                                   &alpha,
+                                                   descr,
+                                                   A_val_dev,
+                                                   A_row_ptr_dev,
+                                                   A_column_index_dev,
+                                                   x,
+                                                   &beta,
+                                                   y);
       AssertCusparse(error_code);
     }
 
-
-
-    void csrmv(cusparseHandle_t handle, bool transpose, int m, int n, int nnz,
-               const cusparseMatDescr_t descr, const double *A_val_dev,
-               const int *A_row_ptr_dev, const int *A_column_index_dev,
-               const double *x, bool add, double *y)
+    void
+    csrmv(cusparseHandle_t         handle,
+          bool                     transpose,
+          int                      m,
+          int                      n,
+          int                      nnz,
+          const cusparseMatDescr_t descr,
+          const double*            A_val_dev,
+          const int*               A_row_ptr_dev,
+          const int*               A_column_index_dev,
+          const double*            x,
+          bool                     add,
+          double*                  y)
     {
-      double alpha = 1.;
-      double beta = add ? 1. : 0.;
-      cusparseOperation_t cusparse_operation = transpose ?
-                                               CUSPARSE_OPERATION_TRANSPOSE :
-                                               CUSPARSE_OPERATION_NON_TRANSPOSE;
+      double              alpha = 1.;
+      double              beta  = add ? 1. : 0.;
+      cusparseOperation_t cusparse_operation
+        = transpose ? CUSPARSE_OPERATION_TRANSPOSE :
+                      CUSPARSE_OPERATION_NON_TRANSPOSE;
 
       // This function performs y = alpha*op(A)*x + beta*y
-      cusparseStatus_t error_code = cusparseDcsrmv(handle, cusparse_operation,
-                                                   m, n, nnz, &alpha, descr,
-                                                   A_val_dev, A_row_ptr_dev,
-                                                   A_column_index_dev, x, &beta, y);
+      cusparseStatus_t error_code = cusparseDcsrmv(handle,
+                                                   cusparse_operation,
+                                                   m,
+                                                   n,
+                                                   nnz,
+                                                   &alpha,
+                                                   descr,
+                                                   A_val_dev,
+                                                   A_row_ptr_dev,
+                                                   A_column_index_dev,
+                                                   x,
+                                                   &beta,
+                                                   y);
       AssertCusparse(error_code);
     }
-
-
 
     template <typename Number>
-    __global__ void l1_norm(const typename SparseMatrix<Number>::size_type n_rows,
-                            const Number *val_dev, const int *column_index_dev,
-                            const int *row_ptr_dev, Number *sums)
+    __global__ void
+    l1_norm(const typename SparseMatrix<Number>::size_type n_rows,
+            const Number*                                  val_dev,
+            const int*                                     column_index_dev,
+            const int*                                     row_ptr_dev,
+            Number*                                        sums)
     {
-      const typename SparseMatrix<Number>::size_type row = threadIdx.x +
-                                                           blockIdx.x * blockDim.x;
+      const typename SparseMatrix<Number>::size_type row
+        = threadIdx.x + blockIdx.x * blockDim.x;
 
-      if (row<n_rows)
+      if(row < n_rows)
         {
-          for (int j=row_ptr_dev[row]; j<row_ptr_dev[row+1] ; ++j)
+          for(int j = row_ptr_dev[row]; j < row_ptr_dev[row + 1]; ++j)
             dealii::LinearAlgebra::CUDAWrappers::atomicAdd_wrapper(
               &sums[column_index_dev[j]], abs(val_dev[j]));
         }
     }
 
-
-
     template <typename Number>
-    __global__ void linfty_norm(const typename SparseMatrix<Number>::size_type n_rows,
-                                const Number *val_dev, const int *column_index_dev,
-                                const int *row_ptr_dev, Number *sums)
+    __global__ void
+    linfty_norm(const typename SparseMatrix<Number>::size_type n_rows,
+                const Number*                                  val_dev,
+                const int*                                     column_index_dev,
+                const int*                                     row_ptr_dev,
+                Number*                                        sums)
     {
-      const typename SparseMatrix<Number>::size_type row = threadIdx.x +
-                                                           blockIdx.x * blockDim.x;
+      const typename SparseMatrix<Number>::size_type row
+        = threadIdx.x + blockIdx.x * blockDim.x;
 
-      if (row<n_rows)
+      if(row < n_rows)
         {
           sums[row] = (Number) 0.;
-          for (int j=row_ptr_dev[row]; j<row_ptr_dev[row+1] ; ++j)
+          for(int j = row_ptr_dev[row]; j < row_ptr_dev[row + 1]; ++j)
             sums[row] += abs(val_dev[j]);
         }
     }
-  }
-
-
+  } // namespace internal
 
   template <typename Number>
   SparseMatrix<Number>::SparseMatrix()
-    :
-    nnz(0),
-    n_rows(0),
-    val_dev(nullptr),
-    column_index_dev(nullptr),
-    row_ptr_dev(nullptr),
-    descr(nullptr)
+    : nnz(0),
+      n_rows(0),
+      val_dev(nullptr),
+      column_index_dev(nullptr),
+      row_ptr_dev(nullptr),
+      descr(nullptr)
   {}
 
-
-
   template <typename Number>
-  SparseMatrix<Number>::SparseMatrix(Utilities::CUDA::Handle &handle,
-                                     const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
-    :
-    val_dev(nullptr),
-    column_index_dev(nullptr),
-    row_ptr_dev(nullptr),
-    descr(nullptr)
+  SparseMatrix<Number>::SparseMatrix(
+    Utilities::CUDA::Handle&              handle,
+    const ::dealii::SparseMatrix<Number>& sparse_matrix_host)
+    : val_dev(nullptr),
+      column_index_dev(nullptr),
+      row_ptr_dev(nullptr),
+      descr(nullptr)
   {
     reinit(handle, sparse_matrix_host);
   }
 
-
-
   template <typename Number>
-  SparseMatrix<Number>::SparseMatrix(CUDAWrappers::SparseMatrix<Number> &&other)
+  SparseMatrix<Number>::SparseMatrix(CUDAWrappers::SparseMatrix<Number>&& other)
   {
-    cusparse_handle = other.cusparse_handle;
-    nnz = other.nnz;
-    n_rows = other.n_rows;
-    n_cols = other.n_cols;
-    val_dev = other.val_dev;
+    cusparse_handle  = other.cusparse_handle;
+    nnz              = other.nnz;
+    n_rows           = other.n_rows;
+    n_cols           = other.n_cols;
+    val_dev          = other.val_dev;
     column_index_dev = other.column_index_dev;
-    row_ptr_dev = other.row_ptr_dev;
-    descr = other.descr;
+    row_ptr_dev      = other.row_ptr_dev;
+    descr            = other.descr;
 
-    other.nnz = 0;
-    other.n_rows = 0;
-    other.n_cols = 0;
-    other.val_dev = nullptr;
+    other.nnz              = 0;
+    other.n_rows           = 0;
+    other.n_cols           = 0;
+    other.val_dev          = nullptr;
     other.column_index_dev = nullptr;
-    other.row_ptr_dev = nullptr;
-    other.descr = nullptr;
+    other.row_ptr_dev      = nullptr;
+    other.descr            = nullptr;
   }
-
-
 
   template <typename Number>
   SparseMatrix<Number>::~SparseMatrix<Number>()
   {
-    if (val_dev != nullptr)
+    if(val_dev != nullptr)
       {
         cudaError_t error_code = cudaFree(val_dev);
         AssertCuda(error_code);
         val_dev = nullptr;
       }
 
-    if (column_index_dev != nullptr)
+    if(column_index_dev != nullptr)
       {
         cudaError_t error_code = cudaFree(column_index_dev);
         AssertCuda(error_code);
         column_index_dev = nullptr;
       }
 
-    if (row_ptr_dev != nullptr)
+    if(row_ptr_dev != nullptr)
       {
         cudaError_t error_code = cudaFree(row_ptr_dev);
         AssertCuda(error_code);
         row_ptr_dev = nullptr;
       }
 
-    if (descr != nullptr)
+    if(descr != nullptr)
       {
         cusparseStatus_t cusparse_error_code = cusparseDestroyMatDescr(descr);
         AssertCusparse(cusparse_error_code);
         descr = nullptr;
       }
 
-    nnz = 0;
+    nnz    = 0;
     n_rows = 0;
   }
 
-
-
   template <typename Number>
-  void SparseMatrix<Number>::reinit(Utilities::CUDA::Handle &handle,
-                                    const ::dealii::SparseMatrix<Number> &sparse_matrix_host)
+  void
+  SparseMatrix<Number>::reinit(
+    Utilities::CUDA::Handle&              handle,
+    const ::dealii::SparseMatrix<Number>& sparse_matrix_host)
   {
-    cusparse_handle = handle.cusparse_handle;
-    nnz = sparse_matrix_host.n_nonzero_elements();
-    n_rows = sparse_matrix_host.m();
-    n_cols = sparse_matrix_host.n();
-    unsigned int const row_ptr_size = n_rows + 1;
+    cusparse_handle                  = handle.cusparse_handle;
+    nnz                              = sparse_matrix_host.n_nonzero_elements();
+    n_rows                           = sparse_matrix_host.m();
+    n_cols                           = sparse_matrix_host.n();
+    unsigned int const  row_ptr_size = n_rows + 1;
     std::vector<Number> val;
     val.reserve(nnz);
     std::vector<int> column_index;
@@ -224,11 +250,11 @@ namespace CUDAWrappers
 
     // dealii::SparseMatrix stores the diagonal first in each row so we need to do some
     // reordering
-    for (int row = 0; row < n_rows; ++row)
+    for(int row = 0; row < n_rows; ++row)
       {
-        auto p_end = sparse_matrix_host.end(row);
+        auto         p_end   = sparse_matrix_host.end(row);
         unsigned int counter = 0;
-        for (auto p = sparse_matrix_host.begin(row); p != p_end; ++p)
+        for(auto p = sparse_matrix_host.begin(row); p != p_end; ++p)
           {
             val.emplace_back(p->value());
             column_index.emplace_back(p->column());
@@ -237,58 +263,63 @@ namespace CUDAWrappers
         row_ptr[row + 1] = row_ptr[row] + counter;
 
         // Sort the elements in the row
-        unsigned int const offset = row_ptr[row];
-        int const diag_index = column_index[offset];
-        Number diag_elem = sparse_matrix_host.diag_element(row);
-        unsigned int pos = 1;
-        while ((column_index[offset + pos] < row) && (pos < counter))
+        unsigned int const offset     = row_ptr[row];
+        int const          diag_index = column_index[offset];
+        Number             diag_elem  = sparse_matrix_host.diag_element(row);
+        unsigned int       pos        = 1;
+        while((column_index[offset + pos] < row) && (pos < counter))
           {
-            val[offset + pos - 1] = val[offset + pos];
+            val[offset + pos - 1]          = val[offset + pos];
             column_index[offset + pos - 1] = column_index[offset + pos];
             ++pos;
           }
-        val[offset + pos - 1] = diag_elem;
+        val[offset + pos - 1]          = diag_elem;
         column_index[offset + pos - 1] = diag_index;
       }
 
     // Copy the elements to the gpu
     cudaError_t error_code = cudaMalloc(&val_dev, nnz * sizeof(Number));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(val_dev, &val[0], nnz * sizeof(Number),
-                            cudaMemcpyHostToDevice);
+    error_code = cudaMemcpy(
+      val_dev, &val[0], nnz * sizeof(Number), cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Copy the column indices to the gpu
     error_code = cudaMalloc(&column_index_dev, nnz * sizeof(int));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(column_index_dev, &column_index[0], nnz * sizeof(int),
+    error_code = cudaMemcpy(column_index_dev,
+                            &column_index[0],
+                            nnz * sizeof(int),
                             cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Copy the row pointer to the gpu
     error_code = cudaMalloc(&row_ptr_dev, row_ptr_size * sizeof(int));
     AssertCuda(error_code);
-    error_code = cudaMemcpy(row_ptr_dev, &row_ptr[0], row_ptr_size * sizeof(int),
+    error_code = cudaMemcpy(row_ptr_dev,
+                            &row_ptr[0],
+                            row_ptr_size * sizeof(int),
                             cudaMemcpyHostToDevice);
     AssertCuda(error_code);
 
     // Create the matrix descriptor
     cusparseStatus_t cusparse_error_code = cusparseCreateMatDescr(&descr);
     AssertCusparse(cusparse_error_code);
-    cusparse_error_code = cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+    cusparse_error_code
+      = cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
     AssertCusparse(cusparse_error_code);
-    cusparse_error_code = cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
+    cusparse_error_code
+      = cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
     AssertCusparse(cusparse_error_code);
   }
 
-
-
   template <typename Number>
-  SparseMatrix<Number> &SparseMatrix<Number>::operator*= (const Number factor)
+  SparseMatrix<Number>&
+  SparseMatrix<Number>::operator*=(const Number factor)
   {
     AssertIsFinite(factor);
-    const int n_blocks = 1 + (nnz-1)/block_size;
-    internal::scale<Number> <<<n_blocks,block_size>>>(val_dev, factor, nnz);
+    const int n_blocks = 1 + (nnz - 1) / block_size;
+    internal::scale<Number><<<n_blocks, block_size>>>(val_dev, factor, nnz);
 
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
@@ -298,15 +329,15 @@ namespace CUDAWrappers
     return *this;
   }
 
-
-
   template <typename Number>
-  SparseMatrix<Number> &SparseMatrix<Number>::operator/= (const Number factor)
+  SparseMatrix<Number>&
+  SparseMatrix<Number>::operator/=(const Number factor)
   {
     AssertIsFinite(factor);
-    Assert(factor!=Number(0.), ExcZero());
-    const int n_blocks = 1 + (nnz-1)/block_size;
-    internal::scale<Number> <<<n_blocks,block_size>>>(val_dev, 1./factor, nnz);
+    Assert(factor != Number(0.), ExcZero());
+    const int n_blocks = 1 + (nnz - 1) / block_size;
+    internal::scale<Number>
+      <<<n_blocks, block_size>>>(val_dev, 1. / factor, nnz);
 
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
@@ -316,80 +347,115 @@ namespace CUDAWrappers
     return *this;
   }
 
-
-
   template <typename Number>
-  void SparseMatrix<Number>::vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                                   const
-                                   LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
+  void
+  SparseMatrix<Number>::vmult(
+    LinearAlgebra::CUDAWrappers::Vector<Number>&       dst,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& src) const
   {
-    internal::csrmv(cusparse_handle, false, n_rows, n_cols, nnz, descr, val_dev,
-                    row_ptr_dev, column_index_dev, src.get_values(), false,
+    internal::csrmv(cusparse_handle,
+                    false,
+                    n_rows,
+                    n_cols,
+                    nnz,
+                    descr,
+                    val_dev,
+                    row_ptr_dev,
+                    column_index_dev,
+                    src.get_values(),
+                    false,
                     dst.get_values());
   }
 
-
-
   template <typename Number>
-  void SparseMatrix<Number>::Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                                    const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
+  void
+  SparseMatrix<Number>::Tvmult(
+    LinearAlgebra::CUDAWrappers::Vector<Number>&       dst,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& src) const
   {
-    internal::csrmv(cusparse_handle, true, n_rows, n_cols, nnz, descr, val_dev,
-                    row_ptr_dev, column_index_dev, src.get_values(), false,
+    internal::csrmv(cusparse_handle,
+                    true,
+                    n_rows,
+                    n_cols,
+                    nnz,
+                    descr,
+                    val_dev,
+                    row_ptr_dev,
+                    column_index_dev,
+                    src.get_values(),
+                    false,
                     dst.get_values());
   }
 
-
-
   template <typename Number>
-  void SparseMatrix<Number>::vmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                                       const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
+  void
+  SparseMatrix<Number>::vmult_add(
+    LinearAlgebra::CUDAWrappers::Vector<Number>&       dst,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& src) const
   {
-    internal::csrmv(cusparse_handle, false, n_rows, n_cols, nnz, descr, val_dev,
-                    row_ptr_dev, column_index_dev, src.get_values(), true,
+    internal::csrmv(cusparse_handle,
+                    false,
+                    n_rows,
+                    n_cols,
+                    nnz,
+                    descr,
+                    val_dev,
+                    row_ptr_dev,
+                    column_index_dev,
+                    src.get_values(),
+                    true,
                     dst.get_values());
   }
 
-
-
   template <typename Number>
-  void SparseMatrix<Number>::Tvmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &dst,
-                                        const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
+  void
+  SparseMatrix<Number>::Tvmult_add(
+    LinearAlgebra::CUDAWrappers::Vector<Number>&       dst,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& src) const
   {
-    internal::csrmv(cusparse_handle, true, n_rows, n_cols, nnz, descr, val_dev,
-                    row_ptr_dev, column_index_dev, src.get_values(), true,
+    internal::csrmv(cusparse_handle,
+                    true,
+                    n_rows,
+                    n_cols,
+                    nnz,
+                    descr,
+                    val_dev,
+                    row_ptr_dev,
+                    column_index_dev,
+                    src.get_values(),
+                    true,
                     dst.get_values());
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::matrix_norm_square(const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const
+  Number
+  SparseMatrix<Number>::matrix_norm_square(
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& v) const
   {
     LinearAlgebra::CUDAWrappers::Vector<Number> tmp = v;
     vmult(tmp, v);
 
-    return v*tmp;
+    return v * tmp;
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::matrix_scalar_product(const LinearAlgebra::CUDAWrappers::Vector<Number> &u,
-                                                     const LinearAlgebra::CUDAWrappers::Vector<Number> &v) const
+  Number
+  SparseMatrix<Number>::matrix_scalar_product(
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& u,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& v) const
   {
     LinearAlgebra::CUDAWrappers::Vector<Number> tmp = v;
     vmult(tmp, v);
 
-    return u*tmp;
+    return u * tmp;
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::residual(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
-                                        const LinearAlgebra::CUDAWrappers::Vector<Number> &x,
-                                        const LinearAlgebra::CUDAWrappers::Vector<Number> &b) const
+  Number
+  SparseMatrix<Number>::residual(
+    LinearAlgebra::CUDAWrappers::Vector<Number>&       dst,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& x,
+    const LinearAlgebra::CUDAWrappers::Vector<Number>& b) const
   {
     vmult(dst, x);
     dst.sadd(-1., 1., b);
@@ -397,17 +463,14 @@ namespace CUDAWrappers
     return dst.l2_norm();
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::l1_norm() const
+  Number
+  SparseMatrix<Number>::l1_norm() const
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> column_sums(n_cols);
-    const int n_blocks = 1 + (nnz-1)/block_size;
-    internal::l1_norm<Number> <<<n_blocks,block_size>>>(n_rows, val_dev,
-                                                        column_index_dev,
-                                                        row_ptr_dev,
-                                                        column_sums.get_values());
+    const int n_blocks = 1 + (nnz - 1) / block_size;
+    internal::l1_norm<Number><<<n_blocks, block_size>>>(
+      n_rows, val_dev, column_index_dev, row_ptr_dev, column_sums.get_values());
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
@@ -416,17 +479,14 @@ namespace CUDAWrappers
     return column_sums.linfty_norm();
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::linfty_norm() const
+  Number
+  SparseMatrix<Number>::linfty_norm() const
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> row_sums(n_rows);
-    const int n_blocks = 1 + (nnz-1)/block_size;
-    internal::linfty_norm<Number> <<<n_blocks,block_size>>>(n_rows, val_dev,
-                                                            column_index_dev,
-                                                            row_ptr_dev,
-                                                            row_sums.get_values());
+    const int n_blocks = 1 + (nnz - 1) / block_size;
+    internal::linfty_norm<Number><<<n_blocks, block_size>>>(
+      n_rows, val_dev, column_index_dev, row_ptr_dev, row_sums.get_values());
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
@@ -435,33 +495,29 @@ namespace CUDAWrappers
     return row_sums.linfty_norm();
   }
 
-
-
   template <typename Number>
-  Number SparseMatrix<Number>::frobenius_norm() const
+  Number
+  SparseMatrix<Number>::frobenius_norm() const
   {
     LinearAlgebra::CUDAWrappers::Vector<real_type> matrix_values(nnz);
-    cudaError_t cuda_error = cudaMemcpy(matrix_values.get_values(), val_dev,
-                                        nnz*sizeof(Number),
+    cudaError_t cuda_error = cudaMemcpy(matrix_values.get_values(),
+                                        val_dev,
+                                        nnz * sizeof(Number),
                                         cudaMemcpyDeviceToDevice);
 
     return matrix_values.l2_norm();
   }
 
-
-
   template <typename Number>
-  std::tuple<Number *, int *, int *, cusparseMatDescr_t>
+  std::tuple<Number*, int*, int*, cusparseMatDescr_t>
   SparseMatrix<Number>::get_cusparse_matrix() const
   {
     return std::make_tuple(val_dev, column_index_dev, row_ptr_dev, descr);
   }
 
-
-
   template class SparseMatrix<float>;
   template class SparseMatrix<double>;
-}
+} // namespace CUDAWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

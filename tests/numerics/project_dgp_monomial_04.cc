@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::project works for DGP_Monomial elements correctly
 
 // note that for mapped DGP(k) spaces, P(k) is not in the range of the
@@ -24,10 +22,10 @@
 
 #include "project_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=0; p<6-dim; ++p)
-    test_with_2d_deformed_mesh (FE_DGPMonomial<dim>(p), p, (p+1)/2);
+  for(unsigned int p = 0; p < 6 - dim; ++p)
+    test_with_2d_deformed_mesh(FE_DGPMonomial<dim>(p), p, (p + 1) / 2);
 }

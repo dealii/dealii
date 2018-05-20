@@ -16,14 +16,13 @@
 #ifndef dealii_tensor_function_h
 #define dealii_tensor_function_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/function_time.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 
@@ -52,59 +51,60 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup functions
  * @author Guido Kanschat, 1999
  */
-template <int rank, int dim, typename Number=double>
-class TensorFunction : public FunctionTime<Number>,
-  public Subscriptor
+template <int rank, int dim, typename Number = double>
+class TensorFunction : public FunctionTime<Number>, public Subscriptor
 {
 public:
   /**
    * Define typedefs for the return types of the <tt>value</tt> functions.
    */
-  typedef Tensor<rank,dim,Number> value_type;
+  typedef Tensor<rank, dim, Number> value_type;
 
-  typedef Tensor<rank+1,dim,Number> gradient_type;
+  typedef Tensor<rank + 1, dim, Number> gradient_type;
 
   /**
    * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
    */
-  TensorFunction (const Number initial_time = Number(0.0));
+  TensorFunction(const Number initial_time = Number(0.0));
 
   /**
    * Virtual destructor; absolutely necessary in this case, as classes are
    * usually not used by their true type, but rather through pointers to this
    * base class.
    */
-  virtual ~TensorFunction () override = default;
+  virtual ~TensorFunction() override = default;
 
   /**
    * Return the value of the function at the given point.
    */
-  virtual value_type value (const Point<dim> &p) const;
+  virtual value_type
+  value(const Point<dim>& p) const;
 
   /**
    * Set <tt>values</tt> to the point values of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<value_type> &values) const;
+  virtual void
+  value_list(const std::vector<Point<dim>>& points,
+             std::vector<value_type>&       values) const;
 
   /**
    * Return the gradient of the function at the given point.
    */
-  virtual gradient_type gradient (const Point<dim> &p) const;
+  virtual gradient_type
+  gradient(const Point<dim>& p) const;
 
   /**
    * Set <tt>gradients</tt> to the gradients of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
    */
-  virtual void gradient_list (const std::vector<Point<dim> >   &points,
-                              std::vector<gradient_type> &gradients) const;
+  virtual void
+  gradient_list(const std::vector<Point<dim>>& points,
+                std::vector<gradient_type>&    gradients) const;
 };
-
-
 
 /**
  * Provide a tensor valued function which always returns a constant tensor
@@ -113,7 +113,7 @@ public:
  * @ingroup functions
  * @author Matthias Maier, 2013
  */
-template <int rank, int dim, typename Number=double>
+template <int rank, int dim, typename Number = double>
 class ConstantTensorFunction : public TensorFunction<rank, dim, Number>
 {
 public:
@@ -124,26 +124,33 @@ public:
    * An initial value for the time variable may be specified, otherwise it
    * defaults to zero.
    */
-  ConstantTensorFunction (const dealii::Tensor<rank, dim, Number> &value,
-                          const Number initial_time = 0.0);
+  ConstantTensorFunction(const dealii::Tensor<rank, dim, Number>& value,
+                         const Number initial_time = 0.0);
 
-  virtual ~ConstantTensorFunction () override = default;
+  virtual ~ConstantTensorFunction() override = default;
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim> &p) const override;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::value_type
+  value(const Point<dim>& p) const override;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type> &values) const override;
+  virtual void
+  value_list(
+    const std::vector<Point<dim>>& points,
+    std::vector<typename dealii::TensorFunction<rank, dim, Number>::value_type>&
+      values) const override;
 
-  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type gradient (const Point<dim> &p) const override;
+  virtual typename dealii::TensorFunction<rank, dim, Number>::gradient_type
+  gradient(const Point<dim>& p) const override;
 
-  virtual void gradient_list (const std::vector<Point<dim> > &points,
-                              std::vector<typename dealii::TensorFunction<rank, dim, Number>::gradient_type> &gradients) const override;
+  virtual void
+  gradient_list(
+    const std::vector<Point<dim>>& points,
+    std::vector<
+      typename dealii::TensorFunction<rank, dim, Number>::gradient_type>&
+      gradients) const override;
 
 private:
   const dealii::Tensor<rank, dim, Number> _value;
 };
-
-
 
 /**
  * Provide a tensor valued function which always returns zero. Obviously, all
@@ -152,7 +159,7 @@ private:
  * @ingroup functions
  * @author Matthias Maier, 2013
  */
-template <int rank, int dim, typename Number=double>
+template <int rank, int dim, typename Number = double>
 class ZeroTensorFunction : public ConstantTensorFunction<rank, dim, Number>
 {
 public:
@@ -162,9 +169,8 @@ public:
    * An initial value for the time variable may be specified, otherwise it
    * defaults to zero.
    */
-  ZeroTensorFunction (const Number initial_time = 0.0);
+  ZeroTensorFunction(const Number initial_time = 0.0);
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 

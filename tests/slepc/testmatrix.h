@@ -1,12 +1,11 @@
 
 #include "../tests.h"
 #include <deal.II/base/exceptions.h>
-#include <iostream>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/vector.h>
-
+#include <iostream>
 
 /**
  * Finite difference diagonal matrix on uniform grid.
@@ -24,16 +23,19 @@ public:
    * Generate the matrix structure.
    */
   template <typename SP>
-  void diag_structure(SP &structure) const;
+  void
+  diag_structure(SP& structure) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void diag(MatrixType &) const;
+  void
+  diag(MatrixType&) const;
 
   template <typename number>
-  void gnuplot_print(std::ostream &, const Vector<number> &) const;
+  void
+  gnuplot_print(std::ostream&, const Vector<number>&) const;
 
 private:
   /**
@@ -47,68 +49,59 @@ private:
   unsigned int ny;
 };
 
-
 // --------------- inline and template functions -----------------
 
-inline
-FDDiagMatrix::FDDiagMatrix(unsigned int nx, unsigned int ny)
-  :
-  nx(nx), ny(ny)
+inline FDDiagMatrix::FDDiagMatrix(unsigned int nx, unsigned int ny)
+  : nx(nx), ny(ny)
 {}
 
-
-
 template <typename SP>
-inline
-void
-FDDiagMatrix::diag_structure(SP &structure) const
+inline void
+FDDiagMatrix::diag_structure(SP& structure) const
 {
-  for (unsigned int i=0; i<=ny-2; i++)
+  for(unsigned int i = 0; i <= ny - 2; i++)
     {
-      for (unsigned int j=0; j<=nx-2; j++)
+      for(unsigned int j = 0; j <= nx - 2; j++)
         {
           // Number of the row to be entered
-          unsigned int row = j+(nx-1)*i;
+          unsigned int row = j + (nx - 1) * i;
           structure.add(row, row);
         }
     }
 }
 
-
 template <typename MatrixType>
-inline
-void
-FDDiagMatrix::diag(MatrixType &A) const
+inline void
+FDDiagMatrix::diag(MatrixType& A) const
 {
-  for (unsigned int i=0; i<=ny-2; i++)
+  for(unsigned int i = 0; i <= ny - 2; i++)
     {
-      for (unsigned int j=0; j<=nx-2; j++)
+      for(unsigned int j = 0; j <= nx - 2; j++)
         {
           // Number of the row to be entered
-          unsigned int row = j+(nx-1)*i;
-          A.set(row, row, 2./std::log(2.0+row));
+          unsigned int row = j + (nx - 1) * i;
+          A.set(row, row, 2. / std::log(2.0 + row));
         }
     }
 }
 
 template <typename number>
-inline
-void
-FDDiagMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const
+inline void
+FDDiagMatrix::gnuplot_print(std::ostream& s, const Vector<number>& V) const
 {
-  for (unsigned int i=0; i<=ny-2; i++)
+  for(unsigned int i = 0; i <= ny - 2; i++)
     {
-      for (unsigned int j=0; j<=nx-2; j++)
+      for(unsigned int j = 0; j <= nx - 2; j++)
         {
           // Number of the row to be entered
-          unsigned int row = j+(nx-1)*i;
-          s << (j+1)/(float)nx << '\t' << (i+1)/(float)ny << '\t' << V(row) << std::endl;
+          unsigned int row = j + (nx - 1) * i;
+          s << (j + 1) / (float) nx << '\t' << (i + 1) / (float) ny << '\t'
+            << V(row) << std::endl;
         }
       s << std::endl;
     }
   s << std::endl;
 }
-
 
 /**
  * Finite difference matrix for laplace operator in 1D on uniform grid.
@@ -126,13 +119,15 @@ public:
    * Generate the matrix structure.
    */
   template <typename SP>
-  void three_point_structure(SP &structure) const;
+  void
+  three_point_structure(SP& structure) const;
 
   /**
    * Fill the matrix with values.
    */
   template <typename MatrixType>
-  void three_point(MatrixType &) const;
+  void
+  three_point(MatrixType&) const;
 
 private:
   /**
@@ -141,45 +136,36 @@ private:
   unsigned int n;
 };
 
-
 // --------------- inline and template functions -----------------
 
-inline
-FD1DLaplaceMatrix::FD1DLaplaceMatrix(unsigned int n)
-  :
-  n(n)
+inline FD1DLaplaceMatrix::FD1DLaplaceMatrix(unsigned int n) : n(n)
 {}
 
-
-
 template <typename SP>
-inline
-void
-FD1DLaplaceMatrix::three_point_structure(SP &structure) const
+inline void
+FD1DLaplaceMatrix::three_point_structure(SP& structure) const
 {
-  for (unsigned int i=0; i<=n-2; i++)
+  for(unsigned int i = 0; i <= n - 2; i++)
     {
       structure.add(i, i);
-      if (i >0)
-        structure.add(i,i-1);
-      if (i < n-1)
-        structure.add(i,i+1);
+      if(i > 0)
+        structure.add(i, i - 1);
+      if(i < n - 1)
+        structure.add(i, i + 1);
     }
 }
 
-
 template <typename MatrixType>
-inline
-void
-FD1DLaplaceMatrix::three_point(MatrixType &A) const
+inline void
+FD1DLaplaceMatrix::three_point(MatrixType& A) const
 {
-  for (unsigned int i=0; i<=n-2; i++)
+  for(unsigned int i = 0; i <= n - 2; i++)
     {
-      A.set(i,i,2.0);
-      if (i > 0)
-        A.set(i,i-1,-1.0);
+      A.set(i, i, 2.0);
+      if(i > 0)
+        A.set(i, i - 1, -1.0);
 
-      if (i < n-2)
-        A.set(i,i+1,-1.0);
+      if(i < n - 2)
+        A.set(i, i + 1, -1.0);
     }
 }

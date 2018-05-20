@@ -13,34 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check FullMatrix::trace
-
 
 #include "../tests.h"
 #include <deal.II/lac/full_matrix.h>
 
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);
 
-  const unsigned int N=20;
-  FullMatrix<double> m (N,N);
+  const unsigned int N = 20;
+  FullMatrix<double> m(N, N);
 
   double tr = 0;
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int j=0; j<N; ++j)
+  for(unsigned int i = 0; i < N; ++i)
+    for(unsigned int j = 0; j < N; ++j)
       {
-        m(i,j) = i+j;
-        if (i==j)
-          tr += i+j;
+        m(i, j) = i + j;
+        if(i == j)
+          tr += i + j;
       }
 
   deallog << "Trace=" << m.trace() << std::endl;
-  Assert (m.trace() == tr, ExcInternalError());
+  Assert(m.trace() == tr, ExcInternalError());
 }

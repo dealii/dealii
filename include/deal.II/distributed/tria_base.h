@@ -16,21 +16,19 @@
 #ifndef dealii_distributed_tria_base_h
 #define dealii_distributed_tria_base_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
 
 #include <functional>
-#include <tuple>
-#include <set>
-#include <vector>
 #include <list>
+#include <set>
+#include <tuple>
 #include <utility>
-
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,31 +40,36 @@ namespace parallel
    * parallel::shared::Triangulation.
    */
   template <int dim, int spacedim = dim>
-  class Triangulation : public dealii::Triangulation<dim,spacedim>
+  class Triangulation : public dealii::Triangulation<dim, spacedim>
   {
   public:
-
     /**
      * Constructor.
      */
-    Triangulation (MPI_Comm mpi_communicator,
-                   const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid = (dealii::Triangulation<dim,spacedim>::none),
-                   const bool check_for_distorted_cells = false);
+    Triangulation(
+      MPI_Comm mpi_communicator,
+      const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
+        smooth_grid
+      = (dealii::Triangulation<dim, spacedim>::none),
+      const bool check_for_distorted_cells = false);
 
     /**
      * Destructor.
      */
-    virtual ~Triangulation () override;
+    virtual ~Triangulation() override;
 
     /**
      * Return MPI communicator used by this triangulation.
      */
-    virtual MPI_Comm get_communicator () const;
+    virtual MPI_Comm
+    get_communicator() const;
 
     /**
      * Implementation of the same function as in the base class.
      */
-    virtual void copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria) override;
+    virtual void
+    copy_triangulation(
+      const dealii::Triangulation<dim, spacedim>& old_tria) override;
 
     /**
      * Return the number of active cells owned by each of the MPI processes
@@ -74,9 +77,8 @@ namespace parallel
      * indexed by locally_owned_subdomain() equals the result of
      * n_locally_owned_active_cells().
      */
-    const std::vector<unsigned int> &
-    n_locally_owned_active_cells_per_processor () const;
-
+    const std::vector<unsigned int>&
+    n_locally_owned_active_cells_per_processor() const;
 
     /**
      * Return the number of active cells in the triangulation that are locally
@@ -96,20 +98,22 @@ namespace parallel
      * and
      * @ref GlossGhostCell).
      */
-    unsigned int n_locally_owned_active_cells () const;
+    unsigned int
+    n_locally_owned_active_cells() const;
 
     /**
      * Return the sum over all processors of the number of active cells owned
      * by each processor. This equals the overall number of active cells in
      * the triangulation.
      */
-    virtual types::global_dof_index n_global_active_cells () const override;
+    virtual types::global_dof_index
+    n_global_active_cells() const override;
 
     /**
      * Return the local memory consumption in bytes.
      */
-    virtual std::size_t memory_consumption () const override;
-
+    virtual std::size_t
+    memory_consumption() const override;
 
     /**
      * Return the global maximum level. This may be bigger than the number
@@ -118,7 +122,8 @@ namespace parallel
      * the domain that are not very refined, but if other processors store
      * cells in more deeply refined parts of the domain.
      */
-    virtual unsigned int n_global_levels () const override;
+    virtual unsigned int
+    n_global_levels() const override;
 
     /**
      * Return the subdomain id of those cells that are owned by the current
@@ -126,7 +131,8 @@ namespace parallel
      * subdomain id are either owned by another processor or have children
      * that only exist on other processors.
      */
-    types::subdomain_id locally_owned_subdomain () const override;
+    types::subdomain_id
+    locally_owned_subdomain() const override;
 
     /**
      * Return a set of MPI ranks of the processors that have at least one
@@ -136,8 +142,8 @@ namespace parallel
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
-    const std::set<types::subdomain_id> &
-    ghost_owners () const;
+    const std::set<types::subdomain_id>&
+    ghost_owners() const;
 
     /**
      * Return a set of MPI ranks of the processors that have at least one
@@ -148,15 +154,15 @@ namespace parallel
      * @note: If @p i is contained in the list of processor @p j, then @p j
      * will also be contained in the list of processor @p i.
      */
-    const std::set<types::subdomain_id> &
-    level_ghost_owners () const;
+    const std::set<types::subdomain_id>&
+    level_ghost_owners() const;
 
     /**
      * Return a map that, for each vertex, lists all the processors whose
      * subdomains are adjacent to that vertex.
      */
-    virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-    compute_vertices_with_ghost_neighbors () const;
+    virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+    compute_vertices_with_ghost_neighbors() const;
 
   protected:
     /**
@@ -187,18 +193,18 @@ namespace parallel
        * This vector stores the number of locally owned active cells per MPI
        * rank.
        */
-      std::vector<unsigned int>     n_locally_owned_active_cells;
+      std::vector<unsigned int> n_locally_owned_active_cells;
       /**
        * The total number of active cells (sum of @p
        * n_locally_owned_active_cells).
        */
-      types::global_dof_index       n_global_active_cells;
+      types::global_dof_index n_global_active_cells;
       /**
        * The global number of levels computed as the maximum number of levels
        * taken over all MPI ranks, so <tt>n_levels()<=n_global_levels =
        * max(n_levels() on proc i)</tt>.
        */
-      unsigned int                  n_global_levels;
+      unsigned int n_global_levels;
       /**
        * A set containing the subdomain_id (MPI rank) of the owners of the
        * ghost cells on this processor.
@@ -218,12 +224,14 @@ namespace parallel
     /**
      * Update the number_cache variable after mesh creation or refinement.
      */
-    virtual void update_number_cache ();
+    virtual void
+    update_number_cache();
 
     /**
      * Store MPI ranks of level ghost owners of this processor on all levels.
      */
-    void fill_level_ghost_owners ();
+    void
+    fill_level_ghost_owners();
   };
 
 } // namespace parallel

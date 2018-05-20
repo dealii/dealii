@@ -13,53 +13,47 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Copy from boundary ids to manifold ids
 
 #include "../tests.h"
 
-
 // all include files you need here
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 
 template <int dim, int spacedim>
-void print_info(Triangulation<dim,spacedim> &tria)
+void
+print_info(Triangulation<dim, spacedim>& tria)
 {
-  typename Triangulation<dim,spacedim>::active_cell_iterator cell;
+  typename Triangulation<dim, spacedim>::active_cell_iterator cell;
 
-  for (cell = tria.begin_active(); cell != tria.end(); ++cell)
+  for(cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      deallog << "cell: " << cell
-              << ", material_id: "
-              << cell->material_id()
-              << ", manifold_id: "
-              << cell->manifold_id() << std::endl;
+      deallog << "cell: " << cell << ", material_id: " << cell->material_id()
+              << ", manifold_id: " << cell->manifold_id() << std::endl;
 
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for(unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         deallog << "face: " << cell->face(f)
-                << ", boundary_id: "
-                << cell->face(f)->boundary_id()
-                << ", manifold_id: "
-                << cell->face(f)->manifold_id() << std::endl;
+                << ", boundary_id: " << cell->face(f)->boundary_id()
+                << ", manifold_id: " << cell->face(f)->manifold_id()
+                << std::endl;
     }
 }
 
-
 // Helper function
 template <int dim, int spacedim>
-void test()
+void
+test()
 {
-  deallog << "Testing dim=" << dim
-          << ", spacedim="<< spacedim << std::endl;
+  deallog << "Testing dim=" << dim << ", spacedim=" << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
-  GridGenerator::hyper_cube (tria, 0., 1.);
+  Triangulation<dim, spacedim> tria;
+  GridGenerator::hyper_cube(tria, 0., 1.);
   tria.refine_global(1);
   tria.begin_active()->set_material_id(1);
 
@@ -73,15 +67,16 @@ void test()
   print_info(tria);
 }
 
-int main ()
+int
+main()
 {
   initlog(true);
 
-  test<1,1>();
-  test<1,2>();
-  test<2,2>();
-  test<2,3>();
-  test<3,3>();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   return 0;
 }

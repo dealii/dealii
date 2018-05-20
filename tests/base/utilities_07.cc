@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // verify that Utilities::string_to_double actually catches errors
 
 #include "../tests.h"
@@ -23,34 +22,30 @@
 
 using namespace dealii;
 
-
-
-
-void verify (const std::string &s)
+void
+verify(const std::string& s)
 {
   bool exception_caught = false;
   try
     {
       Utilities::string_to_double(s);
     }
-  catch (...)
+  catch(...)
     {
       exception_caught = true;
     }
-  Assert (exception_caught == true, ExcMessage ("Function is broken!"));
+  Assert(exception_caught == true, ExcMessage("Function is broken!"));
 
   deallog << "Done correctly: " << s << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  verify ("abc");
-  verify ("1.23.4");
-  verify ("1 23 4");
-  verify ("123abc");
+  verify("abc");
+  verify("1.23.4");
+  verify("1 23 4");
+  verify("123abc");
 }

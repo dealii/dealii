@@ -16,9 +16,7 @@
 #ifndef dealii_differentiation_ad_ad_number_types_h
 #define dealii_differentiation_ad_ad_number_types_h
 
-
 #include <deal.II/base/config.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -26,7 +24,6 @@ namespace Differentiation
 {
   namespace AD
   {
-
     /**
      * An enumeration to indicate which type of auto-differentiable number
      * is to be used for computations. If a type that is selected for use
@@ -78,8 +75,6 @@ namespace Differentiation
 
   } // namespace AD
 } // namespace Differentiation
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

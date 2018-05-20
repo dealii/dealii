@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check the creation of no-flux boundary conditions for a finite
 // element that consists of more than dim components and where
 // therefore we have to pick the vector components from somewhere in
@@ -24,76 +23,72 @@
 // have support points, which caused problems when this test was
 // written
 
-
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/vector_tools.h>
 
-
-
-
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
-  DoFRenumbering::component_wise (dof);
+  DoFRenumbering::component_wise(dof);
 
-  for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+  for(unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
-      deallog << "FE=" << fe.get_name()
-              << ", case=" << i
-              << std::endl;
+      deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 
       std::set<types::boundary_id> boundary_ids;
-      for (unsigned int j=0; j<=i; ++j)
-        boundary_ids.insert (j);
+      for(unsigned int j = 0; j <= i; ++j)
+        boundary_ids.insert(j);
 
       ConstraintMatrix cm;
-      VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
+      VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm);
 
-      cm.print (deallog.get_file_stream ());
+      cm.print(deallog.get_file_stream());
     }
 }
 
-
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
 
   static const SphericalManifold<dim> boundary;
-  tr.set_manifold (0, boundary);
+  tr.set_manifold(0, boundary);
 
   tr.refine_global(1);
 
-  for (unsigned int degree=1; degree<4; ++degree)
+  for(unsigned int degree = 1; degree < 4; ++degree)
     {
-      FESystem<dim> fe (FE_Q<dim>(QIterated<1>(QTrapez<1>(),degree)), dim,
-                        FE_DGP<dim>(degree+1), 1);
+      FESystem<dim> fe(FE_Q<dim>(QIterated<1>(QTrapez<1>(), degree)),
+                       dim,
+                       FE_DGP<dim>(degree + 1),
+                       1);
       test(tr, fe);
     }
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 

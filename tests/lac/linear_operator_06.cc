@@ -24,25 +24,25 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#define PRINTME(name, var) \
+#define PRINTME(name, var)                              \
   deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i) \
+  for(unsigned int i = 0; i < var.n_blocks(); ++i)      \
     deallog << "[block " << i << " ]  " << var.block(i);
-
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
 
   // SparseMatrix:
   {
-    SparsityPattern sparsity_pattern (10, 5, 0);
+    SparsityPattern sparsity_pattern(10, 5, 0);
     sparsity_pattern.compress();
 
-    SparseMatrix<double> a (sparsity_pattern);
+    SparseMatrix<double> a(sparsity_pattern);
 
     auto op_a = linear_operator(a);
 
@@ -61,16 +61,16 @@ int main()
   // BlockSparseMatrix:
   {
     BlockDynamicSparsityPattern dsp(5, 3);
-    for (unsigned int i = 0; i < 5; ++i)
-      for (unsigned int j = 0; j < 3; ++j)
-        dsp.block(i, j).reinit (10, 5);
-    dsp.collect_sizes ();
+    for(unsigned int i = 0; i < 5; ++i)
+      for(unsigned int j = 0; j < 3; ++j)
+        dsp.block(i, j).reinit(10, 5);
+    dsp.collect_sizes();
 
     BlockSparsityPattern sparsity_pattern;
     sparsity_pattern.copy_from(dsp);
     sparsity_pattern.compress();
 
-    BlockSparseMatrix<double> a (sparsity_pattern);
+    BlockSparseMatrix<double> a(sparsity_pattern);
 
     auto op_a = linear_operator<BlockVector<double>>(a);
 
@@ -85,4 +85,3 @@ int main()
     deallog << "OK" << std::endl;
   }
 }
-

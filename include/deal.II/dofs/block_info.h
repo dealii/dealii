@@ -16,8 +16,8 @@
 #ifndef dealii_block_info_h
 #define dealii_block_info_h
 
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/block_indices.h>
 
 #include <iomanip>
@@ -26,12 +26,13 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 
-template <int dim, int spacedim> class DoFHandler;
+template <int dim, int spacedim>
+class DoFHandler;
 namespace hp
 {
-  template <int dim, int spacedim> class DoFHandler;
+  template <int dim, int spacedim>
+  class DoFHandler;
 }
-
 
 /**
  * @brief A small class collecting the different BlockIndices involved in
@@ -107,29 +108,36 @@ public:
    * This function will also clear the local() indices.
    */
   template <int dim, int spacedim>
-  void initialize(const DoFHandler<dim, spacedim> &, bool levels_only = false, bool active_only = false);
+  void
+  initialize(const DoFHandler<dim, spacedim>&,
+             bool levels_only = false,
+             bool active_only = false);
 
   /**
    * @brief Initialize block structure on cells and compute renumbering
    * between cell dofs and block cell dofs.
    */
   template <int dim, int spacedim>
-  void initialize_local(const DoFHandler<dim, spacedim> &);
+  void
+  initialize_local(const DoFHandler<dim, spacedim>&);
 
   /**
    * Access the BlockIndices structure of the global system.
    */
-  const BlockIndices &global() const;
+  const BlockIndices&
+  global() const;
 
   /**
    * Access BlockIndices for the local system on a cell.
    */
-  const BlockIndices &local() const;
+  const BlockIndices&
+  local() const;
 
   /**
    * Access the BlockIndices structure of a level in the multilevel hierarchy.
    */
-  const BlockIndices &level(unsigned int level) const;
+  const BlockIndices&
+  level(unsigned int level) const;
 
   /**
    * Return the index after local renumbering.
@@ -140,38 +148,42 @@ public:
    * forth. The function then outputs the index in the standard local
    * numbering of DoFAccessor.
    */
-  types::global_dof_index renumber (const unsigned int i) const;
+  types::global_dof_index
+  renumber(const unsigned int i) const;
 
   /**
    * The number of base elements.
    */
-  unsigned int n_base_elements() const;
+  unsigned int
+  n_base_elements() const;
 
   /**
    * Return the base element of this index.
    */
-  unsigned int base_element (const unsigned int i) const;
+  unsigned int
+  base_element(const unsigned int i) const;
 
   /**
    * Write a summary of the block structure to the stream.
    */
   template <class OS>
   void
-  print(OS &stream) const;
+  print(OS& stream) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Read or write the data of this object to or from a stream for the purpose
    * of serialization
    */
   template <class Archive>
-  void serialize (Archive &ar,
-                  const unsigned int /*version*/);
+  void
+  serialize(Archive& ar, const unsigned int /*version*/);
 
 private:
   /**
@@ -200,116 +212,99 @@ private:
   std::vector<types::global_dof_index> local_renumbering;
 };
 
-
-
 //----------------------------------------------------------------------//
 
-inline
-const BlockIndices &
+inline const BlockIndices&
 BlockInfo::global() const
 {
   return bi_global;
 }
 
-
-inline
-const BlockIndices &
+inline const BlockIndices&
 BlockInfo::local() const
 {
   return bi_local;
 }
 
-
-inline
-const BlockIndices &
-BlockInfo::level (const unsigned int l) const
+inline const BlockIndices&
+BlockInfo::level(const unsigned int l) const
 {
   AssertIndexRange(l, levels.size());
   return levels[l];
 }
 
-
-inline
-types::global_dof_index BlockInfo::renumber (const unsigned int i) const
+inline types::global_dof_index
+BlockInfo::renumber(const unsigned int i) const
 {
   AssertIndexRange(i, static_cast<unsigned int>(local_renumbering.size()));
   return local_renumbering[i];
 }
 
-
-inline
-unsigned int
-BlockInfo::base_element (const unsigned int i) const
+inline unsigned int
+BlockInfo::base_element(const unsigned int i) const
 {
   AssertIndexRange(i, base_elements.size());
 
   return base_elements[i];
 }
 
-
-inline
-unsigned int
+inline unsigned int
 BlockInfo::n_base_elements() const
 {
   return base_elements.size();
 }
 
-
-
 template <class OS>
-inline
-void
-BlockInfo::print (OS &os) const
+inline void
+BlockInfo::print(OS& os) const
 {
   os << "global   dofs " << std::setw(5) << global().total_size() << " blocks";
-  for (unsigned int i=0; i<global().size(); ++i)
+  for(unsigned int i = 0; i < global().size(); ++i)
     os << ' ' << std::setw(5) << global().block_size(i);
   os << std::endl;
 
-  if (local().size() == 0)
+  if(local().size() == 0)
     {
       os << "local dofs not initialized" << std::endl;
     }
   else
     {
-      os << "local    dofs " << std::setw(5) << local().total_size() << " blocks";
-      for (unsigned int i=0; i<local().size(); ++i)
-        os << ' '  << std::setw(5) << local().block_size(i);
+      os << "local    dofs " << std::setw(5) << local().total_size()
+         << " blocks";
+      for(unsigned int i = 0; i < local().size(); ++i)
+        os << ' ' << std::setw(5) << local().block_size(i);
       os << std::endl;
     }
 
-  for (unsigned int l=0; l<levels.size(); ++l)
+  for(unsigned int l = 0; l < levels.size(); ++l)
     {
-      os << "level " << std::setw(2) << l << " dofs " << std::setw(5) << level(l).total_size() << " blocks";
-      for (unsigned int i=0; i<level(l).size(); ++i)
-        os << ' '  << std::setw(5) << level(l).block_size(i);
+      os << "level " << std::setw(2) << l << " dofs " << std::setw(5)
+         << level(l).total_size() << " blocks";
+      for(unsigned int i = 0; i < level(l).size(); ++i)
+        os << ' ' << std::setw(5) << level(l).block_size(i);
       os << std::endl;
     }
 }
 
-
-inline
-std::size_t
-BlockInfo::memory_consumption () const
+inline std::size_t
+BlockInfo::memory_consumption() const
 {
-  return (MemoryConsumption::memory_consumption (bi_global) +
-          MemoryConsumption::memory_consumption (levels) +
-          MemoryConsumption::memory_consumption (bi_local) +
-          MemoryConsumption::memory_consumption (base_elements));
+  return (MemoryConsumption::memory_consumption(bi_global)
+          + MemoryConsumption::memory_consumption(levels)
+          + MemoryConsumption::memory_consumption(bi_local)
+          + MemoryConsumption::memory_consumption(base_elements));
 }
-
 
 template <class Archive>
-void BlockInfo::serialize (Archive &ar,
-                           const unsigned int /*version*/)
+void
+BlockInfo::serialize(Archive& ar, const unsigned int /*version*/)
 {
-  ar &bi_global;
-  ar &levels;
-  ar &bi_local;
-  ar &base_elements;
-  ar &local_renumbering;
+  ar& bi_global;
+  ar& levels;
+  ar& bi_local;
+  ar& base_elements;
+  ar& local_renumbering;
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

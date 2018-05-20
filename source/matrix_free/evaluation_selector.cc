@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/matrix_free/evaluation_selector.h>
 
 DEAL_II_NAMESPACE_OPEN

@@ -13,44 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // a short (a few lines) description of what the program does
 
 #include "../tests.h"
 
 // all include files you need here
 
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
 
-  Triangulation<2,3> tria;
-  GridIn<2,3> gi;
+  Triangulation<2, 3> tria;
+  GridIn<2, 3>        gi;
   gi.attach_triangulation(tria);
   std::ifstream infile(SOURCE_DIR "/mesh_bug.output");
   gi.read(infile);
 
-  const std::vector<Point<3> > &vertices = tria.get_vertices();
+  const std::vector<Point<3>>& vertices = tria.get_vertices();
 
-  for (unsigned int i=0; i<vertices.size(); ++i)
-    if (vertices[i](2)>1e-7)
+  for(unsigned int i = 0; i < vertices.size(); ++i)
+    if(vertices[i](2) > 1e-7)
       std::cout << "Error!" << std::endl;
-
 
   GridOut go;
   go.write_ucd(tria, logfile);
 
   return 0;
 }
-

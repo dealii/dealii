@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Check for support of std::complex<double> as Number template argument
 
 #include "../tests.h"
@@ -26,28 +25,26 @@ using namespace dealii;
 
 template <typename Number>
 class MyFunctionTime : dealii::FunctionTime<Number>
-{
-};
+{};
 
 template <int dim, typename Number>
 class MyFunction : dealii::Function<dim, Number>
-{
-};
+{};
 
 template <int rank, int dim, typename Number>
 class MyTensorFunction : dealii::TensorFunction<rank, dim, Number>
-{
-};
+{};
 
-int main()
+int
+main()
 {
   initlog();
 
-  MyFunction<1, std::complex<double> > function_1;
-  MyFunction<2, std::complex<float> > function_2;
+  MyFunction<1, std::complex<double>> function_1;
+  MyFunction<2, std::complex<float>>  function_2;
 
-  MyTensorFunction<1, 1, std::complex<double> > tensor_function_1;
-  MyTensorFunction<2, 2, std::complex<float> > tensor_function_2;
+  MyTensorFunction<1, 1, std::complex<double>> tensor_function_1;
+  MyTensorFunction<2, 2, std::complex<float>>  tensor_function_2;
 
   deallog << "OK" << std::endl;
 }

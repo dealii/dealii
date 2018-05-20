@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Just output the constraint matrices of the FE_Q element. Test
 // introduced when we started to compute them on the fly, rather than
 // precomputing them for a number of elements and storing them in a
@@ -27,24 +25,20 @@
 
 #define PRECISION 2
 
-
-
 template <int dim>
 void
 test(const unsigned int degree)
 {
-  deallog << "FE_Q<" << dim << "> (" << degree << ")"
-          << std::endl;
+  deallog << "FE_Q<" << dim << "> (" << degree << ")" << std::endl;
 
   FE_Q<dim> fe_q(degree);
   FE_Q<dim> x(fe_q);
 }
 
-
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
@@ -52,14 +46,11 @@ main()
   // no constraints in 1d, but we had
   // the matrices precomputed up to
   // Q4 for 2d and Q2 for 3d
-  for (unsigned int degree=1; degree<=4; ++degree)
+  for(unsigned int degree = 1; degree <= 4; ++degree)
     test<2>(degree);
 
-  for (unsigned int degree=1; degree<=2; ++degree)
+  for(unsigned int degree = 1; degree <= 2; ++degree)
     test<3>(degree);
 
   return 0;
 }
-
-
-

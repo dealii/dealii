@@ -27,8 +27,8 @@
 
 using namespace dealii;
 
-
-int main ()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(3);
@@ -45,7 +45,7 @@ int main ()
   //      arbitrary point
   double evalutation_number = 12.123;
 
-  for (unsigned int pp = 0; pp < p_dim; pp++)
+  for(unsigned int pp = 0; pp < p_dim; pp++)
     {
       coefficients_a.push_back(pp);
 

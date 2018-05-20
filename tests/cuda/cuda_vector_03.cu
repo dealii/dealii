@@ -19,28 +19,29 @@
 
 // Check that reinit correctly set all the entries of the vector to zero
 
-void test()
+void
+test()
 {
-  const unsigned int size = 100;
+  const unsigned int                          size = 100;
   LinearAlgebra::CUDAWrappers::Vector<double> a(size);
-  LinearAlgebra::ReadWriteVector<double> read_write(size);
-  for (unsigned int i=0; i<size; ++i)
+  LinearAlgebra::ReadWriteVector<double>      read_write(size);
+  for(unsigned int i = 0; i < size; ++i)
     read_write[i] = i;
   a.import(read_write, VectorOperation::insert);
 
-  a.reinit(size/2);
-  AssertThrow(a.l1_norm()==0., ExcMessage("reinit did not zero the entry"));
+  a.reinit(size / 2);
+  AssertThrow(a.l1_norm() == 0., ExcMessage("reinit did not zero the entry"));
 }
 
-
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
 
   test();
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 
   return 0;
 }

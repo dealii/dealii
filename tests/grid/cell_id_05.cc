@@ -13,53 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
 // testing serialize function for class CellId
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/cell_id.h>
 
 template <int spacedim>
-void test(const unsigned int &ref)
+void
+test(const unsigned int& ref)
 {
-
-
   Triangulation<spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(ref);
-  std::vector< CellId > cell_ids;
-  for (auto cell: tria.active_cell_iterators())
+  std::vector<CellId> cell_ids;
+  for(auto cell : tria.active_cell_iterators())
     {
       cell_ids.push_back(cell->id());
     }
 
   auto buffer = Utilities::pack(cell_ids);
 
-  auto unpacked = Utilities::unpack<std::vector< CellId > >(buffer);
+  auto unpacked = Utilities::unpack<std::vector<CellId>>(buffer);
 
-  unsigned int i=0;
-  bool ok = true;
-  for (auto cell: tria.active_cell_iterators())
+  unsigned int i  = 0;
+  bool         ok = true;
+  for(auto cell : tria.active_cell_iterators())
     {
-      if (cell->id() != unpacked[i++])
+      if(cell->id() != unpacked[i++])
         {
           deallog << "NOT OK; problem with cell " << i << std::endl;
           ok = false;
         }
     }
 
-  if (ok)
+  if(ok)
     deallog << "OK!" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

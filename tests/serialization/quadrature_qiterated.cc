@@ -13,28 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check serialization for QIterated
 
 #include "serialization.h"
-#include <deal.II/base/quadrature.h>
 #include <boost/serialization/vector.hpp>
+#include <deal.II/base/quadrature.h>
 
-void test ()
+void
+test()
 {
-  const unsigned int dim = 2;
-  unsigned int n_copies = 3;
+  const unsigned int dim      = 2;
+  unsigned int       n_copies = 3;
 
-  std::vector<Point <1> > points1;
+  std::vector<Point<1>> points1;
   points1.push_back(Point<1>(0.));
   points1.push_back(Point<1>(1.));
-  double w1[2] = {0.5, 0.5};
+  double              w1[2] = {0.5, 0.5};
   std::vector<double> weights1(w1, &w1[2]);
 
-  std::vector<Point <1> > points2;
+  std::vector<Point<1>> points2;
   points2.push_back(Point<1>(0.25));
   points2.push_back(Point<1>(0.75));
-  double w2[2] = {0.4, 0.6};
+  double              w2[2] = {0.4, 0.6};
   std::vector<double> weights2(w2, &w2[2]);
 
   Quadrature<1> qx(points1, weights1);
@@ -44,17 +44,17 @@ void test ()
 
   QIterated<dim> q2(qy, n_copies);
 
-  verify (q1, q2);
+  verify(q1, q2);
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

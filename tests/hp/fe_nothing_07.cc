@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test that FE_Nothing works as intended
 
 // Create a mesh with hanging nodes and FEQ/FENothing interfaces in
@@ -48,53 +46,50 @@
 // Dofs 14 and 15 should be constrained, but at one time only 14 was
 // constrained
 
-
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-
-
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim>       triangulation;
-  GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
+  Triangulation<dim> triangulation;
+  GridGenerator ::hyper_cube(triangulation, -0.5, 0.5);
   triangulation.refine_global(1);
 
   {
-    typename Triangulation<dim> :: active_cell_iterator
-    cell = triangulation.begin_active(),
-    endc = triangulation.end();
+    typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active(),
+      endc = triangulation.end();
 
-    for (; cell != endc; cell++)
+    for(; cell != endc; cell++)
       {
         Point<dim> center = cell->center();
 
-        if (center[0] < 0)
+        if(center[0] < 0)
           {
             cell->set_subdomain_id(1);
           }
 
-        double h=0;
-        for (unsigned d=0; d<dim; ++d) h += center[d];
+        double h = 0;
+        for(unsigned d = 0; d < dim; ++d)
+          h += center[d];
 
-        if (std::fabs(h) + 1e-6 > 0.25*dim)
+        if(std::fabs(h) + 1e-6 > 0.25 * dim)
           cell->set_refine_flag();
       }
 
@@ -105,82 +100,75 @@ void test ()
   // distribute dofs. in this test,
   // we are looking at FESystems.
 
-  hp::FECollection<dim>    fe_collection;
+  hp::FECollection<dim> fe_collection;
 
-  fe_collection.push_back (FESystem<dim>(FE_Q<dim>(1), 1,
-                                         FE_Nothing<dim>(),1));
+  fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1));
 
-  fe_collection.push_back (FESystem<dim>(FE_Nothing<dim>(), 1,
-                                         FE_Q<dim>(1), 1));
+  fe_collection.push_back(FESystem<dim>(FE_Nothing<dim>(), 1, FE_Q<dim>(1), 1));
 
-  hp::DoFHandler<dim>      dof_handler (triangulation);
+  hp::DoFHandler<dim> dof_handler(triangulation);
 
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell != endc; cell++)
+    for(; cell != endc; cell++)
       {
-        if (cell->subdomain_id()==1 )
+        if(cell->subdomain_id() == 1)
           cell->set_active_fe_index(1);
         else
           cell->set_active_fe_index(0);
       }
 
-    dof_handler.distribute_dofs (fe_collection);
+    dof_handler.distribute_dofs(fe_collection);
   }
 
   deallog << "   Number of active cells:       "
-          << triangulation.n_active_cells()
-          << std::endl
-          << "   Number of degrees of freedom: "
-          << dof_handler.n_dofs()
+          << triangulation.n_active_cells() << std::endl
+          << "   Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
-
 
   // .... test constraint handling
 
   ConstraintMatrix constraints;
 
-  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   constraints.close();
 
-  deallog << "   Number of constraints:        "
-          << constraints.n_constraints()
+  deallog << "   Number of constraints:        " << constraints.n_constraints()
           << std::endl;
 
   // the FE assignment is entirely
   // symmetric, so the number of
   // constraints must be even
-  Assert (constraints.n_constraints() % 2 == 0, ExcInternalError());
+  Assert(constraints.n_constraints() % 2 == 0, ExcInternalError());
 
   {
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell != endc; cell++)
+    for(; cell != endc; cell++)
       {
-        deallog << cell << ' ' << cell->active_fe_index() << std::endl
-                << "   ";
-        std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
-        cell->get_dof_indices (local_dof_indices);
+        deallog << cell << ' ' << cell->active_fe_index() << std::endl << "   ";
+        std::vector<types::global_dof_index> local_dof_indices(
+          cell->get_fe().dofs_per_cell);
+        cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+        for(unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
           deallog << local_dof_indices[i]
-                  << (constraints.is_constrained(local_dof_indices[i]) ?
-                      "*" : "")
+                  << (constraints.is_constrained(local_dof_indices[i]) ? "*" :
+                                                                         "")
                   << ' ';
         deallog << std::endl;
       }
   }
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
@@ -188,13 +176,13 @@ int main ()
   deallog.attach(logfile);
 
   deallog << "Try dim == 1" << std::flush << std::endl;
-  test<1> ();
+  test<1>();
 
   deallog << "Try dim == 2" << std::flush << std::endl;
-  test<2> ();
+  test<2>();
 
   deallog << "Try dim == 3" << std::flush << std::endl;
-  test<3> ();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

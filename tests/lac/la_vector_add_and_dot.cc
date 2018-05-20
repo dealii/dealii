@@ -13,63 +13,59 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check that LinearAlgebra::Vector::add_and_dot works correctly
 
 #include "../tests.h"
 #include <deal.II/lac/la_vector.h>
 
-
-
-
 template <typename number>
-void check ()
+void
+check()
 {
-  for (unsigned int test=0; test<5; ++test)
+  for(unsigned int test = 0; test < 5; ++test)
     {
-      const unsigned int size = 17 + test*1101;
-      LinearAlgebra::Vector<number> v1 (size), v2(size), v3(size), check(size);
+      const unsigned int            size = 17 + test * 1101;
+      LinearAlgebra::Vector<number> v1(size), v2(size), v3(size), check(size);
       // Check that the assignment works
       v1 = 0.;
-      for (unsigned int i=0; i<size; ++i)
+      for(unsigned int i = 0; i < size; ++i)
         {
           v1[i] = 0.1 + 0.005 * i;
           v2[i] = -5.2 + 0.18 * i;
-          v3[i] = 3.14159 + 2.7183/(1.+i);
+          v3[i] = 3.14159 + 2.7183 / (1. + i);
         }
-      check = v1;
+      check               = v1;
       const number factor = 0.01432;
 
       v1.add(factor, v2);
-      const number prod = v1 * v3;
+      const number prod       = v1 * v3;
       const number prod_check = check.add_and_dot(factor, v2, v3);
-      if (test == 0 && std::is_same<number,double>::value)
+      if(test == 0 && std::is_same<number, double>::value)
         {
           deallog << "Vector add reference:   ";
-          for (unsigned int i=0; i<size; ++i)
+          for(unsigned int i = 0; i < size; ++i)
             deallog << v1[i] << " ";
           deallog << std::endl;
           deallog << "Vector check reference: ";
-          for (unsigned int i=0; i<size; ++i)
+          for(unsigned int i = 0; i < size; ++i)
             deallog << check[i] << " ";
           deallog << std::endl;
 
           const number constant = 1.;
           v1.add(constant);
           deallog << "Vector add constant:    ";
-          for (unsigned int i=0; i<size; ++i)
+          for(unsigned int i = 0; i < size; ++i)
             deallog << v1[i] << " ";
           deallog << std::endl;
         }
 
-      deallog << "Add and dot should be " << prod/static_cast<number>(size)
-              << ", is " << prod_check/static_cast<number>(size)
-              << std::endl;
+      deallog << "Add and dot should be " << prod / static_cast<number>(size)
+              << ", is " << prod_check / static_cast<number>(size) << std::endl;
     }
 }
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
@@ -78,6 +74,6 @@ int main()
 
   check<float>();
   check<double>();
-  check<std::complex<double> >();
+  check<std::complex<double>>();
   deallog << "OK" << std::endl;
 }

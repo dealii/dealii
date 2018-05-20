@@ -9,7 +9,8 @@
 // the standard library.
 
 template <typename VectorType>
-void test_std_vector_pointer()
+void
+test_std_vector_pointer()
 {
   GrowingVectorMemory<VectorType> mem;
 
@@ -18,9 +19,8 @@ void test_std_vector_pointer()
   va.emplace_back(mem);
 }
 
-
-
-int main()
+int
+main()
 {
   initlog();
   PrimitiveVectorMemory<std::vector<double>> primitive_memory;

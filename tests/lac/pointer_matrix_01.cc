@@ -16,8 +16,8 @@
 // check PointerMatrix:checkConstructor1
 
 #include "../tests.h"
-#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/vector.h>
 
 template <typename number>
@@ -25,14 +25,13 @@ void
 checkConstructor1()
 {
   deallog << "Init with empty matrix" << std::endl;
-  PointerMatrix<FullMatrix<number>, Vector<number> > P;
+  PointerMatrix<FullMatrix<number>, Vector<number>> P;
   deallog << "Is matrix empty:" << P.empty() << std::endl;
 }
 
 int
 main()
 {
-
   std::ofstream logfile("output");
   deallog << std::fixed;
   deallog << std::setprecision(4);

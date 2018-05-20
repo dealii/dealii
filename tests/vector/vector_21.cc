@@ -13,55 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<double>::operator /=
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<double> &v)
+void
+test(Vector<double>& v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
   // actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
-      v(i) = i;
+      v(i)       = i;
       pattern[i] = true;
     }
-  v.compress ();
+  v.compress();
 
   // multiply v with 3/4
-  v /= 4./3.;
+  v /= 4. / 3.;
 
   // check that the entries are ok
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (((pattern[i] == true) && (v(i) == i*3./4.))
-                 ||
-                 ((pattern[i] == false) && (v(i) == 0)),
-                 ExcInternalError());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(((pattern[i] == true) && (v(i) == i * 3. / 4.))
+                  || ((pattern[i] == false) && (v(i) == 0)),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -72,9 +69,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

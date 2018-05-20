@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 /*
  Code for testing the function
  GridGenerator::extract_boundary_mesh (...).
@@ -28,93 +27,91 @@
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 using namespace std;
 
-
 template <int s_dim, int spacedim>
-void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
-                               map< typename Triangulation<s_dim,spacedim>::cell_iterator,
-                               typename Triangulation<s_dim+1,spacedim>::face_iterator >
-                               &surface_to_volume_mapping)
+void
+test_vertices_orientation(
+  const Triangulation<s_dim, spacedim>& boundary_mesh,
+  map<typename Triangulation<s_dim, spacedim>::cell_iterator,
+      typename Triangulation<s_dim + 1, spacedim>::face_iterator>&
+    surface_to_volume_mapping)
 {
-  typename Triangulation<s_dim,spacedim>::active_cell_iterator
-  cell = boundary_mesh.begin_active(),
-  endc = boundary_mesh.end();
-  typename Triangulation<s_dim+1,spacedim>::face_iterator face;
+  typename Triangulation<s_dim, spacedim>::active_cell_iterator cell
+    = boundary_mesh.begin_active(),
+    endc = boundary_mesh.end();
+  typename Triangulation<s_dim + 1, spacedim>::face_iterator face;
 
-  for (; cell!=endc; ++cell)
+  for(; cell != endc; ++cell)
     {
-
-      face = surface_to_volume_mapping [cell];
+      face = surface_to_volume_mapping[cell];
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for(unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         deallog << "  " << cell->vertex(k) << std::endl;
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
-      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for(unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         deallog << "  " << face->vertex(k) << std::endl;
 
-      for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      for(unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          AssertThrow (diff.square() < 1.e-15*face->vertex(k).square(), ExcInternalError());
+          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
+                      ExcInternalError());
         }
     }
 }
 
 template <int dim, int spacedim>
-void save_mesh(const Triangulation<dim,spacedim> &tria)
+void
+save_mesh(const Triangulation<dim, spacedim>& tria)
 {
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
+  grid_out.write_gnuplot(tria, deallog.get_file_stream());
 }
 
-
-int main ()
+int
+main()
 {
-
   ofstream logfile("output");
   deallog.attach(logfile);
-
 
   {
     // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
 
-    map< Triangulation<dim-1,dim>::cell_iterator,
-         Triangulation<dim,dim>::face_iterator>
-         surface_to_volume_mapping;
+    map<Triangulation<dim - 1, dim>::cell_iterator,
+        Triangulation<dim, dim>::face_iterator>
+                                 surface_to_volume_mapping;
     const SphericalManifold<dim> boundary_description;
-    Triangulation<dim> volume_mesh;
+    Triangulation<dim>           volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
-    volume_mesh.set_manifold (0, boundary_description);
-    volume_mesh.refine_global (1);
+    volume_mesh.set_manifold(0, boundary_description);
+    volume_mesh.refine_global(1);
 
-    const SphericalManifold<dim-1,dim> surface_description;
-    Triangulation<dim-1,dim> boundary_mesh;
-    boundary_mesh.set_manifold (0, surface_description);
+    const SphericalManifold<dim - 1, dim> surface_description;
+    Triangulation<dim - 1, dim>           boundary_mesh;
+    boundary_mesh.set_manifold(0, surface_description);
 
     surface_to_volume_mapping
-      = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
-    deallog << volume_mesh.n_active_cells () << std::endl;
-    deallog << boundary_mesh.n_active_cells () << std::endl;
+      = GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
+    deallog << volume_mesh.n_active_cells() << std::endl;
+    deallog << boundary_mesh.n_active_cells() << std::endl;
     save_mesh(boundary_mesh);
-
 
     test_vertices_orientation(boundary_mesh, surface_to_volume_mapping);
     save_mesh(boundary_mesh);
   }
-
 
   return 0;
 }

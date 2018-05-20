@@ -19,13 +19,14 @@
 
 #include <deal.II/base/index_set.h>
 
-int main()
+int
+main()
 {
   initlog();
 
   IndexSet is1(10);
   is1.add_range(0, 2);
-  is1.add_range(5,8);
+  is1.add_range(5, 8);
 
   deallog << is1.n_elements() << ", ";
   deallog << is1.pop_back() << std::endl;
@@ -35,7 +36,6 @@ int main()
 
   deallog << is1.n_elements() << ", ";
   deallog << is1.pop_back() << std::endl;
-
 
   is1.add_index(9);
 

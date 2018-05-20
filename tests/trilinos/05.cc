@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check querying the number of nonzero elements in
 // TrilinosWrappers::SparseMatrix
 
@@ -23,48 +21,47 @@
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <iostream>
 
-
-void test (TrilinosWrappers::SparseMatrix &m)
+void
+test(TrilinosWrappers::SparseMatrix& m)
 {
   // first set a few entries. count how many
   // entries we have
   unsigned int counter = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.m(); ++j)
+      if((i + 2 * j + 1) % 3 == 0)
         {
-          m.set (i,j, i*j*.5+.5);
+          m.set(i, j, i * j * .5 + .5);
           ++counter;
         }
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
-  Assert (m.n_nonzero_elements() == counter,
-          ExcInternalError());
+  Assert(m.n_nonzero_elements() == counter, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
-        TrilinosWrappers::SparseMatrix m (5U,5U,3U);
-        test (m);
+        TrilinosWrappers::SparseMatrix m(5U, 5U, 3U);
+        test(m);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -75,9 +72,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

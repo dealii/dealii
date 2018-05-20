@@ -13,41 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<double>::size()
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 
-
-void test (Vector<double> &v)
+void
+test(Vector<double>& v)
 {
   // set only certain elements of the vector
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     v(i) = i;
 
-  v.compress ();
+  v.compress();
 
-  AssertThrow (v.size() == 100, ExcInternalError());
+  AssertThrow(v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -58,9 +56,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

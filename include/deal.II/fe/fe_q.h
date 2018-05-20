@@ -22,7 +22,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
 /*!@addtogroup fe */
 /*@{*/
 
@@ -548,8 +547,8 @@ DEAL_II_NAMESPACE_OPEN
  * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
  * Martin Kronbichler, 2008
  */
-template <int dim, int spacedim=dim>
-class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
 {
 public:
   /**
@@ -557,7 +556,7 @@ public:
    * Gauss-Lobatto support (node) points. For polynomial degrees of one and
    * two, these are the usual equidistant points.
    */
-  FE_Q (const unsigned int p);
+  FE_Q(const unsigned int p);
 
   /**
    * Constructor for tensor product polynomials with support points @p points
@@ -569,17 +568,17 @@ public:
    * equidistant nodes at <tt>fe_degree > 2</tt>, construct
    * <tt>FE_Q<dim>(QIterated<1>(QTrapez<1>(),fe_degree))</tt>.
    */
-  FE_Q (const Quadrature<1> &points);
+  FE_Q(const Quadrature<1>& points);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q<dim>(degree)</tt>, with @p dim and @p degree replaced by
    * appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
   /**
@@ -589,13 +588,11 @@ public:
    * the current element is scalar, the support point values need to
    * be vectors of length 1.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const override;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>>& support_point_values,
+    std::vector<double>&               nodal_values) const override;
 };
-
-
 
 /*@}*/
 

@@ -13,35 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test a bug in the SolverSelector when using a custom SolverControl. At one
 // point the SolverControl got "sliced".
 
-#include "../tests.h"
 #include "../testmatrix.h"
+#include "../tests.h"
+#include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/solver_selector.h>
 
-
-class MySolverControl:
-  public SolverControl
+class MySolverControl : public SolverControl
 {
 public:
-  virtual State check(const unsigned int step,const double)
+  virtual State
+  check(const unsigned int step, const double)
   {
     deallog << "MySolverControl " << step << std::endl;
     return SolverControl::check(step, 0);
   }
 };
 
-
-
-
 template <typename MatrixType, typename VectorType>
 void
-check(const MatrixType &A, const VectorType &f)
+check(const MatrixType& A, const VectorType& f)
 {
   std::vector<std::string> names;
   names.push_back("cg");
@@ -49,9 +44,9 @@ check(const MatrixType &A, const VectorType &f)
   names.push_back("gmres");
   names.push_back("fgmres");
 
-  MySolverControl mycont;
-  SolverSelector<VectorType> solver;
-  PreconditionSSOR<SparseMatrix<double> > pre;
+  MySolverControl                        mycont;
+  SolverSelector<VectorType>             solver;
+  PreconditionSSOR<SparseMatrix<double>> pre;
   pre.initialize(A);
 
   VectorType u;
@@ -60,7 +55,7 @@ check(const MatrixType &A, const VectorType &f)
   std::vector<std::string>::const_iterator name;
 
   solver.set_control(mycont);
-  for (name = names.begin(); name != names.end(); ++name)
+  for(name = names.begin(); name != names.end(); ++name)
     {
       solver.select(*name);
       u = 0.;
@@ -68,26 +63,26 @@ check(const MatrixType &A, const VectorType &f)
     }
 }
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  unsigned int size=37;
-  unsigned int dim = (size-1)*(size-1);
+  unsigned int size = 37;
+  unsigned int dim  = (size - 1) * (size - 1);
 
   deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
   // Make matrix
-  FDMatrix testproblem(size, size);
+  FDMatrix        testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
   testproblem.five_point_structure(structure);
   structure.compress();
-  SparseMatrix<double>  A(structure);
+  SparseMatrix<double> A(structure);
   testproblem.five_point(A);
-  Vector<double>  f(dim);
+  Vector<double> f(dim);
   f = 1.;
 
   check(A, f);

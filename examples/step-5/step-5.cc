@@ -17,31 +17,30 @@
  * Author: Wolfgang Bangerth, University of Heidelberg, 1999
  */
 
-
 // @sect3{Include files}
 
 // Again, the first few include files are already known, so we won't comment
 // on them:
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // This one is new. We want to read a triangulation from disk, and the class
 // which does this is declared in the following file:
@@ -55,10 +54,8 @@
 #include <fstream>
 #include <iostream>
 
-
 // Finally, this has been discussed in previous tutorial programs before:
 using namespace dealii;
-
 
 // @sect3{The <code>Step5</code> class template}
 
@@ -71,26 +68,30 @@ template <int dim>
 class Step5
 {
 public:
-  Step5 ();
-  void run ();
+  Step5();
+  void
+  run();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void output_results (const unsigned int cycle) const;
+  void
+  setup_system();
+  void
+  assemble_system();
+  void
+  solve();
+  void
+  output_results(const unsigned int cycle) const;
 
-  Triangulation<dim>   triangulation;
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  Triangulation<dim> triangulation;
+  FE_Q<dim>          fe;
+  DoFHandler<dim>    dof_handler;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
-
 
 // @sect3{Working with nonconstant coefficients}
 
@@ -104,9 +105,10 @@ private:
 // point. We let it return 20 if the distance to the origin is less than 0.5,
 // and 1 otherwise.
 template <int dim>
-double coefficient (const Point<dim> &p)
+double
+coefficient(const Point<dim>& p)
 {
-  if (p.square() < 0.5*0.5)
+  if(p.square() < 0.5 * 0.5)
     return 20;
   else
     return 1;
@@ -118,37 +120,31 @@ double coefficient (const Point<dim> &p)
 
 // This function is as before.
 template <int dim>
-Step5<dim>::Step5 () :
-  fe (1),
-  dof_handler (triangulation)
+Step5<dim>::Step5() : fe(1), dof_handler(triangulation)
 {}
-
-
 
 // @sect4{Step5::setup_system}
 
 // This is the function <code>make_grid_and_dofs</code> from the previous
 // example, minus the generation of the grid. Everything else is unchanged:
 template <int dim>
-void Step5<dim>::setup_system ()
+void
+Step5<dim>::setup_system()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  std::cout << "   Number of degrees of freedom: "
-            << dof_handler.n_dofs()
+  std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, dsp);
+  DoFTools::make_sparsity_pattern(dof_handler, dsp);
   sparsity_pattern.copy_from(dsp);
 
-  system_matrix.reinit (sparsity_pattern);
+  system_matrix.reinit(sparsity_pattern);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit(dof_handler.n_dofs());
+  system_rhs.reinit(dof_handler.n_dofs());
 }
-
-
 
 // @sect4{Step5::assemble_system}
 
@@ -167,77 +163,71 @@ void Step5<dim>::setup_system ()
 //
 // The first parts of the function are completely unchanged from before:
 template <int dim>
-void Step5<dim>::assemble_system ()
+void
+Step5<dim>::assemble_system()
 {
-  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim> quadrature_formula(2);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values    |  update_gradients |
-                           update_quadrature_points  |  update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients
+                            | update_quadrature_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
-  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
   // Next is the typical loop over all cells to compute local contributions
   // and then to transfer them into the global matrix and vector. The only
   // change in this part, compared to step-4, is that we will use the
   // <code>coefficient</code> function defined above to compute the
   // coefficient value at each quadrature point.
-  for (const auto &cell: dof_handler.active_cell_iterators())
+  for(const auto& cell : dof_handler.active_cell_iterators())
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
+      for(unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient = coefficient<dim>
-                                             (fe_values.quadrature_point (q_index));
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          const double current_coefficient
+            = coefficient<dim>(fe_values.quadrature_point(q_index));
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (current_coefficient *
-                                     fe_values.shape_grad(i,q_index) *
-                                     fe_values.shape_grad(j,q_index) *
-                                     fe_values.JxW(q_index));
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j)
+                  += (current_coefficient * fe_values.shape_grad(i, q_index)
+                      * fe_values.shape_grad(j, q_index)
+                      * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                              1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0
+                              * fe_values.JxW(q_index));
             }
         }
 
-
-      cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
+      cell->get_dof_indices(local_dof_indices);
+      for(unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
-            system_matrix.add (local_dof_indices[i],
-                               local_dof_indices[j],
-                               cell_matrix(i,j));
+          for(unsigned int j = 0; j < dofs_per_cell; ++j)
+            system_matrix.add(
+              local_dof_indices[i], local_dof_indices[j], cell_matrix(i, j));
 
           system_rhs(local_dof_indices[i]) += cell_rhs(i);
         }
     }
 
   // With the matrix so built, we use zero boundary values again:
-  std::map<types::global_dof_index,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            Functions::ZeroFunction<dim>(),
-                                            boundary_values);
-  MatrixTools::apply_boundary_values (boundary_values,
-                                      system_matrix,
-                                      solution,
-                                      system_rhs);
+  std::map<types::global_dof_index, double> boundary_values;
+  VectorTools::interpolate_boundary_values(
+    dof_handler, 0, Functions::ZeroFunction<dim>(), boundary_values);
+  MatrixTools::apply_boundary_values(
+    boundary_values, system_matrix, solution, system_rhs);
 }
-
 
 // @sect4{Step5::solve}
 
@@ -267,22 +257,20 @@ void Step5<dim>::assemble_system ()
 // the preconditioner we have declared, and the CG solver will do the rest for
 // us:
 template <int dim>
-void Step5<dim>::solve ()
+void
+Step5<dim>::solve()
 {
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  solver.solve (system_matrix, solution, system_rhs,
-                preconditioner);
+  solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
   std::cout << "   " << solver_control.last_step()
-            << " CG iterations needed to obtain convergence."
-            << std::endl;
+            << " CG iterations needed to obtain convergence." << std::endl;
 }
-
 
 // @sect4{Step5::output_results and setting output flags}
 
@@ -290,14 +278,15 @@ void Step5<dim>::solve ()
 // but here we will show how to modify some output options and how to
 // construct a different filename for each refinement cycle.
 template <int dim>
-void Step5<dim>::output_results (const unsigned int cycle) const
+void
+Step5<dim>::output_results(const unsigned int cycle) const
 {
   DataOut<dim> data_out;
 
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(solution, "solution");
 
-  data_out.build_patches ();
+  data_out.build_patches();
 
   // For this example, we would like to write the output directly to a file in
   // Encapsulated Postscript (EPS) format. The library supports this, but
@@ -331,7 +320,7 @@ void Step5<dim>::output_results (const unsigned int cycle) const
   //
   // The only thing still to be done, is to tell the output object to use
   // these flags:
-  data_out.set_flags (eps_flags);
+  data_out.set_flags(eps_flags);
   // The above way to modify flags requires recompilation each time we would
   // like to use different flags. This is inconvenient, and we will see more
   // advanced ways in step-19 where the output flags are determined at run
@@ -345,11 +334,9 @@ void Step5<dim>::output_results (const unsigned int cycle) const
   // to a part of a string; this is most easily done using the C++ function
   // <code>std::to_string</code>. With the so-constructed filename, we can
   // then open an output stream and write the data to that file:
-  std::ofstream output ("solution-" + std::to_string(cycle) + ".eps");
-  data_out.write_eps (output);
+  std::ofstream output("solution-" + std::to_string(cycle) + ".eps");
+  data_out.write_eps(output);
 }
-
-
 
 // @sect4{Step5::run}
 
@@ -372,10 +359,11 @@ void Step5<dim>::output_results (const unsigned int cycle) const
 // triangulation object when we ask it to read the file). Then we open the
 // respective file and initialize the triangulation with the data in the file:
 template <int dim>
-void Step5<dim>::run ()
+void
+Step5<dim>::run()
 {
   GridIn<dim> grid_in;
-  grid_in.attach_triangulation (triangulation);
+  grid_in.attach_triangulation(triangulation);
   std::ifstream input_file("circle-grid.inp");
   // We would now like to read the file. However, the input file is only for a
   // two-dimensional triangulation, while this function is a template for
@@ -420,7 +408,7 @@ void Step5<dim>::run ()
   // it will later also be linked to libraries that have been compiled for
   // optimized mode. In order to switch back to debug mode, simply recompile
   // with the command <code>make debug</code>.
-  Assert (dim==2, ExcInternalError());
+  Assert(dim == 2, ExcInternalError());
   // ExcInternalError is a globally defined exception, which may be thrown
   // whenever something is terribly wrong. Usually, one would like to use more
   // specific exceptions, and particular in this case one would of course try
@@ -435,7 +423,7 @@ void Step5<dim>::run ()
   // So if we got past the assertion, we know that dim==2, and we can now
   // actually read the grid. It is in UCD (unstructured cell data) format (though
   // the convention is to use the suffix <code>inp</code> for UCD files):
-  grid_in.read_ucd (input_file);
+  grid_in.read_ucd(input_file);
   // If you like to use another input format, you have to use one of the other
   // <code>grid_in.read_xxx</code> function. (See the documentation of the
   // <code>GridIn</code> class to find out what input formats are presently
@@ -450,39 +438,37 @@ void Step5<dim>::run ()
   // when we refine the mesh.
   const SphericalManifold<dim> boundary;
   triangulation.set_all_manifold_ids_on_boundary(0);
-  triangulation.set_manifold (0, boundary);
+  triangulation.set_manifold(0, boundary);
 
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for(unsigned int cycle = 0; cycle < 6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
-      if (cycle != 0)
-        triangulation.refine_global (1);
+      if(cycle != 0)
+        triangulation.refine_global(1);
 
       // Now that we have a mesh for sure, we write some output and do all the
       // things that we have already seen in the previous examples.
       std::cout << "   Number of active cells: "
-                << triangulation.n_active_cells()
-                << std::endl
-                << "   Total number of cells: "
-                << triangulation.n_cells()
+                << triangulation.n_active_cells() << std::endl
+                << "   Total number of cells: " << triangulation.n_cells()
                 << std::endl;
 
-      setup_system ();
-      assemble_system ();
-      solve ();
-      output_results (cycle);
+      setup_system();
+      assemble_system();
+      solve();
+      output_results(cycle);
     }
 }
-
 
 // @sect3{The <code>main</code> function}
 
 // The main function looks mostly like the one in the previous example, so we
 // won't comment on it further:
-int main ()
+int
+main()
 {
   Step5<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
+  laplace_problem_2d.run();
   return 0;
 }

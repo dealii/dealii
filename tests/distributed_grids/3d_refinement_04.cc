@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test interaction with p4est with a simple grid in 3d. here, we
 // check that if we refine a square once, and then one of the children
 // once again, that we get 15 cells
@@ -26,58 +24,52 @@
 #include "../tests.h"
 #include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-
-
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
-  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)
+  for(unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
     {
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       GridGenerator::hyper_cube(tr);
 
-      deallog << i << ' ' << tr.n_active_cells()
-              << std::endl;
+      deallog << i << ' ' << tr.n_active_cells() << std::endl;
 
-      tr.refine_global (1);
+      tr.refine_global(1);
 
-      deallog << i << ' ' << tr.n_active_cells()
-              << std::endl;
+      deallog << i << ' ' << tr.n_active_cells() << std::endl;
 
-      Assert (tr.n_active_cells() == 8,
-              ExcInternalError());
+      Assert(tr.n_active_cells() == 8, ExcInternalError());
 
-      typename Triangulation<dim>::active_cell_iterator
-      cell = tr.begin_active();
-      std::advance (cell, i);
+      typename Triangulation<dim>::active_cell_iterator cell
+        = tr.begin_active();
+      std::advance(cell, i);
       cell->set_refine_flag();
-      tr.execute_coarsening_and_refinement ();
+      tr.execute_coarsening_and_refinement();
 
-      deallog << i << ' ' << tr.n_active_cells()
-              << std::endl;
+      deallog << i << ' ' << tr.n_active_cells() << std::endl;
 
-      Assert (tr.n_active_cells() == 15,
-              ExcInternalError());
+      Assert(tr.n_active_cells() == 15, ExcInternalError());
     }
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 #else
-  (void)argc;
-  (void)argv;
+  (void) argc;
+  (void) argv;
 #endif
 
   std::ofstream logfile("output");
@@ -86,6 +78,4 @@ int main(int argc, char *argv[])
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();
-
-
 }

@@ -13,46 +13,43 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test IndexSet::clear
 
 #include "../tests.h"
 
 #include <deal.II/base/index_set.h>
 
-
-void test ()
+void
+test()
 {
-  IndexSet index_set (20);
-  index_set.add_range (2,4);
-  index_set.add_range (12,18);
-  index_set.add_index (6);
-  index_set.add_index (8);
-  index_set.add_index (14);
-  index_set.add_index (16);
+  IndexSet index_set(20);
+  index_set.add_range(2, 4);
+  index_set.add_range(12, 18);
+  index_set.add_index(6);
+  index_set.add_index(8);
+  index_set.add_index(14);
+  index_set.add_index(16);
 
   // clear the IndexSet and then set elements
   // again
-  index_set.clear ();
+  index_set.clear();
 
-  index_set.add_range (2,4);
-  index_set.add_range (12,18);
-  index_set.add_index (6);
-  index_set.add_index (8);
-  index_set.add_index (14);
-  index_set.add_index (16);
+  index_set.add_range(2, 4);
+  index_set.add_range(12, 18);
+  index_set.add_index(6);
+  index_set.add_index(8);
+  index_set.add_index(14);
+  index_set.add_index(16);
 
-  for (unsigned int i=0; i<index_set.size(); ++i)
+  for(unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
             << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

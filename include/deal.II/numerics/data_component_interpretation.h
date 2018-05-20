@@ -16,8 +16,6 @@
 #ifndef dealii_data_component_interpretation_h
 #define dealii_data_component_interpretation_h
 
-
-
 #include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -60,8 +58,7 @@ namespace DataComponentInterpretation
      */
     component_is_part_of_vector
   };
-}
-
+} // namespace DataComponentInterpretation
 
 DEAL_II_NAMESPACE_CLOSE
 

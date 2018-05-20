@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test internal::extract_dofs_by_component for some corner cases that
 // I was unsure about when refactoring some code in there
 //
@@ -22,35 +20,29 @@
 // internal::extract_dofs_by_component from DoFTools::extract_dofs via
 // the BlockMask argument
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_system.h>
-#include <deal.II/dofs/dof_tools.h>
-
-
-
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
 template <int dim>
 void
-check ()
+check()
 {
-  Triangulation<dim> tr(Triangulation<dim>:: limit_level_difference_at_vertices);
-  GridGenerator::hyper_cube(tr, -1,1);
-  tr.refine_global (1);
+  Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
+  GridGenerator::hyper_cube(tr, -1, 1);
+  tr.refine_global(1);
   tr.begin_active()->set_refine_flag();
   tr.execute_coarsening_and_refinement();
 
-  FESystem<dim> element (FE_Q<dim>(2), 1,
-                         FE_Nedelec<dim>(0), 1);
+  FESystem<dim>   element(FE_Q<dim>(2), 1, FE_Nedelec<dim>(0), 1);
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
   dof.distribute_mg_dofs(element);
@@ -58,38 +50,40 @@ check ()
   // try all possible block
   // masks, which we encode as bit
   // strings
-  for (unsigned int int_mask=0; int_mask<(1U<<element[0].n_blocks()); ++int_mask)
+  for(unsigned int int_mask = 0; int_mask < (1U << element[0].n_blocks());
+      ++int_mask)
     {
-      std::vector<bool> component_mask (element[0].n_blocks());
-      for (unsigned int c=0; c<element[0].n_blocks(); ++c)
-        component_mask[c] = (int_mask & (1<<c));
+      std::vector<bool> component_mask(element[0].n_blocks());
+      for(unsigned int c = 0; c < element[0].n_blocks(); ++c)
+        component_mask[c] = (int_mask & (1 << c));
 
-      for (unsigned int level=0; level<tr.n_levels(); ++level)
+      for(unsigned int level = 0; level < tr.n_levels(); ++level)
         {
           deallog << "level=" << level << std::endl;
 
-          std::vector<bool> dofs (dof.n_dofs(level));
-          DoFTools::extract_level_dofs (level, dof, BlockMask(component_mask), dofs);
+          std::vector<bool> dofs(dof.n_dofs(level));
+          DoFTools::extract_level_dofs(
+            level, dof, BlockMask(component_mask), dofs);
 
-          for (unsigned int d=0; d<dofs.size(); ++d)
+          for(unsigned int d = 0; d < dofs.size(); ++d)
             deallog << dofs[d];
           deallog << std::endl;
         }
     }
 }
 
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(2);
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  deallog.push ("2d");
-  check<2> ();
-  deallog.pop ();
-  deallog.push ("3d");
-  check<3> ();
-  deallog.pop ();
+  deallog.push("2d");
+  check<2>();
+  deallog.pop();
+  deallog.push("3d");
+  check<3>();
+  deallog.pop();
 }

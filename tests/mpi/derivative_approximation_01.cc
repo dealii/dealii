@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // document bug in the DerivateApproximation in parallel
 /*
  --------------------------------------------------------
@@ -31,28 +29,28 @@
  */
 
 #include "../tests.h"
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/function.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/base/function.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/numerics/derivative_approximation.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <sstream>
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
-  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int n_processes = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int n_processes
+    = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -61,37 +59,35 @@ void test()
 
   const FE_Q<dim> fe(1);
   DoFHandler<dim> dofh(tr);
-  dofh.distribute_dofs (fe);
+  dofh.distribute_dofs(fe);
 
   IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs (dofh,
-                                           locally_relevant_set);
+  DoFTools::extract_locally_relevant_dofs(dofh, locally_relevant_set);
 
-  TrilinosWrappers::MPI::Vector vec (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
-  for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
+  TrilinosWrappers::MPI::Vector vec(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
+  for(unsigned int i = vec.local_range().first; i < vec.local_range().second;
+      ++i)
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 
-  TrilinosWrappers::MPI::Vector vec_rel ( locally_relevant_set);
+  TrilinosWrappers::MPI::Vector vec_rel(locally_relevant_set);
   vec_rel = vec;
 
   MappingQGeneric<dim> mapping(1);
-  Vector<float> indicators(tr.n_active_cells());
-  DerivativeApproximation::approximate_gradient  (mapping,
-                                                  dofh,
-                                                  vec_rel,
-                                                  indicators);
+  Vector<float>        indicators(tr.n_active_cells());
+  DerivativeApproximation::approximate_gradient(
+    mapping, dofh, vec_rel, indicators);
 
   // we got here, so no exception.
-  if (myid == 0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test<2>();
 }

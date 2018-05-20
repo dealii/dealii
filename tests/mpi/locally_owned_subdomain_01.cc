@@ -13,33 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that p::s::Tria.locally_owned_subdomain() works in 1d.
 
 #include "../tests.h"
 
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/distributed/shared_tria.h>
-#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
 
-
-
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll all;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    all;
 
   {
-    parallel::shared::Triangulation<1>
-    tria (MPI_COMM_WORLD,
-          ::Triangulation<1>::none,
-          false,
-          parallel::shared::Triangulation<1>::partition_metis);
+    parallel::shared::Triangulation<1> tria(
+      MPI_COMM_WORLD,
+      ::Triangulation<1>::none,
+      false,
+      parallel::shared::Triangulation<1>::partition_metis);
 
     deallog << tria.locally_owned_subdomain() << std::endl;
   }

@@ -16,7 +16,6 @@
 #ifndef dealii_diagonal_matrix_h
 #define dealii_diagonal_matrix_h
 
-
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operation.h>
 
@@ -43,12 +42,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Martin Kronbichler, 2016
  */
-template <typename VectorType=Vector<double> >
+template <typename VectorType = Vector<double>>
 class DiagonalMatrix : public Subscriptor
 {
 public:
   typedef typename VectorType::value_type value_type;
-  typedef typename VectorType::size_type size_type;
+  typedef typename VectorType::size_type  size_type;
 
   /**
    * Constructor.
@@ -59,42 +58,49 @@ public:
    * Initialize with a given vector by copying the content of the vector
    * @p vec.
    */
-  void reinit (const VectorType &vec);
+  void
+  reinit(const VectorType& vec);
 
   /**
    * Compresses the data structures and allows the resulting matrix to be used
    * in all other operations like matrix-vector products. This is a collective
    * operation, i.e., it needs to be run on all processors when used in parallel.
    */
-  void compress (VectorOperation::values operation);
+  void
+  compress(VectorOperation::values operation);
 
   /**
    * Return a reference to the underlying vector for manipulation of the
    * entries on the matrix diagonal.
    */
-  VectorType &get_vector();
+  VectorType&
+  get_vector();
 
   /**
    * Clear content of this object and reset to the state of default constructor.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Return a read-only reference to the underlying vector.
    */
-  const VectorType &get_vector() const;
+  const VectorType&
+  get_vector() const;
 
   /**
    * Number of rows of this matrix. This number corresponds to the size of the
    * underlying vector.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Number of columns of this matrix. This number corresponds to the size of
    * the underlying vector.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * Read-only access to a value. This is restricted to the case where
@@ -105,8 +111,8 @@ public:
    * <code>get_vector().locally_owned_elements()</code> for the entries that
    * actually are accessible.
    */
-  value_type operator()(const size_type i,
-                        const size_type j) const;
+  value_type
+  operator()(const size_type i, const size_type j) const;
 
   /**
    * Read-write access to a value. This is restricted to the case where
@@ -117,8 +123,8 @@ public:
    * <code>get_vector().locally_owned_elements()</code> for the entries that
    * actually are accessible.
    */
-  value_type &operator()(const size_type i,
-                         const size_type j);
+  value_type&
+  operator()(const size_type i, const size_type j);
 
   /**
    * Add an array of values given by <tt>values</tt> in the given global
@@ -132,12 +138,13 @@ public:
    * diagonal as when assembling into a sparse matrix.
    */
   template <typename number2>
-  void add (const size_type  row,
-            const size_type  n_cols,
-            const size_type *col_indices,
-            const number2   *values,
-            const bool       elide_zero_values = true,
-            const bool       col_indices_are_sorted = false);
+  void
+  add(const size_type  row,
+      const size_type  n_cols,
+      const size_type* col_indices,
+      const number2*   values,
+      const bool       elide_zero_values      = true,
+      const bool       col_indices_are_sorted = false);
 
   /**
    * Add value to the element (i,j).
@@ -145,39 +152,38 @@ public:
    * Due to the storage of this matrix, entries are only added to the diagonal
    * of the matrix. All other entries are ignored and no exception is thrown.
    */
-  void add (const size_type i,
-            const size_type j,
-            const value_type value);
+  void
+  add(const size_type i, const size_type j, const value_type value);
 
   /**
    * Performs a matrix-vector multiplication with the given matrix.
    */
-  void vmult (VectorType       &dst,
-              const VectorType &src) const;
+  void
+  vmult(VectorType& dst, const VectorType& src) const;
 
   /**
    * Performs a transpose matrix-vector multiplication with the given
    * matrix. Since this represents a diagonal matrix, exactly the same as
    * vmult().
    */
-  void Tvmult (VectorType       &dst,
-               const VectorType &src) const;
+  void
+  Tvmult(VectorType& dst, const VectorType& src) const;
 
   /**
    * Adds the result of a matrix-vector multiplication into the destination
    * vector dst. Needs to create a temporary vector, which makes performance
    * slower than for @p vmult().
    */
-  void vmult_add (VectorType       &dst,
-                  const VectorType &src) const;
+  void
+  vmult_add(VectorType& dst, const VectorType& src) const;
 
   /**
    * Adds the result of a transpose matrix-vector multiplication into the
    * destination vector dst. Needs to create a temporary vector, which makes
    * performance slower than for @p Tvmult().
    */
-  void Tvmult_add (VectorType       &dst,
-                   const VectorType &src) const;
+  void
+  Tvmult_add(VectorType& dst, const VectorType& src) const;
 
   /**
    * Initialize vector @p dst to have the same size and partition as
@@ -186,12 +192,14 @@ public:
    * This is a part of the interface required
    * by linear_operator().
    */
-  void initialize_dof_vector(VectorType &dst) const;
+  void
+  initialize_dof_vector(VectorType& dst) const;
 
   /**
    * Return the memory consumption of this object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -211,61 +219,47 @@ DiagonalMatrix<VectorType>::clear()
   diagonal.reinit(0);
 }
 
-
-
 template <typename VectorType>
 std::size_t
-DiagonalMatrix<VectorType>::memory_consumption () const
+DiagonalMatrix<VectorType>::memory_consumption() const
 {
   return diagonal.memory_consumption();
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::reinit(const VectorType &vec)
+DiagonalMatrix<VectorType>::reinit(const VectorType& vec)
 {
   diagonal = vec;
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::initialize_dof_vector(VectorType &dst) const
+DiagonalMatrix<VectorType>::initialize_dof_vector(VectorType& dst) const
 {
   dst.reinit(diagonal);
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::compress (VectorOperation::values operation)
+DiagonalMatrix<VectorType>::compress(VectorOperation::values operation)
 {
   diagonal.compress(operation);
 }
 
-
-
 template <typename VectorType>
-VectorType &
+VectorType&
 DiagonalMatrix<VectorType>::get_vector()
 {
   return diagonal;
 }
 
-
-
 template <typename VectorType>
-const VectorType &
+const VectorType&
 DiagonalMatrix<VectorType>::get_vector() const
 {
   return diagonal;
 }
-
-
 
 template <typename VectorType>
 typename VectorType::size_type
@@ -274,8 +268,6 @@ DiagonalMatrix<VectorType>::m() const
   return diagonal.size();
 }
 
-
-
 template <typename VectorType>
 typename VectorType::size_type
 DiagonalMatrix<VectorType>::n() const
@@ -283,102 +275,82 @@ DiagonalMatrix<VectorType>::n() const
   return diagonal.size();
 }
 
-
-
 template <typename VectorType>
 typename VectorType::value_type
 DiagonalMatrix<VectorType>::operator()(const size_type i,
                                        const size_type j) const
 {
-  Assert (i==j, ExcIndexRange(j,i,i+1));
+  Assert(i == j, ExcIndexRange(j, i, i + 1));
   (void) j;
   return diagonal(i);
 }
 
-
-
 template <typename VectorType>
-typename VectorType::value_type &
-DiagonalMatrix<VectorType>::operator()(const size_type i,
-                                       const size_type j)
+typename VectorType::value_type&
+DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j)
 {
-  Assert (i==j, ExcIndexRange(j,i,i+1));
-  (void)j;
+  Assert(i == j, ExcIndexRange(j, i, i + 1));
+  (void) j;
   return diagonal(i);
 }
-
-
 
 template <typename VectorType>
 template <typename number2>
 void
-DiagonalMatrix<VectorType>::add (const size_type  row,
-                                 const size_type  n_cols,
-                                 const size_type *col_indices,
-                                 const number2   *values,
-                                 const bool,
-                                 const bool       )
+DiagonalMatrix<VectorType>::add(const size_type  row,
+                                const size_type  n_cols,
+                                const size_type* col_indices,
+                                const number2*   values,
+                                const bool,
+                                const bool)
 {
-  for (size_type i=0; i<n_cols; ++i)
-    if (col_indices[i] == row)
+  for(size_type i = 0; i < n_cols; ++i)
+    if(col_indices[i] == row)
       diagonal(row) += values[i];
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::add (const size_type i,
-                                 const size_type j,
-                                 const value_type value)
+DiagonalMatrix<VectorType>::add(const size_type  i,
+                                const size_type  j,
+                                const value_type value)
 {
-  if (i == j)
+  if(i == j)
     diagonal(i) += value;
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::vmult(VectorType       &dst,
-                                  const VectorType &src) const
+DiagonalMatrix<VectorType>::vmult(VectorType& dst, const VectorType& src) const
 {
   dst = src;
   dst.scale(diagonal);
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::Tvmult(VectorType       &dst,
-                                   const VectorType &src) const
+DiagonalMatrix<VectorType>::Tvmult(VectorType& dst, const VectorType& src) const
 {
   vmult(dst, src);
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::vmult_add(VectorType       &dst,
-                                      const VectorType &src) const
+DiagonalMatrix<VectorType>::vmult_add(VectorType&       dst,
+                                      const VectorType& src) const
 {
   VectorType tmp(src);
   tmp.scale(diagonal);
   dst += tmp;
 }
 
-
-
 template <typename VectorType>
 void
-DiagonalMatrix<VectorType>::Tvmult_add(VectorType       &dst,
-                                       const VectorType &src) const
+DiagonalMatrix<VectorType>::Tvmult_add(VectorType&       dst,
+                                       const VectorType& src) const
 {
   vmult_add(dst, src);
 }
-
 
 #endif
 

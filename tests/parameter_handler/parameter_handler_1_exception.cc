@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // ParameterHandler::declare_entry throws an exception if the default
 // value of an entry doesn't match the pattern; but it should still
 // yield a properly declared entry
@@ -22,31 +20,32 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+void
+check(const char* p)
 {
   ParameterHandler prm;
   try
     {
-      prm.declare_entry ("test_1", "abc",
-                         Patterns::List(Patterns::Integer(-1,1),2,3));
+      prm.declare_entry(
+        "test_1", "abc", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
     }
-  catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
+  catch(const ParameterHandler::ExcValueDoesNotMatchPattern&)
     {
       deallog << "Exception caught as expected." << std::endl;
     }
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
 
   return 0;
 }

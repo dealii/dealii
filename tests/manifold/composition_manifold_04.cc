@@ -13,31 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Stress periodicity in CompositionManifold. Compose PolarManifold with
 // the identity, and make sure periodicity is respected.
 
 #include "../tests.h"
 
-
 // all include files you need here
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/composition_manifold.h>
+#include <deal.II/grid/manifold_lib.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
-  std::ostream &out = deallog.get_file_stream();
+  std::ostream& out = deallog.get_file_stream();
 
-  const int dim=2, spacedim=2;
+  const int dim = 2, spacedim = 2;
 
   Point<spacedim> center;
 
-  PolarManifold<dim,spacedim> S(center);
-  FunctionManifold<dim,spacedim,spacedim> F("x;y", "x;y");
+  PolarManifold<dim, spacedim>              S(center);
+  FunctionManifold<dim, spacedim, spacedim> F("x;y", "x;y");
 
-  CompositionManifold<dim> manifold(S,F);
+  CompositionManifold<dim> manifold(S, F);
 
   // Chart points.
   Point<spacedim> cp[2];
@@ -47,14 +45,14 @@ int main ()
   cp[1][0] = 1.0;
 
   // Force roundoff errors on one side only
-  double eps=1e-10;
+  double eps = 1e-10;
 
   // Last point
-  cp[0][1] = -numbers::PI/4;
-  cp[1][1] =  numbers::PI/4-eps;
+  cp[0][1] = -numbers::PI / 4;
+  cp[1][1] = numbers::PI / 4 - eps;
 
   // Spacedim points
-  std::vector<Point<spacedim> > sp(2);
+  std::vector<Point<spacedim>> sp(2);
 
   // Weights
   std::vector<double> w(2);
@@ -68,23 +66,20 @@ int main ()
       << "set size ratio -1" << std::endl
       << "plot '-' with vectors " << std::endl;
 
-  for (unsigned int v=0; v<sp.size(); ++v)
-    out << center << " "
-        << sp[v] << std::endl;
+  for(unsigned int v = 0; v < sp.size(); ++v)
+    out << center << " " << sp[v] << std::endl;
 
-
-  for (unsigned int i=0; i<n_intermediates+1; ++i)
+  for(unsigned int i = 0; i < n_intermediates + 1; ++i)
     {
-      w[0] = 1.0-(double)i/((double)n_intermediates);
+      w[0] = 1.0 - (double) i / ((double) n_intermediates);
       w[1] = 1.0 - w[0];
 
-      Point<spacedim> ip = manifold.get_new_point(make_array_view(sp),
-                                                  make_array_view(w));
-      Tensor<1,spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
-      Tensor<1,spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
+      Point<spacedim> ip
+        = manifold.get_new_point(make_array_view(sp), make_array_view(w));
+      Tensor<1, spacedim> t1 = manifold.get_tangent_vector(ip, sp[0]);
+      Tensor<1, spacedim> t2 = manifold.get_tangent_vector(ip, sp[1]);
 
-      out << ip << " "
-          << t2 << std::endl;
+      out << ip << " " << t2 << std::endl;
     }
 
   out << "e" << std::endl;
@@ -93,14 +88,13 @@ int main ()
       << "set size ratio -1" << std::endl
       << "plot '-' w lp " << std::endl;
 
-  for (unsigned int i=0; i<n_intermediates+1; ++i)
+  for(unsigned int i = 0; i < n_intermediates + 1; ++i)
     {
-      w[0] = 1.0-(double)i/((double)n_intermediates);
+      w[0] = 1.0 - (double) i / ((double) n_intermediates);
       w[1] = 1.0 - w[0];
 
-      Point<spacedim> ip = manifold.
-                           pull_back(manifold.get_new_point(make_array_view(sp),
-                                                            make_array_view(w)));
+      Point<spacedim> ip = manifold.pull_back(
+        manifold.get_new_point(make_array_view(sp), make_array_view(w)));
 
       ip[0] = w[1];
 

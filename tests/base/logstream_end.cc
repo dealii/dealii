@@ -13,20 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // it used to happen that if we destroyed logstream (and presumably
 // all objects of the same type) that whatever we had put into with
 // operator<< after the last use of std::endl was lost. make sure that
 // that isn't the case anymore: logstream should flush whatever it has
 // left over when it is destroyed
 
-
 #include "../tests.h"
 #include <limits>
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -35,7 +32,7 @@ int main()
     LogStream log;
 
     log.attach(logfile);
-    log.log_thread_id (false);
+    log.log_thread_id(false);
 
     log << "This should be printed!";
   }

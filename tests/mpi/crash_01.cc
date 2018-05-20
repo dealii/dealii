@@ -13,54 +13,50 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // something that crashed at one point and for which I needed a simple testcase
-
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/intergrid_map.h>
-#include <deal.II/base/utilities.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <numeric>
 
-
 template <int dim>
-void test()
+void
+test()
 {
-  parallel::distributed::Triangulation<dim>
-  triangulation (MPI_COMM_WORLD,
-                 Triangulation<dim>::limit_level_difference_at_vertices);
+  parallel::distributed::Triangulation<dim> triangulation(
+    MPI_COMM_WORLD, Triangulation<dim>::limit_level_difference_at_vertices);
 
   FE_Q<dim> fe(1);
 
-  DoFHandler<dim> dof_handler (triangulation);
+  DoFHandler<dim> dof_handler(triangulation);
 
   GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global (1);
+  triangulation.refine_global(1);
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  if (myid == 0)
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  if(myid == 0)
     {
       initlog();
 

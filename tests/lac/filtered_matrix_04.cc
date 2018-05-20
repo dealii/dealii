@@ -20,24 +20,25 @@
 
 template <typename number>
 void
-checkTvmult_Add(FullMatrix<number> &A, Vector<number> &V,
-                bool expect_constrained_source = false)
+checkTvmult_Add(FullMatrix<number>& A,
+                Vector<number>&     V,
+                bool                expect_constrained_source = false)
 {
   deallog << "Tvmult_add" << std::endl;
 
-  FilteredMatrix < Vector<double> > F;
+  FilteredMatrix<Vector<double>> F;
   F.initialize(A, expect_constrained_source);
   F.add_constraint(0, 1);
 
   Vector<number> O(A.n());
-  for (unsigned int i = 0; i < O.size(); ++i)
+  for(unsigned int i = 0; i < O.size(); ++i)
     {
       O(i) = 1;
     }
 
   F.Tvmult_add(O, V);
 
-  for (unsigned int i = 0; i < O.size(); ++i)
+  for(unsigned int i = 0; i < O.size(); ++i)
     deallog << O(i) << '\t';
   deallog << std::endl;
 }
@@ -50,8 +51,7 @@ main()
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  const double Adata[] =
-  { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  const double Adata[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   FullMatrix<double> A(3, 3);
 

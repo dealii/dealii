@@ -13,150 +13,132 @@
 //
 // ---------------------------------------------------------------------
 
-
 // common framework for the various fe_tools_*.cc tests
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iomanip>
-#include <iomanip>
 #include <memory>
 #include <string>
-
 
 // forward declaration of the function that must be provided in the
 // .cc files
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2);
-
-
+check_this(const FiniteElement<dim>& fe1, const FiniteElement<dim>& fe2);
 
 // output some indicators for a given matrix. we don't write out the
 // entire matrix since this would blow up our output files beyond
 // reasonable limits
 void
-output_matrix (const FullMatrix<double> &m)
+output_matrix(const FullMatrix<double>& m)
 {
-  if ((m.m() == 0) || (m.n() == 0))
+  if((m.m() == 0) || (m.n() == 0))
     {
       deallog << "(Empty matrix)" << std::endl;
       return;
     }
 
-  deallog << m.l1_norm() << ' ' << m.linfty_norm()
-          << std::endl;
-  if (m.m() == m.n())
+  deallog << m.l1_norm() << ' ' << m.linfty_norm() << std::endl;
+  if(m.m() == m.n())
     deallog << m.frobenius_norm() << std::endl;
 
-  for (unsigned int i=0; i<std::min(m.m(),m.n()); ++i)
-    deallog << m(i,i) << ' ' << m(i,std::min(m.m(),m.n())-i-1) << ' ';
+  for(unsigned int i = 0; i < std::min(m.m(), m.n()); ++i)
+    deallog << m(i, i) << ' ' << m(i, std::min(m.m(), m.n()) - i - 1) << ' ';
   deallog << std::endl;
 }
-
 
 // output some indicators for a given vector
 template <typename VectorType>
 void
-output_vector (const VectorType &v)
+output_vector(const VectorType& v)
 {
   deallog << v.l1_norm() << ' ' << v.l2_norm() << ' ' << v.linfty_norm()
           << std::endl;
 
   // write out at most 20 equispaced
   // elements of the vector
-  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<typename VectorType::size_type>(1),
-                                                 static_cast<typename VectorType::size_type>(v.size()/20)))
+  for(unsigned int i = 0; i < v.size();
+      i += std::max(static_cast<typename VectorType::size_type>(1),
+                    static_cast<typename VectorType::size_type>(v.size() / 20)))
     deallog << v(i) << ' ';
   deallog << std::endl;
 }
 
-
-
-
 template <int dim>
-Triangulation<dim> *make_tria ()
+Triangulation<dim>*
+make_tria()
 {
-  Triangulation<dim> *tria = new Triangulation<dim>();
+  Triangulation<dim>* tria = new Triangulation<dim>();
   GridGenerator::hyper_cube(*tria, 0., 1.);
-  tria->refine_global (1);
-  for (int i=0; i<2; ++i)
+  tria->refine_global(1);
+  for(int i = 0; i < 2; ++i)
     {
       tria->begin_active()->set_refine_flag();
-      tria->execute_coarsening_and_refinement ();
+      tria->execute_coarsening_and_refinement();
     }
   return tria;
 }
 
-
-
 template <int dim>
-DoFHandler<dim> *make_dof_handler (const Triangulation<dim> &tria,
-                                   const FiniteElement<dim> &fe)
+DoFHandler<dim>*
+make_dof_handler(const Triangulation<dim>& tria, const FiniteElement<dim>& fe)
 {
-  DoFHandler<dim> *dof_handler = new DoFHandler<dim>(tria);
-  dof_handler->distribute_dofs (fe);
+  DoFHandler<dim>* dof_handler = new DoFHandler<dim>(tria);
+  dof_handler->distribute_dofs(fe);
   return dof_handler;
 }
 
-
-
 template <int dim>
-hp::DoFHandler<dim> *make_hp_dof_handler (const Triangulation<dim> &tria,
-                                          const hp::FECollection<dim> &fe)
+hp::DoFHandler<dim>*
+make_hp_dof_handler(const Triangulation<dim>&    tria,
+                    const hp::FECollection<dim>& fe)
 {
-  hp::DoFHandler<dim> *dof_handler = new hp::DoFHandler<dim>(tria);
-  dof_handler->distribute_dofs (fe);
+  hp::DoFHandler<dim>* dof_handler = new hp::DoFHandler<dim>(tria);
+  dof_handler->distribute_dofs(fe);
   return dof_handler;
 }
-
-
 
 template <int dim>
 void
-check (const FiniteElement<dim> &fe1,
-       const FiniteElement<dim> &fe2,
-       const std::string        &name)
+check(const FiniteElement<dim>& fe1,
+      const FiniteElement<dim>& fe2,
+      const std::string&        name)
 {
-  deallog << "Checking " << name
-          << " in " << dim << "d:"
-          << std::endl;
+  deallog << "Checking " << name << " in " << dim << "d:" << std::endl;
 
   // call main function in .cc files
-  check_this (fe1, fe2);
+  check_this(fe1, fe2);
 }
 
-
-
-
-
-#define CHECK(EL1,deg1,EL2,deg2,dim)\
-  { FE_ ## EL1<dim> fe1(deg1);   \
-    FE_ ## EL2<dim> fe2(deg2);   \
+#define CHECK(EL1, deg1, EL2, deg2, dim)                \
+  {                                                     \
+    FE_##EL1<dim> fe1(deg1);                            \
+    FE_##EL2<dim> fe2(deg2);                            \
     check(fe1, fe2, #EL1 #deg1 " against " #EL2 #deg2); \
     check(fe2, fe1, #EL2 #deg2 " against " #EL1 #deg1); \
   }
 
-#define CHECK_SYS1(sub1_1,N1_1,sub2_1,N2_1,dim) \
-  { FESystem<dim> fe1(sub1_1, N1_1);   \
-    FESystem<dim> fe2(sub2_1, N2_1);   \
+#define CHECK_SYS1(sub1_1, N1_1, sub2_1, N2_1, dim)           \
+  {                                                           \
+    FESystem<dim> fe1(sub1_1, N1_1);                          \
+    FESystem<dim> fe2(sub2_1, N2_1);                          \
     check(fe1, fe2, #sub1_1 #N1_1 " against " #sub2_1 #N2_1); \
     check(fe2, fe1, #sub2_1 #N2_1 " against " #sub1_1 #N1_1); \
   }
@@ -171,12 +153,12 @@ check (const FiniteElement<dim> &fe1,
    check(q, #sub1 #N1 #sub2 #N2 #sub3 #N3); }
 
 */
-#define CHECK_ALL(EL1,deg1,EL2,deg2)\
-  { CHECK(EL1,deg1,EL2,deg2,1); \
-    CHECK(EL1,deg1,EL2,deg2,2); \
-    CHECK(EL1,deg1,EL2,deg2,3); \
+#define CHECK_ALL(EL1, deg1, EL2, deg2) \
+  {                                     \
+    CHECK(EL1, deg1, EL2, deg2, 1);     \
+    CHECK(EL1, deg1, EL2, deg2, 2);     \
+    CHECK(EL1, deg1, EL2, deg2, 3);     \
   }
-
 
 int
 main()
@@ -184,73 +166,53 @@ main()
   try
     {
       std::ofstream logfile("output");
-      deallog << std::setprecision (8);
+      deallog << std::setprecision(8);
       deallog.attach(logfile);
       deallog.depth_console(0);
 
-      CHECK_ALL(Q,1,Q,1);
-      CHECK_ALL(Q,1,Q,2);
-      CHECK_ALL(Q,1,Q,3);
-      CHECK_ALL(Q,2,Q,2);
-      CHECK_ALL(Q,2,Q,3);
-      CHECK_ALL(Q,3,Q,3);
+      CHECK_ALL(Q, 1, Q, 1);
+      CHECK_ALL(Q, 1, Q, 2);
+      CHECK_ALL(Q, 1, Q, 3);
+      CHECK_ALL(Q, 2, Q, 2);
+      CHECK_ALL(Q, 2, Q, 3);
+      CHECK_ALL(Q, 3, Q, 3);
 
-      CHECK_ALL(DGQ,0,DGQ,0);
-      CHECK_ALL(DGQ,0,DGQ,1);
-      CHECK_ALL(DGQ,0,DGQ,2);
-      CHECK_ALL(DGQ,0,DGQ,4);
-      CHECK_ALL(DGQ,1,DGQ,1);
-      CHECK_ALL(DGQ,1,DGQ,3);
-      CHECK_ALL(DGQ,2,DGQ,2);
-      CHECK_ALL(DGQ,2,DGQ,2);
-      CHECK_ALL(DGQ,2,DGQ,4);
-      CHECK_ALL(DGQ,3,DGQ,3);
+      CHECK_ALL(DGQ, 0, DGQ, 0);
+      CHECK_ALL(DGQ, 0, DGQ, 1);
+      CHECK_ALL(DGQ, 0, DGQ, 2);
+      CHECK_ALL(DGQ, 0, DGQ, 4);
+      CHECK_ALL(DGQ, 1, DGQ, 1);
+      CHECK_ALL(DGQ, 1, DGQ, 3);
+      CHECK_ALL(DGQ, 2, DGQ, 2);
+      CHECK_ALL(DGQ, 2, DGQ, 2);
+      CHECK_ALL(DGQ, 2, DGQ, 4);
+      CHECK_ALL(DGQ, 3, DGQ, 3);
 
-      CHECK_ALL(DGP,0,DGP,0);
-      CHECK_ALL(DGP,0,DGP,1);
-      CHECK_ALL(DGP,0,DGP,2);
-      CHECK_ALL(DGP,0,DGP,4);
-      CHECK_ALL(DGP,1,DGP,1);
-      CHECK_ALL(DGP,1,DGP,3);
-      CHECK_ALL(DGP,2,DGP,2);
-      CHECK_ALL(DGP,2,DGP,2);
-      CHECK_ALL(DGP,2,DGP,4);
-      CHECK_ALL(DGP,3,DGP,3);
+      CHECK_ALL(DGP, 0, DGP, 0);
+      CHECK_ALL(DGP, 0, DGP, 1);
+      CHECK_ALL(DGP, 0, DGP, 2);
+      CHECK_ALL(DGP, 0, DGP, 4);
+      CHECK_ALL(DGP, 1, DGP, 1);
+      CHECK_ALL(DGP, 1, DGP, 3);
+      CHECK_ALL(DGP, 2, DGP, 2);
+      CHECK_ALL(DGP, 2, DGP, 2);
+      CHECK_ALL(DGP, 2, DGP, 4);
+      CHECK_ALL(DGP, 3, DGP, 3);
 
       CHECK(Nedelec, 0, Nedelec, 0, 2);
       CHECK(Nedelec, 0, Nedelec, 0, 3);
 
+      CHECK_SYS1(FE_Q<1>(1), 3, FE_Q<1>(2), 3, 1);
+      CHECK_SYS1(FE_DGQ<1>(2), 2, FE_DGQ<1>(3), 2, 1);
+      CHECK_SYS1(FE_DGP<1>(3), 1, FE_DGP<1>(1), 1, 1);
 
-      CHECK_SYS1(FE_Q<1>(1),  3,
-                 FE_Q<1>(2),  3,
-                 1);
-      CHECK_SYS1(FE_DGQ<1>(2),2,
-                 FE_DGQ<1>(3),2,
-                 1);
-      CHECK_SYS1(FE_DGP<1>(3),1,
-                 FE_DGP<1>(1),1,
-                 1);
+      CHECK_SYS1(FE_Q<2>(1), 3, FE_Q<2>(2), 3, 2);
+      CHECK_SYS1(FE_DGQ<2>(2), 2, FE_DGQ<2>(3), 2, 2);
+      CHECK_SYS1(FE_DGP<2>(3), 1, FE_DGP<2>(1), 1, 2);
 
-      CHECK_SYS1(FE_Q<2>(1),  3,
-                 FE_Q<2>(2),  3,
-                 2);
-      CHECK_SYS1(FE_DGQ<2>(2),2,
-                 FE_DGQ<2>(3),2,
-                 2);
-      CHECK_SYS1(FE_DGP<2>(3),1,
-                 FE_DGP<2>(1),1,
-                 2);
-
-      CHECK_SYS1(FE_Q<3>(1),  3,
-                 FE_Q<3>(2),  3,
-                 3);
-      CHECK_SYS1(FE_DGQ<3>(2),2,
-                 FE_DGQ<3>(3),2,
-                 3);
-      CHECK_SYS1(FE_DGP<3>(3),1,
-                 FE_DGP<3>(1),1,
-                 3);
-
+      CHECK_SYS1(FE_Q<3>(1), 3, FE_Q<3>(2), 3, 3);
+      CHECK_SYS1(FE_DGQ<3>(2), 2, FE_DGQ<3>(3), 2, 3);
+      CHECK_SYS1(FE_DGP<3>(3), 1, FE_DGP<3>(1), 1, 3);
 
       /*
             CHECK_SYS2(FE_Q<1>(1),  3,FE_DGQ<1>(2),2,1);
@@ -301,9 +263,10 @@ main()
       */
       return 0;
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -313,9 +276,10 @@ main()
               << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

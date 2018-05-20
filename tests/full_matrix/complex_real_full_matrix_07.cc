@@ -13,26 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check matrix=0. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors, even though we only store real values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_matrix(m);
   m = std::complex<number>(0);
-  print_matrix (m);
+  print_matrix(m);
 }
-

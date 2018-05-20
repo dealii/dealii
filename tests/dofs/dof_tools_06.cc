@@ -13,27 +13,23 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "dof_tools_common.h"
 
 // check
 //   DoFTools::extract_subdomain_dofs
 
-
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim>& dof_handler)
 {
   std::vector<bool> dofs(dof_handler.n_dofs());
 
-  for (unsigned int level=0; level<dof_handler.get_triangulation().n_levels(); ++level)
+  for(unsigned int level = 0;
+      level < dof_handler.get_triangulation().n_levels();
+      ++level)
     {
-      DoFTools::extract_subdomain_dofs (dof_handler,
-                                        level,
-                                        dofs);
-      output_bool_vector (dofs);
+      DoFTools::extract_subdomain_dofs(dof_handler, level, dofs);
+      output_bool_vector(dofs);
     }
 }

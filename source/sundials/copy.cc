@@ -29,182 +29,192 @@ namespace SUNDIALS
      * a generic interface to both and does a (checked) conversion from long
      * int (the type SUNDIALS uses for lengths) to std::size_t.
      */
-    inline
-    std::size_t
-    N_Vector_length(const N_Vector &vec)
+    inline std::size_t
+    N_Vector_length(const N_Vector& vec)
     {
-      const N_Vector_ID id = N_VGetVectorID(vec);
-      long int length = -1;
-      switch (id)
+      const N_Vector_ID id     = N_VGetVectorID(vec);
+      long int          length = -1;
+      switch(id)
         {
-        case SUNDIALS_NVEC_SERIAL:
-        {
-          length = NV_LENGTH_S(vec);
-          break;
-        }
-#ifdef DEAL_II_WITH_MPI
-        case SUNDIALS_NVEC_PARALLEL:
-        {
-          length = NV_LOCLENGTH_P(vec);
-          break;
-        }
-#endif
-        default:
-          Assert(false, ExcNotImplemented());
+          case SUNDIALS_NVEC_SERIAL:
+            {
+              length = NV_LENGTH_S(vec);
+              break;
+            }
+#  ifdef DEAL_II_WITH_MPI
+          case SUNDIALS_NVEC_PARALLEL:
+            {
+              length = NV_LOCLENGTH_P(vec);
+              break;
+            }
+#  endif
+          default:
+            Assert(false, ExcNotImplemented());
         }
 
       Assert(length >= 0, ExcInternalError());
       return static_cast<std::size_t>(length);
     }
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
 
-#ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_WITH_TRILINOS
 
-
-    void copy(TrilinosWrappers::MPI::Vector &dst, const N_Vector &src)
+    void
+    copy(TrilinosWrappers::MPI::Vector& dst, const N_Vector& src)
     {
       const IndexSet is = dst.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::Vector &src)
+    void
+    copy(N_Vector& dst, const TrilinosWrappers::MPI::Vector& src)
     {
       const IndexSet is = src.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
     }
 
-    void copy(TrilinosWrappers::MPI::BlockVector &dst, const N_Vector &src)
+    void
+    copy(TrilinosWrappers::MPI::BlockVector& dst, const N_Vector& src)
     {
       const IndexSet is = dst.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::BlockVector &src)
+    void
+    copy(N_Vector& dst, const TrilinosWrappers::MPI::BlockVector& src)
     {
-      IndexSet is = src.locally_owned_elements();
-      const size_t N = is.n_elements();
+      IndexSet     is = src.locally_owned_elements();
+      const size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
     }
 
-#endif //DEAL_II_WITH_TRILINOS
+#    endif //DEAL_II_WITH_TRILINOS
 
-#ifdef DEAL_II_WITH_PETSC
-#ifndef PETSC_USE_COMPLEX
+#    ifdef DEAL_II_WITH_PETSC
+#      ifndef PETSC_USE_COMPLEX
 
-    void copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src)
+    void
+    copy(PETScWrappers::MPI::Vector& dst, const N_Vector& src)
     {
       const IndexSet is = dst.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const PETScWrappers::MPI::Vector &src)
+    void
+    copy(N_Vector& dst, const PETScWrappers::MPI::Vector& src)
     {
       const IndexSet is = src.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
     }
 
-    void copy(PETScWrappers::MPI::BlockVector &dst, const N_Vector &src)
+    void
+    copy(PETScWrappers::MPI::BlockVector& dst, const N_Vector& src)
     {
       const IndexSet is = dst.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
       dst.compress(VectorOperation::insert);
     }
 
-    void copy(N_Vector &dst, const PETScWrappers::MPI::BlockVector &src)
+    void
+    copy(N_Vector& dst, const PETScWrappers::MPI::BlockVector& src)
     {
       const IndexSet is = src.locally_owned_elements();
-      const size_t N = is.n_elements();
+      const size_t   N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
     }
 
-#endif //PETSC_USE_COMPLEX
-#endif //DEAL_II_WITH_PETSC
+#      endif //PETSC_USE_COMPLEX
+#    endif   //DEAL_II_WITH_PETSC
 
-#endif //mpi
+#  endif //mpi
 
-    void copy(BlockVector<double> &dst, const N_Vector &src)
+    void
+    copy(BlockVector<double>& dst, const N_Vector& src)
     {
       const size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[i] = NV_Ith_S(src, i);
         }
     }
 
-    void copy(N_Vector &dst, const BlockVector<double> &src)
+    void
+    copy(N_Vector& dst, const BlockVector<double>& src)
     {
       const size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_S(dst, i) = src[i];
         }
     }
 
-    void copy(Vector<double> &dst, const N_Vector &src)
+    void
+    copy(Vector<double>& dst, const N_Vector& src)
     {
       const size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           dst[i] = NV_Ith_S(src, i);
         }
     }
 
-    void copy(N_Vector &dst, const Vector<double> &src)
+    void
+    copy(N_Vector& dst, const Vector<double>& src)
     {
       const size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);
-      for (size_t i=0; i<N; ++i)
+      for(size_t i = 0; i < N; ++i)
         {
           NV_Ith_S(dst, i) = src[i];
         }
     }
-  }
-}
+  } // namespace internal
+} // namespace SUNDIALS
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -13,16 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
 // same as gmres_reorthogonalize_02 but with worse inner product
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
-
-
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 // reimplements things from vector.templates.h in another way which is more
 // prone to roundoff, the linker will select this version instead of the one
@@ -31,30 +28,30 @@ namespace dealii
 {
   template <typename Number>
   template <typename Number2>
-  Number Vector<Number>::operator* (const Vector<Number2> &v) const
+  Number Vector<Number>::operator*(const Vector<Number2>& v) const
   {
     Number sum = 0;
-    for (unsigned int i=0; i<size(); ++i)
+    for(unsigned int i = 0; i < size(); ++i)
       sum += values[i] * v.values[i];
     return sum;
   }
   template <typename Number>
-  typename Vector<Number>::real_type Vector<Number>::l2_norm () const
+  typename Vector<Number>::real_type
+  Vector<Number>::l2_norm() const
   {
     real_type sum = 0;
-    for (unsigned int i=0; i<size(); ++i)
+    for(unsigned int i = 0; i < size(); ++i)
       sum += values[i] * values[i];
     return std::sqrt(sum);
   }
-}
-
-
+} // namespace dealii
 
 template <typename number>
-void test ()
+void
+test()
 {
   const unsigned int n = 200;
-  Vector<number> rhs(n), sol(n);
+  Vector<number>     rhs(n), sol(n);
   rhs = 1.;
 
   // only add diagonal entries
@@ -62,20 +59,18 @@ void test ()
   sp.compress();
   SparseMatrix<number> matrix(sp);
 
-  for (unsigned int i=0; i<n; ++i)
-    matrix.diag_element(i) = (i+1);
+  for(unsigned int i = 0; i < n; ++i)
+    matrix.diag_element(i) = (i + 1);
 
   // compared to the 02 test, need to use a looser tolerance because linear
   // summation does not allow for 1e2*eps (at least with the current detection
   // of re-orthogonalization)
-  SolverControl control(1000, 1e3*std::numeric_limits<number>::epsilon());
-  typename SolverGMRES<Vector<number> >::AdditionalData data;
+  SolverControl control(1000, 1e3 * std::numeric_limits<number>::epsilon());
+  typename SolverGMRES<Vector<number>>::AdditionalData data;
   data.max_n_tmp_vectors = 202;
 
-  SolverGMRES<Vector<number> > solver(control, data);
-  auto print_re_orthogonalization =
-    [](int accumulated_iterations)
-  {
+  SolverGMRES<Vector<number>> solver(control, data);
+  auto print_re_orthogonalization = [](int accumulated_iterations) {
     deallog.get_file_stream() << "Re-orthogonalization enabled at step "
                               << accumulated_iterations << std::endl;
   };
@@ -83,7 +78,8 @@ void test ()
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
@@ -96,4 +92,3 @@ int main()
   test<float>();
   deallog.pop();
 }
-

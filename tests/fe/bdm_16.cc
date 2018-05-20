@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // The test is used to check the restriction_is_additive flags. The
 // face degrees of freedom of a BDM element must be non-additive as
 // they have continuity requirements, however the interior DOFs must
@@ -28,25 +27,22 @@
 
 #include <string>
 
-
-std::ofstream logfile ("output");
+std::ofstream logfile("output");
 
 template <int dim>
 void
-test (const unsigned int degree)
+test(const unsigned int degree)
 {
   FE_BDM<dim> fe_bdm(degree);
 
   deallog << "Degree=" << degree
-          << ", restriction is additive flags:"
-          << std::endl;
+          << ", restriction is additive flags:" << std::endl;
 
-  for (unsigned int i=0; i<fe_bdm.dofs_per_cell; ++i)
+  for(unsigned int i = 0; i < fe_bdm.dofs_per_cell; ++i)
     deallog << fe_bdm.restriction_is_additive(i) << " ";
 
   deallog << std::endl;
 }
-
 
 int
 main()
@@ -54,15 +50,12 @@ main()
   initlog();
 
   deallog << "Dimension 2: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for(unsigned int i = 1; i < 4; ++i)
     test<2>(i);
 
   deallog << "Dimension 3: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for(unsigned int i = 1; i < 4; ++i)
     test<3>(i);
 
   return 0;
 }
-
-
-

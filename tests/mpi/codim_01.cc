@@ -13,53 +13,50 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test Tria<2,3> and DataOutput.
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <deal.II/fe/fe_q.h>
 
 template <int dim, int spacedim>
-void write_vtk (const parallel::distributed::Triangulation<dim,spacedim> &tria,
-                const char                                *filename)
+void
+write_vtk(const parallel::distributed::Triangulation<dim, spacedim>& tria,
+          const char*                                                filename)
 {
-  deallog << "Checksum: "
-          << tria.get_checksum ()
-          << std::endl;
+  deallog << "Checksum: " << tria.get_checksum() << std::endl;
 
-  tria.write_mesh_vtk (filename);
+  tria.write_mesh_vtk(filename);
 
   // copy the .pvtu and .vtu files
   // into the logstream
-  int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  if (myid==0)
+  int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  if(myid == 0)
     {
       cat_file((std::string(filename) + ".pvtu").c_str());
       cat_file((std::string(filename) + "_0000.vtu").c_str());
     }
-  else if (myid==1)
+  else if(myid == 1)
     cat_file((std::string(filename) + "_0001.vtu").c_str());
-  else if (myid==2)
+  else if(myid == 2)
     cat_file((std::string(filename) + "_0002.vtu").c_str());
   else
     AssertThrow(false, ExcNotImplemented());
-
 }
 
 template <int dim, int spacedim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
-  parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
 
   GridGenerator::torus(tr, 1, 0.2);
   tr.reset_all_manifolds();
@@ -68,41 +65,41 @@ void test(std::ostream & /*out*/)
   tr.begin_active()->set_refine_flag();
   (++(tr.begin_active()))->set_refine_flag();
 
-  tr.execute_coarsening_and_refinement ();
+  tr.execute_coarsening_and_refinement();
 
   write_vtk(tr, "file");
 
-  FE_Q<dim,spacedim> fe(1);
-  DoFHandler<dim,spacedim> dh(tr);
+  FE_Q<dim, spacedim>       fe(1);
+  DoFHandler<dim, spacedim> dh(tr);
   dh.distribute_dofs(fe);
   deallog << "dofs " << dh.n_dofs() << std::endl;
 
-  DataOut<dim,DoFHandler<dim,spacedim> > data_out;
-  data_out.attach_triangulation (tr);
-  Vector<float> subdomain (tr.n_active_cells());
-  for (unsigned int i=0; i<subdomain.size(); ++i)
+  DataOut<dim, DoFHandler<dim, spacedim>> data_out;
+  data_out.attach_triangulation(tr);
+  Vector<float> subdomain(tr.n_active_cells());
+  for(unsigned int i = 0; i < subdomain.size(); ++i)
     subdomain(i) = tr.locally_owned_subdomain();
-  data_out.add_data_vector (subdomain, "subdomain");
+  data_out.add_data_vector(subdomain, "subdomain");
 
   std::string name = "f0.vtu";
   name[1] += tr.locally_owned_subdomain();
 
   {
     std::ofstream file(name.c_str());
-    data_out.build_patches ();
-    data_out.write_vtu (file);
+    data_out.build_patches();
+    data_out.write_vtu(file);
   }
   cat_file(name.c_str());
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll init;
 
   deallog.push("2-3");
-  test<2,3>(deallog.get_file_stream());
+  test<2, 3>(deallog.get_file_stream());
   deallog.pop();
 }

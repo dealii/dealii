@@ -13,33 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the BlockMask class
 //
 // here: test BlockMask::size()
 
-
 #include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
-  AssertThrow (BlockMask(12, false).size() == 12, ExcInternalError());
-  AssertThrow (BlockMask().size() == 0, ExcInternalError());
+  AssertThrow(BlockMask(12, false).size() == 12, ExcInternalError());
+  AssertThrow(BlockMask().size() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

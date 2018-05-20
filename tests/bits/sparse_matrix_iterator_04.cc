@@ -13,58 +13,51 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test setting some elements using a non-const matrix iterator and operator=,
 // and reading them back through the matrix itself
 
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
-
-void test ()
+void
+test()
 {
-  SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if (((i+2*j+1) % 3 == 0)
-          ||
-          (i==j))
-        sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 3);
+  for(unsigned int i = 0; i < 5; ++i)
+    for(unsigned int j = 0; j < 5; ++j)
+      if(((i + 2 * j + 1) % 3 == 0) || (i == j))
+        sp.add(i, j);
+  sp.compress();
   SparseMatrix<double> m(sp);
 
   SparseMatrix<double>::iterator i = m.begin();
-  for (; i!=m.end(); ++i)
-    i->value() = i->row()*i->column();
+  for(; i != m.end(); ++i)
+    i->value() = i->row() * i->column();
 
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if (((i+2*j+1) % 3 == 0)
-          ||
-          (i==j))
+  for(unsigned int i = 0; i < 5; ++i)
+    for(unsigned int j = 0; j < 5; ++j)
+      if(((i + 2 * j + 1) % 3 == 0) || (i == j))
         {
-          deallog << i << ' ' << j << ' ' << m.el(i,j)
-                  << std::endl;
-          Assert (std::fabs(m.el(i,j)-i*j) < 1e-14,
-                  ExcInternalError());
+          deallog << i << ' ' << j << ' ' << m.el(i, j) << std::endl;
+          Assert(std::fabs(m.el(i, j) - i * j) < 1e-14, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -75,9 +68,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

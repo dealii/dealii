@@ -13,21 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test IndexSet::at()
 
 #include "../tests.h"
 
 #include <deal.II/base/index_set.h>
 
-void test (IndexSet &index_set, unsigned int n)
+void
+test(IndexSet& index_set, unsigned int n)
 {
   deallog << "n=" << n;
 
   IndexSet::ElementIterator it = index_set.at(n);
 
   deallog << " end?" << (it == index_set.end());
-  if (it!=index_set.end())
+  if(it != index_set.end())
     {
       deallog << " value=" << *it;
     }
@@ -35,11 +35,12 @@ void test (IndexSet &index_set, unsigned int n)
   deallog << std::endl;
 }
 
-void test()
+void
+test()
 {
-  IndexSet index_set (20);
-  index_set.add_range (2,5);
-  index_set.add_index (9);
+  IndexSet index_set(20);
+  index_set.add_range(2, 5);
+  index_set.add_index(9);
 
   index_set.print(deallog);
 
@@ -51,17 +52,15 @@ void test()
   test(index_set, 9);
   test(index_set, 15);
 
-  IndexSet empty (42);
+  IndexSet empty(42);
   empty.print(deallog);
   test(empty, 6);
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

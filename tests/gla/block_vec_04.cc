@@ -13,33 +13,32 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // allow operator= for BlockVectors if dest is same size or empty
 
 #include "../tests.h"
-#include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 #include <iostream>
 #include <vector>
 
 #include "gla.h"
 
 template <class LA>
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0)
+  if(myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
   IndexSet block1(10);
-  if (myid==0)
-    block1.add_range(0,7);
-  if (myid==1)
-    block1.add_range(7,10);
+  if(myid == 0)
+    block1.add_range(0, 7);
+  if(myid == 1)
+    block1.add_range(7, 10);
 
   IndexSet block2(numproc);
   block2.add_index(myid);
@@ -51,42 +50,41 @@ void test ()
 
   std::vector<IndexSet> relevant = partitioning;
   relevant[0].add_index(0);
-  relevant[1].add_range(0,numproc);
+  relevant[1].add_range(0, numproc);
 
   typename LA::MPI::BlockVector v_2(partitioning, MPI_COMM_WORLD);
 
   {
     typename LA::MPI::BlockVector x(partitioning, MPI_COMM_WORLD);
-    x=v_2;
+    x = v_2;
   }
   {
     typename LA::MPI::BlockVector x;
-    x=v_2;
+    x = v_2;
   }
   {
     deal_II_exceptions::disable_abort_on_exception();
     try
       {
-        typename LA::MPI::BlockVector x=v_1;
-        x=v_2; // error
+        typename LA::MPI::BlockVector x = v_1;
+        x                               = v_2; // error
       }
-    catch (const ExceptionBase &e)
+    catch(const ExceptionBase& e)
       {
         deallog << "Exception: " << e.get_exc_name() << std::endl;
       }
   }
 
   // done
-  if (myid==0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
   {
     deallog.push("PETSc");
     test<LA_PETSc>();
@@ -95,5 +93,4 @@ int main (int argc, char **argv)
     test<LA_Trilinos>();
     deallog.pop();
   }
-
 }

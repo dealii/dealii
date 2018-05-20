@@ -19,12 +19,9 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/point.h>
 
-
 #include <array>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * A namespace for geometric utility functions that are not particularly specific
@@ -36,13 +33,11 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace GeometricUtilities
 {
-
   /**
    * A namespace for coordinate transformations.
    */
   namespace Coordinates
   {
-
     /**
      * Return spherical coordinates of a Cartesian point @p point.
      * The returned array is filled with radius, azimuth angle $\in [0,2 \pi)$
@@ -56,8 +51,8 @@ namespace GeometricUtilities
      * @f}
      */
     template <int dim>
-    std::array<double,dim>
-    to_spherical(const Point<dim> &point);
+    std::array<double, dim>
+    to_spherical(const Point<dim>& point);
 
     /**
      * Return the Cartesian coordinates of a spherical point defined by @p scoord
@@ -74,10 +69,10 @@ namespace GeometricUtilities
      */
     template <std::size_t dim>
     Point<dim>
-    from_spherical(const std::array<double,dim> &scoord);
+    from_spherical(const std::array<double, dim>& scoord);
 
-  }
-}
+  } // namespace Coordinates
+} // namespace GeometricUtilities
 
 DEAL_II_NAMESPACE_CLOSE
 

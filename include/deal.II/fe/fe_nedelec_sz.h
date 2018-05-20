@@ -17,8 +17,8 @@
 #define dealii__fe_nedelec_sz_h
 
 #include <deal.II/base/derivative_form.h>
-#include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
+#include <deal.II/base/qprojector.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
@@ -67,77 +67,83 @@ DEAL_II_NAMESPACE_OPEN
 * @date 2016, 2017, 2018
 */
 template <int dim>
-class FE_NedelecSZ : public FiniteElement<dim,dim>
+class FE_NedelecSZ : public FiniteElement<dim, dim>
 {
 public:
   /**
   * Constructor for an element of given @p degree.
   */
-  FE_NedelecSZ (const unsigned int degree);
+  FE_NedelecSZ(const unsigned int degree);
 
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const override;
+  virtual UpdateFlags
+  requires_update_flags(const UpdateFlags update_flags) const override;
 
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual std::unique_ptr<FiniteElement<dim,dim> > clone() const override;
-
-  /**
-  * This element is vector-valued so this function will
-  * throw an exception.
-  */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim>  &p) const override;
-
-  /**
-  * Not implemented.
-  */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim>  &p,
-                                        const unsigned int component) const override;
+  virtual std::unique_ptr<FiniteElement<dim, dim>>
+  clone() const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
-  virtual Tensor<1,dim> shape_grad (const unsigned int i,
-                                    const Point<dim>  &p) const override;
+  virtual double
+  shape_value(const unsigned int i, const Point<dim>& p) const override;
 
   /**
   * Not implemented.
   */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim>  &p,
-                                              const unsigned int component) const override;
+  virtual double
+  shape_value_component(const unsigned int i,
+                        const Point<dim>&  p,
+                        const unsigned int component) const override;
 
   /**
   * This element is vector-valued so this function will
   * throw an exception.
   */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int i,
-                                         const Point<dim>  &p) const override;
+  virtual Tensor<1, dim>
+  shape_grad(const unsigned int i, const Point<dim>& p) const override;
 
   /**
   * Not implemented.
   */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim>  &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<1, dim>
+  shape_grad_component(const unsigned int i,
+                       const Point<dim>&  p,
+                       const unsigned int component) const override;
+
+  /**
+  * This element is vector-valued so this function will
+  * throw an exception.
+  */
+  virtual Tensor<2, dim>
+  shape_grad_grad(const unsigned int i, const Point<dim>& p) const override;
+
+  /**
+  * Not implemented.
+  */
+  virtual Tensor<2, dim>
+  shape_grad_grad_component(const unsigned int i,
+                            const Point<dim>&  p,
+                            const unsigned int component) const override;
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed only
    * for the reference cell. Make sure, that #mapping_type is set by the
    * derived class, such that this function can operate correctly.
    */
-  UpdateFlags update_once (const UpdateFlags flags) const;
+  UpdateFlags
+  update_once(const UpdateFlags flags) const;
 
   /**
    * Given <tt>flags</tt>, determines the values which must be computed in
    * each cell cell. Make sure, that #mapping_type is set by the derived
    * class, such that this function can operate correctly.
    */
-  UpdateFlags update_each (const UpdateFlags flags) const;
+  UpdateFlags
+  update_each(const UpdateFlags flags) const;
 
 protected:
   /**
@@ -146,12 +152,12 @@ protected:
    */
   MappingType mapping_type;
 
-  virtual
-  std::unique_ptr<typename FiniteElement<dim,dim>::InternalDataBase>
-  get_data (const UpdateFlags                                                             update_flags,
-            const Mapping<dim,dim>                                                       &mapping,
-            const Quadrature<dim>                                                        &quadrature,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &output_data) const override;
+  virtual std::unique_ptr<typename FiniteElement<dim, dim>::InternalDataBase>
+  get_data(const UpdateFlags        update_flags,
+           const Mapping<dim, dim>& mapping,
+           const Quadrature<dim>&   quadrature,
+           dealii::internal::FEValuesImplementation::
+             FiniteElementRelatedData<dim, dim>& output_data) const override;
 
   /**
   * Compute information about the shape functions on the cell denoted by the
@@ -159,14 +165,19 @@ protected:
   * degrees of freedom, and so is not thread-safe at this time.
   */
   virtual void
-  fill_fe_values (const typename Triangulation<dim,dim>::cell_iterator                         &cell,
-                  const CellSimilarity::Similarity                                              cell_similarity,
-                  const Quadrature<dim>                                                        &quadrature,
-                  const Mapping<dim,dim>                                                       &mapping,
-                  const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
-                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
-                  const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
+  fill_fe_values(
+    const typename Triangulation<dim, dim>::cell_iterator& cell,
+    const CellSimilarity::Similarity                       cell_similarity,
+    const Quadrature<dim>&                                 quadrature,
+    const Mapping<dim, dim>&                               mapping,
+    const typename Mapping<dim, dim>::InternalDataBase&    mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       dim>&
+                                                              mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase& fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       dim>&
+      data) const override;
 
   /**
   * Compute information about the shape functions on the cell and face denoted
@@ -174,28 +185,38 @@ protected:
   * cell-dependent degrees of freedom, and so is not thread-safe at this time.
   */
   virtual void
-  fill_fe_face_values (const typename Triangulation<dim,dim>::cell_iterator                         &cell,
-                       const unsigned int                                                            face_no,
-                       const Quadrature<dim-1>                                                      &quadrature,
-                       const Mapping<dim,dim>                                                       &mapping,
-                       const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
-                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
-                       const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
+  fill_fe_face_values(
+    const typename Triangulation<dim, dim>::cell_iterator& cell,
+    const unsigned int                                     face_no,
+    const Quadrature<dim - 1>&                             quadrature,
+    const Mapping<dim, dim>&                               mapping,
+    const typename Mapping<dim, dim>::InternalDataBase&    mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       dim>&
+                                                              mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase& fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       dim>&
+      data) const override;
 
   /**
   * Not implemented.
   */
   virtual void
-  fill_fe_subface_values (const typename Triangulation<dim,dim>::cell_iterator                         &cell,
-                          const unsigned int                                                            face_no,
-                          const unsigned int                                                            sub_no,
-                          const Quadrature<dim-1>                                                      &quadrature,
-                          const Mapping<dim,dim>                                                       &mapping,
-                          const typename Mapping<dim,dim>::InternalDataBase                            &mapping_internal,
-                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, dim> &mapping_data,
-                          const typename FiniteElement<dim,dim>::InternalDataBase                      &fedata,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim> &data) const override;
+  fill_fe_subface_values(
+    const typename Triangulation<dim, dim>::cell_iterator& cell,
+    const unsigned int                                     face_no,
+    const unsigned int                                     sub_no,
+    const Quadrature<dim - 1>&                             quadrature,
+    const Mapping<dim, dim>&                               mapping,
+    const typename Mapping<dim, dim>::InternalDataBase&    mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       dim>&
+                                                              mapping_data,
+    const typename FiniteElement<dim, dim>::InternalDataBase& fedata,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       dim>&
+      data) const override;
 
   /**
   * Derived Internal data which is used to store cell-independent data.
@@ -216,7 +237,7 @@ protected:
   * page 82 of Zaglmayr's thesis. The details of the definition of the
   * globally-defined edge and face orientations can be found on page 67.
   */
-  class InternalData : public FiniteElement<dim,dim>::InternalDataBase
+  class InternalData : public FiniteElement<dim, dim>::InternalDataBase
   {
   public:
     /**
@@ -225,7 +246,7 @@ protected:
     *
     * Due to the cell-dependent DoFs, this variable is declared mutable.
     */
-    mutable std::vector<std::vector<Tensor<1,dim> > > shape_values;
+    mutable std::vector<std::vector<Tensor<1, dim>>> shape_values;
 
     /**
     * Storage for shape function gradients on the reference element. We only
@@ -234,7 +255,7 @@ protected:
     *
     * Due to the cell-dependent DoFs, this variable is declared mutable.
     */
-    mutable std::vector<std::vector<DerivativeForm<1, dim, dim> > > shape_grads;
+    mutable std::vector<std::vector<DerivativeForm<1, dim, dim>>> shape_grads;
 
     /**
     * Storage for all possible edge parameterization between vertices. These
@@ -251,7 +272,7 @@ protected:
     * the hexahedral cell, but they are computed in this fashion for use with
     * non-standard edge and face orientations.
     */
-    std::vector<std::vector<std::vector<double> > > sigma_imj_values;
+    std::vector<std::vector<std::vector<double>>> sigma_imj_values;
 
     /**
     * Storage for gradients of all possible edge parameterizations between
@@ -268,7 +289,7 @@ protected:
     * Note that the gradient of the edge parameterization is constant on an
     * edge, so we do not need to store it at every quadrature point.
     */
-    std::vector<std::vector<std::vector<double> > > sigma_imj_grads;
+    std::vector<std::vector<std::vector<double>>> sigma_imj_grads;
 
     /**
     * Storage for values of edge parameterizations at quadrature points. These
@@ -281,7 +302,7 @@ protected:
     * These values change with the orientation of the edges of a physical cell
     * and so must take the "sign" into account when used for computation.
     */
-    std::vector<std::vector<double> > edge_sigma_values;
+    std::vector<std::vector<double>> edge_sigma_values;
 
     /**
     * Storage for gradients of edge parameterization at quadrature points.
@@ -295,7 +316,7 @@ protected:
     * and so must take the "sign" into account when used for computation.
     *
     */
-    std::vector<std::vector<double> > edge_sigma_grads;
+    std::vector<std::vector<double>> edge_sigma_grads;
 
     /**
     * Storage for edge extension parameters at quadrature points. These are
@@ -311,7 +332,7 @@ protected:
     * edge_lambda_values[m][q] stores the edge extension parameter value at
     * the $q$-th quadrature point on edge $m$.
     */
-    std::vector<std::vector<double> > edge_lambda_values;
+    std::vector<std::vector<double>> edge_lambda_values;
 
     /**
     * Storage for gradients of edge extension parameters in 2D. In this case
@@ -322,7 +343,7 @@ protected:
     * edge_lambda_grads_2d[m][d] stores the gradient of the edge extension
     * parameter for component $d$ on edge $m$.
     */
-    std::vector<std::vector<double> > edge_lambda_grads_2d;
+    std::vector<std::vector<double>> edge_lambda_grads_2d;
 
     /**
     * Storage for gradients of edge extension parameters in 3D. In this case
@@ -333,7 +354,7 @@ protected:
     * edge_lambda_grads_3d[m][q][d] stores the gradient of the edge extension
     * parameter for component $d$ at the $q$-th quadrature point on edge m.
     */
-    std::vector<std::vector<std::vector<double> > > edge_lambda_grads_3d;
+    std::vector<std::vector<std::vector<double>>> edge_lambda_grads_3d;
 
     /**
     * Storage for 2nd derivatives of edge extension parameters in 3D, which are
@@ -344,7 +365,7 @@ protected:
     * edge_lambda_gradgrads_3d[m][d1][d2] stores the 2nd derivatives of the
     * edge extension parameters with respect to components d1 and d2 on edge $m$.
     */
-    std::vector<std::vector<std::vector<double> > > edge_lambda_gradgrads_3d;
+    std::vector<std::vector<std::vector<double>>> edge_lambda_gradgrads_3d;
 
     /**
     * Storage for the face extension parameters. These are stored for the 6
@@ -361,7 +382,7 @@ protected:
     * face_lambda_values[m][q] stores the face extension parameter value at
     * the $q$-th quadrature point on face $m$.
     */
-    std::vector<std::vector<double> > face_lambda_values;
+    std::vector<std::vector<double>> face_lambda_values;
 
     /**
     * Storage for gradients of face extension parameters. These are stored for
@@ -371,7 +392,7 @@ protected:
     * face_lambda_grads[m][d] stores the gradient of the face extension
     * parameters for component $d$ on face $m$.
     */
-    std::vector<std::vector<double> > face_lambda_grads;
+    std::vector<std::vector<double>> face_lambda_grads;
   };
 
 private:
@@ -383,42 +404,45 @@ private:
   * 2 = face (which is a cell in 2D)
   * 3 = cell
   */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Internal storage for all required integrated Legendre polynomials.
    */
-  std::vector<Polynomials::Polynomial<double> > IntegratedLegendrePolynomials;
+  std::vector<Polynomials::Polynomial<double>> IntegratedLegendrePolynomials;
 
   /**
   * Internal function to populate the internal array of integrated Legendre
   * polynomials.
   */
-  void create_polynomials (const unsigned int degree);
+  void
+  create_polynomials(const unsigned int degree);
 
   /**
   * Returns the number of DoFs in the basis set.
   */
-  unsigned int compute_num_dofs (const unsigned int degree) const;
+  unsigned int
+  compute_num_dofs(const unsigned int degree) const;
 
   /**
   * Populates cell-dependent edge-based shape functions on the given
   * InternalData object.
   */
-  void fill_edge_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                        const Quadrature<dim>                                &quadrature,
-                        const InternalData                                   &fedata) const;
+  void
+  fill_edge_values(const typename Triangulation<dim, dim>::cell_iterator& cell,
+                   const Quadrature<dim>& quadrature,
+                   const InternalData&    fedata) const;
 
   /**
   * Populates the cell-dependent face-based shape functions on the given
   * InternalData object.
   */
-  void fill_face_values(const typename Triangulation<dim,dim>::cell_iterator &cell,
-                        const Quadrature<dim>                                &quadrature,
-                        const InternalData                                   &fedata) const;
+  void
+  fill_face_values(const typename Triangulation<dim, dim>::cell_iterator& cell,
+                   const Quadrature<dim>& quadrature,
+                   const InternalData&    fedata) const;
 };
-
-
 
 /*@}*/
 

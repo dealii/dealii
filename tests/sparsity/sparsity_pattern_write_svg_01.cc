@@ -13,26 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparsityPattern::write_svg
 
 #include "../tests.h"
 #include <deal.II/lac/sparsity_pattern.h>
 
-int main ()
+int
+main()
 {
   initlog();
 
-  SparsityPattern sparsity (2,3,3);
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<3; ++j)
-      if (i<j)
-        sparsity.add (i,j);
-  sparsity.compress ();
+  SparsityPattern sparsity(2, 3, 3);
+  for(unsigned int i = 0; i < 2; ++i)
+    for(unsigned int j = 0; j < 3; ++j)
+      if(i < j)
+        sparsity.add(i, j);
+  sparsity.compress();
 
-  sparsity.print_svg (deallog.get_file_stream());
+  sparsity.print_svg(deallog.get_file_stream());
 }
-
-
-

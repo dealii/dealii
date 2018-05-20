@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // ParameterHandler could not deal with missing endline at end of file
 // or can it?
 // http://code.google.com/p/dealii/issues/detail?id=126
@@ -22,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *content, double &v1, double &v2)
+void
+check(const char* content, double& v1, double& v2)
 {
   ParameterHandler foo;
   foo.enter_subsection("bar");
@@ -34,35 +33,35 @@ void check (const char *content, double &v1, double &v2)
 
   foo.parse_input(ss);
 
-
-
   foo.enter_subsection("bar");
-  deallog << foo.get ("val") << std::endl;
+  deallog << foo.get("val") << std::endl;
   v1 = foo.get_double("val");
   foo.leave_subsection();
-  deallog << foo.get ("val2") << std::endl;
+  deallog << foo.get("val2") << std::endl;
   v2 = foo.get_double("val2");
 }
 
-void test(std::string content)
+void
+test(std::string content)
 {
-  double v1,v2;
-  check((content+"\n").c_str(),v1,v2);
-  double v3,v4;
-  check(content.c_str(),v3,v4);
+  double v1, v2;
+  check((content + "\n").c_str(), v1, v2);
+  double v3, v4;
+  check(content.c_str(), v3, v4);
 
-  Assert(v1==v3, ExcInternalError());
-  Assert(v2==v4, ExcInternalError());
+  Assert(v1 == v3, ExcInternalError());
+  Assert(v2 == v4, ExcInternalError());
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ("subsection bar\nend");
-  test ("");
-  test ("set val2=-3");
-  test ("subsection bar\n set val=2\nend");
+  test("subsection bar\nend");
+  test("");
+  test("set val2=-3");
+  test("subsection bar\n set val=2\nend");
 
   return 0;
 }

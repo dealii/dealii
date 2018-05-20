@@ -13,33 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::outer_product for correct functionality
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-const double ints[9] = { 0, -1., 1., -2., 2., -3., 3., -4., 4.};
+const double ints[9] = {0, -1., 1., -2., 2., -3., 3., -4., 4.};
 
 template <typename number>
 void
-check ()
+check()
 {
   deallog << std::fixed;
   deallog << std::setprecision(1);
 
-  Vector<double> First4(4), Second4(4), First9(9);
-  FullMatrix<double>F4(4,4),  F9(9,9);
-
+  Vector<double>     First4(4), Second4(4), First9(9);
+  FullMatrix<double> F4(4, 4), F9(9, 9);
 
   deallog << "Original Vector V" << std::endl;
   deallog << "=================" << std::endl;
 
-  for (unsigned int i = 0; i<First4.size(); i++)
+  for(unsigned int i = 0; i < First4.size(); i++)
     {
       First4(i) = ints[i];
       deallog << First4(i) << "  ";
@@ -50,9 +44,9 @@ check ()
   deallog << "Original Vector W" << std::endl;
   deallog << "=================" << std::endl;
 
-  for (unsigned int i = 0; i<Second4.size(); i++)
+  for(unsigned int i = 0; i < Second4.size(); i++)
     {
-      Second4(i) = ints[i+1];
+      Second4(i) = ints[i + 1];
       deallog << Second4(i) << "  ";
     }
   deallog << std::endl;
@@ -76,7 +70,6 @@ check ()
   deallog << std::endl;
   deallog << std::endl;
 
-
   F4.outer_product(Second4, Second4);
 
   deallog << "Outer_Product of W and W" << std::endl;
@@ -89,7 +82,7 @@ check ()
   deallog << "Vector V" << std::endl;
   deallog << "========" << std::endl;
 
-  for (unsigned int i = 0; i<First9.size(); i++)
+  for(unsigned int i = 0; i < First9.size(); i++)
     {
       First9(i) = ints[i];
       deallog << First9(i) << "  ";
@@ -110,9 +103,9 @@ check ()
   deallog << "Vector V" << std::endl;
   deallog << "========" << std::endl;
 
-  for (unsigned int i = 0; i<First9.size(); i++)
+  for(unsigned int i = 0; i < First9.size(); i++)
     {
-      First9(i) = ints[8-i];
+      First9(i) = ints[8 - i];
       deallog << First9(i) << "  ";
     }
   deallog << std::endl;
@@ -128,5 +121,3 @@ check ()
 
   deallog << std::endl;
 }
-
-

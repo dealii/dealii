@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test that all of the Adol-C number traits combinations are constructible
 
 #include "../tests.h"
@@ -27,32 +26,34 @@
 using namespace dealii;
 namespace AD = Differentiation::AD;
 
-int main ()
+int
+main()
 {
   initlog();
 
   // --- Taped ---
-  AD::NumberTraits<float,AD::NumberTypes::adolc_taped>();
-  AD::NumberTraits<std::complex<float>,AD::NumberTypes::adolc_taped>();
-  AD::NumberTraits<double,AD::NumberTypes::adolc_taped>();
-  AD::NumberTraits<std::complex<double>,AD::NumberTypes::adolc_taped>();
+  AD::NumberTraits<float, AD::NumberTypes::adolc_taped>();
+  AD::NumberTraits<std::complex<float>, AD::NumberTypes::adolc_taped>();
+  AD::NumberTraits<double, AD::NumberTypes::adolc_taped>();
+  AD::NumberTraits<std::complex<double>, AD::NumberTypes::adolc_taped>();
 
   AD::ADNumberTraits<adouble>();
-  AD::ADNumberTraits<std::complex<adouble> >();
-  AD::NumberTraits<adouble,AD::NumberTypes::adolc_taped>();
-  AD::NumberTraits<std::complex<adouble>,AD::NumberTypes::adolc_taped>();
+  AD::ADNumberTraits<std::complex<adouble>>();
+  AD::NumberTraits<adouble, AD::NumberTypes::adolc_taped>();
+  AD::NumberTraits<std::complex<adouble>, AD::NumberTypes::adolc_taped>();
   deallog << "Taped OK" << std::endl;
 
   // --- Tapeless ---
-  AD::NumberTraits<float,AD::NumberTypes::adolc_tapeless>();
-  AD::NumberTraits<std::complex<float>,AD::NumberTypes::adolc_tapeless>();
-  AD::NumberTraits<double,AD::NumberTypes::adolc_tapeless>();
-  AD::NumberTraits<std::complex<double>,AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<float, AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<std::complex<float>, AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<double, AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<std::complex<double>, AD::NumberTypes::adolc_tapeless>();
 
   AD::ADNumberTraits<adtl::adouble>();
-  AD::ADNumberTraits<std::complex<adtl::adouble> >();
-  AD::NumberTraits<adtl::adouble,AD::NumberTypes::adolc_tapeless>();
-  AD::NumberTraits<std::complex<adtl::adouble>,AD::NumberTypes::adolc_tapeless>();
+  AD::ADNumberTraits<std::complex<adtl::adouble>>();
+  AD::NumberTraits<adtl::adouble, AD::NumberTypes::adolc_tapeless>();
+  AD::NumberTraits<std::complex<adtl::adouble>,
+                   AD::NumberTypes::adolc_tapeless>();
   deallog << "Tapeless OK" << std::endl;
 
   deallog << "OK" << std::endl;

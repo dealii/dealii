@@ -13,57 +13,58 @@
 //
 // ---------------------------------------------------------------------
 
-
 // deal.II includes
 #include "../tests.h"
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 // sparse matrix elements
-void test (PETScWrappers::SparseMatrix &m)
+void
+test(PETScWrappers::SparseMatrix& m)
 {
   deallog << "Check matrix access" << std::endl;
 
   // fill up a matrix with some numbers
-  for (unsigned int k=0; k<m.m(); ++k)
-    for (unsigned int l=0; l<m.n(); ++l)
-      if (k>l)
-        m.set (k,l, PetscScalar (k+l,-1.*(k+l)));
+  for(unsigned int k = 0; k < m.m(); ++k)
+    for(unsigned int l = 0; l < m.n(); ++l)
+      if(k > l)
+        m.set(k, l, PetscScalar(k + l, -1. * (k + l)));
 
-  m.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
 
   // check the matrix is correctly filled
-  for (unsigned int k=0; k<m.m(); ++k)
-    for (unsigned int l=0; l<m.n(); ++l)
-      AssertThrow (m(k,l).real () == -1.*(m(k,l).imag ()),
-                   ExcInternalError());
+  for(unsigned int k = 0; k < m.m(); ++k)
+    for(unsigned int l = 0; l < m.n(); ++l)
+      AssertThrow(m(k, l).real() == -1. * (m(k, l).imag()), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  std::ofstream logfile ("output");
-  dealii::deallog.attach (logfile);
-  dealii::deallog.depth_console (0);
+  std::ofstream logfile("output");
+  dealii::deallog.attach(logfile);
+  dealii::deallog.depth_console(0);
 
   try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::SparseMatrix m (10,10,10);
-        test (m);
+        PETScWrappers::SparseMatrix m(10, 10, 10);
+        test(m);
 
         deallog << "matrix:" << std::endl;
-        m.print (logfile);
+        m.print(logfile);
       }
     }
 
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -74,9 +75,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl
@@ -90,5 +92,3 @@ int main (int argc, char **argv)
 
   return 0;
 }
-
-

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // This test verifies that we can use transfinite interpolation on 2D cells
 // that have large aspect ratios: if the initial guess of a chart point is not
 // accurate enough then we will fail to calculate the weighted average in
@@ -39,13 +38,13 @@ struct Geom_parameters
   unsigned int n_balls;
 
   std::vector<Point<2>> ball_centers;
-  std::vector<double> radius;
+  std::vector<double>   radius;
 };
 
-void concentric_disks(Triangulation<2>          &tria,
+void concentric_disks(Triangulation<2>&          tria,
                       const double               s,
-                      const std::vector<double> &x,
-                      Geom_parameters           &gp)
+                      const std::vector<double>& x,
+                      Geom_parameters&           gp)
 {
   double r = x[0], d = 0.5 * x[0],
          q = 1.0 / sqrt(2.0); // q: corner points factor
@@ -61,12 +60,12 @@ void concentric_disks(Triangulation<2>          &tria,
   gp.n_balls = x.size(); // the resonator and all other centered at the origin
   gp.ball_centers.resize(gp.n_balls);
   gp.radius.resize(gp.n_balls);
-  gp.radius[0] = x[0];
+  gp.radius[0]       = x[0];
   gp.ball_centers[0] = Point<2>(s, 0.0);
 
-  for (unsigned int k = 1; k < x.size(); k++)
+  for(unsigned int k = 1; k < x.size(); k++)
     {
-      gp.radius[k] = x[k];
+      gp.radius[k]       = x[k];
       gp.ball_centers[k] = Point<2>(0.0, 0.0);
     }
 
@@ -85,10 +84,10 @@ void concentric_disks(Triangulation<2>          &tria,
   vertices[8] = Point<2>(.5 * d + s, -.5 * d);
 
   // touching circle
-  for (unsigned int k = 0; k < x.size(); k++)
+  for(unsigned int k = 0; k < x.size(); k++)
     {
-      double z = (k == 0) ? s : 0.0;
-      r = x[k];
+      double z                     = (k == 0) ? s : 0.0;
+      r                            = x[k];
       vertices[8 + k * vlayer + 1] = Point<2>(r + z, 0.0);
       vertices[8 + k * vlayer + 2] = Point<2>(r * q + z, r * q);
       vertices[8 + k * vlayer + 3] = Point<2>(0.0 + z, r);
@@ -162,7 +161,7 @@ void concentric_disks(Triangulation<2>          &tria,
   cell_v[11][3] = 15;
 
   // layer cells
-  for (unsigned int k = 1; k < x.size(); k++)
+  for(unsigned int k = 1; k < x.size(); k++)
     {
       const unsigned int m = k + 1;
 
@@ -218,37 +217,38 @@ void concentric_disks(Triangulation<2>          &tria,
   std::vector<CellData<2>> cells(n_cell, CellData<2>());
 
   unsigned int cell_idx = 0;
-  for (unsigned int i = 0; i < n_cell; ++i)
+  for(unsigned int i = 0; i < n_cell; ++i)
     {
-      for (unsigned int j = 0; j < 4; ++j)
+      for(unsigned int j = 0; j < 4; ++j)
         {
           cells[i].vertices[j] = cell_v[i][j];
         }
       cell_idx++;
     }
 
-  tria.create_triangulation(vertices, cells, SubCellData()); // no boundary information
+  tria.create_triangulation(
+    vertices, cells, SubCellData()); // no boundary information
 
-  double eps = 1e-5 * x[0];
+  double       eps   = 1e-5 * x[0];
   unsigned int label = 100;
 
-  for (Triangulation<2>::active_cell_iterator cell = tria.begin_active();
-       cell != tria.end();
-       ++cell)
+  for(Triangulation<2>::active_cell_iterator cell = tria.begin_active();
+      cell != tria.end();
+      ++cell)
     {
-      cell->set_all_manifold_ids(1); // not faces ... for Transfinite interpolation
-      for (unsigned int k = 0; k < gp.n_balls; ++k)
+      cell->set_all_manifold_ids(
+        1); // not faces ... for Transfinite interpolation
+      for(unsigned int k = 0; k < gp.n_balls; ++k)
         {
-          for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+          for(unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
             {
-              const Point<2>
-              p0 = cell->face(f)->vertex(0),
-              p1 = cell->face(f)->vertex(1);
-              const double d0 = p0.distance(gp.ball_centers[k]),
-                           d1 = p1.distance(gp.ball_centers[k]);
+              const Point<2> p0 = cell->face(f)->vertex(0),
+                             p1 = cell->face(f)->vertex(1);
+              const double d0   = p0.distance(gp.ball_centers[k]),
+                           d1   = p1.distance(gp.ball_centers[k]);
 
-              if ((std::abs(d0 - gp.radius[k]) < eps) &&
-                  (std::abs(d1 - gp.radius[k]) < eps))
+              if((std::abs(d0 - gp.radius[k]) < eps)
+                 && (std::abs(d1 - gp.radius[k]) < eps))
                 {
                   cell->face(f)->set_all_manifold_ids(label + k);
                 }
@@ -260,9 +260,9 @@ void concentric_disks(Triangulation<2>          &tria,
   // --------------------------------------------------------------------------------
 }
 
-void concentric_disks(Triangulation<2> &tria,
+void concentric_disks(Triangulation<2>&   tria,
                       std::vector<double> x,
-                      Geom_parameters &gp)
+                      Geom_parameters&    gp)
 {
   concentric_disks(tria, 0.0, x, gp);
 }
@@ -274,36 +274,38 @@ class Mygrid
 {
 public:
   Mygrid(unsigned int r);
-  void run();
+  void
+  run();
 
 private:
-  void make_grid();
+  void
+  make_grid();
 
-  Geom_parameters gp;
-  std::vector<PolarManifold<dim>> balls;
+  Geom_parameters                       gp;
+  std::vector<PolarManifold<dim>>       balls;
   TransfiniteInterpolationManifold<dim> inner_manifold;
-  Triangulation<dim> triangulation;
-  unsigned int refinement;
+  Triangulation<dim>                    triangulation;
+  unsigned int                          refinement;
 };
 
 template <int dim>
-Mygrid<dim>::Mygrid(unsigned int r)
-  : refinement(r)
+Mygrid<dim>::Mygrid(unsigned int r) : refinement(r)
 {}
 
 template <int dim>
-void Mygrid<dim>::make_grid()
+void
+Mygrid<dim>::make_grid()
 {
-  const double s = 0.1;
-  std::vector<double> x {1.0, 1.5, 2.0, 2.5, 3.0};
+  const double        s = 0.1;
+  std::vector<double> x{1.0, 1.5, 2.0, 2.5, 3.0};
   concentric_disks(triangulation, s, x, gp);
-  for (unsigned int i = 0; i < gp.n_balls; i++)
+  for(unsigned int i = 0; i < gp.n_balls; i++)
     {
       balls.emplace_back(gp.ball_centers[i]);
     }
 
   // assigning manifolds, with layers 100, 101, 102, 103
-  for (unsigned int i = 0; i < gp.n_balls; i++)
+  for(unsigned int i = 0; i < gp.n_balls; i++)
     {
       triangulation.set_manifold(100 + i, balls[i]);
     }
@@ -319,12 +321,14 @@ void Mygrid<dim>::make_grid()
 }
 
 template <int dim>
-void Mygrid<dim>::run()
+void
+Mygrid<dim>::run()
 {
   make_grid();
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 

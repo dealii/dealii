@@ -13,47 +13,44 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test for class ArrayView
 
 #include "../tests.h"
 
 #include <deal.II/base/array_view.h>
 
-
-void test ()
+void
+test()
 {
   {
-    std::vector<int> arr = {0,1,2,3,4,5,6,7,8,9};
-    ArrayView<int> view (arr);  // writable view
-    for (auto &el: view)
+    std::vector<int> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    ArrayView<int>   view(arr); // writable view
+    for(auto& el : view)
       ++el;
 
-    int i=0;
-    for (auto &&it = arr.cbegin(); it != arr.cend(); ++it, ++i)
-      AssertThrow (*it == i+1, ExcInternalError());
+    int i = 0;
+    for(auto&& it = arr.cbegin(); it != arr.cend(); ++it, ++i)
+      AssertThrow(*it == i + 1, ExcInternalError());
   }
 
   {
-    std::vector<int> arr = {0,1,2,3,4,5,6,7,8,9};
-    const ArrayView<int> view (arr);  // writable view
-    for (auto &el: view)
+    std::vector<int>     arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    const ArrayView<int> view(arr); // writable view
+    for(auto& el : view)
       ++el;
 
-    int i=0;
-    for (auto &&it = arr.cbegin(); it != arr.cend(); ++it, ++i)
-      AssertThrow (*it == i+1, ExcInternalError());
+    int i = 0;
+    for(auto&& it = arr.cbegin(); it != arr.cend(); ++it, ++i)
+      AssertThrow(*it == i + 1, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // verify that VectorBase::print uses the precision parameter correctly and
 // restores the previous value of the stream precision
 
@@ -23,40 +21,40 @@
 #include <iostream>
 #include <vector>
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(5);
         indices.add_range(0, 5);
-        PETScWrappers::MPI::Vector v (indices, MPI_COMM_WORLD);
-        for (unsigned int i=0; i<v.size(); ++i)
-          v(i) = i*1.2345678901234567;
+        PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
+        for(unsigned int i = 0; i < v.size(); ++i)
+          v(i) = i * 1.2345678901234567;
 
         // print with old precision
         deallog << numbers::PI << std::endl;
 
         // print with prescribed precision
         deallog << "across=false" << std::endl;
-        v.print (logfile, 10, true, false);
+        v.print(logfile, 10, true, false);
 
         deallog << "across=true" << std::endl;
-        v.print (logfile, 10, true, true);
+        v.print(logfile, 10, true, true);
 
         // print once more. should be the old precision again
         deallog << numbers::PI << std::endl;
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -67,9 +65,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

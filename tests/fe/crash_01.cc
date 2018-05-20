@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // crash with fe nedelec reported on mailing list (01/14/2014)
 /*
 #0  0x00007fffeba50425 in __GI_raise (sig=<optimized out>) at ../nptl/sysdeps/unix/sysv/linux/raise.c:64
@@ -42,36 +41,34 @@
 
 */
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/function.h>
+#include <deal.II/numerics/vector_tools.h>
 
-#include <vector>
 #include <string>
-
+#include <vector>
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1.0, 1.0);
   tria.refine_global(1);
   DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs (fe);
-  ConstraintMatrix constraints;
+  dof_handler.distribute_dofs(fe);
+  ConstraintMatrix             constraints;
   Functions::ZeroFunction<dim> boundary_values(fe.n_components());
-  VectorTools::project_boundary_values_curl_conforming (dof_handler, 0, boundary_values, 0, constraints);
+  VectorTools::project_boundary_values_curl_conforming(
+    dof_handler, 0, boundary_values, 0, constraints);
 }
-
-
 
 int
 main()
@@ -79,9 +76,9 @@ main()
   initlog();
   deallog << std::setprecision(7);
 
-  FE_Nedelec<3> fe1(0);  // works
+  FE_Nedelec<3> fe1(0); // works
   test<3>(fe1);
-  FESystem<3> fe2(FE_Nedelec<3> (0), 2); // crash
+  FESystem<3> fe2(FE_Nedelec<3>(0), 2); // crash
   test<3>(fe2);
 
   return 0;

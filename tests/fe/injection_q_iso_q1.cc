@@ -13,20 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 char logname[] = "output";
-
 
 #include "injection_common.h"
 #include <deal.II/fe/fe_q_iso_q1.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
-  deallog << std::setprecision (6);
-  for (unsigned int i=1; i<4; ++i)
-    for (unsigned int j=i; j<4; ++j)
-      if (j%i == 0)
-        do_check (FE_Q_iso_Q1<dim>(i), FE_Q_iso_Q1<dim>(j));
+  deallog << std::setprecision(6);
+  for(unsigned int i = 1; i < 4; ++i)
+    for(unsigned int j = i; j < 4; ++j)
+      if(j % i == 0)
+        do_check(FE_Q_iso_Q1<dim>(i), FE_Q_iso_Q1<dim>(j));
 }

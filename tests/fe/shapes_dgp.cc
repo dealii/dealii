@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "shapes.h"
 #include <deal.II/fe/fe_dgp.h>
@@ -22,9 +21,9 @@
 
 #define PRECISION 8
 
-
 template <int dim>
-void plot_FE_DGP_shape_functions()
+void
+plot_FE_DGP_shape_functions()
 {
   MappingQGeneric<dim> m(1);
 
@@ -43,30 +42,29 @@ void plot_FE_DGP_shape_functions()
   plot_face_shape_functions(m, p3, "DGP3");
   test_compute_functions(m, p3, "DGP3");
 
-//    FE_DGP<dim> p4(4);
-//    plot_shape_functions(m, p4, "DGP4");
-//    plot_face_shape_functions(m, p4, "DGP4");
-//    test_compute_functions(m, p4, "DGP4");
+  //    FE_DGP<dim> p4(4);
+  //    plot_shape_functions(m, p4, "DGP4");
+  //    plot_face_shape_functions(m, p4, "DGP4");
+  //    test_compute_functions(m, p4, "DGP4");
 
-//    FE_DGP<dim> p5(5);
-//    plot_shape_functions(m, p5, "DGP5");
-//    FE_DGP<dim> p6(6);
-//    plot_shape_functions(m, p6, "DGP6");
-//    FE_DGP<dim> p7(7);
-//    plot_shape_functions(m, p7, "DGP7");
-//    FE_DGP<dim> p8(8);
-//    plot_shape_functions(m, p8, "DGP8");
-//    FE_DGP<dim> p9(9);
-//    plot_shape_functions(m, p9, "DGP9");
-//    FE_DGP<dim> p10(10);
-//    plot_shape_functions(m, p10, "DGP10");
+  //    FE_DGP<dim> p5(5);
+  //    plot_shape_functions(m, p5, "DGP5");
+  //    FE_DGP<dim> p6(6);
+  //    plot_shape_functions(m, p6, "DGP6");
+  //    FE_DGP<dim> p7(7);
+  //    plot_shape_functions(m, p7, "DGP7");
+  //    FE_DGP<dim> p8(8);
+  //    plot_shape_functions(m, p8, "DGP8");
+  //    FE_DGP<dim> p9(9);
+  //    plot_shape_functions(m, p9, "DGP9");
+  //    FE_DGP<dim> p10(10);
+  //    plot_shape_functions(m, p10, "DGP10");
 }
-
 
 int
 main()
 {
-  std::ofstream logfile ("output");
+  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
 

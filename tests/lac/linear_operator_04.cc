@@ -26,9 +26,10 @@
 
 using namespace dealii;
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
   deallog << std::setprecision(10);
@@ -36,11 +37,11 @@ int main(int argc, char *argv[])
   TrilinosWrappers::SparseMatrix a;
 
   auto op_a  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
-  auto op_a2  = linear_operator<TrilinosWrappers::MPI::Vector>(a);
+  auto op_a2 = linear_operator<TrilinosWrappers::MPI::Vector>(a);
 
   TrilinosWrappers::BlockSparseMatrix b;
 
-  auto op_b = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
+  auto op_b  = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
   auto op_b3 = linear_operator<TrilinosWrappers::MPI::BlockVector>(b);
 
   deallog << "OK" << std::endl;

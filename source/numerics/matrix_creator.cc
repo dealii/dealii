@@ -15,13 +15,12 @@
 
 #include <deal.II/numerics/matrix_creator.templates.h>
 
-
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
 #define SPLIT_INSTANTIATIONS_COUNT 3
 #ifndef SPLIT_INSTANTIATIONS_INDEX
-#define SPLIT_INSTANTIATIONS_INDEX 0
+#  define SPLIT_INSTANTIATIONS_INDEX 0
 #endif
 #include "matrix_creator.inst"
 

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests matrix-free face evaluation, matrix-vector products as compared to
 // the same implementation with MeshWorker. This example uses a hypercube mesh
 // without any hanging nodes
@@ -28,17 +26,18 @@ std::ofstream logfile("output");
 #include "matrix_vector_faces_common.h"
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
-  tria.refine_global(5-dim);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(5 - dim);
 
-  FE_DGQ<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_DGQ<dim>     fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   constraints.close();
 
-  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, true);
+  do_test<dim, fe_degree, fe_degree + 1, double>(dof, constraints, true);
 }

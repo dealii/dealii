@@ -13,15 +13,13 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // BlockSparsityPattern::column_number is broken
 
 #include "../tests.h"
 #include <deal.II/lac/block_sparsity_pattern.h>
 
-
-int main()
+int
+main()
 {
   initlog();
 
@@ -29,27 +27,26 @@ int main()
   row_blocks[0] = 10;
   row_blocks[1] = 5;
 
-  BlockDynamicSparsityPattern csp (row_blocks, row_blocks);
+  BlockDynamicSparsityPattern csp(row_blocks, row_blocks);
 
-  csp.reinit(2,2);
-  csp.block(0,0).reinit(10,10);
-  csp.block(0,1).reinit(10,5);
-  csp.block(1,0).reinit(5,10);
-  csp.block(1,1).reinit(5,5);
+  csp.reinit(2, 2);
+  csp.block(0, 0).reinit(10, 10);
+  csp.block(0, 1).reinit(10, 5);
+  csp.block(1, 0).reinit(5, 10);
+  csp.block(1, 1).reinit(5, 5);
   csp.collect_sizes();
-  csp.add(5,5);
-  csp.add(12,12);
-  csp.add(5,11);
-  csp.add(11,3);
+  csp.add(5, 5);
+  csp.add(12, 12);
+  csp.add(5, 11);
+  csp.add(11, 3);
 
   csp.print(deallog.get_file_stream());
 
-
-  for (types::global_dof_index row=0; row<csp.n_rows(); ++row)
+  for(types::global_dof_index row = 0; row < csp.n_rows(); ++row)
     {
       types::global_dof_index rlen = csp.row_length(row);
 
-      for (types::global_dof_index c=0; c<rlen; ++c)
+      for(types::global_dof_index c = 0; c < rlen; ++c)
         {
           types::global_dof_index column = csp.column_number(row, c);
           deallog << row << "," << column << std::endl;

@@ -13,20 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
 /**
  * @file Test initialization of Assembler::MatrixSimple and
  * DoFInfo including assigning of local block sizes with multiple matrices
  */
 
 #include "../tests.h"
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_indices.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/meshworker/local_results.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/local_results.h>
 #include <deal.II/meshworker/simple.h>
 
 #include <deal.II/fe/fe_dgp.h>
@@ -36,7 +35,8 @@
 using namespace dealii;
 
 template <int dim>
-void test(FiniteElement<dim> &fe)
+void
+test(FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -51,10 +51,10 @@ void test(FiniteElement<dim> &fe)
   dof.initialize_local_block_info();
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  typename DoFHandler<dim>::face_iterator face = cell->face(1);
+  typename DoFHandler<dim>::face_iterator        face = cell->face(1);
 
-  std::vector<FullMatrix<double> > matrices(2);
-  MeshWorker::Assembler::MatrixSimple<FullMatrix<double> > ass;
+  std::vector<FullMatrix<double>>                         matrices(2);
+  MeshWorker::Assembler::MatrixSimple<FullMatrix<double>> ass;
   ass.initialize(matrices);
 
   MeshWorker::DoFInfo<dim> info(dof.block_info());
@@ -77,19 +77,20 @@ void test(FiniteElement<dim> &fe)
   deallog.pop();
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   deallog.attach(logfile);
 
-  FE_DGP<2> p0(0);
-  FE_DGP<2> p1(1);
-  FE_DGP<2> p2(2);
+  FE_DGP<2>           p0(0);
+  FE_DGP<2>           p1(1);
+  FE_DGP<2>           p2(2);
   FE_RaviartThomas<2> rt0(0);
 
-  FESystem<2> sys1(p0,1, p1, 1);
-  FESystem<2> sys2(p2,2,p0,3,p1,1);
+  FESystem<2> sys1(p0, 1, p1, 1);
+  FESystem<2> sys2(p2, 2, p0, 3, p1, 1);
   FESystem<2> sys3(p0, 2, rt0, 1);
 
   test(sys1);

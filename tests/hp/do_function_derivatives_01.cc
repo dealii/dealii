@@ -13,13 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // FEValues::get_function_* had a problem when using FE_Nothing
 
 #include "../tests.h"
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -27,13 +25,13 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/hp/fe_collection.h>
 
@@ -43,16 +41,16 @@
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
 
   Triangulation<2> triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (1);
+  GridGenerator::hyper_cube(triangulation);
+  triangulation.refine_global(1);
 
-
-  hp::FECollection<2>     fe_collection;
+  hp::FECollection<2> fe_collection;
 
   fe_collection.push_back(FESystem<2>(FE_Q<2>(1), 1, FE_Q<2>(1), 1));
   fe_collection.push_back(FESystem<2>(FE_Nothing<2>(), 1, FE_Nothing<2>(), 1));
@@ -63,7 +61,6 @@ int main()
   hp::DoFHandler<2>::active_cell_iterator cell;
   hp::DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
 
-
   cell = dof_handler.begin_active();
   cell->set_active_fe_index(1);
   cell++;
@@ -73,19 +70,18 @@ int main()
   cell++;
   cell->set_active_fe_index(0);
 
-
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   // Init solution
   Vector<double> solution(dof_handler.n_dofs());
   solution = 1.0;
 
-
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solultion_trans(dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solultion_trans(
+    dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement ();
-  dof_handler.distribute_dofs (fe_collection);
+  triangulation.execute_coarsening_and_refinement();
+  dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
@@ -93,21 +89,19 @@ int main()
   hp::QCollection<2> q;
   q.push_back(QMidpoint<2>());
   q.push_back(QMidpoint<2>());
-  hp::FEValues<2> x_fe_values (fe_collection, q, update_gradients);
-  for (hp::DoFHandler<2>::active_cell_iterator  cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
+  hp::FEValues<2> x_fe_values(fe_collection, q, update_gradients);
+  for(hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
+      cell != dof_handler.end();
+      ++cell)
     {
-      x_fe_values.reinit (cell);
-      std::vector<std::vector<Tensor<1,2> > >
-      derivatives (q[0].size(), std::vector<Tensor<1,2> >(cell->get_fe().n_components()));
+      x_fe_values.reinit(cell);
+      std::vector<std::vector<Tensor<1, 2>>> derivatives(
+        q[0].size(), std::vector<Tensor<1, 2>>(cell->get_fe().n_components()));
 
-      x_fe_values.get_present_fe_values().get_function_gradients (new_solution,
-                                                                  derivatives);
+      x_fe_values.get_present_fe_values().get_function_gradients(new_solution,
+                                                                 derivatives);
     }
 
   // we are good if we made it to here
   deallog << "OK" << std::endl;
 }
-
-
-

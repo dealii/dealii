@@ -13,41 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the ComponentMask class
 //
 // here: ComponentMask::represents_the_all_selected_mask
 
-
 #include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   // test for an initialized mask
-  AssertThrow (ComponentMask(12,false).represents_the_all_selected_mask() == false,
-               ExcInternalError());
+  AssertThrow(ComponentMask(12, false).represents_the_all_selected_mask()
+                == false,
+              ExcInternalError());
   // note the semantics of the following as
   // described in the documentation
-  AssertThrow (ComponentMask(12,true).represents_the_all_selected_mask() == false,
-               ExcInternalError());
+  AssertThrow(ComponentMask(12, true).represents_the_all_selected_mask()
+                == false,
+              ExcInternalError());
   // test for an empty mask
-  AssertThrow (ComponentMask().represents_the_all_selected_mask() == true,
-               ExcInternalError());
+  AssertThrow(ComponentMask().represents_the_all_selected_mask() == true,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

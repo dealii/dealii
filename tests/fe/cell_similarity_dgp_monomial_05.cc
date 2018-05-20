@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // since early 2009, the FEValues objects try to be more efficient by only
 // recomputing things like gradients of shape functions if the cell on which
 // we are is not a translation of the previous one. in this series of tests we
@@ -27,40 +25,37 @@
 // the various tests cell_similarity_dgp_monomial_?? differ in the mappings and finite
 // elements in use
 
-
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_c1.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/lac/vector.h>
 
-
-
-bool equal (const FullMatrix<double> &m1,
-            const FullMatrix<double> &m2)
+bool
+equal(const FullMatrix<double>& m1, const FullMatrix<double>& m2)
 {
   double d = 0, s = 0;
-  for (unsigned int i=0; i<m1.m(); ++i)
-    for (unsigned int j=0; j<m1.n(); ++j)
+  for(unsigned int i = 0; i < m1.m(); ++i)
+    for(unsigned int j = 0; j < m1.n(); ++j)
       {
-        d += (m1(i,j)-m2(i,j)) * (m1(i,j)-m2(i,j));
-        s += m1(i,j) * m1(i,j);
+        d += (m1(i, j) - m2(i, j)) * (m1(i, j) - m2(i, j));
+        s += m1(i, j) * m1(i, j);
       }
-  return (d<1e-8*s);
+  return (d < 1e-8 * s);
 }
 
-
 template <int dim>
-void test (const Triangulation<dim> &tr)
+void
+test(const Triangulation<dim>& tr)
 {
   FE_DGPMonomial<dim> fe(1);
   deallog << "FE=" << fe.get_name() << std::endl;
@@ -68,14 +63,14 @@ void test (const Triangulation<dim> &tr)
   MappingQ<dim> mapping(2);
   deallog << "Mapping=Q2" << std::endl;
 
-
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim> fe_values (mapping, fe, quadrature,
-                           update_values | update_gradients |
-                           update_JxW_values);
+  FEValues<dim>     fe_values(mapping,
+                          fe,
+                          quadrature,
+                          update_values | update_gradients | update_JxW_values);
 
   FullMatrix<double> mass_matrix[2], laplace_matrix[2];
   mass_matrix[0].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
@@ -83,22 +78,22 @@ void test (const Triangulation<dim> &tr)
   laplace_matrix[0].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
   laplace_matrix[1].reinit(fe.dofs_per_cell, fe.dofs_per_cell);
 
-  for (typename DoFHandler<dim>::active_cell_iterator
-       cell = dof.begin_active();
-       cell != dof.end(); ++cell)
+  for(typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+      cell != dof.end();
+      ++cell)
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-        for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-          for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+      for(unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
+        for(unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
+          for(unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
             {
-              mass_matrix[cell->index()](i,j) += fe_values.shape_value (i,q) *
-                                                 fe_values.shape_value (j,q) *
-                                                 fe_values.JxW(q);
-              laplace_matrix[cell->index()](i,j) += fe_values.shape_grad (i,q) *
-                                                    fe_values.shape_grad (j,q) *
-                                                    fe_values.JxW(q);
+              mass_matrix[cell->index()](i, j) += fe_values.shape_value(i, q)
+                                                  * fe_values.shape_value(j, q)
+                                                  * fe_values.JxW(q);
+              laplace_matrix[cell->index()](i, j)
+                += fe_values.shape_grad(i, q) * fe_values.shape_grad(j, q)
+                   * fe_values.JxW(q);
             }
     }
 
@@ -106,65 +101,60 @@ void test (const Triangulation<dim> &tr)
   // about equality or inequality of the
   // matrices
   deallog << "Mass matrices "
-          << (equal (mass_matrix[0], mass_matrix[1]) ? "are" : "are not")
-          << " equal."
-          << std::endl;
+          << (equal(mass_matrix[0], mass_matrix[1]) ? "are" : "are not")
+          << " equal." << std::endl;
   deallog << "Laplace matrices "
-          << (equal (laplace_matrix[0], laplace_matrix[1]) ? "are" : "are not")
-          << " equal."
-          << std::endl;
+          << (equal(laplace_matrix[0], laplace_matrix[1]) ? "are" : "are not")
+          << " equal." << std::endl;
 
-  for (unsigned int cell=0; cell<2; ++cell)
+  for(unsigned int cell = 0; cell < 2; ++cell)
     {
       deallog << "cell=" << cell << std::endl;
       deallog << "mass_matrix:" << std::endl;
-      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+      for(unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-            deallog << mass_matrix[cell](i,j) << ' ';
+          for(unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
+            deallog << mass_matrix[cell](i, j) << ' ';
           deallog << std::endl;
         }
 
       deallog << "laplace_matrix:" << std::endl;
-      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+      for(unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
         {
-          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-            deallog << laplace_matrix[cell](i,j) << ' ';
+          for(unsigned int j = 0; j < fe_values.dofs_per_cell; ++j)
+            deallog << laplace_matrix[cell](i, j) << ' ';
           deallog << std::endl;
         }
     }
 }
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tr;
-  Point<dim> p1 = Point<dim>();
-  Point<dim> p2 = (dim == 2 ?
-                   Point<dim>(2,1) :
-                   Point<dim>(2,1,1));
-  std::vector<unsigned int> subdivisions (dim, 1);
+  Point<dim>         p1 = Point<dim>();
+  Point<dim>         p2 = (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1));
+  std::vector<unsigned int> subdivisions(dim, 1);
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);
 
   static const SphericalManifold<dim> boundary(tr.begin_active()->center());
-  tr.set_manifold (1, boundary);
+  tr.set_manifold(1, boundary);
 
   // set boundary id on cell 1
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    if (tr.begin_active()->at_boundary(f))
-      tr.begin_active()->face(f)->set_manifold_id (1);
+  for(unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    if(tr.begin_active()->at_boundary(f))
+      tr.begin_active()->face(f)->set_manifold_id(1);
 
   test(tr);
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

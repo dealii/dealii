@@ -13,22 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Check FullMatrix::print_formatted on NaN entry
 
 #include "../tests.h"
 
 #include <deal.II/lac/full_matrix.h>
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  FullMatrix<double> matrix(2,2);
-  matrix(0,0) = std::numeric_limits<double>::quiet_NaN();
-  matrix(0,1) = std::numeric_limits<double>::infinity();
-  matrix(1,1) = -std::numeric_limits<double>::infinity();
+  FullMatrix<double> matrix(2, 2);
+  matrix(0, 0) = std::numeric_limits<double>::quiet_NaN();
+  matrix(0, 1) = std::numeric_limits<double>::infinity();
+  matrix(1, 1) = -std::numeric_limits<double>::infinity();
 
   deallog << "Using print" << std::endl;
   matrix.print(deallog.get_file_stream());

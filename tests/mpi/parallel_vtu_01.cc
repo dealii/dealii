@@ -13,36 +13,32 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // create a parallel DoFHandler and output data using the parallel vtk output
 // (uses MPI IO)
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -51,28 +47,27 @@ void test()
   DoFHandler<dim> dofh(tr);
 
   static const FE_Q<dim> fe(2);
-  dofh.distribute_dofs (fe);
-
+  dofh.distribute_dofs(fe);
 
   TrilinosWrappers::MPI::Vector x;
   x.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
-  x=2.0;
+  x = 2.0;
 
   DataOut<dim> data_out;
-  data_out.attach_dof_handler (dofh);
-  data_out.add_data_vector (x, "x");
-  data_out.build_patches ();
+  data_out.attach_dof_handler(dofh);
+  data_out.add_data_vector(x, "x");
+  data_out.build_patches();
 
   data_out.write_vtu_in_parallel("output.vtu", MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if (myid==0)
+  if(myid == 0)
     {
       std::vector<std::string> filenames;
       filenames.push_back("output.vtu");
       {
         std::ofstream master("output.pvtu");
-        data_out.write_pvtu_record (master, filenames);
+        data_out.write_pvtu_record(master, filenames);
       }
 
       cat_file("output.vtu");
@@ -81,12 +76,12 @@ void test()
   deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   test<2>();
 }

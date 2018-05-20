@@ -13,61 +13,59 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests matrix-free face evaluation, matrix-vector products as compared to
 // the same implementation with MeshWorker. This example uses a general mesh
 // with various cell types and hanging nodes
 
 #include "../tests.h"
+#include "create_mesh.h"
 #include <deal.II/base/function.h>
 #include <deal.II/fe/fe_dgq.h>
-#include "create_mesh.h"
 #include <deal.II/grid/grid_tools.h>
 
 std::ofstream logfile("output");
 
 #include "matrix_vector_faces_common.h"
 
-
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  create_mesh (tria);
+  create_mesh(tria);
 
-  tria.begin_active ()->set_refine_flag();
+  tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   typename Triangulation<dim>::active_cell_iterator cell, endc;
-  cell = tria.begin_active ();
+  cell = tria.begin_active();
   endc = tria.end();
-  for (; cell!=endc; ++cell)
-    if (cell->center().norm()<0.5)
+  for(; cell != endc; ++cell)
+    if(cell->center().norm() < 0.5)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
-  tria.begin(tria.n_levels()-1)->set_refine_flag();
+  tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   //if (fe_degree == 1)
   //  tria.refine_global(1);
-  cell = tria.begin_active ();
-  for (unsigned int i=0; i<9-3*dim; ++i)
+  cell = tria.begin_active();
+  for(unsigned int i = 0; i < 9 - 3 * dim; ++i)
     {
-      cell = tria.begin_active ();
-      endc = tria.end();
+      cell                 = tria.begin_active();
+      endc                 = tria.end();
       unsigned int counter = 0;
-      for (; cell!=endc; ++cell, ++counter)
-        if (counter % (7-i) == 0)
+      for(; cell != endc; ++cell, ++counter)
+        if(counter % (7 - i) == 0)
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  FE_DGQ<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_DGQ<dim>     fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   ConstraintMatrix constraints;
   constraints.close();
 
   // also test with threads
-  do_test<dim, fe_degree, fe_degree+1, double> (dof, constraints, true);
+  do_test<dim, fe_degree, fe_degree + 1, double>(dof, constraints, true);
 }

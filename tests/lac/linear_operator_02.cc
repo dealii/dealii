@@ -37,7 +37,8 @@
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
@@ -45,12 +46,12 @@ int main()
   static const int dim = 2;
 
   Triangulation<dim> triangulation;
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
   MappingQGeneric<dim> mapping_q1(1);
-  FE_Q<dim> q1(1);
-  DoFHandler<dim> dof_handler(triangulation);
+  FE_Q<dim>            q1(1);
+  DoFHandler<dim>      dof_handler(triangulation);
   dof_handler.distribute_dofs(q1);
 
   DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
@@ -60,13 +61,12 @@ int main()
   sparsity_pattern.copy_from(dsp);
   sparsity_pattern.compress();
 
-  SparseMatrix<double> a (sparsity_pattern);
-  SparseMatrix<double> b (sparsity_pattern);
+  SparseMatrix<double> a(sparsity_pattern);
+  SparseMatrix<double> b(sparsity_pattern);
 
   QGauss<dim> quadrature(4);
   MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, a);
   MatrixCreator::create_mass_matrix(mapping_q1, dof_handler, quadrature, b);
-
 
   // Constructors and assignment:
 
@@ -74,7 +74,7 @@ int main()
   auto op_b = linear_operator(b);
 
   {
-    LinearOperator<dealii::Vector<double>, dealii::Vector<double>> op_x (a);
+    LinearOperator<dealii::Vector<double>, dealii::Vector<double>> op_x(a);
     op_a = a;
     op_b = b;
   }
@@ -83,9 +83,9 @@ int main()
 
   Vector<double> u;
   op_a.reinit_domain_vector(u, true);
-  for (unsigned int i = 0; i < u.size(); ++i)
+  for(unsigned int i = 0; i < u.size(); ++i)
     {
-      u[i] = (double)(i+1);
+      u[i] = (double) (i + 1);
     }
 
   deallog << "u: " << u << std::endl;
@@ -131,8 +131,8 @@ int main()
 
   // operator*, operator*=
 
-  op_b.vmult(v,u);
-  op_a.vmult(w,v);
+  op_b.vmult(v, u);
+  op_a.vmult(w, v);
   deallog << "(A(Bu)): " << w << std::endl;
 
   (op_a * op_b).vmult(x, u);
@@ -149,8 +149,8 @@ int main()
 
   // solver interface:
 
-  SolverControl solver_control (1000, 1e-12);
-  SolverCG<> solver (solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   deallog.depth_file(0);
   solver.solve(op_b, v, u, PreconditionIdentity());
@@ -177,11 +177,13 @@ int main()
   deallog.depth_file(3);
   deallog << "(inverse_operator(B)*B)u: " << w << std::endl;
 
-  SolverControl inner_solver_control (1000, 1e-12);
-  SolverCG<> inner_solver (solver_control);
+  SolverControl inner_solver_control(1000, 1e-12);
+  SolverCG<>    inner_solver(solver_control);
 
   deallog.depth_file(0);
-  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()), v, u,
+  solver.solve(inverse_operator(op_b, inner_solver, PreconditionIdentity()),
+               v,
+               u,
                PreconditionIdentity());
   deallog.depth_file(3);
   deallog << "solve(inverse_operator(B), v, u) == Bu: " << v << std::endl;

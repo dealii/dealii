@@ -13,36 +13,34 @@
 //
 // ---------------------------------------------------------------------
 
-
 // write the pvd master record for parallel visualization through the
 // vtu file format
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "patches.h"
 
-
 template <int dim, int spacedim>
-void check(std::ostream &out)
+void
+check(std::ostream& out)
 {
-  std::vector<std::pair<double,std::string> > names(5);
-  names[0] = std::make_pair(0,"x1");
-  names[1] = std::make_pair(1,"x2");
-  names[2] = std::make_pair(1e1,"x3");
-  names[3] = std::make_pair(3.141,"d");
-  names[4] = std::make_pair(42e19,"i");
+  std::vector<std::pair<double, std::string>> names(5);
+  names[0] = std::make_pair(0, "x1");
+  names[1] = std::make_pair(1, "x2");
+  names[2] = std::make_pair(1e1, "x3");
+  names[3] = std::make_pair(3.141, "d");
+  names[4] = std::make_pair(42e19, "i");
 
-  DataOutBase::write_pvd_record (out, names);
+  DataOutBase::write_pvd_record(out, names);
 }
 
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
-  check<2,2>(logfile);
+  check<2, 2>(logfile);
 }

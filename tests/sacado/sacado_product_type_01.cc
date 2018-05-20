@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test ProductType with sacado
 
 #include <typeinfo>
@@ -24,66 +23,66 @@
 #include "../tests.h"
 
 template <typename T, typename U, typename CompareType>
-void check()
+void
+check()
 {
-  AssertThrow (typeid(typename ProductType<T,U>::type) == typeid(CompareType),
-               ExcInternalError());
+  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
+              ExcInternalError());
 }
 
-
-int main()
+int
+main()
 {
   typedef Sacado::Fad::DFad<double> Sdouble;
   initlog();
 
-
   // check product of scalars
-  check<double,Sdouble,Sdouble>();
-  check<Sdouble,double,Sdouble>();
+  check<double, Sdouble, Sdouble>();
+  check<Sdouble, double, Sdouble>();
 
-  check<float,Sdouble,Sdouble>();
-  check<Sdouble,float,Sdouble>();
+  check<float, Sdouble, Sdouble>();
+  check<Sdouble, float, Sdouble>();
 
-  check<int,Sdouble,Sdouble>();
-  check<Sdouble,int,Sdouble>();
+  check<int, Sdouble, Sdouble>();
+  check<Sdouble, int, Sdouble>();
 
   // check product with Tensor<1,dim>
-  check<Tensor<1,2,double>,Sdouble,Tensor<1,2,Sdouble> >();
-  check<Tensor<1,2,Sdouble>,double,Tensor<1,2,Sdouble> >();
+  check<Tensor<1, 2, double>, Sdouble, Tensor<1, 2, Sdouble>>();
+  check<Tensor<1, 2, Sdouble>, double, Tensor<1, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<1,2,double>,Tensor<1,2,Sdouble> >();
-  check<double,Tensor<1,2,Sdouble>,Tensor<1,2,Sdouble> >();
+  check<Sdouble, Tensor<1, 2, double>, Tensor<1, 2, Sdouble>>();
+  check<double, Tensor<1, 2, Sdouble>, Tensor<1, 2, Sdouble>>();
 
-  check<Tensor<1,2,float>,Sdouble,Tensor<1,2,Sdouble> >();
-  check<Tensor<1,2,Sdouble>,float,Tensor<1,2,Sdouble> >();
+  check<Tensor<1, 2, float>, Sdouble, Tensor<1, 2, Sdouble>>();
+  check<Tensor<1, 2, Sdouble>, float, Tensor<1, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<1,2,float>,Tensor<1,2,Sdouble> >();
-  check<float,Tensor<1,2,Sdouble>,Tensor<1,2,Sdouble> >();
+  check<Sdouble, Tensor<1, 2, float>, Tensor<1, 2, Sdouble>>();
+  check<float, Tensor<1, 2, Sdouble>, Tensor<1, 2, Sdouble>>();
 
-  check<Tensor<1,2,int>,Sdouble,Tensor<1,2,Sdouble> >();
-  check<Tensor<1,2,Sdouble>,int,Tensor<1,2,Sdouble> >();
+  check<Tensor<1, 2, int>, Sdouble, Tensor<1, 2, Sdouble>>();
+  check<Tensor<1, 2, Sdouble>, int, Tensor<1, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<1,2,int>,Tensor<1,2,Sdouble> >();
-  check<int,Tensor<1,2,Sdouble>,Tensor<1,2,Sdouble> >();
+  check<Sdouble, Tensor<1, 2, int>, Tensor<1, 2, Sdouble>>();
+  check<int, Tensor<1, 2, Sdouble>, Tensor<1, 2, Sdouble>>();
 
   // check product with Tensor<2,dim> (which is a different class)
-  check<Tensor<2,2,double>,Sdouble,Tensor<2,2,Sdouble> >();
-  check<Tensor<2,2,Sdouble>,double,Tensor<2,2,Sdouble> >();
+  check<Tensor<2, 2, double>, Sdouble, Tensor<2, 2, Sdouble>>();
+  check<Tensor<2, 2, Sdouble>, double, Tensor<2, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<2,2,double>,Tensor<2,2,Sdouble> >();
-  check<double,Tensor<2,2,Sdouble>,Tensor<2,2,Sdouble> >();
+  check<Sdouble, Tensor<2, 2, double>, Tensor<2, 2, Sdouble>>();
+  check<double, Tensor<2, 2, Sdouble>, Tensor<2, 2, Sdouble>>();
 
-  check<Tensor<2,2,float>,Sdouble,Tensor<2,2,Sdouble> >();
-  check<Tensor<2,2,Sdouble>,float,Tensor<2,2,Sdouble> >();
+  check<Tensor<2, 2, float>, Sdouble, Tensor<2, 2, Sdouble>>();
+  check<Tensor<2, 2, Sdouble>, float, Tensor<2, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<2,2,float>,Tensor<2,2,Sdouble> >();
-  check<float,Tensor<2,2,Sdouble>,Tensor<2,2,Sdouble> >();
+  check<Sdouble, Tensor<2, 2, float>, Tensor<2, 2, Sdouble>>();
+  check<float, Tensor<2, 2, Sdouble>, Tensor<2, 2, Sdouble>>();
 
-  check<Tensor<2,2,int>,Sdouble,Tensor<2,2,Sdouble> >();
-  check<Tensor<2,2,Sdouble>,int,Tensor<2,2,Sdouble> >();
+  check<Tensor<2, 2, int>, Sdouble, Tensor<2, 2, Sdouble>>();
+  check<Tensor<2, 2, Sdouble>, int, Tensor<2, 2, Sdouble>>();
 
-  check<Sdouble,Tensor<2,2,int>,Tensor<2,2,Sdouble> >();
-  check<int,Tensor<2,2,Sdouble>,Tensor<2,2,Sdouble> >();
+  check<Sdouble, Tensor<2, 2, int>, Tensor<2, 2, Sdouble>>();
+  check<int, Tensor<2, 2, Sdouble>, Tensor<2, 2, Sdouble>>();
 
   deallog << "OK" << std::endl;
 }

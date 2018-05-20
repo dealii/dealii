@@ -13,42 +13,40 @@
 //
 // ---------------------------------------------------------------------
 
-
 //check method mTmult of FullMatrix
 
 #include "../tests.h"
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/eigen.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
-const double entries_A[9] = { 1,2,3,4,5,6,7,8,9 };
-const double entries_B[9] = { 2,1,1,1,2,3,2,1,2 };
-const double entries_Z[9] = { 0,0,0,0,0,0,0,0,0 };
+const double entries_A[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+const double entries_B[9] = {2, 1, 1, 1, 2, 3, 2, 1, 2};
+const double entries_Z[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // Create a positive definite random matrix
 
 int
-main ()
+main()
 {
   initlog();
   deallog << std::fixed;
   deallog << std::setprecision(3);
   Testing::srand(3391466);
 
-  FullMatrix<double> A(3,3,entries_A);
-  FullMatrix<double> B(3,3,entries_B);
-  FullMatrix<double> Z(3,3,entries_Z);
-  FullMatrix<double> C(3,3);
-  FullMatrix<double> D(3,3);
+  FullMatrix<double> A(3, 3, entries_A);
+  FullMatrix<double> B(3, 3, entries_B);
+  FullMatrix<double> Z(3, 3, entries_Z);
+  FullMatrix<double> C(3, 3);
+  FullMatrix<double> D(3, 3);
 
   //compute C= A*B^T in two different ways and compare for equality
-  Z.Tadd(1.,B);
-  A.mmult(D,Z);
-  A.mTmult(C,B);
+  Z.Tadd(1., B);
+  A.mmult(D, Z);
+  A.mTmult(C, B);
 
-  D.add(-1,C);
-  AssertThrow ( D.frobenius_norm() < 1e-15,
-                ExcInternalError());
+  D.add(-1, C);
+  AssertThrow(D.frobenius_norm() < 1e-15, ExcInternalError());
   deallog << "OK" << std::endl;
 }

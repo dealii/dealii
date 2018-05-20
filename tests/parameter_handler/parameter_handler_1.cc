@@ -13,31 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check the Patterns::List pattern
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+void
+check(const char* p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1,0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3));
+  prm.declare_entry(
+    "test_1", "-1,0", Patterns::List(Patterns::Integer(-1, 1), 2, 3));
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1.prm");
 
   return 0;
 }

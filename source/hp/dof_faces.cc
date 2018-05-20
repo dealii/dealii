@@ -22,57 +22,48 @@ namespace internal
 {
   namespace hp
   {
-// ---------------------- DoFObjects ----------------------------
+    // ---------------------- DoFObjects ----------------------------
 
     template <int structdim>
     std::size_t
-    DoFIndicesOnFacesOrEdges<structdim>::memory_consumption () const
+    DoFIndicesOnFacesOrEdges<structdim>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption (dofs) +
-              MemoryConsumption::memory_consumption (dof_offsets));
+      return (MemoryConsumption::memory_consumption(dofs)
+              + MemoryConsumption::memory_consumption(dof_offsets));
     }
 
-
     // explicit instantiations
-    template
-    std::size_t
-    DoFIndicesOnFacesOrEdges<1>::memory_consumption () const;
+    template std::size_t
+    DoFIndicesOnFacesOrEdges<1>::memory_consumption() const;
 
-    template
-    std::size_t
-    DoFIndicesOnFacesOrEdges<2>::memory_consumption () const;
+    template std::size_t
+    DoFIndicesOnFacesOrEdges<2>::memory_consumption() const;
 
-    template
-    std::size_t
-    DoFIndicesOnFacesOrEdges<3>::memory_consumption () const;
+    template std::size_t
+    DoFIndicesOnFacesOrEdges<3>::memory_consumption() const;
 
-
-// ---------------------- DoFFaces ----------------------------
+    // ---------------------- DoFFaces ----------------------------
 
     std::size_t
-    DoFIndicesOnFaces<1>::memory_consumption () const
+    DoFIndicesOnFaces<1>::memory_consumption() const
     {
       return 0;
     }
 
-
-
     std::size_t
-    DoFIndicesOnFaces<2>::memory_consumption () const
+    DoFIndicesOnFaces<2>::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption (lines);
+      return MemoryConsumption::memory_consumption(lines);
     }
 
-
-
     std::size_t
-    DoFIndicesOnFaces<3>::memory_consumption () const
+    DoFIndicesOnFaces<3>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption (lines) +
-              MemoryConsumption::memory_consumption (quads) );
+      return (MemoryConsumption::memory_consumption(lines)
+              + MemoryConsumption::memory_consumption(quads));
     }
 
-  }
-}
+  } // namespace hp
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

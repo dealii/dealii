@@ -13,27 +13,25 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test the tangential functions in integrators/laplace.h
 // Output matrices and assert consistency of residuals
 
-#include "../tests.h"
 #include "../test_grids.h"
+#include "../tests.h"
 
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/integrators/laplace.h>
 
-#include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 
 using namespace LocalIntegrators::Laplace;
 
-
-
 template <int dim>
-void test_boundary(const FiniteElement<dim> &fe, bool diff=false)
+void
+test_boundary(const FiniteElement<dim>& fe, bool diff = false)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -43,30 +41,33 @@ void test_boundary(const FiniteElement<dim> &fe, bool diff=false)
   ConstraintMatrix constraints;
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
-  QGauss<dim-1> quadrature(fe.tensor_degree()+1);
-  FEFaceValues<dim> fev(fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
+  QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);
+  FEFaceValues<dim> fev(fe,
+                        quadrature,
+                        update_values | update_gradients | update_normal_vectors
+                          | update_JxW_values);
 
-  FullMatrix<double> M(fe.dofs_per_cell);
-  FullMatrix<double> Mglobal(dof.n_dofs());
+  FullMatrix<double>                   M(fe.dofs_per_cell);
+  FullMatrix<double>                   Mglobal(dof.n_dofs());
   std::vector<types::global_dof_index> indices(fe.dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   cell->get_dof_indices(indices);
-  for (unsigned i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+  for(unsigned i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
       fev.reinit(cell, i);
       nitsche_tangential_matrix(M, fev, 10.);
-      if (diff)
+      if(diff)
         nitsche_matrix(M, fev, 10., -1.);
       constraints.distribute_local_to_global(M, indices, indices, Mglobal);
     }
-  deallog << fe.get_name() << ": bdry norm " << Mglobal.frobenius_norm() << std::endl;
+  deallog << fe.get_name() << ": bdry norm " << Mglobal.frobenius_norm()
+          << std::endl;
 }
 
-
-
 template <int dim>
-void test_face(const FiniteElement<dim> &fe, bool diff=false)
+void
+test_face(const FiniteElement<dim>& fe, bool diff = false)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
@@ -77,15 +78,21 @@ void test_face(const FiniteElement<dim> &fe, bool diff=false)
   ConstraintMatrix constraints;
   DoFTools::make_zero_boundary_constraints(dof, constraints);
 
-  QGauss<dim-1> quadrature(fe.tensor_degree()+1);
-  FEFaceValues<dim> fev1(fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
-  FEFaceValues<dim> fev2(fe, quadrature, update_values | update_gradients | update_normal_vectors | update_JxW_values);
+  QGauss<dim - 1>   quadrature(fe.tensor_degree() + 1);
+  FEFaceValues<dim> fev1(fe,
+                         quadrature,
+                         update_values | update_gradients
+                           | update_normal_vectors | update_JxW_values);
+  FEFaceValues<dim> fev2(fe,
+                         quadrature,
+                         update_values | update_gradients
+                           | update_normal_vectors | update_JxW_values);
 
-  FullMatrix<double> M11(fe.dofs_per_cell);
-  FullMatrix<double> M12(fe.dofs_per_cell);
-  FullMatrix<double> M21(fe.dofs_per_cell);
-  FullMatrix<double> M22(fe.dofs_per_cell);
-  FullMatrix<double> Mglobal(dof.n_dofs());
+  FullMatrix<double>                   M11(fe.dofs_per_cell);
+  FullMatrix<double>                   M12(fe.dofs_per_cell);
+  FullMatrix<double>                   M21(fe.dofs_per_cell);
+  FullMatrix<double>                   M22(fe.dofs_per_cell);
+  FullMatrix<double>                   Mglobal(dof.n_dofs());
   std::vector<types::global_dof_index> indices1(fe.dofs_per_cell);
   std::vector<types::global_dof_index> indices2(fe.dofs_per_cell);
 
@@ -99,17 +106,16 @@ void test_face(const FiniteElement<dim> &fe, bool diff=false)
   fev2.reinit(cell2, 0);
   ip_tangential_matrix(M11, M12, M21, M22, fev1, fev2, 10);
 
-  if (diff)
+  if(diff)
     ip_matrix(M11, M12, M21, M22, fev1, fev2, 10, -1.);
 
   constraints.distribute_local_to_global(M11, indices1, indices1, Mglobal);
   constraints.distribute_local_to_global(M21, indices2, indices1, Mglobal);
   constraints.distribute_local_to_global(M12, indices1, indices2, Mglobal);
   constraints.distribute_local_to_global(M22, indices2, indices2, Mglobal);
-  deallog << fe.get_name() << ": face norm " << Mglobal.frobenius_norm() << std::endl;
+  deallog << fe.get_name() << ": face norm " << Mglobal.frobenius_norm()
+          << std::endl;
 }
-
-
 
 template <int dim>
 void
@@ -124,12 +130,12 @@ test()
 
   FE_RaviartThomas<dim> r1(2);
   test_boundary(r1, true);
-  test_face(r1,true);
+  test_face(r1, true);
   test_boundary(r1);
   test_face(r1);
 
-  FE_DGQ<dim> q1(1);
-  FESystem<dim> sys1(q1,dim);
+  FE_DGQ<dim>   q1(1);
+  FESystem<dim> sys1(q1, dim);
   test_boundary(sys1);
   test_boundary(sys1, true);
   test_face(sys1);
@@ -137,8 +143,8 @@ test()
   deallog << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

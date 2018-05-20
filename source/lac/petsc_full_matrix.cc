@@ -17,58 +17,52 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#include <deal.II/lac/petsc_compatibility.h>
-#include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_compatibility.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-
-  FullMatrix::FullMatrix ()
+  FullMatrix::FullMatrix()
   {
     // empty constructor generate an empty matrix
-    do_reinit (0, 0);
+    do_reinit(0, 0);
   }
 
-  FullMatrix::FullMatrix (const size_type m,
-                          const size_type n)
+  FullMatrix::FullMatrix(const size_type m, const size_type n)
   {
-    do_reinit (m, n);
+    do_reinit(m, n);
   }
 
   void
-  FullMatrix::reinit (const size_type m,
-                      const size_type n)
+  FullMatrix::reinit(const size_type m, const size_type n)
   {
     // get rid of old matrix and generate a
     // new one
     const PetscErrorCode ierr = destroy_matrix(matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    do_reinit (m, n);
+    do_reinit(m, n);
   }
 
   void
-  FullMatrix::do_reinit (const size_type m,
-                         const size_type n)
+  FullMatrix::do_reinit(const size_type m, const size_type n)
   {
     // use the call sequence indicating only a maximal number of
     // elements per row for all rows globally
-    const PetscErrorCode ierr = MatCreateSeqDense (PETSC_COMM_SELF, m, n,
-                                                   nullptr, &matrix);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    const PetscErrorCode ierr
+      = MatCreateSeqDense(PETSC_COMM_SELF, m, n, nullptr, &matrix);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-
-  const MPI_Comm &
-  FullMatrix::get_mpi_communicator () const
+  const MPI_Comm&
+  FullMatrix::get_mpi_communicator() const
   {
     static const MPI_Comm communicator = MPI_COMM_SELF;
     return communicator;
   }
-}
-
+} // namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 

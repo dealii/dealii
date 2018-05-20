@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "dof_tools_common.h"
 
@@ -22,31 +21,30 @@
 //                                         const std::set<types::boundary_id> &,
 //                                         std::vector<unsigned int> &)
 
-
-
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim>& dof_handler)
 {
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
-  std::set<types::boundary_id> boundary_ids;
+  std::set<types::boundary_id>         boundary_ids;
 
   // check for boundary id 0 alone
-  boundary_ids.insert (0);
-  DoFTools::map_dof_to_boundary_indices (dof_handler, map);
-  for (unsigned int i=0; i<map.size(); ++i)
+  boundary_ids.insert(0);
+  DoFTools::map_dof_to_boundary_indices(dof_handler, map);
+  for(unsigned int i = 0; i < map.size(); ++i)
     deallog << (map[i] == numbers::invalid_dof_index ?
-                -1 : static_cast<signed int>(map[i]))
+                  -1 :
+                  static_cast<signed int>(map[i]))
             << " ";
   deallog << std::endl;
 
   // check for boundary id 0 and 1
-  boundary_ids.insert (1);
-  DoFTools::map_dof_to_boundary_indices (dof_handler, map);
-  for (unsigned int i=0; i<map.size(); ++i)
+  boundary_ids.insert(1);
+  DoFTools::map_dof_to_boundary_indices(dof_handler, map);
+  for(unsigned int i = 0; i < map.size(); ++i)
     deallog << (map[i] == numbers::invalid_dof_index ?
-                -1 : static_cast<signed int>(map[i]))
+                  -1 :
+                  static_cast<signed int>(map[i]))
             << " ";
   deallog << std::endl;
 }

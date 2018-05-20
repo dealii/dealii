@@ -17,7 +17,6 @@
  * Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006
  */
 
-
 // @sect3{Include files and global variables}
 
 // For an explanation of the include files, the reader should refer to the
@@ -26,39 +25,37 @@
 // <code>dofs</code> -- <code>fe</code> -- <code>numerics</code> (since each
 // of these categories roughly builds upon previous ones), then a few C++
 // headers for file input/output and string streams.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iostream>
-
 
 // The last step is as in all previous programs:
 namespace Step25
 {
   using namespace dealii;
-
 
   // @sect3{The <code>SineGordonProblem</code> class template}
 
@@ -97,24 +94,31 @@ namespace Step25
   class SineGordonProblem
   {
   public:
-    SineGordonProblem ();
-    void run ();
+    SineGordonProblem();
+    void
+    run();
 
   private:
-    void make_grid_and_dofs ();
-    void assemble_system ();
-    void compute_nl_term (const Vector<double> &old_data,
-                          const Vector<double> &new_data,
-                          Vector<double>       &nl_term) const;
-    void compute_nl_matrix (const Vector<double> &old_data,
-                            const Vector<double> &new_data,
-                            SparseMatrix<double> &nl_matrix) const;
-    unsigned int solve ();
-    void output_results (const unsigned int timestep_number) const;
+    void
+    make_grid_and_dofs();
+    void
+    assemble_system();
+    void
+    compute_nl_term(const Vector<double>& old_data,
+                    const Vector<double>& new_data,
+                    Vector<double>&       nl_term) const;
+    void
+    compute_nl_matrix(const Vector<double>& old_data,
+                      const Vector<double>& new_data,
+                      SparseMatrix<double>& nl_matrix) const;
+    unsigned int
+    solve();
+    void
+    output_results(const unsigned int timestep_number) const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -123,17 +127,16 @@ namespace Step25
 
     const unsigned int n_global_refinements;
 
-    double time;
+    double       time;
     const double final_time, time_step;
     const double theta;
 
-    Vector<double>       solution, solution_update, old_solution;
-    Vector<double>       M_x_velocity;
-    Vector<double>       system_rhs;
+    Vector<double> solution, solution_update, old_solution;
+    Vector<double> M_x_velocity;
+    Vector<double> system_rhs;
 
     const unsigned int output_timestep_skip;
   };
-
 
   // @sect3{Initial conditions}
 
@@ -153,61 +156,63 @@ namespace Step25
   class ExactSolution : public Function<dim>
   {
   public:
-    ExactSolution (const unsigned int n_components = 1,
-                   const double time = 0.) : Function<dim>(n_components, time) {}
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const override;
+    ExactSolution(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
+    {}
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double ExactSolution<dim>::value (const Point<dim> &p,
-                                    const unsigned int /*component*/) const
+  double
+  ExactSolution<dim>::value(const Point<dim>& p,
+                            const unsigned int /*component*/) const
   {
-    double t = this->get_time ();
+    double t = this->get_time();
 
-    switch (dim)
+    switch(dim)
       {
-      case 1:
-      {
-        const double m = 0.5;
-        const double c1 = 0.;
-        const double c2 = 0.;
-        return -4.*std::atan (m /
-                              std::sqrt(1.-m*m) *
-                              std::sin(std::sqrt(1.-m*m)*t+c2) /
-                              std::cosh(m*p[0]+c1));
-      }
+        case 1:
+          {
+            const double m  = 0.5;
+            const double c1 = 0.;
+            const double c2 = 0.;
+            return -4.
+                   * std::atan(m / std::sqrt(1. - m * m)
+                               * std::sin(std::sqrt(1. - m * m) * t + c2)
+                               / std::cosh(m * p[0] + c1));
+          }
 
-      case 2:
-      {
-        const double theta  = numbers::PI/4.;
-        const double lambda  = 1.;
-        const double a0  = 1.;
-        const double s   = 1.;
-        const double arg = p[0] * std::cos(theta) +
-                           std::sin(theta) *
-                           (p[1] * std::cosh(lambda) +
-                            t * std::sinh(lambda));
-        return 4.*std::atan(a0*std::exp(s*arg));
-      }
+        case 2:
+          {
+            const double theta  = numbers::PI / 4.;
+            const double lambda = 1.;
+            const double a0     = 1.;
+            const double s      = 1.;
+            const double arg
+              = p[0] * std::cos(theta)
+                + std::sin(theta)
+                    * (p[1] * std::cosh(lambda) + t * std::sinh(lambda));
+            return 4. * std::atan(a0 * std::exp(s * arg));
+          }
 
-      case 3:
-      {
-        const double theta  = numbers::PI/4;
-        const double phi = numbers::PI/4;
-        const double tau = 1.;
-        const double c0  = 1.;
-        const double s   = 1.;
-        const double arg = p[0]*std::cos(theta) +
-                           p[1]*std::sin(theta) * std::cos(phi) +
-                           std::sin(theta) * std::sin(phi) *
-                           (p[2]*std::cosh(tau)+t*std::sinh(tau));
-        return 4.*std::atan(c0*std::exp(s*arg));
-      }
+        case 3:
+          {
+            const double theta = numbers::PI / 4;
+            const double phi   = numbers::PI / 4;
+            const double tau   = 1.;
+            const double c0    = 1.;
+            const double s     = 1.;
+            const double arg
+              = p[0] * std::cos(theta) + p[1] * std::sin(theta) * std::cos(phi)
+                + std::sin(theta) * std::sin(phi)
+                    * (p[2] * std::cosh(tau) + t * std::sinh(tau));
+            return 4. * std::atan(c0 * std::exp(s * arg));
+          }
 
-      default:
-        Assert (false, ExcNotImplemented());
-        return -1e8;
+        default:
+          Assert(false, ExcNotImplemented());
+          return -1e8;
       }
   }
 
@@ -220,24 +225,21 @@ namespace Step25
   class InitialValues : public Function<dim>
   {
   public:
-    InitialValues (const unsigned int n_components = 1,
-                   const double time = 0.)
-      :
-      Function<dim>(n_components, time)
+    InitialValues(const unsigned int n_components = 1, const double time = 0.)
+      : Function<dim>(n_components, time)
     {}
 
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double InitialValues<dim>::value (const Point<dim> &p,
-                                    const unsigned int component) const
+  double
+  InitialValues<dim>::value(const Point<dim>&  p,
+                            const unsigned int component) const
   {
-    return ExactSolution<dim>(1, this->get_time()).value (p, component);
+    return ExactSolution<dim>(1, this->get_time()).value(p, component);
   }
-
-
 
   // @sect3{Implementation of the <code>SineGordonProblem</code> class}
 
@@ -267,16 +269,15 @@ namespace Step25
   // technique in step-24 using GridTools::minimal_cell_diameter would work as
   // well.
   template <int dim>
-  SineGordonProblem<dim>::SineGordonProblem ()
-    :
-    fe (1),
-    dof_handler (triangulation),
-    n_global_refinements (6),
-    time (-5.4414),
-    final_time (2.7207),
-    time_step (10*1./std::pow(2.,1.*n_global_refinements)),
-    theta (0.5),
-    output_timestep_skip (1)
+  SineGordonProblem<dim>::SineGordonProblem()
+    : fe(1),
+      dof_handler(triangulation),
+      n_global_refinements(6),
+      time(-5.4414),
+      final_time(2.7207),
+      time_step(10 * 1. / std::pow(2., 1. * n_global_refinements)),
+      theta(0.5),
+      output_timestep_skip(1)
   {}
 
   // @sect4{SineGordonProblem::make_grid_and_dofs}
@@ -289,44 +290,39 @@ namespace Step25
   // and a Laplace matrix $A$ and store them in the appropriate variables for
   // the remainder of the program's life.
   template <int dim>
-  void SineGordonProblem<dim>::make_grid_and_dofs ()
+  void
+  SineGordonProblem<dim>::make_grid_and_dofs()
   {
-    GridGenerator::hyper_cube (triangulation, -10, 10);
-    triangulation.refine_global (n_global_refinements);
+    GridGenerator::hyper_cube(triangulation, -10, 10);
+    triangulation.refine_global(n_global_refinements);
 
-    std::cout << "   Number of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "   Total number of cells: "
-              << triangulation.n_cells()
+              << "   Total number of cells: " << triangulation.n_cells()
               << std::endl;
 
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
-    std::cout << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+    std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    sparsity_pattern.copy_from (dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit  (sparsity_pattern);
-    mass_matrix.reinit    (sparsity_pattern);
-    laplace_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
+    mass_matrix.reinit(sparsity_pattern);
+    laplace_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix (dof_handler,
-                                       QGauss<dim>(3),
-                                       mass_matrix);
-    MatrixCreator::create_laplace_matrix (dof_handler,
-                                          QGauss<dim>(3),
-                                          laplace_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler, QGauss<dim>(3), laplace_matrix);
 
-    solution.reinit       (dof_handler.n_dofs());
-    solution_update.reinit     (dof_handler.n_dofs());
-    old_solution.reinit   (dof_handler.n_dofs());
-    M_x_velocity.reinit    (dof_handler.n_dofs());
-    system_rhs.reinit     (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    solution_update.reinit(dof_handler.n_dofs());
+    old_solution.reinit(dof_handler.n_dofs());
+    M_x_velocity.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
   }
 
   // @sect4{SineGordonProblem::assemble_system}
@@ -344,37 +340,38 @@ namespace Step25
   // <code>compute_nl_term</code> to do this, while the present function
   // provides the top-level logic.
   template <int dim>
-  void SineGordonProblem<dim>::assemble_system ()
+  void
+  SineGordonProblem<dim>::assemble_system()
   {
     // First we assemble the Jacobian matrix $F'_h(U^{n,l})$, where $U^{n,l}$
     // is stored in the vector <code>solution</code> for convenience.
-    system_matrix.copy_from (mass_matrix);
-    system_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
+    system_matrix.copy_from(mass_matrix);
+    system_matrix.add(std::pow(time_step * theta, 2), laplace_matrix);
 
-    SparseMatrix<double> tmp_matrix (sparsity_pattern);
-    compute_nl_matrix (old_solution, solution, tmp_matrix);
-    system_matrix.add (std::pow(time_step*theta,2), tmp_matrix);
+    SparseMatrix<double> tmp_matrix(sparsity_pattern);
+    compute_nl_matrix(old_solution, solution, tmp_matrix);
+    system_matrix.add(std::pow(time_step * theta, 2), tmp_matrix);
 
     // Next we compute the right-hand side vector. This is just the
     // combination of matrix-vector products implied by the description of
     // $-F_h(U^{n,l})$ in the introduction.
     system_rhs = 0.;
 
-    Vector<double> tmp_vector (solution.size());
+    Vector<double> tmp_vector(solution.size());
 
-    mass_matrix.vmult (system_rhs, solution);
-    laplace_matrix.vmult (tmp_vector, solution);
-    system_rhs.add (std::pow(time_step*theta, 2), tmp_vector);
+    mass_matrix.vmult(system_rhs, solution);
+    laplace_matrix.vmult(tmp_vector, solution);
+    system_rhs.add(std::pow(time_step * theta, 2), tmp_vector);
 
-    mass_matrix.vmult (tmp_vector, old_solution);
-    system_rhs.add (-1.0, tmp_vector);
-    laplace_matrix.vmult (tmp_vector, old_solution);
-    system_rhs.add (std::pow(time_step,2)*theta*(1 - theta), tmp_vector);
+    mass_matrix.vmult(tmp_vector, old_solution);
+    system_rhs.add(-1.0, tmp_vector);
+    laplace_matrix.vmult(tmp_vector, old_solution);
+    system_rhs.add(std::pow(time_step, 2) * theta * (1 - theta), tmp_vector);
 
-    system_rhs.add (-time_step, M_x_velocity);
+    system_rhs.add(-time_step, M_x_velocity);
 
-    compute_nl_term (old_solution, solution, tmp_vector);
-    system_rhs.add (std::pow(time_step,2)*theta, tmp_vector);
+    compute_nl_term(old_solution, solution, tmp_vector);
+    system_rhs.add(std::pow(time_step, 2) * theta, tmp_vector);
 
     system_rhs *= -1.;
   }
@@ -402,30 +399,31 @@ namespace Step25
   // constant in the asymptotic statement of convergence by choosing a more
   // accurate quadrature formula.
   template <int dim>
-  void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
-                                                const Vector<double> &new_data,
-                                                Vector<double>       &nl_term) const
+  void
+  SineGordonProblem<dim>::compute_nl_term(const Vector<double>& old_data,
+                                          const Vector<double>& new_data,
+                                          Vector<double>&       nl_term) const
   {
     nl_term = 0;
-    const QGauss<dim> quadrature_formula (3);
-    FEValues<dim>     fe_values (fe, quadrature_formula,
-                                 update_values |
-                                 update_JxW_values |
-                                 update_quadrature_points);
+    const QGauss<dim> quadrature_formula(3);
+    FEValues<dim>     fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values
+                              | update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    Vector<double> local_nl_term (dofs_per_cell);
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    std::vector<double> old_data_values (n_q_points);
-    std::vector<double> new_data_values (n_q_points);
+    Vector<double>                       local_nl_term(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+    std::vector<double>                  old_data_values(n_q_points);
+    std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for(; cell != endc; ++cell)
       {
         local_nl_term = 0;
         // Once we re-initialize our <code>FEValues</code> instantiation to
@@ -434,25 +432,25 @@ namespace Step25
         // "old" data (presumably at $t=t_{n-1}$) and the "new" data
         // (presumably at $t=t_n$) at the nodes of the chosen quadrature
         // formula.
-        fe_values.reinit (cell);
-        fe_values.get_function_values (old_data, old_data_values);
-        fe_values.get_function_values (new_data, new_data_values);
+        fe_values.reinit(cell);
+        fe_values.get_function_values(old_data, old_data_values);
+        fe_values.get_function_values(new_data, new_data_values);
 
         // Now, we can evaluate $\int_K \sin\left[\theta w_{\mathrm{new}} +
         // (1-\theta) w_{\mathrm{old}}\right] \,\varphi_j\,\mathrm{d}x$ using
         // the desired quadrature formula.
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            local_nl_term(i) += (std::sin(theta * new_data_values[q_point] +
-                                          (1-theta) * old_data_values[q_point]) *
-                                 fe_values.shape_value (i, q_point) *
-                                 fe_values.JxW (q_point));
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
+            local_nl_term(i)
+              += (std::sin(theta * new_data_values[q_point]
+                           + (1 - theta) * old_data_values[q_point])
+                  * fe_values.shape_value(i, q_point) * fe_values.JxW(q_point));
 
         // We conclude by adding up the contributions of the integrals over
         // the cells to the global integral.
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for(unsigned int i = 0; i < dofs_per_cell; ++i)
           nl_term(local_dof_indices[i]) += local_nl_term(i);
       }
   }
@@ -466,59 +464,63 @@ namespace Step25
   // solution, which we again call $w_{\mathrm{old}}$ and $w_{\mathrm{new}}$
   // below, respectively.
   template <int dim>
-  void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
-                                                  const Vector<double> &new_data,
-                                                  SparseMatrix<double> &nl_matrix) const
+  void
+  SineGordonProblem<dim>::compute_nl_matrix(
+    const Vector<double>& old_data,
+    const Vector<double>& new_data,
+    SparseMatrix<double>& nl_matrix) const
   {
-    QGauss<dim>   quadrature_formula (3);
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values | update_JxW_values | update_quadrature_points);
+    QGauss<dim>   quadrature_formula(3);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_JxW_values
+                              | update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> local_nl_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
-    std::vector<double> old_data_values (n_q_points);
-    std::vector<double> new_data_values (n_q_points);
+    FullMatrix<double> local_nl_matrix(dofs_per_cell, dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+    std::vector<double>                  old_data_values(n_q_points);
+    std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for(; cell != endc; ++cell)
       {
         local_nl_matrix = 0;
         // Again, first we re-initialize our <code>FEValues</code>
         // instantiation to the current cell.
-        fe_values.reinit (cell);
-        fe_values.get_function_values (old_data, old_data_values);
-        fe_values.get_function_values (new_data, new_data_values);
+        fe_values.reinit(cell);
+        fe_values.get_function_values(old_data, old_data_values);
+        fe_values.get_function_values(new_data, new_data_values);
 
         // Then, we evaluate $\int_K \cos\left[\theta w_{\mathrm{new}} +
         // (1-\theta) w_{\mathrm{old}}\right]\, \varphi_i\,
         // \varphi_j\,\mathrm{d}x$ using the desired quadrature formula.
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              local_nl_matrix(i,j) += (std::cos(theta * new_data_values[q_point] +
-                                                (1-theta) * old_data_values[q_point]) *
-                                       fe_values.shape_value (i, q_point) *
-                                       fe_values.shape_value (j, q_point) *
-                                       fe_values.JxW (q_point));
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
+            for(unsigned int j = 0; j < dofs_per_cell; ++j)
+              local_nl_matrix(i, j)
+                += (std::cos(theta * new_data_values[q_point]
+                             + (1 - theta) * old_data_values[q_point])
+                    * fe_values.shape_value(i, q_point)
+                    * fe_values.shape_value(j, q_point)
+                    * fe_values.JxW(q_point));
 
         // Finally, we add up the contributions of the integrals over the
         // cells to the global integral.
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          for (unsigned int j=0; j<dofs_per_cell; ++j)
-            nl_matrix.add(local_dof_indices[i], local_dof_indices[j],
-                          local_nl_matrix(i,j));
+        for(unsigned int i = 0; i < dofs_per_cell; ++i)
+          for(unsigned int j = 0; j < dofs_per_cell; ++j)
+            nl_matrix.add(local_dof_indices[i],
+                          local_dof_indices[j],
+                          local_nl_matrix(i, j));
       }
   }
-
-
 
   // @sect4{SineGordonProblem::solve}
 
@@ -546,17 +548,15 @@ namespace Step25
   // showing how many iterations were needed in each nonlinear iteration.
   template <int dim>
   unsigned int
-  SineGordonProblem<dim>::solve ()
+  SineGordonProblem<dim>::solve()
   {
-    SolverControl solver_control (1000, 1e-12*system_rhs.l2_norm());
-    SolverCG<> cg (solver_control);
+    SolverControl solver_control(1000, 1e-12 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution_update,
-              system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution_update, system_rhs, preconditioner);
 
     return solver_control.last_step();
   }
@@ -567,20 +567,20 @@ namespace Step25
   // to the respective functions in step-23 and step-24:
   template <int dim>
   void
-  SineGordonProblem<dim>::output_results (const unsigned int timestep_number) const
+  SineGordonProblem<dim>::output_results(
+    const unsigned int timestep_number) const
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "u");
-    data_out.build_patches ();
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "u");
+    data_out.build_patches();
 
-    const std::string filename =  "solution-" +
-                                  Utilities::int_to_string (timestep_number, 3) +
-                                  ".vtk";
+    const std::string filename
+      = "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
 
-    std::ofstream output (filename);
-    data_out.write_vtk (output);
+    std::ofstream output(filename);
+    data_out.write_vtk(output);
   }
 
   // @sect4{SineGordonProblem::run}
@@ -589,9 +589,10 @@ namespace Step25
   // (outer) time-stepping loop, the (inner) nonlinear-solver loop, and
   // outputs the solution after each time step.
   template <int dim>
-  void SineGordonProblem<dim>::run ()
+  void
+  SineGordonProblem<dim>::run()
   {
-    make_grid_and_dofs ();
+    make_grid_and_dofs();
 
     // To acknowledge the initial condition, we must use the function $u_0(x)$
     // to compute $U^0$. To this end, below we will create an object of type
@@ -608,30 +609,30 @@ namespace Step25
     {
       ConstraintMatrix constraints;
       constraints.close();
-      VectorTools::project (dof_handler,
-                            constraints,
-                            QGauss<dim>(3),
-                            InitialValues<dim> (1, time),
-                            solution);
+      VectorTools::project(dof_handler,
+                           constraints,
+                           QGauss<dim>(3),
+                           InitialValues<dim>(1, time),
+                           solution);
     }
 
     // For completeness, we output the zeroth time step to a file just like
     // any other time step.
-    output_results (0);
+    output_results(0);
 
     // Now we perform the time stepping: at every time step we solve the
     // matrix equation(s) corresponding to the finite element discretization
     // of the problem, and then advance our solution according to the time
     // stepping formulas we discussed in the Introduction.
     unsigned int timestep_number = 1;
-    for (time+=time_step; time<=final_time; time+=time_step, ++timestep_number)
+    for(time += time_step; time <= final_time;
+        time += time_step, ++timestep_number)
       {
         old_solution = solution;
 
         std::cout << std::endl
                   << "Time step #" << timestep_number << "; "
-                  << "advancing to t = " << time << "."
-                  << std::endl;
+                  << "advancing to t = " << time << "." << std::endl;
 
         // At the beginning of each time step we must solve the nonlinear
         // equation in the split formulation via Newton's method ---
@@ -644,44 +645,42 @@ namespace Step25
         // linear solver iterations it took us. When the loop below is done,
         // we have (an approximation of) $U^n$.
         double initial_rhs_norm = 0.;
-        bool first_iteration = true;
+        bool   first_iteration  = true;
         do
           {
-            assemble_system ();
+            assemble_system();
 
-            if (first_iteration == true)
+            if(first_iteration == true)
               initial_rhs_norm = system_rhs.l2_norm();
 
-            const unsigned int n_iterations
-              = solve ();
+            const unsigned int n_iterations = solve();
 
             solution += solution_update;
 
-            if (first_iteration == true)
+            if(first_iteration == true)
               std::cout << "    " << n_iterations;
             else
               std::cout << '+' << n_iterations;
             first_iteration = false;
           }
-        while (system_rhs.l2_norm() > 1e-6 * initial_rhs_norm);
+        while(system_rhs.l2_norm() > 1e-6 * initial_rhs_norm);
 
-        std::cout << " CG iterations per nonlinear step."
-                  << std::endl;
+        std::cout << " CG iterations per nonlinear step." << std::endl;
 
         // Upon obtaining the solution to the first equation of the problem at
         // $t=t_n$, we must update the auxiliary velocity variable
         // $V^n$. However, we do not compute and store $V^n$ since it is not a
         // quantity we use directly in the problem. Hence, for simplicity, we
         // update $MV^n$ directly:
-        Vector<double> tmp_vector (solution.size());
-        laplace_matrix.vmult (tmp_vector, solution);
-        M_x_velocity.add (-time_step*theta, tmp_vector);
+        Vector<double> tmp_vector(solution.size());
+        laplace_matrix.vmult(tmp_vector, solution);
+        M_x_velocity.add(-time_step * theta, tmp_vector);
 
-        laplace_matrix.vmult (tmp_vector, old_solution);
-        M_x_velocity.add (-time_step*(1-theta), tmp_vector);
+        laplace_matrix.vmult(tmp_vector, old_solution);
+        M_x_velocity.add(-time_step * (1 - theta), tmp_vector);
 
-        compute_nl_term (old_solution, solution, tmp_vector);
-        M_x_velocity.add (-time_step, tmp_vector);
+        compute_nl_term(old_solution, solution, tmp_vector);
+        M_x_velocity.add(-time_step, tmp_vector);
 
         // Oftentimes, in particular for fine meshes, we must pick the time
         // step to be quite small in order for the scheme to be
@@ -690,11 +689,11 @@ namespace Step25
         // efficiency -- in particular, speed up the program and save disk
         // space -- we only output the solution every
         // <code>output_timestep_skip</code> time steps:
-        if (timestep_number % output_timestep_skip == 0)
-          output_results (timestep_number);
+        if(timestep_number % output_timestep_skip == 0)
+          output_results(timestep_number);
       }
   }
-}
+} // namespace Step25
 
 // @sect3{The <code>main</code> function}
 
@@ -703,7 +702,8 @@ namespace Step25
 // execution of the run method of the <code>SineGordonProblem</code> class, we
 // catch and report them here. For more information about exceptions the
 // reader should consult step-6.
-int main ()
+int
+main()
 {
   try
     {
@@ -711,11 +711,12 @@ int main ()
       using namespace Step25;
 
       SineGordonProblem<1> sg_problem;
-      sg_problem.run ();
+      sg_problem.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -726,9 +727,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

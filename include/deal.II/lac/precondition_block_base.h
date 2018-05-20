@@ -16,12 +16,11 @@
 #ifndef dealii_precondition_block_base_h
 #define dealii_precondition_block_base_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 
@@ -29,8 +28,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class FullMatrix;
-template <typename number> class Vector;
+template <typename number>
+class FullMatrix;
+template <typename number>
+class Vector;
 
 /**
  * A class storing the inverse diagonal blocks for block preconditioners and
@@ -83,8 +84,8 @@ public:
   /**
    * Constructor initializing default values.
    */
-  PreconditionBlockBase(bool store_diagonals = false,
-                        Inversion method = gauss_jordan);
+  PreconditionBlockBase(bool      store_diagonals = false,
+                        Inversion method          = gauss_jordan);
 
   /**
    * The virtual destructor
@@ -95,117 +96,142 @@ public:
    * Deletes the inverse diagonal block matrices if existent hence leaves the
    * class in the state that it had directly after calling the constructor.
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Resize to this number of diagonal blocks with the given block size. If
    * <tt>compress</tt> is true, then only one block will be stored.
    */
-  void reinit(unsigned int nblocks, size_type blocksize, bool compress,
-              Inversion method = gauss_jordan);
+  void
+  reinit(unsigned int nblocks,
+         size_type    blocksize,
+         bool         compress,
+         Inversion    method = gauss_jordan);
 
   /**
    * Tell the class that inverses are computed.
    */
-  void inverses_computed(bool are_they);
+  void
+  inverses_computed(bool are_they);
 
   /**
    * Does the matrix use only one diagonal block?
    */
-  bool same_diagonal () const;
+  bool
+  same_diagonal() const;
 
   /**
    * Check, whether diagonal blocks (not their inverses) should be stored.
    */
-  bool store_diagonals() const;
+  bool
+  store_diagonals() const;
 
   /**
    * Return true, if inverses are ready for use.
    */
-  bool inverses_ready () const;
+  bool
+  inverses_ready() const;
 
   /**
    * The number of blocks.
    */
-  unsigned int size() const;
+  unsigned int
+  size() const;
 
   /**
    * Multiply with the inverse block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void
+  inverse_vmult(size_type              i,
+                Vector<number2>&       dst,
+                const Vector<number2>& src) const;
 
   /**
    * Multiply with the transposed inverse block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void
+  inverse_Tvmult(size_type              i,
+                 Vector<number2>&       dst,
+                 const Vector<number2>& src) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #gauss_jordan.
    */
-  FullMatrix<number> &inverse (size_type i);
+  FullMatrix<number>&
+  inverse(size_type i);
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  Householder<number> &inverse_householder (size_type i);
+  Householder<number>&
+  inverse_householder(size_type i);
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  LAPACKFullMatrix<number> &inverse_svd (size_type i);
+  LAPACKFullMatrix<number>&
+  inverse_svd(size_type i);
 
   /**
    * Access to the inverse diagonal blocks.
    */
-  const FullMatrix<number> &inverse (size_type i) const;
+  const FullMatrix<number>&
+  inverse(size_type i) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  const Householder<number> &inverse_householder (size_type i) const;
+  const Householder<number>&
+  inverse_householder(size_type i) const;
 
   /**
    * Access to the inverse diagonal blocks if Inversion is #householder.
    */
-  const LAPACKFullMatrix<number> &inverse_svd (size_type i) const;
+  const LAPACKFullMatrix<number>&
+  inverse_svd(size_type i) const;
 
   /**
    * Access to the diagonal blocks.
    */
-  FullMatrix<number> &diagonal (size_type i);
+  FullMatrix<number>&
+  diagonal(size_type i);
 
   /**
    * Access to the diagonal blocks.
    */
-  const FullMatrix<number> &diagonal (size_type i) const;
+  const FullMatrix<number>&
+  diagonal(size_type i) const;
 
   /**
    * Print some statistics about the inverses to @p deallog. Output depends on
    * #Inversion. It is richest for svd, where we obtain statistics on extremal
    * singular values and condition numbers.
    */
-  void log_statistics () const;
+  void
+  log_statistics() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * You are trying to access a diagonal block (not its inverse), but you
    * decided not to store the diagonal blocks.
    */
-  DeclException0 (ExcDiagonalsNotStored);
+  DeclException0(ExcDiagonalsNotStored);
 
   /**
    * You are accessing a diagonal block, assuming that it has a certain type.
    * But, the method used for inverting the diagonal blocks does not use this
    * type
    */
-  DeclException0 (ExcInverseNotAvailable);
+  DeclException0(ExcInverseNotAvailable);
 
 protected:
   /**
@@ -225,7 +251,7 @@ private:
    * Using <tt>number=float</tt> saves memory in comparison with
    * <tt>number=double</tt>, but may introduce numerical instability.
    */
-  std::vector<FullMatrix<number> > var_inverse_full;
+  std::vector<FullMatrix<number>> var_inverse_full;
 
   /**
    * Storage of the inverse matrices of the diagonal blocks matrices as
@@ -233,7 +259,7 @@ private:
    * <tt>number=float</tt> saves memory in comparison with
    * <tt>number=double</tt>, but may introduce numerical instability.
    */
-  std::vector<Householder<number> > var_inverse_householder;
+  std::vector<Householder<number>> var_inverse_householder;
 
   /**
    * Storage of the inverse matrices of the diagonal blocks matrices as
@@ -241,15 +267,14 @@ private:
    * <tt>number=float</tt> saves memory in comparison with
    * <tt>number=double</tt>, but may introduce numerical instability.
    */
-  std::vector<LAPACKFullMatrix<number> > var_inverse_svd;
+  std::vector<LAPACKFullMatrix<number>> var_inverse_svd;
 
   /**
    * Storage of the original diagonal blocks.
    *
    * Used by the blocked SSOR method.
    */
-  std::vector<FullMatrix<number> > var_diagonal;
-
+  std::vector<FullMatrix<number>> var_diagonal;
 
   /**
    * This is true, if the field #var_diagonal is to be used.
@@ -271,70 +296,68 @@ private:
 //----------------------------------------------------------------------//
 
 template <typename number>
-inline
-PreconditionBlockBase<number>::PreconditionBlockBase(
-  bool store, Inversion method)
-  :
-  inversion(method),
-  n_diagonal_blocks(0),
-  var_store_diagonals(store),
-  var_same_diagonal(false),
-  var_inverses_ready(false)
+inline PreconditionBlockBase<number>::PreconditionBlockBase(bool      store,
+                                                            Inversion method)
+  : inversion(method),
+    n_diagonal_blocks(0),
+    var_store_diagonals(store),
+    var_same_diagonal(false),
+    var_inverses_ready(false)
 {}
 
-
 template <typename number>
-inline
-void
+inline void
 PreconditionBlockBase<number>::clear()
 {
-  if (var_inverse_full.size()!=0)
+  if(var_inverse_full.size() != 0)
     var_inverse_full.erase(var_inverse_full.begin(), var_inverse_full.end());
-  if (var_inverse_householder.size()!=0)
-    var_inverse_householder.erase(var_inverse_householder.begin(), var_inverse_householder.end());
-  if (var_inverse_svd.size()!=0)
+  if(var_inverse_householder.size() != 0)
+    var_inverse_householder.erase(var_inverse_householder.begin(),
+                                  var_inverse_householder.end());
+  if(var_inverse_svd.size() != 0)
     var_inverse_svd.erase(var_inverse_svd.begin(), var_inverse_svd.end());
-  if (var_diagonal.size()!=0)
+  if(var_diagonal.size() != 0)
     var_diagonal.erase(var_diagonal.begin(), var_diagonal.end());
-  var_same_diagonal = false;
+  var_same_diagonal  = false;
   var_inverses_ready = false;
-  n_diagonal_blocks = 0;
+  n_diagonal_blocks  = 0;
 }
 
 template <typename number>
-inline
-void
-PreconditionBlockBase<number>::reinit(unsigned int n, size_type b, bool compress,
-                                      Inversion method)
+inline void
+PreconditionBlockBase<number>::reinit(unsigned int n,
+                                      size_type    b,
+                                      bool         compress,
+                                      Inversion    method)
 {
-  inversion = method;
-  var_same_diagonal = compress;
+  inversion          = method;
+  var_same_diagonal  = compress;
   var_inverses_ready = false;
-  n_diagonal_blocks = n;
+  n_diagonal_blocks  = n;
 
-  if (compress)
+  if(compress)
     {
-      switch (inversion)
+      switch(inversion)
         {
-        case gauss_jordan:
-          var_inverse_full.resize(1);
-          var_inverse_full[0].reinit(b,b);
-          break;
-        case householder:
-          var_inverse_householder.resize(1);
-          break;
-        case svd:
-          var_inverse_svd.resize(1);
-          var_inverse_svd[0].reinit(b,b);
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
+          case gauss_jordan:
+            var_inverse_full.resize(1);
+            var_inverse_full[0].reinit(b, b);
+            break;
+          case householder:
+            var_inverse_householder.resize(1);
+            break;
+          case svd:
+            var_inverse_svd.resize(1);
+            var_inverse_svd[0].reinit(b, b);
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
         }
 
-      if (store_diagonals())
+      if(store_diagonals())
         {
           var_diagonal.resize(1);
-          var_diagonal[0].reinit(b,b);
+          var_diagonal[0].reinit(b, b);
         }
     }
   else
@@ -347,42 +370,38 @@ PreconditionBlockBase<number>::reinit(unsigned int n, size_type b, bool compress
       //
       // the following is a neat trick which
       // avoids copying
-      if (store_diagonals())
+      if(store_diagonals())
         {
-          std::vector<FullMatrix<number> >
-          tmp(n, FullMatrix<number>(b));
-          var_diagonal.swap (tmp);
+          std::vector<FullMatrix<number>> tmp(n, FullMatrix<number>(b));
+          var_diagonal.swap(tmp);
         }
 
-      switch (inversion)
+      switch(inversion)
         {
-        case gauss_jordan:
-        {
-          std::vector<FullMatrix<number> >
-          tmp(n, FullMatrix<number>(b));
-          var_inverse_full.swap (tmp);
-          break;
-        }
-        case householder:
-          var_inverse_householder.resize(n);
-          break;
-        case svd:
-        {
-          std::vector<LAPACKFullMatrix<number> >
-          tmp(n, LAPACKFullMatrix<number>(b));
-          var_inverse_svd.swap (tmp);
-          break;
-        }
-        default:
-          Assert(false, ExcNotImplemented());
+          case gauss_jordan:
+            {
+              std::vector<FullMatrix<number>> tmp(n, FullMatrix<number>(b));
+              var_inverse_full.swap(tmp);
+              break;
+            }
+          case householder:
+            var_inverse_householder.resize(n);
+            break;
+          case svd:
+            {
+              std::vector<LAPACKFullMatrix<number>> tmp(
+                n, LAPACKFullMatrix<number>(b));
+              var_inverse_svd.swap(tmp);
+              break;
+            }
+          default:
+            Assert(false, ExcNotImplemented());
         }
     }
 }
 
-
 template <typename number>
-inline
-unsigned int
+inline unsigned int
 PreconditionBlockBase<number>::size() const
 {
   return n_diagonal_blocks;
@@ -390,175 +409,159 @@ PreconditionBlockBase<number>::size() const
 
 template <typename number>
 template <typename number2>
-inline
-void
-PreconditionBlockBase<number>::inverse_vmult(
-  size_type i, Vector<number2> &dst, const Vector<number2> &src) const
+inline void
+PreconditionBlockBase<number>::inverse_vmult(size_type              i,
+                                             Vector<number2>&       dst,
+                                             const Vector<number2>& src) const
 {
   const size_type ii = same_diagonal() ? 0U : i;
 
-  switch (inversion)
+  switch(inversion)
     {
-    case gauss_jordan:
-      AssertIndexRange (ii, var_inverse_full.size());
-      var_inverse_full[ii].vmult(dst, src);
-      break;
-    case householder:
-      AssertIndexRange (ii, var_inverse_householder.size());
-      var_inverse_householder[ii].vmult(dst, src);
-      break;
-    case svd:
-      AssertIndexRange (ii, var_inverse_svd.size());
-      var_inverse_svd[ii].vmult(dst, src);
-      break;
-    default:
-      Assert(false, ExcNotImplemented());
+      case gauss_jordan:
+        AssertIndexRange(ii, var_inverse_full.size());
+        var_inverse_full[ii].vmult(dst, src);
+        break;
+      case householder:
+        AssertIndexRange(ii, var_inverse_householder.size());
+        var_inverse_householder[ii].vmult(dst, src);
+        break;
+      case svd:
+        AssertIndexRange(ii, var_inverse_svd.size());
+        var_inverse_svd[ii].vmult(dst, src);
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
     }
 }
-
 
 template <typename number>
 template <typename number2>
-inline
-void
-PreconditionBlockBase<number>::inverse_Tvmult(
-  size_type i, Vector<number2> &dst, const Vector<number2> &src) const
+inline void
+PreconditionBlockBase<number>::inverse_Tvmult(size_type              i,
+                                              Vector<number2>&       dst,
+                                              const Vector<number2>& src) const
 {
   const size_type ii = same_diagonal() ? 0U : i;
 
-  switch (inversion)
+  switch(inversion)
     {
-    case gauss_jordan:
-      AssertIndexRange (ii, var_inverse_full.size());
-      var_inverse_full[ii].Tvmult(dst, src);
-      break;
-    case householder:
-      AssertIndexRange (ii, var_inverse_householder.size());
-      var_inverse_householder[ii].Tvmult(dst, src);
-      break;
-    case svd:
-      AssertIndexRange (ii, var_inverse_svd.size());
-      var_inverse_svd[ii].Tvmult(dst, src);
-      break;
-    default:
-      Assert(false, ExcNotImplemented());
+      case gauss_jordan:
+        AssertIndexRange(ii, var_inverse_full.size());
+        var_inverse_full[ii].Tvmult(dst, src);
+        break;
+      case householder:
+        AssertIndexRange(ii, var_inverse_householder.size());
+        var_inverse_householder[ii].Tvmult(dst, src);
+        break;
+      case svd:
+        AssertIndexRange(ii, var_inverse_svd.size());
+        var_inverse_svd[ii].Tvmult(dst, src);
+        break;
+      default:
+        Assert(false, ExcNotImplemented());
     }
 }
 
-
 template <typename number>
-inline
-const FullMatrix<number> &
+inline const FullMatrix<number>&
 PreconditionBlockBase<number>::inverse(size_type i) const
 {
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_full[0];
 
-  Assert (i < var_inverse_full.size(), ExcIndexRange(i,0,var_inverse_full.size()));
+  Assert(i < var_inverse_full.size(),
+         ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
-
 template <typename number>
-inline
-const Householder<number> &
+inline const Householder<number>&
 PreconditionBlockBase<number>::inverse_householder(size_type i) const
 {
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_householder[0];
 
-  AssertIndexRange (i, var_inverse_householder.size());
+  AssertIndexRange(i, var_inverse_householder.size());
   return var_inverse_householder[i];
 }
 
-
 template <typename number>
-inline
-const LAPACKFullMatrix<number> &
+inline const LAPACKFullMatrix<number>&
 PreconditionBlockBase<number>::inverse_svd(size_type i) const
 {
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_svd[0];
 
-  AssertIndexRange (i, var_inverse_svd.size());
+  AssertIndexRange(i, var_inverse_svd.size());
   return var_inverse_svd[i];
 }
 
-
 template <typename number>
-inline
-const FullMatrix<number> &
+inline const FullMatrix<number>&
 PreconditionBlockBase<number>::diagonal(size_type i) const
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
 
-  if (same_diagonal())
+  if(same_diagonal())
     return var_diagonal[0];
 
-  Assert (i < var_diagonal.size(), ExcIndexRange(i,0,var_diagonal.size()));
+  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
   return var_diagonal[i];
 }
 
-
 template <typename number>
-inline
-FullMatrix<number> &
+inline FullMatrix<number>&
 PreconditionBlockBase<number>::inverse(size_type i)
 {
   Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
 
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_full[0];
 
-  Assert (i < var_inverse_full.size(), ExcIndexRange(i,0,var_inverse_full.size()));
+  Assert(i < var_inverse_full.size(),
+         ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
-
 template <typename number>
-inline
-Householder<number> &
+inline Householder<number>&
 PreconditionBlockBase<number>::inverse_householder(size_type i)
 {
   Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
 
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_householder[0];
 
-  AssertIndexRange (i, var_inverse_householder.size());
+  AssertIndexRange(i, var_inverse_householder.size());
   return var_inverse_householder[i];
 }
 
-
 template <typename number>
-inline
-LAPACKFullMatrix<number> &
+inline LAPACKFullMatrix<number>&
 PreconditionBlockBase<number>::inverse_svd(size_type i)
 {
   Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
 
-  if (same_diagonal())
+  if(same_diagonal())
     return var_inverse_svd[0];
 
-  AssertIndexRange (i, var_inverse_svd.size());
+  AssertIndexRange(i, var_inverse_svd.size());
   return var_inverse_svd[i];
 }
 
-
 template <typename number>
-inline
-FullMatrix<number> &
+inline FullMatrix<number>&
 PreconditionBlockBase<number>::diagonal(size_type i)
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
 
-  if (same_diagonal())
+  if(same_diagonal())
     return var_diagonal[0];
 
-  Assert (i < var_diagonal.size(), ExcIndexRange(i,0,var_diagonal.size()));
+  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
   return var_diagonal[i];
 }
-
 
 template <typename number>
 inline bool
@@ -567,14 +570,12 @@ PreconditionBlockBase<number>::same_diagonal() const
   return var_same_diagonal;
 }
 
-
 template <typename number>
 inline bool
 PreconditionBlockBase<number>::store_diagonals() const
 {
   return var_store_diagonals;
 }
-
 
 template <typename number>
 inline void
@@ -583,7 +584,6 @@ PreconditionBlockBase<number>::inverses_computed(bool x)
   var_inverses_ready = x;
 }
 
-
 template <typename number>
 inline bool
 PreconditionBlockBase<number>::inverses_ready() const
@@ -591,67 +591,67 @@ PreconditionBlockBase<number>::inverses_ready() const
   return var_inverses_ready;
 }
 
-
 template <typename number>
 inline void
-PreconditionBlockBase<number>::log_statistics () const
+PreconditionBlockBase<number>::log_statistics() const
 {
   deallog << "PreconditionBlockBase: " << size() << " blocks; ";
 
-  if (inversion == svd)
+  if(inversion == svd)
     {
       unsigned int kermin = 100000000, kermax = 0;
-      double sigmin = 1.e300, sigmax= -1.e300;
-      double kappamin = 1.e300, kappamax= -1.e300;
+      double       sigmin = 1.e300, sigmax = -1.e300;
+      double       kappamin = 1.e300, kappamax = -1.e300;
 
-      for (size_type b=0; b<size(); ++b)
+      for(size_type b = 0; b < size(); ++b)
         {
-          const LAPACKFullMatrix<number> &matrix = inverse_svd(b);
-          size_type k=1;
-          while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols()-k) == 0)
+          const LAPACKFullMatrix<number>& matrix = inverse_svd(b);
+          size_type                       k      = 1;
+          while(k <= matrix.n_cols()
+                && matrix.singular_value(matrix.n_cols() - k) == 0)
             ++k;
           const double s0 = matrix.singular_value(0);
-          const double sm = matrix.singular_value(matrix.n_cols()-k);
-          const double co = sm/s0;
+          const double sm = matrix.singular_value(matrix.n_cols() - k);
+          const double co = sm / s0;
 
-          if (kermin > k) kermin = k-1;
-          if (kermax < k) kermax = k-1;
-          if (s0 < sigmin) sigmin = s0;
-          if (sm > sigmax) sigmax = sm;
-          if (co < kappamin) kappamin = co;
-          if (co > kappamax) kappamax = co;
+          if(kermin > k)
+            kermin = k - 1;
+          if(kermax < k)
+            kermax = k - 1;
+          if(s0 < sigmin)
+            sigmin = s0;
+          if(sm > sigmax)
+            sigmax = sm;
+          if(co < kappamin)
+            kappamin = co;
+          if(co > kappamax)
+            kappamax = co;
         }
-      deallog << "dim ker [" << kermin << ':' << kermax
-              << "] sigma [" << sigmin << ':' << sigmax
-              << "] kappa [" << kappamin << ':' << kappamax << ']' << std::endl;
-
+      deallog << "dim ker [" << kermin << ':' << kermax << "] sigma [" << sigmin
+              << ':' << sigmax << "] kappa [" << kappamin << ':' << kappamax
+              << ']' << std::endl;
     }
-  else if (inversion == householder)
-    {
-    }
-  else if (inversion == gauss_jordan)
-    {
-    }
+  else if(inversion == householder)
+    {}
+  else if(inversion == gauss_jordan)
+    {}
   else
     {
       Assert(false, ExcNotImplemented());
     }
 }
 
-
 template <typename number>
-inline
-std::size_t
-PreconditionBlockBase<number>::memory_consumption () const
+inline std::size_t
+PreconditionBlockBase<number>::memory_consumption() const
 {
   std::size_t mem = sizeof(*this);
-  for (size_type i=0; i<var_inverse_full.size(); ++i)
+  for(size_type i = 0; i < var_inverse_full.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_inverse_full[i]);
-  for (size_type i=0; i<var_diagonal.size(); ++i)
+  for(size_type i = 0; i < var_diagonal.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_diagonal[i]);
   return mem;
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

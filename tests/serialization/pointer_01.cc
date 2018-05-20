@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test what happens when serializing a pointer. is a new object created when
 // loading into another pointer that is NULL? this is in fact what happens
 
@@ -26,32 +25,29 @@ int object_number = 1;
 class C
 {
 public:
-  C ()
+  C()
   {
     object_number = ::object_number++;
-    deallog << "Default constructor. Object number "
-            << object_number
+    deallog << "Default constructor. Object number " << object_number
             << std::endl;
   }
 
-  C (const C &)
+  C(const C&)
   {
     object_number = ::object_number++;
-    deallog << "copy constructor. Object number "
-            << object_number
-            << std::endl;
+    deallog << "copy constructor. Object number " << object_number << std::endl;
   }
 
   template <typename Archive>
-  void serialize (Archive &ar, const unsigned int version)
+  void
+  serialize(Archive& ar, const unsigned int version)
   {
-    deallog << "Serializing object number "
-            << object_number
-            << " via " << typeid(Archive).name()
-            << std::endl;
+    deallog << "Serializing object number " << object_number << " via "
+            << typeid(Archive).name() << std::endl;
   }
 
-  bool operator == (const C &) const
+  bool
+  operator==(const C&) const
   {
     return true;
   }
@@ -60,32 +56,32 @@ private:
   unsigned int object_number;
 };
 
-
-void test ()
+void
+test()
 {
-  C *p1 = new C();
-  C *p2;
+  C* p1 = new C();
+  C* p2;
 
-  verify (p1, p2);
+  verify(p1, p2);
 
   // p2 should have been created, and should
   // have been different from the address of
   // p1
-  AssertThrow (p2 != nullptr, ExcInternalError());
-  AssertThrow (p1 != p2, ExcInternalError());
+  AssertThrow(p2 != nullptr, ExcInternalError());
+  AssertThrow(p1 != p2, ExcInternalError());
 
   delete p1;
   delete p2;
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test IndexSet::fill_index_vector
 
 #include "../tests.h"
@@ -21,40 +20,38 @@
 
 #include <deal.II/base/index_set.h>
 
-
-void test ()
+void
+test()
 {
-  IndexSet is1 (100);
+  IndexSet is1(100);
 
   // randomly add 90 elements to each
   // set, some of which may be
   // repetitions of previous ones
-  for (unsigned int i=0; i<9*is1.size()/10; ++i)
-    is1.add_index (Testing::rand() % is1.size());
+  for(unsigned int i = 0; i < 9 * is1.size() / 10; ++i)
+    is1.add_index(Testing::rand() % is1.size());
 
   std::vector<types::global_dof_index> indices;
-  is1.fill_index_vector (indices);
+  is1.fill_index_vector(indices);
 
   deallog << "Original index set: " << std::endl;
   is1.print(deallog);
 
   deallog << "List of indices: " << std::endl;
-  for (unsigned int i=0; i<indices.size(); i++)
+  for(unsigned int i = 0; i < indices.size(); i++)
     deallog << indices[i] << ' ';
   deallog << std::endl;
 
-  for (unsigned int i=0; i<indices.size(); i++)
-    Assert(is1.index_within_set(indices[i])==i, ExcInternalError());
+  for(unsigned int i = 0; i < indices.size(); i++)
+    Assert(is1.index_within_set(indices[i]) == i, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // if the mesh is generated after the hp::DoFHandler is attached to the
 // triangulation object, then we can't set active fe indices -- which is
 // somewhat tragic since we have to assign active fe indices before we can
@@ -26,45 +24,43 @@
 // mesh, then refine the mesh, everything is ok again. the solution is to also
 // listen to the creation of triangulations.
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_dgq.h>
-
-
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim> tria;
+  Triangulation<dim>  tria;
   hp::DoFHandler<dim> dof_handler(tria);
 
   GridGenerator::hyper_cube(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-       cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
-    cell->set_active_fe_index (0);
+  for(typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active();
+      cell != dof_handler.end();
+      ++cell)
+    cell->set_active_fe_index(0);
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

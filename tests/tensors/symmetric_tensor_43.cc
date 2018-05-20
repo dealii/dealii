@@ -13,43 +13,44 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Verify that symmetric tensor operators+= and friends work with different
 // number types
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 
-#include<complex>
+#include <complex>
 
 template <int rank, int dim, typename NumberType>
-void fill_tensor  (SymmetricTensor<rank,dim,NumberType> &t)
+void
+fill_tensor(SymmetricTensor<rank, dim, NumberType>& t)
 {
-  for (unsigned int i=0; i!=t.n_independent_components; ++i)
+  for(unsigned int i = 0; i != t.n_independent_components; ++i)
     {
-      t.access_raw_entry(i) = i+1;
+      t.access_raw_entry(i) = i + 1;
     }
 }
 
 template <int dim, int rank, typename NumberType, typename OtherNumberType>
-void test_operators ()
+void
+test_operators()
 {
   const OtherNumberType s1 = 2.0;
   const OtherNumberType s2 = 0.5;
 
   deallog << "operator *=" << std::endl;
-  SymmetricTensor<rank,dim,NumberType> t1;
+  SymmetricTensor<rank, dim, NumberType> t1;
   fill_tensor(t1);
   t1 *= s1;
   deallog << t1 << std::endl;
 
   deallog << "operator /=" << std::endl;
-  SymmetricTensor<rank,dim,NumberType> t2;
+  SymmetricTensor<rank, dim, NumberType> t2;
   fill_tensor(t2);
   t2 /= s2;
   deallog << t2 << std::endl;
 
-  SymmetricTensor<rank,dim,OtherNumberType> t3;
+  SymmetricTensor<rank, dim, OtherNumberType> t3;
   fill_tensor(t3);
 
   deallog << "operator +=" << std::endl;
@@ -62,30 +63,31 @@ void test_operators ()
 }
 
 template <int rank, typename NumberType, typename OtherNumberType>
-void test ()
+void
+test()
 {
   deallog << "dim=" << 1 << std::endl;
-  test_operators<1,rank,NumberType,OtherNumberType> ();
+  test_operators<1, rank, NumberType, OtherNumberType>();
   deallog << "dim=" << 2 << std::endl;
-  test_operators<2,rank,NumberType,OtherNumberType> ();
+  test_operators<2, rank, NumberType, OtherNumberType>();
   deallog << "dim=" << 3 << std::endl;
-  test_operators<3,rank,NumberType,OtherNumberType> ();
+  test_operators<3, rank, NumberType, OtherNumberType>();
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   deallog << "rank 2, double" << std::endl;
-  test<2, double, float >();
+  test<2, double, float>();
   deallog << "rank 2, std::complex<double>" << std::endl;
-  test<2, std::complex<double>, std::complex<float> >();
+  test<2, std::complex<double>, std::complex<float>>();
 
   deallog << "rank 4, double" << std::endl;
-  test<4, double, float >();
+  test<4, double, float>();
   deallog << "rank 4, std::complex<double>" << std::endl;
-  test<4, std::complex<double>, std::complex<float> >();
+  test<4, std::complex<double>, std::complex<float>>();
 
   deallog << "OK" << std::endl;
 }

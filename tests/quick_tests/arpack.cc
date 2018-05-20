@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Arpack by calculating eigenvalues of Laplace matrix.
 
 #include "../tests.h"
@@ -25,19 +24,18 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/lac/arpack_solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/arpack_solver.h>
-#include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/solver_control.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <complex>
 #include <iostream>
@@ -46,83 +44,76 @@
 using namespace dealii;
 
 template <int dim>
-void test ()
+void
+test()
 {
-  const unsigned int n_eigenvalues=3;
+  const unsigned int n_eigenvalues = 3;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria,0,1);
-  tria.refine_global (3);
+  GridGenerator::hyper_cube(tria, 0, 1);
+  tria.refine_global(3);
 
-  FE_Q<dim> fe (1);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FE_Q<dim>       fe(1);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-                           dof_handler.n_dofs(),
-                           dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress ();
+  sparsity_pattern.reinit(dof_handler.n_dofs(),
+                          dof_handler.n_dofs(),
+                          dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
+  sparsity_pattern.compress();
 
-  SparseMatrix<double> A,B;
-  A.reinit (sparsity_pattern);
-  B.reinit (sparsity_pattern);
+  SparseMatrix<double> A, B;
+  A.reinit(sparsity_pattern);
+  B.reinit(sparsity_pattern);
 
-  std::vector<Vector<double> > eigenvectors(n_eigenvalues,
-                                            Vector<double>(dof_handler.n_dofs()));
-  std::vector<std::complex<double> > eigenvalues(n_eigenvalues);
+  std::vector<Vector<double>> eigenvectors(
+    n_eigenvalues, Vector<double>(dof_handler.n_dofs()));
+  std::vector<std::complex<double>> eigenvalues(n_eigenvalues);
 
-  QGauss<dim> qr (2);
-  MatrixTools::create_laplace_matrix (dof_handler, qr, A);
-  MatrixTools::create_mass_matrix (dof_handler, qr, B);
+  QGauss<dim> qr(2);
+  MatrixTools::create_laplace_matrix(dof_handler, qr, A);
+  MatrixTools::create_mass_matrix(dof_handler, qr, B);
 
-  SolverControl solver_control (dof_handler.n_dofs(), 1e-10);
+  SolverControl       solver_control(dof_handler.n_dofs(), 1e-10);
   SparseDirectUMFPACK inverse;
-  inverse.initialize (A);
-  const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
-  ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors,
-                                               ArpackSolver::largest_magnitude,
-                                               true);
-  ArpackSolver eigensolver (solver_control, additional_data);
-  eigensolver.solve (A,
-                     B,
-                     inverse,
-                     eigenvalues,
-                     eigenvectors,
-                     eigenvalues.size());
+  inverse.initialize(A);
+  const unsigned int           num_arnoldi_vectors = 2 * eigenvalues.size() + 2;
+  ArpackSolver::AdditionalData additional_data(
+    num_arnoldi_vectors, ArpackSolver::largest_magnitude, true);
+  ArpackSolver eigensolver(solver_control, additional_data);
+  eigensolver.solve(
+    A, B, inverse, eigenvalues, eigenvectors, eigenvalues.size());
 
   {
-    const double precision = 1e-7;
+    const double   precision = 1e-7;
     Vector<double> Ax(eigenvectors[0]), Bx(eigenvectors[0]);
-    for (unsigned int i=0; i < eigenvectors.size(); ++i)
+    for(unsigned int i = 0; i < eigenvectors.size(); ++i)
       {
-        B.vmult(Bx,eigenvectors[i]);
+        B.vmult(Bx, eigenvectors[i]);
 
-        for (unsigned int j=0; j < eigenvectors.size(); j++)
-          Assert( std::abs( eigenvectors[j] * Bx - (i==j))< precision,
-                  ExcMessage("Eigenvectors " +
-                             Utilities::int_to_string(i) +
-                             " and " +
-                             Utilities::int_to_string(j) +
-                             " are not orthonormal!"));
+        for(unsigned int j = 0; j < eigenvectors.size(); j++)
+          Assert(std::abs(eigenvectors[j] * Bx - (i == j)) < precision,
+                 ExcMessage("Eigenvectors " + Utilities::int_to_string(i)
+                            + " and " + Utilities::int_to_string(j)
+                            + " are not orthonormal!"));
 
-        A.vmult(Ax,eigenvectors[i]);
-        Ax.add(-1.0*std::real(eigenvalues[i]),Bx);
-        Assert (Ax.l2_norm() < precision,
-                ExcMessage("Returned vector " +
-                           Utilities::int_to_string(i) +
-                           " is not an eigenvector!"));
+        A.vmult(Ax, eigenvectors[i]);
+        Ax.add(-1.0 * std::real(eigenvalues[i]), Bx);
+        Assert(Ax.l2_norm() < precision,
+               ExcMessage("Returned vector " + Utilities::int_to_string(i)
+                          + " is not an eigenvector!"));
       }
   }
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2> ();
+  test<2>();
 }

@@ -20,28 +20,25 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/manifold_lib.h>
 
-
 template <int dim>
 void
-print_intermediate_point (const Manifold<dim> &manifold,
-                          const std::string &manifold_name,
-                          const Point<dim> &p1,
-                          const Point<dim> &p2,
-                          const double weight)
+print_intermediate_point(const Manifold<dim>& manifold,
+                         const std::string&   manifold_name,
+                         const Point<dim>&    p1,
+                         const Point<dim>&    p2,
+                         const double         weight)
 {
-  const std::vector<Point<dim> > points({p1, p2});
-  const std::vector<double> weights({1-weight, weight});
+  const std::vector<Point<dim>> points({p1, p2});
+  const std::vector<double>     weights({1 - weight, weight});
   deallog.precision(3);
-  deallog << manifold_name << " between points [" << p1 << "] and ["
-          << p2 << "] with weight " << weight << std::endl;
+  deallog << manifold_name << " between points [" << p1 << "] and [" << p2
+          << "] with weight " << weight << std::endl;
   deallog.precision(12);
   deallog << "Intermediate point: "
-          << manifold.get_intermediate_point(p1, p2, weight)
-          << std::endl
-          << "get_new_point:      "
-          << manifold.get_new_point(points, weights) << std::endl;
+          << manifold.get_intermediate_point(p1, p2, weight) << std::endl
+          << "get_new_point:      " << manifold.get_new_point(points, weights)
+          << std::endl;
 }
-
 
 int
 main()
@@ -99,8 +96,6 @@ main()
     print_intermediate_point(cylindrical, "CylindricalManifold", p1, p2, 0.5);
     print_intermediate_point(cylindrical, "CylindricalManifold", p1, p2, 0.9);
   }
-
-
 
   return 0;
 }

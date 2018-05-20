@@ -17,31 +17,32 @@
  * Test that copying a FilteredIterator works
  */
 
-#include <deal.II/grid/tria.h>
+#include "../tests.h"
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include "../tests.h"
+#include <deal.II/grid/tria.h>
 
 template <int dim>
 void
 test()
 {
   Triangulation<dim> triangulation;
-  DoFHandler<dim> dof_handler(triangulation);
+  DoFHandler<dim>    dof_handler(triangulation);
   GridGenerator::hyper_cube(triangulation);
 
-  FilteredIterator<typename DoFHandler<dim>::level_cell_iterator> begin
-  (IteratorFilters::LocallyOwnedLevelCell(), dof_handler.begin());
-  FilteredIterator<typename DoFHandler<dim>::level_cell_iterator> end
-  (IteratorFilters::LocallyOwnedLevelCell(), dof_handler.end());
+  FilteredIterator<typename DoFHandler<dim>::level_cell_iterator> begin(
+    IteratorFilters::LocallyOwnedLevelCell(), dof_handler.begin());
+  FilteredIterator<typename DoFHandler<dim>::level_cell_iterator> end(
+    IteratorFilters::LocallyOwnedLevelCell(), dof_handler.end());
   end = begin;
 
   deallog << "OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
   test<2>();

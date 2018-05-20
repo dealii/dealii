@@ -13,21 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PetscScalar
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  if (typeid(PetscScalar)==typeid(double))
+  if(typeid(PetscScalar) == typeid(double))
     deallog << "double" << std::endl;
-  else if (typeid(PetscScalar)==typeid(float))
+  else if(typeid(PetscScalar) == typeid(float))
     deallog << "float" << std::endl;
   else
     Assert(false, ExcNotImplemented());

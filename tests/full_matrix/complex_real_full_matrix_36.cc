@@ -13,25 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::diag_add. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors, even though we only store real values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_square_matrix (m);
-  m.diagadd (3.141);
-  print_matrix (m);
+  FullMatrix<std::complex<number>> m;
+  make_square_matrix(m);
+  m.diagadd(3.141);
+  print_matrix(m);
 }

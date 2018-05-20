@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test for AlignedVector::push_back
 
 #include "../tests.h"
@@ -24,15 +23,19 @@
 class foo
 {
 public:
-  foo (const unsigned int a) : vec(1, a) {}
-  foo (const foo &bar) : vec(bar.vec) {}
-  foo &operator= (const foo &bar)
+  foo(const unsigned int a) : vec(1, a)
+  {}
+  foo(const foo& bar) : vec(bar.vec)
+  {}
+  foo&
+  operator=(const foo& bar)
   {
     vec = bar.vec;
     return *this;
   }
 
-  unsigned int element() const
+  unsigned int
+  element() const
   {
     return vec[0];
   }
@@ -41,7 +44,8 @@ private:
   AlignedVector<unsigned int> vec;
 };
 
-void test ()
+void
+test()
 {
   AlignedVector<foo> vec;
   vec.push_back(foo(3));
@@ -53,12 +57,10 @@ void test ()
   deallog << vec[0].element() << " " << vec[1].element() << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

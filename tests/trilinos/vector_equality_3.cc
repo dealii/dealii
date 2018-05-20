@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check TrilinosWrappers::MPI::Vector::operator!=(TrilinosWrappers::MPI::Vector)
 // for vectors that are not equal
 
@@ -24,32 +22,30 @@
 #include <iostream>
 #include <vector>
 
-
-void test (TrilinosWrappers::MPI::Vector &v,
-           TrilinosWrappers::MPI::Vector &w)
+void
+test(TrilinosWrappers::MPI::Vector& v, TrilinosWrappers::MPI::Vector& w)
 {
   // set only certain elements of each
   // vector
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      if (i%3 == 0)
-        w(i) = i+1.;
+      if(i % 3 == 0)
+        w(i) = i + 1.;
     }
 
-  AssertThrow (v!=w, ExcInternalError());
+  AssertThrow(v != w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
@@ -58,12 +54,13 @@ int main (int argc, char **argv)
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         TrilinosWrappers::MPI::Vector w;
         w.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v,w);
+        test(v, w);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -74,9 +71,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

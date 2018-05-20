@@ -13,21 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/base/timer.h>
 
 // compute the ratio of two measurements and compare to
 // the expected value.
 
-void compare (double t1, double t2, double ratio)
+void
+compare(double t1, double t2, double ratio)
 {
-  double r = t2/t1;
-  double d = std::fabs(r-ratio) / ratio;
+  double r = t2 / t1;
+  double d = std::fabs(r - ratio) / ratio;
 
   // relative error < 25%?
-  if (d <= .25)
+  if(d <= .25)
     {
       deallog << "OK" << std::endl;
     }
@@ -37,10 +36,11 @@ void compare (double t1, double t2, double ratio)
     }
 }
 
-void match(double v1, double v2)
+void
+match(double v1, double v2)
 {
   double eps = 1.0e-6;
-  if (std::fabs(v1-v2)<eps)
+  if(std::fabs(v1 - v2) < eps)
     {
       deallog << "OK" << std::endl;
     }
@@ -53,57 +53,56 @@ void match(double v1, double v2)
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for(unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for(unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Timer t1,t2;
-  TimerOutput tO(std::cout,
-                 TimerOutput::summary,
-                 TimerOutput::cpu_times);
+  Timer       t1, t2;
+  TimerOutput tO(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
 
   tO.enter_section("Section1");
   tO.enter_section("Section2");
-  burn (50);
+  burn(50);
   tO.exit_section("Section2");
   tO.enter_section("Section2");
-  burn (50);
+  burn(50);
   tO.exit_section("Section2");
   tO.exit_section("Section1");
 
-  std::map<std::string, double> cpu_times =
-    tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
-  std::map<std::string, double> wall_times =
-    tO.get_summary_data(TimerOutput::OutputData::total_wall_time);
-  std::map<std::string, double> calls =
-    tO.get_summary_data(TimerOutput::OutputData::n_calls);
+  std::map<std::string, double> cpu_times
+    = tO.get_summary_data(TimerOutput::OutputData::total_cpu_time);
+  std::map<std::string, double> wall_times
+    = tO.get_summary_data(TimerOutput::OutputData::total_wall_time);
+  std::map<std::string, double> calls
+    = tO.get_summary_data(TimerOutput::OutputData::n_calls);
 
   match(calls["Section1"], 1.0);
   match(calls["Section2"], 2.0);
 
-  if (cpu_times["Section1"] * cpu_times["Section2"] > 0.)
+  if(cpu_times["Section1"] * cpu_times["Section2"] > 0.)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - total cpu time 0" << std::endl;
 
-  if (wall_times["Section1"] * wall_times["Section2"] > 0.)
+  if(wall_times["Section1"] * wall_times["Section2"] > 0.)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - total wall time 0" << std::endl;
 
-  compare (cpu_times["Section1"],cpu_times["Section2"],1.);
-  compare (wall_times["Section1"],wall_times["Section2"],1.);
+  compare(cpu_times["Section1"], cpu_times["Section2"], 1.);
+  compare(wall_times["Section1"], wall_times["Section2"], 1.);
 }

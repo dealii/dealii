@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check periodic boundary conditions for a simple enough case where we know
 // the exact set of constraints
 //
@@ -24,58 +22,52 @@
 // compared to the _03 test, we also set a component mask
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
-
-
-
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << dim << "D" << std::endl;
 
   // create a 2x1 (or 2x1x1) mesh and refine the leftmost cell twice
-  Triangulation<dim> triangulation;
-  std::vector<unsigned int> repetitions (dim, 1);
+  Triangulation<dim>        triangulation;
+  std::vector<unsigned int> repetitions(dim, 1);
   repetitions[0] = 2;
-  GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                             repetitions,
-                                             Point<dim>(),
-                                             (dim == 2 ?
-                                              Point<dim>(2,1) :
-                                              Point<dim>(2,1,1)));
-  triangulation.begin_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
-  triangulation.begin_active(1)->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation,
+    repetitions,
+    Point<dim>(),
+    (dim == 2 ? Point<dim>(2, 1) : Point<dim>(2, 1, 1)));
+  triangulation.begin_active()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
+  triangulation.begin_active(1)->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 
-  FESystem<dim> fe(FE_Q<dim>(1),2);
-  DoFHandler<dim>    dof_handler (triangulation);
-  dof_handler.distribute_dofs (fe);
-  DoFRenumbering::component_wise (dof_handler);
+  FESystem<dim>   fe(FE_Q<dim>(1), 2);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
+  DoFRenumbering::component_wise(dof_handler);
 
   std::vector<bool> mask(2, true);
   mask[1] = false;
   ConstraintMatrix cm;
-  DoFTools::make_periodicity_constraints (dof_handler.begin(0)->face(0),
-                                          (++dof_handler.begin(0))->face(1),
-                                          cm,
-                                          mask);
-  cm.print (deallog.get_file_stream());
+  DoFTools::make_periodicity_constraints(
+    dof_handler.begin(0)->face(0), (++dof_handler.begin(0))->face(1), cm, mask);
+  cm.print(deallog.get_file_stream());
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 

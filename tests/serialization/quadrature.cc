@@ -13,54 +13,54 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check serialization for Quadrature
 
 #include "serialization.h"
-#include <deal.II/base/quadrature.h>
 #include <boost/serialization/vector.hpp>
+#include <deal.II/base/quadrature.h>
 
-void test ()
+void
+test()
 {
   const unsigned int dim = 2;
 
-  std::vector<Point <dim> > points1;
-  points1.push_back(Point<dim>(0,0));
-  points1.push_back(Point<dim>(0,1));
-  points1.push_back(Point<dim>(1,1));
-  points1.push_back(Point<dim>(1,0));
+  std::vector<Point<dim>> points1;
+  points1.push_back(Point<dim>(0, 0));
+  points1.push_back(Point<dim>(0, 1));
+  points1.push_back(Point<dim>(1, 1));
+  points1.push_back(Point<dim>(1, 0));
 
-  double w1[4] = {0.20, 0.30, 0.15, 0.35};
+  double              w1[4] = {0.20, 0.30, 0.15, 0.35};
   std::vector<double> weights1(w1, &w1[4]);
 
   Quadrature<dim> q1(points1, weights1);
 
-  std::vector<Point <dim> > points2;
-  points2.push_back(Point<dim>(1,1));
-  points2.push_back(Point<dim>(1,0));
-  points2.push_back(Point<dim>(0,0));
-  points2.push_back(Point<dim>(0,1));
+  std::vector<Point<dim>> points2;
+  points2.push_back(Point<dim>(1, 1));
+  points2.push_back(Point<dim>(1, 0));
+  points2.push_back(Point<dim>(0, 0));
+  points2.push_back(Point<dim>(0, 1));
 
-  double w2[4] = {0.1, 0.2, 0.3, 0.4};
+  double              w2[4] = {0.1, 0.2, 0.3, 0.4};
   std::vector<double> weights2(w2, &w2[4]);
 
   Quadrature<dim> q2(points2, weights2);
 
   Quadrature<dim> q3;
 
-  verify (q1, q2);
+  verify(q1, q2);
 
-  verify (q1, q3);
+  verify(q1, q3);
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

@@ -13,69 +13,59 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
-
-
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 std::ofstream logfile("output");
 
-
-
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
-  if (true)
+  if(true)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for(unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: "
-                  << GridTools::minimal_cell_diameter (tria)
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
                   << std::endl;
         };
     };
 
   // test 2: hyperball
-  if (dim >= 2)
+  if(dim >= 2)
     {
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
       tria.reset_manifold(0);
 
-      for (unsigned int i=0; i<2; ++i)
+      for(unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: "
-                  << GridTools::minimal_cell_diameter (tria)
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
                   << std::endl;
         };
     };
 }
 
-
-
-
-int main ()
+int
+main()
 {
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  test1<1> ();
-  test1<2> ();
-  test1<3> ();
+  test1<1>();
+  test1<2>();
+  test1<3>();
 
   return 0;
 }
-

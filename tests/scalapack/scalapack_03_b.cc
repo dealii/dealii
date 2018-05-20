@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
 #include "../lapack/create_matrix.h"
+#include "../tests.h"
 
 /*
  * test inverse via LU decomposition in ScaLAPACK vs FullMatrix for general matrices
@@ -27,11 +27,11 @@
  * full_matrix/full_matrix_41
  */
 
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/timer.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -41,35 +41,42 @@
 #include <iostream>
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void
+test(const unsigned int size, const unsigned int block_size)
 {
-  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
-  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
-  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
+  MPI_Comm           mpi_communicator(MPI_COMM_WORLD);
+  const unsigned int n_mpi_processes(
+    Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(
+    Utilities::MPI::this_mpi_process(mpi_communicator));
 
-  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+  ConditionalOStream pcout(std::cout, (this_mpi_process == 0));
 
   // Create SPD matrices of requested size:
-  FullMatrix<NumberType> full_in(size), inverse(size), full_out(size), diff(size), prod1(size), prod2(size), one(size);
-  create_spd (full_in);
+  FullMatrix<NumberType> full_in(size), inverse(size), full_out(size),
+    diff(size), prod1(size), prod2(size), one(size);
+  create_spd(full_in);
 
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix (size, grid, block_size,
-                                                LAPACKSupport::Property::general);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid
+    = std::make_shared<Utilities::MPI::ProcessGrid>(
+      mpi_communicator, size, size, block_size, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix(
+    size, grid, block_size, LAPACKSupport::Property::general);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows()
+        << " " << grid->get_process_grid_columns() << std::endl;
 
   // add a skew-symmetric matrix to the s.p.d matrix
   // the positive definiteness is inherited from the symmetric part
-  for (unsigned int i=1; i<size; ++i)
-    for (unsigned int j=i+1; j<size; ++j)
+  for(unsigned int i = 1; i < size; ++i)
+    for(unsigned int j = i + 1; j < size; ++j)
       {
-        full_in(i,j) *= 1.3;
-        full_in(j,i) *= -1.3;
+        full_in(i, j) *= 1.3;
+        full_in(j, i) *= -1.3;
       }
   one = 0.;
-  for (unsigned int i=0; i<size; ++i)
-    one(i,i) = 1.;
+  for(unsigned int i = 0; i < size; ++i)
+    one(i, i) = 1.;
   // invert via Lapack
   inverse.invert(full_in);
   inverse.mmult(prod1, full_in);
@@ -77,7 +84,7 @@ void test(const unsigned int size, const unsigned int block_size)
   const NumberType lapack_error = prod1.linfty_norm();
 
   // estimated condition number from 1-norm:
-  const NumberType k = full_in.l1_norm() * inverse.l1_norm();
+  const NumberType k   = full_in.l1_norm() * inverse.l1_norm();
   const NumberType tol = k * 1000 * std::numeric_limits<NumberType>::epsilon();
 
   // invert via ScaLAPACK
@@ -85,46 +92,47 @@ void test(const unsigned int size, const unsigned int block_size)
   scalapack_matrix.invert();
   scalapack_matrix.copy_to(full_out);
   full_out.mmult(prod2, full_in);
-  prod2.add(-1.,one);
+  prod2.add(-1., one);
   const NumberType error = prod2.linfty_norm();
 
-  if ( error > tol && this_mpi_process == 0)
+  if(error > tol && this_mpi_process == 0)
     {
       diff = 0;
-      diff.add( 1., inverse);
+      diff.add(1., inverse);
       diff.add(-1., full_out);
 
       std::cout << "Norm of the error " << error
                 << " is more than the threshold " << tol
-                << " . Norm of the A^{-1}*A using Lapack is " << lapack_error << std::endl
+                << " . Norm of the A^{-1}*A using Lapack is " << lapack_error
+                << std::endl
                 << "===== Expected to have:" << std::endl;
-      inverse.print_formatted (std::cout);
+      inverse.print_formatted(std::cout);
       std::cout << "===== But got:" << std::endl;
       full_out.print_formatted(std::cout);
       std::cout << "===== Difference:" << std::endl;
       diff.print_formatted(std::cout);
-      AssertThrow (false, dealii::ExcInternalError());
+      AssertThrow(false, dealii::ExcInternalError());
     }
   else
     pcout << "Ok" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
-  const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
-  const std::vector<unsigned int> blocks = {{32,64}};
+  const std::vector<unsigned int> sizes  = {{32, 64, 120, 320, 640}};
+  const std::vector<unsigned int> blocks = {{32, 64}};
 
-  for (const auto &s : sizes)
-    for (const auto &b : blocks)
-      if (b <= s)
-        test<float>(s,b);
+  for(const auto& s : sizes)
+    for(const auto& b : blocks)
+      if(b <= s)
+        test<float>(s, b);
 
-  for (const auto &s : sizes)
-    for (const auto &b : blocks)
-      if (b <= s)
-        test<double>(s,b);
+  for(const auto& s : sizes)
+    for(const auto& b : blocks)
+      if(b <= s)
+        test<double>(s, b);
 }

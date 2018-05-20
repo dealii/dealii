@@ -18,50 +18,51 @@
 
 #include "../tests.h"
 
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/lac/linear_operator.h>
-#include <deal.II/lac/trilinos_linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/schur_complement.h>
+#include <deal.II/lac/trilinos_linear_operator.h>
 
-#include <sstream>
 #include <cctype>
+#include <sstream>
 
 // Have to remove the control commands returned from
 // Vector::print in order for the deallog to print properly
 // http://www.cplusplus.com/forum/general/76900/
-#define PRINTME(name, var) \
-  { \
-    std::ostringstream stream; \
-    var.print(stream); \
-    std::string str = stream.str(); \
-    str.resize(remove_if(str.begin(), str.end(),[](char x){return std::iscntrl(x);})-str.begin()); \
-    deallog \
-        << "RHS vector: " << name << ": " \
-        << str << std::endl; \
+#define PRINTME(name, var)                                         \
+  {                                                                \
+    std::ostringstream stream;                                     \
+    var.print(stream);                                             \
+    std::string str = stream.str();                                \
+    str.resize(remove_if(str.begin(),                              \
+                         str.end(),                                \
+                         [](char x) { return std::iscntrl(x); })   \
+               - str.begin());                                     \
+    deallog << "RHS vector: " << name << ": " << str << std::endl; \
   }
 
 using namespace dealii;
 
-
-int main(int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
   deallog << std::setprecision(10);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   // deal.II SparseMatrix
   {
-
     deallog << "Schur complement" << std::endl;
     deallog.push("SC_SparseMatrix");
 
@@ -94,26 +95,26 @@ int main(int argc,char **argv)
 
        */
 
-      const unsigned int rc=1;
+      const unsigned int                    rc = 1;
       typedef TrilinosWrappers::MPI::Vector VectorType;
 
-      TrilinosWrappers::SparseMatrix A (rc,rc,rc);
-      TrilinosWrappers::SparseMatrix B (rc,rc,rc);
-      TrilinosWrappers::SparseMatrix C (rc,rc,rc);
-      TrilinosWrappers::SparseMatrix D (rc,rc,rc);
+      TrilinosWrappers::SparseMatrix A(rc, rc, rc);
+      TrilinosWrappers::SparseMatrix B(rc, rc, rc);
+      TrilinosWrappers::SparseMatrix C(rc, rc, rc);
+      TrilinosWrappers::SparseMatrix D(rc, rc, rc);
 
       VectorType y;
       y.reinit(complete_index_set(rc));
       VectorType g;
       g.reinit(complete_index_set(rc));
-      for (unsigned int i=0; i < rc; ++i)
+      for(unsigned int i = 0; i < rc; ++i)
         {
-          A.set(i,i, 1.0*(i+1));
-          B.set(i,i, 2.0*(i+1));
-          C.set(i,i, 3.0*(i+1));
-          D.set(i,i, 4.0*(i+1));
-          y(i) = 6.0*(i+1);
-          g(i) = 2.0*(i+1);
+          A.set(i, i, 1.0 * (i + 1));
+          B.set(i, i, 2.0 * (i + 1));
+          C.set(i, i, 3.0 * (i + 1));
+          D.set(i, i, 4.0 * (i + 1));
+          y(i) = 6.0 * (i + 1);
+          g(i) = 2.0 * (i + 1);
         }
       A.compress(VectorOperation::insert);
       B.compress(VectorOperation::insert);
@@ -128,30 +129,26 @@ int main(int argc,char **argv)
       const auto lo_C = linear_operator<VectorType>(C);
       const auto lo_D = linear_operator<VectorType>(D);
 
-      SolverControl solver_control_A (100, 1.0e-10);
-      TrilinosWrappers::SolverCG solver_A (solver_control_A);
+      SolverControl                        solver_control_A(100, 1.0e-10);
+      TrilinosWrappers::SolverCG           solver_A(solver_control_A);
       TrilinosWrappers::PreconditionJacobi preconditioner_A;
       preconditioner_A.initialize(A);
-      const auto lo_A_inv = inverse_operator(lo_A,
-                                             solver_A,
-                                             preconditioner_A);
+      const auto lo_A_inv = inverse_operator(lo_A, solver_A, preconditioner_A);
 
-      const auto lo_S = schur_complement(lo_A_inv,lo_B,
-                                         lo_C,lo_D);
+      const auto lo_S   = schur_complement(lo_A_inv, lo_B, lo_C, lo_D);
       const auto lo_S_t = transpose_operator(lo_S);
 
-      const VectorType g1 = lo_S*y;
-      const VectorType g2 = lo_S_t *y;
-      const VectorType g3 = lo_S*y + g;
-      const VectorType g4 = lo_S_t *y + g;
+      const VectorType g1 = lo_S * y;
+      const VectorType g2 = lo_S_t * y;
+      const VectorType g3 = lo_S * y + g;
+      const VectorType g4 = lo_S_t * y + g;
 
-      PRINTME("g1",g1);
-      PRINTME("g2",g2);
-      PRINTME("g3",g3);
-      PRINTME("g4",g4);
+      PRINTME("g1", g1);
+      PRINTME("g2", g2);
+      PRINTME("g3", g3);
+      PRINTME("g4", g4);
     }
 
     deallog << "SparseMatrix OK" << std::endl;
   }
-
 }

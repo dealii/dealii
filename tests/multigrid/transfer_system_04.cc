@@ -13,22 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 // like _03, but with a TransferSelect that selects the first two vector components as the first block
 
 #include "../tests.h"
 #include <deal.II/base/mg_level_object.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
-#include <deal.II/multigrid/mg_tools.h>
 
 #include <algorithm>
 
@@ -36,54 +35,48 @@ using namespace std;
 
 template <int dim, typename number, int spacedim>
 void
-reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
-               MGLevelObject<dealii::Vector<number> > &v)
+reinit_vector(const dealii::DoFHandler<dim, spacedim>& mg_dof,
+              MGLevelObject<dealii::Vector<number>>&   v)
 {
-  for (unsigned int level=v.min_level();
-       level<=v.max_leve(); ++level)
+  for(unsigned int level = v.min_level(); level <= v.max_leve(); ++level)
     {
-      unsigned int n = mg_dof.n_dofs (level);
+      unsigned int n = mg_dof.n_dofs(level);
       v[level].reinit(n);
     }
-
 }
-
 
 template <typename Transfer>
 void
-make_matrix (const Transfer &transfer,
-             const unsigned int high_level,
-             FullMatrix<double> &matrix)
+make_matrix(const Transfer&     transfer,
+            const unsigned int  high_level,
+            FullMatrix<double>& matrix)
 {
-  Vector<double> src (matrix.n());
-  Vector<double> dst (matrix.m());
-  for (unsigned int i=0; i<src.size(); ++i)
+  Vector<double> src(matrix.n());
+  Vector<double> dst(matrix.m());
+  for(unsigned int i = 0; i < src.size(); ++i)
     {
-      src = 0;
+      src    = 0;
       src(i) = 1;
-      transfer.prolongate (high_level, dst, src);
-      for (unsigned int j=0; j<dst.size(); ++j)
-        matrix(j,i) = dst(j);
+      transfer.prolongate(high_level, dst, src);
+      for(unsigned int j = 0; j < dst.size(); ++j)
+        matrix(j, i) = dst(j);
     }
 }
 
-
-
-void print_matrix (const FullMatrix<double> &m)
+void
+print_matrix(const FullMatrix<double>& m)
 {
-  for (unsigned int i=0; i<m.m(); ++i)
+  for(unsigned int i = 0; i < m.m(); ++i)
     {
-      for (unsigned int j=0; j<m.n(); ++j)
-        deallog << m(i,j) << ' ';
+      for(unsigned int j = 0; j < m.n(); ++j)
+        deallog << m(i, j) << ' ';
       deallog << std::endl;
     }
 }
 
-
-
-
 template <int dim>
-void check (const FiniteElement<dim> &fe)
+void
+check(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -95,44 +88,43 @@ void check (const FiniteElement<dim> &fe)
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs(fe);
 
-  std::vector<unsigned int> block_component(3,0);
-  block_component[2]=1;
+  std::vector<unsigned int> block_component(3, 0);
+  block_component[2] = 1;
 
-  DoFRenumbering::component_wise (mg_dof_handler, block_component);
-  for (unsigned int level=0; level<tr.n_levels(); ++level)
-    DoFRenumbering::component_wise (mg_dof_handler, level, block_component);
+  DoFRenumbering::component_wise(mg_dof_handler, block_component);
+  for(unsigned int level = 0; level < tr.n_levels(); ++level)
+    DoFRenumbering::component_wise(mg_dof_handler, level, block_component);
 
   MGTransferSelect<double> transfer;
 
-  transfer.build_matrices(mg_dof_handler, mg_dof_handler,
-                          0, 0,
-                          block_component, block_component);
+  transfer.build_matrices(
+    mg_dof_handler, mg_dof_handler, 0, 0, block_component, block_component);
 
-  std::vector<std::vector<types::global_dof_index> > dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
-  MGTools::count_dofs_per_block(mg_dof_handler, dofs_per_block, block_component);
-  FullMatrix<double> prolong_0_1 (dofs_per_block[1][0],
-                                  dofs_per_block[0][0]);
-  FullMatrix<double> prolong_1_2 (dofs_per_block[2][0],
-                                  dofs_per_block[1][0]);
+  std::vector<std::vector<types::global_dof_index>> dofs_per_block(
+    tr.n_levels(), std::vector<types::global_dof_index>(2));
+  MGTools::count_dofs_per_block(
+    mg_dof_handler, dofs_per_block, block_component);
+  FullMatrix<double> prolong_0_1(dofs_per_block[1][0], dofs_per_block[0][0]);
+  FullMatrix<double> prolong_1_2(dofs_per_block[2][0], dofs_per_block[1][0]);
 
   deallog << "Level 0->1" << std::endl;
-  make_matrix (transfer, 1, prolong_0_1);
-  print_matrix (prolong_0_1);
+  make_matrix(transfer, 1, prolong_0_1);
+  print_matrix(prolong_0_1);
 
   deallog << std::endl;
 
   deallog << "Level 1->2" << std::endl;
-  make_matrix (transfer, 2, prolong_1_2);
-  print_matrix (prolong_1_2);
+  make_matrix(transfer, 2, prolong_1_2);
+  print_matrix(prolong_1_2);
 }
 
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-//TODO: do in 1d
-  check (FESystem<2>(FE_Q<2>(1),3));
+  //TODO: do in 1d
+  check(FESystem<2>(FE_Q<2>(1), 3));
 }

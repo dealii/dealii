@@ -13,44 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test identity_tensor
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "dim=" << dim << std::endl;
 
-  SymmetricTensor<2,dim> t;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i; j<dim; ++j)
-      t[i][j] = (1.+(i+1)*(j*2));
+  SymmetricTensor<2, dim> t;
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = i; j < dim; ++j)
+      t[i][j] = (1. + (i + 1) * (j * 2));
 
-  SymmetricTensor<2,dim> x = identity_tensor<dim>() * t;
-  AssertThrow ((x-t).norm() < 1e-15*t.norm(), ExcInternalError());
+  SymmetricTensor<2, dim> x = identity_tensor<dim>() * t;
+  AssertThrow((x - t).norm() < 1e-15 * t.norm(), ExcInternalError());
 
   deallog << "x=" << std::endl;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       deallog << i << ' ' << j << ' ' << x[i][j] << std::endl;
 }
 
-
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

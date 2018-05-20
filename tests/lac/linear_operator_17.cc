@@ -21,23 +21,21 @@
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector.h>
 
-
 using namespace dealii;
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  const std::function<void(Vector<double> &, bool)> reinit_vector =
-    [](Vector<double> &v, bool omit_zeroing_entries)
-  {
-    v.reinit(3, omit_zeroing_entries);
-  };
+  const std::function<void(Vector<double>&, bool)> reinit_vector
+    = [](Vector<double>& v, bool omit_zeroing_entries) {
+        v.reinit(3, omit_zeroing_entries);
+      };
 
   const auto filter = mean_value_filter(reinit_vector);
 
-  Vector<double> vec (3);
+  Vector<double> vec(3);
   vec[0] = 1.;
   vec[1] = 2.;
   vec[2] = 3.;

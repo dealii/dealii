@@ -20,18 +20,22 @@
 
 using namespace std;
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
   mg::SparseMatrixCollection<float> smc;
   smc.resize(0, 5);
 
-  deallog << "matrix      " << smc.matrix.min_level() << '-' << smc.matrix.max_level() << std::endl;
-  deallog << "matrix_in   " << smc.matrix_in.min_level() << '-' << smc.matrix_in.max_level() << std::endl;
-  deallog << "matrix_out  " << smc.matrix_out.min_level() << '-' << smc.matrix_out.max_level() << std::endl;
-  deallog << "matrix_up   " << smc.matrix_up.min_level() << '-' << smc.matrix_up.max_level() << std::endl;
-  deallog << "matrix_down " << smc.matrix_down.min_level() << '-' << smc.matrix_down.max_level() << std::endl;
+  deallog << "matrix      " << smc.matrix.min_level() << '-'
+          << smc.matrix.max_level() << std::endl;
+  deallog << "matrix_in   " << smc.matrix_in.min_level() << '-'
+          << smc.matrix_in.max_level() << std::endl;
+  deallog << "matrix_out  " << smc.matrix_out.min_level() << '-'
+          << smc.matrix_out.max_level() << std::endl;
+  deallog << "matrix_up   " << smc.matrix_up.min_level() << '-'
+          << smc.matrix_up.max_level() << std::endl;
+  deallog << "matrix_down " << smc.matrix_down.min_level() << '-'
+          << smc.matrix_down.max_level() << std::endl;
 }

@@ -13,40 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test for class ArrayView. check make_array_view for whole vectors
 
 #include "../tests.h"
 
 #include <deal.II/base/array_view.h>
 
-
-void test ()
+void
+test()
 {
   std::vector<int> v(10);
 
-  ArrayView<int> a = make_array_view (v);  // writable view
-  a[2] = 42;
+  ArrayView<int> a = make_array_view(v); // writable view
+  a[2]             = 42;
 
-  Assert (a[2] == 42, ExcInternalError());
-  Assert (v[2] == 42, ExcInternalError());
+  Assert(a[2] == 42, ExcInternalError());
+  Assert(v[2] == 42, ExcInternalError());
 
-  ArrayView<const int> a2 = make_array_view (v);  // readable view
-  Assert (a2[2] == 42, ExcInternalError());
+  ArrayView<const int> a2 = make_array_view(v); // readable view
+  Assert(a2[2] == 42, ExcInternalError());
 
   ArrayView<const int> a3
-    = make_array_view (const_cast<const std::vector<int> &>(v));
-  Assert (a3[2] == 42, ExcInternalError());
+    = make_array_view(const_cast<const std::vector<int>&>(v));
+  Assert(a3[2] == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

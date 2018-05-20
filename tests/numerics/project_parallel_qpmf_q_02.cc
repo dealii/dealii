@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check VectorTools::project_parallel() for matrix-free quadrature data for
 // FE_Q on a mesh with hanging nodes.
 
@@ -21,21 +20,22 @@
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>
-void test ()
+void
+test()
 {
-  test_with_hanging_nodes<1, 2,dim> (FE_Q<dim>(1), 1);
-  test_with_hanging_nodes<2, 3,dim> (FE_Q<dim>(2), 2);
-  test_with_hanging_nodes<3, 4,dim> (FE_Q<dim>(3), 3);
+  test_with_hanging_nodes<1, 2, dim>(FE_Q<dim>(1), 1);
+  test_with_hanging_nodes<2, 3, dim>(FE_Q<dim>(2), 2);
+  test_with_hanging_nodes<3, 4, dim>(FE_Q<dim>(3), 3);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
-                                                       numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
   initlog();
 
   test<2>();
   test<3>();
 }
-

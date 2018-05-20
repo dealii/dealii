@@ -13,25 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::matrix_norm_square
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
   Vector<number> v;
-  make_range_vector (v);
+  make_range_vector(v);
 
-  deallog << m.matrix_norm_square (v) << std::endl;
+  deallog << m.matrix_norm_square(v) << std::endl;
 }

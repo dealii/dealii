@@ -16,24 +16,22 @@
 #ifndef dealii_memory_consumption_h
 #define dealii_memory_consumption_h
 
-
 #include <deal.II/base/config.h>
 
-#include <string>
+#include <array>
 #include <complex>
-#include <vector>
 #include <cstddef>
 #include <cstring>
 #include <memory>
-#include <array>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 // forward declaration
-template <typename T> class VectorizedArray;
-
+template <typename T>
+class VectorizedArray;
 
 /**
  * This namespace provides functions helping to determine the amount of memory
@@ -97,8 +95,8 @@ namespace MemoryConsumption
    */
   template <typename T>
   inline
-  typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
-  memory_consumption (const T &t);
+    typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
+    memory_consumption(const T& t);
 
   /**
    * Estimate the memory consumption of an object. If no further template
@@ -107,9 +105,10 @@ namespace MemoryConsumption
    * <tt>t.memory_consumption()</tt>'s value.
    */
   template <typename T>
-  inline
-  typename std::enable_if<!(std::is_fundamental<T>::value || std::is_pointer<T>::value), std::size_t>::type
-  memory_consumption (const T &t);
+  inline typename std::enable_if<!(std::is_fundamental<T>::value
+                                   || std::is_pointer<T>::value),
+                                 std::size_t>::type
+  memory_consumption(const T& t);
 
   /**
    * Determine the amount of memory consumed by a C-style string. The returned
@@ -117,31 +116,31 @@ namespace MemoryConsumption
    * measures up to (and including) the NUL byte; the underlying buffer may be
    * larger.
    */
-  inline
-  std::size_t memory_consumption (const char *string);
+  inline std::size_t
+  memory_consumption(const char* string);
 
   /**
    * Determine the amount of memory in bytes consumed by a
    * <tt>std::complex</tt> variable.
    */
   template <typename T>
-  inline
-  std::size_t memory_consumption (const std::complex<T> &);
+  inline std::size_t
+  memory_consumption(const std::complex<T>&);
 
   /**
    * Determine the amount of memory in bytes consumed by a
    * <tt>VectorizedArray</tt> variable.
    */
   template <typename T>
-  inline
-  std::size_t memory_consumption (const VectorizedArray<T> &);
+  inline std::size_t
+  memory_consumption(const VectorizedArray<T>&);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
    * <tt>std::string</tt> variable.
    */
-  inline
-  std::size_t memory_consumption (const std::string &s);
+  inline std::size_t
+  memory_consumption(const std::string& s);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -171,8 +170,8 @@ namespace MemoryConsumption
    * of vectors of bools.
    */
   template <typename T>
-  inline
-  std::size_t memory_consumption (const std::vector<T> &v);
+  inline std::size_t
+  memory_consumption(const std::vector<T>& v);
 
   /**
    * Determine the amount of memory in bytes consumed by a
@@ -195,8 +194,8 @@ namespace MemoryConsumption
    * different sizes.
    */
   template <typename T, std::size_t N>
-  inline
-  std::size_t memory_consumption (const std::array<T,N> &v);
+  inline std::size_t
+  memory_consumption(const std::array<T, N>& v);
 
   /**
    * Estimate the amount of memory (in bytes) occupied by a C-style array.
@@ -207,8 +206,8 @@ namespace MemoryConsumption
    * elements.
    */
   template <typename T, int N>
-  inline
-  std::size_t memory_consumption (const T (&v)[N]);
+  inline std::size_t
+  memory_consumption(const T (&v)[N]);
 
   /**
    * Specialization of the determination of the memory consumption of a
@@ -217,16 +216,16 @@ namespace MemoryConsumption
    * This is a special case, as the bools are not stored one-by-one, but as a
    * bit field.
    */
-  inline
-  std::size_t memory_consumption (const std::vector<bool> &v);
+  inline std::size_t
+  memory_consumption(const std::vector<bool>& v);
 
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a pair
    * of values.
    */
   template <typename A, typename B>
-  inline
-  std::size_t memory_consumption (const std::pair<A,B> &p);
+  inline std::size_t
+  memory_consumption(const std::pair<A, B>& p);
 
   /**
    * Calculate the memory consumption of a pointer.
@@ -238,9 +237,8 @@ namespace MemoryConsumption
    * pointed to.
    */
   template <typename T>
-  inline
-  std::size_t
-  memory_consumption (const T *const);
+  inline std::size_t
+  memory_consumption(const T* const);
 
   /**
    * Return the amount of memory used by a shared pointer.
@@ -248,8 +246,8 @@ namespace MemoryConsumption
    * @note This returns the size of the pointer, not of the object pointed to.
    */
   template <typename T>
-  inline
-  std::size_t memory_consumption (const std::shared_ptr<T> &);
+  inline std::size_t
+  memory_consumption(const std::shared_ptr<T>&);
 
   /**
    * Return the amount of memory used by a std::unique_ptr object.
@@ -257,11 +255,9 @@ namespace MemoryConsumption
    * @note This returns the size of the pointer, not of the object pointed to.
    */
   template <typename T>
-  inline
-  std::size_t memory_consumption (const std::unique_ptr<T> &);
-}
-
-
+  inline std::size_t
+  memory_consumption(const std::unique_ptr<T>&);
+} // namespace MemoryConsumption
 
 // now comes the implementation of these functions
 
@@ -269,163 +265,137 @@ namespace MemoryConsumption
 {
   template <typename T>
   inline
-  typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
-  memory_consumption(const T &)
+    typename std::enable_if<std::is_fundamental<T>::value, std::size_t>::type
+    memory_consumption(const T&)
   {
     return sizeof(T);
   }
 
-
-
-  inline
-  std::size_t memory_consumption (const char *string)
+  inline std::size_t
+  memory_consumption(const char* string)
   {
-    if (string == nullptr)
+    if(string == nullptr)
       {
         return 0;
       }
     else
       {
-        return sizeof(char)*(strlen(string) /*Remember the NUL*/ + 1);
+        return sizeof(char) * (strlen(string) /*Remember the NUL*/ + 1);
       }
   }
 
-
-
   template <typename T>
-  inline
-  std::size_t memory_consumption (const std::complex<T> &)
+  inline std::size_t
+  memory_consumption(const std::complex<T>&)
   {
     return sizeof(std::complex<T>);
   }
 
-
-
   template <typename T>
-  inline
-  std::size_t memory_consumption (const VectorizedArray<T> &)
+  inline std::size_t
+  memory_consumption(const VectorizedArray<T>&)
   {
     return sizeof(VectorizedArray<T>);
   }
 
-
-
-  inline
-  std::size_t memory_consumption (const std::string &s)
+  inline std::size_t
+  memory_consumption(const std::string& s)
   {
     return sizeof(s) + s.length();
   }
 
-
-
   template <typename T>
-  std::size_t memory_consumption (const std::vector<T> &v)
+  std::size_t
+  memory_consumption(const std::vector<T>& v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if(std::is_fundamental<T>::value || std::is_pointer<T>::value)
       {
-        return v.capacity()*sizeof(T) + sizeof(v);
+        return v.capacity() * sizeof(T) + sizeof(v);
       }
     else
       {
         std::size_t mem = sizeof(std::vector<T>);
-        for (unsigned int i=0; i<v.size(); ++i)
+        for(unsigned int i = 0; i < v.size(); ++i)
           {
             mem += memory_consumption(v[i]);
           }
-        mem += (v.capacity() - v.size())*sizeof(T);
+        mem += (v.capacity() - v.size()) * sizeof(T);
         return mem;
       }
   }
 
-
-
   template <typename T, std::size_t N>
-  std::size_t memory_consumption (const std::array<T,N> &v)
+  std::size_t
+  memory_consumption(const std::array<T, N>& v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if(std::is_fundamental<T>::value || std::is_pointer<T>::value)
       {
         return sizeof(v);
       }
     else
       {
         std::size_t mem = 0;
-        for (std::size_t i=0; i!=N; ++i)
+        for(std::size_t i = 0; i != N; ++i)
           mem += memory_consumption(v[i]);
         return mem;
       }
   }
 
-
-
   template <typename T, int N>
-  std::size_t memory_consumption (const T (&v)[N])
+  std::size_t
+  memory_consumption(const T (&v)[N])
   {
     std::size_t mem = 0;
-    for (unsigned int i=0; i<N; ++i)
+    for(unsigned int i = 0; i < N; ++i)
       mem += memory_consumption(v[i]);
     return mem;
   }
 
-
-
-  inline
-  std::size_t memory_consumption (const std::vector<bool> &v)
+  inline std::size_t
+  memory_consumption(const std::vector<bool>& v)
   {
     return v.capacity() / 8 + sizeof(v);
   }
 
-
-
   template <typename A, typename B>
-  inline
-  std::size_t memory_consumption (const std::pair<A,B> &p)
+  inline std::size_t
+  memory_consumption(const std::pair<A, B>& p)
   {
-    return (memory_consumption(p.first) +
-            memory_consumption(p.second));
+    return (memory_consumption(p.first) + memory_consumption(p.second));
   }
 
-
-
   template <typename T>
-  inline
-  std::size_t
-  memory_consumption(const T *const)
+  inline std::size_t
+  memory_consumption(const T* const)
   {
-    return sizeof(T *);
+    return sizeof(T*);
   }
 
-
-
   template <typename T>
-  inline
-  std::size_t
-  memory_consumption (const std::shared_ptr<T> &)
+  inline std::size_t
+  memory_consumption(const std::shared_ptr<T>&)
   {
     return sizeof(std::shared_ptr<T>);
   }
 
-
-
   template <typename T>
-  inline
-  std::size_t
-  memory_consumption (const std::unique_ptr<T> &)
+  inline std::size_t
+  memory_consumption(const std::unique_ptr<T>&)
   {
     return sizeof(std::unique_ptr<T>);
   }
 
-
-
   template <typename T>
-  inline
-  typename std::enable_if<!(std::is_fundamental<T>::value || std::is_pointer<T>::value), std::size_t>::type
-  memory_consumption (const T &t)
+  inline typename std::enable_if<!(std::is_fundamental<T>::value
+                                   || std::is_pointer<T>::value),
+                                 std::size_t>::type
+  memory_consumption(const T& t)
   {
     return t.memory_consumption();
   }
-}
+} // namespace MemoryConsumption
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -13,53 +13,51 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparseMatrix::linfty_norm
 
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
-
-void test ()
+void
+test()
 {
-  SparsityPattern sp (5,5,3);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if ((i+2*j+1) % 3 == 0)
-        sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 3);
+  for(unsigned int i = 0; i < 5; ++i)
+    for(unsigned int j = 0; j < 5; ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        sp.add(i, j);
+  sp.compress();
 
   SparseMatrix<double> m(sp);
 
   // first set a few entries. count how many
   // entries we have
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      if ((i+2*j+1) % 3 == 0)
-        m.set (i,j, i*j*.5+.5);
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.n(); ++j)
+      if((i + 2 * j + 1) % 3 == 0)
+        m.set(i, j, i * j * .5 + .5);
 
   // compare against the exact value of the
   // linfty-norm (max row-sum)
   deallog << m.linfty_norm() << std::endl;
-  Assert (m.linfty_norm() == 8.5, ExcInternalError());
+  Assert(m.linfty_norm() == 8.5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -70,9 +68,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

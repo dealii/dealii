@@ -13,64 +13,57 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // take a 3d mesh and check that we can find an arbitrary point's cell
 // in it.
 
 #include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-
 
 #include <deal.II/fe/mapping_q1.h>
 
-
-void check (Triangulation<3> &tria)
+void check(Triangulation<3>& tria)
 {
   MappingQGeneric<3> map(1);
 
-  Point<3> p (0.75,0,0);
+  Point<3> p(0.75, 0, 0);
 
-  std::pair<Triangulation<3>::active_cell_iterator, Point<3> > cell
-    = GridTools::find_active_cell_around_point (map, tria, p);
+  std::pair<Triangulation<3>::active_cell_iterator, Point<3>> cell
+    = GridTools::find_active_cell_around_point(map, tria, p);
 
   deallog << cell.first << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+  for(unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell.first->vertex(v) << "> ";
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 
   // Now transform back and check distance
-  Point<3> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<3>::project_to_unit_cell(cell.second));
+  Point<3> pp = map.transform_unit_to_real_cell(
+    cell.first, GeometryInfo<3>::project_to_unit_cell(cell.second));
   deallog << pp.distance(p) << std::endl;
-  Assert (pp.distance(p) < 1e-13,
-          ExcInternalError());
+  Assert(pp.distance(p) < 1e-13, ExcInternalError());
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<3> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (3);
-      check (coarse_grid);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(3);
+      check(coarse_grid);
     }
-  catch (const std::exception &exc)
+  catch(const std::exception& exc)
     {
       // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
-
-
-

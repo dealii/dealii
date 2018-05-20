@@ -13,20 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-#include "../tests.h"
 #include "../testmatrix.h"
+#include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
-
-void graph_laplacian(const SparsityPattern &sparsity,
-                     SparseMatrix<double> &matrix)
+void
+graph_laplacian(const SparsityPattern& sparsity, SparseMatrix<double>& matrix)
 {
   matrix = 0.0;
 
-  for (SparsityPattern::const_iterator it = sparsity.begin();
-       it != sparsity.end(); ++it)
+  for(SparsityPattern::const_iterator it = sparsity.begin();
+      it != sparsity.end();
+      ++it)
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
@@ -35,8 +33,8 @@ void graph_laplacian(const SparsityPattern &sparsity,
     }
 }
 
-
-SparseMatrix<double> graph_laplacian(const SparsityPattern &sparsity)
+SparseMatrix<double>
+graph_laplacian(const SparsityPattern& sparsity)
 {
   SparseMatrix<double> A(sparsity);
   graph_laplacian(sparsity, A);
@@ -44,9 +42,8 @@ SparseMatrix<double> graph_laplacian(const SparsityPattern &sparsity)
   return A;
 }
 
-
 SparseMatrix<double>
-graph_laplacian_move_return(const SparsityPattern &sparsity)
+graph_laplacian_move_return(const SparsityPattern& sparsity)
 {
   SparseMatrix<double> A(sparsity);
   graph_laplacian(sparsity, A);
@@ -54,16 +51,16 @@ graph_laplacian_move_return(const SparsityPattern &sparsity)
   return std::move(A);
 }
 
-
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(3);
 
   const unsigned int size = 5;
 
-  FDMatrix testproblem (size, size);
-  unsigned int dim = (size-1) * (size-1);
+  FDMatrix     testproblem(size, size);
+  unsigned int dim = (size - 1) * (size - 1);
 
   SparsityPattern sparsity(dim, dim, size);
   testproblem.five_point_structure(sparsity);

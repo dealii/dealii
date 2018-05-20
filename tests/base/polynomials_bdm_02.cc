@@ -17,71 +17,72 @@
 
 #include "../tests.h"
 #include <deal.II/base/job_identifier.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 
 using namespace std;
 
 template <int dim>
-void plot(const PolynomialsBDM<dim> &poly)
+void
+plot(const PolynomialsBDM<dim>& poly)
 {
+  const PolynomialSpace<dim> legendre_poly_space
+    = Polynomials::Legendre::generate_complete_basis(poly.degree());
 
-  const PolynomialSpace<dim> legendre_poly_space = Polynomials::Legendre::generate_complete_basis(poly.degree());
+  const Point<3> p0(0, 0, 0);
+  const Point<3> p1(0.25, 0.5, 0.75);
+  const Point<3> p2(0.75, 0.5, 0.25);
+  const Point<3> p3(0.75, 0.25, 0.5);
+  const Point<3> p4(1.0, 1.0, 1.0);
 
-  const Point<3> p0(0,0,0);
-  const Point<3> p1(0.25,0.5,0.75);
-  const Point<3> p2(0.75,0.5,0.25);
-  const Point<3> p3(0.75,0.25,0.5);
-  const Point<3> p4(1.0,1.0,1.0);
-
-  std::vector<Point<3> > points;
+  std::vector<Point<3>> points;
   points.push_back(p0);
   points.push_back(p1);
   points.push_back(p2);
   points.push_back(p3);
   points.push_back(p4);
 
-  std::vector<Tensor<1,dim> > values;
-  std::vector<Tensor<2,dim> > grads;
-  std::vector<Tensor<3,dim> > grads2(poly.n());
-  std::vector<Tensor<4,dim> > thirds;
-  std::vector<Tensor<5,dim> > fourths;
+  std::vector<Tensor<1, dim>> values;
+  std::vector<Tensor<2, dim>> grads;
+  std::vector<Tensor<3, dim>> grads2(poly.n());
+  std::vector<Tensor<4, dim>> thirds;
+  std::vector<Tensor<5, dim>> fourths;
 
   const unsigned int n_sub = legendre_poly_space.n();
 
-  for (unsigned int k=0; k<points.size(); ++k)
+  for(unsigned int k = 0; k < points.size(); ++k)
     {
-      if (k%(poly.degree()+4) == 0)
+      if(k % (poly.degree() + 4) == 0)
         deallog << "BDM" << poly.degree() << '<' << dim << '>' << std::endl;
 
-      unsigned int start = dim*n_sub;
+      unsigned int start = dim * n_sub;
 
-      deallog << "BDM" << poly.degree() << '<' << dim << '>'
-              << points[k] << std::endl;
+      deallog << "BDM" << poly.degree() << '<' << dim << '>' << points[k]
+              << std::endl;
       poly.compute(points[k], values, grads, grads2, thirds, fourths);
 
-      for (unsigned int i=0; i<poly.degree()+1; ++i,start+=dim)
-        for (unsigned int j=0; j < dim; ++j)
+      for(unsigned int i = 0; i < poly.degree() + 1; ++i, start += dim)
+        for(unsigned int j = 0; j < dim; ++j)
           {
-            for (unsigned int d1=0; d1<dim; ++d1)
-              for (unsigned int d2=0; d2<dim; ++d2)
-                for (unsigned int d3=0; d3<dim; ++d3)
-                  deallog << '\t' << grads2[start+j][d1][d2][d3];
+            for(unsigned int d1 = 0; d1 < dim; ++d1)
+              for(unsigned int d2 = 0; d2 < dim; ++d2)
+                for(unsigned int d3 = 0; d3 < dim; ++d3)
+                  deallog << '\t' << grads2[start + j][d1][d2][d3];
           }
       deallog << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-
 
   PolynomialsBDM<3> p31(1);
   PolynomialsBDM<3> p32(2);

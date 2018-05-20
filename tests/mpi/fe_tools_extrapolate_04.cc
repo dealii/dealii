@@ -13,53 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include "fe_tools_extrapolate_common.h"
+#include <deal.II/lac/trilinos_parallel_block_vector.h>
 
 // check FETools::extrapolate on distributed triangulations
 // for TrilinosWrappers::MPI::BlockVector
 
 template <int dim>
 void
-check (const FiniteElement<dim> &fe1,
-       const FiniteElement<dim> &fe2,
-       const std::string        &name)
+check(const FiniteElement<dim>& fe1,
+      const FiniteElement<dim>& fe2,
+      const std::string&        name)
 {
-  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
-    deallog << "Checking " << name
-            << " in " << dim << "d:"
-            << std::endl;
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    deallog << "Checking " << name << " in " << dim << "d:" << std::endl;
 
   // call main function in .cc files
-  check_this<dim, TrilinosWrappers::MPI::BlockVector> (fe1, fe2);
+  check_this<dim, TrilinosWrappers::MPI::BlockVector>(fe1, fe2);
 }
 
-#define CHECK(EL1,deg1,EL2,deg2,dim)\
-  { FE_ ## EL1<dim> fe1(deg1);   \
-    FE_ ## EL2<dim> fe2(deg2);   \
+#define CHECK(EL1, deg1, EL2, deg2, dim)                \
+  {                                                     \
+    FE_##EL1<dim> fe1(deg1);                            \
+    FE_##EL2<dim> fe2(deg2);                            \
     check(fe1, fe2, #EL1 #deg1 " against " #EL2 #deg2); \
   }
 
-#define CHECK_ALL(EL1,deg1,EL2,deg2)\
-  { CHECK(EL1,deg1,EL2,deg2,2); \
-    CHECK(EL1,deg1,EL2,deg2,3); \
+#define CHECK_ALL(EL1, deg1, EL2, deg2) \
+  {                                     \
+    CHECK(EL1, deg1, EL2, deg2, 2);     \
+    CHECK(EL1, deg1, EL2, deg2, 3);     \
   }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll log;
 
-  CHECK_ALL(Q,1,Q,1);
-  CHECK_ALL(Q,1,Q,2);
-  CHECK_ALL(Q,2,Q,1);
-  CHECK_ALL(Q,2,Q,2);
+  CHECK_ALL(Q, 1, Q, 1);
+  CHECK_ALL(Q, 1, Q, 2);
+  CHECK_ALL(Q, 2, Q, 1);
+  CHECK_ALL(Q, 2, Q, 2);
 
-  CHECK_ALL(DGQ,0,DGQ,0);
-  CHECK_ALL(DGQ,0,DGQ,1);
-  CHECK_ALL(DGQ,1,DGQ,0);
-  CHECK_ALL(DGQ,1,DGQ,1);
+  CHECK_ALL(DGQ, 0, DGQ, 0);
+  CHECK_ALL(DGQ, 0, DGQ, 1);
+  CHECK_ALL(DGQ, 1, DGQ, 0);
+  CHECK_ALL(DGQ, 1, DGQ, 1);
 }
-

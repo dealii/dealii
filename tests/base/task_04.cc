@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // start tasks from tasks
 
 #include "../tests.h"
@@ -21,41 +20,39 @@
 
 #include <deal.II/base/thread_management.h>
 
-
-void test (int i)
+void
+test(int i)
 {
   deallog << "Task " << i << " starting..." << std::endl;
 
-  if (i < 10)
+  if(i < 10)
     {
-      Threads::Task<> t1 = Threads::new_task (test, 10*i+1);
-      Threads::Task<> t2 = Threads::new_task (test, 10*i+2);
+      Threads::Task<> t1 = Threads::new_task(test, 10 * i + 1);
+      Threads::Task<> t2 = Threads::new_task(test, 10 * i + 2);
 
-      t1.join ();
-      t2.join ();
+      t1.join();
+      t2.join();
     }
 
-  sleep (1);
+  sleep(1);
   deallog << "Task " << i << " finished!" << std::endl;
 }
 
-
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
-  Threads::Task<> t1 = Threads::new_task (test, 1);
-  Threads::Task<> t2 = Threads::new_task (test, 2);
+  Threads::Task<> t1 = Threads::new_task(test, 1);
+  Threads::Task<> t2 = Threads::new_task(test, 2);
 
-  t1.join ();
-  t2.join ();
+  t1.join();
+  t2.join();
 
   deallog << "OK" << std::endl;
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  deallog.detach();
+  logfile.close();
+  sort_file_contents("output");
 }

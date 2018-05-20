@@ -13,23 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
-
 
 std::ofstream logfile("output");
 
-
-
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria_1, tria_2, tria_3;
   GridGenerator::hyper_cube(tria_1);
@@ -43,34 +39,36 @@ void test ()
 
   // refine once, then refine first
   // cell
-  tria_1.refine_global (1);
+  tria_1.refine_global(1);
   tria_1.begin_active()->set_refine_flag();
-  tria_1.execute_coarsening_and_refinement ();
+  tria_1.execute_coarsening_and_refinement();
 
   // similar for second grid, but
   // different cell
-  tria_2.refine_global (1);
+  tria_2.refine_global(1);
   (++tria_2.begin_active())->set_refine_flag();
-  tria_2.execute_coarsening_and_refinement ();
+  tria_2.execute_coarsening_and_refinement();
 
-  GridGenerator::create_union_triangulation (tria_1, tria_2, tria_3);
+  GridGenerator::create_union_triangulation(tria_1, tria_2, tria_3);
 
-  GridOut().write_gnuplot (tria_3, logfile);
+  GridOut().write_gnuplot(tria_3, logfile);
 
-  deallog << "     Total number of cells        = " << tria_3.n_cells() << std::endl
-          << "     Total number of active cells = " << tria_3.n_active_cells() << std::endl;
+  deallog << "     Total number of cells        = " << tria_3.n_cells()
+          << std::endl
+          << "     Total number of active cells = " << tria_3.n_active_cells()
+          << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   deallog << std::setprecision(2);
   logfile << std::setprecision(2);
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   return 0;
 }

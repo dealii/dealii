@@ -13,51 +13,48 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // investigate performance issues in DynamicSparsityPattern::begin(r) and
 // end(r) for large sets with many empty rows.
 
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-
-void test (bool empty, bool large_gap)
+void
+test(bool empty, bool large_gap)
 {
-  const int size = 100000000;
-  const int my_start = size/3;
-  IndexSet owned(size);
-  owned.add_range(my_start, my_start+5);
-  if (large_gap)
-    owned.add_range(size-1, size);
-  DynamicSparsityPattern sp (size, 5, owned);
-  if (!empty)
-    sp.add(my_start+1, 1);
+  const int size     = 100000000;
+  const int my_start = size / 3;
+  IndexSet  owned(size);
+  owned.add_range(my_start, my_start + 5);
+  if(large_gap)
+    owned.add_range(size - 1, size);
+  DynamicSparsityPattern sp(size, 5, owned);
+  if(!empty)
+    sp.add(my_start + 1, 1);
 
-  for (unsigned int i=my_start-10; i<my_start+10; ++i)
-    for (DynamicSparsityPattern::iterator p=sp.begin(i);
-         p != sp.end(i); ++p)
+  for(unsigned int i = my_start - 10; i < my_start + 10; ++i)
+    for(DynamicSparsityPattern::iterator p = sp.begin(i); p != sp.end(i); ++p)
       deallog << p->row() << ' ' << p->column() << std::endl;
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test (false, false);
-      test (true, false);
-      test (false, true);
-      test (true, true);
+      test(false, false);
+      test(true, false);
+      test(false, true);
+      test(true, true);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -68,9 +65,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

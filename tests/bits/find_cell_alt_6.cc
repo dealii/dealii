@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // On a 2D mesh of the following structure look for the cells surrounding
 // each vertex, using the find_active_cell_around_point with Mapping:
 //
@@ -29,57 +27,50 @@
 // x--x--x-----x
 
 #include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/fe/mapping_q1.h>
 
-
-
-
-
-void check (Triangulation<2> &tria)
+void check(Triangulation<2>& tria)
 {
-  const std::vector<Point<2> > &v = tria.get_vertices();
-  MappingQGeneric<2> map(1);
+  const std::vector<Point<2>>& v = tria.get_vertices();
+  MappingQGeneric<2>           map(1);
 
-  for (unsigned i=0; i<tria.n_vertices(); i++)
+  for(unsigned i = 0; i < tria.n_vertices(); i++)
     {
-      std::pair<Triangulation<2>::active_cell_iterator, Point<2> >
-      cell = GridTools::find_active_cell_around_point(map, tria, v[i]);
+      std::pair<Triangulation<2>::active_cell_iterator, Point<2>> cell
+        = GridTools::find_active_cell_around_point(map, tria, v[i]);
 
       deallog << "Vertex <" << v[i] << "> found in cell ";
-      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+      for(unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
         deallog << "<" << cell.first->vertex(v) << "> ";
       deallog << " [local: " << cell.second << "]" << std::endl;
     }
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<2> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (1);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(1);
       coarse_grid.begin_active()->set_refine_flag();
       coarse_grid.execute_coarsening_and_refinement();
-      check (coarse_grid);
+      check(coarse_grid);
     }
-  catch (const std::exception &exc)
+  catch(const std::exception& exc)
     {
       // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
-
-
-

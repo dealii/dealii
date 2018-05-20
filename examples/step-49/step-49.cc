@@ -17,7 +17,6 @@
  * Author: Timo Heister, Texas A&M University, 2013
  */
 
-
 // This tutorial program is odd in the sense that, unlike for most other
 // steps, the introduction already provides most of the information on how to
 // use the various strategies to generate meshes. Consequently, there is
@@ -28,17 +27,17 @@
 
 // @sect3{Include files}
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include <map>
 
@@ -58,8 +57,9 @@ using namespace dealii;
 // Finally, the function outputs the mesh in encapsulated postscript (EPS)
 // format that can easily be visualized in the same way as was done in step-1.
 template <int dim>
-void print_mesh_info(const Triangulation<dim> &triangulation,
-                     const std::string        &filename)
+void
+print_mesh_info(const Triangulation<dim>& triangulation,
+                const std::string&        filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
@@ -72,17 +72,19 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // we then increment it):
   {
     std::map<types::boundary_id, unsigned int> boundary_count;
-    for (auto cell : triangulation.active_cell_iterators())
+    for(auto cell : triangulation.active_cell_iterators())
       {
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+        for(unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+            ++face)
           {
-            if (cell->face(face)->at_boundary())
+            if(cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;
           }
       }
 
     std::cout << " boundary indicators: ";
-    for (const std::pair<const types::boundary_id, unsigned int> &pair : boundary_count)
+    for(const std::pair<const types::boundary_id, unsigned int>& pair :
+        boundary_count)
       {
         std::cout << pair.first << "(" << pair.second << " times) ";
       }
@@ -91,12 +93,10 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 
   // Finally, produce a graphical representation of the mesh to an output
   // file:
-  std::ofstream out (filename);
-  GridOut grid_out;
-  grid_out.write_eps (triangulation, out);
-  std::cout << " written to " << filename
-            << std::endl
-            << std::endl;
+  std::ofstream out(filename);
+  GridOut       grid_out;
+  grid_out.write_eps(triangulation, out);
+  std::cout << " written to " << filename << std::endl << std::endl;
 }
 
 // @sect3{Main routines}
@@ -107,7 +107,8 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
 // discussed in the introduction how to generate it. This follows the same
 // pattern as used in step-5 to load a mesh, although there it was written in
 // a different file format (UCD instead of MSH).
-void grid_1 ()
+void
+grid_1()
 {
   Triangulation<2> triangulation;
 
@@ -116,34 +117,32 @@ void grid_1 ()
   std::ifstream f("untitled.msh");
   gridin.read_msh(f);
 
-  print_mesh_info (triangulation, "grid-1.eps");
+  print_mesh_info(triangulation, "grid-1.eps");
 }
-
 
 // @sect4{grid_2: Merging triangulations}
 
 // Here, we first create two triangulations and then merge them into one.  As
 // discussed in the introduction, it is important to ensure that the vertices
 // at the common interface are located at the same coordinates.
-void grid_2 ()
+void
+grid_2()
 {
   Triangulation<2> tria1;
-  GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
+  GridGenerator::hyper_cube_with_cylindrical_hole(tria1, 0.25, 1.0);
 
-  Triangulation<2> tria2;
+  Triangulation<2>          tria2;
   std::vector<unsigned int> repetitions(2);
-  repetitions[0]=3;
-  repetitions[1]=2;
-  GridGenerator::subdivided_hyper_rectangle (tria2, repetitions,
-                                             Point<2>(1.0,-1.0),
-                                             Point<2>(4.0,1.0));
+  repetitions[0] = 3;
+  repetitions[1] = 2;
+  GridGenerator::subdivided_hyper_rectangle(
+    tria2, repetitions, Point<2>(1.0, -1.0), Point<2>(4.0, 1.0));
 
   Triangulation<2> triangulation;
-  GridGenerator::merge_triangulations (tria1, tria2, triangulation);
+  GridGenerator::merge_triangulations(tria1, tria2, triangulation);
 
-  print_mesh_info (triangulation, "grid-2.eps");
+  print_mesh_info(triangulation, "grid-2.eps");
 }
-
 
 // @sect4{grid_3: Moving vertices}
 
@@ -166,17 +165,18 @@ void grid_2 ()
 // to keep a std::set of those vertex indices that we have already moved
 // (which we can obtain using <code>cell-@>vertex_index(i)</code> and only
 // move those vertices whose index isn't in the set yet.
-void grid_3 ()
+void
+grid_3()
 {
   Triangulation<2> triangulation;
-  GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
+  GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, 0.25, 1.0);
 
-  for (const auto &cell : triangulation.active_cell_iterators())
+  for(const auto& cell : triangulation.active_cell_iterators())
     {
-      for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+      for(unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
         {
-          Point<2> &v = cell->vertex(i);
-          if (std::abs(v(1)-1.0)<1e-5)
+          Point<2>& v = cell->vertex(i);
+          if(std::abs(v(1) - 1.0) < 1e-5)
             v(1) += 0.5;
         }
     }
@@ -189,7 +189,7 @@ void grid_3 ()
   // anything but refine the mesh (see the @ref Results results section for a
   // fully worked example where we <em>do</em> attach a Manifold object).
   triangulation.refine_global(2);
-  print_mesh_info (triangulation, "grid-3.eps");
+  print_mesh_info(triangulation, "grid-3.eps");
 }
 
 // There is one snag to doing things as shown above: If one moves the nodes on
@@ -206,21 +206,19 @@ void grid_3 ()
 // vertex coordinates and moves all of the other vertices in such a way that the
 // resulting mesh has, in some sense, a small distortion.
 
-
-
 // @sect4{grid_4: Demonstrating extrude_triangulation}
 
 // This example takes the initial grid from the previous function and simply extrudes it into the third space dimension:
-void grid_4()
+void
+grid_4()
 {
   Triangulation<2> triangulation;
   Triangulation<3> out;
-  GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
+  GridGenerator::hyper_cube_with_cylindrical_hole(triangulation, 0.25, 1.0);
 
-  GridGenerator::extrude_triangulation (triangulation, 3, 2.0, out);
-  print_mesh_info (out, "grid-4.eps");
+  GridGenerator::extrude_triangulation(triangulation, 3, 2.0, out);
+  print_mesh_info(out, "grid-4.eps");
 }
-
 
 // @sect4{grid_5: Demonstrating GridTools::transform, part 1}
 
@@ -236,26 +234,23 @@ void grid_4()
 // <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can
 // get via <code>std::bind</code> in more complex cases. Here we have a simple
 // transformation and use the simplest method: a lambda function.
-void grid_5()
+void
+grid_5()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = 14;
   repetitions[1] = 2;
-  GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                             repetitions,
-                                             Point<2>(0.0,0.0),
-                                             Point<2>(10.0,1.0));
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(10.0, 1.0));
 
-  GridTools::transform([](const Point<2> &in) -> Point<2>
-  {
-    return {in[0], in[1] + std::sin(in[0]/5.0*numbers::PI)};
-  },
-  triangulation);
-  print_mesh_info (triangulation, "grid-5.eps");
+  GridTools::transform(
+    [](const Point<2>& in) -> Point<2> {
+      return {in[0], in[1] + std::sin(in[0] / 5.0 * numbers::PI)};
+    },
+    triangulation);
+  print_mesh_info(triangulation, "grid-5.eps");
 }
-
-
 
 // @sect4{grid_6: Demonstrating GridTools::transform, part 2}
 
@@ -269,33 +264,31 @@ void grid_5()
 // vertices.
 struct Grid6Func
 {
-  double trans(const double y) const
+  double
+  trans(const double y) const
   {
-    return std::tanh(2*y)/tanh(2);
+    return std::tanh(2 * y) / tanh(2);
   }
 
-  Point<2> operator() (const Point<2> &in) const
+  Point<2>
+  operator()(const Point<2>& in) const
   {
-    return Point<2> (in(0),
-                     trans(in(1)));
+    return Point<2>(in(0), trans(in(1)));
   }
 };
 
-
-void grid_6()
+void
+grid_6()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 40;
-  GridGenerator::subdivided_hyper_rectangle (triangulation,
-                                             repetitions,
-                                             Point<2>(0.0,0.0),
-                                             Point<2>(1.0,1.0));
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(1.0, 1.0));
 
   GridTools::transform(Grid6Func(), triangulation);
-  print_mesh_info (triangulation, "grid-6.eps");
+  print_mesh_info(triangulation, "grid-6.eps");
 }
-
 
 // @sect4{grid_7: Demonstrating distort_random}
 
@@ -305,39 +298,40 @@ void grid_6()
 // discretizations and codes to make sure they don't work just by accident
 // because the mesh happens to be uniformly structured and supporting
 // super-convergence properties.
-void grid_7()
+void
+grid_7()
 {
-  Triangulation<2> triangulation;
+  Triangulation<2>          triangulation;
   std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 16;
-  GridGenerator::subdivided_hyper_rectangle (triangulation, repetitions,
-                                             Point<2>(0.0,0.0),
-                                             Point<2>(1.0,1.0));
+  GridGenerator::subdivided_hyper_rectangle(
+    triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(1.0, 1.0));
 
-  GridTools::distort_random (0.3, triangulation, true);
-  print_mesh_info (triangulation, "grid-7.eps");
+  GridTools::distort_random(0.3, triangulation, true);
+  print_mesh_info(triangulation, "grid-7.eps");
 }
-
 
 // @sect3{The main function}
 
 // Finally, the main function. There isn't much to do here, only to call the
 // subfunctions.
-int main ()
+int
+main()
 {
   try
     {
-      grid_1 ();
-      grid_2 ();
-      grid_3 ();
-      grid_4 ();
-      grid_5 ();
-      grid_6 ();
-      grid_7 ();
+      grid_1();
+      grid_2();
+      grid_3();
+      grid_4();
+      grid_5();
+      grid_6();
+      grid_7();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -348,9 +342,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

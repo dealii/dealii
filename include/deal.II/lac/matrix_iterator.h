@@ -16,7 +16,6 @@
 #ifndef dealii_matrix_iterator_h
 #define dealii_matrix_iterator_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 
@@ -48,9 +47,9 @@ public:
    * Constructor. Create an iterator into the matrix <tt>matrix</tt> for the
    * given <tt>row</tt> and the <tt>index</tt> within it.
    */
-  MatrixIterator (MatrixType      *matrix,
-                  const size_type  row = 0,
-                  const size_type  index = 0);
+  MatrixIterator(MatrixType*     matrix,
+                 const size_type row   = 0,
+                 const size_type index = 0);
 
   /**
    * Copy from another matrix iterator. Mostly implemented to allow
@@ -59,37 +58,41 @@ public:
    * this accessor object is possible.
    */
   template <class OtherAccessor>
-  MatrixIterator(const MatrixIterator<OtherAccessor> &other);
+  MatrixIterator(const MatrixIterator<OtherAccessor>& other);
 
   /**
    * Prefix increment.
    */
-  MatrixIterator &operator++ ();
+  MatrixIterator&
+  operator++();
 
   /**
    * Postfix increment.
    */
-  MatrixIterator operator++ (int);
+  MatrixIterator
+  operator++(int);
 
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR &operator* () const;
+  const ACCESSOR& operator*() const;
 
   /**
    * Dereferencing operator.
    */
-  const ACCESSOR *operator-> () const;
+  const ACCESSOR* operator->() const;
 
   /**
    * Comparison. True, if both accessors are equal.
    */
-  bool operator == (const MatrixIterator &) const;
+  bool
+  operator==(const MatrixIterator&) const;
 
   /**
    * Inverse of <tt>==</tt>.
    */
-  bool operator != (const MatrixIterator &) const;
+  bool
+  operator!=(const MatrixIterator&) const;
 
   /**
    * Comparison operator. Result is true if either the first row number is
@@ -97,13 +100,15 @@ public:
    *
    * This function is only valid if both iterators point into the same matrix.
    */
-  bool operator < (const MatrixIterator &) const;
+  bool
+  operator<(const MatrixIterator&) const;
 
   /**
    * Comparison operator. Works in the same way as above operator, just the
    * other way round.
    */
-  bool operator > (const MatrixIterator &) const;
+  bool
+  operator>(const MatrixIterator&) const;
 
 private:
   /**
@@ -114,110 +119,82 @@ private:
   /**
    * Allow other iterators access to private data.
    */
-  template <class OtherAccessor> friend class MatrixIterator;
+  template <class OtherAccessor>
+  friend class MatrixIterator;
 };
-
 
 //----------------------------------------------------------------------//
 
 template <class ACCESSOR>
-inline
-MatrixIterator<ACCESSOR>::
-MatrixIterator (MatrixType      *matrix,
-                const size_type  r,
-                const size_type  i)
-  :
-  accessor(matrix, r, i)
+inline MatrixIterator<ACCESSOR>::MatrixIterator(MatrixType*     matrix,
+                                                const size_type r,
+                                                const size_type i)
+  : accessor(matrix, r, i)
 {}
-
 
 template <class ACCESSOR>
 template <class OtherAccessor>
-inline
-MatrixIterator<ACCESSOR>::
-MatrixIterator (const MatrixIterator<OtherAccessor> &other)
-  :
-  accessor(other.accessor)
+inline MatrixIterator<ACCESSOR>::MatrixIterator(
+  const MatrixIterator<OtherAccessor>& other)
+  : accessor(other.accessor)
 {}
 
-
 template <class ACCESSOR>
-inline
-MatrixIterator<ACCESSOR> &
-MatrixIterator<ACCESSOR>::operator++ ()
+inline MatrixIterator<ACCESSOR>&
+MatrixIterator<ACCESSOR>::operator++()
 {
-  accessor.advance ();
+  accessor.advance();
   return *this;
 }
 
-
 template <class ACCESSOR>
-inline
-MatrixIterator<ACCESSOR>
-MatrixIterator<ACCESSOR>::operator++ (int)
+inline MatrixIterator<ACCESSOR>
+MatrixIterator<ACCESSOR>::operator++(int)
 {
   const MatrixIterator iter = *this;
-  accessor.advance ();
+  accessor.advance();
   return iter;
 }
 
-
 template <class ACCESSOR>
-inline
-const ACCESSOR &
-MatrixIterator<ACCESSOR>::operator* () const
+inline const ACCESSOR& MatrixIterator<ACCESSOR>::operator*() const
 {
   return accessor;
 }
 
-
 template <class ACCESSOR>
-inline
-const ACCESSOR *
-MatrixIterator<ACCESSOR>::operator-> () const
+inline const ACCESSOR* MatrixIterator<ACCESSOR>::operator->() const
 {
   return &accessor;
 }
 
-
 template <class ACCESSOR>
-inline
-bool
-MatrixIterator<ACCESSOR>::
-operator == (const MatrixIterator &other) const
+inline bool
+MatrixIterator<ACCESSOR>::operator==(const MatrixIterator& other) const
 {
   return (accessor == other.accessor);
 }
 
-
 template <class ACCESSOR>
-inline
-bool
-MatrixIterator<ACCESSOR>::
-operator != (const MatrixIterator &other) const
+inline bool
+MatrixIterator<ACCESSOR>::operator!=(const MatrixIterator& other) const
 {
-  return ! (*this == other);
+  return !(*this == other);
 }
 
-
 template <class ACCESSOR>
-inline
-bool
-MatrixIterator<ACCESSOR>::
-operator < (const MatrixIterator &other) const
+inline bool
+MatrixIterator<ACCESSOR>::operator<(const MatrixIterator& other) const
 {
-  Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
-          ExcInternalError());
+  Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+         ExcInternalError());
 
   return (accessor < other.accessor);
 }
 
-
 template <class ACCESSOR>
-inline
-bool
-MatrixIterator<ACCESSOR>::
-operator > (const MatrixIterator &other) const
+inline bool
+MatrixIterator<ACCESSOR>::operator>(const MatrixIterator& other) const
 {
   return (other < *this);
 }

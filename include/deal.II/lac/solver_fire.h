@@ -16,7 +16,6 @@
 #ifndef dealii_solver_fire_h
 #define dealii_solver_fire_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/diagonal_matrix.h>
@@ -24,9 +23,7 @@
 
 #include <functional>
 
-
 DEAL_II_NAMESPACE_OPEN
-
 
 /*!@addtogroup Solvers */
 /*@{*/
@@ -85,12 +82,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Vishal Boddu, Denis Davydov, 2017
  */
-template <typename VectorType = Vector<double> >
+template <typename VectorType = Vector<double>>
 class SolverFIRE : public Solver<VectorType>
 {
-
 public:
-
   /**
    * Standardized data struct to pipe additional data to the solver.
    */
@@ -101,10 +96,9 @@ public:
      * Euler integration step to 0.1, the maximum time step to 1 and the
      * maximum change allowed in any variable (per iteration) to 1.
      */
-    explicit
-    AdditionalData (const double  initial_timestep    = 0.1,
-                    const double  maximum_timestep    = 1,
-                    const double  maximum_linfty_norm = 1);
+    explicit AdditionalData(const double initial_timestep    = 0.1,
+                            const double maximum_timestep    = 1,
+                            const double maximum_linfty_norm = 1);
 
     /**
      * Initial time step for the (forward) Euler integration step.
@@ -120,22 +114,20 @@ public:
      * Maximum change allowed in any variable of the objective function.
      */
     const double maximum_linfty_norm;
-
   };
 
   /**
    * Constructor.
    */
-  SolverFIRE (SolverControl            &solver_control,
-              VectorMemory<VectorType> &vector_memory,
-              const AdditionalData     &data = AdditionalData());
+  SolverFIRE(SolverControl&            solver_control,
+             VectorMemory<VectorType>& vector_memory,
+             const AdditionalData&     data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverFIRE (SolverControl         &solver_control,
-              const AdditionalData  &data          );
+  SolverFIRE(SolverControl& solver_control, const AdditionalData& data);
 
   /**
    * Virtual destructor.
@@ -152,10 +144,10 @@ public:
    * variables.
    */
   template <typename PreconditionerType = DiagonalMatrix<VectorType>>
-  void solve
-  (const std::function<double(VectorType &, const VectorType &)> &compute,
-   VectorType                                                    &x,
-   const PreconditionerType                                      &inverse_mass_matrix);
+  void
+  solve(const std::function<double(VectorType&, const VectorType&)>& compute,
+        VectorType&                                                  x,
+        const PreconditionerType& inverse_mass_matrix);
 
   /**
    * Solve for x that minimizes $E(\mathbf x)$ for the <EM>special case</EM>
@@ -163,29 +155,29 @@ public:
    * = \frac{1}{2} \mathbf x^{T} \mathbf A \mathbf x - \mathbf x^{T} \mathbf b$.
    */
   template <typename MatrixType, typename PreconditionerType>
-  void solve (const MatrixType         &A,
-              VectorType               &x,
-              const VectorType         &b,
-              const PreconditionerType &preconditioner);
+  void
+  solve(const MatrixType&         A,
+        VectorType&               x,
+        const VectorType&         b,
+        const PreconditionerType& preconditioner);
 
 protected:
-
   /**
    * Interface for derived class. This function gets the current iteration
    * @p x (variables), @p v (x's time derivative) and @p g (the gradient) in
    * each step.
    * It can be used for graphical output of the convergence history.
    */
-  virtual void print_vectors (const unsigned int,
-                              const VectorType &x,
-                              const VectorType &v,
-                              const VectorType &g) const;
+  virtual void
+  print_vectors(const unsigned int,
+                const VectorType& x,
+                const VectorType& v,
+                const VectorType& g) const;
 
   /**
    * Additional data to the solver.
    */
   const AdditionalData additional_data;
-
 };
 
 /*@}*/
@@ -195,61 +187,45 @@ protected:
 #ifndef DOXYGEN
 
 template <typename VectorType>
-SolverFIRE<VectorType>::AdditionalData::
-AdditionalData (const double  initial_timestep,
-                const double  maximum_timestep,
-                const double  maximum_linfty_norm)
-  :
-  initial_timestep(initial_timestep),
-  maximum_timestep(maximum_timestep),
-  maximum_linfty_norm(maximum_linfty_norm)
+SolverFIRE<VectorType>::AdditionalData::AdditionalData(
+  const double initial_timestep,
+  const double maximum_timestep,
+  const double maximum_linfty_norm)
+  : initial_timestep(initial_timestep),
+    maximum_timestep(maximum_timestep),
+    maximum_linfty_norm(maximum_linfty_norm)
 {
-  AssertThrow (initial_timestep    > 0. &&
-               maximum_timestep    > 0. &&
-               maximum_linfty_norm > 0.,
-               ExcMessage("Expected positive values for initial_timestep, "
-                          "maximum_timestep and maximum_linfty_norm but one "
-                          "or more of the these values are not positive."));
+  AssertThrow(initial_timestep > 0. && maximum_timestep > 0.
+                && maximum_linfty_norm > 0.,
+              ExcMessage("Expected positive values for initial_timestep, "
+                         "maximum_timestep and maximum_linfty_norm but one "
+                         "or more of the these values are not positive."));
 }
 
-
-
 template <typename VectorType>
-SolverFIRE<VectorType>::
-SolverFIRE (SolverControl            &solver_control,
-            VectorMemory<VectorType> &vector_memory,
-            const AdditionalData     &data          )
-  :
-  Solver<VectorType>(solver_control, vector_memory),
-  additional_data(data)
+SolverFIRE<VectorType>::SolverFIRE(SolverControl&            solver_control,
+                                   VectorMemory<VectorType>& vector_memory,
+                                   const AdditionalData&     data)
+  : Solver<VectorType>(solver_control, vector_memory), additional_data(data)
 {}
 
-
-
 template <typename VectorType>
-SolverFIRE<VectorType>::
-SolverFIRE (SolverControl         &solver_control,
-            const AdditionalData  &data          )
-  :
-  Solver<VectorType>(solver_control),
-  additional_data(data)
+SolverFIRE<VectorType>::SolverFIRE(SolverControl&        solver_control,
+                                   const AdditionalData& data)
+  : Solver<VectorType>(solver_control), additional_data(data)
 {}
-
-
 
 template <typename VectorType>
 SolverFIRE<VectorType>::~SolverFIRE()
 {}
 
-
-
 template <typename VectorType>
 template <typename PreconditionerType>
 void
-SolverFIRE<VectorType>::solve
-(const std::function<double(VectorType &, const VectorType &)> &compute,
- VectorType                                                    &x,
- const PreconditionerType                                      &inverse_mass_matrix)
+SolverFIRE<VectorType>::solve(
+  const std::function<double(VectorType&, const VectorType&)>& compute,
+  VectorType&                                                  x,
+  const PreconditionerType& inverse_mass_matrix)
 {
   LogStream::Prefix prefix("FIRE");
 
@@ -267,12 +243,12 @@ SolverFIRE<VectorType>::solve
 
   // Set velocities to zero but not gradients
   // as we are going to compute them soon.
-  v->reinit(x,false);
-  g->reinit(x,true);
+  v->reinit(x, false);
+  g->reinit(x, true);
 
   // Refer to v and g with some readable names.
-  VectorType &velocities = *v;
-  VectorType &gradients  = *g;
+  VectorType& velocities = *v;
+  VectorType& gradients  = *g;
 
   // Update gradients for the new x.
   compute(gradients, x);
@@ -280,59 +256,57 @@ SolverFIRE<VectorType>::solve
   unsigned int iter = 0;
 
   SolverControl::State conv = SolverControl::iterate;
-  conv = this->iteration_status (iter, gradients * gradients, x);
-  if (conv != SolverControl::iterate)
+  conv = this->iteration_status(iter, gradients * gradients, x);
+  if(conv != SolverControl::iterate)
     return;
 
   // Refer to additional data members with some readable names.
-  const auto &maximum_timestep   = additional_data.maximum_timestep;
-  double timestep                = additional_data.initial_timestep;
+  const auto& maximum_timestep = additional_data.maximum_timestep;
+  double      timestep         = additional_data.initial_timestep;
 
   // First scaling factor.
   double alpha = ALPHA_0;
 
   unsigned int previous_iter_with_positive_v_dot_g = 0;
 
-  while (conv == SolverControl::iterate)
+  while(conv == SolverControl::iterate)
     {
       ++iter;
       // Euler integration step.
-      x.add (timestep, velocities);                    // x += dt     * v
+      x.add(timestep, velocities);                     // x += dt     * v
       inverse_mass_matrix.vmult(gradients, gradients); // g  = M^{-1} * g
-      velocities.add (-timestep, gradients);           // v -= dt     * h
+      velocities.add(-timestep, gradients);            // v -= dt     * h
 
       // Compute gradients for the new x.
       compute(gradients, x);
 
       const real_type gradient_norm_squared = gradients * gradients;
       conv = this->iteration_status(iter, gradient_norm_squared, x);
-      if (conv != SolverControl::iterate)
+      if(conv != SolverControl::iterate)
         break;
 
       // v_dot_g = V * G
       const real_type v_dot_g = velocities * gradients;
 
-      if (v_dot_g < 0.)
+      if(v_dot_g < 0.)
         {
-          const real_type velocities_norm_squared =
-            velocities * velocities;
+          const real_type velocities_norm_squared = velocities * velocities;
 
           // Check if we divide by zero in DEBUG mode.
-          Assert (gradient_norm_squared > 0., ExcInternalError());
+          Assert(gradient_norm_squared > 0., ExcInternalError());
 
           // beta = - alpha |V|/|G|
-          const real_type beta = -alpha *
-                                 std::sqrt (velocities_norm_squared
-                                            /
-                                            gradient_norm_squared);
+          const real_type beta
+            = -alpha
+              * std::sqrt(velocities_norm_squared / gradient_norm_squared);
 
           // V = (1-alpha) V + beta G.
-          velocities.sadd (1. - alpha, beta, gradients);
+          velocities.sadd(1. - alpha, beta, gradients);
 
-          if (iter - previous_iter_with_positive_v_dot_g > DELAYSTEP)
+          if(iter - previous_iter_with_positive_v_dot_g > DELAYSTEP)
             {
               // Increase timestep and decrease alpha.
-              timestep = std::min (timestep*TIMESTEP_GROW, maximum_timestep);
+              timestep = std::min(timestep * TIMESTEP_GROW, maximum_timestep);
               alpha *= ALPHA_SHRINK;
             }
         }
@@ -341,19 +315,18 @@ SolverFIRE<VectorType>::solve
           // Decrease timestep, reset alpha and set V = 0.
           previous_iter_with_positive_v_dot_g = iter;
           timestep *= TIMESTEP_SHRINK;
-          alpha = ALPHA_0;
+          alpha      = ALPHA_0;
           velocities = 0.;
         }
 
       real_type vmax = velocities.linfty_norm();
 
       // Change timestep if any dof would move more than maximum_linfty_norm.
-      if (vmax > 0.)
+      if(vmax > 0.)
         {
-          const double minimal_timestep = additional_data.maximum_linfty_norm
-                                          /
-                                          vmax;
-          if (minimal_timestep < timestep)
+          const double minimal_timestep
+            = additional_data.maximum_linfty_norm / vmax;
+          if(minimal_timestep < timestep)
             timestep = minimal_timestep;
         }
 
@@ -362,25 +335,21 @@ SolverFIRE<VectorType>::solve
     } // While we need to iterate.
 
   // In the case of failure: throw exception.
-  if (conv != SolverControl::success)
-    AssertThrow (false,
-                 SolverControl::NoConvergence (iter, gradients * gradients));
-
+  if(conv != SolverControl::success)
+    AssertThrow(false,
+                SolverControl::NoConvergence(iter, gradients * gradients));
 }
-
-
 
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
-void SolverFIRE<VectorType>::solve (const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner)
+void
+SolverFIRE<VectorType>::solve(const MatrixType&         A,
+                              VectorType&               x,
+                              const VectorType&         b,
+                              const PreconditionerType& preconditioner)
 {
-
-  std::function<double(VectorType &,  const VectorType &)> compute_func =
-    [&]               (VectorType &g, const VectorType &x) -> double
-  {
+  std::function<double(VectorType&, const VectorType&)> compute_func
+    = [&](VectorType& g, const VectorType& x) -> double {
     // Residual of the quadratic form $ \frac{1}{2} xAx - xb $.
     // G = b - Ax
     A.residual(g, x, b);
@@ -389,23 +358,19 @@ void SolverFIRE<VectorType>::solve (const MatrixType         &A,
     g *= -1.;
 
     // The quadratic form $\frac{1}{2} xAx - xb $.
-    return 0.5*A.matrix_norm_square(x) - x*b;
+    return 0.5 * A.matrix_norm_square(x) - x * b;
   };
 
-  this->solve (compute_func, x, preconditioner);
+  this->solve(compute_func, x, preconditioner);
 }
-
-
 
 template <typename VectorType>
 void
-SolverFIRE<VectorType>::print_vectors (const unsigned int,
-                                       const VectorType &,
-                                       const VectorType &,
-                                       const VectorType &) const
+SolverFIRE<VectorType>::print_vectors(const unsigned int,
+                                      const VectorType&,
+                                      const VectorType&,
+                                      const VectorType&) const
 {}
-
-
 
 #endif // DOXYGEN
 

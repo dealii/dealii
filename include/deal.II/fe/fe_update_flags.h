@@ -16,20 +16,18 @@
 #ifndef dealii_fe_update_flags_h
 #define dealii_fe_update_flags_h
 
-
 #include <deal.II/base/config.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 
 #include <vector>
 
-
 DEAL_II_NAMESPACE_OPEN
 
-template <int,int> class FiniteElement;
-
+template <int, int>
+class FiniteElement;
 
 /*!@addtogroup feaccess */
 /*@{*/
@@ -224,27 +222,19 @@ enum UpdateFlags
    */
   update_mapping =
     // Direct data
-    update_quadrature_points |
-    update_JxW_values |
-    update_jacobians |
-    update_jacobian_grads |
-    update_jacobian_pushed_forward_grads |
-    update_jacobian_2nd_derivatives |
-    update_jacobian_pushed_forward_2nd_derivatives |
-    update_jacobian_3rd_derivatives |
-    update_jacobian_pushed_forward_3rd_derivatives |
-    update_inverse_jacobians |
-    update_boundary_forms |
-    update_normal_vectors |
-    // Transformation dependence
-    update_covariant_transformation |
-    update_contravariant_transformation |
-    update_transformation_values |
-    update_transformation_gradients |
-    // Volume data
-    update_volume_elements
+  update_quadrature_points | update_JxW_values | update_jacobians
+  | update_jacobian_grads | update_jacobian_pushed_forward_grads
+  | update_jacobian_2nd_derivatives
+  | update_jacobian_pushed_forward_2nd_derivatives
+  | update_jacobian_3rd_derivatives
+  | update_jacobian_pushed_forward_3rd_derivatives | update_inverse_jacobians
+  | update_boundary_forms | update_normal_vectors |
+  // Transformation dependence
+  update_covariant_transformation | update_contravariant_transformation
+  | update_transformation_values | update_transformation_gradients |
+  // Volume data
+  update_volume_elements
 };
-
 
 /**
  * Output operator which outputs update flags as a set of or'd text values.
@@ -252,35 +242,52 @@ enum UpdateFlags
  * @ref UpdateFlags
  */
 template <class StreamType>
-inline
-StreamType &operator << (StreamType &s,
-                         const UpdateFlags u)
+inline StreamType&
+operator<<(StreamType& s, const UpdateFlags u)
 {
   s << " UpdateFlags|";
-  if (u & update_values)                                  s << "values|";
-  if (u & update_gradients)                               s << "gradients|";
-  if (u & update_hessians)                                s << "hessians|";
-  if (u & update_3rd_derivatives)                         s << "3rd_derivatives|";
-  if (u & update_quadrature_points)                       s << "quadrature_points|";
-  if (u & update_JxW_values)                              s << "JxW_values|";
-  if (u & update_normal_vectors)                          s << "normal_vectors|";
-  if (u & update_jacobians)                               s << "jacobians|";
-  if (u & update_inverse_jacobians)                       s << "inverse_jacobians|";
-  if (u & update_jacobian_grads)                          s << "jacobian_grads|";
-  if (u & update_covariant_transformation)                s << "covariant_transformation|";
-  if (u & update_contravariant_transformation)            s << "contravariant_transformation|";
-  if (u & update_transformation_values)                   s << "transformation_values|";
-  if (u & update_transformation_gradients)                s << "transformation_gradients|";
-  if (u & update_jacobian_pushed_forward_grads)           s << "jacobian_pushed_forward_grads|";
-  if (u & update_jacobian_2nd_derivatives)                s << "jacobian_2nd_derivatives|";
-  if (u & update_jacobian_pushed_forward_2nd_derivatives) s << "jacobian_pushed_forward_2nd_derivatives|";
-  if (u &update_jacobian_3rd_derivatives)                 s << "jacobian_3rd_derivatives|";
-  if (u & update_jacobian_pushed_forward_3rd_derivatives) s << "jacobian_pushed_forward_3rd_derivatives|";
+  if(u & update_values)
+    s << "values|";
+  if(u & update_gradients)
+    s << "gradients|";
+  if(u & update_hessians)
+    s << "hessians|";
+  if(u & update_3rd_derivatives)
+    s << "3rd_derivatives|";
+  if(u & update_quadrature_points)
+    s << "quadrature_points|";
+  if(u & update_JxW_values)
+    s << "JxW_values|";
+  if(u & update_normal_vectors)
+    s << "normal_vectors|";
+  if(u & update_jacobians)
+    s << "jacobians|";
+  if(u & update_inverse_jacobians)
+    s << "inverse_jacobians|";
+  if(u & update_jacobian_grads)
+    s << "jacobian_grads|";
+  if(u & update_covariant_transformation)
+    s << "covariant_transformation|";
+  if(u & update_contravariant_transformation)
+    s << "contravariant_transformation|";
+  if(u & update_transformation_values)
+    s << "transformation_values|";
+  if(u & update_transformation_gradients)
+    s << "transformation_gradients|";
+  if(u & update_jacobian_pushed_forward_grads)
+    s << "jacobian_pushed_forward_grads|";
+  if(u & update_jacobian_2nd_derivatives)
+    s << "jacobian_2nd_derivatives|";
+  if(u & update_jacobian_pushed_forward_2nd_derivatives)
+    s << "jacobian_pushed_forward_2nd_derivatives|";
+  if(u & update_jacobian_3rd_derivatives)
+    s << "jacobian_3rd_derivatives|";
+  if(u & update_jacobian_pushed_forward_3rd_derivatives)
+    s << "jacobian_pushed_forward_3rd_derivatives|";
 
-//TODO: check that 'u' really only has the flags set that are handled above
+  //TODO: check that 'u' really only has the flags set that are handled above
   return s;
 }
-
 
 /**
  * Global operator which returns an object in which all bits are set which are
@@ -291,18 +298,12 @@ StreamType &operator << (StreamType &s,
  *
  * @ref UpdateFlags
  */
-inline
-UpdateFlags
-operator | (const UpdateFlags f1,
-            const UpdateFlags f2)
+inline UpdateFlags
+operator|(const UpdateFlags f1, const UpdateFlags f2)
 {
-  return static_cast<UpdateFlags> (
-           static_cast<unsigned int> (f1) |
-           static_cast<unsigned int> (f2));
+  return static_cast<UpdateFlags>(static_cast<unsigned int>(f1)
+                                  | static_cast<unsigned int>(f2));
 }
-
-
-
 
 /**
  * Global operator which sets the bits from the second argument also in the
@@ -310,15 +311,12 @@ operator | (const UpdateFlags f1,
  *
  * @ref UpdateFlags
  */
-inline
-UpdateFlags &
-operator |= (UpdateFlags &f1,
-             const UpdateFlags f2)
+inline UpdateFlags&
+operator|=(UpdateFlags& f1, const UpdateFlags f2)
 {
   f1 = f1 | f2;
   return f1;
 }
-
 
 /**
  * Global operator which returns an object in which all bits are set which are
@@ -329,16 +327,11 @@ operator |= (UpdateFlags &f1,
  *
  * @ref UpdateFlags
  */
-inline
-UpdateFlags
-operator & (const UpdateFlags f1,
-            const UpdateFlags f2)
+inline UpdateFlags operator&(const UpdateFlags f1, const UpdateFlags f2)
 {
-  return static_cast<UpdateFlags> (
-           static_cast<unsigned int> (f1) &
-           static_cast<unsigned int> (f2));
+  return static_cast<UpdateFlags>(static_cast<unsigned int>(f1)
+                                  & static_cast<unsigned int>(f2));
 }
-
 
 /**
  * Global operator which clears all the bits in the first argument if they are
@@ -346,16 +339,12 @@ operator & (const UpdateFlags f1,
  *
  * @ref UpdateFlags
  */
-inline
-UpdateFlags &
-operator &= (UpdateFlags &f1,
-             const UpdateFlags f2)
+inline UpdateFlags&
+operator&=(UpdateFlags& f1, const UpdateFlags f2)
 {
   f1 = f1 & f2;
   return f1;
 }
-
-
 
 /**
  * This enum definition is used for storing similarities of the current cell
@@ -391,7 +380,6 @@ namespace CellSimilarity
   };
 }
 
-
 namespace internal
 {
   namespace FEValuesImplementation
@@ -408,21 +396,23 @@ namespace internal
      *
      * @ingroup feaccess
      */
-    template <int dim, int spacedim=dim>
+    template <int dim, int spacedim = dim>
     class MappingRelatedData
     {
     public:
       /**
        * Initialize all vectors to correct size.
        */
-      void initialize (const unsigned int n_quadrature_points,
-                       const UpdateFlags  flags);
+      void
+      initialize(const unsigned int n_quadrature_points,
+                 const UpdateFlags  flags);
 
       /**
        * Compute and return an estimate for the memory consumption (in bytes)
        * of this object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Store an array of weights times the Jacobi determinant at the
@@ -437,72 +427,71 @@ namespace internal
        * that of a surface measure, not of a volume measure. In this case, it
        * is computed from the boundary forms, rather than the Jacobian matrix.
        */
-      std::vector<double>       JxW_values;
+      std::vector<double> JxW_values;
 
       /**
        * Array of the Jacobian matrices at the quadrature points.
        */
-      std::vector< DerivativeForm<1,dim,spacedim> > jacobians;
+      std::vector<DerivativeForm<1, dim, spacedim>> jacobians;
 
       /**
        * Array of the derivatives of the Jacobian matrices at the quadrature
        * points.
        */
-      std::vector<DerivativeForm<2,dim,spacedim> >  jacobian_grads;
+      std::vector<DerivativeForm<2, dim, spacedim>> jacobian_grads;
 
       /**
        * Array of the inverse Jacobian matrices at the quadrature points.
        */
-      std::vector<DerivativeForm<1,spacedim,dim> > inverse_jacobians;
+      std::vector<DerivativeForm<1, spacedim, dim>> inverse_jacobians;
 
       /**
        * Array of the derivatives of the Jacobian matrices at the quadrature
        * points, pushed forward to the real cell coordinates.
        */
-      std::vector<Tensor<3,spacedim> > jacobian_pushed_forward_grads;
+      std::vector<Tensor<3, spacedim>> jacobian_pushed_forward_grads;
 
       /**
        * Array of the second derivatives of the Jacobian matrices at the
        * quadrature points.
        */
-      std::vector<DerivativeForm<3,dim,spacedim> > jacobian_2nd_derivatives;
+      std::vector<DerivativeForm<3, dim, spacedim>> jacobian_2nd_derivatives;
 
       /**
        * Array of the  second derivatives of the Jacobian matrices at the
        * quadrature points, pushed forward to the real cell coordinates.
        */
-      std::vector<Tensor<4,spacedim> > jacobian_pushed_forward_2nd_derivatives;
+      std::vector<Tensor<4, spacedim>> jacobian_pushed_forward_2nd_derivatives;
 
       /**
        * Array of the  third derivatives of the Jacobian matrices at the
        * quadrature points.
        */
-      std::vector<DerivativeForm<4,dim,spacedim> > jacobian_3rd_derivatives;
+      std::vector<DerivativeForm<4, dim, spacedim>> jacobian_3rd_derivatives;
 
       /**
        * Array of the  third derivatives of the Jacobian matrices at the
        * quadrature points, pushed forward to the real cell coordinates.
        */
-      std::vector<Tensor<5,spacedim> > jacobian_pushed_forward_3rd_derivatives;
+      std::vector<Tensor<5, spacedim>> jacobian_pushed_forward_3rd_derivatives;
 
       /**
        * Array of quadrature points. This array is set up upon calling
        * reinit() and contains the quadrature points on the real element,
        * rather than on the reference element.
        */
-      std::vector<Point<spacedim> >  quadrature_points;
+      std::vector<Point<spacedim>> quadrature_points;
 
       /**
        * List of outward normal vectors at the quadrature points.
        */
-      std::vector<Tensor<1,spacedim> >  normal_vectors;
+      std::vector<Tensor<1, spacedim>> normal_vectors;
 
       /**
        * List of boundary forms at the quadrature points.
        */
-      std::vector<Tensor<1,spacedim> >  boundary_forms;
+      std::vector<Tensor<1, spacedim>> boundary_forms;
     };
-
 
     /**
      * A class that stores all of the shape function related data used in
@@ -512,22 +501,24 @@ namespace internal
      *
      * @ingroup feaccess
      */
-    template <int dim, int spacedim=dim>
+    template <int dim, int spacedim = dim>
     class FiniteElementRelatedData
     {
     public:
       /**
        * Initialize all vectors to correct size.
        */
-      void initialize (const unsigned int        n_quadrature_points,
-                       const FiniteElement<dim,spacedim> &fe,
-                       const UpdateFlags         flags);
+      void
+      initialize(const unsigned int                  n_quadrature_points,
+                 const FiniteElement<dim, spacedim>& fe,
+                 const UpdateFlags                   flags);
 
       /**
        * Compute and return an estimate for the memory consumption (in bytes)
        * of this object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Storage type for shape values. Each row in the matrix denotes the
@@ -547,23 +538,23 @@ namespace internal
        * components are non-zero and thus have a row in the array presently
        * under discussion.
        */
-      typedef dealii::Table<2,double> ShapeVector;
+      typedef dealii::Table<2, double> ShapeVector;
 
       /**
        * Storage type for gradients. The layout of data is the same as for the
        * #ShapeVector data type.
        */
-      typedef dealii::Table<2,Tensor<1,spacedim> > GradientVector;
+      typedef dealii::Table<2, Tensor<1, spacedim>> GradientVector;
 
       /**
        * Likewise for second order derivatives.
        */
-      typedef dealii::Table<2,Tensor<2,spacedim> > HessianVector;
+      typedef dealii::Table<2, Tensor<2, spacedim>> HessianVector;
 
       /**
        * And the same also applies to the third order derivatives.
        */
-      typedef dealii::Table<2,Tensor<3,spacedim> > ThirdDerivativeVector;
+      typedef dealii::Table<2, Tensor<3, spacedim>> ThirdDerivativeVector;
 
       /**
        * Store the values of the shape functions at the quadrature points. See
@@ -624,13 +615,10 @@ namespace internal
        */
       std::vector<unsigned int> shape_function_to_row_table;
     };
-  }
-}
-
+  } // namespace FEValuesImplementation
+} // namespace internal
 
 /*@}*/
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

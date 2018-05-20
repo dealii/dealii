@@ -13,47 +13,46 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Plot PolynomialsRT_Bubbles on the reference cell
 
 #include "../tests.h"
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_rt_bubbles.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 
-
 template <int dim>
-void plot(const PolynomialsRT_Bubbles<dim> &poly)
+void
+plot(const PolynomialsRT_Bubbles<dim>& poly)
 {
-  QTrapez<1> base_quadrature;
-  QIterated<dim> quadrature(base_quadrature, poly.degree()+2);
-  std::vector<Tensor<1,dim> > values(poly.n());
-  std::vector<Tensor<2,dim> > grads;
-  std::vector<Tensor<3,dim> > grads2;
-  std::vector<Tensor<4,dim> > thirds;
-  std::vector<Tensor<5,dim> > fourths;
+  QTrapez<1>                  base_quadrature;
+  QIterated<dim>              quadrature(base_quadrature, poly.degree() + 2);
+  std::vector<Tensor<1, dim>> values(poly.n());
+  std::vector<Tensor<2, dim>> grads;
+  std::vector<Tensor<3, dim>> grads2;
+  std::vector<Tensor<4, dim>> thirds;
+  std::vector<Tensor<5, dim>> fourths;
 
-  for (unsigned int k=0; k<quadrature.size(); ++k)
+  for(unsigned int k = 0; k < quadrature.size(); ++k)
     {
-      if (k%(poly.degree()+3) == 0)
-        deallog << "RT_Bubbles" << poly.degree() << '<' << dim << '>' << std::endl;
+      if(k % (poly.degree() + 3) == 0)
+        deallog << "RT_Bubbles" << poly.degree() << '<' << dim << '>'
+                << std::endl;
 
-      deallog << "RT_Bubbles" << poly.degree() << '<' << dim << '>'
-              << '\t' << quadrature.point(k);
+      deallog << "RT_Bubbles" << poly.degree() << '<' << dim << '>' << '\t'
+              << quadrature.point(k);
       poly.compute(quadrature.point(k), values, grads, grads2, thirds, fourths);
 
-      for (unsigned int i=0; i<poly.n(); ++i)
-        for (unsigned int d=0; d<dim; ++d)
+      for(unsigned int i = 0; i < poly.n(); ++i)
+        for(unsigned int d = 0; d < dim; ++d)
           deallog << '\t' << values[i][d];
       deallog << std::endl;
     }
 }
 
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);

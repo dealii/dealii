@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/algorithms/timestep_control.h>
 #include <deal.II/base/parameter_handler.h>
 
@@ -21,12 +20,12 @@ DEAL_II_NAMESPACE_OPEN
 
 using namespace Algorithms;
 
-TimestepControl::TimestepControl (double start,
-                                  double final,
-                                  double tolerance,
-                                  double start_step,
-                                  double print_step,
-                                  double max_step)
+TimestepControl::TimestepControl(double start,
+                                 double final,
+                                 double tolerance,
+                                 double start_step,
+                                 double print_step,
+                                 double max_step)
   : start_val(start),
     final_val(final),
     tolerance_val(tolerance),
@@ -43,65 +42,59 @@ TimestepControl::TimestepControl (double start,
   strcpy(format, "T.%06.3f");
 
   // avoid compiler warning
-  (void)min_step_val;
+  (void) min_step_val;
 }
 
-
-
-void TimestepControl::declare_parameters (ParameterHandler &param)
+void
+TimestepControl::declare_parameters(ParameterHandler& param)
 {
-  param.declare_entry ("Start", "0.", Patterns::Double());
-  param.declare_entry ("Final", "1.", Patterns::Double());
-  param.declare_entry ("First step", "1.e-2", Patterns::Double());
-  param.declare_entry ("Max step", "1.", Patterns::Double());
-  param.declare_entry ("Tolerance", "1.e-2", Patterns::Double());
-  param.declare_entry ("Print step", "-1.", Patterns::Double());
-  param.declare_entry ("Strategy", "uniform",
-                       Patterns::Selection("uniform|doubling"));
+  param.declare_entry("Start", "0.", Patterns::Double());
+  param.declare_entry("Final", "1.", Patterns::Double());
+  param.declare_entry("First step", "1.e-2", Patterns::Double());
+  param.declare_entry("Max step", "1.", Patterns::Double());
+  param.declare_entry("Tolerance", "1.e-2", Patterns::Double());
+  param.declare_entry("Print step", "-1.", Patterns::Double());
+  param.declare_entry(
+    "Strategy", "uniform", Patterns::Selection("uniform|doubling"));
 }
 
-
-
-
-void TimestepControl::parse_parameters (ParameterHandler &param)
+void
+TimestepControl::parse_parameters(ParameterHandler& param)
 {
-  start (param.get_double ("Start"));
-  start_step (param.get_double ("First step"));
-  max_step (param.get_double ("Max step"));
-  final (param.get_double ("Final"));
-  tolerance (param.get_double ("Tolerance"));
-  print_step = param.get_double ("Print step");
+  start(param.get_double("Start"));
+  start_step(param.get_double("First step"));
+  max_step(param.get_double("Max step"));
+  final(param.get_double("Final"));
+  tolerance(param.get_double("Tolerance"));
+  print_step              = param.get_double("Print step");
   const std::string strat = param.get("Strategy");
-  if (strat == std::string("uniform"))
+  if(strat == std::string("uniform"))
     strategy_val = uniform;
-  else if (strat == std::string("doubling"))
+  else if(strat == std::string("doubling"))
     strategy_val = doubling;
 }
 
-
-
-
 bool
-TimestepControl::advance ()
+TimestepControl::advance()
 {
-  bool changed = false;
-  double s = step_val;
+  bool   changed = false;
+  double s       = step_val;
 
   // Do time step control, but not in
   // first step.
-  if (now_val != start())
+  if(now_val != start())
     {
-      if (strategy_val == doubling && 2*s <= tolerance_val)
+      if(strategy_val == doubling && 2 * s <= tolerance_val)
         s *= 2;
-      if (s > max_step_val)
+      if(s > max_step_val)
         s = max_step_val;
     }
 
   // Try incrementing time by s
   double h = now_val + s;
-  changed = s != step_val;
+  changed  = s != step_val;
 
-  step_val = s;
+  step_val         = s;
   current_step_val = s;
   // If we just missed the final
   // time, increase the step size a
@@ -110,36 +103,35 @@ TimestepControl::advance ()
   // shot over the final time, adjust
   // it so we hit the final time
   // exactly.
-  double s1 = .01*s;
-  if (h > final_val-s1)
+  double s1 = .01 * s;
+  if(h > final_val - s1)
     {
       current_step_val = final_val - now_val;
-      h = final_val;
-      changed = true;
+      h                = final_val;
+      changed          = true;
     }
 
   now_val = h;
   return changed;
 }
 
-
-bool TimestepControl::print ()
+bool
+TimestepControl::print()
 {
-  if (print_step == 0.)
+  if(print_step == 0.)
     return false;
-  if (print_step < 0.)
+  if(print_step < 0.)
     return true;
 
   bool result = (now_val >= next_print_val);
 
-  if (result)
+  if(result)
     {
       next_print_val += print_step;
-      if (next_print_val > final_val)
+      if(next_print_val > final_val)
         next_print_val = final_val;
     }
   return result;
 }
 
 DEAL_II_NAMESPACE_CLOSE
-

@@ -13,33 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::Tmmult
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m, n, o;
-  make_square_matrix (m);
-  make_square_matrix (n);
-  make_square_matrix (o);
+  make_square_matrix(m);
+  make_square_matrix(n);
+  make_square_matrix(o);
 
-  m.Tmmult (n, o, true);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.Tmmult(n, o, true);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 
-  m.Tmmult (n, o, false);
-  print_matrix (m);
-  print_matrix (n);
-  print_matrix (o);
+  m.Tmmult(n, o, false);
+  print_matrix(m);
+  print_matrix(n);
+  print_matrix(o);
 }

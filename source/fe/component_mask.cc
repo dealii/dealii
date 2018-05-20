@@ -13,26 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/fe/component_mask.h>
 
 #include <iostream>
 
-
 DEAL_II_NAMESPACE_OPEN
 
-std::ostream &operator << (std::ostream &out,
-                           const ComponentMask &mask)
+std::ostream&
+operator<<(std::ostream& out, const ComponentMask& mask)
 {
-  if (mask.component_mask.size() == 0)
+  if(mask.component_mask.size() == 0)
     out << "[all components selected]";
   else
     {
       out << '[';
-      for (unsigned int i=0; i<mask.component_mask.size(); ++i)
+      for(unsigned int i = 0; i < mask.component_mask.size(); ++i)
         {
           out << (mask.component_mask[i] ? "true" : "false");
-          if (i != mask.component_mask.size()-1)
+          if(i != mask.component_mask.size() - 1)
             out << ',';
         }
       out << ']';
@@ -41,13 +39,10 @@ std::ostream &operator << (std::ostream &out,
   return out;
 }
 
-
-
 std::size_t
-ComponentMask::memory_consumption () const
+ComponentMask::memory_consumption() const
 {
-  return sizeof(*this) + MemoryConsumption::memory_consumption (component_mask);
+  return sizeof(*this) + MemoryConsumption::memory_consumption(component_mask);
 }
-
 
 DEAL_II_NAMESPACE_CLOSE

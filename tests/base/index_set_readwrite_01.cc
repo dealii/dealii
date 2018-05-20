@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test IndexSet::read() and write()
 
 #include "../tests.h"
@@ -21,25 +20,24 @@
 
 #include <deal.II/base/index_set.h>
 
-
-void test ()
+void
+test()
 {
-  IndexSet is1 (100);
+  IndexSet is1(100);
 
-  is1.add_range(0,10);
-  is1.add_range(20,100);
+  is1.add_range(0, 10);
+  is1.add_range(20, 100);
 
   std::ofstream out("a.idxset");
   is1.write(out);
-  IndexSet is2;
+  IndexSet      is2;
   std::ifstream in("a.idxset");
   is2.read(in);
 
   Assert(is1 == is2, ExcInternalError());
 
-
   IndexSet is3(11);
-  is3.add_range(3,5);
+  is3.add_range(3, 5);
   std::ifstream in2("a.idxset");
   is3.read(in2);
 
@@ -47,15 +45,13 @@ void test ()
 
   deallog << "OK" << std::endl;
 
-  std::remove ("a.idxset");
+  std::remove("a.idxset");
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test interaction with p4est with a complicated 2d grid read from file. the
 // grid describes a cross-section of an airfoil with flaps at the front and
 // back. it has some 30,000 cells
@@ -22,41 +20,39 @@
 #include "../tests.h"
 #include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
-
-
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridIn<dim> gi;
-  gi.attach_triangulation (tr);
-  std::ifstream in (SOURCE_DIR "/../grid/grid_in_02/2d.xda");
+  gi.attach_triangulation(tr);
+  std::ifstream in(SOURCE_DIR "/../grid/grid_in_02/2d.xda");
   try
     {
-      gi.read_xda (in);
+      gi.read_xda(in);
     }
-  catch (const typename Triangulation<dim>::DistortedCellList &distorted_cells)
+  catch(const typename Triangulation<dim>::DistortedCellList& distorted_cells)
     {
       // ignore distorted cells
       deallog << distorted_cells.distorted_cells.size()
-              << " distorted cells after creating mesh."
-              << std::endl;
+              << " distorted cells after creating mesh." << std::endl;
     }
 
   write_vtk(tr, "1");
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -64,6 +60,4 @@ int main(int argc, char *argv[])
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();
-
-
 }

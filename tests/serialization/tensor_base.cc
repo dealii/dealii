@@ -13,34 +13,33 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check serialization for Tensor<1,dim>
 
 #include "serialization.h"
 #include <deal.II/base/tensor.h>
 
-
-void test ()
+void
+test()
 {
-  const unsigned int dim=3;
+  const unsigned int dim = 3;
 
-  double a1[3] = {1, 2, 3};
-  Tensor<1,dim> t1(a1);
+  double         a1[3] = {1, 2, 3};
+  Tensor<1, dim> t1(a1);
 
-  double a2[3] = {3, 6, 9};
-  Tensor<1,dim> t2(a2);
+  double         a2[3] = {3, 6, 9};
+  Tensor<1, dim> t2(a2);
 
-  verify (t1, t2);
+  verify(t1, t2);
 }
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

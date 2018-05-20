@@ -13,91 +13,64 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_tools_common.h"
 
 // check
 //   FE::face_interpolation
 
-
-
-
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim>& fe1, const FiniteElement<dim>& fe2)
 {
-  if (dim == 1)
+  if(dim == 1)
     return;
 
   // check all combinations of fe1 and fe2
   FullMatrix<double> face_constraints;
   try
     {
-      face_constraints.reinit (fe1.dofs_per_face,
-                               fe1.dofs_per_face);
-      fe1.get_face_interpolation_matrix (fe1, face_constraints);
+      face_constraints.reinit(fe1.dofs_per_face, fe1.dofs_per_face);
+      fe1.get_face_interpolation_matrix(fe1, face_constraints);
 
-      deallog << fe1.get_name()
-              << "  vs.  "
-              << fe1.get_name()
-              << std::endl;
-      output_matrix (face_constraints);
+      deallog << fe1.get_name() << "  vs.  " << fe1.get_name() << std::endl;
+      output_matrix(face_constraints);
     }
-  catch (...)
-    {
-    }
+  catch(...)
+    {}
 
   try
     {
-      face_constraints.reinit (fe2.dofs_per_face,
-                               fe2.dofs_per_face);
-      fe2.get_face_interpolation_matrix (fe2, face_constraints);
+      face_constraints.reinit(fe2.dofs_per_face, fe2.dofs_per_face);
+      fe2.get_face_interpolation_matrix(fe2, face_constraints);
 
-      deallog << fe2.get_name()
-              << "  vs.  "
-              << fe2.get_name()
-              << std::endl;
-      output_matrix (face_constraints);
+      deallog << fe2.get_name() << "  vs.  " << fe2.get_name() << std::endl;
+      output_matrix(face_constraints);
     }
-  catch (...)
-    {
-    }
+  catch(...)
+    {}
 
-  if (fe1.dofs_per_face <= fe2.dofs_per_face)
+  if(fe1.dofs_per_face <= fe2.dofs_per_face)
     try
       {
-        face_constraints.reinit (fe2.dofs_per_face,
-                                 fe1.dofs_per_face);
-        fe1.get_face_interpolation_matrix (fe2, face_constraints);
+        face_constraints.reinit(fe2.dofs_per_face, fe1.dofs_per_face);
+        fe1.get_face_interpolation_matrix(fe2, face_constraints);
 
-        deallog << fe1.get_name()
-                << "  vs.  "
-                << fe2.get_name()
-                << std::endl;
-        output_matrix (face_constraints);
+        deallog << fe1.get_name() << "  vs.  " << fe2.get_name() << std::endl;
+        output_matrix(face_constraints);
       }
-    catch (...)
-      {
-      }
+    catch(...)
+      {}
 
-  if (fe2.dofs_per_face <= fe1.dofs_per_face)
+  if(fe2.dofs_per_face <= fe1.dofs_per_face)
     try
       {
-        face_constraints.reinit (fe1.dofs_per_face,
-                                 fe2.dofs_per_face);
-        fe2.get_face_interpolation_matrix (fe1, face_constraints);
+        face_constraints.reinit(fe1.dofs_per_face, fe2.dofs_per_face);
+        fe2.get_face_interpolation_matrix(fe1, face_constraints);
 
-        deallog << fe2.get_name()
-                << "  vs.  "
-                << fe1.get_name()
-                << std::endl;
-        output_matrix (face_constraints);
+        deallog << fe2.get_name() << "  vs.  " << fe1.get_name() << std::endl;
+        output_matrix(face_constraints);
       }
-    catch (...)
-      {
-      }
+    catch(...)
+      {}
 }
-

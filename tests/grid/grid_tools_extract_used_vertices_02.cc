@@ -16,47 +16,44 @@
 // Check extract used_vertices and find_closest_vertex
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
-
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 template <int dim, int spacedim>
-void test (const Point<spacedim> &p)
+void
+test(const Point<spacedim>& p)
 {
-  deallog << "dim: " << dim << ", spacedim: "
-          << spacedim << std::endl;
+  deallog << "dim: " << dim << ", spacedim: " << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
+  Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
 
   tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  for (auto cell = tria.begin_active(2); cell != tria.end(2); ++cell)
+  for(auto cell = tria.begin_active(2); cell != tria.end(2); ++cell)
     cell->set_coarsen_flag();
 
   tria.execute_coarsening_and_refinement();
 
   auto m = GridTools::extract_used_vertices(tria);
 
-  for (auto &e: m)
+  for(auto& e : m)
     deallog << "Vertex: " << e.first << ": " << e.second << std::endl;
 
-  auto i = GridTools::find_closest_vertex(m,p);
-  deallog << "Closest vertex to " << p
-          << ", v["<< i << "] :"
-          << m[i] << std::endl;
+  auto i = GridTools::find_closest_vertex(m, p);
+  deallog << "Closest vertex to " << p << ", v[" << i << "] :" << m[i]
+          << std::endl;
 };
 
-
-int main ()
+int
+main()
 {
   initlog();
-  test<2,2> (Point<2>(.2,.2));
-  test<2,2> (Point<2>(.6,.9));
+  test<2, 2>(Point<2>(.2, .2));
+  test<2, 2>(Point<2>(.6, .9));
   return 0;
 }
-

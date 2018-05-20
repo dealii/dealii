@@ -13,35 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the BlockMask class
 //
 // here: test that creating a mask that's empty is always true
 
-
 #include "../tests.h"
 #include <deal.II/fe/block_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   BlockMask m;
-  AssertThrow (m[0] == true, ExcInternalError());
-  AssertThrow (m[42] == true, ExcInternalError());
-  AssertThrow (m[1000000000] == true, ExcInternalError());
+  AssertThrow(m[0] == true, ExcInternalError());
+  AssertThrow(m[42] == true, ExcInternalError());
+  AssertThrow(m[1000000000] == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

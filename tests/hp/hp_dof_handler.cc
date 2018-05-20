@@ -13,41 +13,37 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 /* Author: Ralf Hartmann, 2005, O. Kayser-Herold, simply modified
   the mg_dof_handler.cc test for the hp::DoFHandler. */
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/hp/dof_handler.h>
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  const unsigned int dim=2;
+  const unsigned int dim = 2;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
 
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back (FE_DGQ<dim> (1));
+  fe_collection.push_back(FE_DGQ<dim>(1));
 
   hp::DoFHandler<dim> dof_handler(tria);
 
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  Triangulation<dim>::active_cell_iterator
-  cell=tria.begin_active(),
-  endc=tria.end();
-  for (; cell!=endc; ++cell)
+  Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
+                                           endc = tria.end();
+  for(; cell != endc; ++cell)
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement();
 

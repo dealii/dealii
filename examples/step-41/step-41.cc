@@ -19,43 +19,41 @@
  *          Wolfgang Bangerth, Texas A&M University, 2012
  */
 
-
 // @sect3{Include files}
 
 // As usual, at the beginning we include all the header files we need in
 // here. With the exception of the various files that provide interfaces to
 // the Trilinos library, there are no surprises:
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iostream>
 #include <list>
-
 
 namespace Step41
 {
@@ -77,34 +75,41 @@ namespace Step41
   class ObstacleProblem
   {
   public:
-    ObstacleProblem ();
-    void run ();
+    ObstacleProblem();
+    void
+    run();
 
   private:
-    void make_grid ();
-    void setup_system();
-    void assemble_system ();
-    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
-    void update_solution_and_constraints ();
-    void solve ();
-    void output_results (const unsigned int iteration) const;
+    void
+    make_grid();
+    void
+    setup_system();
+    void
+    assemble_system();
+    void
+    assemble_mass_matrix_diagonal(TrilinosWrappers::SparseMatrix& mass_matrix);
+    void
+    update_solution_and_constraints();
+    void
+    solve();
+    void
+    output_results(const unsigned int iteration) const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
-    ConstraintMatrix     constraints;
-    IndexSet             active_set;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
+    ConstraintMatrix   constraints;
+    IndexSet           active_set;
 
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
-    TrilinosWrappers::MPI::Vector  solution;
-    TrilinosWrappers::MPI::Vector  system_rhs;
-    TrilinosWrappers::MPI::Vector  complete_system_rhs;
-    TrilinosWrappers::MPI::Vector  diagonal_of_mass_matrix;
-    TrilinosWrappers::MPI::Vector  contact_force;
+    TrilinosWrappers::MPI::Vector solution;
+    TrilinosWrappers::MPI::Vector system_rhs;
+    TrilinosWrappers::MPI::Vector complete_system_rhs;
+    TrilinosWrappers::MPI::Vector diagonal_of_mass_matrix;
+    TrilinosWrappers::MPI::Vector contact_force;
   };
-
 
   // @sect3{Right hand side, boundary values, and the obstacle}
 
@@ -120,15 +125,17 @@ namespace Step41
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide () : Function<dim>() {}
+    RightHandSide() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &,
-                                    const unsigned int component) const
+  double
+  RightHandSide<dim>::value(const Point<dim>&,
+                            const unsigned int component) const
   {
     (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
@@ -136,21 +143,21 @@ namespace Step41
     return -10;
   }
 
-
-
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues () : Function<dim>() {}
+    BoundaryValues() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double BoundaryValues<dim>::value (const Point<dim> &,
-                                     const unsigned int component) const
+  double
+  BoundaryValues<dim>::value(const Point<dim>&,
+                             const unsigned int component) const
   {
     (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
@@ -158,53 +165,45 @@ namespace Step41
     return 0;
   }
 
-
-
   // We describe the obstacle function by a cascaded barrier (think: stair
   // steps):
   template <int dim>
   class Obstacle : public Function<dim>
   {
   public:
-    Obstacle () : Function<dim>() {}
+    Obstacle() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
   };
 
   template <int dim>
-  double Obstacle<dim>::value (const Point<dim> &p,
-                               const unsigned int component) const
+  double
+  Obstacle<dim>::value(const Point<dim>& p, const unsigned int component) const
   {
     (void) component;
     Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    if (p (0) < -0.5)
+    if(p(0) < -0.5)
       return -0.2;
-    else if (p (0) >= -0.5 && p (0) < 0.0)
+    else if(p(0) >= -0.5 && p(0) < 0.0)
       return -0.4;
-    else if (p (0) >= 0.0 && p (0) < 0.5)
+    else if(p(0) >= 0.0 && p(0) < 0.5)
       return -0.6;
     else
       return -0.8;
   }
 
-
-
   // @sect3{Implementation of the <code>ObstacleProblem</code> class}
-
 
   // @sect4{ObstacleProblem::ObstacleProblem}
 
   // To everyone who has taken a look at the first few tutorial programs, the
   // constructor is completely obvious:
   template <int dim>
-  ObstacleProblem<dim>::ObstacleProblem ()
-    :
-    fe (1),
-    dof_handler (triangulation)
+  ObstacleProblem<dim>::ObstacleProblem() : fe(1), dof_handler(triangulation)
   {}
-
 
   // @sect4{ObstacleProblem::make_grid}
 
@@ -212,19 +211,17 @@ namespace Step41
   // 2D. This function therefore just sets up one of the simplest possible
   // meshes.
   template <int dim>
-  void ObstacleProblem<dim>::make_grid ()
+  void
+  ObstacleProblem<dim>::make_grid()
   {
-    GridGenerator::hyper_cube (triangulation, -1, 1);
-    triangulation.refine_global (7);
+    GridGenerator::hyper_cube(triangulation, -1, 1);
+    triangulation.refine_global(7);
 
-    std::cout << "Number of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "Total number of cells: "
-              << triangulation.n_cells()
+              << "Total number of cells: " << triangulation.n_cells()
               << std::endl;
   }
-
 
   // @sect4{ObstacleProblem::setup_system}
 
@@ -233,36 +230,31 @@ namespace Step41
   // the constraints are, of course, only given by boundary values, so we
   // interpolate them towards the top of the function.
   template <int dim>
-  void ObstacleProblem<dim>::setup_system ()
+  void
+  ObstacleProblem<dim>::setup_system()
   {
-    dof_handler.distribute_dofs (fe);
-    active_set.set_size (dof_handler.n_dofs());
+    dof_handler.distribute_dofs(fe);
+    active_set.set_size(dof_handler.n_dofs());
 
-    std::cout << "Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl
               << std::endl;
 
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              BoundaryValues<dim>(),
-                                              constraints);
-    constraints.close ();
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, BoundaryValues<dim>(), constraints);
+    constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler,
-                                     dsp,
-                                     constraints,
-                                     false);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
 
-    system_matrix.reinit (dsp);
-    complete_system_matrix.reinit (dsp);
+    system_matrix.reinit(dsp);
+    complete_system_matrix.reinit(dsp);
 
     IndexSet solution_index_set = dof_handler.locally_owned_dofs();
-    solution.reinit (solution_index_set, MPI_COMM_WORLD);
-    system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
-    complete_system_rhs.reinit (solution_index_set, MPI_COMM_WORLD);
-    contact_force.reinit (solution_index_set, MPI_COMM_WORLD);
+    solution.reinit(solution_index_set, MPI_COMM_WORLD);
+    system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
+    complete_system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
+    contact_force.reinit(solution_index_set, MPI_COMM_WORLD);
 
     // The only other thing to do here is to compute the factors in the $B$
     // matrix which is used to scale the residual. As discussed in the
@@ -270,13 +262,12 @@ namespace Step41
     // diagonal, and in the following then first compute all of this as a
     // matrix and then extract the diagonal elements for later use:
     TrilinosWrappers::SparseMatrix mass_matrix;
-    mass_matrix.reinit (dsp);
-    assemble_mass_matrix_diagonal (mass_matrix);
-    diagonal_of_mass_matrix.reinit (solution_index_set);
-    for (unsigned int j=0; j<solution.size (); j++)
-      diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
+    mass_matrix.reinit(dsp);
+    assemble_mass_matrix_diagonal(mass_matrix);
+    diagonal_of_mass_matrix.reinit(solution_index_set);
+    for(unsigned int j = 0; j < solution.size(); j++)
+      diagonal_of_mass_matrix(j) = mass_matrix.diag_element(j);
   }
-
 
   // @sect4{ObstacleProblem::assemble_system}
 
@@ -285,64 +276,64 @@ namespace Step41
   // boundary values) to our system. Otherwise, it is functionally equivalent
   // to the corresponding function in, for example, step-4.
   template <int dim>
-  void ObstacleProblem<dim>::assemble_system ()
+  void
+  ObstacleProblem<dim>::assemble_system()
   {
     std::cout << "   Assembling system..." << std::endl;
 
     system_matrix = 0;
     system_rhs    = 0;
 
-    const QGauss<dim>         quadrature_formula(fe.degree+1);
-    const RightHandSide<dim>  right_hand_side;
+    const QGauss<dim>        quadrature_formula(fe.degree + 1);
+    const RightHandSide<dim> right_hand_side;
 
-    FEValues<dim>             fe_values (fe, quadrature_formula,
-                                         update_values   | update_gradients |
-                                         update_quadrature_points |
-                                         update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients
+                              | update_quadrature_points | update_JxW_values);
 
-    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int        n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>            cell_rhs (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for(; cell != endc; ++cell)
       {
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
         cell_matrix = 0;
-        cell_rhs = 0;
+        cell_rhs    = 0;
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad (i, q_point) *
-                                     fe_values.shape_grad (j, q_point) *
-                                     fe_values.JxW (q_point));
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j) += (fe_values.shape_grad(i, q_point)
+                                      * fe_values.shape_grad(j, q_point)
+                                      * fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value (i, q_point) *
-                              right_hand_side.value (fe_values.quadrature_point (q_point)) *
-                              fe_values.JxW (q_point));
+              cell_rhs(i)
+                += (fe_values.shape_value(i, q_point)
+                    * right_hand_side.value(fe_values.quadrature_point(q_point))
+                    * fe_values.JxW(q_point));
             }
 
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global (cell_matrix,
-                                                cell_rhs,
-                                                local_dof_indices,
-                                                system_matrix,
-                                                system_rhs,
-                                                true);
+        constraints.distribute_local_to_global(cell_matrix,
+                                               cell_rhs,
+                                               local_dof_indices,
+                                               system_matrix,
+                                               system_rhs,
+                                               true);
       }
   }
-
-
 
   // @sect4{ObstacleProblem::assemble_mass_matrix_diagonal}
 
@@ -368,46 +359,42 @@ namespace Step41
   // is in fact satisfied.
   template <int dim>
   void
-  ObstacleProblem<dim>::
-  assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
+  ObstacleProblem<dim>::assemble_mass_matrix_diagonal(
+    TrilinosWrappers::SparseMatrix& mass_matrix)
   {
-    Assert (fe.degree == 1, ExcNotImplemented());
+    Assert(fe.degree == 1, ExcNotImplemented());
 
-    const QTrapez<dim>        quadrature_formula;
-    FEValues<dim>             fe_values (fe,
-                                         quadrature_formula,
-                                         update_values   |
-                                         update_JxW_values);
+    const QTrapez<dim> quadrature_formula;
+    FEValues<dim>      fe_values(
+      fe, quadrature_formula, update_values | update_JxW_values);
 
-    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int        n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
-    for (; cell!=endc; ++cell)
+    for(; cell != endc; ++cell)
       {
-        fe_values.reinit (cell);
+        fe_values.reinit(cell);
         cell_matrix = 0;
 
-        for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            cell_matrix(i,i) += (fe_values.shape_value (i, q_point) *
-                                 fe_values.shape_value (i, q_point) *
-                                 fe_values.JxW (q_point));
+        for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
+            cell_matrix(i, i)
+              += (fe_values.shape_value(i, q_point)
+                  * fe_values.shape_value(i, q_point) * fe_values.JxW(q_point));
 
-        cell->get_dof_indices (local_dof_indices);
+        cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global (cell_matrix,
-                                                local_dof_indices,
-                                                mass_matrix);
+        constraints.distribute_local_to_global(
+          cell_matrix, local_dof_indices, mass_matrix);
       }
   }
-
 
   // @sect4{ObstacleProblem::update_solution_and_constraints}
 
@@ -430,19 +417,19 @@ namespace Step41
   // that is part of the matrix classes.
   template <int dim>
   void
-  ObstacleProblem<dim>::update_solution_and_constraints ()
+  ObstacleProblem<dim>::update_solution_and_constraints()
   {
     std::cout << "   Updating active set..." << std::endl;
 
     const double penalty_parameter = 100.0;
 
-    TrilinosWrappers::MPI::Vector lambda (complete_index_set(dof_handler.n_dofs()));
-    complete_system_matrix.residual (lambda,
-                                     solution, complete_system_rhs);
+    TrilinosWrappers::MPI::Vector lambda(
+      complete_index_set(dof_handler.n_dofs()));
+    complete_system_matrix.residual(lambda, solution, complete_system_rhs);
 
     // compute contact_force[i] = - lambda[i] * diagonal_of_mass_matrix[i]
     contact_force = lambda;
-    contact_force.scale (diagonal_of_mass_matrix);
+    contact_force.scale(diagonal_of_mass_matrix);
     contact_force *= -1;
 
     // The next step is to reset the active set and constraints objects and to
@@ -471,24 +458,24 @@ namespace Step41
     // which we haven't so far. We do so by using an array of flags
     // <code>dof_touched</code>:
     constraints.clear();
-    active_set.clear ();
+    active_set.clear();
 
     const Obstacle<dim> obstacle;
-    std::vector<bool>   dof_touched (dof_handler.n_dofs(), false);
+    std::vector<bool>   dof_touched(dof_handler.n_dofs(), false);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
+      for(unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
-          Assert (dof_handler.get_fe().dofs_per_cell ==
-                  GeometryInfo<dim>::vertices_per_cell,
-                  ExcNotImplemented());
+          Assert(dof_handler.get_fe().dofs_per_cell
+                   == GeometryInfo<dim>::vertices_per_cell,
+                 ExcNotImplemented());
 
-          const unsigned int dof_index = cell->vertex_dof_index (v,0);
+          const unsigned int dof_index = cell->vertex_dof_index(v, 0);
 
-          if (dof_touched[dof_index] == false)
+          if(dof_touched[dof_index] == false)
             dof_touched[dof_index] = true;
           else
             continue;
@@ -512,40 +499,35 @@ namespace Step41
           // residual will therefore only consist of the residual in the
           // non-contact zone. We output the norm of this residual along with
           // the size of the active set after the loop.
-          const double obstacle_value = obstacle.value (cell->vertex(v));
-          const double solution_value = solution (dof_index);
+          const double obstacle_value = obstacle.value(cell->vertex(v));
+          const double solution_value = solution(dof_index);
 
-          if (lambda (dof_index) +
-              penalty_parameter *
-              diagonal_of_mass_matrix(dof_index) *
-              (solution_value - obstacle_value)
-              <
-              0)
+          if(lambda(dof_index)
+               + penalty_parameter * diagonal_of_mass_matrix(dof_index)
+                   * (solution_value - obstacle_value)
+             < 0)
             {
-              active_set.add_index (dof_index);
-              constraints.add_line (dof_index);
-              constraints.set_inhomogeneity (dof_index, obstacle_value);
+              active_set.add_index(dof_index);
+              constraints.add_line(dof_index);
+              constraints.set_inhomogeneity(dof_index, obstacle_value);
 
-              solution (dof_index) = obstacle_value;
+              solution(dof_index) = obstacle_value;
 
-              lambda (dof_index) = 0;
+              lambda(dof_index) = 0;
             }
         }
     std::cout << "      Size of active set: " << active_set.n_elements()
               << std::endl;
 
     std::cout << "   Residual of the non-contact part of the system: "
-              << lambda.l2_norm()
-              << std::endl;
+              << lambda.l2_norm() << std::endl;
 
     // In a final step, we add to the set of constraints on DoFs we have so
     // far from the active set those that result from Dirichlet boundary
     // values, and close the constraints object:
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              BoundaryValues<dim>(),
-                                              constraints);
-    constraints.close ();
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, BoundaryValues<dim>(), constraints);
+    constraints.close();
   }
 
   // @sect4{ObstacleProblem::solve}
@@ -558,26 +540,24 @@ namespace Step41
   // either an absolute tolerance is reached (for which we choose $10^{-12}$)
   // or when the residual is reduced by a certain factor (here, $10^{-3}$).
   template <int dim>
-  void ObstacleProblem<dim>::solve ()
+  void
+  ObstacleProblem<dim>::solve()
   {
     std::cout << "   Solving system..." << std::endl;
 
-    ReductionControl                    reduction_control (100, 1e-12, 1e-3);
-    SolverCG<TrilinosWrappers::MPI::Vector>  solver (reduction_control);
-    TrilinosWrappers::PreconditionAMG   precondition;
-    precondition.initialize (system_matrix);
+    ReductionControl                        reduction_control(100, 1e-12, 1e-3);
+    SolverCG<TrilinosWrappers::MPI::Vector> solver(reduction_control);
+    TrilinosWrappers::PreconditionAMG       precondition;
+    precondition.initialize(system_matrix);
 
-    solver.solve (system_matrix, solution, system_rhs, precondition);
-    constraints.distribute (solution);
+    solver.solve(system_matrix, solution, system_rhs, precondition);
+    constraints.distribute(solution);
 
-    std::cout << "      Error: " << reduction_control.initial_value()
-              << " -> " << reduction_control.last_value()
-              << " in "
-              <<  reduction_control.last_step()
-              << " CG iterations."
+    std::cout << "      Error: " << reduction_control.initial_value() << " -> "
+              << reduction_control.last_value() << " in "
+              << reduction_control.last_step() << " CG iterations."
               << std::endl;
   }
-
 
   // @sect4{ObstacleProblem::output_results}
 
@@ -588,26 +568,24 @@ namespace Step41
   // interpreted as a function that is either zero (when a degree of freedom
   // is not part of the IndexSet) or one (if it is).
   template <int dim>
-  void ObstacleProblem<dim>::output_results (const unsigned int iteration) const
+  void
+  ObstacleProblem<dim>::output_results(const unsigned int iteration) const
   {
     std::cout << "   Writing graphical output..." << std::endl;
 
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "displacement");
-    data_out.add_data_vector (active_set, "active_set");
-    data_out.add_data_vector (contact_force, "lambda");
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "displacement");
+    data_out.add_data_vector(active_set, "active_set");
+    data_out.add_data_vector(contact_force, "lambda");
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
-    std::ofstream output_vtk (std::string("output_") +
-                              Utilities::int_to_string (iteration, 3) +
-                              ".vtk");
-    data_out.write_vtk (output_vtk);
+    std::ofstream output_vtk(std::string("output_")
+                             + Utilities::int_to_string(iteration, 3) + ".vtk");
+    data_out.write_vtk(output_vtk);
   }
-
-
 
   // @sect4{ObstacleProblem::run}
 
@@ -628,29 +606,30 @@ namespace Step41
   // eliminated, and so we can no longer access the full residual of the
   // original equation.
   template <int dim>
-  void ObstacleProblem<dim>::run ()
+  void
+  ObstacleProblem<dim>::run()
   {
     make_grid();
-    setup_system ();
+    setup_system();
 
-    IndexSet active_set_old (active_set);
-    for (unsigned int iteration=0; iteration<=solution.size (); ++iteration)
+    IndexSet active_set_old(active_set);
+    for(unsigned int iteration = 0; iteration <= solution.size(); ++iteration)
       {
         std::cout << "Newton iteration " << iteration << std::endl;
 
-        assemble_system ();
+        assemble_system();
 
-        if (iteration == 0)
+        if(iteration == 0)
           {
-            complete_system_matrix.copy_from (system_matrix);
+            complete_system_matrix.copy_from(system_matrix);
             complete_system_rhs = system_rhs;
           }
 
-        solve ();
-        update_solution_and_constraints ();
-        output_results (iteration);
+        solve();
+        update_solution_and_constraints();
+        output_results(iteration);
 
-        if (active_set == active_set_old)
+        if(active_set == active_set_old)
           break;
 
         active_set_old = active_set;
@@ -658,34 +637,36 @@ namespace Step41
         std::cout << std::endl;
       }
   }
-}
-
+} // namespace Step41
 
 // @sect3{The <code>main</code> function}
 
 // And this is the main function. It follows the pattern of all other main
 // functions. The call to initialize MPI exists because the Trilinos library
 // upon which we build our linear solvers in this program requires it.
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   try
     {
       using namespace dealii;
       using namespace Step41;
 
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
-                                                           numbers::invalid_unsigned_int);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(
+        argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)==1,
-                  ExcMessage("This program can only be run in serial, use ./step-41"));
+      AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
-      obstacle_problem.run ();
+      obstacle_problem.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -696,9 +677,10 @@ int main (int argc, char *argv[])
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

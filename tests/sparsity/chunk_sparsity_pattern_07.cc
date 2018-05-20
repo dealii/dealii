@@ -13,26 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check ChunkSparsityPattern::copy_from
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
-  for (unsigned int i=0; i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]); ++i)
+  const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
+  for(unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]); ++i)
     {
       chunk_size = chunk_sizes[i];
-      copy_from_2<ChunkSparsityPattern, DynamicSparsityPattern> ();
+      copy_from_2<ChunkSparsityPattern, DynamicSparsityPattern>();
     }
 }
-
-
-

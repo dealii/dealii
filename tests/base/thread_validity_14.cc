@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // See that we can query a task object's return value for cases
 // where these returned objects are not copyable but only
 // movable. This is relevant, for example, when calling functions that
@@ -24,72 +23,66 @@
 
 #include <deal.II/base/thread_management.h>
 
-
 class X
 {
 public:
-  X (int i) :
-    value (i)
+  X(int i) : value(i)
   {}
 
   // default constructor
-  X () :
-    value (13)
+  X() : value(13)
   {}
 
   // delete the copy constructor
-  X (const X &) = delete;
+  X(const X&) = delete;
 
   // move constructor. sets the moved-from value to a recognizable
   // value
-  X (X &&x)
+  X(X&& x)
   {
-    value = x.value;
+    value   = x.value;
     x.value = 0;
   }
 
   // same idea about copy operators
-  X &operator = (const X &) = delete;
+  X&
+  operator=(const X&)
+    = delete;
 
-  X &operator = (X &&x)
+  X&
+  operator=(X&& x)
   {
-    value = x.value;
+    value   = x.value;
     x.value = 0;
 
     return *this;
   }
 
-
   int value;
 };
 
-
-
-X foo ()
+X
+foo()
 {
   return X(42);
 }
 
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  Threads::Task<X> t = Threads::new_task (&foo);
+  Threads::Task<X> t = Threads::new_task(&foo);
 
   // wait for the thread to return and query its value
-  deallog << t.return_value().value
-          << std::endl;
+  deallog << t.return_value().value << std::endl;
 
   // we can't copy the return_value() object directly, but we can move
   // it. do so and check that we still get the correct value. then
   // also check that the value of the original return object has been
   // reset in the move constructor/operator
   X x = std::move(t.return_value());
-  deallog << x.value
-          << std::endl;
+  deallog << x.value << std::endl;
 
-  deallog << t.return_value().value
-          << std::endl;
+  deallog << t.return_value().value << std::endl;
 }

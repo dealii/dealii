@@ -16,11 +16,9 @@
 #ifndef dealii_std_cxx11_unique_ptr_h
 #define dealii_std_cxx11_unique_ptr_h
 
-
 #include <deal.II/base/config.h>
 
-
-#  include <memory>
+#include <memory>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx11
 {

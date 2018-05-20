@@ -13,17 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test LAPACKFullMatrix::trace() by comparing to FullMatrix
 
 #include "../tests.h"
 #include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
-
 
 template <typename NumberType>
 void
@@ -37,19 +35,19 @@ test(const unsigned int size)
   LAPACKFullMatrix<NumberType> M(size);
   M = F;
 
-  deallog << "trace difference: " << (F.trace() - M.trace())<< std::endl;
+  deallog << "trace difference: " << (F.trace() - M.trace()) << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
+  std::ofstream     logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
 
-  const std::vector<unsigned int> sizes = {{17,391}};
-  for (const auto &s : sizes)
+  const std::vector<unsigned int> sizes = {{17, 391}};
+  for(const auto& s : sizes)
     {
       deallog << "size=" << s << std::endl;
       test<double>(s);

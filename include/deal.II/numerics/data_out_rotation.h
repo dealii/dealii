@@ -16,7 +16,6 @@
 #ifndef dealii_data_out_rotation_h
 #define dealii_data_out_rotation_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/numerics/data_out_dof_data.h>
 
@@ -24,7 +23,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 namespace internal
 {
@@ -36,24 +34,25 @@ namespace internal
      * documentation of the WorkStream class.
      */
     template <int dim, int spacedim>
-    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim,spacedim>
+    struct ParallelData
+      : public internal::DataOutImplementation::ParallelDataBase<dim, spacedim>
     {
-      ParallelData (const unsigned int n_datasets,
-                    const unsigned int n_subdivisions,
-                    const unsigned int n_patches_per_circle,
-                    const std::vector<unsigned int> &n_postprocessor_outputs,
-                    const Mapping<dim,spacedim> &mapping,
-                    const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
-                    const UpdateFlags update_flags);
+      ParallelData(const unsigned int               n_datasets,
+                   const unsigned int               n_subdivisions,
+                   const unsigned int               n_patches_per_circle,
+                   const std::vector<unsigned int>& n_postprocessor_outputs,
+                   const Mapping<dim, spacedim>&    mapping,
+                   const std::vector<
+                     std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>&
+                                     finite_elements,
+                   const UpdateFlags update_flags);
 
       const unsigned int n_patches_per_circle;
 
-      std::vector<Point<spacedim> > patch_evaluation_points;
+      std::vector<Point<spacedim>> patch_evaluation_points;
     };
-  }
-}
-
-
+  } // namespace DataOutRotationImplementation
+} // namespace internal
 
 /**
  * This class generates output in the full domain of computations that were
@@ -115,8 +114,9 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, 2000
  */
-template <int dim, typename DoFHandlerType=DoFHandler<dim> >
-class DataOutRotation : public DataOut_DoFData<DoFHandlerType,DoFHandlerType::dimension+1>
+template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+class DataOutRotation
+  : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension + 1>
 {
 public:
   /**
@@ -135,7 +135,8 @@ public:
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType,dimension+1>::cell_iterator cell_iterator;
+  typedef typename DataOut_DoFData<DoFHandlerType, dimension + 1>::cell_iterator
+    cell_iterator;
 
   /**
    * This is the central function of this class since it builds the list of
@@ -154,8 +155,9 @@ public:
    * @param n_subdivisions See DataOut::build_patches() for an extensive
    * description of this parameter.
    */
-  virtual void build_patches (const unsigned int n_patches_per_circle,
-                              const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches(const unsigned int n_patches_per_circle,
+                const unsigned int n_subdivisions = 0);
 
   /**
    * Return the first cell which we want output for. The default
@@ -163,7 +165,8 @@ public:
    * @ref GlossActive "active cell",
    * but you might want to return other cells in a derived class.
    */
-  virtual cell_iterator first_cell ();
+  virtual cell_iterator
+  first_cell();
 
   /**
    * Return the next cell after @p cell which we want output for. If there are
@@ -176,20 +179,21 @@ public:
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
    */
-  virtual cell_iterator next_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_cell(const cell_iterator& cell);
 
   /**
    * Exception
    */
-  DeclException1 (ExcRadialVariableHasNegativeValues,
-                  double,
-                  << "You are attempting to use this class on a triangulation "
-                  "in which some vertices have a negative radial coordinate "
-                  "value of "
-                  << arg1
-                  << ". If you rotate such a triangulation around an "
-                  "axis, you will get (dim+1)-dimensional meshes "
-                  "that are not likely what you hoped to see.");
+  DeclException1(ExcRadialVariableHasNegativeValues,
+                 double,
+                 << "You are attempting to use this class on a triangulation "
+                    "in which some vertices have a negative radial coordinate "
+                    "value of "
+                 << arg1
+                 << ". If you rotate such a triangulation around an "
+                    "axis, you will get (dim+1)-dimensional meshes "
+                    "that are not likely what you hoped to see.");
 
 private:
   /**
@@ -198,11 +202,14 @@ private:
    * invocation in WorkStream, and put the results into the last argument.
    */
   void
-  build_one_patch (const cell_iterator *cell,
-                   internal::DataOutRotationImplementation::ParallelData<dimension, space_dimension> &data,
-                   std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &my_patches);
+  build_one_patch(
+    const cell_iterator* cell,
+    internal::DataOutRotationImplementation::ParallelData<dimension,
+                                                          space_dimension>&
+      data,
+    std::vector<DataOutBase::Patch<dimension + 1, space_dimension + 1>>&
+      my_patches);
 };
-
 
 DEAL_II_NAMESPACE_CLOSE
 

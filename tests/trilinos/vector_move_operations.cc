@@ -13,30 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
-#define PRINTME(name, var)                                 \
-  deallog << "Vector: " name << ":" << std::endl;          \
-  for (unsigned int i = 0; i < var.size(); ++i)            \
-    deallog << var[i] << " ";                              \
+#define PRINTME(name, var)                        \
+  deallog << "Vector: " name << ":" << std::endl; \
+  for(unsigned int i = 0; i < var.size(); ++i)    \
+    deallog << var[i] << " ";                     \
   deallog << std::endl;
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   {
     IndexSet local_owned(10);
-    local_owned.add_range (0,10);
+    local_owned.add_range(0, 10);
 
     TrilinosWrappers::MPI::Vector temp(local_owned, MPI_COMM_WORLD);
-    for (unsigned int i = 0; i < temp.size(); ++i)
-      temp[i] = (double)(i+1);
+    for(unsigned int i = 0; i < temp.size(); ++i)
+      temp[i] = (double) (i + 1);
 
     PRINTME("Vector", temp);
 
@@ -54,5 +55,3 @@ int main (int argc, char **argv)
     deallog << "old object size: " << u.size() << std::endl;
   }
 }
-
-

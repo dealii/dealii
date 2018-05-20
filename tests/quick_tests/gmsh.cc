@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Test that the GMSH executable actually works.
 // This is a reduced version of gmsh/create_tria_01.
 
@@ -22,7 +21,8 @@
 
 #include <fstream>
 
-int main ()
+int
+main()
 {
   std::ofstream geo("file.geo");
 
@@ -48,11 +48,12 @@ int main ()
 
   geo.close();
 
-  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH " -2 file.geo 1>file.log 2>file_warn.log");
-  Assert(ierr==0, dealii::ExcInternalError());
+  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH
+                               " -2 file.geo 1>file.log 2>file_warn.log");
+  Assert(ierr == 0, dealii::ExcInternalError());
 
-  std::remove ("file.geo");
-  std::remove ("file.log");
-  std::remove ("file_warn.log");
+  std::remove("file.geo");
+  std::remove("file.log");
+  std::remove("file_warn.log");
   return 0;
 }

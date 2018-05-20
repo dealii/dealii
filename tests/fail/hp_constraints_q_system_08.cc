@@ -13,24 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that computation of hp constraints works for FESystem(FE_Q) elements correctly
 // on a uniformly refined mesh for functions of degree q
 
 char logname[] = "output";
 
-
 #include "../hp/hp_constraints_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe;
-  for (unsigned int i=1; i<4; ++i)
-    fe.push_back (FESystem<dim>(FE_Q<dim>(i), 1,
-                                FE_DGQ<dim>(i+1), 1));
+  for(unsigned int i = 1; i < 4; ++i)
+    fe.push_back(FESystem<dim>(FE_Q<dim>(i), 1, FE_DGQ<dim>(i + 1), 1));
 
-  test_with_hanging_nodes_random_aniso (fe);
+  test_with_hanging_nodes_random_aniso(fe);
 }

@@ -15,43 +15,43 @@
 
 // test FiniteElement::get_dof_association() with a couple of elements
 
-
 #include "../tests.h"
 #include <iostream>
 
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_nedelec.h>
-
+#include <deal.II/fe/fe_q.h>
 
 template <int dim>
-void test (const FiniteElement<dim> &fe)
+void
+test(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+  for(unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     {
-      switch (fe.get_associated_geometry_primitive(i))
+      switch(fe.get_associated_geometry_primitive(i))
         {
-        case GeometryPrimitive::vertex:
-          deallog << 'v';
-          break;
-        case GeometryPrimitive::line:
-          deallog << 'l';
-          break;
-        case GeometryPrimitive::quad:
-          deallog << 'q';
-          break;
-        case GeometryPrimitive::hex:
-          deallog << 'h';
-          break;
-        default:
-          Assert (false, ExcInternalError());
+          case GeometryPrimitive::vertex:
+            deallog << 'v';
+            break;
+          case GeometryPrimitive::line:
+            deallog << 'l';
+            break;
+          case GeometryPrimitive::quad:
+            deallog << 'q';
+            break;
+          case GeometryPrimitive::hex:
+            deallog << 'h';
+            break;
+          default:
+            Assert(false, ExcInternalError());
         }
     }
   deallog << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

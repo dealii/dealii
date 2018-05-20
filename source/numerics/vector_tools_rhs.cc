@@ -13,71 +13,62 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/numerics/vector_tools.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace VectorTools
 {
-
-// separate implementation for 1D because otherwise we get linker errors since
-// (hp::)FEFaceValues<1> is not compiled
+  // separate implementation for 1D because otherwise we get linker errors since
+  // (hp::)FEFaceValues<1> is not compiled
   template <>
   void
-  create_boundary_right_hand_side (const Mapping<1,1> &,
-                                   const DoFHandler<1,1> &,
-                                   const Quadrature<0> &,
-                                   const Function<1> &,
-                                   Vector<double> &,
-                                   const std::set<types::boundary_id> &)
+  create_boundary_right_hand_side(const Mapping<1, 1>&,
+                                  const DoFHandler<1, 1>&,
+                                  const Quadrature<0>&,
+                                  const Function<1>&,
+                                  Vector<double>&,
+                                  const std::set<types::boundary_id>&)
   {
-    Assert (false, ExcImpossibleInDim(1));
+    Assert(false, ExcImpossibleInDim(1));
   }
-
-
 
   template <>
   void
-  create_boundary_right_hand_side (const Mapping<1,2> &,
-                                   const DoFHandler<1,2> &,
-                                   const Quadrature<0> &,
-                                   const Function<2> &,
-                                   Vector<double> &,
-                                   const std::set<types::boundary_id> &)
+  create_boundary_right_hand_side(const Mapping<1, 2>&,
+                                  const DoFHandler<1, 2>&,
+                                  const Quadrature<0>&,
+                                  const Function<2>&,
+                                  Vector<double>&,
+                                  const std::set<types::boundary_id>&)
   {
-    Assert (false, ExcImpossibleInDim(1));
+    Assert(false, ExcImpossibleInDim(1));
   }
-
-
 
   template <>
   void
-  create_boundary_right_hand_side (const hp::MappingCollection<1,1> &,
-                                   const hp::DoFHandler<1,1> &,
-                                   const hp::QCollection<0> &,
-                                   const Function<1> &,
-                                   Vector<double> &,
-                                   const std::set<types::boundary_id> &)
+  create_boundary_right_hand_side(const hp::MappingCollection<1, 1>&,
+                                  const hp::DoFHandler<1, 1>&,
+                                  const hp::QCollection<0>&,
+                                  const Function<1>&,
+                                  Vector<double>&,
+                                  const std::set<types::boundary_id>&)
   {
-    Assert (false, ExcImpossibleInDim(1));
+    Assert(false, ExcImpossibleInDim(1));
   }
-
-
 
   template <>
   void
-  create_boundary_right_hand_side (const hp::MappingCollection<1,2> &,
-                                   const hp::DoFHandler<1,2> &,
-                                   const hp::QCollection<0> &,
-                                   const Function<2> &,
-                                   Vector<double> &,
-                                   const std::set<types::boundary_id> &)
+  create_boundary_right_hand_side(const hp::MappingCollection<1, 2>&,
+                                  const hp::DoFHandler<1, 2>&,
+                                  const hp::QCollection<0>&,
+                                  const Function<2>&,
+                                  Vector<double>&,
+                                  const std::set<types::boundary_id>&)
   {
-    Assert (false, ExcImpossibleInDim(1));
+    Assert(false, ExcImpossibleInDim(1));
   }
-}
+} // namespace VectorTools
 
 // ---------------------------- explicit instantiations --------------------
 #include "vector_tools_rhs.inst"

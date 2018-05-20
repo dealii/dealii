@@ -13,12 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
+#include <boost/core/demangle.hpp>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/numbers.h>
-#include <boost/core/demangle.hpp>
 
 #include <memory>
 
@@ -28,29 +27,31 @@ using namespace Patterns::Tools;
 // Try conversion on complex map types
 
 template <class T>
-void test(T t)
+void
+test(T t)
 {
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
   deallog << "To String: " << s << std::endl;
-  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s)) << std::endl;
-
+  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s))
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  Point<3>                          t0(1,2,3);
-  std::complex<double>              t1(4,5);
-  std::vector<Point<3>>             t2(2,t0);
-  std::vector<std::complex<double>> t3(2,t1);
+  Point<3>                          t0(1, 2, 3);
+  std::complex<double>              t1(4, 5);
+  std::vector<Point<3>>             t2(2, t0);
+  std::vector<std::complex<double>> t3(2, t1);
 
-  std::map<unsigned int, Point<3>                          > t10;
-  std::map<unsigned int, std::complex<double>              > t11;
-  std::map<unsigned int, std::vector<Point<3>>             > t12;
-  std::map<unsigned int, std::vector<std::complex<double>> > t13;
+  std::map<unsigned int, Point<3>>                          t10;
+  std::map<unsigned int, std::complex<double>>              t11;
+  std::map<unsigned int, std::vector<Point<3>>>             t12;
+  std::map<unsigned int, std::vector<std::complex<double>>> t13;
 
   t10[0] = t0;
   t11[0] = t1;

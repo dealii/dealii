@@ -13,19 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_SYS3(FE_Nedelec<2>(1), 1,
-             FESystem<2>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(),3)),3), 1,
-             FESystem<2>(FE_Q<2>(2),3,
-                         FE_Nedelec<2>(1),2),2,
-             2);
+  CHECK_SYS3(
+    FE_Nedelec<2>(1),
+    1,
+    FESystem<2>(FE_DGQArbitraryNodes<2>(QIterated<1>(QTrapez<1>(), 3)), 3),
+    1,
+    FESystem<2>(FE_Q<2>(2), 3, FE_Nedelec<2>(1), 2),
+    2,
+    2);
 }

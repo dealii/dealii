@@ -13,9 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/parallel.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -32,8 +30,7 @@ namespace internal
     // split into enough chunks and the problem becomes badly balanced. the
     // tests are documented at https://github.com/dealii/dealii/issues/2496
     unsigned int minimum_parallel_grain_size = 4096;
-  }
-
+  } // namespace VectorImplementation
 
   namespace SparseMatrixImplementation
   {
@@ -46,8 +43,8 @@ namespace internal
     // any more for anything but very small matrices that we don't care that
     // much about anyway.
     unsigned int minimum_parallel_grain_size = 256;
-  }
-}
+  } // namespace SparseMatrixImplementation
+} // namespace internal
 
 namespace parallel
 {
@@ -55,39 +52,34 @@ namespace parallel
   {
 #ifdef DEAL_II_WITH_THREADS
     TBBPartitioner::TBBPartitioner()
-      :
-      my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
-      in_use(false)
+      : my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
+        in_use(false)
     {}
-
-
 
     TBBPartitioner::~TBBPartitioner()
     {
-      AssertNothrow(in_use == false,
-                    ExcInternalError("A vector partitioner goes out of scope, but "
-                                     "it appears to be still in use."));
+      AssertNothrow(
+        in_use == false,
+        ExcInternalError("A vector partitioner goes out of scope, but "
+                         "it appears to be still in use."));
     }
-
-
 
     std::shared_ptr<tbb::affinity_partitioner>
     TBBPartitioner::acquire_one_partitioner()
     {
       dealii::Threads::Mutex::ScopedLock lock(mutex);
-      if (in_use)
+      if(in_use)
         return std::make_shared<tbb::affinity_partitioner>();
 
       in_use = true;
       return my_partitioner;
     }
 
-
-
     void
-    TBBPartitioner::release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
+    TBBPartitioner::release_one_partitioner(
+      std::shared_ptr<tbb::affinity_partitioner>& p)
     {
-      if (p.get() == my_partitioner.get())
+      if(p.get() == my_partitioner.get())
         {
           dealii::Threads::Mutex::ScopedLock lock(mutex);
           in_use = false;
@@ -96,10 +88,7 @@ namespace parallel
 #else
     TBBPartitioner::TBBPartitioner() = default;
 #endif
-  }
-}
-
-
-
+  } // namespace internal
+} // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE

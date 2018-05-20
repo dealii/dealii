@@ -13,22 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-
 // similar to parallel_sparse_vector_03.cc, but make sure
 // compress(insert) zeroes out ghosts in Release mode
 
 #include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-void check(const unsigned int myid,
-           const LinearAlgebra::distributed::Vector<double> &v)
+void
+check(const unsigned int                                myid,
+      const LinearAlgebra::distributed::Vector<double>& v)
 {
-  if (myid==0)
+  if(myid == 0)
     {
       AssertThrow(v(10) == 10.0, ExcInternalError());
       AssertThrow(v(11) == 0., ExcInternalError());
@@ -45,40 +45,41 @@ void check(const unsigned int myid,
     }
 }
 
-
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  Assert (numproc==2, ExcNotImplemented());
+  Assert(numproc == 2, ExcNotImplemented());
 
   const unsigned int size = 20;
-  IndexSet local_owned(size);
-  IndexSet local_nonzero(size);
-  IndexSet local_relevant(size);
-  if (myid==0)
+  IndexSet           local_owned(size);
+  IndexSet           local_nonzero(size);
+  IndexSet           local_relevant(size);
+  if(myid == 0)
     {
-      local_owned.add_range(0,10);
-      local_nonzero.add_range(5,10);
+      local_owned.add_range(0, 10);
+      local_nonzero.add_range(5, 10);
       local_relevant = local_owned;
-      local_relevant.add_range(10,13);
-      local_relevant.add_range(14,15);
+      local_relevant.add_range(10, 13);
+      local_relevant.add_range(14, 15);
     }
   else
     {
-      local_owned.add_range(10,size);
-      local_nonzero.add_range(10,11);
-      local_nonzero.add_range(13,15);
+      local_owned.add_range(10, size);
+      local_nonzero.add_range(10, 11);
+      local_nonzero.add_range(13, 15);
       local_relevant = local_owned;
-      local_relevant.add_range(4,7);
+      local_relevant.add_range(4, 7);
     }
 
-  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(
+    local_owned, local_relevant, MPI_COMM_WORLD);
   v = 0.;
 
   // set local values
-  for (unsigned int i = 0; i < local_nonzero.n_elements(); i++)
+  for(unsigned int i = 0; i < local_nonzero.n_elements(); i++)
     v(local_nonzero.nth_index_in_set(i)) = local_nonzero.nth_index_in_set(i);
 
   // set value from processor which does not own it:
@@ -86,7 +87,7 @@ void test ()
   v.compress(VectorOperation::insert);
 
   // add to value from processor which has it as a ghost
-  if (myid == 1)
+  if(myid == 1)
     v(6) = 60;
   v.compress(VectorOperation::add); // 60 + 6
   // compress(insert) used to leave ghosts un-touched which resulted in
@@ -94,22 +95,22 @@ void test ()
 
   v.update_ghost_values();
 
-  check(myid,v);
+  check(myid, v);
 
-  if (myid == 0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       std::ofstream logfile("output");
       deallog.attach(logfile);
@@ -119,5 +120,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

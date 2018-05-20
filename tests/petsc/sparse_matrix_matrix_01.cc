@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparseMatrix::mmult
 
 #include "../tests.h"
@@ -23,27 +21,27 @@
 #include <iostream>
 #include <vector>
 
-
-void test ()
+void
+test()
 {
   // A = [1, 0, 0; 4, 1, 0; 7, 2, 1]
   PETScWrappers::SparseMatrix A(3, 3, 3);
-  A.set (0, 0, 1);
-  A.set (1, 0, 4);
-  A.set (1, 1, 1);
-  A.set (2, 0, 7);
-  A.set (2, 1, 2);
-  A.set (2, 2, 1);
-  A.compress (VectorOperation::insert);
+  A.set(0, 0, 1);
+  A.set(1, 0, 4);
+  A.set(1, 1, 1);
+  A.set(2, 0, 7);
+  A.set(2, 1, 2);
+  A.set(2, 2, 1);
+  A.compress(VectorOperation::insert);
 
   // B = [1, 2, 3; 0, -3, -6; 0, 0, 0]
   PETScWrappers::SparseMatrix B(3, 3, 3);
-  B.set (0, 0, 1);
-  B.set (0, 1, 2);
-  B.set (0, 2, 3);
-  B.set (1, 1, -3);
-  B.set (1, 2, -6);
-  B.compress (VectorOperation::insert);
+  B.set(0, 0, 1);
+  B.set(0, 1, 2);
+  B.set(0, 2, 3);
+  B.set(1, 1, -3);
+  B.set(1, 2, -6);
+  B.compress(VectorOperation::insert);
 
   PETScWrappers::SparseMatrix C(3, 3, 3);
 
@@ -51,30 +49,29 @@ void test ()
   A.mmult(C, B);
 
   // make sure we get the expected result
-  for (unsigned int i = 0; i < C.m(); ++i)
-    for (unsigned int j = 0; j < C.n(); ++j)
-      AssertThrow (C(i, j) == 3 * i + j + 1, ExcInternalError());
+  for(unsigned int i = 0; i < C.m(); ++i)
+    for(unsigned int j = 0; j < C.n(); ++j)
+      AssertThrow(C(i, j) == 3 * i + j + 1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -85,9 +82,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

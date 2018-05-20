@@ -13,57 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/thread_management.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/thread_management.h>
 
-#include <typeinfo>
-#include <string>
 #include <iostream>
+#include <string>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
+static const char* unknown_subscriber = "unknown subscriber";
 
-static const char *unknown_subscriber = "unknown subscriber";
-
-
-Subscriptor::Subscriptor ()
-  :
-  counter (0),
-  object_info (nullptr)
+Subscriptor::Subscriptor() : counter(0), object_info(nullptr)
 {
   // this has to go somewhere to avoid an extra warning.
-  (void)unknown_subscriber;
+  (void) unknown_subscriber;
 }
 
-
-
-Subscriptor::Subscriptor (const Subscriptor &)
-  :
-  counter (0),
-  object_info (nullptr)
+Subscriptor::Subscriptor(const Subscriptor&) : counter(0), object_info(nullptr)
 {}
 
-
-
-Subscriptor::Subscriptor (Subscriptor &&subscriptor) noexcept
-:
-counter(0),
-        object_info (subscriptor.object_info)
+Subscriptor::Subscriptor(Subscriptor&& subscriptor) noexcept
+  : counter(0), object_info(subscriptor.object_info)
 {
   subscriptor.check_no_subscribers();
 }
 
-
-
-Subscriptor::~Subscriptor ()
+Subscriptor::~Subscriptor()
 {
   check_no_subscribers();
   object_info = nullptr;
 }
 
-
-void Subscriptor::check_no_subscribers () const noexcept
+void
+Subscriptor::check_no_subscribers() const noexcept
 {
   // Check whether there are still subscriptions to this object. If so, output
   // the actual name of the class to which this object belongs, i.e. the most
@@ -85,57 +69,57 @@ void Subscriptor::check_no_subscribers () const noexcept
   // an assertion in the triangulation. If we kill the program at this point, we
   // will never be able to learn what caused the problem. In this situation,
   // just display a message and continue the program.
-  if (counter != 0)
+  if(counter != 0)
     {
-      if (std::uncaught_exception() == false)
+      if(std::uncaught_exception() == false)
         {
           std::string infostring;
-          for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+          for(map_iterator it = counter_map.begin(); it != counter_map.end();
+              ++it)
             {
-              if (it->second > 0)
+              if(it->second > 0)
                 infostring += std::string("\n  from Subscriber ")
                               + std::string(it->first);
             }
 
-          if (infostring == "")
+          if(infostring == "")
             infostring = "<none>";
 
-          AssertNothrow (counter == 0,
-                         ExcInUse (counter.load(), object_info->name(), infostring));
+          AssertNothrow(
+            counter == 0,
+            ExcInUse(counter.load(), object_info->name(), infostring));
         }
       else
         {
-          std::cerr << "---------------------------------------------------------"
-                    << std::endl
-                    << "An object pointed to by a SmartPointer is being destroyed."
-                    << std::endl
-                    << "Under normal circumstances, this would abort the program."
-                    << std::endl
-                    << "However, another exception is being processed at the"
-                    << std::endl
-                    << "moment, so the program will continue to run to allow"
-                    << std::endl
-                    << "this exception to be processed."
-                    << std::endl
-                    << "---------------------------------------------------------"
-                    << std::endl;
+          std::cerr
+            << "---------------------------------------------------------"
+            << std::endl
+            << "An object pointed to by a SmartPointer is being destroyed."
+            << std::endl
+            << "Under normal circumstances, this would abort the program."
+            << std::endl
+            << "However, another exception is being processed at the"
+            << std::endl
+            << "moment, so the program will continue to run to allow"
+            << std::endl
+            << "this exception to be processed." << std::endl
+            << "---------------------------------------------------------"
+            << std::endl;
         }
     }
 #endif
 }
 
-
-
-Subscriptor &Subscriptor::operator = (const Subscriptor &s)
+Subscriptor&
+Subscriptor::operator=(const Subscriptor& s)
 {
   check_no_subscribers();
   object_info = s.object_info;
   return *this;
 }
 
-
-
-Subscriptor &Subscriptor::operator = (Subscriptor &&s) noexcept
+Subscriptor&
+Subscriptor::operator=(Subscriptor&& s) noexcept
 {
   check_no_subscribers();
   s.check_no_subscribers();
@@ -143,45 +127,42 @@ Subscriptor &Subscriptor::operator = (Subscriptor &&s) noexcept
   return *this;
 }
 
-
-
 void
-Subscriptor::subscribe(const char *id) const
+Subscriptor::subscribe(const char* id) const
 {
 #ifdef DEBUG
-  if (object_info == nullptr)
+  if(object_info == nullptr)
     object_info = &typeid(*this);
   ++counter;
 
   // This feature is disabled when we compile with threads: see the
   // documentation of this class.
 #  ifndef DEAL_II_WITH_THREADS
-  const char *const name = (id != 0) ? id : unknown_subscriber;
+  const char* const name = (id != 0) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
-  if (it == counter_map.end())
+  if(it == counter_map.end())
     counter_map.insert(map_value_type(name, 1U));
 
   else
     it->second++;
 #  else
-  (void)id;
+  (void) id;
 #  endif
 #else
-  (void)id;
+  (void) id;
 #endif
 }
 
-
 void
-Subscriptor::unsubscribe(const char *id) const
+Subscriptor::unsubscribe(const char* id) const
 {
 #ifdef DEBUG
-  const char *name = (id != nullptr) ? id : unknown_subscriber;
-  AssertNothrow (counter>0, ExcNoSubscriber(object_info->name(), name));
+  const char* name = (id != nullptr) ? id : unknown_subscriber;
+  AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
   // not abort after the exception
-  if (counter == 0)
+  if(counter == 0)
     return;
 
   --counter;
@@ -190,32 +171,29 @@ Subscriptor::unsubscribe(const char *id) const
   // documentation of this class.
 #  ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
-  AssertNothrow (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
-  AssertNothrow (it->second > 0, ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow(it != counter_map.end(),
+                ExcNoSubscriber(object_info->name(), name));
+  AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
 
   it->second--;
 #  endif
 #else
-  (void)id;
+  (void) id;
 #endif
 }
 
-
-
-unsigned int Subscriptor::n_subscriptions () const
+unsigned int
+Subscriptor::n_subscriptions() const
 {
   return counter;
 }
 
-
-
-void Subscriptor::list_subscribers () const
+void
+Subscriptor::list_subscribers() const
 {
 #ifndef DEAL_II_WITH_THREADS
-  for (map_iterator it = counter_map.begin();
-       it != counter_map.end(); ++it)
-    deallog << it->second << '/'
-            << counter << " subscriptions from \""
+  for(map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+    deallog << it->second << '/' << counter << " subscriptions from \""
             << it->first << '\"' << std::endl;
 #else
   deallog << "No subscriber listing with multithreading" << std::endl;

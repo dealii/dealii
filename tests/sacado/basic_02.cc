@@ -21,7 +21,6 @@
 // A related example that is shipped with Trilinos can be found at
 // https://github.com/trilinos/Trilinos/blob/master/packages/sacado/example/dfad_dfad_example.cpp
 
-
 #include "../tests.h"
 
 #include <Sacado.hpp>
@@ -29,32 +28,39 @@
 // The function to differentiate
 template <typename NumberType, typename NumberType2>
 NumberType
-f(const NumberType &x, const NumberType &y, const NumberType2 &z)
+f(const NumberType& x, const NumberType& y, const NumberType2& z)
 {
-  return z*(x*x*x + z*y*y + 0.5*x*y*y);
+  return z * (x * x * x + z * y * y + 0.5 * x * y * y);
 }
 
 // The analytic derivative of f(x,y,z) with respect to x and y
 void
-df(const double &x, const double &y, const double &z,
-   double &df_dx, double &df_dy)
+df(const double& x,
+   const double& y,
+   const double& z,
+   double&       df_dx,
+   double&       df_dy)
 {
-  df_dx = z*(3.0*x*x + 0.5*y*y);
-  df_dy = z*(2.0*z*y + x*y);
+  df_dx = z * (3.0 * x * x + 0.5 * y * y);
+  df_dy = z * (2.0 * z * y + x * y);
 }
 
 // The analytic second derivatives of f(x,y,z) with respect to x and y
 void
-d2f(const double &x, const double &y, const double &z,
-    double &d2f_dx_dx, double &d2f_dy_dy,
-    double &d2f_dy_dx)
+d2f(const double& x,
+    const double& y,
+    const double& z,
+    double&       d2f_dx_dx,
+    double&       d2f_dy_dy,
+    double&       d2f_dy_dx)
 {
-  d2f_dx_dx = z*(6.0*x);
-  d2f_dy_dx = z*y;
-  d2f_dy_dy = z*(2.0*z + x);
+  d2f_dx_dx = z * (6.0 * x);
+  d2f_dy_dx = z * y;
+  d2f_dy_dy = z * (2.0 * z + x);
 }
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -67,8 +73,8 @@ int main()
   const int num_deriv = 2;
 
   // FAD objects: Independent variables
-  Sacado::Fad::DFad< Sacado::Fad::DFad<double> > x_ad(num_deriv, 0, x);
-  Sacado::Fad::DFad< Sacado::Fad::DFad<double> > y_ad(num_deriv, 1, y);
+  Sacado::Fad::DFad<Sacado::Fad::DFad<double>> x_ad(num_deriv, 0, x);
+  Sacado::Fad::DFad<Sacado::Fad::DFad<double>> y_ad(num_deriv, 1, y);
   // FAD objects: Passive variables
   const Sacado::Fad::DFad<double> z_ad(z);
 
@@ -93,28 +99,27 @@ int main()
   d2f(x, y, z, d2f_dx_dx, d2f_dy_dy, d2f_dy_dx);
 
   // Compute function and derivative with AD
-  const Sacado::Fad::DFad< Sacado::Fad::DFad<double> > f_fad = ::f(x_ad, y_ad, z_ad);
+  const Sacado::Fad::DFad<Sacado::Fad::DFad<double>> f_fad
+    = ::f(x_ad, y_ad, z_ad);
 
   deallog << "f_fad: " << f_fad << std::endl;
 
   // Extract value and derivatives
-  const double f_ad = f_fad.val().val();          // f
-  const double df_dx_ad = f_fad.dx(0).val();      // df/dx
-  const double df_dy_ad = f_fad.dx(1).val();      // df/dy
-  const double d2f_dx_dx_ad = f_fad.dx(0).dx(0);  // d^2f/dx^2
-  const double d2f_dy_dx_ad = f_fad.dx(0).dx(1);  // d^2f/dy_dx
-  const double d2f_dx_dy_ad = f_fad.dx(1).dx(0);  // d^2f/dx_dy
-  const double d2f_dy_dy_ad = f_fad.dx(1).dx(1);  // d^2f/dy^2
+  const double f_ad         = f_fad.val().val(); // f
+  const double df_dx_ad     = f_fad.dx(0).val(); // df/dx
+  const double df_dy_ad     = f_fad.dx(1).val(); // df/dy
+  const double d2f_dx_dx_ad = f_fad.dx(0).dx(0); // d^2f/dx^2
+  const double d2f_dy_dx_ad = f_fad.dx(0).dx(1); // d^2f/dy_dx
+  const double d2f_dx_dy_ad = f_fad.dx(1).dx(0); // d^2f/dx_dy
+  const double d2f_dy_dy_ad = f_fad.dx(1).dx(1); // d^2f/dy^2
 
   const double tol = 1.0e-14;
-  Assert(std::fabs(f - f_ad) < tol,
-         ExcMessage("Computation incorrect: Value"));
-  Assert(std::fabs(df_dx - df_dx_ad) < tol &&
-         std::fabs(df_dy - df_dy_ad) < tol,
+  Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
+  Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
          ExcMessage("Computation incorrect: First derivative"));
-  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol &&
-         std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
-         std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
+  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol
+           && std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol
+           && std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
          ExcMessage("Computation incorrect: Second derivative"));
 
   deallog << "OK" << std::endl;

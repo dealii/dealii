@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check the creation and destruction of particle within the particle handler class.
 
 #include "../tests.h"
@@ -27,57 +25,60 @@
 #include <deal.II/fe/mapping_q.h>
 
 template <int dim, int spacedim>
-void test ()
+void
+test()
 {
   {
-    parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
+    parallel::distributed::Triangulation<dim, spacedim> tr(MPI_COMM_WORLD);
 
     GridGenerator::hyper_cube(tr);
     tr.refine_global(2);
 
-    MappingQ<dim,spacedim> mapping(1);
+    MappingQ<dim, spacedim> mapping(1);
 
-    Particles::ParticleHandler<dim,spacedim> particle_handler(tr,mapping);
+    Particles::ParticleHandler<dim, spacedim> particle_handler(tr, mapping);
 
-    std::vector<Point<spacedim> > points(10);
-    for (unsigned int i=0; i<10; ++i)
+    std::vector<Point<spacedim>> points(10);
+    for(unsigned int i = 0; i < 10; ++i)
       {
-        const double coordinate = static_cast<double> (i)/10.0;
-        for (unsigned int j=0; j<spacedim; ++j)
+        const double coordinate = static_cast<double>(i) / 10.0;
+        for(unsigned int j = 0; j < spacedim; ++j)
           points[i][j] = 0.05 + coordinate;
       }
 
     particle_handler.insert_particles(points);
     particle_handler.update_cached_numbers();
 
-    deallog << "Particle number: " << particle_handler.n_global_particles() << std::endl;
+    deallog << "Particle number: " << particle_handler.n_global_particles()
+            << std::endl;
 
-    for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
-      deallog << "Particle id " << particle->get_id()
-              << " is in cell " << particle->get_surrounding_cell(tr) << std::endl
+    for(auto particle = particle_handler.begin();
+        particle != particle_handler.end();
+        ++particle)
+      deallog << "Particle id " << particle->get_id() << " is in cell "
+              << particle->get_surrounding_cell(tr) << std::endl
               << "     at location " << particle->get_location() << std::endl
-              << "     at reference location " << particle->get_reference_location()
-              << std::endl;
+              << "     at reference location "
+              << particle->get_reference_location() << std::endl;
   }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
 
   deallog.push("2d/2d");
-  test<2,2>();
+  test<2, 2>();
   deallog.pop();
   deallog.push("2d/3d");
-  test<2,3>();
+  test<2, 3>();
   deallog.pop();
   deallog.push("3d/3d");
-  test<3,3>();
+  test<3, 3>();
   deallog.pop();
 }

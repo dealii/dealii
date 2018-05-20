@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // The test is used to check the restriction_is_additive flags. The
 // face degrees of freedom of an RT_Bubbles element must be non-additive
 // as they have continuity requrements. The interior DoFs however must
@@ -24,26 +23,22 @@
 
 #include <string>
 
+std::ofstream logfile("output");
 
-std::ofstream logfile ("output");
-
-template<int dim>
+template <int dim>
 void
-test (const unsigned int degree)
+test(const unsigned int degree)
 {
   FE_RT_Bubbles<dim> fe_rt_bubbles(degree);
 
   deallog << "Degree=" << degree
-          << ", restriction is additive flags:"
-          << std::endl;
+          << ", restriction is additive flags:" << std::endl;
 
-  for (unsigned int i=0; i<fe_rt_bubbles.dofs_per_cell; ++i)
+  for(unsigned int i = 0; i < fe_rt_bubbles.dofs_per_cell; ++i)
     deallog << fe_rt_bubbles.restriction_is_additive(i) << " ";
 
   deallog << std::endl;
 }
-
-
 
 int
 main()
@@ -51,11 +46,11 @@ main()
   initlog();
 
   deallog << "Dimension 2: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for(unsigned int i = 1; i < 4; ++i)
     test<2>(i);
 
   deallog << "Dimension 3: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for(unsigned int i = 1; i < 4; ++i)
     test<3>(i);
 
   return 0;

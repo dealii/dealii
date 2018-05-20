@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/fe/fe_tools_interpolate.templates.h>
 
 DEAL_II_NAMESPACE_OPEN

@@ -13,40 +13,36 @@
 //
 // ---------------------------------------------------------------------
 
-
 // verify that we can do things like cell->face() in 1d as well. here:
 // check that we can default construct such an iterator and then
 // assign to it using operator= (default construction did not work originally)
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
-
-
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int spacedim>
-void test ()
+void
+test()
 {
-  Triangulation<1,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  Triangulation<1, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
 
-  typename Triangulation<1,spacedim>::face_iterator face;
+  typename Triangulation<1, spacedim>::face_iterator face;
   face = tria.begin_active()->face(0);
 
   deallog << face << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
+  test<1>();
+  test<2>();
 
   return 0;
 }

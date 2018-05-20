@@ -13,58 +13,58 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // a further extract of the _02 test. the results here are correct and
 // show the relationship between the various cells of the mesh
 
 #include "../tests.h"
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   const unsigned int spacedim = 3;
-  const unsigned int dim = spacedim-1;
+  const unsigned int dim      = spacedim - 1;
 
-  Triangulation<dim,spacedim> boundary_mesh;
+  Triangulation<dim, spacedim> boundary_mesh;
 
   /*****************************************************************/
   // Create Surface Mesh:  Boundary of hypercube without one face
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_cube(volume_mesh);
-    Triangulation<spacedim>::active_cell_iterator
-    cell = volume_mesh.begin_active();
+    Triangulation<spacedim>::active_cell_iterator cell
+      = volume_mesh.begin_active();
 
-    cell->face(0)->set_all_boundary_ids (1);
+    cell->face(0)->set_all_boundary_ids(1);
     std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(0);
-    GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh, boundary_ids);
+    GridGenerator::extract_boundary_mesh(
+      volume_mesh, boundary_mesh, boundary_ids);
   }
 
-  Triangulation<dim,spacedim>::active_cell_iterator
-  cell = boundary_mesh.begin_active();
-  for (; cell!=boundary_mesh.end(); ++cell)
+  Triangulation<dim, spacedim>::active_cell_iterator cell
+    = boundary_mesh.begin_active();
+  for(; cell != boundary_mesh.end(); ++cell)
     {
       deallog << "Cell = " << cell << std::endl;
       deallog << "  direction_flag = " << cell->direction_flag() << std::endl;
 
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      for(unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+          ++face)
         {
           deallog << "  face = " << face
                   << "  (neighbor = " << cell->neighbor(face) << ")"
                   << std::endl;
 
-          if (cell->face(face)->has_children())
-            for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
+          if(cell->face(face)->has_children())
+            for(unsigned int c = 0; c < cell->face(face)->n_children(); ++c)
               {
                 deallog << "    subface = " << c << std::endl;
               }

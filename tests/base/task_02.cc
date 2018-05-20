@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // like task_01, but with return value
 
 #include "../tests.h"
@@ -21,22 +20,20 @@
 
 #include <deal.II/base/thread_management.h>
 
-
-int test ()
+int
+test()
 {
-  sleep (3);
+  sleep(3);
   return 42;
 }
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  Threads::Task<int> t = Threads::new_task (test);
-  AssertThrow (t.return_value() == 42, ExcInternalError());
+  Threads::Task<int> t = Threads::new_task(test);
+  AssertThrow(t.return_value() == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

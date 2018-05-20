@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // TrilinosWrappers::internal::VectorReference had its non-const copy
 // operator return a const reference. That was non-intuitive but,
 // because of the particular semantics of copying vector reference
@@ -25,8 +23,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <iostream>
 
-
-void test ()
+void
+test()
 {
   TrilinosWrappers::MPI::Vector v;
   v.reinit(complete_index_set(3), MPI_COMM_WORLD);
@@ -34,9 +32,9 @@ void test ()
   v(1) = 1;
   v(2) = 2;
 
-  TrilinosWrappers::internal::VectorReference a (v(0));
-  TrilinosWrappers::internal::VectorReference b (v(1));
-  TrilinosWrappers::internal::VectorReference c (v(2));
+  TrilinosWrappers::internal::VectorReference a(v(0));
+  TrilinosWrappers::internal::VectorReference b(v(1));
+  TrilinosWrappers::internal::VectorReference c(v(2));
 
   // Copy the VectorReference objects. Note that operator= for these
   // objects does not copy the *content* of the reference object, but
@@ -47,19 +45,23 @@ void test ()
   // 2. We next assign c to point to where b points (c points to entry 1)
   // 3. Lastly, we assign b to point to where a points (b points to entry 0)
   (c = a) = b;
-  b = a;
+  b       = a;
 
-  deallog << static_cast<TrilinosScalar>(a) << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(b) << std::endl; // should point to v(0)
-  deallog << static_cast<TrilinosScalar>(c) << std::endl; // should point to v(1)
+  deallog << static_cast<TrilinosScalar>(a)
+          << std::endl; // should point to v(0)
+  deallog << static_cast<TrilinosScalar>(b)
+          << std::endl; // should point to v(0)
+  deallog << static_cast<TrilinosScalar>(c)
+          << std::endl; // should point to v(1)
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-  initlog();;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
+  initlog();
+  ;
 
-  test ();
+  test();
 }

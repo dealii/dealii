@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_tools_common.h"
 #include <deal.II/lac/sparsity_pattern.h>
@@ -21,42 +20,38 @@
 // check
 //   FETools::interpolate(5)
 
-
-
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim>& fe1, const FiniteElement<dim>& fe2)
 {
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really
   // work
-  if ((fe1.get_unit_support_points().size() == 0) ||
-      (fe2.get_unit_support_points().size() == 0))
+  if((fe1.get_unit_support_points().size() == 0)
+     || (fe2.get_unit_support_points().size() == 0))
     return;
   //  likewise for non-primitive elements
-  if (!fe1.is_primitive() || !fe2.is_primitive())
+  if(!fe1.is_primitive() || !fe2.is_primitive())
     return;
   // we need to have dof_constraints
   // for this test
-  if (!fe2.constraints_are_implemented())
+  if(!fe2.constraints_are_implemented())
     return;
 
-  std::unique_ptr<Triangulation<dim> > tria(make_tria<dim>());
-  std::unique_ptr<DoFHandler<dim> >    dof1(make_dof_handler (*tria, fe1));
-  std::unique_ptr<DoFHandler<dim> >    dof2(make_dof_handler (*tria, fe2));
-  ConstraintMatrix cm;
-  DoFTools::make_hanging_node_constraints (*dof2, cm);
-  cm.close ();
+  std::unique_ptr<Triangulation<dim>> tria(make_tria<dim>());
+  std::unique_ptr<DoFHandler<dim>>    dof1(make_dof_handler(*tria, fe1));
+  std::unique_ptr<DoFHandler<dim>>    dof2(make_dof_handler(*tria, fe2));
+  ConstraintMatrix                    cm;
+  DoFTools::make_hanging_node_constraints(*dof2, cm);
+  cm.close();
 
-  Vector<double> in (dof1->n_dofs());
-  for (unsigned int i=0; i<in.size(); ++i) in(i) = i;
-  Vector<double> out (dof2->n_dofs());
+  Vector<double> in(dof1->n_dofs());
+  for(unsigned int i = 0; i < in.size(); ++i)
+    in(i) = i;
+  Vector<double> out(dof2->n_dofs());
 
-  FETools::interpolate (*dof1, in, *dof2, cm, out);
+  FETools::interpolate(*dof1, in, *dof2, cm, out);
   deallog << std::setprecision(9);
-  output_vector (out);
+  output_vector(out);
 }
-

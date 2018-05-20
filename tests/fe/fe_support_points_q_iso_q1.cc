@@ -13,21 +13,18 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_support_points_common.h"
-
-
 
 int
 main()
 {
   initlog();
 
-  CHECK_ALL(Q_iso_Q1,1,2);
-  CHECK_ALL(Q_iso_Q1,2,2);
-  CHECK_ALL(Q_iso_Q1,3,2);
+  CHECK_ALL(Q_iso_Q1, 1, 2);
+  CHECK_ALL(Q_iso_Q1, 2, 2);
+  CHECK_ALL(Q_iso_Q1, 3, 2);
 
-  CHECK_ALL(Q_iso_Q1,1,3);
-  CHECK_ALL(Q_iso_Q1,2,3);
+  CHECK_ALL(Q_iso_Q1, 1, 3);
+  CHECK_ALL(Q_iso_Q1, 2, 3);
 }

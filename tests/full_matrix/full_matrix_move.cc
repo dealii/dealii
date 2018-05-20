@@ -13,38 +13,33 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Check that FullMatrix objects can be move constructed and assigned
 
 #include "../tests.h"
 
 #include <deal.II/lac/full_matrix.h>
 
-int main()
+int
+main()
 {
   initlog();
 
-  size_t m = 2, n = 3;
+  size_t             m = 2, n = 3;
   FullMatrix<double> A(m, n);
-  for (size_t i = 0; i < m; ++i)
-    for (size_t j = 0; j < n; ++j)
+  for(size_t i = 0; i < m; ++i)
+    for(size_t j = 0; j < n; ++j)
       A(i, j) = n * i + j;
 
-  deallog << "Size of A:" << std::endl
-          << A.m() << " " << A.n() << std::endl;
+  deallog << "Size of A:" << std::endl << A.m() << " " << A.n() << std::endl;
 
   FullMatrix<double> B = std::move(A);
 
-  deallog << "Size of B:" << std::endl
-          << B.m() << " " << B.n() << std::endl;
-  deallog << "Size of A:" << std::endl
-          << A.m() << " " << A.n() << std::endl;
+  deallog << "Size of B:" << std::endl << B.m() << " " << B.n() << std::endl;
+  deallog << "Size of A:" << std::endl << A.m() << " " << A.n() << std::endl;
 
   A = std::move(B);
-  deallog << "Size of B:" << std::endl
-          << B.m() << " " << B.n() << std::endl;
-  deallog << "Size of A:" << std::endl
-          << A.m() << " " << A.n() << std::endl;
+  deallog << "Size of B:" << std::endl << B.m() << " " << B.n() << std::endl;
+  deallog << "Size of A:" << std::endl << A.m() << " " << A.n() << std::endl;
 
   return 0;
 }

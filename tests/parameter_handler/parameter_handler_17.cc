@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // One can (accidentally) call ParameterHandler::get_int/double on parameters
 // that are really strings. There used to be a bug in these functions in that
 // they didn't throw an error when the string wasn't actually convertible to a
@@ -23,46 +21,45 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check()
 {
   ParameterHandler prm;
-  prm.declare_entry ("a", "this that and the other", Patterns::Anything(),
-                     "");
+  prm.declare_entry("a", "this that and the other", Patterns::Anything(), "");
   try
     {
-      prm.get_double ("a");
+      prm.get_double("a");
     }
-  catch (...)
+  catch(...)
     {
       deallog << "get_double() detected the mistake" << std::endl;
     }
 
   try
     {
-      prm.get_integer ("a");
+      prm.get_integer("a");
     }
-  catch (...)
+  catch(...)
     {
       deallog << "get_integer() detected the mistake" << std::endl;
     }
 
   try
     {
-      prm.get_bool ("a");
+      prm.get_bool("a");
     }
-  catch (...)
+  catch(...)
     {
       deallog << "get_bool() detected the mistake" << std::endl;
     }
-
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 
   return 0;
 }

@@ -12,20 +12,18 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <map>
 #include <vector>
 
-
-void test()
+void
+test()
 {
   const MPI_Comm mpi_comm = MPI_COMM_WORLD;
 
@@ -33,51 +31,55 @@ void test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
   unsigned int rank = Utilities::MPI::this_mpi_process(mpi_comm);
-  if (rank==0)
+  if(rank == 0)
     {
-      typename Triangulation<2>::active_cell_iterator cell = tria.begin_active(),
-                                                      end_cell = tria.end();
-      for (; cell!=end_cell; ++cell)
-        if (cell->is_locally_owned())
+      typename Triangulation<2>::active_cell_iterator cell
+        = tria.begin_active(),
+        end_cell = tria.end();
+      for(; cell != end_cell; ++cell)
+        if(cell->is_locally_owned())
           cell->set_refine_flag();
     }
 
   tria.execute_coarsening_and_refinement();
 
+  std::map<unsigned int, types::global_vertex_index> local_to_global_id
+    = GridTools::compute_local_to_global_vertex_index_map(tria);
 
-  std::map<unsigned int, types::global_vertex_index> local_to_global_id =
-    GridTools::compute_local_to_global_vertex_index_map(tria);
-
-  std::vector<types::global_vertex_index> vertex_global_index;
+  std::vector<types::global_vertex_index>         vertex_global_index;
   typename Triangulation<2>::active_cell_iterator cell = tria.begin_active(),
                                                   endc = tria.end();
-  for (; cell!=endc; ++cell)
+  for(; cell != endc; ++cell)
     {
-      if (cell->is_locally_owned())
+      if(cell->is_locally_owned())
         {
-          for (unsigned int i=0; i<GeometryInfo<2>::lines_per_cell; ++i)
+          for(unsigned int i = 0; i < GeometryInfo<2>::lines_per_cell; ++i)
             {
-              vertex_global_index.push_back(local_to_global_id[cell->line(i)->vertex_index(0)]);
-              vertex_global_index.push_back(local_to_global_id[cell->line(i)->vertex_index(1)]);
-              if (cell->line(i)->has_children())
-                vertex_global_index.push_back(local_to_global_id[cell->line(i)->child(0)->vertex_index(1)]);
+              vertex_global_index.push_back(
+                local_to_global_id[cell->line(i)->vertex_index(0)]);
+              vertex_global_index.push_back(
+                local_to_global_id[cell->line(i)->vertex_index(1)]);
+              if(cell->line(i)->has_children())
+                vertex_global_index.push_back(
+                  local_to_global_id[cell->line(i)->child(0)->vertex_index(1)]);
             }
         }
     }
-  std::sort(vertex_global_index.begin(),vertex_global_index.end());
+  std::sort(vertex_global_index.begin(), vertex_global_index.end());
   std::vector<types::global_vertex_index>::iterator it;
-  it = std::unique(vertex_global_index.begin(),vertex_global_index.end());
-  vertex_global_index.resize(it-vertex_global_index.begin());
+  it = std::unique(vertex_global_index.begin(), vertex_global_index.end());
+  vertex_global_index.resize(it - vertex_global_index.begin());
 
-  if (rank==0)
+  if(rank == 0)
     {
       std::vector<types::global_vertex_index> reference;
-      for (unsigned int i=0; i<31; ++i)
+      for(unsigned int i = 0; i < 31; ++i)
         reference.push_back(i);
-      for (unsigned int i=0; i<vertex_global_index.size(); ++i)
-        AssertThrow(reference[i]==vertex_global_index[i],ExcMessage("Wrong global index"));
+      for(unsigned int i = 0; i < vertex_global_index.size(); ++i)
+        AssertThrow(reference[i] == vertex_global_index[i],
+                    ExcMessage("Wrong global index"));
     }
-  if (rank==1)
+  if(rank == 1)
     {
       std::vector<types::global_vertex_index> reference;
       reference.push_back(14);
@@ -87,18 +89,19 @@ void test()
       reference.push_back(22);
       reference.push_back(23);
       reference.push_back(24);
-      for (unsigned int i=27; i<55; ++i)
+      for(unsigned int i = 27; i < 55; ++i)
         reference.push_back(i);
-      for (unsigned int i=0; i<vertex_global_index.size(); ++i)
-        AssertThrow(reference[i]==vertex_global_index[i],ExcMessage("Wrong global index"));
+      for(unsigned int i = 0; i < vertex_global_index.size(); ++i)
+        AssertThrow(reference[i] == vertex_global_index[i],
+                    ExcMessage("Wrong global index"));
     }
 }
 
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test();
 

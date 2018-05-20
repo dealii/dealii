@@ -13,25 +13,26 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 
   // create a pattern and match a string
-  const auto &pattern = Patterns::Tuple(";", Patterns::Integer(), Patterns::Double(), Patterns::Anything());
+  const auto& pattern = Patterns::Tuple(
+    ";", Patterns::Integer(), Patterns::Double(), Patterns::Anything());
   const std::string desc = pattern.description();
 
   deallog << desc << std::endl;
 
   std::string test = "5; 3.14; Ciao";
 
-  if (pattern.match(test))
+  if(pattern.match(test))
     deallog << "OK" << std::endl;
   else
     deallog << "Not OK" << std::endl;

@@ -14,20 +14,21 @@
 // ---------------------------------------------------------------------
 
 #ifndef dealii_sparse_matrix_ez_h
-#define dealii_sparse_matrix_ez_h
+#  define dealii_sparse_matrix_ez_h
 
+#  include <deal.II/base/config.h>
+#  include <deal.II/base/smartpointer.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/exceptions.h>
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/lac/exceptions.h>
-
-#include <vector>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class Vector;
-template <typename number> class FullMatrix;
+template <typename number>
+class Vector;
+template <typename number>
+class FullMatrix;
 
 /**
  * @addtogroup Matrix1
@@ -119,8 +120,7 @@ public:
     /**
      * Constructor. Fills column and value.
      */
-    Entry (const size_type column,
-           const number &value);
+    Entry(const size_type column, const number& value);
 
     /**
      * The column number.
@@ -147,7 +147,7 @@ public:
     /**
      * Constructor.
      */
-    RowInfo (const size_type start = Entry::invalid);
+    RowInfo(const size_type start = Entry::invalid);
 
     /**
      * Index of first entry of the row in the data field.
@@ -164,12 +164,11 @@ public:
     /**
      * Value for non-existing diagonal.
      */
-    static const unsigned short
-    invalid_diagonal = static_cast<unsigned short>(-1);
+    static const unsigned short invalid_diagonal
+      = static_cast<unsigned short>(-1);
   };
 
 public:
-
   /**
    * Standard-conforming iterator.
    */
@@ -186,35 +185,39 @@ public:
        * Constructor. Since we use accessors only for read access, a const
        * matrix pointer is sufficient.
        */
-      Accessor (const SparseMatrixEZ<number> *matrix,
-                const size_type               row,
-                const unsigned short          index);
+      Accessor(const SparseMatrixEZ<number>* matrix,
+               const size_type               row,
+               const unsigned short          index);
 
       /**
        * Row number of the element represented by this object.
        */
-      size_type row() const;
+      size_type
+      row() const;
 
       /**
        * Index in row of the element represented by this object.
        */
-      unsigned short index() const;
+      unsigned short
+      index() const;
 
       /**
        * Column number of the element represented by this object.
        */
-      size_type column() const;
+      size_type
+      column() const;
 
       /**
        * Value of this matrix entry.
        */
-      number value() const;
+      number
+      value() const;
 
     protected:
       /**
        * The matrix accessed.
        */
-      const SparseMatrixEZ<number> *matrix;
+      const SparseMatrixEZ<number>* matrix;
 
       /**
        * Current row number.
@@ -236,39 +239,43 @@ public:
     /**
      * Constructor.
      */
-    const_iterator(const SparseMatrixEZ<number> *matrix,
+    const_iterator(const SparseMatrixEZ<number>* matrix,
                    const size_type               row,
                    const unsigned short          index);
 
     /**
      * Prefix increment. This always returns a valid entry or <tt>end()</tt>.
      */
-    const_iterator &operator++ ();
+    const_iterator&
+    operator++();
 
     /**
      * Dereferencing operator.
      */
-    const Accessor &operator* () const;
+    const Accessor& operator*() const;
 
     /**
      * Dereferencing operator.
      */
-    const Accessor *operator-> () const;
+    const Accessor* operator->() const;
 
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
-    bool operator == (const const_iterator &) const;
+    bool
+    operator==(const const_iterator&) const;
     /**
      * Inverse of <tt>==</tt>.
      */
-    bool operator != (const const_iterator &) const;
+    bool
+    operator!=(const const_iterator&) const;
 
     /**
      * Comparison operator. Result is true if either the first row number is
      * smaller or if the row numbers are equal and the first index is smaller.
      */
-    bool operator < (const const_iterator &) const;
+    bool
+    operator<(const const_iterator&) const;
 
   private:
     /**
@@ -294,11 +301,11 @@ public:
   /**
    * @name Constructors and initialization
    */
-//@{
+  //@{
   /**
    * Constructor. Initializes an empty matrix of dimension zero times zero.
    */
-  SparseMatrixEZ ();
+  SparseMatrixEZ();
 
   /**
    * Dummy copy constructor. This is here for use in containers. It may only
@@ -307,7 +314,7 @@ public:
    * If you really want to copy a whole matrix, you can do so by using the @p
    * copy_from function.
    */
-  SparseMatrixEZ (const SparseMatrixEZ &);
+  SparseMatrixEZ(const SparseMatrixEZ&);
 
   /**
    * Constructor. Generates a matrix of the given size, ready to be filled.
@@ -315,20 +322,21 @@ public:
    * allow for preallocating memory. Providing these properly is essential for
    * an efficient assembling of the matrix.
    */
-  explicit SparseMatrixEZ (const size_type n_rows,
-                           const size_type n_columns,
-                           const size_type default_row_length = 0,
-                           const unsigned int default_increment = 1);
+  explicit SparseMatrixEZ(const size_type    n_rows,
+                          const size_type    n_columns,
+                          const size_type    default_row_length = 0,
+                          const unsigned int default_increment  = 1);
 
   /**
    * Destructor. Free all memory.
    */
-  ~SparseMatrixEZ () override = default;
+  ~SparseMatrixEZ() override = default;
 
   /**
    * Pseudo operator only copying empty objects.
    */
-  SparseMatrixEZ<number> &operator = (const SparseMatrixEZ<number> &);
+  SparseMatrixEZ<number>&
+  operator=(const SparseMatrixEZ<number>&);
 
   /**
    * This operator assigns a scalar to a matrix. Since this does usually not
@@ -338,7 +346,8 @@ public:
    * allow for the obvious notation <tt>matrix=0</tt>, which sets all elements
    * of the matrix to zero, but keep the sparsity pattern previously used.
    */
-  SparseMatrixEZ<number> &operator = (const double d);
+  SparseMatrixEZ<number>&
+  operator=(const double d);
 
   /**
    * Reinitialize the sparse matrix to the dimensions provided. The matrix
@@ -347,55 +356,63 @@ public:
    * preallocating memory. Providing these properly is essential for an
    * efficient assembling of the matrix.
    */
-  void reinit (const size_type n_rows,
-               const size_type n_columns,
-               size_type default_row_length = 0,
-               unsigned int default_increment = 1,
-               size_type reserve = 0);
+  void
+  reinit(const size_type n_rows,
+         const size_type n_columns,
+         size_type       default_row_length = 0,
+         unsigned int    default_increment  = 1,
+         size_type       reserve            = 0);
 
   /**
    * Release all memory and return to a state just like after having called
    * the default constructor. It also forgets its sparsity pattern.
    */
-  void clear ();
-//@}
+  void
+  clear();
+  //@}
   /**
    * @name Information on the matrix
    */
-//@{
+  //@{
   /**
    * Return whether the object is empty. It is empty if both dimensions are
    * zero.
    */
-  bool empty () const;
+  bool
+  empty() const;
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * Return the number of entries in a specific row.
    */
-  size_type get_row_length (const size_type row) const;
+  size_type
+  get_row_length(const size_type row) const;
 
   /**
    * Return the number of nonzero elements of this matrix.
    */
-  size_type n_nonzero_elements () const;
+  size_type
+  n_nonzero_elements() const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Print statistics. If @p full is @p true, prints a histogram of all
@@ -403,7 +420,8 @@ public:
    * relation of allocated and used entries is shown.
    */
   template <class StreamType>
-  void print_statistics (StreamType &s, bool full = false);
+  void
+  print_statistics(StreamType& s, bool full = false);
 
   /**
    * Compute numbers of entries.
@@ -414,16 +432,17 @@ public:
    * If the final argument is true, the number of entries in each line is
    * printed as well.
    */
-  void compute_statistics (size_type &used,
-                           size_type &allocated,
-                           size_type &reserved,
-                           std::vector<size_type> &used_by_line,
-                           const bool compute_by_line) const;
-//@}
+  void
+  compute_statistics(size_type&              used,
+                     size_type&              allocated,
+                     size_type&              reserved,
+                     std::vector<size_type>& used_by_line,
+                     const bool              compute_by_line) const;
+  //@}
   /**
    * @name Modifying entries
    */
-//@{
+  //@{
   /**
    * Set the element <tt>(i,j)</tt> to @p value.
    *
@@ -440,17 +459,19 @@ public:
    * @note You may need to insert some zero elements to keep a symmetric
    * sparsity pattern for the matrix.
    */
-  void set (const size_type i, const size_type j,
-            const number value, const bool elide_zero_values = true);
+  void
+  set(const size_type i,
+      const size_type j,
+      const number    value,
+      const bool      elide_zero_values = true);
 
   /**
    * Add @p value to the element <tt>(i,j)</tt>. Allocates the entry if it
    * does not exist. Filters out zeroes automatically. If <tt>value</tt> is
    * not a finite number an exception is thrown.
    */
-  void add (const size_type i,
-            const size_type j,
-            const number value);
+  void
+  add(const size_type i, const size_type j, const number value);
 
   /**
    * Add all elements given in a FullMatrix<double> into sparse matrix
@@ -467,9 +488,10 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number2>
-  void add (const std::vector<size_type> &indices,
-            const FullMatrix<number2>    &full_matrix,
-            const bool                    elide_zero_values = true);
+  void
+  add(const std::vector<size_type>& indices,
+      const FullMatrix<number2>&    full_matrix,
+      const bool                    elide_zero_values = true);
 
   /**
    * Same function as before, but now including the possibility to use
@@ -477,10 +499,11 @@ public:
    * and columns, respectively.
    */
   template <typename number2>
-  void add (const std::vector<size_type> &row_indices,
-            const std::vector<size_type> &col_indices,
-            const FullMatrix<number2>       &full_matrix,
-            const bool                       elide_zero_values = true);
+  void
+  add(const std::vector<size_type>& row_indices,
+      const std::vector<size_type>& col_indices,
+      const FullMatrix<number2>&    full_matrix,
+      const bool                    elide_zero_values = true);
 
   /**
    * Set several elements in the specified row of the matrix with column
@@ -492,10 +515,11 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number2>
-  void add (const size_type               row,
-            const std::vector<size_type> &col_indices,
-            const std::vector<number2>   &values,
-            const bool                    elide_zero_values = true);
+  void
+  add(const size_type               row,
+      const std::vector<size_type>& col_indices,
+      const std::vector<number2>&   values,
+      const bool                    elide_zero_values = true);
 
   /**
    * Add an array of values given by <tt>values</tt> in the given global
@@ -507,12 +531,13 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number2>
-  void add (const size_type  row,
-            const size_type  n_cols,
-            const size_type *col_indices,
-            const number2   *values,
-            const bool       elide_zero_values = true,
-            const bool       col_indices_are_sorted = false);
+  void
+  add(const size_type  row,
+      const size_type  n_cols,
+      const size_type* col_indices,
+      const number2*   values,
+      const bool       elide_zero_values      = true,
+      const bool       col_indices_are_sorted = false);
 
   /**
    * Copy the matrix given as argument into the current object.
@@ -536,9 +561,8 @@ public:
    * The function returns a reference to @p this.
    */
   template <typename MatrixType>
-  SparseMatrixEZ<number> &
-  copy_from (const MatrixType &source,
-             const bool elide_zero_values = true);
+  SparseMatrixEZ<number>&
+  copy_from(const MatrixType& source, const bool elide_zero_values = true);
 
   /**
    * Add @p matrix scaled by @p factor to this matrix.
@@ -548,13 +572,13 @@ public:
    * standard @p const_iterator.
    */
   template <typename MatrixType>
-  void add (const number      factor,
-            const MatrixType &matrix);
-//@}
+  void
+  add(const number factor, const MatrixType& matrix);
+  //@}
   /**
    * @name Entry Access
    */
-//@{
+  //@{
   /**
    * Return the value of the entry (i,j).  This may be an expensive operation
    * and you should always take care where to call this function.  In order to
@@ -564,27 +588,27 @@ public:
    * In case you want a function that returns zero instead (for entries that
    * are not in the sparsity pattern of the matrix), use the @p el function.
    */
-  number operator () (const size_type i,
-                      const size_type j) const;
+  number
+  operator()(const size_type i, const size_type j) const;
 
   /**
    * Return the value of the entry (i,j). Returns zero for all non-existing
    * entries.
    */
-  number el (const size_type i,
-             const size_type j) const;
-//@}
+  number
+  el(const size_type i, const size_type j) const;
+  //@}
   /**
    * @name Multiplications
    */
-//@{
+  //@{
   /**
    * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
    * matrix.
    */
   template <typename somenumber>
-  void vmult (Vector<somenumber>       &dst,
-              const Vector<somenumber> &src) const;
+  void
+  vmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
@@ -592,16 +616,16 @@ public:
    * matrix.
    */
   template <typename somenumber>
-  void Tvmult (Vector<somenumber>       &dst,
-               const Vector<somenumber> &src) const;
+  void
+  Tvmult(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
    * this matrix.
    */
   template <typename somenumber>
-  void vmult_add (Vector<somenumber>       &dst,
-                  const Vector<somenumber> &src) const;
+  void
+  vmult_add(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
 
   /**
    * Adding Matrix-vector multiplication. Add $M^T*src$ to $dst$ with $M$
@@ -609,58 +633,64 @@ public:
    * the transposed matrix.
    */
   template <typename somenumber>
-  void Tvmult_add (Vector<somenumber>       &dst,
-                   const Vector<somenumber> &src) const;
-//@}
+  void
+  Tvmult_add(Vector<somenumber>& dst, const Vector<somenumber>& src) const;
+  //@}
   /**
    * @name Matrix norms
    */
-//@{
+  //@{
   /**
    * Frobenius-norm of the matrix.
    */
-  number l2_norm () const;
-//@}
+  number
+  l2_norm() const;
+  //@}
   /**
    * @name Preconditioning methods
    */
-//@{
+  //@{
   /**
    * Apply the Jacobi preconditioner, which multiplies every element of the @p
    * src vector by the inverse of the respective diagonal element and
    * multiplies the result with the damping factor @p omega.
    */
   template <typename somenumber>
-  void precondition_Jacobi (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src,
-                            const number              omega = 1.) const;
+  void
+  precondition_Jacobi(Vector<somenumber>&       dst,
+                      const Vector<somenumber>& src,
+                      const number              omega = 1.) const;
 
   /**
    * Apply SSOR preconditioning to @p src.
    */
   template <typename somenumber>
-  void precondition_SSOR (Vector<somenumber>       &dst,
-                          const Vector<somenumber> &src,
-                          const number              om = 1.,
-                          const std::vector<std::size_t> &pos_right_of_diagonal = std::vector<std::size_t>()) const;
+  void
+  precondition_SSOR(Vector<somenumber>&             dst,
+                    const Vector<somenumber>&       src,
+                    const number                    om = 1.,
+                    const std::vector<std::size_t>& pos_right_of_diagonal
+                    = std::vector<std::size_t>()) const;
 
   /**
    * Apply SOR preconditioning matrix to @p src. The result of this method is
    * $dst = (om D - L)^{-1} src$.
    */
   template <typename somenumber>
-  void precondition_SOR (Vector<somenumber>       &dst,
-                         const Vector<somenumber> &src,
-                         const number              om = 1.) const;
+  void
+  precondition_SOR(Vector<somenumber>&       dst,
+                   const Vector<somenumber>& src,
+                   const number              om = 1.) const;
 
   /**
    * Apply transpose SOR preconditioning matrix to @p src. The result of this
    * method is $dst = (om D - U)^{-1} src$.
    */
   template <typename somenumber>
-  void precondition_TSOR (Vector<somenumber>       &dst,
-                          const Vector<somenumber> &src,
-                          const number              om = 1.) const;
+  void
+  precondition_TSOR(Vector<somenumber>&       dst,
+                    const Vector<somenumber>& src,
+                    const number              om = 1.) const;
 
   /**
    * Add the matrix @p A conjugated by @p B, that is, $B A B^T$ to this
@@ -671,45 +701,51 @@ public:
    * to a specific entry.
    */
   template <typename MatrixTypeA, typename MatrixTypeB>
-  void conjugate_add (const MatrixTypeA &A,
-                      const MatrixTypeB &B,
-                      const bool         transpose = false);
-//@}
+  void
+  conjugate_add(const MatrixTypeA& A,
+                const MatrixTypeB& B,
+                const bool         transpose = false);
+  //@}
   /**
    * @name Iterators
    */
-//@{
+  //@{
   /**
    * Iterator starting at the first existing entry.
    */
-  const_iterator begin () const;
+  const_iterator
+  begin() const;
 
   /**
    * Final iterator.
    */
-  const_iterator end () const;
+  const_iterator
+  end() const;
 
   /**
    * Iterator starting at the first entry of row @p r. If this row is empty,
    * the result is <tt>end(r)</tt>, which does NOT point into row @p r.
    */
-  const_iterator begin (const size_type r) const;
+  const_iterator
+  begin(const size_type r) const;
 
   /**
    * Final iterator of row @p r. The result may be different from
    * <tt>end()</tt>!
    */
-  const_iterator end (const size_type r) const;
-//@}
+  const_iterator
+  end(const size_type r) const;
+  //@}
   /**
    * @name Input/Output
    */
-//@{
+  //@{
   /**
    * Print the matrix to the given stream, using the format <tt>(line,col)
    * value</tt>, i.e. one nonzero entry of the matrix per line.
    */
-  void print (std::ostream &out) const;
+  void
+  print(std::ostream& out) const;
 
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
@@ -731,19 +767,21 @@ public:
    * This function may produce @em large amounts of output if applied to a
    * large matrix!
    */
-  void print_formatted (std::ostream       &out,
-                        const unsigned int  precision   = 3,
-                        const bool          scientific  = true,
-                        const unsigned int  width       = 0,
-                        const char         *zero_string = " ",
-                        const double        denominator = 1.) const;
+  void
+  print_formatted(std::ostream&      out,
+                  const unsigned int precision   = 3,
+                  const bool         scientific  = true,
+                  const unsigned int width       = 0,
+                  const char*        zero_string = " ",
+                  const double       denominator = 1.) const;
 
   /**
    * Write the data of this object in binary mode to a file.
    *
    * Note that this binary format is platform dependent.
    */
-  void block_write (std::ostream &out) const;
+  void
+  block_write(std::ostream& out) const;
 
   /**
    * Read data that has previously been written by @p block_write.
@@ -755,8 +793,9 @@ public:
    * bluntest attempts to interpret some data as a vector stored bitwise to a
    * file, but not more.
    */
-  void block_read (std::istream &in);
-//@}
+  void
+  block_read(std::istream& in);
+  //@}
 
   /**
    * @addtogroup Exceptions
@@ -771,13 +810,15 @@ public:
   /**
    * Exception
    */
-  DeclException2 (ExcInvalidEntry,
-                  int, int,
-                  << "The entry with index (" << arg1 << ',' << arg2
-                  << ") does not exist.");
+  DeclException2(ExcInvalidEntry,
+                 int,
+                 int,
+                 << "The entry with index (" << arg1 << ',' << arg2
+                 << ") does not exist.");
 
   DeclException2(ExcEntryAllocationFailure,
-                 int, int,
+                 int,
+                 int,
                  << "An entry with index (" << arg1 << ',' << arg2
                  << ") cannot be allocated.");
   //@}
@@ -786,21 +827,21 @@ private:
    * Find an entry and return a const pointer. Return a zero-pointer if the
    * entry does not exist.
    */
-  const Entry *locate (const size_type row,
-                       const size_type col) const;
+  const Entry*
+  locate(const size_type row, const size_type col) const;
 
   /**
    * Find an entry and return a writable pointer. Return a zero-pointer if the
    * entry does not exist.
    */
-  Entry *locate (const size_type row,
-                 const size_type col);
+  Entry*
+  locate(const size_type row, const size_type col);
 
   /**
    * Find an entry or generate it.
    */
-  Entry *allocate (const size_type row,
-                   const size_type col);
+  Entry*
+  allocate(const size_type row, const size_type col);
 
   /**
    * Version of @p vmult which only performs its actions on the region defined
@@ -808,10 +849,11 @@ private:
    * the case of enabled multithreading.
    */
   template <typename somenumber>
-  void threaded_vmult (Vector<somenumber>       &dst,
-                       const Vector<somenumber> &src,
-                       const size_type           begin_row,
-                       const size_type           end_row) const;
+  void
+  threaded_vmult(Vector<somenumber>&       dst,
+                 const Vector<somenumber>& src,
+                 const size_type           begin_row,
+                 const size_type           end_row) const;
 
   /**
    * Version of @p matrix_norm_square which only performs its actions on the
@@ -819,10 +861,11 @@ private:
    * by @p matrix_norm_square in the case of enabled multithreading.
    */
   template <typename somenumber>
-  void threaded_matrix_norm_square (const Vector<somenumber> &v,
-                                    const size_type           begin_row,
-                                    const size_type           end_row,
-                                    somenumber               *partial_sum) const;
+  void
+  threaded_matrix_norm_square(const Vector<somenumber>& v,
+                              const size_type           begin_row,
+                              const size_type           end_row,
+                              somenumber*               partial_sum) const;
 
   /**
    * Version of @p matrix_scalar_product which only performs its actions on
@@ -830,11 +873,12 @@ private:
    * called by @p matrix_scalar_product in the case of enabled multithreading.
    */
   template <typename somenumber>
-  void threaded_matrix_scalar_product (const Vector<somenumber> &u,
-                                       const Vector<somenumber> &v,
-                                       const size_type           begin_row,
-                                       const size_type           end_row,
-                                       somenumber               *partial_sum) const;
+  void
+  threaded_matrix_scalar_product(const Vector<somenumber>& u,
+                                 const Vector<somenumber>& v,
+                                 const size_type           begin_row,
+                                 const size_type           end_row,
+                                 somenumber*               partial_sum) const;
 
   /**
    * Number of columns. This is used to check vector dimensions only.
@@ -868,97 +912,67 @@ private:
 /*---------------------- Inline functions -----------------------------------*/
 
 template <typename number>
-inline
-SparseMatrixEZ<number>::Entry::Entry(const size_type column,
-                                     const number &value)
-  :
-  column(column),
-  value(value)
+inline SparseMatrixEZ<number>::Entry::Entry(const size_type column,
+                                            const number&   value)
+  : column(column), value(value)
 {}
-
-
 
 template <typename number>
-inline
-SparseMatrixEZ<number>::Entry::Entry()
-  :
-  column(invalid),
-  value(0)
+inline SparseMatrixEZ<number>::Entry::Entry() : column(invalid), value(0)
 {}
-
 
 template <typename number>
-inline
-SparseMatrixEZ<number>::RowInfo::RowInfo(const size_type start)
-  :
-  start(start),
-  length(0),
-  diagonal(invalid_diagonal)
+inline SparseMatrixEZ<number>::RowInfo::RowInfo(const size_type start)
+  : start(start), length(0), diagonal(invalid_diagonal)
 {}
-
 
 //---------------------------------------------------------------------------
 template <typename number>
-inline
-SparseMatrixEZ<number>::const_iterator::Accessor::
-Accessor (const SparseMatrixEZ<number> *matrix,
-          const size_type               r,
-          const unsigned short          i)
-  :
-  matrix(matrix),
-  a_row(r),
-  a_index(i)
+inline SparseMatrixEZ<number>::const_iterator::Accessor::Accessor(
+  const SparseMatrixEZ<number>* matrix,
+  const size_type               r,
+  const unsigned short          i)
+  : matrix(matrix), a_row(r), a_index(i)
 {}
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::size_type
+inline typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::const_iterator::Accessor::row() const
 {
   return a_row;
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::size_type
+inline typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::const_iterator::Accessor::column() const
 {
-  return matrix->data[matrix->row_info[a_row].start+a_index].column;
+  return matrix->data[matrix->row_info[a_row].start + a_index].column;
 }
 
-
 template <typename number>
-inline
-unsigned short
+inline unsigned short
 SparseMatrixEZ<number>::const_iterator::Accessor::index() const
 {
   return a_index;
 }
 
-
-
 template <typename number>
-inline
-number
+inline number
 SparseMatrixEZ<number>::const_iterator::Accessor::value() const
 {
-  return matrix->data[matrix->row_info[a_row].start+a_index].value;
+  return matrix->data[matrix->row_info[a_row].start + a_index].value;
 }
 
-
 template <typename number>
-inline
-SparseMatrixEZ<number>::const_iterator::
-const_iterator(const SparseMatrixEZ<number> *matrix,
-               const size_type               r,
-               const unsigned short          i)
-  :
-  accessor(matrix, r, i)
+inline SparseMatrixEZ<number>::const_iterator::const_iterator(
+  const SparseMatrixEZ<number>* matrix,
+  const size_type               r,
+  const unsigned short          i)
+  : accessor(matrix, r, i)
 {
   // Finish if this is the end()
-  if (r==accessor.matrix->m() && i==0) return;
+  if(r == accessor.matrix->m() && i == 0)
+    return;
 
   // Make sure we never construct an
   // iterator pointing to a
@@ -967,7 +981,7 @@ const_iterator(const SparseMatrixEZ<number> *matrix,
   // If the index points beyond the
   // end of the row, try the next
   // row.
-  if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
+  if(accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       do
         {
@@ -977,25 +991,23 @@ const_iterator(const SparseMatrixEZ<number> *matrix,
       // empty, iterate until a
       // non-empty row is found or we
       // hit the end of the matrix.
-      while (accessor.a_row < accessor.matrix->m()
-             && accessor.matrix->row_info[accessor.a_row].length == 0);
+      while(accessor.a_row < accessor.matrix->m()
+            && accessor.matrix->row_info[accessor.a_row].length == 0);
     }
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::const_iterator &
-SparseMatrixEZ<number>::const_iterator::operator++ ()
+inline typename SparseMatrixEZ<number>::const_iterator&
+SparseMatrixEZ<number>::const_iterator::operator++()
 {
-  Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+  Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
 
   // Increment column index
   ++(accessor.a_index);
   // If index exceeds number of
   // entries in this row, proceed
   // with next row.
-  if (accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
+  if(accessor.a_index >= accessor.matrix->row_info[accessor.a_row].length)
     {
       accessor.a_index = 0;
       // Do this loop to avoid
@@ -1004,139 +1016,118 @@ SparseMatrixEZ<number>::const_iterator::operator++ ()
         {
           ++accessor.a_row;
         }
-      while (accessor.a_row < accessor.matrix->m()
-             && accessor.matrix->row_info[accessor.a_row].length == 0);
+      while(accessor.a_row < accessor.matrix->m()
+            && accessor.matrix->row_info[accessor.a_row].length == 0);
     }
   return *this;
 }
 
-
 template <typename number>
-inline
-const typename SparseMatrixEZ<number>::const_iterator::Accessor &
-SparseMatrixEZ<number>::const_iterator::operator* () const
+inline const typename SparseMatrixEZ<number>::const_iterator::Accessor&
+  SparseMatrixEZ<number>::const_iterator::operator*() const
 {
   return accessor;
 }
 
-
 template <typename number>
-inline
-const typename SparseMatrixEZ<number>::const_iterator::Accessor *
-SparseMatrixEZ<number>::const_iterator::operator-> () const
+inline const typename SparseMatrixEZ<number>::const_iterator::Accessor*
+  SparseMatrixEZ<number>::const_iterator::operator->() const
 {
   return &accessor;
 }
 
-
 template <typename number>
-inline
-bool
-SparseMatrixEZ<number>::const_iterator::operator == (
-  const const_iterator &other) const
-{
-  return (accessor.row() == other.accessor.row() &&
-          accessor.index() == other.accessor.index());
-}
-
-
-template <typename number>
-inline
-bool
+inline bool
 SparseMatrixEZ<number>::const_iterator::
-operator != (const const_iterator &other) const
+operator==(const const_iterator& other) const
 {
-  return ! (*this == other);
+  return (accessor.row() == other.accessor.row()
+          && accessor.index() == other.accessor.index());
 }
-
 
 template <typename number>
-inline
-bool
+inline bool
 SparseMatrixEZ<number>::const_iterator::
-operator < (const const_iterator &other) const
+operator!=(const const_iterator& other) const
 {
-  return (accessor.row() < other.accessor.row() ||
-          (accessor.row() == other.accessor.row() &&
-           accessor.index() < other.accessor.index()));
+  return !(*this == other);
 }
 
+template <typename number>
+inline bool
+SparseMatrixEZ<number>::const_iterator::
+operator<(const const_iterator& other) const
+{
+  return (accessor.row() < other.accessor.row()
+          || (accessor.row() == other.accessor.row()
+              && accessor.index() < other.accessor.index()));
+}
 
 //---------------------------------------------------------------------------
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::size_type SparseMatrixEZ<number>::m () const
+inline typename SparseMatrixEZ<number>::size_type
+SparseMatrixEZ<number>::m() const
 {
   return row_info.size();
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::size_type SparseMatrixEZ<number>::n () const
+inline typename SparseMatrixEZ<number>::size_type
+SparseMatrixEZ<number>::n() const
 {
   return n_columns;
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::locate (const size_type row,
-                                const size_type col)
+inline typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
 {
-  Assert (row<m(), ExcIndexRange(row,0,m()));
-  Assert (col<n(), ExcIndexRange(col,0,n()));
+  Assert(row < m(), ExcIndexRange(row, 0, m()));
+  Assert(col < n(), ExcIndexRange(col, 0, n()));
 
-  const RowInfo &r = row_info[row];
+  const RowInfo&  r   = row_info[row];
   const size_type end = r.start + r.length;
-  for (size_type i=r.start; i<end; ++i)
+  for(size_type i = r.start; i < end; ++i)
     {
-      Entry *const entry = &data[i];
-      if (entry->column == col)
+      Entry* const entry = &data[i];
+      if(entry->column == col)
         return entry;
-      if (entry->column == Entry::invalid)
+      if(entry->column == Entry::invalid)
         return nullptr;
     }
   return nullptr;
 }
 
-
-
 template <typename number>
-inline
-const typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::locate (const size_type row,
-                                const size_type col) const
+inline const typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::locate(const size_type row, const size_type col) const
 {
-  SparseMatrixEZ<number> *t = const_cast<SparseMatrixEZ<number>*> (this);
-  return t->locate(row,col);
+  SparseMatrixEZ<number>* t = const_cast<SparseMatrixEZ<number>*>(this);
+  return t->locate(row, col);
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::allocate (const size_type row,
-                                  const size_type col)
+inline typename SparseMatrixEZ<number>::Entry*
+SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
 {
-  Assert (row<m(), ExcIndexRange(row,0,m()));
-  Assert (col<n(), ExcIndexRange(col,0,n()));
+  Assert(row < m(), ExcIndexRange(row, 0, m()));
+  Assert(col < n(), ExcIndexRange(col, 0, n()));
 
-  RowInfo &r = row_info[row];
+  RowInfo&        r   = row_info[row];
   const size_type end = r.start + r.length;
 
   size_type i = r.start;
   // If diagonal exists and this
   // column is higher, start only
   // after diagonal.
-  if (r.diagonal != RowInfo::invalid_diagonal && col >= row)
+  if(r.diagonal != RowInfo::invalid_diagonal && col >= row)
     i += r.diagonal;
   // Find position of entry
-  while (i<end && data[i].column < col) ++i;
+  while(i < end && data[i].column < col)
+    ++i;
 
   // entry found
-  if (i != end && data[i].column == col)
+  if(i != end && data[i].column == col)
     return &data[i];
 
   // Now, we must insert the new
@@ -1146,25 +1137,25 @@ SparseMatrixEZ<number>::allocate (const size_type row,
   // If no more space is available
   // for this row, insert new
   // elements into the vector.
-//TODO:[GK] We should not extend this row if i<end
-  if (row != row_info.size()-1)
+  //TODO:[GK] We should not extend this row if i<end
+  if(row != row_info.size() - 1)
     {
-      if (end >= row_info[row+1].start)
+      if(end >= row_info[row + 1].start)
         {
           // Failure if increment 0
-          Assert(increment!=0,ExcEntryAllocationFailure(row,col));
+          Assert(increment != 0, ExcEntryAllocationFailure(row, col));
 
           // Insert new entries
-          data.insert(data.begin()+end, increment, Entry());
+          data.insert(data.begin() + end, increment, Entry());
           // Update starts of
           // following rows
-          for (size_type rn=row+1; rn<row_info.size(); ++rn)
+          for(size_type rn = row + 1; rn < row_info.size(); ++rn)
             row_info[rn].start += increment;
         }
     }
   else
     {
-      if (end >= data.size())
+      if(end >= data.size())
         {
           // Here, appending a block
           // does not increase
@@ -1173,7 +1164,7 @@ SparseMatrixEZ<number>::allocate (const size_type row,
         }
     }
 
-  Entry *entry = &data[i];
+  Entry* entry = &data[i];
   // Save original entry
   Entry temp = *entry;
   // Insert new entry here to
@@ -1181,232 +1172,209 @@ SparseMatrixEZ<number>::allocate (const size_type row,
   // are ordered by column
   // index
   entry->column = col;
-  entry->value = 0;
+  entry->value  = 0;
   // Update row_info
   ++r.length;
-  if (col == row)
+  if(col == row)
     r.diagonal = i - r.start;
-  else if (col<row && r.diagonal!= RowInfo::invalid_diagonal)
+  else if(col < row && r.diagonal != RowInfo::invalid_diagonal)
     ++r.diagonal;
 
-  if (i == end)
+  if(i == end)
     return entry;
 
   // Move all entries in this
   // row up by one
-  for (size_type j = i+1; j < end; ++j)
+  for(size_type j = i + 1; j < end; ++j)
     {
       // There should be no invalid
       // entry below end
-      Assert (data[j].column != Entry::invalid, ExcInternalError());
+      Assert(data[j].column != Entry::invalid, ExcInternalError());
 
-//TODO[GK]: This could be done more efficiently by moving starting at the top rather than swapping starting at the bottom
-      std::swap (data[j], temp);
+      //TODO[GK]: This could be done more efficiently by moving starting at the top rather than swapping starting at the bottom
+      std::swap(data[j], temp);
     }
-  Assert (data[end].column == Entry::invalid, ExcInternalError());
+  Assert(data[end].column == Entry::invalid, ExcInternalError());
 
   data[end] = temp;
 
   return entry;
 }
 
-
-
 template <typename number>
-inline
-void SparseMatrixEZ<number>::set (const size_type i,
-                                  const size_type j,
-                                  const number value,
-                                  const bool elide_zero_values)
+inline void
+SparseMatrixEZ<number>::set(const size_type i,
+                            const size_type j,
+                            const number    value,
+                            const bool      elide_zero_values)
 {
   AssertIsFinite(value);
 
-  Assert (i<m(), ExcIndexRange(i,0,m()));
-  Assert (j<n(), ExcIndexRange(j,0,n()));
+  Assert(i < m(), ExcIndexRange(i, 0, m()));
+  Assert(j < n(), ExcIndexRange(j, 0, n()));
 
-  if (elide_zero_values && value == 0.)
+  if(elide_zero_values && value == 0.)
     {
-      Entry *entry = locate(i,j);
-      if (entry != nullptr)
+      Entry* entry = locate(i, j);
+      if(entry != nullptr)
         entry->value = 0.;
     }
   else
     {
-      Entry *entry = allocate(i,j);
+      Entry* entry = allocate(i, j);
       entry->value = value;
     }
 }
 
-
-
 template <typename number>
-inline
-void SparseMatrixEZ<number>::add (const size_type i,
-                                  const size_type j,
-                                  const number value)
+inline void
+SparseMatrixEZ<number>::add(const size_type i,
+                            const size_type j,
+                            const number    value)
 {
-
   AssertIsFinite(value);
 
-  Assert (i<m(), ExcIndexRange(i,0,m()));
-  Assert (j<n(), ExcIndexRange(j,0,n()));
+  Assert(i < m(), ExcIndexRange(i, 0, m()));
+  Assert(j < n(), ExcIndexRange(j, 0, n()));
 
   // ignore zero additions
-  if (value == 0)
+  if(value == 0)
     return;
 
-  Entry *entry = allocate(i,j);
+  Entry* entry = allocate(i, j);
   entry->value += value;
 }
 
+template <typename number>
+template <typename number2>
+void
+SparseMatrixEZ<number>::add(const std::vector<size_type>& indices,
+                            const FullMatrix<number2>&    full_matrix,
+                            const bool                    elide_zero_values)
+{
+  //TODO: This function can surely be made more efficient
+  for(size_type i = 0; i < indices.size(); ++i)
+    for(size_type j = 0; j < indices.size(); ++j)
+      if((full_matrix(i, j) != 0) || (elide_zero_values == false))
+        add(indices[i], indices[j], full_matrix(i, j));
+}
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const std::vector<size_type> &indices,
-                                  const FullMatrix<number2>    &full_matrix,
-                                  const bool                    elide_zero_values)
+void
+SparseMatrixEZ<number>::add(const std::vector<size_type>& row_indices,
+                            const std::vector<size_type>& col_indices,
+                            const FullMatrix<number2>&    full_matrix,
+                            const bool                    elide_zero_values)
 {
-//TODO: This function can surely be made more efficient
-  for (size_type i=0; i<indices.size(); ++i)
-    for (size_type j=0; j<indices.size(); ++j)
-      if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
-        add (indices[i], indices[j], full_matrix(i,j));
+  //TODO: This function can surely be made more efficient
+  for(size_type i = 0; i < row_indices.size(); ++i)
+    for(size_type j = 0; j < col_indices.size(); ++j)
+      if((full_matrix(i, j) != 0) || (elide_zero_values == false))
+        add(row_indices[i], col_indices[j], full_matrix(i, j));
 }
-
-
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const std::vector<size_type> &row_indices,
-                                  const std::vector<size_type> &col_indices,
-                                  const FullMatrix<number2>    &full_matrix,
-                                  const bool                    elide_zero_values)
+void
+SparseMatrixEZ<number>::add(const size_type               row,
+                            const std::vector<size_type>& col_indices,
+                            const std::vector<number2>&   values,
+                            const bool                    elide_zero_values)
 {
-//TODO: This function can surely be made more efficient
-  for (size_type i=0; i<row_indices.size(); ++i)
-    for (size_type j=0; j<col_indices.size(); ++j)
-      if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
-        add (row_indices[i], col_indices[j], full_matrix(i,j));
+  //TODO: This function can surely be made more efficient
+  for(size_type j = 0; j < col_indices.size(); ++j)
+    if((values[j] != 0) || (elide_zero_values == false))
+      add(row, col_indices[j], values[j]);
 }
-
-
-
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const size_type               row,
-                                  const std::vector<size_type> &col_indices,
-                                  const std::vector<number2>   &values,
-                                  const bool                    elide_zero_values)
+void
+SparseMatrixEZ<number>::add(const size_type  row,
+                            const size_type  n_cols,
+                            const size_type* col_indices,
+                            const number2*   values,
+                            const bool       elide_zero_values,
+                            const bool /*col_indices_are_sorted*/)
 {
-//TODO: This function can surely be made more efficient
-  for (size_type j=0; j<col_indices.size(); ++j)
-    if ((values[j] != 0) || (elide_zero_values == false))
-      add (row, col_indices[j], values[j]);
+  //TODO: This function can surely be made more efficient
+  for(size_type j = 0; j < n_cols; ++j)
+    if((values[j] != 0) || (elide_zero_values == false))
+      add(row, col_indices[j], values[j]);
 }
 
-
-
 template <typename number>
-template <typename number2>
-void SparseMatrixEZ<number>::add (const size_type  row,
-                                  const size_type  n_cols,
-                                  const size_type *col_indices,
-                                  const number2   *values,
-                                  const bool       elide_zero_values,
-                                  const bool      /*col_indices_are_sorted*/)
+inline number
+SparseMatrixEZ<number>::el(const size_type i, const size_type j) const
 {
-//TODO: This function can surely be made more efficient
-  for (size_type j=0; j<n_cols; ++j)
-    if ((values[j] != 0) || (elide_zero_values == false))
-      add (row, col_indices[j], values[j]);
-}
-
-
-
-
-template <typename number>
-inline
-number SparseMatrixEZ<number>::el (const size_type i,
-                                   const size_type j) const
-{
-  const Entry *entry = locate(i,j);
-  if (entry)
+  const Entry* entry = locate(i, j);
+  if(entry)
     return entry->value;
   return 0.;
 }
 
-
-
 template <typename number>
-inline
-number SparseMatrixEZ<number>::operator() (const size_type i,
-                                           const size_type j) const
+inline number
+SparseMatrixEZ<number>::operator()(const size_type i, const size_type j) const
 {
-  const Entry *entry = locate(i,j);
-  if (entry)
+  const Entry* entry = locate(i, j);
+  if(entry)
     return entry->value;
-  Assert(false, ExcInvalidEntry(i,j));
+  Assert(false, ExcInvalidEntry(i, j));
   return 0.;
 }
 
-
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::begin () const
+inline typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::begin() const
 {
   const_iterator result(this, 0, 0);
   return result;
 }
 
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::end () const
+inline typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::end() const
 {
   return const_iterator(this, m(), 0);
 }
 
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::begin (const size_type r) const
+inline typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::begin(const size_type r) const
 {
-  Assert (r<m(), ExcIndexRange(r,0,m()));
-  const_iterator result (this, r, 0);
+  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  const_iterator result(this, r, 0);
   return result;
 }
 
 template <typename number>
-inline
-typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::end (const size_type r) const
+inline typename SparseMatrixEZ<number>::const_iterator
+SparseMatrixEZ<number>::end(const size_type r) const
 {
-  Assert (r<m(), ExcIndexRange(r,0,m()));
-  const_iterator result(this, r+1, 0);
+  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  const_iterator result(this, r + 1, 0);
   return result;
 }
 
 template <typename number>
 template <typename MatrixType>
-inline
-SparseMatrixEZ<number> &
-SparseMatrixEZ<number>::copy_from (const MatrixType &M, const bool elide_zero_values)
+inline SparseMatrixEZ<number>&
+SparseMatrixEZ<number>::copy_from(const MatrixType& M,
+                                  const bool        elide_zero_values)
 {
-  reinit(M.m(),
-         M.n(),
-         this->saved_default_row_length,
-         this->increment);
+  reinit(M.m(), M.n(), this->saved_default_row_length, this->increment);
 
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (size_type row = 0; row < M.m(); ++row)
+  for(size_type row = 0; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row; ++entry)
+      for(typename MatrixType::const_iterator entry = M.begin(row);
+          entry != end_row;
+          ++entry)
         set(row, entry->column(), entry->value(), elide_zero_values);
     }
 
@@ -1415,46 +1383,43 @@ SparseMatrixEZ<number>::copy_from (const MatrixType &M, const bool elide_zero_va
 
 template <typename number>
 template <typename MatrixType>
-inline
-void
-SparseMatrixEZ<number>::add (const number      factor,
-                             const MatrixType &M)
+inline void
+SparseMatrixEZ<number>::add(const number factor, const MatrixType& M)
 {
-  Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
-  Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
+  Assert(M.m() == m(), ExcDimensionMismatch(M.m(), m()));
+  Assert(M.n() == n(), ExcDimensionMismatch(M.n(), n()));
 
-  if (factor == 0.)
+  if(factor == 0.)
     return;
 
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // add them into the current object
-  for (size_type row = 0; row < M.m(); ++row)
+  for(size_type row = 0; row < M.m(); ++row)
     {
       const typename MatrixType::const_iterator end_row = M.end(row);
-      for (typename MatrixType::const_iterator entry = M.begin(row);
-           entry != end_row; ++entry)
-        if (entry->value() != 0)
+      for(typename MatrixType::const_iterator entry = M.begin(row);
+          entry != end_row;
+          ++entry)
+        if(entry->value() != 0)
           add(row, entry->column(), factor * entry->value());
     }
 }
 
-
-
 template <typename number>
 template <typename MatrixTypeA, typename MatrixTypeB>
 inline void
-SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
-                                       const MatrixTypeB &B,
-                                       const bool         transpose)
+SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA& A,
+                                      const MatrixTypeB& B,
+                                      const bool         transpose)
 {
-// Compute the result
-// r_ij = \sum_kl b_ik b_jl a_kl
+  // Compute the result
+  // r_ij = \sum_kl b_ik b_jl a_kl
 
-//    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
-//    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-//    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
-//    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
+  //    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+  //    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  //    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
+  //    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
 
   // Somehow, we have to avoid making
   // this an operation of complexity
@@ -1464,23 +1429,23 @@ SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
   // corresponding rows of B only.
   // For the non-transpose case, we
   // must find a trick.
-  typename MatrixTypeB::const_iterator b1 = B.begin();
+  typename MatrixTypeB::const_iterator       b1      = B.begin();
   const typename MatrixTypeB::const_iterator b_final = B.end();
-  if (transpose)
-    while (b1 != b_final)
+  if(transpose)
+    while(b1 != b_final)
       {
-        const size_type i = b1->column();
-        const size_type k = b1->row();
+        const size_type                      i  = b1->column();
+        const size_type                      k  = b1->row();
         typename MatrixTypeB::const_iterator b2 = B.begin();
-        while (b2 != b_final)
+        while(b2 != b_final)
           {
             const size_type j = b2->column();
             const size_type l = b2->row();
 
-            const typename MatrixTypeA::value_type a = A.el(k,l);
+            const typename MatrixTypeA::value_type a = A.el(k, l);
 
-            if (a != 0.)
-              add (i, j, a * b1->value() * b2->value());
+            if(a != 0.)
+              add(i, j, a * b1->value() * b2->value());
             ++b2;
           }
         ++b1;
@@ -1493,55 +1458,56 @@ SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
 
       std::vector<size_type> minrow(B.n(), B.m());
       std::vector<size_type> maxrow(B.n(), 0);
-      while (b1 != b_final)
+      while(b1 != b_final)
         {
           const size_type r = b1->row();
-          if (r < minrow[b1->column()])
+          if(r < minrow[b1->column()])
             minrow[b1->column()] = r;
-          if (r > maxrow[b1->column()])
+          if(r > maxrow[b1->column()])
             maxrow[b1->column()] = r;
           ++b1;
         }
 
-      typename MatrixTypeA::const_iterator ai = A.begin();
+      typename MatrixTypeA::const_iterator       ai = A.begin();
       const typename MatrixTypeA::const_iterator ae = A.end();
 
-      while (ai != ae)
+      while(ai != ae)
         {
           const typename MatrixTypeA::value_type a = ai->value();
           // Don't do anything if
           // this entry is zero.
-          if (a == 0.) continue;
+          if(a == 0.)
+            continue;
 
           // Now, loop over all rows
           // having possibly a
           // nonzero entry in column
           // ai->row()
           b1 = B.begin(minrow[ai->row()]);
-          const typename MatrixTypeB::const_iterator
-          be1 = B.end(maxrow[ai->row()]);
-          const typename MatrixTypeB::const_iterator
-          be2 = B.end(maxrow[ai->column()]);
+          const typename MatrixTypeB::const_iterator be1
+            = B.end(maxrow[ai->row()]);
+          const typename MatrixTypeB::const_iterator be2
+            = B.end(maxrow[ai->column()]);
 
-          while (b1 != be1)
+          while(b1 != be1)
             {
               const double b1v = b1->value();
               // We need the product
               // of both. If it is
               // zero, we can save
               // the work
-              if (b1->column() == ai->row() && (b1v != 0.))
+              if(b1->column() == ai->row() && (b1v != 0.))
                 {
                   const size_type i = b1->row();
 
-                  typename MatrixTypeB::const_iterator
-                  b2 = B.begin(minrow[ai->column()]);
-                  while (b2 != be2)
+                  typename MatrixTypeB::const_iterator b2
+                    = B.begin(minrow[ai->column()]);
+                  while(b2 != be2)
                     {
-                      if (b2->column() == ai->column())
+                      if(b2->column() == ai->column())
                         {
                           const size_type j = b2->row();
-                          add (i, j, a * b1v * b2->value());
+                          add(i, j, a * b1v * b2->value());
                         }
                       ++b2;
                     }
@@ -1553,35 +1519,30 @@ SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,
     }
 }
 
-
 template <typename number>
 template <class StreamType>
-inline
-void
-SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
+inline void
+SparseMatrixEZ<number>::print_statistics(StreamType& out, bool full)
 {
-  size_type used;
-  size_type allocated;
-  size_type reserved;
+  size_type              used;
+  size_type              allocated;
+  size_type              reserved;
   std::vector<size_type> used_by_line;
 
-  compute_statistics (used, allocated, reserved, used_by_line, full);
+  compute_statistics(used, allocated, reserved, used_by_line, full);
 
   out << "SparseMatrixEZ:used      entries:" << used << std::endl
       << "SparseMatrixEZ:allocated entries:" << allocated << std::endl
       << "SparseMatrixEZ:reserved  entries:" << reserved << std::endl;
 
-  if (full)
+  if(full)
     {
-      for (size_type i=0; i< used_by_line.size(); ++i)
-        if (used_by_line[i] != 0)
-          out << "SparseMatrixEZ:entries\t" << i
-              << "\trows\t" << used_by_line[i]
-              << std::endl;
-
+      for(size_type i = 0; i < used_by_line.size(); ++i)
+        if(used_by_line[i] != 0)
+          out << "SparseMatrixEZ:entries\t" << i << "\trows\t"
+              << used_by_line[i] << std::endl;
     }
 }
-
 
 DEAL_II_NAMESPACE_CLOSE
 

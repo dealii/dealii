@@ -16,14 +16,15 @@
 
 #include "../tests.h"
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/cell_id.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <vector>
 
-void test()
+void
+test()
 {
   const MPI_Comm mpi_comm = MPI_COMM_WORLD;
 
@@ -31,57 +32,58 @@ void test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
   unsigned int rank = Utilities::MPI::this_mpi_process(mpi_comm);
-  if (rank==0)
+  if(rank == 0)
     {
-      typename Triangulation<2>::active_cell_iterator cell = tria.begin_active(),
-                                                      end_cell = tria.end();
-      for (; cell!=end_cell; ++cell)
-        if (cell->is_locally_owned())
+      typename Triangulation<2>::active_cell_iterator cell
+        = tria.begin_active(),
+        end_cell = tria.end();
+      for(; cell != end_cell; ++cell)
+        if(cell->is_locally_owned())
           cell->set_refine_flag();
     }
 
   tria.execute_coarsening_and_refinement();
 
-  std::vector<std::set<typename Triangulation<2>::active_cell_iterator> >
-  vertex_to_cell = GridTools::vertex_to_cell_map(tria);
+  std::vector<std::set<typename Triangulation<2>::active_cell_iterator>>
+    vertex_to_cell = GridTools::vertex_to_cell_map(tria);
 
-  AssertThrow(tria.n_vertices()==vertex_to_cell.size(),
+  AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
               ExcMessage("Wrong number of vertices"));
   std::vector<unsigned int> n_cells;
-  for (unsigned int i=0; i<vertex_to_cell.size(); ++i)
+  for(unsigned int i = 0; i < vertex_to_cell.size(); ++i)
     n_cells.push_back(vertex_to_cell[i].size());
 
-  if (rank==0)
+  if(rank == 0)
     {
-      std::vector<unsigned int> histogram(5,0);
-      for (unsigned int i=0; i<n_cells.size(); ++i)
+      std::vector<unsigned int> histogram(5, 0);
+      for(unsigned int i = 0; i < n_cells.size(); ++i)
         histogram[n_cells[i]] += 1;
 
-      AssertThrow(histogram[0]==0, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[1]==4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[2]==20, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[3]==4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[4]==27, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[1] == 4, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[2] == 20, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[3] == 4, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[4] == 27, ExcMessage("Wrong cell distribution"));
     }
-  if (rank==1)
+  if(rank == 1)
     {
-      std::vector<unsigned int> histogram(5,0);
-      for (unsigned int i=0; i<n_cells.size(); ++i)
+      std::vector<unsigned int> histogram(5, 0);
+      for(unsigned int i = 0; i < n_cells.size(); ++i)
         histogram[n_cells[i]] += 1;
 
-      AssertThrow(histogram[0]==0, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[1]==4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[2]==18, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[3]==6, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[4]==24, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[1] == 4, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[2] == 18, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[3] == 6, ExcMessage("Wrong cell distribution"));
+      AssertThrow(histogram[4] == 24, ExcMessage("Wrong cell distribution"));
     }
 }
 
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test();
 

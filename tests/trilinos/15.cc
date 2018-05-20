@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check TrilinosWrappers::MPI::Vector::operator() in set/add-mode alternatingly, but
 // writing to the same elements
 //
@@ -40,53 +38,52 @@
 #include <iostream>
 #include <vector>
 
-
-void test (TrilinosWrappers::MPI::Vector &v)
+void
+test(TrilinosWrappers::MPI::Vector& v)
 {
   // set only certain elements of the
   // vector. have a bit pattern of where we
   // actually wrote elements to
-  std::vector<bool> pattern (v.size(), false);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  std::vector<bool> pattern(v.size(), false);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
-      v(i) = i;
+      v(i)       = i;
       pattern[i] = true;
     }
-  v.compress (VectorOperation::insert);
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  v.compress(VectorOperation::insert);
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     v(i) += i;
 
   // check that they are ok, and this time
   // all of them
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow ((((pattern[i] == true) && (v(i) == 2*i))
-                  ||
-                  ((pattern[i] == false) && (v(i) == 0))),
-                 ExcInternalError());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow((((pattern[i] == true) && (v(i) == 2 * i))
+                 || ((pattern[i] == false) && (v(i) == 0))),
+                ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
         TrilinosWrappers::MPI::Vector v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v);
+        test(v);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -97,9 +94,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -17,30 +17,29 @@
  * Author: Xing Jin, Wolfgang Bangerth, Texas A&M University, 2006
  */
 
-
 // @sect3{Include files}
 
 // The following have all been covered previously:
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -70,18 +69,23 @@ namespace Step24
   class TATForwardProblem
   {
   public:
-    TATForwardProblem ();
-    void run ();
+    TATForwardProblem();
+    void
+    run();
 
   private:
-    void setup_system ();
-    void solve_p ();
-    void solve_v ();
-    void output_results () const;
+    void
+    setup_system();
+    void
+    solve_p();
+    void
+    solve_v();
+    void
+    output_results() const;
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
 
     ConstraintMatrix constraints;
 
@@ -90,11 +94,11 @@ namespace Step24
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
 
-    Vector<double>       solution_p, solution_v;
-    Vector<double>       old_solution_p, old_solution_v;
-    Vector<double>       system_rhs_p, system_rhs_v;
+    Vector<double> solution_p, solution_v;
+    Vector<double> old_solution_p, old_solution_v;
+    Vector<double> system_rhs_p, system_rhs_v;
 
-    double time_step, time;
+    double       time_step, time;
     unsigned int timestep_number;
     const double theta;
 
@@ -104,15 +108,14 @@ namespace Step24
     //  wave speed $c_0$ that will enter all the formulas with the Laplace
     //  matrix (which we still define as $(\nabla \phi_i,\nabla \phi_j)$):
     SparseMatrix<double> boundary_matrix;
-    const double wave_speed;
+    const double         wave_speed;
 
     // The last thing we have to take care of is that we wanted to evaluate
     // the solution at a certain number of detector locations. We need an
     // array to hold these locations, declared here and filled in the
     // constructor:
-    std::vector<Point<dim> > detector_locations;
+    std::vector<Point<dim>> detector_locations;
   };
-
 
   // @sect3{Equation data}
 
@@ -139,22 +142,16 @@ namespace Step24
   class InitialValuesP : public Function<dim>
   {
   public:
-    InitialValuesP ()
-      :
-      Function<dim>()
+    InitialValuesP() : Function<dim>()
     {}
 
-    virtual double value (const Point<dim> &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
 
   private:
     struct Source
     {
-      Source (const Point<dim> &l,
-              const double      r)
-        :
-        location (l),
-        radius (r)
+      Source(const Point<dim>& l, const double r) : location(l), radius(r)
       {}
 
       const Point<dim> location;
@@ -162,26 +159,24 @@ namespace Step24
     };
   };
 
-
   template <int dim>
-  double InitialValuesP<dim>::value (const Point<dim> &p,
-                                     const unsigned int /*component*/) const
+  double
+  InitialValuesP<dim>::value(const Point<dim>& p,
+                             const unsigned int /*component*/) const
   {
-    static const Source sources[] = {Source (Point<dim> (0, 0),         0.025),
-                                     Source (Point<dim> (-0.135, 0),    0.05),
-                                     Source (Point<dim> (0.17, 0),      0.03),
-                                     Source (Point<dim> (-0.25, 0),     0.02),
-                                     Source (Point<dim> (-0.05, -0.15), 0.015)
-                                    };
-    static const unsigned int n_sources = sizeof(sources)/sizeof(sources[0]);
+    static const Source       sources[] = {Source(Point<dim>(0, 0), 0.025),
+                                     Source(Point<dim>(-0.135, 0), 0.05),
+                                     Source(Point<dim>(0.17, 0), 0.03),
+                                     Source(Point<dim>(-0.25, 0), 0.02),
+                                     Source(Point<dim>(-0.05, -0.15), 0.015)};
+    static const unsigned int n_sources = sizeof(sources) / sizeof(sources[0]);
 
-    for (unsigned int i=0; i<n_sources; ++i)
-      if (p.distance(sources[i].location) < sources[i].radius)
+    for(unsigned int i = 0; i < n_sources; ++i)
+      if(p.distance(sources[i].location) < sources[i].radius)
         return 1;
 
     return 0;
   }
-
 
   // @sect3{Implementation of the <code>TATForwardProblem</code> class}
 
@@ -193,15 +188,14 @@ namespace Step24
   // i.e. theta is set to 0.5. The time step is later selected to satisfy $k =
   // \frac hc$: here we initialize it to an invalid number.
   template <int dim>
-  TATForwardProblem<dim>::TATForwardProblem ()
-    :
-    fe (1),
-    dof_handler (triangulation),
-    time_step (std::numeric_limits<double>::quiet_NaN()),
-    time (time_step),
-    timestep_number (1),
-    theta (0.5),
-    wave_speed (1.437)
+  TATForwardProblem<dim>::TATForwardProblem()
+    : fe(1),
+      dof_handler(triangulation),
+      time_step(std::numeric_limits<double>::quiet_NaN()),
+      time(time_step),
+      timestep_number(1),
+      theta(0.5),
+      wave_speed(1.437)
   {
     // The second task in the constructor is to initialize the array that
     // holds the detector locations. The results of this program were compared
@@ -217,20 +211,17 @@ namespace Step24
     // to run the same program in 3d, we would have to add code here for the
     // initialization of detector locations in 3d. Due to the assertion, there
     // is no way we can forget to do this.
-    Assert (dim == 2, ExcNotImplemented());
+    Assert(dim == 2, ExcNotImplemented());
 
     const double detector_step_angle = 2.25;
-    const double detector_radius = 0.5;
+    const double detector_radius     = 0.5;
 
-    for (double detector_angle = 2*numbers::PI;
-         detector_angle >= 0;
-         detector_angle -= detector_step_angle/360*2*numbers::PI)
-      detector_locations.push_back (Point<dim> (std::cos(detector_angle),
-                                                std::sin(detector_angle)) *
-                                    detector_radius);
+    for(double detector_angle = 2 * numbers::PI; detector_angle >= 0;
+        detector_angle -= detector_step_angle / 360 * 2 * numbers::PI)
+      detector_locations.push_back(
+        Point<dim>(std::cos(detector_angle), std::sin(detector_angle))
+        * detector_radius);
   }
-
-
 
   // @sect4{TATForwardProblem::setup_system}
 
@@ -269,39 +260,36 @@ namespace Step24
   // The only other significant change is that we need to build the boundary
   // mass matrix. We will comment on this further down below.
   template <int dim>
-  void TATForwardProblem<dim>::setup_system ()
+  void
+  TATForwardProblem<dim>::setup_system()
   {
     const Point<dim> center;
-    GridGenerator::hyper_ball (triangulation, center, 1.);
-    triangulation.refine_global (7);
+    GridGenerator::hyper_ball(triangulation, center, 1.);
+    triangulation.refine_global(7);
 
-    time_step = GridTools::minimal_cell_diameter(triangulation) /
-                wave_speed /
-                std::sqrt (1.*dim);
+    time_step = GridTools::minimal_cell_diameter(triangulation) / wave_speed
+                / std::sqrt(1. * dim);
 
-    std::cout << "Number of active cells: "
-              << triangulation.n_active_cells()
+    std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
 
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
-    std::cout << "Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl
               << std::endl;
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    sparsity_pattern.copy_from (dsp);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
-    mass_matrix.reinit (sparsity_pattern);
-    laplace_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
+    mass_matrix.reinit(sparsity_pattern);
+    laplace_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3),
-                                       mass_matrix);
-    MatrixCreator::create_laplace_matrix (dof_handler, QGauss<dim>(3),
-                                          laplace_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_laplace_matrix(
+      dof_handler, QGauss<dim>(3), laplace_matrix);
 
     // The second difference, as mentioned, to step-23 is that we need to
     // build the boundary mass matrix that grew out of the absorbing boundary
@@ -330,7 +318,7 @@ namespace Step24
     // matrices have the same sparsity pattern).
     //
     // So let's go with that:
-    boundary_matrix.reinit (sparsity_pattern);
+    boundary_matrix.reinit(sparsity_pattern);
 
     // The second thing to do is to actually build the matrix. Here, we need
     // to integrate over faces of cells, so first we need a quadrature object
@@ -345,65 +333,60 @@ namespace Step24
     // do something only if that particular face is at the boundary of the
     // domain. Like this:
     {
-      const QGauss<dim-1>  quadrature_formula(3);
-      FEFaceValues<dim> fe_values (fe, quadrature_formula,
-                                   update_values  |  update_JxW_values);
+      const QGauss<dim - 1> quadrature_formula(3);
+      FEFaceValues<dim>     fe_values(
+        fe, quadrature_formula, update_values | update_JxW_values);
 
-      const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-      const unsigned int   n_q_points    = quadrature_formula.size();
+      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+      const unsigned int n_q_points    = quadrature_formula.size();
 
-      FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+      FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
-      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-
-
-      typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-      for (; cell!=endc; ++cell)
-        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-          if (cell->at_boundary(f))
+      typename DoFHandler<dim>::active_cell_iterator cell
+        = dof_handler.begin_active(),
+        endc = dof_handler.end();
+      for(; cell != endc; ++cell)
+        for(unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+          if(cell->at_boundary(f))
             {
               cell_matrix = 0;
 
-              fe_values.reinit (cell, f);
+              fe_values.reinit(cell, f);
 
-              for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-                for (unsigned int i=0; i<dofs_per_cell; ++i)
-                  for (unsigned int j=0; j<dofs_per_cell; ++j)
-                    cell_matrix(i,j) += (fe_values.shape_value(i,q_point) *
-                                         fe_values.shape_value(j,q_point) *
-                                         fe_values.JxW(q_point));
+              for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                for(unsigned int i = 0; i < dofs_per_cell; ++i)
+                  for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                    cell_matrix(i, j) += (fe_values.shape_value(i, q_point)
+                                          * fe_values.shape_value(j, q_point)
+                                          * fe_values.JxW(q_point));
 
-              cell->get_dof_indices (local_dof_indices);
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
-                  boundary_matrix.add (local_dof_indices[i],
-                                       local_dof_indices[j],
-                                       cell_matrix(i,j));
+              cell->get_dof_indices(local_dof_indices);
+              for(unsigned int i = 0; i < dofs_per_cell; ++i)
+                for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                  boundary_matrix.add(local_dof_indices[i],
+                                      local_dof_indices[j],
+                                      cell_matrix(i, j));
             }
-
     }
 
-    system_matrix.copy_from (mass_matrix);
-    system_matrix.add (time_step * time_step * theta * theta *
-                       wave_speed * wave_speed,
-                       laplace_matrix);
-    system_matrix.add (wave_speed * theta * time_step, boundary_matrix);
+    system_matrix.copy_from(mass_matrix);
+    system_matrix.add(time_step * time_step * theta * theta * wave_speed
+                        * wave_speed,
+                      laplace_matrix);
+    system_matrix.add(wave_speed * theta * time_step, boundary_matrix);
 
+    solution_p.reinit(dof_handler.n_dofs());
+    old_solution_p.reinit(dof_handler.n_dofs());
+    system_rhs_p.reinit(dof_handler.n_dofs());
 
-    solution_p.reinit (dof_handler.n_dofs());
-    old_solution_p.reinit (dof_handler.n_dofs());
-    system_rhs_p.reinit (dof_handler.n_dofs());
+    solution_v.reinit(dof_handler.n_dofs());
+    old_solution_v.reinit(dof_handler.n_dofs());
+    system_rhs_v.reinit(dof_handler.n_dofs());
 
-    solution_v.reinit (dof_handler.n_dofs());
-    old_solution_v.reinit (dof_handler.n_dofs());
-    system_rhs_v.reinit (dof_handler.n_dofs());
-
-    constraints.close ();
+    constraints.close();
   }
-
 
   // @sect4{TATForwardProblem::solve_p and TATForwardProblem::solve_v}
 
@@ -412,58 +395,51 @@ namespace Step24
   // exception of the change of name from $u$ to $p$ of the primary variable)
   // from step-23:
   template <int dim>
-  void TATForwardProblem<dim>::solve_p ()
+  void
+  TATForwardProblem<dim>::solve_p()
   {
-    SolverControl           solver_control (1000, 1e-8*system_rhs_p.l2_norm());
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs_p.l2_norm());
+    SolverCG<>    cg(solver_control);
 
-    cg.solve (system_matrix, solution_p, system_rhs_p,
-              PreconditionIdentity());
+    cg.solve(system_matrix, solution_p, system_rhs_p, PreconditionIdentity());
 
     std::cout << "   p-equation: " << solver_control.last_step()
-              << " CG iterations."
-              << std::endl;
+              << " CG iterations." << std::endl;
   }
-
 
   template <int dim>
-  void TATForwardProblem<dim>::solve_v ()
+  void
+  TATForwardProblem<dim>::solve_v()
   {
-    SolverControl           solver_control (1000, 1e-8*system_rhs_v.l2_norm());
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control(1000, 1e-8 * system_rhs_v.l2_norm());
+    SolverCG<>    cg(solver_control);
 
-    cg.solve (mass_matrix, solution_v, system_rhs_v,
-              PreconditionIdentity());
+    cg.solve(mass_matrix, solution_v, system_rhs_v, PreconditionIdentity());
 
     std::cout << "   v-equation: " << solver_control.last_step()
-              << " CG iterations."
-              << std::endl;
+              << " CG iterations." << std::endl;
   }
-
-
 
   // @sect4{TATForwardProblem::output_results}
 
   // The same holds here: the function is from step-23.
   template <int dim>
-  void TATForwardProblem<dim>::output_results () const
+  void
+  TATForwardProblem<dim>::output_results() const
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution_p, "P");
-    data_out.add_data_vector (solution_v, "V");
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution_p, "P");
+    data_out.add_data_vector(solution_v, "V");
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
-    const std::string filename =  "solution-" +
-                                  Utilities::int_to_string (timestep_number, 3) +
-                                  ".gnuplot";
-    std::ofstream output (filename);
-    data_out.write_gnuplot (output);
+    const std::string filename
+      = "solution-" + Utilities::int_to_string(timestep_number, 3) + ".gnuplot";
+    std::ofstream output(filename);
+    data_out.write_gnuplot(output);
   }
-
-
 
   // @sect4{TATForwardProblem::run}
 
@@ -480,80 +456,79 @@ namespace Step24
   // VectorTools::point_value function. These values are then written to a
   // file that we open at the beginning of the function.
   template <int dim>
-  void TATForwardProblem<dim>::run ()
+  void
+  TATForwardProblem<dim>::run()
   {
     setup_system();
 
-    VectorTools::project (dof_handler, constraints,
-                          QGauss<dim>(3), InitialValuesP<dim>(),
-                          old_solution_p);
+    VectorTools::project(dof_handler,
+                         constraints,
+                         QGauss<dim>(3),
+                         InitialValuesP<dim>(),
+                         old_solution_p);
     old_solution_v = 0;
-
 
     std::ofstream detector_data("detectors.dat");
 
-    Vector<double> tmp (solution_p.size());
-    Vector<double> G1 (solution_p.size());
-    Vector<double> G2 (solution_v.size());
+    Vector<double> tmp(solution_p.size());
+    Vector<double> G1(solution_p.size());
+    Vector<double> G2(solution_v.size());
 
     const double end_time = 0.7;
-    for (time=time_step; time<=end_time; time+=time_step, ++timestep_number)
+    for(time = time_step; time <= end_time;
+        time += time_step, ++timestep_number)
       {
         std::cout << std::endl;
-        std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;
+        std::cout << "time_step " << timestep_number << " @ t=" << time
+                  << std::endl;
 
-        mass_matrix.vmult (G1, old_solution_p);
-        mass_matrix.vmult (tmp, old_solution_v);
-        G1.add(time_step * (1-theta), tmp);
+        mass_matrix.vmult(G1, old_solution_p);
+        mass_matrix.vmult(tmp, old_solution_v);
+        G1.add(time_step * (1 - theta), tmp);
 
-        mass_matrix.vmult (G2, old_solution_v);
-        laplace_matrix.vmult (tmp, old_solution_p);
-        G2.add (-wave_speed * wave_speed * time_step * (1-theta), tmp);
+        mass_matrix.vmult(G2, old_solution_v);
+        laplace_matrix.vmult(tmp, old_solution_p);
+        G2.add(-wave_speed * wave_speed * time_step * (1 - theta), tmp);
 
-        boundary_matrix.vmult (tmp, old_solution_p);
-        G2.add (wave_speed, tmp);
+        boundary_matrix.vmult(tmp, old_solution_p);
+        G2.add(wave_speed, tmp);
 
         system_rhs_p = G1;
         system_rhs_p.add(time_step * theta, G2);
 
-        solve_p ();
-
+        solve_p();
 
         system_rhs_v = G2;
-        laplace_matrix.vmult (tmp, solution_p);
-        system_rhs_v.add (-time_step * theta * wave_speed * wave_speed, tmp);
+        laplace_matrix.vmult(tmp, solution_p);
+        system_rhs_v.add(-time_step * theta * wave_speed * wave_speed, tmp);
 
-        boundary_matrix.vmult (tmp, solution_p);
-        system_rhs_v.add (-wave_speed, tmp);
+        boundary_matrix.vmult(tmp, solution_p);
+        system_rhs_v.add(-wave_speed, tmp);
 
-        solve_v ();
+        solve_v();
 
-        output_results ();
-
+        output_results();
 
         detector_data << time;
-        for (unsigned int i=0 ; i<detector_locations.size(); ++i)
+        for(unsigned int i = 0; i < detector_locations.size(); ++i)
           detector_data << " "
-                        << VectorTools::point_value (dof_handler,
-                                                     solution_p,
-                                                     detector_locations[i])
+                        << VectorTools::point_value(
+                             dof_handler, solution_p, detector_locations[i])
                         << " ";
         detector_data << std::endl;
-
 
         old_solution_p = solution_p;
         old_solution_v = solution_v;
       }
   }
-}
-
-
+} // namespace Step24
 
 // @sect3{The <code>main</code> function}
 
 // What remains is the main function of the program. There is nothing here
 // that hasn't been shown in several of the previous programs:
-int main ()
+int
+main()
 {
   try
     {
@@ -561,11 +536,12 @@ int main ()
       using namespace Step24;
 
       TATForwardProblem<2> forward_problem_solver;
-      forward_problem_solver.run ();
+      forward_problem_solver.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -576,9 +552,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -13,21 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparsityPattern::matrix_position
 
 #include "sparsity_pattern_common.h"
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  matrix_position<SparsityPattern> ();
+  matrix_position<SparsityPattern>();
 }
-
-
-

@@ -23,20 +23,17 @@
 
 #include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/numerics/data_out.h>
 
-
-
-
 template <int dim>
 void
-test ()
+test()
 {
-  Triangulation<dim> tria(Triangulation<dim>::MeshSmoothing::none,true);
+  Triangulation<dim> tria(Triangulation<dim>::MeshSmoothing::none, true);
   GridGenerator::hyper_cube(tria, 1., 2.);
   tria.refine_global(1);
 
@@ -46,30 +43,32 @@ test ()
   dof1.distribute_dofs(fe1);
 
   Vector<double> v1(dof1.n_dofs());
-  for (unsigned int i=0; i<v1.size(); ++i) v1(i) = i;
+  for(unsigned int i = 0; i < v1.size(); ++i)
+    v1(i) = i;
 
   DataOut<dim> data_out;
-  data_out.add_data_vector (dof1, v1, "linear");
-  data_out.build_patches ();
+  data_out.add_data_vector(dof1, v1, "linear");
+  data_out.build_patches();
 
-  DataOutBase::DataOutFilter data_filter
-  (DataOutBase::DataOutFilterFlags (true, false));
+  DataOutBase::DataOutFilter data_filter(
+    DataOutBase::DataOutFilterFlags(true, false));
 
-  data_out.write_filtered_data (data_filter);
+  data_out.write_filtered_data(data_filter);
 
   deallog << "Number of filtered nodes: " << data_filter.n_nodes() << std::endl;
 
-  DataOutBase::DataOutFilter data_filter2
-  (DataOutBase::DataOutFilterFlags (false, false));
-  data_out.write_filtered_data (data_filter2);
+  DataOutBase::DataOutFilter data_filter2(
+    DataOutBase::DataOutFilterFlags(false, false));
+  data_out.write_filtered_data(data_filter2);
 
-  deallog << "Number of unfiltered nodes: " << data_filter2.n_nodes() << std::endl;
+  deallog << "Number of unfiltered nodes: " << data_filter2.n_nodes()
+          << std::endl;
 
   deallog << "ok" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   initlog();
   test<2>();

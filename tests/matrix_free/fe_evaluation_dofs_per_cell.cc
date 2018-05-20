@@ -13,23 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test the basic member variables of FEEvaluation
 
 #include "../tests.h"
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgp.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/matrix_free/matrix_free.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
-
+#include <deal.II/matrix_free/matrix_free.h>
 
 template <typename FEEval>
-void print_info(const FEEval &eval)
+void
+print_info(const FEEval& eval)
 {
   // copy static variables to int to avoid taking references (with possibly
   // undefined references) when inside deallog::operator<<
@@ -45,54 +43,55 @@ void print_info(const FEEval &eval)
   deallog << "FEEvaluation::tensor_dofs_per_cell: " << v << std::endl;
   v = FEEval::static_dofs_per_cell;
   deallog << "FEEvaluation::static_dofs_per_cell: " << v << std::endl;
-  deallog << "FEEvaluation::dofs_per_component: " << eval.dofs_per_component << std::endl;
+  deallog << "FEEvaluation::dofs_per_component: " << eval.dofs_per_component
+          << std::endl;
   deallog << "FEEvaluation::dofs_per_cell: " << eval.dofs_per_cell << std::endl;
   deallog << "FEEvaluation::n_q_points: " << eval.n_q_points << std::endl;
 }
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
-  const unsigned int degree = 1;
-  FESystem<dim> fe1(FE_Q<dim>(degree+1), dim);
-  FESystem<dim> fe2(FE_Q<dim>(degree+1), 1);
-  FESystem<dim> fe3(FE_DGP<dim>(degree+1), 2);
-  FESystem<dim> fe4(FE_Q<dim>(degree), 1);
-  std::vector<FiniteElement<dim> *> fes {&fe1, &fe2, &fe3, &fe4};
+  const unsigned int               degree = 1;
+  FESystem<dim>                    fe1(FE_Q<dim>(degree + 1), dim);
+  FESystem<dim>                    fe2(FE_Q<dim>(degree + 1), 1);
+  FESystem<dim>                    fe3(FE_DGP<dim>(degree + 1), 2);
+  FESystem<dim>                    fe4(FE_Q<dim>(degree), 1);
+  std::vector<FiniteElement<dim>*> fes{&fe1, &fe2, &fe3, &fe4};
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   DoFHandler<dim> dof(tria);
-  for (unsigned int i=0; i<fes.size(); ++i)
+  for(unsigned int i = 0; i < fes.size(); ++i)
     {
       deallog << "Checking " << fes[i]->get_name() << std::endl;
       dof.distribute_dofs(*fes[i]);
       MatrixFree<dim> matrix_free;
-      matrix_free.reinit(dof, ConstraintMatrix(), QGauss<1>(degree+3),
+      matrix_free.reinit(dof,
+                         ConstraintMatrix(),
+                         QGauss<1>(degree + 3),
                          typename MatrixFree<dim>::AdditionalData());
-      if (i<2)
+      if(i < 2)
         {
-          FEEvaluation<dim,degree+1,degree+3,dim> phi(matrix_free);
+          FEEvaluation<dim, degree + 1, degree + 3, dim> phi(matrix_free);
           print_info(phi);
         }
-      if (i!=2)
+      if(i != 2)
         {
-          FEEvaluation<dim,-1,0,dim> phi(matrix_free);
+          FEEvaluation<dim, -1, 0, dim> phi(matrix_free);
           print_info(phi);
         }
-      if (i==2)
+      if(i == 2)
         {
-          FEEvaluation<dim,degree+1,degree+3,2> phi(matrix_free);
+          FEEvaluation<dim, degree + 1, degree + 3, 2> phi(matrix_free);
           print_info(phi);
         }
     }
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
   test<1>();

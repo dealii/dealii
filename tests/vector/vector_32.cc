@@ -13,47 +13,46 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<double>::mean_value()
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<double> &v)
+void
+test(Vector<double>& v)
 {
   // set some elements of the vector
   double sum = 0;
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) = i;
       sum += i;
     }
-  v.compress ();
+  v.compress();
 
   // then check the norm
-  AssertThrow (std::fabs(v.mean_value() - sum/v.size()) < 1e-14*sum/v.size(),
-               ExcInternalError());
+  AssertThrow(std::fabs(v.mean_value() - sum / v.size())
+                < 1e-14 * sum / v.size(),
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -64,9 +63,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

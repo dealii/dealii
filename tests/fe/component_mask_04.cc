@@ -13,33 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the ComponentMask class
 //
 // here: test ComponentMask::size()
 
-
 #include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
-  AssertThrow (ComponentMask(12, false).size() == 12, ExcInternalError());
-  AssertThrow (ComponentMask().size() == 0, ExcInternalError());
+  AssertThrow(ComponentMask(12, false).size() == 12, ExcInternalError());
+  AssertThrow(ComponentMask().size() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

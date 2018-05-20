@@ -13,6 +13,5 @@
 //
 // ---------------------------------------------------------------------
 
-
 #define SPLIT_INSTANTIATIONS_INDEX 1
 #include "vector_tools_project.cc"

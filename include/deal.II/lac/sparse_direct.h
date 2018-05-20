@@ -16,15 +16,14 @@
 #ifndef dealii_sparse_direct_h
 #define dealii_sparse_direct_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
-#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
@@ -94,17 +93,16 @@ public:
   class AdditionalData
   {};
 
-
   /**
    * Constructor. See the documentation of this class for the meaning of the
    * parameters to this function.
    */
-  SparseDirectUMFPACK ();
+  SparseDirectUMFPACK();
 
   /**
    * Destructor.
    */
-  ~SparseDirectUMFPACK () override;
+  ~SparseDirectUMFPACK() override;
 
   /**
    * @name Setting up a sparse factorization
@@ -117,7 +115,8 @@ public:
    * This function does nothing. It is only here to provide a interface
    * consistent with other sparse direct solvers.
    */
-  void initialize (const SparsityPattern &sparsity_pattern);
+  void
+  initialize(const SparsityPattern& sparsity_pattern);
 
   /**
    * Factorize the matrix. This function may be called multiple times for
@@ -137,14 +136,16 @@ public:
    * solves are required.
    */
   template <class Matrix>
-  void factorize (const Matrix &matrix);
+  void
+  factorize(const Matrix& matrix);
 
   /**
    * Initialize memory and call SparseDirectUMFPACK::factorize.
    */
   template <class Matrix>
-  void initialize(const Matrix &matrix,
-                  const AdditionalData additional_data = AdditionalData());
+  void
+  initialize(const Matrix&        matrix,
+             const AdditionalData additional_data = AdditionalData());
 
   /**
    * @}
@@ -166,39 +167,41 @@ public:
    * In other words, this function actually multiplies with the exact inverse
    * of the matrix, $A^{-1}$.
    */
-  void vmult (Vector<double> &dst,
-              const Vector<double> &src) const;
+  void
+  vmult(Vector<double>& dst, const Vector<double>& src) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void vmult (BlockVector<double> &dst,
-              const BlockVector<double> &src) const;
+  void
+  vmult(BlockVector<double>& dst, const BlockVector<double>& src) const;
 
   /**
    * Same as before, but uses the transpose of the matrix, i.e. this function
    * multiplies with $A^{-T}$.
    */
-  void Tvmult (Vector<double> &dst,
-               const Vector<double> &src) const;
+  void
+  Tvmult(Vector<double>& dst, const Vector<double>& src) const;
 
   /**
    * Same as before, but for block vectors
    */
-  void Tvmult (BlockVector<double> &dst,
-               const BlockVector<double> &src) const;
+  void
+  Tvmult(BlockVector<double>& dst, const BlockVector<double>& src) const;
 
   /**
    * Return the dimension of the codomain (or range) space. Note that the
    * matrix is of dimension $m \times n$.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Return the dimension of the domain space. Note that the matrix is of
    * dimension $m \times n$.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * @}
@@ -226,14 +229,15 @@ public:
    * If @p transpose is set to true this function solves for the transpose of
    * the matrix, i.e. $x=A^{-T}b$.
    */
-  void solve (Vector<double> &rhs_and_solution,
-              const bool      transpose = false) const;
+  void
+  solve(Vector<double>& rhs_and_solution, const bool transpose = false) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void solve (BlockVector<double> &rhs_and_solution,
-              const bool           transpose = false) const;
+  void
+  solve(BlockVector<double>& rhs_and_solution,
+        const bool           transpose = false) const;
 
   /**
    * Call the two functions factorize() and solve() in that order, i.e.
@@ -242,17 +246,19 @@ public:
    * The solution will be returned in place of the right hand side vector.
    */
   template <class Matrix>
-  void solve (const Matrix   &matrix,
-              Vector<double> &rhs_and_solution,
-              const bool      transpose = false);
+  void
+  solve(const Matrix&   matrix,
+        Vector<double>& rhs_and_solution,
+        const bool      transpose = false);
 
   /**
    * Same as before, but for block vectors.
    */
   template <class Matrix>
-  void solve (const Matrix        &matrix,
-              BlockVector<double> &rhs_and_solution,
-              const bool           transpose = false);
+  void
+  solve(const Matrix&        matrix,
+        BlockVector<double>& rhs_and_solution,
+        const bool           transpose = false);
 
   /**
    * @}
@@ -263,39 +269,41 @@ public:
    * the output and can be looked up in the UMFPack user manual. The name of
    * the routine is included for reference.
    */
-  DeclException2 (ExcUMFPACKError, char *, int,
-                  << "UMFPACK routine " << arg1
-                  << " returned error status " << arg2 << "."
-                  << "\n\n"
-                  << ("A complete list of error codes can be found in the file "
-                      "<bundled/umfpack/UMFPACK/Include/umfpack.h>."
-                      "\n\n"
-                      "That said, the two most common errors that can happen are "
-                      "that your matrix cannot be factorized because it is "
-                      "rank deficient, and that UMFPACK runs out of memory "
-                      "because your problem is too large."
-                      "\n\n"
-                      "The first of these cases most often happens if you "
-                      "forget terms in your bilinear form necessary to ensure "
-                      "that the matrix has full rank, or if your equation has a "
-                      "spatially variable coefficient (or nonlinearity) that is "
-                      "supposed to be strictly positive but, for whatever "
-                      "reasons, is negative or zero. In either case, you probably "
-                      "want to check your assembly procedure. Similarly, a "
-                      "matrix can be rank deficient if you forgot to apply the "
-                      "appropriate boundary conditions. For example, the "
-                      "Laplace equation without boundary conditions has a "
-                      "single zero eigenvalue and its rank is therefore "
-                      "deficient by one."
-                      "\n\n"
-                      "The other common situation is that you run out of memory."
-                      "On a typical laptop or desktop, it should easily be possible "
-                      "to solve problems with 100,000 unknowns in 2d. If you are "
-                      "solving problems with many more unknowns than that, in "
-                      "particular if you are in 3d, then you may be running out "
-                      "of memory and you will need to consider iterative "
-                      "solvers instead of the direct solver employed by "
-                      "UMFPACK."));
+  DeclException2(
+    ExcUMFPACKError,
+    char*,
+    int,
+    << "UMFPACK routine " << arg1 << " returned error status " << arg2 << "."
+    << "\n\n"
+    << ("A complete list of error codes can be found in the file "
+        "<bundled/umfpack/UMFPACK/Include/umfpack.h>."
+        "\n\n"
+        "That said, the two most common errors that can happen are "
+        "that your matrix cannot be factorized because it is "
+        "rank deficient, and that UMFPACK runs out of memory "
+        "because your problem is too large."
+        "\n\n"
+        "The first of these cases most often happens if you "
+        "forget terms in your bilinear form necessary to ensure "
+        "that the matrix has full rank, or if your equation has a "
+        "spatially variable coefficient (or nonlinearity) that is "
+        "supposed to be strictly positive but, for whatever "
+        "reasons, is negative or zero. In either case, you probably "
+        "want to check your assembly procedure. Similarly, a "
+        "matrix can be rank deficient if you forgot to apply the "
+        "appropriate boundary conditions. For example, the "
+        "Laplace equation without boundary conditions has a "
+        "single zero eigenvalue and its rank is therefore "
+        "deficient by one."
+        "\n\n"
+        "The other common situation is that you run out of memory."
+        "On a typical laptop or desktop, it should easily be possible "
+        "to solve problems with 100,000 unknowns in 2d. If you are "
+        "solving problems with many more unknowns than that, in "
+        "particular if you are in 3d, then you may be running out "
+        "of memory and you will need to consider iterative "
+        "solvers instead of the direct solver employed by "
+        "UMFPACK."));
 
 private:
   /**
@@ -313,13 +321,14 @@ private:
    * about symbolic and numeric values of the decomposition. The actual data
    * type of these objects is opaque, and only passed around as void pointers.
    */
-  void *symbolic_decomposition;
-  void *numeric_decomposition;
+  void* symbolic_decomposition;
+  void* numeric_decomposition;
 
   /**
    * Free all memory that hasn't been freed yet.
    */
-  void clear ();
+  void
+  clear();
 
   /**
    * Make sure that the arrays Ai and Ap are sorted in each row. UMFPACK wants
@@ -328,13 +337,16 @@ private:
    * BlockSparseMatrix classes
    */
   template <typename number>
-  void sort_arrays (const SparseMatrixEZ<number> &);
+  void
+  sort_arrays(const SparseMatrixEZ<number>&);
 
   template <typename number>
-  void sort_arrays (const SparseMatrix<number> &);
+  void
+  sort_arrays(const SparseMatrix<number>&);
 
   template <typename number>
-  void sort_arrays (const BlockSparseMatrix<number> &);
+  void
+  sort_arrays(const BlockSparseMatrix<number>&);
 
   /**
    * The arrays in which we store the data for the solver. SuiteSparse_long
@@ -343,7 +355,7 @@ private:
    */
   std::vector<SuiteSparse_long> Ap;
   std::vector<SuiteSparse_long> Ai;
-  std::vector<double> Ax;
+  std::vector<double>           Ax;
 
   /**
    * Control and work arrays for the solver routines.

@@ -13,33 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // tests for the ComponentMask class
 //
 // here: ComponentMask::n_selected_components
 
-
 #include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
-
-
-
-
-void test ()
+void
+test()
 {
   // test for an initialized mask
-  Assert (ComponentMask(12,true).n_selected_components() == 12,
-          ExcInternalError());
-  Assert (ComponentMask(12,true).n_selected_components(12) == 12,
-          ExcInternalError());
+  Assert(ComponentMask(12, true).n_selected_components() == 12,
+         ExcInternalError());
+  Assert(ComponentMask(12, true).n_selected_components(12) == 12,
+         ExcInternalError());
   // test for an empty mask
-  Assert (ComponentMask().n_selected_components(12) == 12,
-          ExcInternalError());
-  Assert (ComponentMask().n_selected_components(13) == 13,
-          ExcInternalError());
-
+  Assert(ComponentMask().n_selected_components(12) == 12, ExcInternalError());
+  Assert(ComponentMask().n_selected_components(13) == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 
@@ -47,23 +38,22 @@ void test ()
   // though:
   try
     {
-      Assert (ComponentMask(12,true).n_selected_components(13) == 12,
-              ExcInternalError());
+      Assert(ComponentMask(12, true).n_selected_components(13) == 12,
+             ExcInternalError());
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
-
 }
 
-
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

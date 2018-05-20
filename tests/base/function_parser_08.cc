@@ -1,23 +1,22 @@
 #include "../tests.h"
-#include <map>
+#include <deal.II/base/function_parser.h>
 #include <deal.II/base/point.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/base/function_parser.h>
+#include <map>
 
 // simple function parser test for erfc functionality.
 
-void test1()
+void
+test1()
 {
   // set up problem:
-  std::string variables = "x,y";
-  std::string expression = "erfc(x)+erfc(y)";
-  std::map<std::string,double> constants;
+  std::string                   variables  = "x,y";
+  std::string                   expression = "erfc(x)+erfc(y)";
+  std::map<std::string, double> constants;
 
   // FunctionParser with 2 variables and 1 component:
   FunctionParser<2> fp(1);
-  fp.initialize(variables,
-                expression,
-                constants);
+  fp.initialize(variables, expression, constants);
 
   // Point at which we want to evaluate the function
   Point<2> point(0.1, -0.7);
@@ -26,15 +25,14 @@ void test1()
   double result = fp.value(point);
 
   deallog << "Function '" << expression << "'"
-          << " @ " << point
-          << " is " << result << std::endl;
+          << " @ " << point << " is " << result << std::endl;
 }
 
-
-void test2()
+void
+test2()
 {
   // Define some constants that will be used by the function parser
-  std::map<std::string,double> constants;
+  std::map<std::string, double> constants;
   constants["pi"] = numbers::PI;
 
   // Define the variables that will be used inside the expressions
@@ -50,9 +48,7 @@ void test2()
   FunctionParser<3> vector_function(2);
 
   // And populate it with the newly created objects.
-  vector_function.initialize(variables,
-                             expressions,
-                             constants);
+  vector_function.initialize(variables, expressions, constants);
 
   // Point at which we want to evaluate the function
   Point<3> point(0.0, 1.0, 1.0);
@@ -70,12 +66,11 @@ void test2()
 
   // Output the evaluated function
   deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
-          << " @ " << point
-          << " is " << result << std::endl;
+          << " @ " << point << " is " << result << std::endl;
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

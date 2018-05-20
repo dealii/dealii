@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // CSpline
 // take example from https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
 
@@ -21,39 +20,39 @@
 #include <deal.II/base/function_cspline.h>
 
 template <int dim>
-void check()
+void
+check()
 {
-  const unsigned int n_points = 10;
+  const unsigned int  n_points = 10;
   std::vector<double> x(n_points), y(n_points);
-  for (unsigned int i = 0; i < n_points; i++)
+  for(unsigned int i = 0; i < n_points; i++)
     {
-      x[i] = i + 0.5 * std::sin (i);
-      y[i] = i + std::cos (i * i);
+      x[i] = i + 0.5 * std::sin(i);
+      y[i] = i + std::cos(i * i);
     }
-
 
   std::vector<double> y_native;
   // native version
   {
-    gsl_interp_accel *acc = gsl_interp_accel_alloc ();
-    gsl_spline *spline = gsl_spline_alloc (gsl_interp_cspline, n_points);
+    gsl_interp_accel* acc    = gsl_interp_accel_alloc();
+    gsl_spline*       spline = gsl_spline_alloc(gsl_interp_cspline, n_points);
 
-    gsl_spline_init (spline, &x[0], &y[0], n_points);
+    gsl_spline_init(spline, &x[0], &y[0], n_points);
 
-    for (double xi = x[0]; xi <= x.back(); xi += 0.01)
+    for(double xi = x[0]; xi <= x.back(); xi += 0.01)
       {
-        const double yi = gsl_spline_eval (spline, xi, acc);
+        const double yi = gsl_spline_eval(spline, xi, acc);
         //deallog << xi << " " << yi << std::endl;
         y_native.push_back(yi);
       }
-    gsl_spline_free (spline);
-    gsl_interp_accel_free (acc);
+    gsl_spline_free(spline);
+    gsl_interp_accel_free(acc);
   }
 
   std::vector<double> y_dealii;
   {
-    Functions::CSpline<dim> cspline(x,y);
-    for (double xi = x[0]; xi <= x.back(); xi += 0.01)
+    Functions::CSpline<dim> cspline(x, y);
+    for(double xi = x[0]; xi <= x.back(); xi += 0.01)
       {
         const double yi = cspline.value(Point<dim>(xi));
         //deallog << xi << " " << yi << std::endl;
@@ -61,18 +60,19 @@ void check()
       }
   }
 
-  AssertThrow(std::equal(y_native.begin(), y_native.end(), y_dealii.begin()),
-              ExcMessage("deal.II implementation of CSpline does not match native GSL."));
+  AssertThrow(
+    std::equal(y_native.begin(), y_native.end(), y_dealii.begin()),
+    ExcMessage("deal.II implementation of CSpline does not match native GSL."));
 
-  deallog << "Ok"<< std::endl;
+  deallog << "Ok" << std::endl;
 }
 
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 
   check<1>();
 }
-

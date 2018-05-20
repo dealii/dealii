@@ -13,27 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check running over const iterators
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
   FullMatrix<number> m;
-  make_square_matrix (m);
+  make_square_matrix(m);
 
-  for (typename FullMatrix<number>::const_iterator
-       p = m.begin(); p!=m.end(); ++p)
-    deallog << p->row() << ' ' << p->column() << ' '
-            << p->value()
-            << std::endl;
+  for(typename FullMatrix<number>::const_iterator p = m.begin(); p != m.end();
+      ++p)
+    deallog << p->row() << ' ' << p->column() << ' ' << p->value() << std::endl;
 }

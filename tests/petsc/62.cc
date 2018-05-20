@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MatrixBase::clear ()
 
 #include "../tests.h"
@@ -24,38 +22,37 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::MatrixBase &m)
+void
+test(PETScWrappers::MatrixBase& m)
 {
-  AssertThrow (m.m() != 0, ExcInternalError());
-  AssertThrow (m.n() != 0, ExcInternalError());
+  AssertThrow(m.m() != 0, ExcInternalError());
+  AssertThrow(m.n() != 0, ExcInternalError());
 
-  m.clear ();
+  m.clear();
 
-  AssertThrow (m.m() == 0, ExcInternalError());
-  AssertThrow (m.n() == 0, ExcInternalError());
+  AssertThrow(m.m() == 0, ExcInternalError());
+  AssertThrow(m.n() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::SparseMatrix v (100,100,5);
-        test (v);
+        PETScWrappers::SparseMatrix v(100, 100, 5);
+        test(v);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -66,9 +63,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

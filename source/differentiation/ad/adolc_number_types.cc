@@ -13,24 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_ADOLC
 
-#include <deal.II/differentiation/ad/adolc_number_types.h>
-#include <deal.II/differentiation/ad/ad_number_traits.h>
+#  include <deal.II/differentiation/ad/ad_number_traits.h>
+#  include <deal.II/differentiation/ad/adolc_number_types.h>
 
-#include <utility>
+#  include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-#ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+#  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
 
 namespace numbers
 {
-
   namespace internal
   {
     namespace
@@ -40,49 +37,50 @@ namespace numbers
       // such a comparison. This is implemented as a general function so that
       // the list of implemented comparative operations can be easily extended.
       bool
-      adouble_boolean_comparator (const adouble &value_1,
-                                  const adouble &value_2,
-                                  const std::function<adouble(const adouble &, const adouble &)> &comparator)
+      adouble_boolean_comparator(
+        const adouble& value_1,
+        const adouble& value_2,
+        const std::function<adouble(const adouble&, const adouble&)>&
+          comparator)
       {
-        typedef typename Differentiation::AD::NumberTraits<double,Differentiation::AD::NumberTypes::adolc_taped>::ad_type ad_type;
-        static_assert(std::is_same<adouble,ad_type>::value, "The type of the AD number is not that which was expected.");
-        const ad_type result = comparator(value_1,value_2);
-        return !(Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(result) == 0.0);
+        typedef typename Differentiation::AD::NumberTraits<
+          double,
+          Differentiation::AD::NumberTypes::adolc_taped>::ad_type ad_type;
+        static_assert(
+          std::is_same<adouble, ad_type>::value,
+          "The type of the AD number is not that which was expected.");
+        const ad_type result = comparator(value_1, value_2);
+        return !(
+          Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(result)
+          == 0.0);
       }
-    }
+    } // namespace
+  }   // namespace internal
+
+  bool
+  values_are_equal(const adouble& value_1, const adouble& value_2)
+  {
+    return internal::adouble_boolean_comparator(
+      value_1, value_2, [](const adouble& a, const adouble& b) -> adouble {
+        return dealii::internal::NumberType<adouble>::value(a == b);
+      });
   }
 
   bool
-  values_are_equal (const adouble &value_1,
-                    const adouble &value_2)
+  value_is_less_than(const adouble& value_1, const adouble& value_2)
   {
     return internal::adouble_boolean_comparator(
-             value_1, value_2,
-             [](const adouble &a,const adouble &b) -> adouble
-    {
-      return dealii::internal::NumberType<adouble>::value(a == b);
-    });
+      value_1, value_2, [](const adouble& a, const adouble& b) -> adouble {
+        return dealii::internal::NumberType<adouble>::value(a < b);
+      });
   }
+} // namespace numbers
 
-  bool
-  value_is_less_than (const adouble &value_1,
-                      const adouble &value_2)
-  {
-    return internal::adouble_boolean_comparator(
-             value_1, value_2,
-             [](const adouble &a,const adouble &b) -> adouble
-    {
-      return dealii::internal::NumberType<adouble>::value(a < b);
-    });
-  }
-}
-
-#endif
-
+#  endif
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
-#include "adolc_number_types.inst"
+#  include "adolc_number_types.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

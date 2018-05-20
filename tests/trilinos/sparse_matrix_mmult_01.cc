@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check TrilinosWrappers::SparseMatrix::mmult for non-square matrices
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -25,29 +23,28 @@
 
 using namespace dealii;
 
-
 template <typename MATRIX>
-void out_matrix_size(const MATRIX &M,
-                     const std::string &name)
+void
+out_matrix_size(const MATRIX& M, const std::string& name)
 {
   deallog << name << " = " << M.m() << " x " << M.n() << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
   initlog();
 
   TrilinosWrappers::SparsityPattern P_A;
-  TrilinosWrappers::SparseMatrix A;
+  TrilinosWrappers::SparseMatrix    A;
   P_A.reinit(4, 3);
   P_A.compress();
   A.reinit(P_A);
 
   TrilinosWrappers::SparsityPattern P_B;
-  TrilinosWrappers::SparseMatrix B;
+  TrilinosWrappers::SparseMatrix    B;
   P_B.reinit(3, 5);
   P_B.compress();
   B.reinit(P_B);
@@ -60,11 +57,11 @@ int main(int argc, char *argv[])
 
   out_matrix_size(AB, "A.B");
 
-  Assert (AB.m() == A.m(), ExcInternalError());
-  Assert (AB.n() == B.n(), ExcInternalError());
+  Assert(AB.m() == A.m(), ExcInternalError());
+  Assert(AB.n() == B.n(), ExcInternalError());
 
   TrilinosWrappers::SparsityPattern P_C;
-  TrilinosWrappers::SparseMatrix C;
+  TrilinosWrappers::SparseMatrix    C;
   P_C.reinit(4, 5);
   P_C.compress();
   C.reinit(P_C);
@@ -76,6 +73,6 @@ int main(int argc, char *argv[])
 
   out_matrix_size(AtC, "At.C");
 
-  Assert (AtC.m() == A.n(), ExcInternalError());
-  Assert (AtC.n() == C.n(), ExcInternalError());
+  Assert(AtC.m() == A.n(), ExcInternalError());
+  Assert(AtC.n() == C.n(), ExcInternalError());
 }

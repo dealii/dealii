@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MPI::Vector::operator = (Vector), except that we don't
 // resize the vector to be copied to beforehand
 
@@ -23,50 +21,49 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::MPI::Vector &v)
+void
+test(PETScWrappers::MPI::Vector& v)
 {
   // set some entries of the vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = i+1.;
-  v.compress (VectorOperation::insert);
+  for(unsigned int i = 0; i < v.size(); ++i)
+    if(i % 3 == 0)
+      v(i) = i + 1.;
+  v.compress(VectorOperation::insert);
 
   // then copy it to a vector of different
   // size
-  PETScWrappers::MPI::Vector w (MPI_COMM_WORLD, 1, 1);
+  PETScWrappers::MPI::Vector w(MPI_COMM_WORLD, 1, 1);
   w = v;
 
   // make sure they're equal
-  deallog << v *w << ' ' << v.l2_norm() * w.l2_norm()
-          << ' ' << v *w - v.l2_norm() * w.l2_norm() << std::endl;
-  const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
-  Assert (std::fabs(v*w - v.l2_norm() * w.l2_norm()) < eps*(v*w),
-          ExcInternalError());
+  deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' '
+          << v * w - v.l2_norm() * w.l2_norm() << std::endl;
+  const double eps = typeid(PetscScalar) == typeid(double) ? 1e-14 : 1e-5;
+  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < eps * (v * w),
+         ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         IndexSet indices(100);
         indices.add_range(0, 100);
         PETScWrappers::MPI::Vector v(indices, MPI_COMM_WORLD);
         test(v);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -77,9 +74,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

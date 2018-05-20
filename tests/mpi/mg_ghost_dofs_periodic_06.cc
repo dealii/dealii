@@ -25,73 +25,81 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 
 #include <deal.II/distributed/tria.h>
 
-
-
 template <int dim>
-void test()
+void
+test()
 {
   const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  parallel::distributed::Triangulation<dim>
-  tria(MPI_COMM_WORLD, dealii::Triangulation<dim>::limit_level_difference_at_vertices,
-       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::subdivided_hyper_cube (tria, 3);
+  parallel::distributed::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    dealii::Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  GridGenerator::subdivided_hyper_cube(tria, 3);
 
   // set periodic boundary conditions in all directions
-  for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
-       cell != tria.end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->at_boundary(f))
-        cell->face(f)->set_all_boundary_ids(f+10);
+  for(typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      cell != tria.end();
+      ++cell)
+    for(unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      if(cell->at_boundary(f))
+        cell->face(f)->set_all_boundary_ids(f + 10);
 
-  std::vector<GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> > periodic_faces;
-  GridTools::collect_periodic_faces(tria, 0+10, 1+10, 0, periodic_faces);
-  GridTools::collect_periodic_faces(tria, 2+10, 3+10, 1, periodic_faces);
+  std::vector<
+    GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator>>
+    periodic_faces;
+  GridTools::collect_periodic_faces(tria, 0 + 10, 1 + 10, 0, periodic_faces);
+  GridTools::collect_periodic_faces(tria, 2 + 10, 3 + 10, 1, periodic_faces);
   tria.add_periodicity(periodic_faces);
 
   // adaptively refine into the lower left corner
-  for (unsigned int i=0; i<2; ++i)
+  for(unsigned int i = 0; i < 2; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-           cell != tria.end(); ++cell)
-        if (cell->at_boundary(0) && cell->at_boundary(2) && cell->is_locally_owned())
+      for(typename Triangulation<dim>::active_cell_iterator cell
+          = tria.begin_active();
+          cell != tria.end();
+          ++cell)
+        if(cell->at_boundary(0) && cell->at_boundary(2)
+           && cell->is_locally_owned())
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  for (typename Triangulation<dim>::cell_iterator cell=tria.begin();
-       cell != tria.end(); ++cell)
-    deallog << cell->id().to_string() << " " << cell->level_subdomain_id() << std::endl;
+  for(typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      cell != tria.end();
+      ++cell)
+    deallog << cell->id().to_string() << " " << cell->level_subdomain_id()
+            << std::endl;
 
-  if (0)
+  if(0)
     {
-      std::ofstream grid_output (("out"+Utilities::to_string(myid)+".svg").c_str());
-      GridOut grid_out;
+      std::ofstream grid_output(
+        ("out" + Utilities::to_string(myid) + ".svg").c_str());
+      GridOut           grid_out;
       GridOutFlags::Svg flags;
       flags.label_level_subdomain_id = true;
-      flags.coloring = GridOutFlags::Svg::level_subdomain_id;
+      flags.coloring                 = GridOutFlags::Svg::level_subdomain_id;
       flags.convert_level_number_to_height = true;
       grid_out.set_flags(flags);
 
-      grid_out.write_svg (tria, grid_output);
+      grid_out.write_svg(tria, grid_output);
     }
 }
 
-
-
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test<2>();
 

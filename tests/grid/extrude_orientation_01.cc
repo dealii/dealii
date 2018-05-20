@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test GridGenerator::extrude. 2d meshes are always correctly
 // edge-oriented, and so if we stack them one on top of the other, we
 // should also get a 3d mesh for which both edge and face orientations
@@ -25,24 +23,24 @@
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/tria.h>
 
-
-
-void test(std::ostream &out)
+void
+test(std::ostream& out)
 {
   Triangulation<2> tr;
-  GridGenerator::hyper_cube (tr);
+  GridGenerator::hyper_cube(tr);
 
-  for (Triangulation<2>::active_cell_iterator c=tr.begin_active();
-       c!=tr.end(); ++c)
+  for(Triangulation<2>::active_cell_iterator c = tr.begin_active();
+      c != tr.end();
+      ++c)
     {
-      deallog << "2d cell " << c << " has the following face orientations:"
-              << std::endl;
-      for (unsigned int l=0; l<GeometryInfo<2>::faces_per_cell; ++l)
+      deallog << "2d cell " << c
+              << " has the following face orientations:" << std::endl;
+      for(unsigned int l = 0; l < GeometryInfo<2>::faces_per_cell; ++l)
         deallog << "    " << (c->face_orientation(l) ? "true" : "false")
                 << std::endl;
     }
@@ -50,24 +48,27 @@ void test(std::ostream &out)
   Triangulation<3> tr3;
   GridGenerator::extrude_triangulation(tr, 2, 1.0, tr3);
 
-  for (Triangulation<3>::active_cell_iterator c=tr3.begin_active();
-       c!=tr3.end(); ++c)
+  for(Triangulation<3>::active_cell_iterator c = tr3.begin_active();
+      c != tr3.end();
+      ++c)
     {
-      deallog << "3d cell " << c << " has the following face orientation/flips and edge orientations:"
-              << std::endl;
-      for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+      deallog
+        << "3d cell " << c
+        << " has the following face orientation/flips and edge orientations:"
+        << std::endl;
+      for(unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
         deallog << "    face=" << f
                 << (c->face_orientation(f) ? " -> true" : " -> false")
-                << (c->face_flip(f) ? "/true" : "/false")
-                << std::endl;
-      for (unsigned int e=0; e<GeometryInfo<3>::lines_per_cell; ++e)
-        deallog << "    edge=" << e << (c->line_orientation(e) ? " -> true" : " -> false")
+                << (c->face_flip(f) ? "/true" : "/false") << std::endl;
+      for(unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
+        deallog << "    edge=" << e
+                << (c->line_orientation(e) ? " -> true" : " -> false")
                 << std::endl;
     }
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

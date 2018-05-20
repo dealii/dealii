@@ -21,13 +21,12 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/thread_local_storage.h>
 
-#include <string>
-#include <stack>
-#include <map>
 #include <cmath>
-#include <sstream>
+#include <map>
 #include <memory>
-
+#include <sstream>
+#include <stack>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -105,82 +104,77 @@ public:
      * Set a new prefix for @p deallog, which will be removed when the
      * variable is destroyed.
      */
-    Prefix(const std::string &text);
+    Prefix(const std::string& text);
 
     /**
      * Set a new prefix for the given stream, which will be removed when the
      * variable is destroyed.
      */
-    Prefix(const std::string &text,
-           LogStream &stream);
+    Prefix(const std::string& text, LogStream& stream);
 
     /**
      * Remove the prefix associated with this variable.
      */
-    ~Prefix ();
+    ~Prefix();
 
   private:
     /**
      * A pointer to the LogStream object to which the prefix is
      * applied.
      */
-    SmartPointer<LogStream,LogStream::Prefix> stream;
+    SmartPointer<LogStream, LogStream::Prefix> stream;
   };
-
 
   /**
    * Standard constructor. The standard output stream to
    * <tt>std::cout</tt>.
    */
-  LogStream ();
-
+  LogStream();
 
   /**
    * Destructor.
    */
   ~LogStream() override;
 
-
   /**
    * Enable output to a second stream <tt>o</tt>.
    *
    * The optional argument @p print_job_id specifies whether
    */
-  void attach (std::ostream &o,
-               const bool    print_job_id = true);
-
+  void
+  attach(std::ostream& o, const bool print_job_id = true);
 
   /**
    * Disable output to the second stream. You may want to call <tt>close</tt>
    * on the stream that was previously attached to this object.
    */
-  void detach ();
-
+  void
+  detach();
 
   /**
    * Return the default stream (<tt>std_out</tt>).
    */
-  std::ostream &get_console ();
-
+  std::ostream&
+  get_console();
 
   /**
    * Return the file stream.
    */
-  std::ostream &get_file_stream ();
-
+  std::ostream&
+  get_file_stream();
 
   /**
    * Return @p true if file stream has already been attached,
    * @p false otherwise.
    */
-  bool has_file () const;
-
+  bool
+  has_file() const;
 
   /**
    * Return the prefix string.
    */
-  const std::string &get_prefix () const;
-
+  const std::string&
+  get_prefix() const;
 
   /**
    * Push another prefix on the stack. Prefixes are automatically separated by
@@ -194,14 +188,14 @@ public:
    * because an intermediate function call results in an exception that
    * is not immediately caught.
    */
-  void push (const std::string &text);
-
+  void
+  push(const std::string& text);
 
   /**
    * Remove the last prefix added with push().
    */
-  void pop ();
-
+  void
+  pop();
 
   /**
    * Maximum number of levels to be printed on the console. The default is 0,
@@ -213,8 +207,8 @@ public:
    *
    * The previous value of this parameter is returned.
    */
-  unsigned int depth_console (const unsigned int n);
-
+  unsigned int
+  depth_console(const unsigned int n);
 
   /**
    * Maximum number of levels to be written to the log file. The functionality
@@ -223,38 +217,38 @@ public:
    *
    * The previous value of this parameter is returned.
    */
-  unsigned int depth_file (const unsigned int n);
-
+  unsigned int
+  depth_file(const unsigned int n);
 
   /**
    * Log the thread id.
    */
-  bool log_thread_id (const bool flag);
-
+  bool
+  log_thread_id(const bool flag);
 
   /**
    * set the precision for the underlying stream and returns the previous
    * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
    */
-  std::streamsize precision (const std::streamsize prec);
-
+  std::streamsize
+  precision(const std::streamsize prec);
 
   /**
    * set the width for the underlying stream and returns the previous stream
    * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
    */
-  std::streamsize width (const std::streamsize wide);
-
+  std::streamsize
+  width(const std::streamsize wide);
 
   /**
    * set the flags for the underlying stream and returns the previous stream
    * flags. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
    */
-  std::ios::fmtflags flags(const std::ios::fmtflags f);
-
+  std::ios::fmtflags
+  flags(const std::ios::fmtflags f);
 
   /**
    * Treat ostream manipulators. This passes on the whole thing to the
@@ -270,19 +264,18 @@ public:
    * @p std::wostream, and potentially more of this kind. This function is
    * therefore necessary to pick one element from this overload set.
    */
-  LogStream &operator<< (std::ostream& (*p) (std::ostream &));
-
+  LogStream&
+  operator<<(std::ostream& (*p)(std::ostream&) );
 
   /**
    * Return an estimate for the memory consumption, in bytes, of this object.
    * This is not exact (but will usually be close) because calculating the
    * memory usage of trees (e.g., <tt>std::map</tt>) is difficult.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
-
-
   /**
    * Internal wrapper around thread-local prefixes. This private function will
    * return the correct internal prefix stack. More important, a new thread-
@@ -290,20 +283,21 @@ private:
    * that created this LogStream instance (usually, in the case of deallog,
    * the "main" thread).
    */
-  std::stack<std::string> &get_prefixes() const;
+  std::stack<std::string>&
+  get_prefixes() const;
 
   /**
    * Stack of strings which are printed at the beginning of each line to allow
    * identification where the output was generated.
    */
-  mutable Threads::ThreadLocalStorage<std::stack<std::string> > prefixes;
+  mutable Threads::ThreadLocalStorage<std::stack<std::string>> prefixes;
 
   /**
    * Default stream, where the output is to go to. This stream defaults to
    * <tt>std::cout</tt>, but can be set to another stream through the
    * constructor.
    */
-  std::ostream  *std_out;
+  std::ostream* std_out;
 
   /**
    * Pointer to a stream, where a copy of the output is to go to. Usually,
@@ -311,7 +305,7 @@ private:
    *
    * You can set and reset this stream by the <tt>attach</tt> function.
    */
-  std::ostream  *file;
+  std::ostream* file;
 
   /**
    * Value denoting the number of prefixes to be printed to the standard
@@ -339,26 +333,28 @@ private:
   /**
    * Print head of line.
    */
-  void print_line_head ();
+  void
+  print_line_head();
 
   /**
    * Internal wrapper around "thread local" outstreams. This private function
    * will return the correct internal ostringstream buffer for operator<<.
    */
-  std::ostringstream &get_stream();
+  std::ostringstream&
+  get_stream();
 
   /**
    * We use tbb's thread local storage facility to generate a stringstream for
    * every thread that sends log messages.
    */
-  Threads::ThreadLocalStorage<std::shared_ptr<std::ostringstream> > outstreams;
+  Threads::ThreadLocalStorage<std::shared_ptr<std::ostringstream>> outstreams;
 
-  template <typename T> friend LogStream &operator << (LogStream &log, const T &t);
+  template <typename T>
+  friend LogStream&
+  operator<<(LogStream& log, const T& t);
 };
 
-
 /* ----------------------------- Inline functions and templates ---------------- */
-
 
 /**
  * Output a constant something through LogStream:
@@ -368,16 +364,13 @@ private:
  * C++11 overload resolution rules
  */
 template <typename T>
-inline
-LogStream &operator<< (LogStream &log, const T &t)
+inline LogStream&
+operator<<(LogStream& log, const T& t)
 {
   // print to the internal stringstream
   log.get_stream() << t;
   return log;
 }
-
-
-
 
 /**
  * The standard log object of deal.II:
@@ -385,8 +378,6 @@ LogStream &operator<< (LogStream &log, const T &t)
  * @author Guido Kanschat, 1999
  */
 extern LogStream deallog;
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

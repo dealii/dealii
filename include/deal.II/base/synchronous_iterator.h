@@ -16,10 +16,8 @@
 #ifndef dealii_synchronous_iterator_h
 #define dealii_synchronous_iterator_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
-
 
 #include <iterator>
 #include <tuple>
@@ -54,19 +52,19 @@ struct SynchronousIterators
   /**
    * Constructor.
    */
-  SynchronousIterators (const Iterators &i);
+  SynchronousIterators(const Iterators& i);
 
   /**
    * Dereference const operator. Returns a const reference to the iterators
    * represented by the current class.
    */
-  const Iterators &operator* () const;
+  const Iterators& operator*() const;
 
   /**
    * Dereference operator. Returns a reference to the iterators
    * represented by the current class.
    */
-  Iterators &operator* ();
+  Iterators& operator*();
 
 private:
   /**
@@ -75,37 +73,22 @@ private:
   Iterators iterators;
 };
 
-
-
 template <typename Iterators>
-inline
-SynchronousIterators<Iterators>::
-SynchronousIterators (const Iterators &i)
-  :
-  iterators (i)
+inline SynchronousIterators<Iterators>::SynchronousIterators(const Iterators& i)
+  : iterators(i)
 {}
 
-
-
 template <typename Iterators>
-inline
-const Iterators &
-SynchronousIterators<Iterators>::operator* () const
+inline const Iterators& SynchronousIterators<Iterators>::operator*() const
 {
   return iterators;
 }
 
-
-
 template <typename Iterators>
-inline
-Iterators &
-SynchronousIterators<Iterators>::operator* ()
+inline Iterators& SynchronousIterators<Iterators>::operator*()
 {
   return iterators;
 }
-
-
 
 /**
  * Return whether the first element of the first argument is less than the
@@ -116,15 +99,12 @@ SynchronousIterators<Iterators>::operator* ()
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline
-bool
-operator< (const SynchronousIterators<Iterators> &a,
-           const SynchronousIterators<Iterators> &b)
+inline bool
+operator<(const SynchronousIterators<Iterators>& a,
+          const SynchronousIterators<Iterators>& b)
 {
   return std::get<0>(*a) < std::get<0>(*b);
 }
-
-
 
 /**
  * Return the distance between the first and the second argument. Since the
@@ -134,18 +114,14 @@ operator< (const SynchronousIterators<Iterators> &a,
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline
-std::size_t
-operator- (const SynchronousIterators<Iterators> &a,
-           const SynchronousIterators<Iterators> &b)
+inline std::size_t
+operator-(const SynchronousIterators<Iterators>& a,
+          const SynchronousIterators<Iterators>& b)
 {
-  Assert (std::distance (std::get<0>(*b),
-                         std::get<0>(*a)) >= 0,
-          ExcInternalError());
-  return std::distance (std::get<0>(*b),
-                        std::get<0>(*a));
+  Assert(std::distance(std::get<0>(*b), std::get<0>(*a)) >= 0,
+         ExcInternalError());
+  return std::distance(std::get<0>(*b), std::get<0>(*a));
 }
-
 
 /**
  * Advance a tuple of iterators by $n$.
@@ -153,12 +129,11 @@ operator- (const SynchronousIterators<Iterators> &a,
  * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2>
-inline
-void advance (std::tuple<I1,I2> &t,
-              const unsigned int       n)
+inline void
+advance(std::tuple<I1, I2>& t, const unsigned int n)
 {
-  std::advance (std::get<0>(t), n);
-  std::advance (std::get<1>(t), n);
+  std::advance(std::get<0>(t), n);
+  std::advance(std::get<1>(t), n);
 }
 
 /**
@@ -167,13 +142,12 @@ void advance (std::tuple<I1,I2> &t,
  * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
-inline
-void advance (std::tuple<I1,I2,I3> &t,
-              const unsigned int          n)
+inline void
+advance(std::tuple<I1, I2, I3>& t, const unsigned int n)
 {
-  std::advance (std::get<0>(t), n);
-  std::advance (std::get<1>(t), n);
-  std::advance (std::get<2>(t), n);
+  std::advance(std::get<0>(t), n);
+  std::advance(std::get<1>(t), n);
+  std::advance(std::get<2>(t), n);
 }
 
 /**
@@ -181,19 +155,15 @@ void advance (std::tuple<I1,I2,I3> &t,
  *
  * @relatesalso SynchronousIterators
  */
-template <typename I1, typename I2,
-          typename I3, typename I4>
-inline
-void advance (std::tuple<I1,I2,I3, I4> &t,
-              const unsigned int              n)
+template <typename I1, typename I2, typename I3, typename I4>
+inline void
+advance(std::tuple<I1, I2, I3, I4>& t, const unsigned int n)
 {
-  std::advance (std::get<0>(t), n);
-  std::advance (std::get<1>(t), n);
-  std::advance (std::get<2>(t), n);
-  std::advance (std::get<3>(t), n);
+  std::advance(std::get<0>(t), n);
+  std::advance(std::get<1>(t), n);
+  std::advance(std::get<2>(t), n);
+  std::advance(std::get<3>(t), n);
 }
-
-
 
 /**
  * Advance a tuple of iterators by 1.
@@ -201,8 +171,8 @@ void advance (std::tuple<I1,I2,I3, I4> &t,
  * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2>
-inline
-void advance_by_one (std::tuple<I1,I2> &t)
+inline void
+advance_by_one(std::tuple<I1, I2>& t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);
@@ -214,8 +184,8 @@ void advance_by_one (std::tuple<I1,I2> &t)
  * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
-inline
-void advance_by_one (std::tuple<I1,I2,I3> &t)
+inline void
+advance_by_one(std::tuple<I1, I2, I3>& t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);
@@ -227,10 +197,9 @@ void advance_by_one (std::tuple<I1,I2,I3> &t)
  *
  * @relatesalso SynchronousIterators
  */
-template <typename I1, typename I2,
-          typename I3, typename I4>
-inline
-void advance_by_one (std::tuple<I1,I2,I3,I4> &t)
+template <typename I1, typename I2, typename I3, typename I4>
+inline void
+advance_by_one(std::tuple<I1, I2, I3, I4>& t)
 {
   ++std::get<0>(t);
   ++std::get<1>(t);
@@ -238,21 +207,17 @@ void advance_by_one (std::tuple<I1,I2,I3,I4> &t)
   ++std::get<3>(t);
 }
 
-
-
 /**
  * Advance the elements of this iterator by $n$.
  *
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline
-SynchronousIterators<Iterators>
-operator + (const SynchronousIterators<Iterators> &a,
-            const std::size_t                      n)
+inline SynchronousIterators<Iterators>
+operator+(const SynchronousIterators<Iterators>& a, const std::size_t n)
 {
-  SynchronousIterators<Iterators> x (a);
-  dealii::advance (*x, n);
+  SynchronousIterators<Iterators> x(a);
+  dealii::advance(*x, n);
   return x;
 }
 
@@ -262,14 +227,12 @@ operator + (const SynchronousIterators<Iterators> &a,
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline
-SynchronousIterators<Iterators>
-operator ++ (SynchronousIterators<Iterators> &a)
+inline SynchronousIterators<Iterators>
+operator++(SynchronousIterators<Iterators>& a)
 {
-  dealii::advance_by_one (*a);
+  dealii::advance_by_one(*a);
   return a;
 }
-
 
 /**
  * Compare synch iterators for inequality. Since they march in synch,
@@ -278,13 +241,11 @@ operator ++ (SynchronousIterators<Iterators> &a)
  * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
-inline
-bool
-operator != (const SynchronousIterators<Iterators> &a,
-             const SynchronousIterators<Iterators> &b)
+inline bool
+operator!=(const SynchronousIterators<Iterators>& a,
+           const SynchronousIterators<Iterators>& b)
 {
-  return (std::get<0>(*a) !=
-          std::get<0>(*b));
+  return (std::get<0>(*a) != std::get<0>(*b));
 }
 
 DEAL_II_NAMESPACE_CLOSE

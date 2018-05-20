@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Verify that we can run SolutionTransfer with FE_Nothing. This led
 // to an exception because at one point we try to multiply a vector by
 // an empty matrix (because FE_Nothing has no degrees of freedom)
@@ -21,20 +20,18 @@
 // Test case by Claire Bruna-Rosso based on an earlier one written by
 // K. Bzowski
 
-
 #include "../tests.h"
-
 
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <deal.II/hp/fe_collection.h>
 
@@ -45,12 +42,13 @@
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
 
   Triangulation<2> triangulation(Triangulation<2>::none);
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1);
 
   hp::FECollection<2> fe_collection;
@@ -80,33 +78,30 @@ int main()
   cell++;
   cell->set_active_fe_index(0);
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   // Init solution
   Vector<double> solution(dof_handler.n_dofs());
   solution = 1.0;
 
-
   // Vector to visualize the FE of each cell
-  Vector<double> FE_Type (triangulation.n_active_cells());
-  unsigned int cnt_cells (0);
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  Vector<double> FE_Type(triangulation.n_active_cells());
+  unsigned int   cnt_cells(0);
+  cell = dof_handler.begin_active(), endc = dof_handler.end();
+  for(; cell != endc; ++cell)
     {
       unsigned int fe_index = cell->active_fe_index();
-      FE_Type[cnt_cells] = fe_index;
-      ++ cnt_cells;
+      FE_Type[cnt_cells]    = fe_index;
+      ++cnt_cells;
     }
 
   // Save output
-  DataOut<2, hp::DoFHandler<2> > data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "Solution");
-  data_out.add_data_vector (FE_Type, "FE_Type");
+  DataOut<2, hp::DoFHandler<2>> data_out;
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(solution, "Solution");
+  data_out.add_data_vector(FE_Type, "FE_Type");
   data_out.build_patches();
-  data_out.write_gnuplot (deallog.get_file_stream());
-
+  data_out.write_gnuplot(deallog.get_file_stream());
 
   /* Set refine flags:
    * -----------
@@ -115,7 +110,6 @@ int main()
    * |  R |    |
    * -----------
    */
-
 
   cell = dof_handler.begin_active();
   cell->set_refine_flag();
@@ -127,10 +121,11 @@ int main()
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solution_trans(dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans(
+    dof_handler);
   solution_trans.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
   dof_handler.distribute_dofs(fe_collection);
 
@@ -138,27 +133,26 @@ int main()
   solution_trans.interpolate(solution, new_solution);
 
   FE_Type.reinit(triangulation.n_active_cells());
-  cnt_cells=0;
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  cnt_cells = 0;
+  cell = dof_handler.begin_active(), endc = dof_handler.end();
+  for(; cell != endc; ++cell)
     {
       unsigned int fe_index = cell->active_fe_index();
-      FE_Type[cnt_cells] = fe_index;
-      ++ cnt_cells;
+      FE_Type[cnt_cells]    = fe_index;
+      ++cnt_cells;
     }
 
   // Save new solution
-  DataOut<2, hp::DoFHandler<2> > data_out2;
-  data_out2.attach_dof_handler (dof_handler);
-  data_out2.add_data_vector (new_solution, "Solution");
-  data_out2.add_data_vector(FE_Type, "FE_type" );
+  DataOut<2, hp::DoFHandler<2>> data_out2;
+  data_out2.attach_dof_handler(dof_handler);
+  data_out2.add_data_vector(new_solution, "Solution");
+  data_out2.add_data_vector(FE_Type, "FE_type");
   data_out2.build_patches();
   data_out2.write_gnuplot(deallog.get_file_stream());
 
   // Solution reinitialization
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
   solution.reinit(dof_handler.n_dofs());
   solution = 1.0;
 
@@ -171,40 +165,39 @@ int main()
    */
 
   endc = dof_handler.end();
-  for (cell=dof_handler.begin_active(); cell!=endc; cell++)
-    if (cell->level() > 1)
+  for(cell = dof_handler.begin_active(); cell != endc; cell++)
+    if(cell->level() > 1)
       cell->set_coarsen_flag();
 
   triangulation.prepare_coarsening_and_refinement();
 
   // Interpolate solution
-  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2> > solution_trans2(dof_handler);
+  SolutionTransfer<2, Vector<double>, hp::DoFHandler<2>> solution_trans2(
+    dof_handler);
   solution_trans2.prepare_for_coarsening_and_refinement(solution);
 
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 
-  dof_handler.distribute_dofs (fe_collection);
+  dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution2(dof_handler.n_dofs());
   solution_trans2.interpolate(solution, new_solution2);
 
   FE_Type.reinit(triangulation.n_active_cells());
-  cnt_cells=0;
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  cnt_cells = 0;
+  cell = dof_handler.begin_active(), endc = dof_handler.end();
+  for(; cell != endc; ++cell)
     {
       unsigned int fe_index = cell->active_fe_index();
-      FE_Type[cnt_cells] = fe_index;
-      ++ cnt_cells;
+      FE_Type[cnt_cells]    = fe_index;
+      ++cnt_cells;
     }
 
   // Save new solution
-  DataOut<2, hp::DoFHandler<2> > data_out3;
-  data_out3.attach_dof_handler (dof_handler);
-  data_out3.add_data_vector (new_solution2, "Solution");
-  data_out3.add_data_vector(FE_Type, "FE_type" );
+  DataOut<2, hp::DoFHandler<2>> data_out3;
+  data_out3.attach_dof_handler(dof_handler);
+  data_out3.add_data_vector(new_solution2, "Solution");
+  data_out3.add_data_vector(FE_Type, "FE_type");
   data_out3.build_patches();
   data_out3.write_gnuplot(deallog.get_file_stream());
 }
-

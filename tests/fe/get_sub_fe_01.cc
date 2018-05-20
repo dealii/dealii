@@ -18,73 +18,69 @@
 #include "../tests.h"
 #include <iostream>
 
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_bdm.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/tria_iterator.h>
 
 template <int dim>
-void works(const FiniteElement<dim> &fe, const ComponentMask &m)
+void
+works(const FiniteElement<dim>& fe, const ComponentMask& m)
 {
-  deallog << "FE: " << fe.get_name()
-          << " mask: " << m << std::endl;
+  deallog << "FE: " << fe.get_name() << " mask: " << m << std::endl;
 
-  const FiniteElement<dim> &child = fe.get_sub_fe(m);
+  const FiniteElement<dim>& child = fe.get_sub_fe(m);
 
   deallog << "  worked: " << child.get_name() << std::endl;
 }
 
 template <int dim>
-void fails(const FiniteElement<dim> &fe, const ComponentMask &m)
+void
+fails(const FiniteElement<dim>& fe, const ComponentMask& m)
 {
-  deallog << "FE: " << fe.get_name()
-          << " mask: " << m << std::endl;
+  deallog << "FE: " << fe.get_name() << " mask: " << m << std::endl;
 
   try
     {
-      const FiniteElement<dim> &child = fe.get_sub_fe(m);
+      const FiniteElement<dim>& child = fe.get_sub_fe(m);
       deallog << "  ERROR: we succeeded and got " << child.get_name()
               << " but we should have failed!" << std::endl;
     }
-  catch (...)
+  catch(...)
     {
       deallog << "  failed as expected" << std::endl;
     }
 }
 
-
 template <int dim>
-void check ()
+void
+check()
 {
-  auto mask_none = [] (const unsigned int n_components) -> ComponentMask
-  {
+  auto mask_none = [](const unsigned int n_components) -> ComponentMask {
     return ComponentMask(n_components, false);
   };
-  auto mask_all = [] (const unsigned int n_components) -> ComponentMask
-  {
+  auto mask_all = [](const unsigned int n_components) -> ComponentMask {
     return ComponentMask(n_components, true);
   };
-  auto mask_single = [] (const unsigned int n_components,
-                         const unsigned int single) -> ComponentMask
-  {
+  auto mask_single = [](const unsigned int n_components,
+                        const unsigned int single) -> ComponentMask {
     ComponentMask c(n_components, false);
     c.set(single, true);
     return c;
   };
-  auto mask = [] (const unsigned int n_components,
-                  const unsigned int first,
-                  const unsigned int last) -> ComponentMask
-  {
+  auto mask = [](const unsigned int n_components,
+                 const unsigned int first,
+                 const unsigned int last) -> ComponentMask {
     ComponentMask c(n_components, false);
-    for (unsigned int i=first; i<=last; ++i)
+    for(unsigned int i = first; i <= last; ++i)
       c.set(i, true);
     return c;
   };
 
-  FE_Q<dim> fe_q(2);
+  FE_Q<dim>   fe_q(2);
   FE_DGP<dim> fe_dg(2);
   FE_BDM<dim> fe_nonprim(1);
 
@@ -113,68 +109,67 @@ void check ()
   // part of system:
   {
     FESystem<dim> fe(fe_q, 3);
-    works(fe, mask_all(3)); // keep system
+    works(fe, mask_all(3));       // keep system
     works(fe, mask_single(3, 1)); // select one component
-    fails(fe, mask(3, 1, 2)); // select more than one component but not the whole FESystem
+    fails(fe,
+          mask(3,
+               1,
+               2)); // select more than one component but not the whole FESystem
   }
 
   // more systems:
   {
-    FESystem<dim> fe(fe_nonprim,1,fe_dg,1);
-    works(fe, mask(dim+1, 0, dim)); // nonprimitive
-    works(fe, mask_single(dim+1, dim)); // select one component
+    FESystem<dim> fe(fe_nonprim, 1, fe_dg, 1);
+    works(fe, mask(dim + 1, 0, dim));     // nonprimitive
+    works(fe, mask_single(dim + 1, dim)); // select one component
   }
   {
-    FESystem<dim> fe(fe_nonprim,1,fe_dg,2);
+    FESystem<dim> fe(fe_nonprim, 1, fe_dg, 2);
     // non-contiguous is a fail!
-    auto m = mask(dim+2, 0, dim);
+    auto m = mask(dim + 2, 0, dim);
     m.set(1, false);
-    m.set(dim+1,true);
+    m.set(dim + 1, true);
     fails(fe, m);
   }
   {
-    FESystem<dim> fe(fe_q,dim,fe_q,1);
-    works(fe, mask_single(dim+1, dim));
-    fails(fe, mask(dim+1, 0, dim-1)); // can not select the dim fe_q
+    FESystem<dim> fe(fe_q, dim, fe_q, 1);
+    works(fe, mask_single(dim + 1, dim));
+    fails(fe, mask(dim + 1, 0, dim - 1)); // can not select the dim fe_q
   }
   {
-    FESystem<dim> qs(fe_q,dim);
-    FESystem<dim> fe(qs,1,fe_q,1);
-    works(fe, mask(dim+1, 0, dim-1)); // but works if nested
+    FESystem<dim> qs(fe_q, dim);
+    FESystem<dim> fe(qs, 1, fe_q, 1);
+    works(fe, mask(dim + 1, 0, dim - 1)); // but works if nested
   }
 
   {
-    FESystem<dim> fe(fe_q,2,fe_nonprim,2,fe_dg,1);
-    works(fe, mask_single(2*dim+3, 0));
-    works(fe, mask_single(2*dim+3, 1));
-    works(fe, mask_single(2*dim+3, 2*dim+3-1));
-    works(fe, mask(2*dim+3, 2, 2+dim-1)); // 1st nonprimitive
-    works(fe, mask(2*dim+3, 2+dim, 2+2*dim-1)); // 2nd nonprimitive
+    FESystem<dim> fe(fe_q, 2, fe_nonprim, 2, fe_dg, 1);
+    works(fe, mask_single(2 * dim + 3, 0));
+    works(fe, mask_single(2 * dim + 3, 1));
+    works(fe, mask_single(2 * dim + 3, 2 * dim + 3 - 1));
+    works(fe, mask(2 * dim + 3, 2, 2 + dim - 1));           // 1st nonprimitive
+    works(fe, mask(2 * dim + 3, 2 + dim, 2 + 2 * dim - 1)); // 2nd nonprimitive
   }
 
   // nesting doll:
   {
-    FESystem<dim> inner(fe_dg,1);
-    FESystem<dim> fe(fe_nonprim,1,inner,2);
-    FESystem<dim> outer(fe,2);
-    FESystem<dim> outer_outer(outer,1);
+    FESystem<dim> inner(fe_dg, 1);
+    FESystem<dim> fe(fe_nonprim, 1, inner, 2);
+    FESystem<dim> outer(fe, 2);
+    FESystem<dim> outer_outer(outer, 1);
 
-    works(fe, mask_single(dim+2, dim));
-    works(fe, mask_single(dim+2, dim+1));
-    works(outer, mask_single(2*(dim+2), dim));
-    works(outer_outer, mask_single(2*(dim+2), dim));
+    works(fe, mask_single(dim + 2, dim));
+    works(fe, mask_single(dim + 2, dim + 1));
+    works(outer, mask_single(2 * (dim + 2), dim));
+    works(outer_outer, mask_single(2 * (dim + 2), dim));
   }
-
 }
 
-
-
-
-int main ()
+int
+main()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();
 
-  check<2> ();
+  check<2>();
 }
-

@@ -13,14 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "fe_face_orientation_nedelec.h"
-
-
 
 int
 main()
 {
   initlog();
-  run (false, true, true);
+  run(false, true, true);
 }

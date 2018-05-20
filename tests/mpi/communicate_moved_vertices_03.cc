@@ -17,44 +17,54 @@
 // Triangulation with periodic faces.
 
 #include "../tests.h"
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  deallog << "Testing " << Utilities::int_to_string(dim,1) << "D" << std::endl;
+  deallog << "Testing " << Utilities::int_to_string(dim, 1) << "D" << std::endl;
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube (triangulation, -1., 1., true);
+  GridGenerator::hyper_cube(triangulation, -1., 1., true);
 
-  std::vector<GridTools::PeriodicFacePair<typename parallel::distributed::Triangulation<dim>::cell_iterator> > periodicity_vector;
-  for (int i = 0; i < dim; ++i)
-    GridTools::collect_periodic_faces(triangulation, 2*i, 2*i+1, i, periodicity_vector);
+  std::vector<GridTools::PeriodicFacePair<
+    typename parallel::distributed::Triangulation<dim>::cell_iterator>>
+    periodicity_vector;
+  for(int i = 0; i < dim; ++i)
+    GridTools::collect_periodic_faces(
+      triangulation, 2 * i, 2 * i + 1, i, periodicity_vector);
   triangulation.add_periodicity(periodicity_vector);
 
   triangulation.refine_global(3);
 
-  auto cell = triangulation.begin_active();
+  auto       cell = triangulation.begin_active();
   const auto endc = triangulation.end();
 
   std::map<unsigned int, Point<dim>> non_artificial_vertices_old;
-  for (cell = triangulation.begin_active(); cell!=endc; ++cell)
-    if (!cell->is_artificial())
-      for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-        non_artificial_vertices_old[cell->vertex_index(vertex_no)] = cell->vertex(vertex_no);
+  for(cell = triangulation.begin_active(); cell != endc; ++cell)
+    if(!cell->is_artificial())
+      for(unsigned int vertex_no = 0;
+          vertex_no < GeometryInfo<dim>::vertices_per_cell;
+          ++vertex_no)
+        non_artificial_vertices_old[cell->vertex_index(vertex_no)]
+          = cell->vertex(vertex_no);
 
-  std::vector<bool> vertex_moved(triangulation.n_vertices(), false);
-  const std::vector<bool> locally_owned_vertices = GridTools::get_locally_owned_vertices(triangulation);
-  for (cell = triangulation.begin_active(); cell!=endc; ++cell)
-    if (cell->is_locally_owned())
-      for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+  std::vector<bool>       vertex_moved(triangulation.n_vertices(), false);
+  const std::vector<bool> locally_owned_vertices
+    = GridTools::get_locally_owned_vertices(triangulation);
+  for(cell = triangulation.begin_active(); cell != endc; ++cell)
+    if(cell->is_locally_owned())
+      for(unsigned int vertex_no = 0;
+          vertex_no < GeometryInfo<dim>::vertices_per_cell;
+          ++vertex_no)
         {
           const unsigned global_vertex_no = cell->vertex_index(vertex_no);
-          if (!vertex_moved[global_vertex_no] && locally_owned_vertices[global_vertex_no])
+          if(!vertex_moved[global_vertex_no]
+             && locally_owned_vertices[global_vertex_no])
             {
               cell->vertex(vertex_no)(0) += 1.e-1;
               vertex_moved[global_vertex_no] = true;
@@ -64,35 +74,41 @@ void test()
   triangulation.communicate_locally_moved_vertices(vertex_moved);
 
   std::map<unsigned int, Point<dim>> non_artificial_vertices_new;
-  for (cell = triangulation.begin_active(); cell!=endc; ++cell)
-    if (!cell->is_artificial())
-      for (unsigned int vertex_no=0; vertex_no<GeometryInfo<dim>::vertices_per_cell;
-           ++vertex_no)
+  for(cell = triangulation.begin_active(); cell != endc; ++cell)
+    if(!cell->is_artificial())
+      for(unsigned int vertex_no = 0;
+          vertex_no < GeometryInfo<dim>::vertices_per_cell;
+          ++vertex_no)
         {
           Point<dim> point = cell->vertex(vertex_no);
-          point(0)-=1.e-1;
+          point(0) -= 1.e-1;
           non_artificial_vertices_new[cell->vertex_index(vertex_no)] = point;
         }
 
-  for (const auto &pair: non_artificial_vertices_new)
-    if ((non_artificial_vertices_old[pair.first]-pair.second).norm_square()>1.e-6)
+  for(const auto& pair : non_artificial_vertices_new)
+    if((non_artificial_vertices_old[pair.first] - pair.second).norm_square()
+       > 1.e-6)
       {
-        deallog << pair.first << ": "
-                << non_artificial_vertices_old[pair.first] << " vs. " << pair.second << std::endl;
-        AssertThrow(false, ExcMessage("Some of the vertices on ghost cell were not moved correctly!"));
+        deallog << pair.first << ": " << non_artificial_vertices_old[pair.first]
+                << " vs. " << pair.second << std::endl;
+        AssertThrow(
+          false,
+          ExcMessage(
+            "Some of the vertices on ghost cell were not moved correctly!"));
       }
 
   /*std::string filename("grid"+Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),2)+".vtu");
   std::ofstream out(filename.c_str());
   GridOut grid_out;
   grid_out.write_vtu(triangulation, out);*/
-  deallog << Utilities::int_to_string(dim,1) << "D OK" << std::endl;
+  deallog << Utilities::int_to_string(dim, 1) << "D OK" << std::endl;
 }
 
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  MPILogInitAll log;
+  MPILogInitAll                    log;
   test<2>();
   test<3>();
   return 0;

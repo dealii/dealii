@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // distribute_dofs on one cpu crashes with a segmentation fault.
 /* valgrind says:
 ==7944== Invalid read of size 8
@@ -32,45 +30,43 @@
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-
 template <int dim>
-void output(parallel::distributed::Triangulation<dim> &tr)
+void
+output(parallel::distributed::Triangulation<dim>& tr)
 {
-  const std::string filename = ("mesh." +
-                                Utilities::int_to_string
-                                (tr.locally_owned_subdomain(), 4) +
-                                ".vtu");
-
-
+  const std::string filename
+    = ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4)
+       + ".vtu");
 }
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
-  if (myid == 0)
+  if(myid == 0)
     deallog << "hyper_cube" << std::endl;
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                               Triangulation<dim>:: limit_level_difference_at_vertices,
-                                               parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+  parallel::distributed::Triangulation<dim> tr(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::limit_level_difference_at_vertices,
+    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
@@ -79,24 +75,23 @@ void test()
   output(tr);
 
   static const FE_DGP<dim> fe(0);
-  dofh.distribute_dofs (fe);
-  dofh.distribute_mg_dofs (fe);
+  dofh.distribute_dofs(fe);
+  dofh.distribute_mg_dofs(fe);
 
   {
-    for (unsigned int lvl=0; lvl<tr.n_levels(); ++lvl)
+    for(unsigned int lvl = 0; lvl < tr.n_levels(); ++lvl)
       {
         deallog << "level " << lvl << ": ";
-        typename DoFHandler<dim>::cell_iterator
-        cell = dofh.begin(lvl),
-        endc = dofh.end(lvl);
+        typename DoFHandler<dim>::cell_iterator cell = dofh.begin(lvl),
+                                                endc = dofh.end(lvl);
 
-        for (; cell!=endc; ++cell)
+        for(; cell != endc; ++cell)
           {
             std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
             cell->get_mg_dof_indices(dofs);
 
-            for (unsigned int i=0; i<dofs.size(); ++i)
-              if (dofs[i]==numbers::invalid_dof_index)
+            for(unsigned int i = 0; i < dofs.size(); ++i)
+              if(dofs[i] == numbers::invalid_dof_index)
                 deallog << "- ";
               else
                 deallog << dofs[i] << " ";
@@ -106,15 +101,15 @@ void test()
       }
   }
 
-  if (myid==0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   deallog.push("2d");
   test<2>();

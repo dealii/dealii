@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the correctness of the detection of the elements in
 // internal::MatrixFreeFunctions::ShapeInfo
 
@@ -25,30 +23,31 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_q_dg0.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_system.h>
 
 #include <iostream>
 
 std::ofstream logfile("output");
 
-
 template <int dim>
-void test (const FiniteElement<dim> &fe,
-           const Quadrature<1>      &quad)
+void
+test(const FiniteElement<dim>& fe, const Quadrature<1>& quad)
 {
-  for (unsigned int i=0; i<fe.n_base_elements(); ++i)
+  for(unsigned int i = 0; i < fe.n_base_elements(); ++i)
     {
       internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
       shape_info.reinit(quad, fe, i);
-      deallog << "Detected shape info type for " << fe.base_element(i).get_name() << ": "
-              << static_cast<unsigned int>(shape_info.element_type) << std::endl;
+      deallog << "Detected shape info type for "
+              << fe.base_element(i).get_name() << ": "
+              << static_cast<unsigned int>(shape_info.element_type)
+              << std::endl;
     }
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
   QGauss<1> gauss3(3);
@@ -122,7 +121,7 @@ int main ()
 
   // define quadrature rule that is not symmetric around 0.5
   deallog << "Non-symmetric quadrature" << std::endl;
-  std::vector<Point<1> > points(4);
+  std::vector<Point<1>> points(4);
   points[0][0] = 0.2;
   points[1][0] = 0.4;
   points[2][0] = 0.5;

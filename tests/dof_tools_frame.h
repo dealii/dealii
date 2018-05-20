@@ -13,71 +13,64 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <string>
-
 
 // forward declaration of the function that must be provided in the
 // .cc files
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler);
-
+check_this(const DoFHandler<dim>& dof_handler);
 
 void
-output_vector (std::vector<bool> &v)
+output_vector(std::vector<bool>& v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     deallog << (v[i] ? '1' : '0');
   deallog << std::endl;
 }
 
-
 void
-output_vector (std::vector<unsigned int> &v)
+output_vector(std::vector<unsigned int>& v)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v[i];
   deallog << std::endl;
 }
 
-
-
 template <int dim>
 void
-check (const Triangulation<dim> &tria,
-       const FiniteElement<dim> &fe)
+check(const Triangulation<dim>& tria, const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   // call main function in .cc files
-  check_this (dof_handler);
+  check_this(dof_handler);
 }
 
-
 template <int dim>
-void check_grid(const Triangulation<dim> &tr)
+void
+check_grid(const Triangulation<dim>& tr)
 {
   FE_Q<dim> q1(1);
   check(tr, q1);
@@ -125,5 +118,3 @@ void check_grid(const Triangulation<dim> &tr)
   FESystem<dim> ss1(s1, 2, s3, 1);
   check(tr, ss1);
 }
-
-

@@ -13,29 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
 //check method mTmult of FullMatrix, symmetric case
 
 #include "../tests.h"
 
 #include <deal.II/lac/full_matrix.h>
 
-const double entries_A[9] = { 1,2,3,4,5,6,7,8,9 };
-const double compare[9] = { 14,32,50,32,77,122,50,122,194 };
+const double entries_A[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+const double compare[9]   = {14, 32, 50, 32, 77, 122, 50, 122, 194};
 
 int
-main ()
+main()
 {
   initlog();
   deallog << std::fixed;
   deallog << std::setprecision(3);
 
-  FullMatrix<double> A(3,3,entries_A);
-  FullMatrix<double> C(3,3);
-  FullMatrix<double> D(3,3,compare);
+  FullMatrix<double> A(3, 3, entries_A);
+  FullMatrix<double> C(3, 3);
+  FullMatrix<double> D(3, 3, compare);
 
   //compute C= A*A^T
-  A.mTmult(C,A);
+  A.mTmult(C, A);
 
   C.add(-1., D);
   Assert(C.frobenius_norm() < 1e-12, ExcInternalError());

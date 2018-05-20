@@ -17,7 +17,6 @@
  * Author: Guido Kanschat and Timo Heister
  */
 
-
 // @note: This a work in progress example of parallel geometric
 // multigrid. Some parts are still in heavy development.
 
@@ -29,26 +28,26 @@
 // Again, the first few include files
 // are already known, so we won't
 // comment on them:
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/conditional_ostream.h>
 
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_gmres.h>
-#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -56,22 +55,21 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/base/index_set.h>
-#include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
 
-#include <deal.II/multigrid/mg_constrained_dofs.h>
-#include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_transfer.h>
-#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
-#include <deal.II/multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_matrix.h>
-
+#include <deal.II/multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/multigrid.h>
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
@@ -84,18 +82,17 @@ namespace LA
 #else
   using namespace dealii::LinearAlgebraTrilinos;
 #endif
-}
+} // namespace LA
 
 // This is C++:
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 // The last step is as in all
 // previous programs:
 namespace Step50
 {
   using namespace dealii;
-
 
   // @sect3{The <code>LaplaceProblem</code> class template}
 
@@ -105,34 +102,41 @@ namespace Step50
   class LaplaceProblem
   {
   public:
-    LaplaceProblem (const unsigned int deg);
-    void run ();
+    LaplaceProblem(const unsigned int deg);
+    void
+    run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void assemble_multigrid ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void
+    setup_system();
+    void
+    assemble_system();
+    void
+    assemble_multigrid();
+    void
+    solve();
+    void
+    refine_grid();
+    void
+    output_results(const unsigned int cycle) const;
 
-    ConditionalOStream                        pcout;
+    ConditionalOStream pcout;
 
-    parallel::distributed::Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>    mg_dof_handler;
+    parallel::distributed::Triangulation<dim> triangulation;
+    FE_Q<dim>                                 fe;
+    DoFHandler<dim>                           mg_dof_handler;
 
     typedef LA::MPI::SparseMatrix matrix_t;
-    typedef LA::MPI::Vector vector_t;
+    typedef LA::MPI::Vector       vector_t;
 
     matrix_t system_matrix;
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
-    vector_t       solution;
-    vector_t       system_rhs;
+    vector_t solution;
+    vector_t system_rhs;
 
     const unsigned int degree;
 
@@ -142,10 +146,8 @@ namespace Step50
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
     //
-    MGConstrainedDoFs                    mg_constrained_dofs;
+    MGConstrainedDoFs mg_constrained_dofs;
   };
-
-
 
   // @sect3{Nonconstant coefficients}
 
@@ -157,48 +159,45 @@ namespace Step50
   class Coefficient : public Function<dim>
   {
   public:
-    Coefficient () : Function<dim>() {}
+    Coefficient() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component = 0) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component = 0) const override;
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const override;
+    virtual void
+    value_list(const std::vector<Point<dim>>& points,
+               std::vector<double>&           values,
+               const unsigned int             component = 0) const override;
   };
 
-
-
   template <int dim>
-  double Coefficient<dim>::value (const Point<dim> &p,
-                                  const unsigned int) const
+  double
+  Coefficient<dim>::value(const Point<dim>& p, const unsigned int) const
   {
-    if (p.square() < 0.5*0.5)
+    if(p.square() < 0.5 * 0.5)
       return 5;
     else
       return 1;
   }
 
-
-
   template <int dim>
-  void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
-                                     std::vector<double>            &values,
-                                     const unsigned int              component) const
+  void
+  Coefficient<dim>::value_list(const std::vector<Point<dim>>& points,
+                               std::vector<double>&           values,
+                               const unsigned int             component) const
   {
-    (void)component;
+    (void) component;
     const unsigned int n_points = points.size();
 
-    Assert (values.size() == n_points,
-            ExcDimensionMismatch (values.size(), n_points));
+    Assert(values.size() == n_points,
+           ExcDimensionMismatch(values.size(), n_points));
 
-    Assert (component == 0,
-            ExcIndexRange (component, 0, 1));
+    Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-    for (unsigned int i=0; i<n_points; ++i)
-      values[i] = Coefficient<dim>::value (points[i]);
+    for(unsigned int i = 0; i < n_points; ++i)
+      values[i] = Coefficient<dim>::value(points[i]);
   }
-
 
   // @sect3{The <code>LaplaceProblem</code> class implementation}
 
@@ -228,19 +227,16 @@ namespace Step50
   // flag to the constructor of the
   // triangulation class.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
-    :
-    pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-            == 0)),
-    triangulation (MPI_COMM_WORLD,Triangulation<dim>::
-                   limit_level_difference_at_vertices,
-                   parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
-    fe (degree),
-    mg_dof_handler (triangulation),
-    degree(degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int degree)
+    : pcout(std::cout, (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)),
+      triangulation(MPI_COMM_WORLD,
+                    Triangulation<dim>::limit_level_difference_at_vertices,
+                    parallel::distributed::Triangulation<
+                      dim>::construct_multigrid_hierarchy),
+      fe(degree),
+      mg_dof_handler(triangulation),
+      degree(degree)
   {}
-
 
   // @sect4{LaplaceProblem::setup_system}
 
@@ -249,13 +245,14 @@ namespace Step50
   // part, apart from the additional output,
   // does the same:
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system()
   {
-    mg_dof_handler.distribute_dofs (fe);
-    mg_dof_handler.distribute_mg_dofs ();
+    mg_dof_handler.distribute_dofs(fe);
+    mg_dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
-                                             locally_relevant_set);
+    DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
+                                            locally_relevant_set);
 
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -280,23 +277,23 @@ namespace Step50
     // correctly into the global linear system
     // right away, without the need for a later
     // clean-up stage:
-    constraints.reinit (locally_relevant_set);
-    DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
+    constraints.reinit(locally_relevant_set);
+    DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
-    std::set<types::boundary_id>         dirichlet_boundary_ids;
-    typename FunctionMap<dim>::type      dirichlet_boundary;
-    Functions::ConstantFunction<dim>                    homogeneous_dirichlet_bc (1.0);
+    std::set<types::boundary_id>     dirichlet_boundary_ids;
+    typename FunctionMap<dim>::type  dirichlet_boundary;
+    Functions::ConstantFunction<dim> homogeneous_dirichlet_bc(1.0);
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values (mg_dof_handler,
-                                              dirichlet_boundary,
-                                              constraints);
-    constraints.close ();
+    VectorTools::interpolate_boundary_values(
+      mg_dof_handler, dirichlet_boundary, constraints);
+    constraints.close();
 
-    DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, dsp, constraints);
-    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
-
+    DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(),
+                               mg_dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(mg_dof_handler, dsp, constraints);
+    system_matrix.reinit(
+      mg_dof_handler.locally_owned_dofs(), dsp, MPI_COMM_WORLD, true);
 
     // The multigrid constraints have to be
     // initialized. They need to know about
@@ -305,8 +302,8 @@ namespace Step50
     // here as well.
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(mg_dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler, dirichlet_boundary_ids);
-
+    mg_constrained_dofs.make_zero_boundary_constraints(mg_dof_handler,
+                                                       dirichlet_boundary_ids);
 
     // Now for the things that concern the
     // multigrid data structures. First, we
@@ -325,10 +322,10 @@ namespace Step50
     // can be destroyed upon resizing.
     const unsigned int n_levels = triangulation.n_global_levels();
 
-    mg_interface_matrices.resize(0, n_levels-1);
-    mg_interface_matrices.clear_elements ();
-    mg_matrices.resize(0, n_levels-1);
-    mg_matrices.clear_elements ();
+    mg_interface_matrices.resize(0, n_levels - 1);
+    mg_interface_matrices.clear_elements();
+    mg_matrices.resize(0, n_levels - 1);
+    mg_matrices.clear_elements();
 
     // Now, we have to provide a matrix on each
     // level. To this end, we first use the
@@ -356,7 +353,7 @@ namespace Step50
     // use separate and different sparsity
     // patterns for these two kinds of
     // matrices.
-    for (unsigned int level=0; level<n_levels; ++level)
+    for(unsigned int level = 0; level < n_levels; ++level)
       {
         DynamicSparsityPattern dsp(mg_dof_handler.n_dofs(level),
                                    mg_dof_handler.n_dofs(level));
@@ -365,15 +362,17 @@ namespace Step50
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
                                   mg_dof_handler.locally_owned_mg_dofs(level),
                                   dsp,
-                                  MPI_COMM_WORLD, true);
+                                  MPI_COMM_WORLD,
+                                  true);
 
-        mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-                                            mg_dof_handler.locally_owned_mg_dofs(level),
-                                            dsp,
-                                            MPI_COMM_WORLD, true);
+        mg_interface_matrices[level].reinit(
+          mg_dof_handler.locally_owned_mg_dofs(level),
+          mg_dof_handler.locally_owned_mg_dofs(level),
+          dsp,
+          MPI_COMM_WORLD,
+          true);
       }
   }
-
 
   // @sect4{LaplaceProblem::assemble_system}
 
@@ -394,63 +393,65 @@ namespace Step50
   // discussion of this function in the
   // introduction of step-27.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system()
   {
-    const QGauss<dim>  quadrature_formula(degree+1);
+    const QGauss<dim> quadrature_formula(degree + 1);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values    |  update_gradients |
-                             update_quadrature_points  |  update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients
+                              | update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const Coefficient<dim> coefficient;
-    std::vector<double>    coefficient_values (n_q_points);
+    std::vector<double>    coefficient_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = mg_dof_handler.begin_active(),
-    endc = mg_dof_handler.end();
-    for (; cell!=endc; ++cell)
-      if (cell->is_locally_owned())
+    typename DoFHandler<dim>::active_cell_iterator cell
+      = mg_dof_handler.begin_active(),
+      endc = mg_dof_handler.end();
+    for(; cell != endc; ++cell)
+      if(cell->is_locally_owned())
         {
           cell_matrix = 0;
-          cell_rhs = 0;
+          cell_rhs    = 0;
 
-          fe_values.reinit (cell);
+          fe_values.reinit(cell);
 
-          coefficient.value_list (fe_values.get_quadrature_points(),
-                                  coefficient_values);
+          coefficient.value_list(fe_values.get_quadrature_points(),
+                                 coefficient_values);
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for(unsigned int i = 0; i < dofs_per_cell; ++i)
               {
-                for (unsigned int j=0; j<dofs_per_cell; ++j)
-                  cell_matrix(i,j) += (coefficient_values[q_point] *
-                                       fe_values.shape_grad(i,q_point) *
-                                       fe_values.shape_grad(j,q_point) *
-                                       fe_values.JxW(q_point));
+                for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                  cell_matrix(i, j) += (coefficient_values[q_point]
+                                        * fe_values.shape_grad(i, q_point)
+                                        * fe_values.shape_grad(j, q_point)
+                                        * fe_values.JxW(q_point));
 
-                cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-                                10.0 *
-                                fe_values.JxW(q_point));
+                cell_rhs(i) += (fe_values.shape_value(i, q_point) * 10.0
+                                * fe_values.JxW(q_point));
               }
 
-          cell->get_dof_indices (local_dof_indices);
-          constraints.distribute_local_to_global (cell_matrix, cell_rhs,
-                                                  local_dof_indices,
-                                                  system_matrix, system_rhs);
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 cell_rhs,
+                                                 local_dof_indices,
+                                                 system_matrix,
+                                                 system_rhs);
         }
 
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
   }
-
 
   // @sect4{LaplaceProblem::assemble_multigrid}
 
@@ -470,23 +471,25 @@ namespace Step50
   // take care of a significant amount of book
   // keeping:
   template <int dim>
-  void LaplaceProblem<dim>::assemble_multigrid ()
+  void
+  LaplaceProblem<dim>::assemble_multigrid()
   {
-    QGauss<dim>  quadrature_formula(1+degree);
+    QGauss<dim> quadrature_formula(1 + degree);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values   | update_gradients |
-                             update_quadrature_points | update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients
+                              | update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-    const unsigned int   n_q_points      = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     const Coefficient<dim> coefficient;
-    std::vector<double>    coefficient_values (n_q_points);
+    std::vector<double>    coefficient_values(n_q_points);
 
     // Next a few things that are specific to building the multigrid
     // data structures (since we only need them in the current
@@ -522,17 +525,22 @@ namespace Step50
     // ConstraintMatrix::add_line(); doing so for several degrees of
     // freedom at once can be done using
     // ConstraintMatrix::add_lines():
-    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
+    std::vector<ConstraintMatrix> boundary_constraints(
+      triangulation.n_global_levels());
     ConstraintMatrix empty_constraints;
-    for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
+    for(unsigned int level = 0; level < triangulation.n_global_levels();
+        ++level)
       {
         IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs (mg_dof_handler, level, dofset);
+        DoFTools::extract_locally_relevant_level_dofs(
+          mg_dof_handler, level, dofset);
         boundary_constraints[level].reinit(dofset);
-        boundary_constraints[level].add_lines (mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices(level));
+        boundary_constraints[level].add_lines(
+          mg_constrained_dofs.get_refinement_edge_indices(level));
+        boundary_constraints[level].add_lines(
+          mg_constrained_dofs.get_boundary_indices(level));
 
-        boundary_constraints[level].close ();
+        boundary_constraints[level].close();
       }
 
     // Now that we're done with most of our preliminaries, let's start
@@ -546,22 +554,22 @@ namespace Step50
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
 
-    for (; cell!=endc; ++cell)
-      if (cell->level_subdomain_id()==triangulation.locally_owned_subdomain())
+    for(; cell != endc; ++cell)
+      if(cell->level_subdomain_id() == triangulation.locally_owned_subdomain())
         {
           cell_matrix = 0;
-          fe_values.reinit (cell);
+          fe_values.reinit(cell);
 
-          coefficient.value_list (fe_values.get_quadrature_points(),
-                                  coefficient_values);
+          coefficient.value_list(fe_values.get_quadrature_points(),
+                                 coefficient_values);
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-            for (unsigned int i=0; i<dofs_per_cell; ++i)
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (coefficient_values[q_point] *
-                                     fe_values.shape_grad(i,q_point) *
-                                     fe_values.shape_grad(j,q_point) *
-                                     fe_values.JxW(q_point));
+          for(unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+            for(unsigned int i = 0; i < dofs_per_cell; ++i)
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j) += (coefficient_values[q_point]
+                                      * fe_values.shape_grad(i, q_point)
+                                      * fe_values.shape_grad(j, q_point)
+                                      * fe_values.JxW(q_point));
 
           // The rest of the assembly is again slightly
           // different. This starts with a gotcha that is easily
@@ -571,7 +579,7 @@ namespace Step50
           // MGDoFAccessorLLget_mg_dof_indices, not
           // MGDoFAccessor::get_dof_indices as used in the assembly of
           // the global system:
-          cell->get_mg_dof_indices (local_dof_indices);
+          cell->get_mg_dof_indices(local_dof_indices);
 
           // Next, we need to copy local contributions into the level
           // objects. We can do this in the same way as in the global
@@ -583,10 +591,8 @@ namespace Step50
           // the level matrices contains no contributions from degrees
           // of freedom at the interface between cells of different
           // refinement level.
-          boundary_constraints[cell->level()]
-          .distribute_local_to_global (cell_matrix,
-                                       local_dof_indices,
-                                       mg_matrices[cell->level()]);
+          boundary_constraints[cell->level()].distribute_local_to_global(
+            cell_matrix, local_dof_indices, mg_matrices[cell->level()]);
 
           // The next step is again slightly more obscure (but
           // explained in the @ref mg_paper): We need the remainder of
@@ -618,52 +624,49 @@ namespace Step50
           // the <code>solve()</code> function) be able to just pass
           // the transpose matrix where necessary.
 
-          const IndexSet &interface_dofs_on_level
+          const IndexSet& interface_dofs_on_level
             = mg_constrained_dofs.get_refinement_edge_indices(cell->level());
           const unsigned int lvl = cell->level();
 
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            for (unsigned int j=0; j<dofs_per_cell; ++j)
-              if (interface_dofs_on_level.is_element(local_dof_indices[i])   // at_refinement_edge(i)
-                  &&
-                  !interface_dofs_on_level.is_element(local_dof_indices[j])   // !at_refinement_edge(j)
-                  &&
-                  (
-                    (!mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
-                     &&
-                     !mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[j])
-                    ) // ( !boundary(i) && !boundary(j) )
-                    ||
-                    (
-                      mg_constrained_dofs.is_boundary_index(lvl, local_dof_indices[i])
-                      &&
-                      local_dof_indices[i]==local_dof_indices[j]
-                    ) // ( boundary(i) && boundary(j) && i==j )
-                  )
-                 )
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
+            for(unsigned int j = 0; j < dofs_per_cell; ++j)
+              if(
+                interface_dofs_on_level.is_element(
+                  local_dof_indices[i]) // at_refinement_edge(i)
+                && !interface_dofs_on_level.is_element(
+                     local_dof_indices[j]) // !at_refinement_edge(j)
+                && ((!mg_constrained_dofs.is_boundary_index(
+                       lvl, local_dof_indices[i])
+                     && !mg_constrained_dofs.is_boundary_index(
+                          lvl,
+                          local_dof_indices
+                            [j])) // ( !boundary(i) && !boundary(j) )
+                    || (mg_constrained_dofs.is_boundary_index(
+                          lvl, local_dof_indices[i])
+                        && local_dof_indices[i]
+                             == local_dof_indices
+                                  [j]) // ( boundary(i) && boundary(j) && i==j )
+                    ))
                 {
                   // do nothing, so add entries to interface matrix
                 }
               else
                 {
-                  cell_matrix(i,j) = 0;
+                  cell_matrix(i, j) = 0;
                 }
 
-
-          empty_constraints
-          .distribute_local_to_global (cell_matrix,
-                                       local_dof_indices,
-                                       mg_interface_matrices[cell->level()]);
+          empty_constraints.distribute_local_to_global(
+            cell_matrix,
+            local_dof_indices,
+            mg_interface_matrices[cell->level()]);
         }
 
-    for (unsigned int i=0; i<triangulation.n_global_levels(); ++i)
+    for(unsigned int i = 0; i < triangulation.n_global_levels(); ++i)
       {
         mg_matrices[i].compress(VectorOperation::add);
         mg_interface_matrices[i].compress(VectorOperation::add);
       }
   }
-
-
 
   // @sect4{LaplaceProblem::solve}
 
@@ -689,7 +692,8 @@ namespace Step50
   // five we have here, something better suited would obviously be
   // necessary here.
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve()
   {
     // Create the object that deals with the transfer between
     // different refinement levels.
@@ -697,13 +701,16 @@ namespace Step50
     // Now the prolongation matrix has to be built.
     mg_transfer.build_matrices(mg_dof_handler);
 
-    matrix_t &coarse_matrix = mg_matrices[0];
+    matrix_t& coarse_matrix = mg_matrices[0];
 
-    SolverControl coarse_solver_control (1000, 1e-10, false, false);
-    SolverCG<vector_t> coarse_solver(coarse_solver_control);
+    SolverControl        coarse_solver_control(1000, 1e-10, false, false);
+    SolverCG<vector_t>   coarse_solver(coarse_solver_control);
     PreconditionIdentity id;
-    MGCoarseGridIterativeSolver<vector_t, SolverCG<vector_t>, matrix_t, PreconditionIdentity>
-    coarse_grid_solver(coarse_solver, coarse_matrix, id);
+    MGCoarseGridIterativeSolver<vector_t,
+                                SolverCG<vector_t>,
+                                matrix_t,
+                                PreconditionIdentity>
+      coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
     // The next component of a multilevel solver or preconditioner is
     // that we need a smoother on each level. A common choice for this
@@ -736,7 +743,7 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef LA::MPI::PreconditionJacobi Smoother;
+    typedef LA::MPI::PreconditionJacobi                  Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices, Smoother::AdditionalData(0.5));
     mg_smoother.set_steps(2);
@@ -762,25 +769,21 @@ namespace Step50
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t > mg(mg_matrix,
-                            coarse_grid_solver,
-                            mg_transfer,
-                            mg_smoother,
-                            mg_smoother);
+    Multigrid<vector_t> mg(
+      mg_matrix, coarse_grid_solver, mg_transfer, mg_smoother, mg_smoother);
     //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
-    PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
-    preconditioner(mg_dof_handler, mg, mg_transfer);
-
+    PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t>> preconditioner(
+      mg_dof_handler, mg, mg_transfer);
 
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
-    SolverCG<vector_t> solver (solver_control);
+    SolverControl      solver_control(500, 1e-8 * system_rhs.l2_norm(), false);
+    SolverCG<vector_t> solver(solver_control);
 
-    if (false)
+    if(false)
       {
         /*
          // code to optionally compare to Trilinos ML
@@ -801,15 +804,13 @@ namespace Step50
       }
     else
       {
-        solver.solve (system_matrix, solution, system_rhs,
-                      preconditioner);
+        solver.solve(system_matrix, solution, system_rhs, preconditioner);
       }
-    pcout << "   CG converged in " << solver_control.last_step() << " iterations." << std::endl;
+    pcout << "   CG converged in " << solver_control.last_step()
+          << " iterations." << std::endl;
 
-    constraints.distribute (solution);
+    constraints.distribute(solution);
   }
-
-
 
   // @sect4{Postprocessing}
 
@@ -822,32 +823,31 @@ namespace Step50
   // <code>output_results()</code> method is quite different since each
   // processor writes only part of the overall graphical output.
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void
+  LaplaceProblem<dim>::refine_grid()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     LA::MPI::Vector temp_solution;
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
-    KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
-                                        QGauss<dim-1>(degree+1),
-                                        typename FunctionMap<dim>::type(),
-                                        temp_solution,
-                                        estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(
+      static_cast<DoFHandler<dim>&>(mg_dof_handler),
+      QGauss<dim - 1>(degree + 1),
+      typename FunctionMap<dim>::type(),
+      temp_solution,
+      estimated_error_per_cell);
 
-    parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_fraction (triangulation,
-                                       estimated_error_per_cell,
-                                       0.3, 0.0);
+    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
+      triangulation, estimated_error_per_cell, 0.3, 0.0);
 
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.execute_coarsening_and_refinement();
   }
 
-
-
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void
+  LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
     DataOut<dim> data_out;
 
@@ -855,59 +855,50 @@ namespace Step50
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
 
-
     LA::MPI::Vector temp = solution;
-    system_matrix.residual(temp,solution,system_rhs);
+    system_matrix.residual(temp, solution, system_rhs);
     LA::MPI::Vector res_ghosted = temp_solution;
-    res_ghosted = temp;
+    res_ghosted                 = temp;
 
-    data_out.attach_dof_handler (mg_dof_handler);
-    data_out.add_data_vector (temp_solution, "solution");
-    data_out.add_data_vector (res_ghosted, "res");
-    Vector<float> subdomain (triangulation.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
+    data_out.attach_dof_handler(mg_dof_handler);
+    data_out.add_data_vector(temp_solution, "solution");
+    data_out.add_data_vector(res_ghosted, "res");
+    Vector<float> subdomain(triangulation.n_active_cells());
+    for(unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
-    data_out.add_data_vector (subdomain, "subdomain");
+    data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.build_patches (0);
+    data_out.build_patches(0);
 
-    const std::string filename = ("solution-" +
-                                  Utilities::int_to_string (cycle, 5) +
-                                  "." +
-                                  Utilities::int_to_string
-                                  (triangulation.locally_owned_subdomain(), 4) +
-                                  ".vtu");
-    std::ofstream output (filename);
-    data_out.write_vtu (output);
+    const std::string filename
+      = ("solution-" + Utilities::int_to_string(cycle, 5) + "."
+         + Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4)
+         + ".vtu");
+    std::ofstream output(filename);
+    data_out.write_vtu(output);
 
-    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+    if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-          filenames.push_back (std::string("solution-") +
-                               Utilities::int_to_string (cycle, 5) +
-                               "." +
-                               Utilities::int_to_string(i, 4) +
-                               ".vtu");
-        const std::string
-        pvtu_master_filename = ("solution-" +
-                                Utilities::int_to_string (cycle, 5) +
-                                ".pvtu");
-        std::ofstream pvtu_master (pvtu_master_filename);
-        data_out.write_pvtu_record (pvtu_master, filenames);
+        for(unsigned int i = 0;
+            i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+            ++i)
+          filenames.push_back(std::string("solution-")
+                              + Utilities::int_to_string(cycle, 5) + "."
+                              + Utilities::int_to_string(i, 4) + ".vtu");
+        const std::string pvtu_master_filename
+          = ("solution-" + Utilities::int_to_string(cycle, 5) + ".pvtu");
+        std::ofstream pvtu_master(pvtu_master_filename);
+        data_out.write_pvtu_record(pvtu_master, filenames);
 
-        const std::string
-        visit_master_filename = ("solution-" +
-                                 Utilities::int_to_string (cycle, 5) +
-                                 ".visit");
-        std::ofstream visit_master (visit_master_filename);
-        DataOutBase::write_visit_record (visit_master, filenames);
+        const std::string visit_master_filename
+          = ("solution-" + Utilities::int_to_string(cycle, 5) + ".visit");
+        std::ofstream visit_master(visit_master_filename);
+        DataOutBase::write_visit_record(visit_master, filenames);
 
         std::cout << "   wrote " << pvtu_master_filename << std::endl;
-
       }
   }
-
 
   // @sect4{LaplaceProblem::run}
 
@@ -920,51 +911,50 @@ namespace Step50
   // level that we need in the multigrid
   // method.
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run()
   {
-    for (unsigned int cycle=0; cycle<15; ++cycle)
+    for(unsigned int cycle = 0; cycle < 15; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;
 
-        if (cycle == 0)
+        if(cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation);
+            GridGenerator::hyper_cube(triangulation);
 
-            triangulation.refine_global (4);
+            triangulation.refine_global(4);
           }
         else
-          refine_grid ();
+          refine_grid();
 
         pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells()
-              << std::endl;
+              << triangulation.n_global_active_cells() << std::endl;
 
-        setup_system ();
+        setup_system();
 
-        pcout << "   Number of degrees of freedom: "
-              << mg_dof_handler.n_dofs()
+        pcout << "   Number of degrees of freedom: " << mg_dof_handler.n_dofs()
               << " (by level: ";
-        for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
+        for(unsigned int level = 0; level < triangulation.n_global_levels();
+            ++level)
           pcout << mg_dof_handler.n_dofs(level)
-                << (level == triangulation.n_global_levels()-1
-                    ? ")" : ", ");
+                << (level == triangulation.n_global_levels() - 1 ? ")" : ", ");
         pcout << std::endl;
 
-        assemble_system ();
-        assemble_multigrid ();
+        assemble_system();
+        assemble_multigrid();
 
-        solve ();
-        output_results (cycle);
+        solve();
+        output_results(cycle);
       }
   }
-}
-
+} // namespace Step50
 
 // @sect3{The main() function}
 //
 // This is again the same function as
 // in step-6:
-int main (int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
   try
     {
@@ -973,12 +963,13 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-      LaplaceProblem<2> laplace_problem(1/*degree*/);
-      laplace_problem.run ();
+      LaplaceProblem<2> laplace_problem(1 /*degree*/);
+      laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -987,9 +978,10 @@ int main (int argc, char *argv[])
                 << "----------------------------------------------------"
                 << std::endl;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

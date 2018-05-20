@@ -13,75 +13,71 @@
 //
 // ---------------------------------------------------------------------
 
-
 // make sure the tensor t_ijkl=delta_ik delta_jl + delta_il delta_jk
 // actually maps a rank-2 tensor onto twice itself
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  SymmetricTensor<4,dim> t;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-        for (unsigned int l=0; l<dim; ++l)
-          t[i][j][k][l] = (((i==k) && (j==l) ? 1 : 0) +
-                           ((i==l) && (j==k) ? 1 : 0));
+  SymmetricTensor<4, dim> t;
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
+      for(unsigned int k = 0; k < dim; ++k)
+        for(unsigned int l = 0; l < dim; ++l)
+          t[i][j][k][l]
+            = (((i == k) && (j == l) ? 1 : 0) + ((i == l) && (j == k) ? 1 : 0));
 
-  SymmetricTensor<2,dim> a, b;
+  SymmetricTensor<2, dim> a, b;
   a[0][0] = 1;
   a[1][1] = 2;
   a[0][1] = 3;
 
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       {
         double tmp_ij = 0;
-        for (unsigned int k=0; k<dim; ++k)
-          for (unsigned int l=0; l<dim; ++l)
+        for(unsigned int k = 0; k < dim; ++k)
+          for(unsigned int l = 0; l < dim; ++l)
             {
               deallog << i << ' ' << j << ' ' << k << ' ' << l << ": "
-                      << t[i][j][k][l] << ' ' << a[k][l]
-                      << std::endl;
+                      << t[i][j][k][l] << ' ' << a[k][l] << std::endl;
               tmp_ij += t[i][j][k][l] * a[k][l];
             }
         b[i][j] = tmp_ij;
       }
 
-  AssertThrow (a == b/2, ExcInternalError());
+  AssertThrow(a == b / 2, ExcInternalError());
 
   // try the same thing with scaled
   // tensors etc
   t *= 2;
-  b.clear ();
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  b.clear();
+  for(unsigned int i = 0; i < dim; ++i)
+    for(unsigned int j = 0; j < dim; ++j)
       {
         double tmp_ij = 0;
-        for (unsigned int k=0; k<dim; ++k)
-          for (unsigned int l=0; l<dim; ++l)
+        for(unsigned int k = 0; k < dim; ++k)
+          for(unsigned int l = 0; l < dim; ++l)
             tmp_ij += t[i][j][k][l] * a[k][l];
         b[i][j] = tmp_ij;
       }
 
-  AssertThrow (a == b/4, ExcInternalError());
+  AssertThrow(a == b / 4, ExcInternalError());
 }
 
-
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

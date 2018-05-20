@@ -13,83 +13,87 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Check that graph coloring works on hp-mesh.
-
 
 #include "../tests.h"
 #include <vector>
 
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/hp/fe_values.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_values.h>
 
 template <int dim>
-std::vector<types::global_dof_index> get_conflict_indices_cfem(
-  typename hp::DoFHandler<dim>::active_cell_iterator const &it)
+std::vector<types::global_dof_index>
+get_conflict_indices_cfem(
+  typename hp::DoFHandler<dim>::active_cell_iterator const& it)
 {
-  std::vector<types::global_dof_index> local_dof_indices(it->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(
+    it->get_fe().dofs_per_cell);
   it->get_dof_indices(local_dof_indices);
 
   return local_dof_indices;
 }
 
 template <int dim>
-void check()
+void
+check()
 {
   // Create the Triangulation and the DoFHandler
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
   hp::FECollection<dim> fe_collection;
-  for (unsigned int degree=1; degree<4; ++degree)
+  for(unsigned int degree = 1; degree < 4; ++degree)
     fe_collection.push_back(FE_Q<dim>(degree));
-  hp::DoFHandler<dim> dof_handler(triangulation);
-  typename hp::DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active();
-  for (unsigned int degree=1; cell!=dof_handler.end(); ++cell,++degree)
-    cell->set_active_fe_index(degree%3);
+  hp::DoFHandler<dim>                                dof_handler(triangulation);
+  typename hp::DoFHandler<dim>::active_cell_iterator cell
+    = dof_handler.begin_active();
+  for(unsigned int degree = 1; cell != dof_handler.end(); ++cell, ++degree)
+    cell->set_active_fe_index(degree % 3);
   dof_handler.distribute_dofs(fe_collection);
 
   // Create an adapted mesh
-  for (cell=dof_handler.begin_active(); cell<dof_handler.end(); ++cell)
-    if ((cell->center()[0]==0.625) && (cell->center()[1]==0.625))
+  for(cell = dof_handler.begin_active(); cell < dof_handler.end(); ++cell)
+    if((cell->center()[0] == 0.625) && (cell->center()[1] == 0.625))
       cell->set_refine_flag();
 
   triangulation.execute_coarsening_and_refinement();
   dof_handler.distribute_dofs(fe_collection);
 
   // Create the coloring
-  std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator> > coloring(
-    GraphColoring::make_graph_coloring(dof_handler.begin_active(),dof_handler.end(),
-                                       std::function<std::vector<types::global_dof_index> (typename
-                                           hp::DoFHandler<dim>::active_cell_iterator const &)> (&get_conflict_indices_cfem<dim>)));
+  std::vector<std::vector<typename hp::DoFHandler<dim>::active_cell_iterator>>
+    coloring(GraphColoring::make_graph_coloring(
+      dof_handler.begin_active(),
+      dof_handler.end(),
+      std::function<std::vector<types::global_dof_index>(
+        typename hp::DoFHandler<dim>::active_cell_iterator const&)>(
+        &get_conflict_indices_cfem<dim>)));
 
   // Output the coloring
-  for (unsigned int color=0; color<coloring.size(); ++color)
+  for(unsigned int color = 0; color < coloring.size(); ++color)
     {
-      deallog<<"Color: "<<color<<std::endl;
-      for (unsigned int i=0; i<coloring[color].size(); ++i)
-        for (unsigned int j=0; j<dim; ++j)
-          deallog<<coloring[color][i]->center()[j]<<" ";
-      deallog<<std::endl;
+      deallog << "Color: " << color << std::endl;
+      for(unsigned int i = 0; i < coloring[color].size(); ++i)
+        for(unsigned int j = 0; j < dim; ++j)
+          deallog << coloring[color][i]->center()[j] << " ";
+      deallog << std::endl;
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
-  deallog<<std::setprecision(4);
-  deallog<<std::fixed;
+  deallog << std::setprecision(4);
+  deallog << std::fixed;
   deallog.attach(logfile);
 
-  check<2> ();
+  check<2>();
 
   return 0;
 }

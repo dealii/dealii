@@ -17,24 +17,25 @@
 
 #include "../tests.h"
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <vector>
 
-void test()
+void
+test()
 {
-  IndexSet is(8);
+  IndexSet     is(8);
   unsigned int rank = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  if (rank==0)
-    is.add_range(0,4);
-  if (rank==1)
-    is.add_range(4,8);
+  if(rank == 0)
+    is.add_range(0, 4);
+  if(rank == 1)
+    is.add_range(4, 8);
   is.compress();
   TrilinosWrappers::MPI::Vector tril_vector(is);
-  Vector<double> tmp(8);
-  for (unsigned int i=0; i<8; ++i)
+  Vector<double>                tmp(8);
+  for(unsigned int i = 0; i < 8; ++i)
     tmp[i] = i;
   tril_vector = tmp;
 
@@ -43,73 +44,75 @@ void test()
   MPI_Barrier(MPI_COMM_WORLD);
 
   IndexSet readwrite_is(8);
-  if (rank==0)
+  if(rank == 0)
     {
-      readwrite_is.add_range(0,2);
-      readwrite_is.add_range(6,8);
+      readwrite_is.add_range(0, 2);
+      readwrite_is.add_range(6, 8);
     }
-  if (rank==1)
-    readwrite_is.add_range(2,6);
+  if(rank == 1)
+    readwrite_is.add_range(2, 6);
   readwrite_is.compress();
   LinearAlgebra::ReadWriteVector<double> readwrite(readwrite_is);
-  readwrite.import(tril_vector,VectorOperation::insert);
-  if (rank==0)
+  readwrite.import(tril_vector, VectorOperation::insert);
+  if(rank == 0)
     {
       std::vector<double> comp(4);
       comp[0] = 0.;
       comp[1] = 1.;
       comp[2] = 6.;
       comp[3] = 7.;
-      for (unsigned int i=0; i<4; ++i)
-        AssertThrow(readwrite.local_element(i)==comp[i],
+      for(unsigned int i = 0; i < 4; ++i)
+        AssertThrow(readwrite.local_element(i) == comp[i],
                     ExcMessage("Element not copied correctly"));
     }
   MPI_Barrier(MPI_COMM_WORLD);
-  if (rank==1)
+  if(rank == 1)
     {
       std::vector<double> comp(4);
       comp[0] = 2.;
       comp[1] = 3.;
       comp[2] = 4.;
       comp[3] = 5.;
-      for (unsigned int i=0; i<4; ++i)
-        AssertThrow(readwrite.local_element(i)==comp[i],
+      for(unsigned int i = 0; i < 4; ++i)
+        AssertThrow(readwrite.local_element(i) == comp[i],
                     ExcMessage("Element not copied correctly"));
     }
 
-  readwrite.import(tril_vector,VectorOperation::add);
+  readwrite.import(tril_vector, VectorOperation::add);
 
-  if (rank==0)
+  if(rank == 0)
     {
       std::vector<double> comp(4);
       comp[0] = 0.;
       comp[1] = 2.;
       comp[2] = 12.;
       comp[3] = 14.;
-      for (unsigned int i=0; i<4; ++i)
-        AssertThrow(readwrite.local_element(i)==comp[i],
+      for(unsigned int i = 0; i < 4; ++i)
+        AssertThrow(readwrite.local_element(i) == comp[i],
                     ExcMessage("Element not copied correctly"));
     }
   MPI_Barrier(MPI_COMM_WORLD);
-  if (rank==1)
+  if(rank == 1)
     {
       std::vector<double> comp(4);
       comp[0] = 4.;
       comp[1] = 6.;
       comp[2] = 8.;
       comp[3] = 10.;
-      for (unsigned int i=0; i<4; ++i)
-        AssertThrow(readwrite.local_element(i)==comp[i],
+      for(unsigned int i = 0; i < 4; ++i)
+        AssertThrow(readwrite.local_element(i) == comp[i],
                     ExcMessage("Element not copied correctly"));
     }
 
-  deallog << "OK" <<std::endl;
+  deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
   test();
 }

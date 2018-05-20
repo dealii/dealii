@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check TrilinosWrappers::MPI::Vector::l1_norm()
 
 #include "../tests.h"
@@ -23,44 +21,44 @@
 #include <iostream>
 #include <vector>
 
-
-void test (TrilinosWrappers::MPI::Vector &v)
+void
+test(TrilinosWrappers::MPI::Vector& v)
 {
   // set some elements of the vector
   double norm = 0;
-  for (unsigned int i=0; i<v.size(); i+=1+i)
+  for(unsigned int i = 0; i < v.size(); i += 1 + i)
     {
       v(i) = i;
-      norm += std::fabs(1.*i);
+      norm += std::fabs(1. * i);
     }
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
   // then check the norm
-  AssertThrow (v.l1_norm() == norm, ExcInternalError());
+  AssertThrow(v.l1_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
       {
         TrilinosWrappers::MPI::Vector v;
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v);
+        test(v);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -71,9 +69,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

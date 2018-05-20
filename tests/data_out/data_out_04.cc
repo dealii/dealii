@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // write the data in deal.II intermediate form, read it back in, and
 // make sure that the result is the same
 
@@ -26,41 +24,36 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/numerics/data_out.h>
 
-
-
-
 // have a class that makes sure we can get at the patches and data set
 // names that the base class generates
 template <int dim>
 class XDataOut : public DataOut<dim>
 {
 public:
-  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  const std::vector<typename ::DataOutBase::Patch<dim, dim>>&
   get_patches() const
   {
     return DataOut<dim>::get_patches();
   }
 
   std::vector<std::string>
-  get_dataset_names () const
+  get_dataset_names() const
   {
     return DataOut<dim>::get_dataset_names();
   }
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string> >
-  get_vector_data_ranges () const
+  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+  get_vector_data_ranges() const
   {
     // if we have enough components for a
     // vector solution, make the last dim
     // components a vector
-    std::vector<std::tuple<unsigned int, unsigned int, std::string> >
-    retval;
-    if (get_dataset_names().size() >= dim)
-      retval.push_back (std::tuple
-                        <unsigned int, unsigned int, std::string>
-                        (get_dataset_names().size()-dim,
-                         get_dataset_names().size()-1,
-                         "vector_data"));
+    std::vector<std::tuple<unsigned int, unsigned int, std::string>> retval;
+    if(get_dataset_names().size() >= dim)
+      retval.push_back(std::tuple<unsigned int, unsigned int, std::string>(
+        get_dataset_names().size() - dim,
+        get_dataset_names().size() - 1,
+        "vector_data"));
     return retval;
   }
 };
@@ -71,93 +64,83 @@ template <int dim>
 class XDataOutReader : public DataOutReader<dim>
 {
 public:
-  const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
+  const std::vector<typename ::DataOutBase::Patch<dim, dim>>&
   get_patches() const
   {
     return DataOutReader<dim>::get_patches();
   }
 
   std::vector<std::string>
-  get_dataset_names () const
+  get_dataset_names() const
   {
     return DataOutReader<dim>::get_dataset_names();
   }
 
-  std::vector<std::tuple<unsigned int, unsigned int, std::string> >
-  get_vector_data_ranges () const
+  std::vector<std::tuple<unsigned int, unsigned int, std::string>>
+  get_vector_data_ranges() const
   {
-    return DataOutReader<dim>::get_vector_data_ranges ();
+    return DataOutReader<dim>::get_vector_data_ranges();
   }
 };
 
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler,
-            const Vector<double>  &v_node,
-            const Vector<double>  &v_cell)
+check_this(const DoFHandler<dim>& dof_handler,
+           const Vector<double>&  v_node,
+           const Vector<double>&  v_cell)
 {
   XDataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (v_node, "node_data", XDataOut<dim>::type_dof_data);
-  data_out.add_data_vector (v_cell, "cell_data", XDataOut<dim>::type_cell_data);
-  data_out.build_patches ();
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(v_node, "node_data", XDataOut<dim>::type_dof_data);
+  data_out.add_data_vector(v_cell, "cell_data", XDataOut<dim>::type_cell_data);
+  data_out.build_patches();
 
   {
-    std::ofstream tmp ("data_out_04.tmp");
-    data_out.write_deal_II_intermediate (tmp);
+    std::ofstream tmp("data_out_04.tmp");
+    data_out.write_deal_II_intermediate(tmp);
   }
 
   XDataOutReader<dim> reader;
   {
-    std::ifstream tmp ("data_out_04.tmp");
-    reader.read (tmp);
+    std::ifstream tmp("data_out_04.tmp");
+    reader.read(tmp);
   }
 
   // finally make sure that we have
   // read everything back in
   // correctly
-  Assert (data_out.get_dataset_names() == reader.get_dataset_names(),
-          ExcInternalError());
+  Assert(data_out.get_dataset_names() == reader.get_dataset_names(),
+         ExcInternalError());
 
-  Assert (data_out.get_patches().size() == reader.get_patches().size(),
-          ExcInternalError());
+  Assert(data_out.get_patches().size() == reader.get_patches().size(),
+         ExcInternalError());
 
-  for (unsigned int i=0; i<reader.get_patches().size(); ++i)
-    Assert (data_out.get_patches()[i] == reader.get_patches()[i],
-            ExcInternalError());
+  for(unsigned int i = 0; i < reader.get_patches().size(); ++i)
+    Assert(data_out.get_patches()[i] == reader.get_patches()[i],
+           ExcInternalError());
 
-  deallog << data_out.get_vector_data_ranges().size()
-          << std::endl;
-  Assert (data_out.get_vector_data_ranges().size() ==
-          reader.get_vector_data_ranges().size(),
-          ExcInternalError());
-  for (unsigned int i=0; i<data_out.get_vector_data_ranges().size(); ++i)
+  deallog << data_out.get_vector_data_ranges().size() << std::endl;
+  Assert(data_out.get_vector_data_ranges().size()
+           == reader.get_vector_data_ranges().size(),
+         ExcInternalError());
+  for(unsigned int i = 0; i < data_out.get_vector_data_ranges().size(); ++i)
     {
-      deallog << std::get<0>(data_out.get_vector_data_ranges()[i])
-              << ' '
-              << std::get<1>(data_out.get_vector_data_ranges()[i])
-              << ' '
-              << std::get<2>(data_out.get_vector_data_ranges()[i])
-              << std::endl;
-      Assert (std::get<0>(data_out.get_vector_data_ranges()[i])
-              ==
-              std::get<0>(reader.get_vector_data_ranges()[i]),
-              ExcInternalError());
-      Assert (std::get<1>(data_out.get_vector_data_ranges()[i])
-              ==
-              std::get<1>(reader.get_vector_data_ranges()[i]),
-              ExcInternalError());
-      Assert (std::get<2>(data_out.get_vector_data_ranges()[i])
-              ==
-              std::get<2>(reader.get_vector_data_ranges()[i]),
-              ExcInternalError());
+      deallog << std::get<0>(data_out.get_vector_data_ranges()[i]) << ' '
+              << std::get<1>(data_out.get_vector_data_ranges()[i]) << ' '
+              << std::get<2>(data_out.get_vector_data_ranges()[i]) << std::endl;
+      Assert(std::get<0>(data_out.get_vector_data_ranges()[i])
+               == std::get<0>(reader.get_vector_data_ranges()[i]),
+             ExcInternalError());
+      Assert(std::get<1>(data_out.get_vector_data_ranges()[i])
+               == std::get<1>(reader.get_vector_data_ranges()[i]),
+             ExcInternalError());
+      Assert(std::get<2>(data_out.get_vector_data_ranges()[i])
+               == std::get<2>(reader.get_vector_data_ranges()[i]),
+             ExcInternalError());
     }
 
   // for good measure, delete tmp file
-  remove ("data_out_04.tmp");
+  remove("data_out_04.tmp");
 
   deallog << "OK" << std::endl;
 }
-
-

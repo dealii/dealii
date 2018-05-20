@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_trace.h>
@@ -21,151 +20,117 @@
 // check
 //   FE_FaceQ/FaceP/TraceQ::face_interpolation
 
-
-
-
 void
-output_matrix (const FullMatrix<double> &m)
+output_matrix(const FullMatrix<double>& m)
 {
-  if ((m.m() == 0) || (m.n() == 0))
+  if((m.m() == 0) || (m.n() == 0))
     {
       deallog << "(Empty matrix)" << std::endl;
       return;
     }
 
-  deallog << m.l1_norm() << ' ' << m.linfty_norm()
-          << std::endl;
-  if (m.m() == m.n())
+  deallog << m.l1_norm() << ' ' << m.linfty_norm() << std::endl;
+  if(m.m() == m.n())
     deallog << m.frobenius_norm() << std::endl;
 
-  for (unsigned int i=0; i<std::min(m.m(),m.n()); ++i)
-    deallog << m(i,i) << ' ' << m(i,std::min(m.m(),m.n())-i-1) << ' ';
+  for(unsigned int i = 0; i < std::min(m.m(), m.n()); ++i)
+    deallog << m(i, i) << ' ' << m(i, std::min(m.m(), m.n()) - i - 1) << ' ';
   deallog << std::endl;
 }
 
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this(const FiniteElement<dim>& fe1, const FiniteElement<dim>& fe2)
 {
   // check all combinations of fe1 and fe2
   FullMatrix<double> face_constraints;
   try
     {
-      face_constraints.reinit (fe1.dofs_per_face,
-                               fe1.dofs_per_face);
-      fe1.get_face_interpolation_matrix (fe1, face_constraints);
+      face_constraints.reinit(fe1.dofs_per_face, fe1.dofs_per_face);
+      fe1.get_face_interpolation_matrix(fe1, face_constraints);
 
-      deallog << fe1.get_name()
-              << "  vs.  "
-              << fe1.get_name()
-              << std::endl;
-      output_matrix (face_constraints);
+      deallog << fe1.get_name() << "  vs.  " << fe1.get_name() << std::endl;
+      output_matrix(face_constraints);
     }
-  catch (...)
-    {
-    }
+  catch(...)
+    {}
 
   try
     {
-      face_constraints.reinit (fe2.dofs_per_face,
-                               fe2.dofs_per_face);
-      fe2.get_face_interpolation_matrix (fe2, face_constraints);
+      face_constraints.reinit(fe2.dofs_per_face, fe2.dofs_per_face);
+      fe2.get_face_interpolation_matrix(fe2, face_constraints);
 
-      deallog << fe2.get_name()
-              << "  vs.  "
-              << fe2.get_name()
-              << std::endl;
-      output_matrix (face_constraints);
+      deallog << fe2.get_name() << "  vs.  " << fe2.get_name() << std::endl;
+      output_matrix(face_constraints);
     }
-  catch (...)
-    {
-    }
+  catch(...)
+    {}
 
-  if (fe1.dofs_per_face <= fe2.dofs_per_face)
+  if(fe1.dofs_per_face <= fe2.dofs_per_face)
     try
       {
-        face_constraints.reinit (fe2.dofs_per_face,
-                                 fe1.dofs_per_face);
-        fe1.get_face_interpolation_matrix (fe2, face_constraints);
+        face_constraints.reinit(fe2.dofs_per_face, fe1.dofs_per_face);
+        fe1.get_face_interpolation_matrix(fe2, face_constraints);
 
-        deallog << fe1.get_name()
-                << "  vs.  "
-                << fe2.get_name()
-                << std::endl;
-        output_matrix (face_constraints);
+        deallog << fe1.get_name() << "  vs.  " << fe2.get_name() << std::endl;
+        output_matrix(face_constraints);
       }
-    catch (...)
-      {
-      }
+    catch(...)
+      {}
 
-  if (fe2.dofs_per_face <= fe1.dofs_per_face)
+  if(fe2.dofs_per_face <= fe1.dofs_per_face)
     try
       {
-        face_constraints.reinit (fe1.dofs_per_face,
-                                 fe2.dofs_per_face);
-        fe2.get_face_interpolation_matrix (fe1, face_constraints);
+        face_constraints.reinit(fe1.dofs_per_face, fe2.dofs_per_face);
+        fe2.get_face_interpolation_matrix(fe1, face_constraints);
 
-        deallog << fe2.get_name()
-                << "  vs.  "
-                << fe1.get_name()
-                << std::endl;
-        output_matrix (face_constraints);
+        deallog << fe2.get_name() << "  vs.  " << fe1.get_name() << std::endl;
+        output_matrix(face_constraints);
       }
-    catch (...)
-      {
-      }
+    catch(...)
+      {}
 }
-
 
 template <int dim>
 void
-check (const unsigned int degree1,
-       const unsigned int degree2)
+check(const unsigned int degree1, const unsigned int degree2)
 {
   {
-    deallog << "Checking FE_FaceQ in " << dim << "d:"
-            << std::endl;
+    deallog << "Checking FE_FaceQ in " << dim << "d:" << std::endl;
 
-    FE_FaceQ<dim> fe1 (degree1), fe2 (degree2);
+    FE_FaceQ<dim> fe1(degree1), fe2(degree2);
 
-    check_this (fe1, fe2);
+    check_this(fe1, fe2);
   }
   {
-    deallog << "Checking FE_FaceP in " << dim << "d:"
-            << std::endl;
+    deallog << "Checking FE_FaceP in " << dim << "d:" << std::endl;
 
-    FE_FaceP<dim> fe1 (degree1), fe2 (degree2);
+    FE_FaceP<dim> fe1(degree1), fe2(degree2);
 
-    check_this (fe1, fe2);
+    check_this(fe1, fe2);
   }
-  if (degree1 > 0 && degree2 > 0)
+  if(degree1 > 0 && degree2 > 0)
     {
-      deallog << "Checking FE_TraceQ in " << dim << "d:"
-              << std::endl;
+      deallog << "Checking FE_TraceQ in " << dim << "d:" << std::endl;
 
-      FE_TraceQ<dim> fe1 (degree1), fe2 (degree2);
+      FE_TraceQ<dim> fe1(degree1), fe2(degree2);
 
-      check_this (fe1, fe2);
+      check_this(fe1, fe2);
     }
 }
 
-
 template <int dim>
 void
-check ()
+check()
 {
-  check<dim>(0,0);
-  check<dim>(0,1);
-  check<dim>(0,2);
-  check<dim>(0,3);
-  check<dim>(1,2);
-  check<dim>(1,3);
-  check<dim>(2,3);
+  check<dim>(0, 0);
+  check<dim>(0, 1);
+  check<dim>(0, 2);
+  check<dim>(0, 3);
+  check<dim>(1, 2);
+  check<dim>(1, 3);
+  check<dim>(2, 3);
 }
-
-
 
 int
 main()
@@ -173,7 +138,7 @@ main()
   try
     {
       std::ofstream logfile("output");
-      deallog << std::setprecision (6);
+      deallog << std::setprecision(6);
       deallog.attach(logfile);
 
       check<1>();
@@ -182,9 +147,10 @@ main()
 
       return 0;
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -194,9 +160,10 @@ main()
               << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

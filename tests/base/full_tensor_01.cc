@@ -13,30 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test full 2x2 tensors
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  Tensor<2,2> t;
+  Tensor<2, 2> t;
   t[0][0] = 1;
   t[1][1] = 2;
   t[0][1] = 4;
   t[1][0] = 4;
   // make sure transposition doesn't change
   // anything
-  AssertThrow (t == transpose(t), ExcInternalError());
+  AssertThrow(t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  AssertThrow (std::fabs(t.norm() - std::sqrt(1.*1+2*2+2*4*4)) < 1e-14,
-               ExcInternalError());
+  AssertThrow(std::fabs(t.norm() - std::sqrt(1. * 1 + 2 * 2 + 2 * 4 * 4))
+                < 1e-14,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

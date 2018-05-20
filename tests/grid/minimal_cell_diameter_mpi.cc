@@ -13,62 +13,58 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
-
+#include <deal.II/grid/grid_tools.h>
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
-  if (true)
+  if(true)
     {
       parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for(unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: "
-                  << GridTools::minimal_cell_diameter (tria)
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
                   << std::endl;
         };
     };
 
   // test 2: hyperball
-  if (dim >= 2)
+  if(dim >= 2)
     {
       parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
       tria.reset_manifold(0);
 
-      for (unsigned int i=0; i<2; ++i)
+      for(unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "min diameter: "
-                  << GridTools::minimal_cell_diameter (tria)
+                  << "min diameter: " << GridTools::minimal_cell_diameter(tria)
                   << std::endl;
         };
     };
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll mpi_init_log;
 
-  test1<2> ();
-  test1<3> ();
+  test1<2>();
+  test1<3>();
 
   return 0;
 }
-

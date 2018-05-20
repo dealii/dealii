@@ -13,30 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::backward. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors; this time we actually store complex values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_square_matrix (m);
-  Vector<std::complex<number> > x, y;
-  make_complex_range_vector (x);
-  make_complex_range_vector (y);
+  FullMatrix<std::complex<number>> m;
+  make_complex_square_matrix(m);
+  Vector<std::complex<number>> x, y;
+  make_complex_range_vector(x);
+  make_complex_range_vector(y);
 
-  m.backward (x, y);
-  print_vector (x);
-  print_vector (y);
+  m.backward(x, y);
+  print_vector(x);
+  print_vector(y);
 }

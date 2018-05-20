@@ -13,69 +13,49 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check ParameterHandler::parse_input_from_xml
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
   ParameterHandler prm;
-  prm.declare_entry ("int1",
-                     "1",
-                     Patterns::Integer(),
-                     "doc 1");
-  prm.declare_entry ("int2",
-                     "2",
-                     Patterns::Integer(),
-                     "doc 2");
-  prm.enter_subsection ("ss1");
+  prm.declare_entry("int1", "1", Patterns::Integer(), "doc 1");
+  prm.declare_entry("int2", "2", Patterns::Integer(), "doc 2");
+  prm.enter_subsection("ss1");
   {
-    prm.declare_entry ("double 1",
-                       "1.234",
-                       Patterns::Double(),
-                       "doc 3");
+    prm.declare_entry("double 1", "1.234", Patterns::Double(), "doc 3");
 
-    prm.enter_subsection ("ss2");
+    prm.enter_subsection("ss2");
     {
-      prm.declare_entry ("double 2",
-                         "4.321",
-                         Patterns::Double(),
-                         "doc 4");
+      prm.declare_entry("double 2", "4.321", Patterns::Double(), "doc 4");
     }
-    prm.leave_subsection ();
+    prm.leave_subsection();
   }
-  prm.leave_subsection ();
+  prm.leave_subsection();
 
   // things with strange characters
-  prm.enter_subsection ("Testing%testing");
+  prm.enter_subsection("Testing%testing");
   {
-    prm.declare_entry ("string&list",
-                       "< & > ; /",
-                       Patterns::Anything(),
-                       "docs 1");
-    prm.declare_entry ("int*int",
-                       "2",
-                       Patterns::Integer());
-    prm.declare_entry ("double+double",
-                       "6.1415926",
-                       Patterns::Double(),
-                       "docs 3");
+    prm.declare_entry(
+      "string&list", "< & > ; /", Patterns::Anything(), "docs 1");
+    prm.declare_entry("int*int", "2", Patterns::Integer());
+    prm.declare_entry(
+      "double+double", "6.1415926", Patterns::Double(), "docs 3");
   }
-  prm.leave_subsection ();
+  prm.leave_subsection();
 
   // read from XML
-  std::ifstream in (SOURCE_DIR "/prm/parameter_handler_read_xml.prm");
-  prm.parse_input_from_xml (in);
+  std::ifstream in(SOURCE_DIR "/prm/parameter_handler_read_xml.prm");
+  prm.parse_input_from_xml(in);
 
   // write it out again
-  prm.print_parameters (deallog.get_file_stream(), ParameterHandler::XML);
+  prm.print_parameters(deallog.get_file_stream(), ParameterHandler::XML);
   logfile << std::endl;
 
   return 0;

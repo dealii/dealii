@@ -265,30 +265,29 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2002
  */
-template <int dim, int spacedim=dim>
-class FE_DGPNonparametric : public FiniteElement<dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_DGPNonparametric : public FiniteElement<dim, spacedim>
 {
 public:
   /**
    * Constructor for tensor product polynomials of degree @p k.
    */
-  FE_DGPNonparametric (const unsigned int k);
+  FE_DGPNonparametric(const unsigned int k);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGPNonparametric<dim>(degree)</tt>, with @p dim and @p
    * degree replaced by appropriate values.
    */
-  virtual std::string get_name () const override;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
   // for documentation, see the FiniteElement base class
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const override;
+  virtual UpdateFlags
+  requires_update_flags(const UpdateFlags update_flags) const override;
 
   /**
    * This function is intended to return the value of a shape function at a
@@ -300,8 +299,8 @@ public:
    * class, FiniteElement::shape_value(), this function throws an exception of
    * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value (const unsigned int i,
-                              const Point<dim> &p) const override;
+  virtual double
+  shape_value(const unsigned int i, const Point<dim>& p) const override;
 
   /**
    * This function is intended to return the value of a shape function at a
@@ -313,9 +312,10 @@ public:
    * class, FiniteElement::shape_value_component(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim> &p,
-                                        const unsigned int component) const override;
+  virtual double
+  shape_value_component(const unsigned int i,
+                        const Point<dim>&  p,
+                        const unsigned int component) const override;
 
   /**
    * This function is intended to return the gradient of a shape function at a
@@ -327,8 +327,8 @@ public:
    * class, FiniteElement::shape_grad(), this function throws an exception of
    * type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const override;
+  virtual Tensor<1, dim>
+  shape_grad(const unsigned int i, const Point<dim>& p) const override;
 
   /**
    * This function is intended to return the gradient of a shape function at a
@@ -340,9 +340,10 @@ public:
    * class, FiniteElement::shape_grad_component(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
-                                              const unsigned int component) const override;
+  virtual Tensor<1, dim>
+  shape_grad_component(const unsigned int i,
+                       const Point<dim>&  p,
+                       const unsigned int component) const override;
 
   /**
    * This function is intended to return the Hessian of a shape function at a
@@ -354,8 +355,8 @@ public:
    * class, FiniteElement::shape_grad_grad(), this function throws an
    * exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim> &p) const override;
+  virtual Tensor<2, dim>
+  shape_grad_grad(const unsigned int i, const Point<dim>& p) const override;
 
   /**
    * This function is intended to return the Hessian of a shape function at a
@@ -367,15 +368,17 @@ public:
    * class, FiniteElement::shape_grad_grad_component(), this function throws
    * an exception of type FiniteElement::ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim> &p,
-                                                   const unsigned int component) const override;
+  virtual Tensor<2, dim>
+  shape_grad_grad_component(const unsigned int i,
+                            const Point<dim>&  p,
+                            const unsigned int component) const override;
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value
    * passed to the constructor.
    */
-  unsigned int get_degree () const;
+  unsigned int
+  get_degree() const;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -389,8 +392,8 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const override;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim>& source,
+                                FullMatrix<double>& matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -404,9 +407,9 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const override;
+  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim>& source,
+                                   const unsigned int                  subface,
+                                   FullMatrix<double>& matrix) const override;
 
   /**
    * @name Functions to support hp
@@ -431,9 +434,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim>& fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -442,9 +445,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim>& fe_other) const override;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -453,9 +456,9 @@ public:
    * This being a discontinuous element, the set of such constraints is of
    * course empty.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(
+    const FiniteElement<dim, spacedim>& fe_other) const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
@@ -465,7 +468,8 @@ public:
    * of the degree of the element), as it has no hanging nodes (being a
    * discontinuous element).
    */
-  virtual bool hp_constraints_are_implemented () const override;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -476,9 +480,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const override;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim>& fe_other) const override;
 
   /**
    * @}
@@ -488,8 +492,9 @@ public:
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const override;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -499,66 +504,72 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const override;
+  virtual std::size_t
+  memory_consumption() const override;
 
 protected:
-
   /**
    * Prepare internal data structures and fill in values independent of the
    * cell.
    */
-  virtual
-  std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>
-  get_data (const UpdateFlags                                                    update_flags,
-            const Mapping<dim,spacedim>                                         &mapping,
-            const Quadrature<dim>                                               &quadrature,
-            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual std::unique_ptr<
+    typename FiniteElement<dim, spacedim>::InternalDataBase>
+  get_data(const UpdateFlags             update_flags,
+           const Mapping<dim, spacedim>& mapping,
+           const Quadrature<dim>&        quadrature,
+           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<
+             dim,
+             spacedim>& output_data) const override;
 
-  virtual
-  void
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                  const CellSimilarity::Similarity                                     cell_similarity,
-                  const Quadrature<dim>                                               &quadrature,
-                  const Mapping<dim,spacedim>                                         &mapping,
-                  const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                  const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const Quadrature<dim>&                                      quadrature,
+    const Mapping<dim, spacedim>&                               mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase& mapping_internal,
+    const dealii::internal::FEValuesImplementation::
+      MappingRelatedData<dim, spacedim>&                           mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase& fe_internal,
+    dealii::internal::FEValuesImplementation::
+      FiniteElementRelatedData<dim, spacedim>& output_data) const override;
 
-  virtual
-  void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                       const unsigned int                                                   face_no,
-                       const Quadrature<dim-1>                                             &quadrature,
-                       const Mapping<dim,spacedim>                                         &mapping,
-                       const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                       const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1>&                                  quadrature,
+    const Mapping<dim, spacedim>&                               mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase& mapping_internal,
+    const dealii::internal::FEValuesImplementation::
+      MappingRelatedData<dim, spacedim>&                           mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase& fe_internal,
+    dealii::internal::FEValuesImplementation::
+      FiniteElementRelatedData<dim, spacedim>& output_data) const override;
 
-  virtual
-  void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                          const unsigned int                                                   face_no,
-                          const unsigned int                                                   sub_no,
-                          const Quadrature<dim-1>                                             &quadrature,
-                          const Mapping<dim,spacedim>                                         &mapping,
-                          const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
-                          const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const override;
+  virtual void
+  fill_fe_subface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator& cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          sub_no,
+    const Quadrature<dim - 1>&                                  quadrature,
+    const Mapping<dim, spacedim>&                               mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase& mapping_internal,
+    const dealii::internal::FEValuesImplementation::
+      MappingRelatedData<dim, spacedim>&                           mapping_data,
+    const typename FiniteElement<dim, spacedim>::InternalDataBase& fe_internal,
+    dealii::internal::FEValuesImplementation::
+      FiniteElementRelatedData<dim, spacedim>& output_data) const override;
 
 private:
-
   /**
    * Only for internal use. Its full name is @p get_dofs_per_object_vector
    * function and it creates the @p dofs_per_object vector that is needed
    * within the constructor to be passed to the constructor of @p
    * FiniteElementData.
    */
-  static
-  std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int degree);
 
   /**
    * Pointer to an object representing the polynomial space used here.
@@ -568,7 +579,8 @@ private:
   /**
    * Allow access from other dimensions.
    */
-  template <int, int> friend class FE_DGPNonparametric;
+  template <int, int>
+  friend class FE_DGPNonparametric;
 };
 
 /*@}*/

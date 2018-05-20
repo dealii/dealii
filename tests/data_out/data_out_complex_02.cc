@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check DataOut for complex vectors, using the vector-valued path
 //
 // this test uses the method that generates the names of vector
@@ -22,51 +21,47 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
 #include <iomanip>
 #include <string>
 
-
-
 template <int dim>
 void
-check ()
+check()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global (1);
+  tria.refine_global(1);
   tria.begin_active()->set_refine_flag();
-  tria.execute_coarsening_and_refinement ();
+  tria.execute_coarsening_and_refinement();
 
-  FESystem<dim> fe(FE_Q<dim>(1), 2);
-  DoFHandler<dim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FESystem<dim>   fe(FE_Q<dim>(1), 2);
+  DoFHandler<dim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
-  Vector<std::complex<double> > v (dof_handler.n_dofs());
-  for (unsigned int i=0; i<v.size(); ++i)
-    v(i) = std::complex<double>(1.*i,-1.*i);
+  Vector<std::complex<double>> v(dof_handler.n_dofs());
+  for(unsigned int i = 0; i < v.size(); ++i)
+    v(i) = std::complex<double>(1. * i, -1. * i);
 
   DataOut<dim> data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (v, "node_data");
-  data_out.build_patches ();
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(v, "node_data");
+  data_out.build_patches();
 
-  data_out.write_gnuplot (deallog.get_file_stream());
+  data_out.write_gnuplot(deallog.get_file_stream());
 }
-
-
 
 int
 main()
@@ -75,13 +70,14 @@ main()
 
   try
     {
-      check<1> ();
-      check<2> ();
-      check<3> ();
+      check<1>();
+      check<2>();
+      check<3>();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -91,9 +87,10 @@ main()
               << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl
@@ -103,4 +100,3 @@ main()
       return 1;
     }
 }
-

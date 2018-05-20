@@ -18,17 +18,17 @@
 #include "../tests.h"
 #include <iostream>
 
-#include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
 
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/fe_field_function.h>
 
 #include <deal.II/fe/mapping_q.h>
@@ -36,7 +36,8 @@
 using namespace dealii;
 
 template <int dim>
-void test_compute_pt_loc(unsigned int n_points)
+void
+test_compute_pt_loc(unsigned int n_points)
 {
   deallog << "Testing for dim = " << dim << std::endl;
   deallog << "Testing on: " << n_points << " points." << std::endl;
@@ -44,61 +45,61 @@ void test_compute_pt_loc(unsigned int n_points)
   // Creating a grid in the square [0,1]x[0,1]
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
-  tria.refine_global(std::max(6-dim,2));
+  tria.refine_global(std::max(6 - dim, 2));
 
   //Creating the finite elements needed:
-  FE_Q<dim> fe(1);
+  FE_Q<dim>       fe(1);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
   // Creating the random points
   std::vector<Point<dim>> points;
 
-  for (size_t i=0; i<n_points; ++i)
+  for(size_t i = 0; i < n_points; ++i)
     points.push_back(random_point<dim>());
 
   std::vector<typename DoFHandler<dim>::active_cell_iterator> cells;
-  std::vector<std::vector<Point<dim> > > qpoints;
-  std::vector<std::vector<unsigned int> > maps;
+  std::vector<std::vector<Point<dim>>>                        qpoints;
+  std::vector<std::vector<unsigned int>>                      maps;
 
   // Creating a dummy vector/fe_field_function in order to use FEFieldFunction
-  Vector<double> dummy;
-  Functions::FEFieldFunction<dim> fe_function(dof_handler, dummy, StaticMappingQ1<dim,dim>::mapping);
-  size_t n_cells = fe_function.compute_point_locations(points, cells, qpoints, maps);
+  Vector<double>                  dummy;
+  Functions::FEFieldFunction<dim> fe_function(
+    dof_handler, dummy, StaticMappingQ1<dim, dim>::mapping);
+  size_t n_cells
+    = fe_function.compute_point_locations(points, cells, qpoints, maps);
 
   deallog << "Points found in " << n_cells << " cells" << std::endl;
 
   // testing if the transformation is correct:
   // For each cell check if the quadrature points in the i-th FE
   // are the same as maps[i]
-  for (unsigned int i=0; i<cells.size(); ++i)
+  for(unsigned int i = 0; i < cells.size(); ++i)
     {
-      auto &cell = cells[i];
-      auto &quad = qpoints[i];
-      auto &local_map = maps[i];
+      auto& cell      = cells[i];
+      auto& quad      = qpoints[i];
+      auto& local_map = maps[i];
 
       // Given the qpoints of the current cell, compute the real points
       FEValues<dim> fev(fe, quad, update_quadrature_points);
       fev.reinit(cell);
-      const auto &real_quad = fev.get_quadrature_points();
+      const auto& real_quad = fev.get_quadrature_points();
 
-      for (unsigned int q=0; q<real_quad.size(); ++q)
+      for(unsigned int q = 0; q < real_quad.size(); ++q)
         {
           // Check if points are the same as real points
-          if (real_quad[q].distance(points[local_map[q]]) > 1e-10)
-            deallog << "Error on cell : " << cell
-                    << " at local point " << i
-                    << ", corresponding to real point "
-                    << points[local_map[q]]
-                    << ", that got transformed to "
-                    << real_quad[q]
+          if(real_quad[q].distance(points[local_map[q]]) > 1e-10)
+            deallog << "Error on cell : " << cell << " at local point " << i
+                    << ", corresponding to real point " << points[local_map[q]]
+                    << ", that got transformed to " << real_quad[q]
                     << " instead." << std::endl;
         }
     }
   deallog << "Test finished" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 

@@ -34,13 +34,15 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-    template <typename> class BlockVector;
+    template <typename>
+    class BlockVector;
   }
-}
+} // namespace LinearAlgebra
 
 namespace LinearAlgebra
 {
-  template <typename> class ReadWriteVector;
+  template <typename>
+  class ReadWriteVector;
 }
 
 #ifdef DEAL_II_WITH_PETSC
@@ -50,7 +52,7 @@ namespace PETScWrappers
   {
     class Vector;
   }
-}
+} // namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -60,7 +62,7 @@ namespace TrilinosWrappers
   {
     class Vector;
   }
-}
+} // namespace TrilinosWrappers
 #endif
 
 namespace LinearAlgebra
@@ -175,16 +177,16 @@ namespace LinearAlgebra
      */
     template <typename Number>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
-      public Subscriptor
+                   public Subscriptor
     {
     public:
       typedef Number                                            value_type;
-      typedef value_type                                       *pointer;
-      typedef const value_type                                 *const_pointer;
-      typedef value_type                                       *iterator;
-      typedef const value_type                                 *const_iterator;
-      typedef value_type                                       &reference;
-      typedef const value_type                                 &const_reference;
+      typedef value_type*                                       pointer;
+      typedef const value_type*                                 const_pointer;
+      typedef value_type*                                       iterator;
+      typedef const value_type*                                 const_iterator;
+      typedef value_type&                                       reference;
+      typedef const value_type&                                 const_reference;
       typedef types::global_dof_index                           size_type;
       typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
@@ -195,18 +197,18 @@ namespace LinearAlgebra
       /**
        * Empty constructor.
        */
-      Vector ();
+      Vector();
 
       /**
        * Copy constructor. Uses the parallel partitioning of @p in_vector.
        */
-      Vector (const Vector<Number> &in_vector);
+      Vector(const Vector<Number>& in_vector);
 
       /**
        * Construct a parallel vector of the given global size without any
        * actual parallel distribution.
        */
-      Vector (const size_type size);
+      Vector(const size_type size);
 
       /**
        * Construct a parallel vector. The local range is specified by @p
@@ -224,15 +226,14 @@ namespace LinearAlgebra
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      Vector (const IndexSet &local_range,
-              const IndexSet &ghost_indices,
-              const MPI_Comm  communicator);
+      Vector(const IndexSet& local_range,
+             const IndexSet& ghost_indices,
+             const MPI_Comm  communicator);
 
       /**
        * Same constructor as above but without any ghost indices.
        */
-      Vector (const IndexSet &local_range,
-              const MPI_Comm  communicator);
+      Vector(const IndexSet& local_range, const MPI_Comm communicator);
 
       /**
        * Create the vector based on the parallel partitioning described in @p
@@ -240,19 +241,20 @@ namespace LinearAlgebra
        * partitioner data only once and share it between several vectors with
        * the same layout.
        */
-      Vector (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      Vector(
+        const std::shared_ptr<const Utilities::MPI::Partitioner>& partitioner);
 
       /**
        * Destructor.
        */
-      virtual ~Vector () override;
+      virtual ~Vector() override;
 
       /**
        * Set the global size of the vector to @p size without any actual
        * parallel distribution.
        */
-      void reinit (const size_type size,
-                   const bool      omit_zeroing_entries = false);
+      void
+      reinit(const size_type size, const bool omit_zeroing_entries = false);
 
       /**
        * Uses the parallel layout of the input vector @p in_vector and
@@ -265,8 +267,9 @@ namespace LinearAlgebra
        * it).
        */
       template <typename Number2>
-      void reinit(const Vector<Number2> &in_vector,
-                  const bool             omit_zeroing_entries = false);
+      void
+      reinit(const Vector<Number2>& in_vector,
+             const bool             omit_zeroing_entries = false);
 
       /**
        * Initialize the vector. The local range is specified by @p
@@ -284,15 +287,16 @@ namespace LinearAlgebra
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void reinit (const IndexSet &local_range,
-                   const IndexSet &ghost_indices,
-                   const MPI_Comm  communicator);
+      void
+      reinit(const IndexSet& local_range,
+             const IndexSet& ghost_indices,
+             const MPI_Comm  communicator);
 
       /**
        * Same as above, but without ghost entries.
        */
-      void reinit (const IndexSet &local_range,
-                   const MPI_Comm  communicator);
+      void
+      reinit(const IndexSet& local_range, const MPI_Comm communicator);
 
       /**
        * Initialize the vector given to the parallel partitioning described in
@@ -300,7 +304,9 @@ namespace LinearAlgebra
        * the partitioner data only once and share it between several vectors
        * with the same layout.
        */
-      void reinit (const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+      void
+      reinit(
+        const std::shared_ptr<const Utilities::MPI::Partitioner>& partitioner);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -317,7 +323,8 @@ namespace LinearAlgebra
        * This function is virtual in order to allow for derived classes to
        * handle memory separately.
        */
-      void swap (Vector<Number> &v);
+      void
+      swap(Vector<Number>& v);
 
       /**
        * Assigns the vector to the parallel partitioning of the input vector
@@ -330,8 +337,8 @@ namespace LinearAlgebra
        * at all, the vector will also update its ghost values in analogy to
        * the respective setting the Trilinos and PETSc vectors.
        */
-      Vector<Number> &
-      operator = (const Vector<Number> &in_vector);
+      Vector<Number>&
+      operator=(const Vector<Number>& in_vector);
 
       /**
        * Assigns the vector to the parallel partitioning of the input vector
@@ -345,8 +352,8 @@ namespace LinearAlgebra
        * the respective setting the Trilinos and PETSc vectors.
        */
       template <typename Number2>
-      Vector<Number> &
-      operator = (const Vector<Number2> &in_vector);
+      Vector<Number>&
+      operator=(const Vector<Number2>& in_vector);
 
 #ifdef DEAL_II_WITH_PETSC
       /**
@@ -360,8 +367,8 @@ namespace LinearAlgebra
        * ReadWriteVector instead.
        */
       DEAL_II_DEPRECATED
-      Vector<Number> &
-      operator = (const PETScWrappers::MPI::Vector &petsc_vec);
+      Vector<Number>&
+      operator=(const PETScWrappers::MPI::Vector& petsc_vec);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -377,8 +384,8 @@ namespace LinearAlgebra
        * ReadWriteVector instead.
        */
       DEAL_II_DEPRECATED
-      Vector<Number> &
-      operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec);
+      Vector<Number>&
+      operator=(const TrilinosWrappers::MPI::Vector& trilinos_vec);
 #endif
       //@}
 
@@ -408,7 +415,8 @@ namespace LinearAlgebra
        * ghost element is found, it is compared to the value on the owning
        * processor and an exception is thrown if these elements do not agree.
        */
-      virtual void compress (::dealii::VectorOperation::values operation) override;
+      virtual void
+      compress(::dealii::VectorOperation::values operation) override;
 
       /**
        * Fills the data field for ghost indices with the values stored in the
@@ -431,7 +439,8 @@ namespace LinearAlgebra
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      void update_ghost_values () const;
+      void
+      update_ghost_values() const;
 
       /**
        * Initiates communication for the @p compress() function with non-
@@ -447,8 +456,10 @@ namespace LinearAlgebra
        * communication channel to each such call, in order to avoid several
        * messages with the same ID that will corrupt this operation.
        */
-      void compress_start (const unsigned int communication_channel = 0,
-                           ::dealii::VectorOperation::values operation = VectorOperation::add);
+      void
+      compress_start(const unsigned int communication_channel = 0,
+                     ::dealii::VectorOperation::values operation
+                     = VectorOperation::add);
 
       /**
        * For all requests that have been initiated in compress_start, wait for
@@ -465,7 +476,8 @@ namespace LinearAlgebra
        *
        * Must follow a call to the @p compress_start function.
        */
-      void compress_finish (::dealii::VectorOperation::values operation);
+      void
+      compress_finish(::dealii::VectorOperation::values operation);
 
       /**
        * Initiates communication for the @p update_ghost_values() function
@@ -481,8 +493,9 @@ namespace LinearAlgebra
        * unique communication channel to each such call, in order to avoid
        * several messages with the same ID that will corrupt this operation.
        */
-      void update_ghost_values_start (const unsigned int communication_channel = 0) const;
-
+      void
+      update_ghost_values_start(const unsigned int communication_channel
+                                = 0) const;
 
       /**
        * For all requests that have been started in update_ghost_values_start,
@@ -491,7 +504,8 @@ namespace LinearAlgebra
        * Must follow a call to the @p update_ghost_values_start function
        * before reading data from ghost indices.
        */
-      void update_ghost_values_finish () const;
+      void
+      update_ghost_values_finish() const;
 
       /**
        * This method zeros the entries on ghost dofs, but does not touch
@@ -501,7 +515,8 @@ namespace LinearAlgebra
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
        */
-      void zero_out_ghosts () const;
+      void
+      zero_out_ghosts() const;
 
       /**
        * Return whether the vector currently is in a state where ghost values
@@ -514,7 +529,8 @@ namespace LinearAlgebra
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
-      bool has_ghost_elements() const;
+      bool
+      has_ghost_elements() const;
 
       /**
        * This method copies the data in the locally owned range from another
@@ -531,7 +547,8 @@ namespace LinearAlgebra
        * correct results.
        */
       template <typename Number2>
-      void copy_locally_owned_data_from(const Vector<Number2> &src);
+      void
+      copy_locally_owned_data_from(const Vector<Number2>& src);
 
       //@}
 
@@ -544,28 +561,33 @@ namespace LinearAlgebra
        * Change the dimension to that of the vector V. The elements of V are not
        * copied.
        */
-      virtual void reinit(const VectorSpaceVector<Number> &V,
-                          const bool omit_zeroing_entries = false) override;
+      virtual void
+      reinit(const VectorSpaceVector<Number>& V,
+             const bool omit_zeroing_entries = false) override;
 
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual Vector<Number> &operator*= (const Number factor) override;
+      virtual Vector<Number>&
+      operator*=(const Number factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector<Number> &operator/= (const Number factor) override;
+      virtual Vector<Number>&
+      operator/=(const Number factor) override;
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector<Number> &operator+= (const VectorSpaceVector<Number> &V) override;
+      virtual Vector<Number>&
+      operator+=(const VectorSpaceVector<Number>& V) override;
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector<Number> &operator-= (const VectorSpaceVector<Number> &V) override;
+      virtual Vector<Number>&
+      operator-=(const VectorSpaceVector<Number>& V) override;
 
       /**
        * Import all the elements present in the vector's IndexSet from the input
@@ -575,80 +597,97 @@ namespace LinearAlgebra
        * communication pattern is used multiple times. This can be used to improve
        * performance.
        */
-      virtual void import(const LinearAlgebra::ReadWriteVector<Number> &V,
-                          VectorOperation::values operation,
-                          std::shared_ptr<const CommunicationPatternBase> communication_pattern =
-                            std::shared_ptr<const CommunicationPatternBase> ()) override;
+      virtual void
+      import(
+        const LinearAlgebra::ReadWriteVector<Number>&   V,
+        VectorOperation::values                         operation,
+        std::shared_ptr<const CommunicationPatternBase> communication_pattern
+        = std::shared_ptr<const CommunicationPatternBase>()) override;
 
       /**
        * Return the scalar product of two vectors.
        */
-      virtual Number operator* (const VectorSpaceVector<Number> &V) const override;
+      virtual Number
+      operator*(const VectorSpaceVector<Number>& V) const override;
 
       /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
        */
-      virtual void add(const Number a) override;
+      virtual void
+      add(const Number a) override;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
        */
-      virtual void add(const Number a, const VectorSpaceVector<Number> &V) override;
+      virtual void
+      add(const Number a, const VectorSpaceVector<Number>& V) override;
 
       /**
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
        */
-      virtual void add(const Number a, const VectorSpaceVector<Number> &V,
-                       const Number b, const VectorSpaceVector<Number> &W) override;
+      virtual void
+      add(const Number                     a,
+          const VectorSpaceVector<Number>& V,
+          const Number                     b,
+          const VectorSpaceVector<Number>& W) override;
 
       /**
        * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
-      virtual void add (const std::vector<size_type> &indices,
-                        const std::vector<Number>    &values);
+      virtual void
+      add(const std::vector<size_type>& indices,
+          const std::vector<Number>&    values);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt>.
        */
-      virtual void sadd(const Number s, const Number a,
-                        const VectorSpaceVector<Number> &V) override;
+      virtual void
+      sadd(const Number                     s,
+           const Number                     a,
+           const VectorSpaceVector<Number>& V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
        * argument. This function is mostly meant to simulate multiplication (and
        * immediate re-assignment) by a diagonal scaling matrix.
        */
-      virtual void scale(const VectorSpaceVector<Number> &scaling_factors) override;
+      virtual void
+      scale(const VectorSpaceVector<Number>& scaling_factors) override;
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
-      virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
+      virtual void
+      equ(const Number a, const VectorSpaceVector<Number>& V) override;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual real_type l1_norm() const override;
+      virtual real_type
+      l1_norm() const override;
 
       /**
        * Return the $l_2$ norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual real_type l2_norm() const override;
+      virtual real_type
+      l2_norm() const override;
 
       /**
        * Return the square of the $l_2$ norm of the vector.
        */
-      real_type norm_sqr() const;
+      real_type
+      norm_sqr() const;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual real_type linfty_norm() const override;
+      virtual real_type
+      linfty_norm() const override;
 
       /**
        * Perform a combined operation of a vector addition and a subsequent
@@ -669,15 +708,17 @@ namespace LinearAlgebra
        * For complex-valued vectors, the scalar product in the second step is implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual Number add_and_dot(const Number a,
-                                 const VectorSpaceVector<Number> &V,
-                                 const VectorSpaceVector<Number> &W) override;
+      virtual Number
+      add_and_dot(const Number                     a,
+                  const VectorSpaceVector<Number>& V,
+                  const VectorSpaceVector<Number>& W) override;
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
        * locally owned indices among all processors.
        */
-      virtual size_type size() const override;
+      virtual size_type
+      size() const override;
 
       /**
        * Return an index set that describes which elements of this vector are
@@ -690,20 +731,23 @@ namespace LinearAlgebra
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode
        */
-      virtual dealii::IndexSet locally_owned_elements() const override;
+      virtual dealii::IndexSet
+      locally_owned_elements() const override;
 
       /**
        * Print the vector to the output stream @p out.
        */
-      virtual void print(std::ostream &out,
-                         const unsigned int precision=3,
-                         const bool scientific=true,
-                         const bool across=true) const override;
+      virtual void
+      print(std::ostream&      out,
+            const unsigned int precision  = 3,
+            const bool         scientific = true,
+            const bool         across     = true) const override;
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      virtual std::size_t memory_consumption() const override;
+      virtual std::size_t
+      memory_consumption() const override;
       //@}
 
       /**
@@ -716,31 +760,34 @@ namespace LinearAlgebra
        * zero, also ghost elements are set to zero, otherwise they remain
        * unchanged.
        */
-      virtual Vector<Number> &operator = (const Number s) override;
+      virtual Vector<Number>&
+      operator=(const Number s) override;
 
       /**
        * This is a collective add operation that adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
       template <typename OtherNumber>
-      void add (const std::vector<size_type>        &indices,
-                const ::dealii::Vector<OtherNumber> &values);
+      void
+      add(const std::vector<size_type>&        indices,
+          const ::dealii::Vector<OtherNumber>& values);
 
       /**
        * Take an address where n_elements are stored contiguously and add them
        * into the vector.
        */
       template <typename OtherNumber>
-      void add (const size_type n_elements,
-                const size_type *indices,
-                const OtherNumber *values);
+      void
+      add(const size_type    n_elements,
+          const size_type*   indices,
+          const OtherNumber* values);
 
       /**
        * Scaling and simple vector addition, i.e.  <tt>*this =
        * s*(*this)+V</tt>.
        */
-      void sadd (const Number          s,
-                 const Vector<Number> &V);
+      void
+      sadd(const Number s, const Vector<Number>& V);
 
       /**
        * Scaling and multiple addition.
@@ -748,11 +795,12 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      void sadd (const Number          s,
-                 const Number          a,
-                 const Vector<Number> &V,
-                 const Number          b,
-                 const Vector<Number> &W);
+      void
+      sadd(const Number          s,
+           const Number          a,
+           const Vector<Number>& V,
+           const Number          b,
+           const Vector<Number>& W);
 
       /**
        * Assignment <tt>*this = a*u + b*v</tt>.
@@ -760,11 +808,13 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      void equ (const Number a, const Vector<Number> &u,
-                const Number b, const Vector<Number> &v);
+      void
+      equ(const Number          a,
+          const Vector<Number>& u,
+          const Number          b,
+          const Vector<Number>& v);
 
       //@}
-
 
       /**
        * @name 5: Entry access and local data representation
@@ -775,7 +825,8 @@ namespace LinearAlgebra
        * Return the local size of the vector, i.e., the number of indices
        * owned locally.
        */
-      size_type local_size() const;
+      size_type
+      local_size() const;
 
       /**
        * Return the half-open interval that specifies the locally owned range
@@ -785,7 +836,8 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      std::pair<size_type, size_type> local_range () const;
+      std::pair<size_type, size_type>
+      local_range() const;
 
       /**
        * Return true if the given global index is in the local range of this
@@ -794,7 +846,8 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      bool in_local_range (const size_type global_index) const;
+      bool
+      in_local_range(const size_type global_index) const;
 
       /**
        * Return the number of ghost elements present on the vector.
@@ -802,7 +855,8 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      size_type n_ghost_entries () const;
+      size_type
+      n_ghost_entries() const;
 
       /**
        * Return an index set that describes which elements of this vector are
@@ -812,7 +866,8 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      const IndexSet &ghost_elements() const;
+      const IndexSet&
+      ghost_elements() const;
 
       /**
        * Return whether the given global index is a ghost index on the
@@ -822,7 +877,8 @@ namespace LinearAlgebra
        * This function is deprecated.
        */
       DEAL_II_DEPRECATED
-      bool is_ghost_entry (const types::global_dof_index global_index) const;
+      bool
+      is_ghost_entry(const types::global_dof_index global_index) const;
 
       /**
        * Make the @p Vector class a bit like the <tt>vector<></tt> class of
@@ -831,25 +887,29 @@ namespace LinearAlgebra
        *
        * It holds that end() - begin() == local_size().
        */
-      iterator begin ();
+      iterator
+      begin();
 
       /**
        * Return constant iterator to the start of the locally owned elements
        * of the vector.
        */
-      const_iterator begin () const;
+      const_iterator
+      begin() const;
 
       /**
        * Return an iterator pointing to the element past the end of the array
        * of locally owned entries.
        */
-      iterator end ();
+      iterator
+      end();
 
       /**
        * Return a constant iterator pointing to the element past the end of
        * the array of the locally owned entries.
        */
-      const_iterator end () const;
+      const_iterator
+      end() const;
 
       /**
        * Read access to the data in the position corresponding to @p
@@ -860,7 +920,8 @@ namespace LinearAlgebra
        * a contiguous range and <tt>O(log(n<sub>ranges</sub>))</tt> for ghost
        * elements (quite fast, but slower than local_element()).
        */
-      Number operator () (const size_type global_index) const;
+      Number
+      operator()(const size_type global_index) const;
 
       /**
        * Read and write access to the data in the position corresponding to @p
@@ -871,7 +932,8 @@ namespace LinearAlgebra
        * a contiguous range and <tt>O(log(n<sub>ranges</sub>))</tt> for ghost
        * elements (quite fast, but slower than local_element()).
        */
-      Number &operator () (const size_type global_index);
+      Number&
+      operator()(const size_type global_index);
 
       /**
        * Read access to the data in the position corresponding to @p
@@ -880,7 +942,7 @@ namespace LinearAlgebra
        *
        * This function does the same thing as operator().
        */
-      Number operator [] (const size_type global_index) const;
+      Number operator[](const size_type global_index) const;
       /**
        * Read and write access to the data in the position corresponding to @p
        * global_index. The index must be either in the local range of the
@@ -888,7 +950,7 @@ namespace LinearAlgebra
        *
        * This function does the same thing as operator().
        */
-      Number &operator [] (const size_type global_index);
+      Number& operator[](const size_type global_index);
 
       /**
        * Read access to the data field specified by @p local_index. Locally
@@ -898,7 +960,8 @@ namespace LinearAlgebra
        *
        * Performance: Direct array access (fast).
        */
-      Number local_element (const size_type local_index) const;
+      Number
+      local_element(const size_type local_index) const;
 
       /**
        * Read and write access to the data field specified by @p local_index.
@@ -908,7 +971,8 @@ namespace LinearAlgebra
        *
        * Performance: Direct array access (fast).
        */
-      Number &local_element (const size_type local_index);
+      Number&
+      local_element(const size_type local_index);
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -926,8 +990,9 @@ namespace LinearAlgebra
        * @pre The sizes of the @p indices and @p values arrays must be identical.
        */
       template <typename OtherNumber>
-      void extract_subvector_to (const std::vector<size_type> &indices,
-                                 std::vector<OtherNumber> &values) const;
+      void
+      extract_subvector_to(const std::vector<size_type>& indices,
+                           std::vector<OtherNumber>&     values) const;
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -957,26 +1022,30 @@ namespace LinearAlgebra
        *   @p indices_begin and @p indices_end.
        */
       template <typename ForwardIterator, typename OutputIterator>
-      void extract_subvector_to (ForwardIterator          indices_begin,
-                                 const ForwardIterator    indices_end,
-                                 OutputIterator           values_begin) const;
+      void
+      extract_subvector_to(ForwardIterator       indices_begin,
+                           const ForwardIterator indices_end,
+                           OutputIterator        values_begin) const;
       /**
        * Return whether the vector contains only elements with value zero.
        * This is a collective operation. This function is expensive, because
        * potentially all elements have to be checked.
        */
-      virtual bool all_zero () const override;
+      virtual bool
+      all_zero() const override;
 
       /**
        * Compute the mean value of all the entries in the vector.
        */
-      virtual Number mean_value () const override;
+      virtual Number
+      mean_value() const override;
 
       /**
        * $l_p$-norm of the vector. The pth root of the sum of the pth powers
        * of the absolute values of the elements.
        */
-      real_type lp_norm (const real_type p) const;
+      real_type
+      lp_norm(const real_type p) const;
       //@}
 
       /**
@@ -988,7 +1057,8 @@ namespace LinearAlgebra
        * Return a reference to the MPI communicator object in use with this
        * vector.
        */
-      const MPI_Comm &get_mpi_communicator () const;
+      const MPI_Comm&
+      get_mpi_communicator() const;
 
       /**
        * Return the MPI partitioner that describes the parallel layout of the
@@ -996,8 +1066,8 @@ namespace LinearAlgebra
        * respective reinit() call, for additional queries regarding the
        * parallel communication, or the compatibility of partitioners.
        */
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &
-      get_partitioner () const;
+      const std::shared_ptr<const Utilities::MPI::Partitioner>&
+      get_partitioner() const;
 
       /**
        * Check whether the given partitioner is compatible with the
@@ -1009,7 +1079,8 @@ namespace LinearAlgebra
        * return @p false, whereas the other processors will return @p true.
        */
       bool
-      partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
+      partitioners_are_compatible(
+        const Utilities::MPI::Partitioner& part) const;
 
       /**
        * Check whether the given partitioner is compatible with the
@@ -1025,7 +1096,8 @@ namespace LinearAlgebra
        * times.
        */
       bool
-      partitioners_are_globally_compatible (const Utilities::MPI::Partitioner &part) const;
+      partitioners_are_globally_compatible(
+        const Utilities::MPI::Partitioner& part) const;
       //@}
 
       /**
@@ -1038,86 +1110,101 @@ namespace LinearAlgebra
       /**
        * Exception
        */
-      DeclException3 (ExcNonMatchingElements,
-                      Number, Number, unsigned int,
-                      << "Called compress(VectorOperation::insert), but"
-                      << " the element received from a remote processor, value "
-                      << std::setprecision(16) << arg1
-                      << ", does not match with the value "
-                      << std::setprecision(16) << arg2
-                      << " on the owner processor " << arg3);
+      DeclException3(ExcNonMatchingElements,
+                     Number,
+                     Number,
+                     unsigned int,
+                     << "Called compress(VectorOperation::insert), but"
+                     << " the element received from a remote processor, value "
+                     << std::setprecision(16) << arg1
+                     << ", does not match with the value "
+                     << std::setprecision(16) << arg2
+                     << " on the owner processor " << arg3);
 
       /**
        * Exception
        */
-      DeclException4 (ExcAccessToNonLocalElement,
-                      size_type, size_type, size_type, size_type,
-                      << "You tried to access element " << arg1
-                      << " of a distributed vector, but this element is not "
-                      << "stored on the current processor. Note: The range of "
-                      << "locally owned elements is " << arg2 << " to "
-                      << arg3 << ", and there are " << arg4 << " ghost elements "
-                      << "that this vector can access.");
+      DeclException4(ExcAccessToNonLocalElement,
+                     size_type,
+                     size_type,
+                     size_type,
+                     size_type,
+                     << "You tried to access element " << arg1
+                     << " of a distributed vector, but this element is not "
+                     << "stored on the current processor. Note: The range of "
+                     << "locally owned elements is " << arg2 << " to " << arg3
+                     << ", and there are " << arg4 << " ghost elements "
+                     << "that this vector can access.");
 
     private:
-
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>
        * without MPI communication.
        */
-      void add_local(const Number a, const VectorSpaceVector<Number> &V);
+      void
+      add_local(const Number a, const VectorSpaceVector<Number>& V);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt> without MPI communication.
        */
-      void sadd_local(const Number s, const Number a,
-                      const VectorSpaceVector<Number> &V);
+      void
+      sadd_local(const Number                     s,
+                 const Number                     a,
+                 const VectorSpaceVector<Number>& V);
 
       /**
        * Local part of all_zero().
        */
-      bool all_zero_local () const;
+      bool
+      all_zero_local() const;
 
       /**
        * Local part of the inner product of two vectors.
        */
       template <typename Number2>
-      Number inner_product_local (const Vector<Number2> &V) const;
+      Number
+      inner_product_local(const Vector<Number2>& V) const;
 
       /**
        * Local part of norm_sqr().
        */
-      real_type norm_sqr_local () const;
+      real_type
+      norm_sqr_local() const;
 
       /**
        * Local part of mean_value().
        */
-      Number mean_value_local () const;
+      Number
+      mean_value_local() const;
 
       /**
        * Local part of l1_norm().
        */
-      real_type l1_norm_local () const;
+      real_type
+      l1_norm_local() const;
 
       /**
        * Local part of lp_norm().
        */
-      real_type lp_norm_local (const real_type p) const;
+      real_type
+      lp_norm_local(const real_type p) const;
 
       /**
        * Local part of linfty_norm().
        */
-      real_type linfty_norm_local () const;
+      real_type
+      linfty_norm_local() const;
 
       /**
        * Local part of the addition followed by an inner product of two
        * vectors. The same applies for complex-valued vectors as for
        * the add_and_dot() function.
        */
-      Number add_and_dot_local (const Number          a,
-                                const Vector<Number> &V,
-                                const Vector<Number> &W);
+      Number
+      add_and_dot_local(const Number          a,
+                        const Vector<Number>& V,
+                        const Vector<Number>& W);
 
       /**
        * Shared pointer to store the parallel partitioning information. This
@@ -1144,7 +1231,8 @@ namespace LinearAlgebra
        * For parallel loops with TBB, this member variable stores the affinity
        * information of loops.
        */
-      mutable std::shared_ptr< ::dealii::parallel::internal::TBBPartitioner> thread_loop_partitioner;
+      mutable std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
+        thread_loop_partitioner;
 
       /**
        * Temporary storage that holds the data that is sent to this processor
@@ -1171,13 +1259,13 @@ namespace LinearAlgebra
        * it does not remove the need for a receive operation to be posted
        * before the data can actually be sent.
        */
-      std::vector<MPI_Request>   compress_requests;
+      std::vector<MPI_Request> compress_requests;
 
       /**
        * A vector that collects all requests from @p update_ghost_values()
        * operations. This class uses persistent MPI communicators.
        */
-      mutable std::vector<MPI_Request>   update_ghost_values_requests;
+      mutable std::vector<MPI_Request> update_ghost_values_requests;
 #endif
 
       /**
@@ -1191,278 +1279,223 @@ namespace LinearAlgebra
        * A helper function that clears the compress_requests and
        * update_ghost_values_requests field. Used in reinit functions.
        */
-      void clear_mpi_requests ();
+      void
+      clear_mpi_requests();
 
       /**
        * A helper function that is used to resize the val array.
        */
-      void resize_val (const size_type new_allocated_size);
+      void
+      resize_val(const size_type new_allocated_size);
 
       /*
        * Make all other vector types friends.
        */
-      template <typename Number2> friend class Vector;
+      template <typename Number2>
+      friend class Vector;
 
       /**
        * Make BlockVector type friends.
        */
-      template <typename Number2> friend class BlockVector;
+      template <typename Number2>
+      friend class BlockVector;
     };
     /*@}*/
-
 
     /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
 
-
     template <typename Number>
-    inline
-    bool
-    Vector<Number>::has_ghost_elements () const
+    inline bool
+    Vector<Number>::has_ghost_elements() const
     {
       return vector_is_ghosted;
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::size_type
-    Vector<Number>::size () const
+    inline typename Vector<Number>::size_type
+    Vector<Number>::size() const
     {
       return partitioner->size();
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::size_type
-    Vector<Number>::local_size () const
+    inline typename Vector<Number>::size_type
+    Vector<Number>::local_size() const
     {
       return partitioner->local_size();
     }
 
-
-
     template <typename Number>
-    inline
-    std::pair<typename Vector<Number>::size_type,
-        typename Vector<Number>::size_type>
-        Vector<Number>::local_range () const
+    inline std::pair<typename Vector<Number>::size_type,
+                     typename Vector<Number>::size_type>
+    Vector<Number>::local_range() const
     {
       return partitioner->local_range();
     }
 
-
-
     template <typename Number>
-    inline
-    bool
-    Vector<Number>::in_local_range
-    (const size_type global_index) const
+    inline bool
+    Vector<Number>::in_local_range(const size_type global_index) const
     {
-      return partitioner->in_local_range (global_index);
+      return partitioner->in_local_range(global_index);
     }
 
-
-
     template <typename Number>
-    inline
-    IndexSet
+    inline IndexSet
     Vector<Number>::locally_owned_elements() const
     {
-      IndexSet is (size());
+      IndexSet is(size());
 
-      is.add_range (partitioner->local_range().first,
-                    partitioner->local_range().second);
+      is.add_range(partitioner->local_range().first,
+                   partitioner->local_range().second);
 
       return is;
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::size_type
-    Vector<Number>::n_ghost_entries () const
+    inline typename Vector<Number>::size_type
+    Vector<Number>::n_ghost_entries() const
     {
       return partitioner->n_ghost_indices();
     }
 
-
-
     template <typename Number>
-    inline
-    const IndexSet &
+    inline const IndexSet&
     Vector<Number>::ghost_elements() const
     {
       return partitioner->ghost_indices();
     }
 
-
-
     template <typename Number>
-    inline
-    bool
-    Vector<Number>::is_ghost_entry (const size_type global_index) const
+    inline bool
+    Vector<Number>::is_ghost_entry(const size_type global_index) const
     {
-      return partitioner->is_ghost_entry (global_index);
+      return partitioner->is_ghost_entry(global_index);
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::iterator
-    Vector<Number>::begin ()
+    inline typename Vector<Number>::iterator
+    Vector<Number>::begin()
     {
       return values.get();
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::const_iterator
-    Vector<Number>::begin () const
+    inline typename Vector<Number>::const_iterator
+    Vector<Number>::begin() const
     {
       return values.get();
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::iterator
-    Vector<Number>::end ()
+    inline typename Vector<Number>::iterator
+    Vector<Number>::end()
     {
-      return values.get()+partitioner->local_size();
+      return values.get() + partitioner->local_size();
     }
 
-
-
     template <typename Number>
-    inline
-    typename Vector<Number>::const_iterator
-    Vector<Number>::end () const
+    inline typename Vector<Number>::const_iterator
+    Vector<Number>::end() const
     {
-      return values.get()+partitioner->local_size();
+      return values.get() + partitioner->local_size();
     }
 
-
-
     template <typename Number>
-    inline
-    Number
-    Vector<Number>::operator() (const size_type global_index) const
+    inline Number
+    Vector<Number>::operator()(const size_type global_index) const
     {
-      Assert (partitioner->in_local_range (global_index) ||
-              partitioner->ghost_indices().is_element(global_index),
-              ExcAccessToNonLocalElement(global_index, partitioner->local_range().first,
-                                         partitioner->local_range().second,
-                                         partitioner->ghost_indices().n_elements()));
+      Assert(
+        partitioner->in_local_range(global_index)
+          || partitioner->ghost_indices().is_element(global_index),
+        ExcAccessToNonLocalElement(global_index,
+                                   partitioner->local_range().first,
+                                   partitioner->local_range().second,
+                                   partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
-      Assert (partitioner->in_local_range (global_index) || vector_is_ghosted == true,
-              ExcMessage("You tried to read a ghost element of this vector, "
-                         "but it has not imported its ghost values."));
+      Assert(partitioner->in_local_range(global_index)
+               || vector_is_ghosted == true,
+             ExcMessage("You tried to read a ghost element of this vector, "
+                        "but it has not imported its ghost values."));
       return values[partitioner->global_to_local(global_index)];
     }
 
-
-
     template <typename Number>
-    inline
-    Number &
-    Vector<Number>::operator() (const size_type global_index)
+    inline Number&
+    Vector<Number>::operator()(const size_type global_index)
     {
-      Assert (partitioner->in_local_range (global_index) ||
-              partitioner->ghost_indices().is_element(global_index),
-              ExcAccessToNonLocalElement(global_index, partitioner->local_range().first,
-                                         partitioner->local_range().second,
-                                         partitioner->ghost_indices().n_elements()));
+      Assert(
+        partitioner->in_local_range(global_index)
+          || partitioner->ghost_indices().is_element(global_index),
+        ExcAccessToNonLocalElement(global_index,
+                                   partitioner->local_range().first,
+                                   partitioner->local_range().second,
+                                   partitioner->ghost_indices().n_elements()));
       // we would like to prevent reading ghosts from a vector that does not
       // have them imported, but this is not possible because we might be in a
       // part of the code where the vector has enabled ghosts but is non-const
       // (then, the compiler picks this method according to the C++ rule book
       // even if a human would pick the const method when this subsequent use
       // is just a read)
-      return values[partitioner->global_to_local (global_index)];
+      return values[partitioner->global_to_local(global_index)];
     }
 
-
-
     template <typename Number>
-    inline
-    Number
-    Vector<Number>::operator[] (const size_type global_index) const
+    inline Number Vector<Number>::operator[](const size_type global_index) const
     {
       return operator()(global_index);
     }
 
-
-
     template <typename Number>
-    inline
-    Number &
-    Vector<Number>::operator[] (const size_type global_index)
+    inline Number& Vector<Number>::operator[](const size_type global_index)
     {
       return operator()(global_index);
     }
 
-
-
     template <typename Number>
-    inline
-    Number
-    Vector<Number>::local_element (const size_type local_index) const
+    inline Number
+    Vector<Number>::local_element(const size_type local_index) const
     {
-      AssertIndexRange (local_index,
-                        partitioner->local_size()+
-                        partitioner->n_ghost_indices());
+      AssertIndexRange(local_index,
+                       partitioner->local_size()
+                         + partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
-      Assert (local_index < local_size() || vector_is_ghosted == true,
-              ExcMessage("You tried to read a ghost element of this vector, "
-                         "but it has not imported its ghost values."));
+      Assert(local_index < local_size() || vector_is_ghosted == true,
+             ExcMessage("You tried to read a ghost element of this vector, "
+                        "but it has not imported its ghost values."));
       return values[local_index];
     }
-
-
 
     template <typename Number>
-    inline
-    Number &
-    Vector<Number>::local_element (const size_type local_index)
+    inline Number&
+    Vector<Number>::local_element(const size_type local_index)
     {
-      AssertIndexRange (local_index,
-                        partitioner->local_size()+
-                        partitioner->n_ghost_indices());
+      AssertIndexRange(local_index,
+                       partitioner->local_size()
+                         + partitioner->n_ghost_indices());
       return values[local_index];
     }
-
-
 
     template <typename Number>
     template <typename OtherNumber>
-    inline
-    void Vector<Number>::extract_subvector_to (const std::vector<size_type> &indices,
-                                               std::vector<OtherNumber> &values) const
+    inline void
+    Vector<Number>::extract_subvector_to(const std::vector<size_type>& indices,
+                                         std::vector<OtherNumber>& values) const
     {
-      for (size_type i = 0; i < indices.size(); ++i)
+      for(size_type i = 0; i < indices.size(); ++i)
         values[i] = operator()(indices[i]);
     }
 
-
-
     template <typename Number>
     template <typename ForwardIterator, typename OutputIterator>
-    inline
-    void Vector<Number>::extract_subvector_to (ForwardIterator          indices_begin,
-                                               const ForwardIterator    indices_end,
-                                               OutputIterator           values_begin) const
+    inline void
+    Vector<Number>::extract_subvector_to(ForwardIterator       indices_begin,
+                                         const ForwardIterator indices_end,
+                                         OutputIterator values_begin) const
     {
-      while (indices_begin != indices_end)
+      while(indices_begin != indices_end)
         {
           *values_begin = operator()(*indices_begin);
           indices_begin++;
@@ -1470,67 +1503,58 @@ namespace LinearAlgebra
         }
     }
 
-
-
     template <typename Number>
     template <typename OtherNumber>
-    inline
-    void
-    Vector<Number>::add (const std::vector<size_type>    &indices,
-                         const ::dealii::Vector<OtherNumber> &values)
+    inline void
+    Vector<Number>::add(const std::vector<size_type>&        indices,
+                        const ::dealii::Vector<OtherNumber>& values)
     {
-      AssertDimension (indices.size(), values.size());
-      for (size_type i=0; i<indices.size(); ++i)
+      AssertDimension(indices.size(), values.size());
+      for(size_type i = 0; i < indices.size(); ++i)
         {
-          Assert (numbers::is_finite(values[i]),
-                  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          Assert(
+            numbers::is_finite(values[i]),
+            ExcMessage(
+              "The given value is not finite but either infinite or Not A Number (NaN)"));
           this->operator()(indices[i]) += values(i);
         }
     }
 
-
-
     template <typename Number>
     template <typename OtherNumber>
-    inline
-    void
-    Vector<Number>::add (const size_type n_elements,
-                         const size_type *indices,
-                         const OtherNumber *values)
+    inline void
+    Vector<Number>::add(const size_type    n_elements,
+                        const size_type*   indices,
+                        const OtherNumber* values)
     {
-      for (size_type i=0; i<n_elements; ++i, ++indices, ++values)
+      for(size_type i = 0; i < n_elements; ++i, ++indices, ++values)
         {
-          Assert (numbers::is_finite(*values),
-                  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+          Assert(
+            numbers::is_finite(*values),
+            ExcMessage(
+              "The given value is not finite but either infinite or Not A Number (NaN)"));
           this->operator()(*indices) += *values;
         }
     }
 
-
-
     template <typename Number>
-    inline
-    const MPI_Comm &
+    inline const MPI_Comm&
     Vector<Number>::get_mpi_communicator() const
     {
       return partitioner->get_mpi_communicator();
     }
 
-
-
     template <typename Number>
-    inline
-    const std::shared_ptr<const Utilities::MPI::Partitioner> &
-    Vector<Number>::get_partitioner () const
+    inline const std::shared_ptr<const Utilities::MPI::Partitioner>&
+    Vector<Number>::get_partitioner() const
     {
       return partitioner;
     }
 
 #endif
 
-  }
-}
-
+  } // namespace distributed
+} // namespace LinearAlgebra
 
 /**
  * Global function @p swap which overloads the default implementation of the
@@ -1541,13 +1565,12 @@ namespace LinearAlgebra
  * @author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <typename Number>
-inline
-void swap (LinearAlgebra::distributed::Vector<Number> &u,
-           LinearAlgebra::distributed::Vector<Number> &v)
+inline void
+swap(LinearAlgebra::distributed::Vector<Number>& u,
+     LinearAlgebra::distributed::Vector<Number>& v)
 {
-  u.swap (v);
+  u.swap(v);
 }
-
 
 /**
  * Declare dealii::LinearAlgebra::Vector< Number > as distributed vector.
@@ -1555,16 +1578,16 @@ void swap (LinearAlgebra::distributed::Vector<Number> &u,
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std::false_type
-{
-};
-
+struct is_serial_vector<LinearAlgebra::distributed::Vector<Number>>
+  : std::false_type
+{};
 
 namespace internal
 {
   namespace LinearOperatorImplementation
   {
-    template <typename> class ReinitHelper;
+    template <typename>
+    class ReinitHelper;
 
     /**
      * A helper class used internally in linear_operator.h. Specialization for
@@ -1575,31 +1598,30 @@ namespace internal
     {
     public:
       template <typename Matrix>
-      static
-      void reinit_range_vector (const Matrix &matrix,
-                                LinearAlgebra::distributed::Vector<Number> &v,
-                                bool omit_zeroing_entries)
+      static void
+      reinit_range_vector(const Matrix&                               matrix,
+                          LinearAlgebra::distributed::Vector<Number>& v,
+                          bool omit_zeroing_entries)
       {
         matrix.initialize_dof_vector(v);
-        if (!omit_zeroing_entries)
+        if(!omit_zeroing_entries)
           v = Number();
       }
 
       template <typename Matrix>
-      static
-      void reinit_domain_vector(const Matrix &matrix,
-                                LinearAlgebra::distributed::Vector<Number> &v,
-                                bool omit_zeroing_entries)
+      static void
+      reinit_domain_vector(const Matrix&                               matrix,
+                           LinearAlgebra::distributed::Vector<Number>& v,
+                           bool omit_zeroing_entries)
       {
         matrix.initialize_dof_vector(v);
-        if (!omit_zeroing_entries)
+        if(!omit_zeroing_entries)
           v = Number();
       }
     };
 
-  } /* namespace LinearOperator */
+  } // namespace LinearOperatorImplementation
 } /* namespace internal */
-
 
 DEAL_II_NAMESPACE_CLOSE
 

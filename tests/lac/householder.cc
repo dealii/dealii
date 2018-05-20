@@ -13,37 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
 // Tests Householder class for QR-decomposition
 
 #include "../tests.h"
-#include <deal.II/lac/householder.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/householder.h>
 #include <deal.II/lac/vector.h>
 
+const double rect[] = {4., 3., 2., 1., 5., 8., 1., -2., 11., 13., -4., -5};
 
-const double rect[] =
-{
-  4., 3., 2., 1.,
-  5., 8., 1., -2.,
-  11., 13., -4., -5
-};
-
-
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  FullMatrix<double> A(4,3,rect);
+  FullMatrix<double>  A(4, 3, rect);
   Householder<double> H(A);
 
   Vector<double> u(4);
   Vector<double> v1(3);
   Vector<double> v2(3);
 
-  for (unsigned int i=0; i<u.size(); ++i)
-    u(i) = i*i;
-  deallog << "Distance " << H.least_squares(v1,u) << std::endl;
+  for(unsigned int i = 0; i < u.size(); ++i)
+    u(i) = i * i;
+  deallog << "Distance " << H.least_squares(v1, u) << std::endl;
 }

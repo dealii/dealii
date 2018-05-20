@@ -16,17 +16,16 @@
 #ifndef dealii_scalapack_templates_h
 #define dealii_scalapack_templates_h
 
-
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SCALAPACK
 
-#include <deal.II/base/mpi.h>
-#include <deal.II/base/mpi.templates.h>
+#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/mpi.templates.h>
 
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
-#include <cfenv>
-#endif
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#    include <cfenv>
+#  endif
 
 // useful examples:
 // https://stackoverflow.com/questions/14147705/cholesky-decomposition-scalapack-error/14203864
@@ -51,8 +50,8 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbpnf.htm
    */
-  void Cblacs_pinfo(int *rank,
-                    int *nprocs);
+  void
+  Cblacs_pinfo(int* rank, int* nprocs);
 
   /**
    * Return internal BLACS value in @p val based on the input @p what and @p icontxt.
@@ -61,9 +60,8 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbget.htm
    */
-  void Cblacs_get(int icontxt,
-                  int what,
-                  int *val);
+  void
+  Cblacs_get(int icontxt, int what, int* val);
 
   /**
    * Map the processes sequentially in row-major or column-major order
@@ -75,66 +73,58 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbint.htm
    */
-  void Cblacs_gridinit(int *context,
-                       const char *order,
-                       int grid_height,
-                       int grid_width);
+  void
+  Cblacs_gridinit(int*        context,
+                  const char* order,
+                  int         grid_height,
+                  int         grid_width);
 
   /**
    * Return the process row and column index.
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbinfo.htm
    */
-  void Cblacs_gridinfo(int context,
-                       int *grid_height,
-                       int *grid_width,
-                       int *grid_row,
-                       int *grid_col);
+  void
+  Cblacs_gridinfo(int  context,
+                  int* grid_height,
+                  int* grid_width,
+                  int* grid_row,
+                  int* grid_col);
 
   /**
    * Given the system process number, return the row and column coordinates in the BLACS' process grid.
    */
-  void Cblacs_pcoord(int ictxt,
-                     int pnum,
-                     int *prow,
-                     int *pcol);
+  void
+  Cblacs_pcoord(int ictxt, int pnum, int* prow, int* pcol);
 
   /**
    * Release a BLACS context.
    */
-  void Cblacs_gridexit(int context);
+  void
+  Cblacs_gridexit(int context);
 
   /**
    * This routines holds up execution of all processes within the indicated
    * scope until they have all called the routine.
    */
-  void Cblacs_barrier(int,
-                      const char *);
+  void
+  Cblacs_barrier(int, const char*);
 
   /**
    * Free all BLACS contexts and releases all allocated memory.
    */
-  void Cblacs_exit(int error_code);
+  void
+  Cblacs_exit(int error_code);
 
   /**
    * Receives a message from a process @prsrc, @p csrc into a general rectangular matrix.
    *
    * https://software.intel.com/en-us/mkl-developer-reference-c-gerv2d
    */
-  void Cdgerv2d(int context,
-                int M,
-                int N,
-                double *A,
-                int lda,
-                int rsrc,
-                int csrc);
-  void Csgerv2d(int context,
-                int M,
-                int N,
-                float *A,
-                int lda,
-                int rsrc,
-                int csrc);
+  void
+  Cdgerv2d(int context, int M, int N, double* A, int lda, int rsrc, int csrc);
+  void
+  Csgerv2d(int context, int M, int N, float* A, int lda, int rsrc, int csrc);
 
   /**
    * Sends the general rectangular matrix A to the destination
@@ -142,36 +132,28 @@ extern "C"
    *
    * https://software.intel.com/en-us/mkl-developer-reference-c-2018-beta-gesd2d
    */
-  void Cdgesd2d(int context,
-                int M,
-                int N,
-                double *A,
-                int lda,
-                int rdest,
-                int cdest);
-  void Csgesd2d(int context,
-                int M,
-                int N,
-                float *A,
-                int lda,
-                int rdest,
-                int cdest);
+  void
+  Cdgesd2d(int context, int M, int N, double* A, int lda, int rdest, int cdest);
+  void
+  Csgesd2d(int context, int M, int N, float* A, int lda, int rdest, int cdest);
 
   /**
    * Get BLACS context from MPI @p comm.
    */
-  int Csys2blacs_handle(MPI_Comm comm);
+  int
+  Csys2blacs_handle(MPI_Comm comm);
 
   /**
    * Compute how many rows and columns each process owns (NUMber of Rows Or Columns).
    *
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dnumy.htm
    */
-  int numroc_ (const int *n,
-               const int *nb,
-               const int *iproc,
-               const int *isproc,
-               const int *nprocs);
+  int
+  numroc_(const int* n,
+          const int* nb,
+          const int* iproc,
+          const int* isproc,
+          const int* nprocs);
 
   /**
    * Compute the Cholesky factorization of an N-by-N real
@@ -181,20 +163,22 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/d5/d9e/pdpotrf_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpotrf.htm
    */
-  void pdpotrf_(const char *UPLO,
-                const int *N,
-                double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *INFO);
-  void pspotrf_(const char *UPLO,
-                const int *N,
-                float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *INFO);
+  void
+  pdpotrf_(const char* UPLO,
+           const int*  N,
+           double*     A,
+           const int*  IA,
+           const int*  JA,
+           const int*  DESCA,
+           int*        INFO);
+  void
+  pspotrf_(const char* UPLO,
+           const int*  N,
+           float*      A,
+           const int*  IA,
+           const int*  JA,
+           const int*  DESCA,
+           int*        INFO);
 
   /**
    * Computes an LU factorization of a general distributed matrix sub( A )
@@ -203,22 +187,24 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/df/dfe/pdgetrf_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgetrf.htm
    */
-  void pdgetrf_(const int *m,
-                const int *n,
-                double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *ipiv,
-                int *INFO);
-  void psgetrf_(const int *m,
-                const int *n,
-                float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *ipiv,
-                int *INFO);
+  void
+  pdgetrf_(const int* m,
+           const int* n,
+           double*    A,
+           const int* IA,
+           const int* JA,
+           const int* DESCA,
+           int*       ipiv,
+           int*       INFO);
+  void
+  psgetrf_(const int* m,
+           const int* n,
+           float*     A,
+           const int* IA,
+           const int* JA,
+           const int* DESCA,
+           int*       ipiv,
+           int*       INFO);
 
   /**
    * Compute the inverse of a real symmetric positive definite
@@ -230,20 +216,22 @@ extern "C"
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpotri.htm
    * https://software.intel.com/en-us/mkl-developer-reference-c-p-potri
    */
-  void pdpotri_(const char *UPLO,
-                const int *N,
-                double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *INFO);
-  void pspotri_(const char *UPLO,
-                const int *N,
-                float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                int *INFO);
+  void
+  pdpotri_(const char* UPLO,
+           const int*  N,
+           double*     A,
+           const int*  IA,
+           const int*  JA,
+           const int*  DESCA,
+           int*        INFO);
+  void
+  pspotri_(const char* UPLO,
+           const int*  N,
+           float*      A,
+           const int*  IA,
+           const int*  JA,
+           const int*  DESCA,
+           int*        INFO);
 
   /**
    * PDGETRI computes the inverse of a distributed matrix using the LU
@@ -254,28 +242,30 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/d3/df3/pdgetri_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgetri.htm
    */
-  void pdgetri_(const int *N,
-                double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const int *ipiv,
-                double *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *info);
-  void psgetri_(const int *N,
-                float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const int *ipiv,
-                float *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *info);
+  void
+  pdgetri_(const int* N,
+           double*    A,
+           const int* IA,
+           const int* JA,
+           const int* DESCA,
+           const int* ipiv,
+           double*    work,
+           int*       lwork,
+           int*       iwork,
+           int*       liwork,
+           int*       info);
+  void
+  psgetri_(const int* N,
+           float*     A,
+           const int* IA,
+           const int* JA,
+           const int* DESCA,
+           const int* ipiv,
+           float*     work,
+           int*       lwork,
+           int*       iwork,
+           int*       liwork,
+           int*       info);
 
   /**
    * Estimate the reciprocal of the condition number (in the
@@ -286,30 +276,34 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/d4/df7/pdpocon_8f.html
    * https://software.intel.com/en-us/mkl-developer-reference-fortran-pocon
    */
-  void pdpocon_(const char *uplo,
-                const int *N,
-                const double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const double *ANORM, double *RCOND,
-                double *WORK,
-                const int *LWORK,
-                int *IWORK,
-                const int *LIWORK,
-                int *INFO);
-  void pspocon_(const char *uplo,
-                const int *N,
-                const float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const float *ANORM, float *RCOND,
-                float *WORK,
-                const int *LWORK,
-                int *IWORK,
-                const int *LIWORK,
-                int *INFO);
+  void
+  pdpocon_(const char*   uplo,
+           const int*    N,
+           const double* A,
+           const int*    IA,
+           const int*    JA,
+           const int*    DESCA,
+           const double* ANORM,
+           double*       RCOND,
+           double*       WORK,
+           const int*    LWORK,
+           int*          IWORK,
+           const int*    LIWORK,
+           int*          INFO);
+  void
+  pspocon_(const char*  uplo,
+           const int*   N,
+           const float* A,
+           const int*   IA,
+           const int*   JA,
+           const int*   DESCA,
+           const float* ANORM,
+           float*       RCOND,
+           float*       WORK,
+           const int*   LWORK,
+           int*         IWORK,
+           const int*   LIWORK,
+           int*         INFO);
 
   /**
    * Norm of a real symmetric matrix
@@ -317,22 +311,24 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/dd/d12/pdlansy_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_pdlansy.htm#pdlansy
    */
-  double pdlansy_(const char *norm,
-                  const char *uplo,
-                  const int *N,
-                  const double *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  double *work);
-  float pslansy_(const char *norm,
-                 const char *uplo,
-                 const int *N,
-                 const float *A,
-                 const int *IA,
-                 const int *JA,
-                 const int *DESCA,
-                 float *work);
+  double
+  pdlansy_(const char*   norm,
+           const char*   uplo,
+           const int*    N,
+           const double* A,
+           const int*    IA,
+           const int*    JA,
+           const int*    DESCA,
+           double*       work);
+  float
+  pslansy_(const char*  norm,
+           const char*  uplo,
+           const int*   N,
+           const float* A,
+           const int*   IA,
+           const int*   JA,
+           const int*   DESCA,
+           float*       work);
 
   /**
    * Compute the Least Common Multiple (LCM) of two positive integers @p M and @p N.
@@ -341,30 +337,31 @@ extern "C"
    *
    * http://www.netlib.org/scalapack/explore-html/d0/d9b/ilcm_8f_source.html
    */
-  int ilcm_(const int *M,
-            const int *N);
+  int
+  ilcm_(const int* M, const int* N);
 
   /**
    * Return the ceiling of the division of two integers.
    *
    * http://www.netlib.org/scalapack/explore-html/df/d07/iceil_8f_source.html
    */
-  int iceil_(const int *i1,
-             const int *i2);
+  int
+  iceil_(const int* i1, const int* i2);
 
   /**
    * Initialize the descriptor vector with the 8 input arguments
    */
-  void descinit_ (int *desc,
-                  const int *m,
-                  const int *n,
-                  const int *mb,
-                  const int *nb,
-                  const int *irsrc,
-                  const int *icsrc,
-                  const int *ictxt,
-                  const int *lld,
-                  int *info);
+  void
+  descinit_(int*       desc,
+            const int* m,
+            const int* n,
+            const int* mb,
+            const int* nb,
+            const int* irsrc,
+            const int* icsrc,
+            const int* ictxt,
+            const int* lld,
+            int*       info);
 
   /**
    * Compute the global index of a distributed matrix entry
@@ -377,39 +374,42 @@ extern "C"
    * @param isrcproc  The coordinate of the process that possesses the first row/column of the distributed matrix
    * @param nprocs The total number processes over which the distributed matrix is distributed
    */
-  int indxl2g_ (const int *indxloc,
-                const int *nb,
-                const int *iproc,
-                const int *isrcproc,
-                const int *nprocs);
+  int
+  indxl2g_(const int* indxloc,
+           const int* nb,
+           const int* iproc,
+           const int* isrcproc,
+           const int* nprocs);
 
   /**
    * Compute the solution to a real system of linear equations
    */
-  void pdgesv_(const int *n,
-               const int *nrhs,
-               double *A,
-               const int *ia,
-               const int *ja,
-               const int *desca,
-               int *ipiv,
-               double *B,
-               const int *ib,
-               const int *jb,
-               const int *descb,
-               int *info);
-  void psgesv_(const int *n,
-               const int *nrhs,
-               float *A,
-               const int *ia,
-               const int *ja,
-               const int *desca,
-               int *ipiv,
-               float *B,
-               const int *ib,
-               const int *jb,
-               const int *descb,
-               int *info);
+  void
+  pdgesv_(const int* n,
+          const int* nrhs,
+          double*    A,
+          const int* ia,
+          const int* ja,
+          const int* desca,
+          int*       ipiv,
+          double*    B,
+          const int* ib,
+          const int* jb,
+          const int* descb,
+          int*       info);
+  void
+  psgesv_(const int* n,
+          const int* nrhs,
+          float*     A,
+          const int* ia,
+          const int* ja,
+          const int* desca,
+          int*       ipiv,
+          float*     B,
+          const int* ib,
+          const int* jb,
+          const int* descb,
+          int*       info);
 
   /**
    * Perform one of the matrix-matrix operations:
@@ -418,75 +418,80 @@ extern "C"
    * sub( C ) denotes C(IC:IC+M-1,JC:JC+N-1),  and, op( X )  is one  of
    * op( X ) = X   or   op( X ) = X'.
    */
-  void pdgemm_(const char *transa,
-               const char *transb,
-               const int *m,
-               const int *n,
-               const int *k,
-               const double *alpha,
-               const double *A,
-               const int *IA,
-               const int *JA,
-               const int *DESCA,
-               const double *B,
-               const int *IB,
-               const int *JB,
-               const int *DESCB,
-               const double *beta,
-               double *C,
-               const int *IC,
-               const int *JC,
-               const int *DESCC);
-  void psgemm_(const char *transa,
-               const char *transb,
-               const int *m,
-               const int *n,
-               const int *k,
-               const float *alpha,
-               const float *A,
-               const int *IA,
-               const int *JA,
-               const int *DESCA,
-               const float *B,
-               const int *IB,
-               const int *JB,
-               const int *DESCB,
-               const float *beta,
-               float *C,
-               const int *IC,
-               const int *JC,
-               const int *DESCC);
+  void
+  pdgemm_(const char*   transa,
+          const char*   transb,
+          const int*    m,
+          const int*    n,
+          const int*    k,
+          const double* alpha,
+          const double* A,
+          const int*    IA,
+          const int*    JA,
+          const int*    DESCA,
+          const double* B,
+          const int*    IB,
+          const int*    JB,
+          const int*    DESCB,
+          const double* beta,
+          double*       C,
+          const int*    IC,
+          const int*    JC,
+          const int*    DESCC);
+  void
+  psgemm_(const char*  transa,
+          const char*  transb,
+          const int*   m,
+          const int*   n,
+          const int*   k,
+          const float* alpha,
+          const float* A,
+          const int*   IA,
+          const int*   JA,
+          const int*   DESCA,
+          const float* B,
+          const int*   IB,
+          const int*   JB,
+          const int*   DESCB,
+          const float* beta,
+          float*       C,
+          const int*   IC,
+          const int*   JC,
+          const int*   DESCC);
 
   /**
    * Return the value of the one norm, or the Frobenius norm, or the infinity norm,
    * or the element of largest absolute value of a distributed matrix
    */
-  double pdlange_(char const *norm,
-                  const int *m,
-                  const int *n,
-                  const double *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  double *work);
-  float pslange_(const char *norm,
-                 const int *m,
-                 const int *n,
-                 const float *A,
-                 const int *ia,
-                 const int *ja,
-                 const int *desca,
-                 float *work);
+  double
+  pdlange_(char const*   norm,
+           const int*    m,
+           const int*    n,
+           const double* A,
+           const int*    ia,
+           const int*    ja,
+           const int*    desca,
+           double*       work);
+  float
+  pslange_(const char*  norm,
+           const int*   m,
+           const int*   n,
+           const float* A,
+           const int*   ia,
+           const int*   ja,
+           const int*   desca,
+           float*       work);
 
   /**
    * Compute the process coordinate which possesses the entry of a
    * distributed matrix specified by a global index
    */
-  int indxg2p_(const int *glob,
-               const int *nb,
-               const int *iproc,
-               const int *isproc,
-               const int *nprocs);
+  int
+  indxg2p_(const int* glob,
+           const int* nb,
+           const int* iproc,
+           const int* isproc,
+           const int* nprocs);
 
   /**
    * Compute all eigenvalues and, optionally, eigenvectors of a real symmetric matrix A
@@ -497,36 +502,38 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/d0/d1a/pdsyev_8f.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lsyev.htm#lsyev
    */
-  void pdsyev_(const char *jobz,
-               const char *uplo,
-               const int *m,
-               double *A,
-               const int *ia,
-               const int *ja,
-               int *desca,
-               double *w,
-               double *z,
-               const int *iz,
-               const int *jz,
-               int *descz,
-               double *work,
-               const int *lwork,
-               int *info);
-  void pssyev_(const char *jobz,
-               const char *uplo,
-               const int *m,
-               float *A,
-               const int *ia,
-               const int *ja,
-               int *desca,
-               float *w,
-               float *z,
-               const int *iz,
-               const int *jz,
-               int *descz,
-               float *work,
-               const int *lwork,
-               int *info);
+  void
+  pdsyev_(const char* jobz,
+          const char* uplo,
+          const int*  m,
+          double*     A,
+          const int*  ia,
+          const int*  ja,
+          int*        desca,
+          double*     w,
+          double*     z,
+          const int*  iz,
+          const int*  jz,
+          int*        descz,
+          double*     work,
+          const int*  lwork,
+          int*        info);
+  void
+  pssyev_(const char* jobz,
+          const char* uplo,
+          const int*  m,
+          float*      A,
+          const int*  ia,
+          const int*  ja,
+          int*        desca,
+          float*      w,
+          float*      z,
+          const int*  iz,
+          const int*  jz,
+          int*        descz,
+          float*      work,
+          const int*  lwork,
+          int*        info);
 
   /**
    * Copy all or a part of a distributed matrix A to another
@@ -534,28 +541,30 @@ extern "C"
    * performs a local copy sub(A) := sub(B), where sub(A) denotes
    * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
    */
-  void pdlacpy_(const char *uplo,
-                const int *m,
-                const int *n,
-                double *A,
-                const int *ia,
-                const int *ja,
-                int *desca,
-                double *B,
-                const int *ib,
-                const int *jb,
-                int *descb);
-  void pslacpy_(const char *uplo,
-                const int *m,
-                const int *n,
-                float *A,
-                const int *ia,
-                const int *ja,
-                int *desca,
-                float *B,
-                const int *ib,
-                const int *jb,
-                int *descb);
+  void
+  pdlacpy_(const char* uplo,
+           const int*  m,
+           const int*  n,
+           double*     A,
+           const int*  ia,
+           const int*  ja,
+           int*        desca,
+           double*     B,
+           const int*  ib,
+           const int*  jb,
+           int*        descb);
+  void
+  pslacpy_(const char* uplo,
+           const int*  m,
+           const int*  n,
+           float*      A,
+           const int*  ia,
+           const int*  ja,
+           int*        desca,
+           float*      B,
+           const int*  ib,
+           const int*  jb,
+           int*        descb);
 
   /**
    * Copies the content of a general rectangular distributed matrix @p A to another distributed matrix @p B
@@ -563,37 +572,38 @@ extern "C"
    * matrix from a one-dimensional to a two-dimensional process grid
    * @p ictxt is a context which is at least a union of all processes in context A and B
    */
-  void pdgemr2d_(const int *m,
-                 const int *n,
-                 const double *A,
-                 const int *ia,
-                 const int *ja,
-                 const int *desca,
-                 double *B,
-                 const int *ib,
-                 const int *jb,
-                 const int *descb,
-                 const int *ictxt);
-  void psgemr2d_(const int *m,
-                 const int *n,
-                 const float *A,
-                 const int *ia,
-                 const int *ja,
-                 const int *desca,
-                 float *B,
-                 const int *ib,
-                 const int *jb,
-                 const int *descb,
-                 const int *ictxt);
+  void
+  pdgemr2d_(const int*    m,
+            const int*    n,
+            const double* A,
+            const int*    ia,
+            const int*    ja,
+            const int*    desca,
+            double*       B,
+            const int*    ib,
+            const int*    jb,
+            const int*    descb,
+            const int*    ictxt);
+  void
+  psgemr2d_(const int*   m,
+            const int*   n,
+            const float* A,
+            const int*   ia,
+            const int*   ja,
+            const int*   desca,
+            float*       B,
+            const int*   ib,
+            const int*   jb,
+            const int*   descb,
+            const int*   ictxt);
 
   /**
    * helper routines determining machine precision
    */
-  double pdlamch_(const int *ictxt,
-                  const char *cmach);
-  float  pslamch_(const int *ictxt,
-                  const char *cmach);
-
+  double
+  pdlamch_(const int* ictxt, const char* cmach);
+  float
+  pslamch_(const int* ictxt, const char* cmach);
 
   /**
    *  psyevx computes selected eigenvalues and, optionally, eigenvectors
@@ -601,207 +611,217 @@ extern "C"
    *  specifying a range of values or a range of indices for the desired
    *  eigenvalues.
    */
-  void pdsyevx_(const char *jobz,
-                const char *range,
-                const char *uplo,
-                const int *n,
-                double *A,
-                const int *ia,
-                const int *ja,
-                const int *desca,
-                const double *VL,
-                const double *VU,
-                const int *il,
-                const int *iu,
-                const double *abstol,
-                const int *m,
-                const int *nz,
-                double *w,
-                double *orfac,
-                double *Z,
-                const int *iz,
-                const int *jz,
-                const int *descz,
-                double *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *ifail,
-                int *iclustr,
-                double *gap,
-                int *info);
-  void pssyevx_(const char *jobz,
-                const char *range,
-                const char *uplo,
-                const int *n,
-                float *A,
-                const int *ia,
-                const int *ja,
-                const int *desca,
-                const float *VL,
-                const float *VU,
-                const int *il,
-                const int *iu,
-                const float *abstol,
-                const int *m,
-                const int *nz,
-                float *w,
-                float *orfac,
-                float *Z,
-                const int *iz,
-                const int *jz,
-                const int *descz,
-                float *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *ifail,
-                int *iclustr,
-                float *gap,
-                int *info);
+  void
+  pdsyevx_(const char*   jobz,
+           const char*   range,
+           const char*   uplo,
+           const int*    n,
+           double*       A,
+           const int*    ia,
+           const int*    ja,
+           const int*    desca,
+           const double* VL,
+           const double* VU,
+           const int*    il,
+           const int*    iu,
+           const double* abstol,
+           const int*    m,
+           const int*    nz,
+           double*       w,
+           double*       orfac,
+           double*       Z,
+           const int*    iz,
+           const int*    jz,
+           const int*    descz,
+           double*       work,
+           int*          lwork,
+           int*          iwork,
+           int*          liwork,
+           int*          ifail,
+           int*          iclustr,
+           double*       gap,
+           int*          info);
+  void
+  pssyevx_(const char*  jobz,
+           const char*  range,
+           const char*  uplo,
+           const int*   n,
+           float*       A,
+           const int*   ia,
+           const int*   ja,
+           const int*   desca,
+           const float* VL,
+           const float* VU,
+           const int*   il,
+           const int*   iu,
+           const float* abstol,
+           const int*   m,
+           const int*   nz,
+           float*       w,
+           float*       orfac,
+           float*       Z,
+           const int*   iz,
+           const int*   jz,
+           const int*   descz,
+           float*       work,
+           int*         lwork,
+           int*         iwork,
+           int*         liwork,
+           int*         ifail,
+           int*         iclustr,
+           float*       gap,
+           int*         info);
 
   /*
    * PDGESVD computes the singular value decomposition (SVD) of an
    * M-by-N matrix A, optionally computing the left and/or right
    * singular vectors
    */
-  void pdgesvd_(const char *jobu,
-                const char *jobvt,
-                const int *m,
-                const int *n,
-                double *A,
-                const int *ia,
-                const int *ja,
-                const int *desca,
-                double *S,
-                double *U,
-                const int *iu,
-                const int *ju,
-                const int *descu,
-                double *VT,
-                const int *ivt,
-                const int *jvt,
-                const int *descvt,
-                double *work,
-                int *lwork,
-                int *info);
-  void psgesvd_(const char *jobu,
-                const char *jobvt,
-                const int *m,
-                const int *n,
-                float *A,
-                const int *ia,
-                const int *ja,
-                const int *desca,
-                float *S,
-                float *U,
-                const int *iu,
-                const int *ju,
-                const int *descu,
-                float *VT,
-                const int *ivt,
-                const int *jvt,
-                const int *descvt,
-                float *work,
-                int *lwork,
-                int *info);
+  void
+  pdgesvd_(const char* jobu,
+           const char* jobvt,
+           const int*  m,
+           const int*  n,
+           double*     A,
+           const int*  ia,
+           const int*  ja,
+           const int*  desca,
+           double*     S,
+           double*     U,
+           const int*  iu,
+           const int*  ju,
+           const int*  descu,
+           double*     VT,
+           const int*  ivt,
+           const int*  jvt,
+           const int*  descvt,
+           double*     work,
+           int*        lwork,
+           int*        info);
+  void
+  psgesvd_(const char* jobu,
+           const char* jobvt,
+           const int*  m,
+           const int*  n,
+           float*      A,
+           const int*  ia,
+           const int*  ja,
+           const int*  desca,
+           float*      S,
+           float*      U,
+           const int*  iu,
+           const int*  ju,
+           const int*  descu,
+           float*      VT,
+           const int*  ivt,
+           const int*  jvt,
+           const int*  descvt,
+           float*      work,
+           int*        lwork,
+           int*        info);
 
   /*
    * P_GELS solves overdetermined or underdetermined real linear
    * systems involving an M-by-N matrix A, or its transpose,
    * using a QR or LQ factorization of A.  It is assumed that A has full rank.
    */
-  void pdgels_(const char *trans,
-               const int *m,
-               const int *n,
-               const int *nrhs,
-               double *A,
-               const int *ia,
-               const int *ja,
-               const int *desca,
-               double *B,
-               const int *ib,
-               const int *jb,
-               const int *descb,
-               double *work,
-               int *lwork,
-               int *info);
-  void psgels_(const char *trans,
-               const int *m,
-               const int *n,
-               const int *nrhs,
-               float *A,
-               const int *ia,
-               const int *ja,
-               const int *desca,
-               float *B,
-               const int *ib,
-               const int *jb,
-               const int *descb,
-               float *work,
-               int *lwork,
-               int *info);
+  void
+  pdgels_(const char* trans,
+          const int*  m,
+          const int*  n,
+          const int*  nrhs,
+          double*     A,
+          const int*  ia,
+          const int*  ja,
+          const int*  desca,
+          double*     B,
+          const int*  ib,
+          const int*  jb,
+          const int*  descb,
+          double*     work,
+          int*        lwork,
+          int*        info);
+  void
+  psgels_(const char* trans,
+          const int*  m,
+          const int*  n,
+          const int*  nrhs,
+          float*      A,
+          const int*  ia,
+          const int*  ja,
+          const int*  desca,
+          float*      B,
+          const int*  ib,
+          const int*  jb,
+          const int*  descb,
+          float*      work,
+          int*        lwork,
+          int*        info);
 
   /*
    * Perform matrix sum:
    * C := beta*C + alpha*op(A),
    * where op(A) denotes either op(A)=A or op(A)=A^T
    */
-  void pdgeadd_(const char *transa,
-                const int *m,
-                const int *n,
-                const double *alpha,
-                const double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const double *beta,
-                double *C,
-                const int *IC,
-                const int *JC,
-                const int *DESCC);
-  void psgeadd_(const char *transa,
-                const int *m,
-                const int *n,
-                const float *alpha,
-                const float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const float *beta,
-                float *C,
-                const int *IC,
-                const int *JC,
-                const int *DESCC);
+  void
+  pdgeadd_(const char*   transa,
+           const int*    m,
+           const int*    n,
+           const double* alpha,
+           const double* A,
+           const int*    IA,
+           const int*    JA,
+           const int*    DESCA,
+           const double* beta,
+           double*       C,
+           const int*    IC,
+           const int*    JC,
+           const int*    DESCC);
+  void
+  psgeadd_(const char*  transa,
+           const int*   m,
+           const int*   n,
+           const float* alpha,
+           const float* A,
+           const int*   IA,
+           const int*   JA,
+           const int*   DESCA,
+           const float* beta,
+           float*       C,
+           const int*   IC,
+           const int*   JC,
+           const int*   DESCC);
 
   /**
    * Routine to transpose a matrix:
    * C = beta C + alpha A^T
    */
-  void pdtran_(const int *m,
-               const int *n,
-               const double *alpha,
-               const double *A,
-               const int *IA,
-               const int *JA,
-               const int *DESCA,
-               const double *beta,
-               double *C,
-               const int *IC,
-               const int *JC,
-               const int *DESCC);
-  void pstran_(const int *m,
-               const int *n,
-               const float *alpha,
-               const float *A,
-               const int *IA,
-               const int *JA,
-               const int *DESCA,
-               const float *beta,
-               float *C,
-               const int *IC,
-               const int *JC,
-               const int *DESCC);
+  void
+  pdtran_(const int*    m,
+          const int*    n,
+          const double* alpha,
+          const double* A,
+          const int*    IA,
+          const int*    JA,
+          const int*    DESCA,
+          const double* beta,
+          double*       C,
+          const int*    IC,
+          const int*    JC,
+          const int*    DESCC);
+  void
+  pstran_(const int*   m,
+          const int*   n,
+          const float* alpha,
+          const float* A,
+          const int*   IA,
+          const int*   JA,
+          const int*   DESCA,
+          const float* beta,
+          float*       C,
+          const int*   IC,
+          const int*   JC,
+          const int*   DESCC);
 
   /**
    *  psyevr computes selected eigenvalues and, optionally, eigenvectors
@@ -809,1160 +829,1356 @@ extern "C"
    *  Eigenvalues/vectors can be selected by specifying a range of values
    *  or a range of indices for the desired eigenvalues.
    */
-  void pdsyevr_(const char *jobz,
-                const char *range,
-                const char *uplo,
-                const int *n,
-                double *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const double *VL,
-                const double *VU,
-                const int *IL,
-                const int *IU,
-                int *m,
-                int *nz,
-                double *w,
-                double *Z,
-                const int *IZ,
-                const int *JZ,
-                const int *DESCZ,
-                double *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *info);
-  void pssyevr_(const char *jobz,
-                const char *range,
-                const char *uplo,
-                const int *n,
-                float *A,
-                const int *IA,
-                const int *JA,
-                const int *DESCA,
-                const float *VL,
-                const float *VU,
-                const int *IL,
-                const int *IU,
-                int *m,
-                int *nz,
-                float *w,
-                float *Z,
-                const int *IZ,
-                const int *JZ,
-                const int *DESCZ,
-                float *work,
-                int *lwork,
-                int *iwork,
-                int *liwork,
-                int *info);
+  void
+  pdsyevr_(const char*   jobz,
+           const char*   range,
+           const char*   uplo,
+           const int*    n,
+           double*       A,
+           const int*    IA,
+           const int*    JA,
+           const int*    DESCA,
+           const double* VL,
+           const double* VU,
+           const int*    IL,
+           const int*    IU,
+           int*          m,
+           int*          nz,
+           double*       w,
+           double*       Z,
+           const int*    IZ,
+           const int*    JZ,
+           const int*    DESCZ,
+           double*       work,
+           int*          lwork,
+           int*          iwork,
+           int*          liwork,
+           int*          info);
+  void
+  pssyevr_(const char*  jobz,
+           const char*  range,
+           const char*  uplo,
+           const int*   n,
+           float*       A,
+           const int*   IA,
+           const int*   JA,
+           const int*   DESCA,
+           const float* VL,
+           const float* VU,
+           const int*   IL,
+           const int*   IU,
+           int*         m,
+           int*         nz,
+           float*       w,
+           float*       Z,
+           const int*   IZ,
+           const int*   JZ,
+           const int*   DESCZ,
+           float*       work,
+           int*         lwork,
+           int*         iwork,
+           int*         liwork,
+           int*         info);
 }
-
-
 
 /*
  * In the following we have template wrappers for the ScaLAPACK routines
  * wrappers for other numeric types can be added in the future
  */
 template <typename number>
-inline void Cgerv2d(int /*context*/,
-                    int /*M*/,
-                    int /*N*/,
-                    number * /*A*/,
-                    int /*lda*/,
-                    int /*rsrc*/,
-                    int /*csrc*/)
+inline void
+Cgerv2d(int /*context*/,
+        int /*M*/,
+        int /*N*/,
+        number* /*A*/,
+        int /*lda*/,
+        int /*rsrc*/,
+        int /*csrc*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void Cgerv2d(int context,
-                    int M,
-                    int N,
-                    double *A,
-                    int lda,
-                    int rsrc,
-                    int csrc)
+inline void
+Cgerv2d(int context, int M, int N, double* A, int lda, int rsrc, int csrc)
 {
-  Cdgerv2d (context, M, N, A, lda, rsrc, csrc);
+  Cdgerv2d(context, M, N, A, lda, rsrc, csrc);
 }
 
-inline void Cgerv2d(int context,
-                    int M,
-                    int N,
-                    float *A,
-                    int lda,
-                    int rsrc,
-                    int csrc)
+inline void
+Cgerv2d(int context, int M, int N, float* A, int lda, int rsrc, int csrc)
 {
-  Csgerv2d (context, M, N, A, lda, rsrc, csrc);
+  Csgerv2d(context, M, N, A, lda, rsrc, csrc);
 }
-
 
 template <typename number>
-inline void Cgesd2d(int /*context*/,
-                    int /*M*/,
-                    int /*N*/,
-                    number * /*A*/,
-                    int /*lda*/,
-                    int /*rdest*/,
-                    int /*cdest*/)
+inline void
+Cgesd2d(int /*context*/,
+        int /*M*/,
+        int /*N*/,
+        number* /*A*/,
+        int /*lda*/,
+        int /*rdest*/,
+        int /*cdest*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void Cgesd2d (int context,
-                     int M,
-                     int N,
-                     double *A,
-                     int lda,
-                     int rdest,
-                     int cdest)
+inline void
+Cgesd2d(int context, int M, int N, double* A, int lda, int rdest, int cdest)
 {
-  Cdgesd2d (context, M, N, A, lda, rdest, cdest);
+  Cdgesd2d(context, M, N, A, lda, rdest, cdest);
 }
 
-inline void Cgesd2d (int context,
-                     int M,
-                     int N,
-                     float *A,
-                     int lda,
-                     int rdest,
-                     int cdest)
+inline void
+Cgesd2d(int context, int M, int N, float* A, int lda, int rdest, int cdest)
 {
-  Csgesd2d (context, M, N, A, lda, rdest, cdest);
+  Csgesd2d(context, M, N, A, lda, rdest, cdest);
 }
-
 
 template <typename number>
-inline void ppotrf(const char * /*UPLO*/,
-                   const int * /*N*/,
-                   number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   int * /*INFO*/)
+inline void
+ppotrf(const char* /*UPLO*/,
+       const int* /*N*/,
+       number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       int* /*INFO*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void ppotrf(const char *UPLO,
-                   const int *N,
-                   double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void
+ppotrf(const char* UPLO,
+       const int*  N,
+       double*     A,
+       const int*  IA,
+       const int*  JA,
+       const int*  DESCA,
+       int*        INFO)
 {
   pdpotrf_(UPLO, N, A, IA, JA, DESCA, INFO);
 }
 
-inline void ppotrf(const char *UPLO,
-                   const int *N,
-                   float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void
+ppotrf(const char* UPLO,
+       const int*  N,
+       float*      A,
+       const int*  IA,
+       const int*  JA,
+       const int*  DESCA,
+       int*        INFO)
 {
   pspotrf_(UPLO, N, A, IA, JA, DESCA, INFO);
 }
 
+template <typename number>
+inline void
+pgetrf(const int* /*m*/,
+       const int* /*n*/,
+       number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       int* /*ipiv*/,
+       int* /*INFO*/)
+{
+  Assert(false, dealii::ExcNotImplemented());
+}
+
+inline void
+pgetrf(const int* m,
+       const int* n,
+       double*    A,
+       const int* IA,
+       const int* JA,
+       const int* DESCA,
+       int*       ipiv,
+       int*       INFO)
+{
+  pdgetrf_(m, n, A, IA, JA, DESCA, ipiv, INFO);
+}
+
+inline void
+pgetrf(const int* m,
+       const int* n,
+       float*     A,
+       const int* IA,
+       const int* JA,
+       const int* DESCA,
+       int*       ipiv,
+       int*       INFO)
+{
+  psgetrf_(m, n, A, IA, JA, DESCA, ipiv, INFO);
+}
 
 template <typename number>
-inline void pgetrf(const int * /*m*/,
-                   const int * /*n*/,
-                   number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   int * /*ipiv*/,
-                   int * /*INFO*/)
+inline void
+ppotri(const char* /*UPLO*/,
+       const int* /*N*/,
+       number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       int* /*INFO*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgetrf(const int *m,
-                   const int *n,
-                   double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *ipiv,
-                   int *INFO)
-{
-  pdgetrf_(m,n,A,IA,JA,DESCA,ipiv,INFO);
-}
-
-inline void pgetrf(const int *m,
-                   const int *n,
-                   float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *ipiv,
-                   int *INFO)
-{
-  psgetrf_(m,n,A,IA,JA,DESCA,ipiv,INFO);
-}
-
-
-template <typename number>
-inline void ppotri(const char * /*UPLO*/,
-                   const int * /*N*/,
-                   number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   int * /*INFO*/)
-{
-  Assert (false, dealii::ExcNotImplemented());
-}
-
-inline void ppotri(const char *UPLO,
-                   const int *N,
-                   double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void
+ppotri(const char* UPLO,
+       const int*  N,
+       double*     A,
+       const int*  IA,
+       const int*  JA,
+       const int*  DESCA,
+       int*        INFO)
 {
   pdpotri_(UPLO, N, A, IA, JA, DESCA, INFO);
 }
 
-inline void ppotri(const char *UPLO,
-                   const int *N,
-                   float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void
+ppotri(const char* UPLO,
+       const int*  N,
+       float*      A,
+       const int*  IA,
+       const int*  JA,
+       const int*  DESCA,
+       int*        INFO)
 {
   pspotri_(UPLO, N, A, IA, JA, DESCA, INFO);
 }
 
+template <typename number>
+inline void
+pgetri(const int* /*N*/,
+       number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       const int* /*ipiv*/,
+       number* /*work*/,
+       int* /*lwork*/,
+       int* /*iwork*/,
+       int* /*liwork*/,
+       int* /*info*/)
+{
+  Assert(false, dealii::ExcNotImplemented());
+}
+
+inline void
+pgetri(const int* N,
+       double*    A,
+       const int* IA,
+       const int* JA,
+       const int* DESCA,
+       const int* ipiv,
+       double*    work,
+       int*       lwork,
+       int*       iwork,
+       int*       liwork,
+       int*       info)
+{
+  pdgetri_(N, A, IA, JA, DESCA, ipiv, work, lwork, iwork, liwork, info);
+}
+
+inline void
+pgetri(const int* N,
+       float*     A,
+       const int* IA,
+       const int* JA,
+       const int* DESCA,
+       const int* ipiv,
+       float*     work,
+       int*       lwork,
+       int*       iwork,
+       int*       liwork,
+       int*       info)
+{
+  psgetri_(N, A, IA, JA, DESCA, ipiv, work, lwork, iwork, liwork, info);
+}
 
 template <typename number>
-inline void pgetri(const int * /*N*/,
-                   number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   const int * /*ipiv*/,
-                   number * /*work*/,
-                   int * /*lwork*/,
-                   int * /*iwork*/,
-                   int * /*liwork*/,
-                   int * /*info*/)
+inline void
+ppocon(const char* /*uplo*/,
+       const int* /*N*/,
+       const number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       const number* /*ANORM*/,
+       number* /*RCOND*/,
+       number* /*WORK*/,
+       const int* /*LWORK*/,
+       int* /*IWORK*/,
+       const int* /*LIWORK*/,
+       int* /*INFO*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgetri(const int *N,
-                   double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const int *ipiv,
-                   double *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *info)
+inline void
+ppocon(const char*   uplo,
+       const int*    N,
+       const double* A,
+       const int*    IA,
+       const int*    JA,
+       const int*    DESCA,
+       const double* ANORM,
+       double*       RCOND,
+       double*       WORK,
+       const int*    LWORK,
+       int*          IWORK,
+       const int*    LIWORK,
+       int*          INFO)
 {
-  pdgetri_(N,A,IA,JA,DESCA,ipiv,work,lwork,iwork,liwork,info);
+  pdpocon_(
+    uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
 }
 
-inline void pgetri(const int *N,
-                   float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const int *ipiv,
-                   float *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *info)
+inline void
+ppocon(const char*  uplo,
+       const int*   N,
+       const float* A,
+       const int*   IA,
+       const int*   JA,
+       const int*   DESCA,
+       const float* ANORM,
+       float*       RCOND,
+       float*       WORK,
+       const int*   LWORK,
+       int*         IWORK,
+       const int*   LIWORK,
+       int*         INFO)
 {
-  psgetri_(N,A,IA,JA,DESCA,ipiv,work,lwork,iwork,liwork,info);
+  pspocon_(
+    uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
 }
-
 
 template <typename number>
-inline void ppocon(const char * /*uplo*/,
-                   const int * /*N*/,
-                   const number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   const number * /*ANORM*/,
-                   number * /*RCOND*/,
-                   number * /*WORK*/,
-                   const int * /*LWORK*/,
-                   int * /*IWORK*/,
-                   const int * /*LIWORK*/,
-                   int * /*INFO*/)
+inline number
+plansy(const char* /*norm*/,
+       const char* /*uplo*/,
+       const int* /*N*/,
+       const number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       number* /*work*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void ppocon(const char *uplo,
-                   const int *N,
-                   const double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const double *ANORM,
-                   double *RCOND,
-                   double *WORK,
-                   const int *LWORK,
-                   int *IWORK,
-                   const int *LIWORK,
-                   int *INFO)
-{
-  pdpocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
-}
-
-inline void ppocon(const char *uplo,
-                   const int *N,
-                   const float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const float *ANORM,
-                   float *RCOND,
-                   float *WORK,
-                   const int *LWORK,
-                   int *IWORK,
-                   const int *LIWORK,
-                   int *INFO)
-{
-  pspocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
-}
-
-
-template <typename number>
-inline number plansy(const char * /*norm*/,
-                     const char * /*uplo*/,
-                     const int * /*N*/,
-                     const number * /*A*/,
-                     const int * /*IA*/,
-                     const int * /*JA*/,
-                     const int * /*DESCA*/,
-                     number * /*work*/)
-{
-  Assert (false, dealii::ExcNotImplemented());
-}
-
-inline double plansy(const char *norm,
-                     const char *uplo,
-                     const int *N,
-                     const double *A,
-                     const int *IA,
-                     const int *JA,
-                     const int *DESCA,
-                     double *work)
+inline double
+plansy(const char*   norm,
+       const char*   uplo,
+       const int*    N,
+       const double* A,
+       const int*    IA,
+       const int*    JA,
+       const int*    DESCA,
+       double*       work)
 {
   return pdlansy_(norm, uplo, N, A, IA, JA, DESCA, work);
 }
 
-inline float plansy(const char *norm,
-                    const char *uplo,
-                    const int *N,
-                    const float *A,
-                    const int *IA,
-                    const int *JA,
-                    const int *DESCA,
-                    float *work)
+inline float
+plansy(const char*  norm,
+       const char*  uplo,
+       const int*   N,
+       const float* A,
+       const int*   IA,
+       const int*   JA,
+       const int*   DESCA,
+       float*       work)
 {
   return pslansy_(norm, uplo, N, A, IA, JA, DESCA, work);
 }
 
-
 template <typename number>
-inline void pgesv(const int * /*n*/,
-                  const int * /*nrhs*/,
-                  number * /*A*/,
-                  const int * /*ia*/,
-                  const int * /*ja*/,
-                  const int * /*desca*/,
-                  int * /*ipiv*/,
-                  number * /*B*/,
-                  const int * /*ib*/,
-                  const int * /*jb*/,
-                  const int * /*descb*/,
-                  int * /*info*/)
+inline void
+pgesv(const int* /*n*/,
+      const int* /*nrhs*/,
+      number* /*A*/,
+      const int* /*ia*/,
+      const int* /*ja*/,
+      const int* /*desca*/,
+      int* /*ipiv*/,
+      number* /*B*/,
+      const int* /*ib*/,
+      const int* /*jb*/,
+      const int* /*descb*/,
+      int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgesv(const int *n,
-                  const int *nrhs,
-                  double *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  int *ipiv,
-                  double *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  int *info)
+inline void
+pgesv(const int* n,
+      const int* nrhs,
+      double*    A,
+      const int* ia,
+      const int* ja,
+      const int* desca,
+      int*       ipiv,
+      double*    B,
+      const int* ib,
+      const int* jb,
+      const int* descb,
+      int*       info)
 {
   pdgesv_(n, nrhs, A, ia, ja, desca, ipiv, B, ib, jb, descb, info);
 }
 
-inline void pgesv(const int *n,
-                  const int *nrhs,
-                  float *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  int *ipiv,
-                  float *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  int *info)
+inline void
+pgesv(const int* n,
+      const int* nrhs,
+      float*     A,
+      const int* ia,
+      const int* ja,
+      const int* desca,
+      int*       ipiv,
+      float*     B,
+      const int* ib,
+      const int* jb,
+      const int* descb,
+      int*       info)
 {
   psgesv_(n, nrhs, A, ia, ja, desca, ipiv, B, ib, jb, descb, info);
 }
 
+template <typename number>
+inline void
+pgemm(const char* /*transa*/,
+      const char* /*transb*/,
+      const int* /*m*/,
+      const int* /*n*/,
+      const int* /*k*/,
+      const number* /*alpha*/,
+      number* /*A*/,
+      const int* /*IA*/,
+      const int* /*JA*/,
+      const int* /*DESCA*/,
+      number* /*B*/,
+      const int* /*IB*/,
+      const int* /*JB*/,
+      const int* /*DESCB*/,
+      const number* /*beta*/,
+      number* /*C*/,
+      const int* /*IC*/,
+      const int* /*JC*/,
+      const int* /*DESCC*/)
+{
+  Assert(false, dealii::ExcNotImplemented());
+}
+
+inline void
+pgemm(const char*   transa,
+      const char*   transb,
+      const int*    m,
+      const int*    n,
+      const int*    k,
+      const double* alpha,
+      const double* A,
+      const int*    IA,
+      const int*    JA,
+      const int*    DESCA,
+      const double* B,
+      const int*    IB,
+      const int*    JB,
+      const int*    DESCB,
+      const double* beta,
+      double*       C,
+      const int*    IC,
+      const int*    JC,
+      const int*    DESCC)
+{
+  pdgemm_(transa,
+          transb,
+          m,
+          n,
+          k,
+          alpha,
+          A,
+          IA,
+          JA,
+          DESCA,
+          B,
+          IB,
+          JB,
+          DESCB,
+          beta,
+          C,
+          IC,
+          JC,
+          DESCC);
+}
+
+inline void
+pgemm(const char*  transa,
+      const char*  transb,
+      const int*   m,
+      const int*   n,
+      const int*   k,
+      const float* alpha,
+      const float* A,
+      const int*   IA,
+      const int*   JA,
+      const int*   DESCA,
+      const float* B,
+      const int*   IB,
+      const int*   JB,
+      const int*   DESCB,
+      const float* beta,
+      float*       C,
+      const int*   IC,
+      const int*   JC,
+      const int*   DESCC)
+{
+  psgemm_(transa,
+          transb,
+          m,
+          n,
+          k,
+          alpha,
+          A,
+          IA,
+          JA,
+          DESCA,
+          B,
+          IB,
+          JB,
+          DESCB,
+          beta,
+          C,
+          IC,
+          JC,
+          DESCC);
+}
 
 template <typename number>
-inline void pgemm(const char * /*transa*/,
-                  const char * /*transb*/,
-                  const int * /*m*/,
-                  const int * /*n*/,
-                  const int * /*k*/,
-                  const number * /*alpha*/,
-                  number * /*A*/,
-                  const int * /*IA*/,
-                  const int * /*JA*/,
-                  const int * /*DESCA*/,
-                  number * /*B*/,
-                  const int * /*IB*/,
-                  const int * /*JB*/,
-                  const int * /*DESCB*/,
-                  const number * /*beta*/,
-                  number * /*C*/,
-                  const int * /*IC*/,
-                  const int * /*JC*/,
-                  const int * /*DESCC*/)
+inline number
+plange(const char* /*norm*/,
+       const int* /*m*/,
+       const int* /*n*/,
+       const number* /*A*/,
+       const int* /*ia*/,
+       const int* /*ja*/,
+       const int* /*desca*/,
+       number* /*work*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgemm(const char *transa,
-                  const char *transb,
-                  const int *m,
-                  const int *n,
-                  const int *k,
-                  const double *alpha,
-                  const double *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  const double *B,
-                  const int *IB,
-                  const int *JB,
-                  const int *DESCB,
-                  const double *beta,
-                  double *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
+inline double
+plange(const char*   norm,
+       const int*    m,
+       const int*    n,
+       const double* A,
+       const int*    ia,
+       const int*    ja,
+       const int*    desca,
+       double*       work)
 {
-  pdgemm_(transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
+  return pdlange_(norm, m, n, A, ia, ja, desca, work);
 }
 
-inline void pgemm(const char *transa,
-                  const char *transb,
-                  const int *m,
-                  const int *n,
-                  const int *k,
-                  const float *alpha,
-                  const float *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  const float *B,
-                  const int *IB,
-                  const int *JB,
-                  const int *DESCB,
-                  const float *beta,
-                  float *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
+inline float
+plange(const char*  norm,
+       const int*   m,
+       const int*   n,
+       const float* A,
+       const int*   ia,
+       const int*   ja,
+       const int*   desca,
+       float*       work)
 {
-  psgemm_(transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
+  return pslange_(norm, m, n, A, ia, ja, desca, work);
 }
-
 
 template <typename number>
-inline number plange(const char * /*norm*/,
-                     const int * /*m*/,
-                     const int * /*n*/,
-                     const number * /*A*/,
-                     const int * /*ia*/,
-                     const int * /*ja*/,
-                     const int * /*desca*/,
-                     number * /*work*/)
+inline void
+psyev(const char* /*jobz*/,
+      const char* /*uplo*/,
+      const int* /*m*/,
+      number* /*A*/,
+      const int* /*ia*/,
+      const int* /*ja*/,
+      int* /*desca*/,
+      number* /*w*/,
+      number* /*z*/,
+      const int* /*iz*/,
+      const int* /*jz*/,
+      int* /*descz*/,
+      number* /*work*/,
+      const int* /*lwork*/,
+      int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline double plange(const char *norm,
-                     const int *m,
-                     const int *n,
-                     const double *A,
-                     const int *ia,
-                     const int *ja,
-                     const int *desca,
-                     double *work)
+inline void
+psyev(const char* jobz,
+      const char* uplo,
+      const int*  m,
+      double*     A,
+      const int*  ia,
+      const int*  ja,
+      int*        desca,
+      double*     w,
+      double*     z,
+      const int*  iz,
+      const int*  jz,
+      int*        descz,
+      double*     work,
+      const int*  lwork,
+      int*        info)
 {
-  return pdlange_(norm, m, n, A, ia, ja,desca, work);
+  pdsyev_(
+    jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
 }
 
-inline float plange(const char *norm,
-                    const int *m,
-                    const int *n,
-                    const float *A,
-                    const int *ia,
-                    const int *ja,
-                    const int *desca,
-                    float *work)
+inline void
+psyev(const char* jobz,
+      const char* uplo,
+      const int*  m,
+      float*      A,
+      const int*  ia,
+      const int*  ja,
+      int*        desca,
+      float*      w,
+      float*      z,
+      const int*  iz,
+      const int*  jz,
+      int*        descz,
+      float*      work,
+      const int*  lwork,
+      int*        info)
 {
-  return pslange_(norm, m, n, A, ia, ja,desca, work);
+  pssyev_(
+    jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
 }
-
 
 template <typename number>
-inline void psyev(const char * /*jobz*/,
-                  const char * /*uplo*/,
-                  const int * /*m*/,
-                  number * /*A*/,
-                  const int * /*ia*/,
-                  const int * /*ja*/,
-                  int * /*desca*/,
-                  number * /*w*/,
-                  number * /*z*/,
-                  const int * /*iz*/,
-                  const int * /*jz*/,
-                  int * /*descz*/,
-                  number * /*work*/,
-                  const int * /*lwork*/,
-                  int * /*info*/)
+inline void
+placpy(const char* /*uplo*/,
+       const int* /*m*/,
+       const int* /*n*/,
+       number* /*A*/,
+       const int* /*ia*/,
+       const int* /*ja*/,
+       int* /*desca*/,
+       number* /*B*/,
+       const int* /*ib*/,
+       const int* /*jb*/,
+       int* /*descb*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void psyev(const char *jobz,
-                  const char *uplo,
-                  const int *m,
-                  double *A,
-                  const int *ia,
-                  const int *ja,
-                  int *desca,
-                  double *w,
-                  double *z,
-                  const int *iz,
-                  const int *jz,
-                  int *descz,
-                  double *work,
-                  const int *lwork,
-                  int *info)
-{
-  pdsyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
-}
-
-inline void psyev(const char *jobz,
-                  const char *uplo,
-                  const int *m,
-                  float *A,
-                  const int *ia,
-                  const int *ja,
-                  int *desca,
-                  float *w,
-                  float *z,
-                  const int *iz,
-                  const int *jz,
-                  int *descz,
-                  float *work,
-                  const int *lwork,
-                  int *info)
-{
-  pssyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
-}
-
-
-template <typename number>
-inline void placpy(const char * /*uplo*/,
-                   const int * /*m*/,
-                   const int * /*n*/,
-                   number * /*A*/,
-                   const int * /*ia*/,
-                   const int * /*ja*/,
-                   int * /*desca*/,
-                   number * /*B*/,
-                   const int * /*ib*/,
-                   const int * /*jb*/,
-                   int * /*descb*/)
-{
-  Assert (false, dealii::ExcNotImplemented());
-}
-
-inline void placpy(const char *uplo,
-                   const int *m,
-                   const int *n,
-                   double *A,
-                   const int *ia,
-                   const int *ja,
-                   int *desca, double *B,
-                   const int *ib,
-                   const int *jb,
-                   int *descb)
+inline void
+placpy(const char* uplo,
+       const int*  m,
+       const int*  n,
+       double*     A,
+       const int*  ia,
+       const int*  ja,
+       int*        desca,
+       double*     B,
+       const int*  ib,
+       const int*  jb,
+       int*        descb)
 {
   pdlacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
 }
 
-inline void placpy(const char *uplo,
-                   const int *m,
-                   const int *n,
-                   float *A,
-                   const int *ia,
-                   const int *ja,
-                   int *desca,
-                   float *B,
-                   const int *ib,
-                   const int *jb,
-                   int *descb)
+inline void
+placpy(const char* uplo,
+       const int*  m,
+       const int*  n,
+       float*      A,
+       const int*  ia,
+       const int*  ja,
+       int*        desca,
+       float*      B,
+       const int*  ib,
+       const int*  jb,
+       int*        descb)
 {
   pslacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
 }
 
+template <typename number>
+inline void
+pgemr2d(const int* /*m*/,
+        const int* /*n*/,
+        const number* /*A*/,
+        const int* /*ia*/,
+        const int* /*ja*/,
+        const int* /*desca*/,
+        number* /*B*/,
+        const int* /*ib*/,
+        const int* /*jb*/,
+        const int* /*descb*/,
+        const int* /*ictxt*/)
+{
+  Assert(false, dealii::ExcNotImplemented());
+}
+
+inline void
+pgemr2d(const int*    m,
+        const int*    n,
+        const double* A,
+        const int*    ia,
+        const int*    ja,
+        const int*    desca,
+        double*       B,
+        const int*    ib,
+        const int*    jb,
+        const int*    descb,
+        const int*    ictxt)
+{
+  pdgemr2d_(m, n, A, ia, ja, desca, B, ib, jb, descb, ictxt);
+}
+
+inline void
+pgemr2d(const int*   m,
+        const int*   n,
+        const float* A,
+        const int*   ia,
+        const int*   ja,
+        const int*   desca,
+        float*       B,
+        const int*   ib,
+        const int*   jb,
+        const int*   descb,
+        const int*   ictxt)
+{
+  psgemr2d_(m, n, A, ia, ja, desca, B, ib, jb, descb, ictxt);
+}
 
 template <typename number>
-inline void pgemr2d(const int * /*m*/,
-                    const int * /*n*/,
-                    const number * /*A*/,
-                    const int * /*ia*/,
-                    const int * /*ja*/,
-                    const int * /*desca*/,
-                    number * /*B*/,
-                    const int * /*ib*/,
-                    const int * /*jb*/,
-                    const int * /*descb*/,
-                    const int * /*ictxt*/)
+inline void
+plamch(const int* /*ictxt*/, const char* /*cmach*/, number& /*val*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgemr2d(const int *m,
-                    const int *n,
-                    const double *A,
-                    const int *ia,
-                    const int *ja,
-                    const int *desca,
-                    double *B,
-                    const int *ib,
-                    const int *jb,
-                    const int *descb,
-                    const int *ictxt)
+inline void
+plamch(const int* ictxt, const char* cmach, double& val)
 {
-  pdgemr2d_(m,n,A,ia,ja,desca,B,ib,jb,descb,ictxt);
+  val = pdlamch_(ictxt, cmach);
 }
 
-inline void pgemr2d(const int *m,
-                    const int *n,
-                    const float *A,
-                    const int *ia,
-                    const int *ja,
-                    const int *desca,
-                    float *B,
-                    const int *ib,
-                    const int *jb,
-                    const int *descb,
-                    const int *ictxt)
+inline void
+plamch(const int* ictxt, const char* cmach, float& val)
 {
-  psgemr2d_(m,n,A,ia,ja,desca,B,ib,jb,descb,ictxt);
+  val = pslamch_(ictxt, cmach);
 }
-
 
 template <typename number>
-inline void plamch(const int * /*ictxt*/,
-                   const char * /*cmach*/,
-                   number &/*val*/)
+inline void
+psyevx(const char* /*jobz*/,
+       const char* /*range*/,
+       const char* /*uplo*/,
+       const int* /*n*/,
+       number* /*A*/,
+       const int* /*ia*/,
+       const int* /*ja*/,
+       const int* /*desca*/,
+       number* /*VL*/,
+       number* /*VU*/,
+       const int* /*il*/,
+       const int* /*iu*/,
+       number* /*abstol*/,
+       const int* /*m*/,
+       const int* /*nz*/,
+       number* /*w*/,
+       number* /*orfac*/,
+       number* /*Z*/,
+       const int* /*iz*/,
+       const int* /*jz*/,
+       const int* /*descz*/,
+       number* /*work*/,
+       int* /*lwork*/,
+       int* /*iwork*/,
+       int* /*liwork*/,
+       int* /*ifail*/,
+       int* /*iclustr*/,
+       number* /*gap*/,
+       int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void plamch(const int *ictxt,
-                   const char *cmach,
-                   double &val)
+inline void
+psyevx(const char* jobz,
+       const char* range,
+       const char* uplo,
+       const int*  n,
+       double*     A,
+       const int*  ia,
+       const int*  ja,
+       const int*  desca,
+       double*     VL,
+       double*     VU,
+       const int*  il,
+       const int*  iu,
+       double*     abstol,
+       const int*  m,
+       const int*  nz,
+       double*     w,
+       double*     orfac,
+       double*     Z,
+       const int*  iz,
+       const int*  jz,
+       const int*  descz,
+       double*     work,
+       int*        lwork,
+       int*        iwork,
+       int*        liwork,
+       int*        ifail,
+       int*        iclustr,
+       double*     gap,
+       int*        info)
 {
-  val = pdlamch_(ictxt,cmach);
+  pdsyevx_(jobz,
+           range,
+           uplo,
+           n,
+           A,
+           ia,
+           ja,
+           desca,
+           VL,
+           VU,
+           il,
+           iu,
+           abstol,
+           m,
+           nz,
+           w,
+           orfac,
+           Z,
+           iz,
+           jz,
+           descz,
+           work,
+           lwork,
+           iwork,
+           liwork,
+           ifail,
+           iclustr,
+           gap,
+           info);
 }
 
-inline void plamch(const int *ictxt,
-                   const char *cmach,
-                   float &val)
+inline void
+psyevx(const char* jobz,
+       const char* range,
+       const char* uplo,
+       const int*  n,
+       float*      A,
+       const int*  ia,
+       const int*  ja,
+       const int*  desca,
+       float*      VL,
+       float*      VU,
+       const int*  il,
+       const int*  iu,
+       float*      abstol,
+       const int*  m,
+       const int*  nz,
+       float*      w,
+       float*      orfac,
+       float*      Z,
+       const int*  iz,
+       const int*  jz,
+       const int*  descz,
+       float*      work,
+       int*        lwork,
+       int*        iwork,
+       int*        liwork,
+       int*        ifail,
+       int*        iclustr,
+       float*      gap,
+       int*        info)
 {
-  val = pslamch_(ictxt,cmach);
+  pssyevx_(jobz,
+           range,
+           uplo,
+           n,
+           A,
+           ia,
+           ja,
+           desca,
+           VL,
+           VU,
+           il,
+           iu,
+           abstol,
+           m,
+           nz,
+           w,
+           orfac,
+           Z,
+           iz,
+           jz,
+           descz,
+           work,
+           lwork,
+           iwork,
+           liwork,
+           ifail,
+           iclustr,
+           gap,
+           info);
 }
-
 
 template <typename number>
-inline void psyevx(const char * /*jobz*/,
-                   const char * /*range*/,
-                   const char * /*uplo*/,
-                   const int * /*n*/,
-                   number * /*A*/,
-                   const int * /*ia*/,
-                   const int * /*ja*/,
-                   const int * /*desca*/,
-                   number * /*VL*/,
-                   number * /*VU*/,
-                   const int * /*il*/,
-                   const int * /*iu*/,
-                   number * /*abstol*/,
-                   const int * /*m*/,
-                   const int * /*nz*/,
-                   number * /*w*/,
-                   number * /*orfac*/,
-                   number * /*Z*/,
-                   const int * /*iz*/,
-                   const int * /*jz*/,
-                   const int * /*descz*/,
-                   number * /*work*/,
-                   int * /*lwork*/,
-                   int * /*iwork*/,
-                   int * /*liwork*/,
-                   int * /*ifail*/,
-                   int * /*iclustr*/,
-                   number * /*gap*/,
-                   int * /*info*/)
+inline void
+pgesvd(const char* /*jobu*/,
+       const char* /*jobvt*/,
+       const int* /*m*/,
+       const int* /*n*/,
+       number* /*A*/,
+       const int* /*ia*/,
+       const int* /*ja*/,
+       const int* /*desca*/,
+       number* /*S*/,
+       number* /*U*/,
+       const int* /*iu*/,
+       const int* /*ju*/,
+       const int* /*descu*/,
+       number* /*VT*/,
+       const int* /*ivt*/,
+       const int* /*jvt*/,
+       const int* /*descvt*/,
+       number* /*work*/,
+       int* /*lwork*/,
+       int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void psyevx(const char *jobz,
-                   const char *range,
-                   const char *uplo,
-                   const int *n,
-                   double *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   double *VL,
-                   double *VU,
-                   const int *il,
-                   const int *iu,
-                   double *abstol,
-                   const int *m,
-                   const int *nz,
-                   double *w,
-                   double *orfac,
-                   double *Z,
-                   const int *iz,
-                   const int *jz,
-                   const int *descz,
-                   double *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *ifail,
-                   int *iclustr,
-                   double *gap,
-                   int *info)
+inline void
+pgesvd(const char* jobu,
+       const char* jobvt,
+       const int*  m,
+       const int*  n,
+       double*     A,
+       const int*  ia,
+       const int*  ja,
+       const int*  desca,
+       double*     S,
+       double*     U,
+       const int*  iu,
+       const int*  ju,
+       const int*  descu,
+       double*     VT,
+       const int*  ivt,
+       const int*  jvt,
+       const int*  descvt,
+       double*     work,
+       int*        lwork,
+       int*        info)
 {
-  pdsyevx_(jobz,range,uplo,n,A,ia,ja,desca,VL,VU,il,iu,abstol,m,nz,w,orfac,Z,iz,jz,descz,work,lwork,iwork,liwork,ifail,iclustr,gap,info);
+  pdgesvd_(jobu,
+           jobvt,
+           m,
+           n,
+           A,
+           ia,
+           ja,
+           desca,
+           S,
+           U,
+           iu,
+           ju,
+           descu,
+           VT,
+           ivt,
+           jvt,
+           descvt,
+           work,
+           lwork,
+           info);
 }
 
-inline void psyevx(const char *jobz,
-                   const char *range,
-                   const char *uplo,
-                   const int *n,
-                   float *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   float *VL,
-                   float *VU,
-                   const int *il,
-                   const int *iu,
-                   float *abstol,
-                   const int *m,
-                   const int *nz,
-                   float *w,
-                   float *orfac,
-                   float *Z,
-                   const int *iz,
-                   const int *jz,
-                   const int *descz,
-                   float *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *ifail,
-                   int *iclustr,
-                   float *gap,
-                   int *info)
+inline void
+pgesvd(const char* jobu,
+       const char* jobvt,
+       const int*  m,
+       const int*  n,
+       float*      A,
+       const int*  ia,
+       const int*  ja,
+       const int*  desca,
+       float*      S,
+       float*      U,
+       const int*  iu,
+       const int*  ju,
+       const int*  descu,
+       float*      VT,
+       const int*  ivt,
+       const int*  jvt,
+       const int*  descvt,
+       float*      work,
+       int*        lwork,
+       int*        info)
 {
-  pssyevx_(jobz,range,uplo,n,A,ia,ja,desca,VL,VU,il,iu,abstol,m,nz,w,orfac,Z,iz,jz,descz,work,lwork,iwork,liwork,ifail,iclustr,gap,info);
+  psgesvd_(jobu,
+           jobvt,
+           m,
+           n,
+           A,
+           ia,
+           ja,
+           desca,
+           S,
+           U,
+           iu,
+           ju,
+           descu,
+           VT,
+           ivt,
+           jvt,
+           descvt,
+           work,
+           lwork,
+           info);
 }
-
 
 template <typename number>
-inline void pgesvd(const char * /*jobu*/,
-                   const char * /*jobvt*/,
-                   const int * /*m*/,
-                   const int * /*n*/,
-                   number * /*A*/,
-                   const int * /*ia*/,
-                   const int * /*ja*/,
-                   const int * /*desca*/,
-                   number * /*S*/,
-                   number * /*U*/,
-                   const int * /*iu*/,
-                   const int * /*ju*/,
-                   const int * /*descu*/,
-                   number * /*VT*/,
-                   const int * /*ivt*/,
-                   const int * /*jvt*/,
-                   const int * /*descvt*/,
-                   number * /*work*/,
-                   int * /*lwork*/,
-                   int * /*info*/)
+inline void
+pgels(const char* /*trans*/,
+      const int* /*m*/,
+      const int* /*n*/,
+      const int* /*nrhs*/,
+      number* /*A*/,
+      const int* /*ia*/,
+      const int* /*ja*/,
+      const int* /*desca*/,
+      number* /*B*/,
+      const int* /*ib*/,
+      const int* /*jb*/,
+      const int* /*descb*/,
+      number* /*work*/,
+      int* /*lwork*/,
+      int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgesvd(const char *jobu,
-                   const char *jobvt,
-                   const int *m,
-                   const int *n,
-                   double *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   double *S,
-                   double *U,
-                   const int *iu,
-                   const int *ju,
-                   const int *descu,
-                   double *VT,
-                   const int *ivt,
-                   const int *jvt,
-                   const int *descvt,
-                   double *work,
-                   int *lwork,
-                   int *info)
+inline void
+pgels(const char* trans,
+      const int*  m,
+      const int*  n,
+      const int*  nrhs,
+      double*     A,
+      const int*  ia,
+      const int*  ja,
+      const int*  desca,
+      double*     B,
+      const int*  ib,
+      const int*  jb,
+      const int*  descb,
+      double*     work,
+      int*        lwork,
+      int*        info)
 {
-  pdgesvd_(jobu,jobvt,m,n,A,ia,ja,desca,S,U,iu,ju,descu,VT,ivt,jvt,descvt,work,lwork,info);
+  pdgels_(
+    trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
 }
 
-inline void pgesvd(const char *jobu,
-                   const char *jobvt,
-                   const  int *m,
-                   const int *n,
-                   float *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   float *S,
-                   float *U,
-                   const int *iu,
-                   const int *ju,
-                   const int *descu,
-                   float *VT,
-                   const  int *ivt,
-                   const  int *jvt,
-                   const int *descvt,
-                   float *work,
-                   int *lwork,
-                   int *info)
+inline void
+pgels(const char* trans,
+      const int*  m,
+      const int*  n,
+      const int*  nrhs,
+      float*      A,
+      const int*  ia,
+      const int*  ja,
+      const int*  desca,
+      float*      B,
+      const int*  ib,
+      const int*  jb,
+      const int*  descb,
+      float*      work,
+      int*        lwork,
+      int*        info)
 {
-  psgesvd_(jobu,jobvt,m,n,A,ia,ja,desca,S,U,iu,ju,descu,VT,ivt,jvt,descvt,work,lwork,info);
+  psgels_(
+    trans, m, n, nrhs, A, ia, ja, desca, B, ib, jb, descb, work, lwork, info);
 }
-
 
 template <typename number>
-inline void pgels(const char * /*trans*/,
-                  const int * /*m*/,
-                  const int * /*n*/,
-                  const int * /*nrhs*/,
-                  number * /*A*/,
-                  const int * /*ia*/,
-                  const int * /*ja*/,
-                  const int * /*desca*/,
-                  number * /*B*/,
-                  const int * /*ib*/,
-                  const int * /*jb*/,
-                  const int * /*descb*/,
-                  number * /*work*/,
-                  int * /*lwork*/,
-                  int * /*info*/)
+inline void
+pgeadd(const char* /*transa*/,
+       const int* /*m*/,
+       const int* /*n*/,
+       const number* /*alpha*/,
+       const number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       const number* /*beta*/,
+       number* /*C*/,
+       const int* /*IC*/,
+       const int* /*JC*/,
+       const int* /*DESCC*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgels(const char *trans,
-                  const int *m,
-                  const int *n,
-                  const int *nrhs,
-                  double *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  double *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  double *work,
-                  int *lwork,
-                  int *info)
+inline void
+pgeadd(const char*   transa,
+       const int*    m,
+       const int*    n,
+       const double* alpha,
+       const double* A,
+       const int*    IA,
+       const int*    JA,
+       const int*    DESCA,
+       const double* beta,
+       double*       C,
+       const int*    IC,
+       const int*    JC,
+       const int*    DESCC)
 {
-  pdgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
+  pdgeadd_(transa, m, n, alpha, A, IA, JA, DESCA, beta, C, IC, JC, DESCC);
 }
 
-inline void pgels(const char *trans,
-                  const int *m,
-                  const int *n,
-                  const int *nrhs,
-                  float *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  float *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  float *work,
-                  int *lwork,
-                  int *info)
+inline void
+pgeadd(const char*  transa,
+       const int*   m,
+       const int*   n,
+       const float* alpha,
+       const float* A,
+       const int*   IA,
+       const int*   JA,
+       const int*   DESCA,
+       const float* beta,
+       float*       C,
+       const int*   IC,
+       const int*   JC,
+       const int*   DESCC)
 {
-  psgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
+  psgeadd_(transa, m, n, alpha, A, IA, JA, DESCA, beta, C, IC, JC, DESCC);
 }
-
 
 template <typename number>
-inline void pgeadd(const char * /*transa*/,
-                   const int * /*m*/,
-                   const int * /*n*/,
-                   const number * /*alpha*/,
-                   const number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   const number * /*beta*/,
-                   number * /*C*/,
-                   const int * /*IC*/,
-                   const int * /*JC*/,
-                   const int * /*DESCC*/)
+inline void
+ptran(const int* /*m*/,
+      const int* /*n*/,
+      const number* /*alpha*/,
+      const number* /*A*/,
+      const int* /*IA*/,
+      const int* /*JA*/,
+      const int* /*DESCA*/,
+      const number* /*beta*/,
+      number* /*C*/,
+      const int* /*IC*/,
+      const int* /*JC*/,
+      const int* /*DESCC*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void pgeadd(const char *transa,
-                   const int *m,
-                   const int *n,
-                   const double *alpha,
-                   const double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const double *beta,
-                   double *C,
-                   const int *IC,
-                   const int *JC,
-                   const int *DESCC)
+inline void
+ptran(const int*    m,
+      const int*    n,
+      const double* alpha,
+      const double* A,
+      const int*    IA,
+      const int*    JA,
+      const int*    DESCA,
+      const double* beta,
+      double*       C,
+      const int*    IC,
+      const int*    JC,
+      const int*    DESCC)
 {
-  pdgeadd_(transa,m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+  pdtran_(m, n, alpha, A, IA, JA, DESCA, beta, C, IC, JC, DESCC);
 }
 
-inline void pgeadd(const char *transa,
-                   const int *m,
-                   const int *n,
-                   const float *alpha,
-                   const float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const float *beta,
-                   float *C,
-                   const int *IC,
-                   const int *JC,
-                   const int *DESCC)
+inline void
+ptran(const int*   m,
+      const int*   n,
+      const float* alpha,
+      const float* A,
+      const int*   IA,
+      const int*   JA,
+      const int*   DESCA,
+      const float* beta,
+      float*       C,
+      const int*   IC,
+      const int*   JC,
+      const int*   DESCC)
 {
-  psgeadd_(transa,m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+  pstran_(m, n, alpha, A, IA, JA, DESCA, beta, C, IC, JC, DESCC);
 }
-
 
 template <typename number>
-inline void ptran(const int * /*m*/,
-                  const int * /*n*/,
-                  const number * /*alpha*/,
-                  const number * /*A*/,
-                  const int * /*IA*/,
-                  const int * /*JA*/,
-                  const int * /*DESCA*/,
-                  const number * /*beta*/,
-                  number * /*C*/,
-                  const int * /*IC*/,
-                  const int * /*JC*/,
-                  const int * /*DESCC*/)
+inline void
+psyevr(const char* /*jobz*/,
+       const char* /*range*/,
+       const char* /*uplo*/,
+       const int* /*n*/,
+       number* /*A*/,
+       const int* /*IA*/,
+       const int* /*JA*/,
+       const int* /*DESCA*/,
+       const number* /*VL*/,
+       const number* /*VU*/,
+       const int* /*IL*/,
+       const int* /*IU*/,
+       int* /*m*/,
+       int* /*nz*/,
+       number* /*w*/,
+       number* /*Z*/,
+       const int* /*IZ*/,
+       const int* /*JZ*/,
+       const int* /*DESCZ*/,
+       number* /*work*/,
+       int* /*lwork*/,
+       int* /*iwork*/,
+       int* /*liwork*/,
+       int* /*info*/)
 {
-  Assert (false, dealii::ExcNotImplemented());
+  Assert(false, dealii::ExcNotImplemented());
 }
 
-inline void ptran(const int *m,
-                  const int *n,
-                  const double *alpha,
-                  const double *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  const double *beta,
-                  double *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
-{
-  pdtran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
-}
-
-inline void ptran(const int *m,
-                  const int *n,
-                  const float *alpha,
-                  const float *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  const float *beta,
-                  float *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
-{
-  pstran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
-}
-
-
-template <typename number>
-inline void psyevr(const char * /*jobz*/,
-                   const char * /*range*/,
-                   const char * /*uplo*/,
-                   const int * /*n*/,
-                   number * /*A*/,
-                   const int * /*IA*/,
-                   const int * /*JA*/,
-                   const int * /*DESCA*/,
-                   const number * /*VL*/,
-                   const number * /*VU*/,
-                   const int * /*IL*/,
-                   const int * /*IU*/,
-                   int * /*m*/,
-                   int * /*nz*/,
-                   number * /*w*/,
-                   number * /*Z*/,
-                   const int * /*IZ*/,
-                   const int * /*JZ*/,
-                   const int * /*DESCZ*/,
-                   number * /*work*/,
-                   int * /*lwork*/,
-                   int * /*iwork*/,
-                   int * /*liwork*/,
-                   int * /*info*/)
-{
-  Assert (false, dealii::ExcNotImplemented());
-}
-
-inline void psyevr(const char *jobz,
-                   const char *range,
-                   const char *uplo,
-                   const int *n,
-                   double *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const double *VL,
-                   const double *VU,
-                   const int *IL,
-                   const int *IU,
-                   int *m,
-                   int *nz,
-                   double *w,
-                   double *Z,
-                   const int *IZ,
-                   const int *JZ,
-                   const int *DESCZ,
-                   double *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *info)
+inline void
+psyevr(const char*   jobz,
+       const char*   range,
+       const char*   uplo,
+       const int*    n,
+       double*       A,
+       const int*    IA,
+       const int*    JA,
+       const int*    DESCA,
+       const double* VL,
+       const double* VU,
+       const int*    IL,
+       const int*    IU,
+       int*          m,
+       int*          nz,
+       double*       w,
+       double*       Z,
+       const int*    IZ,
+       const int*    JZ,
+       const int*    DESCZ,
+       double*       work,
+       int*          lwork,
+       int*          iwork,
+       int*          liwork,
+       int*          info)
 {
   /*
    * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pdsyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
    * to pdsyevr into the following code to suppress the exception.
    */
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;
   feholdexcept(&fp_exceptions);
-#endif
+#  endif
 
-  pdsyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
+  pdsyevr_(jobz,
+           range,
+           uplo,
+           n,
+           A,
+           IA,
+           JA,
+           DESCA,
+           VL,
+           VU,
+           IL,
+           IU,
+           m,
+           nz,
+           w,
+           Z,
+           IZ,
+           JZ,
+           DESCZ,
+           work,
+           lwork,
+           iwork,
+           liwork,
+           info);
 
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fesetenv(&fp_exceptions);
-#endif
+#  endif
 }
 
-inline void psyevr(const char *jobz,
-                   const char *range,
-                   const char *uplo,
-                   const int *n,
-                   float *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const float *VL,
-                   const float *VU,
-                   const int *IL,
-                   const int *IU,
-                   int *m,
-                   int *nz,
-                   float *w,
-                   float *Z,
-                   const int *IZ,
-                   const int *JZ,
-                   const int *DESCZ,
-                   float *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *info)
+inline void
+psyevr(const char*  jobz,
+       const char*  range,
+       const char*  uplo,
+       const int*   n,
+       float*       A,
+       const int*   IA,
+       const int*   JA,
+       const int*   DESCA,
+       const float* VL,
+       const float* VU,
+       const int*   IL,
+       const int*   IU,
+       int*         m,
+       int*         nz,
+       float*       w,
+       float*       Z,
+       const int*   IZ,
+       const int*   JZ,
+       const int*   DESCZ,
+       float*       work,
+       int*         lwork,
+       int*         iwork,
+       int*         liwork,
+       int*         info)
 {
   /*
    * Netlib ScaLAPACK performs floating point tests (e.g. divide-by-zero) within the call to pssyevr
    * causing floating point exceptions to be thrown (at least in debug mode). Therefore, we wrap the calls
    * to pssyevr into the following code to suppress the exception.
    */
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fenv_t fp_exceptions;
   feholdexcept(&fp_exceptions);
-#endif
+#  endif
 
-  pssyevr_(jobz,range,uplo,n,A,IA,JA,DESCA,VL,VU,IL,IU,m,nz,w,Z,IZ,JZ,DESCZ,work,lwork,iwork,liwork,info);
+  pssyevr_(jobz,
+           range,
+           uplo,
+           n,
+           A,
+           IA,
+           JA,
+           DESCA,
+           VL,
+           VU,
+           IL,
+           IU,
+           m,
+           nz,
+           w,
+           Z,
+           IZ,
+           JZ,
+           DESCZ,
+           work,
+           lwork,
+           iwork,
+           liwork,
+           info);
 
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
   fesetenv(&fp_exceptions);
-#endif
+#  endif
 }
 
 #endif // DEAL_II_WITH_SCALAPACK

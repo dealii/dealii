@@ -18,55 +18,52 @@
  *          Denis Davydov, University of Erlangen-Nuremberg, 2016.
  */
 
-
 // @sect3{Include files}
 
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // These are the new files we need. The first and second provide <i>hp</i>
 // versions of the DoFHandler and FEValues classes as described in the
 // introduction of this program. The last one provides Fourier transformation
 // class on the unit cell.
+#include <deal.II/fe/fe_series.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
-#include <deal.II/fe/fe_series.h>
 
 // The last set of include files are standard C++ headers. We need support for
 // complex numbers when we compute the Fourier transform.
+#include <complex>
 #include <fstream>
 #include <iostream>
-#include <complex>
-
 
 // Finally, this is as in previous programs:
 namespace Step27
 {
   using namespace dealii;
-
 
   // @sect3{The main class}
 
@@ -89,44 +86,50 @@ namespace Step27
   class LaplaceProblem
   {
   public:
-    LaplaceProblem ();
-    ~LaplaceProblem ();
+    LaplaceProblem();
+    ~LaplaceProblem();
 
-    void run ();
+    void
+    run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void create_coarse_grid ();
-    void estimate_smoothness (Vector<float> &smoothness_indicators);
-    void postprocess (const unsigned int cycle);
-    std::pair<bool,unsigned int> predicate(const TableIndices<dim> &indices);
+    void
+    setup_system();
+    void
+    assemble_system();
+    void
+    solve();
+    void
+    create_coarse_grid();
+    void
+    estimate_smoothness(Vector<float>& smoothness_indicators);
+    void
+    postprocess(const unsigned int cycle);
+    std::pair<bool, unsigned int>
+    predicate(const TableIndices<dim>& indices);
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim> triangulation;
 
     hp::DoFHandler<dim>      dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
-    hp::QCollection<dim-1>   face_quadrature_collection;
+    hp::QCollection<dim - 1> face_quadrature_collection;
 
-    hp::QCollection<dim> fourier_q_collection;
-    std::shared_ptr<FESeries::Fourier<dim> > fourier;
-    std::vector<double> ln_k;
-    Table<dim,std::complex<double> > fourier_coefficients;
+    hp::QCollection<dim>                    fourier_q_collection;
+    std::shared_ptr<FESeries::Fourier<dim>> fourier;
+    std::vector<double>                     ln_k;
+    Table<dim, std::complex<double>>        fourier_coefficients;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
 
     const unsigned int max_degree;
   };
-
-
 
   // @sect3{Equation data}
   //
@@ -136,26 +139,23 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide () : Function<dim> () {}
+    RightHandSide() : Function<dim>()
+    {}
 
-    virtual double value (const Point<dim>   &p,
-                          const unsigned int  component) const override;
+    virtual double
+    value(const Point<dim>& p, const unsigned int component) const override;
   };
-
 
   template <int dim>
   double
-  RightHandSide<dim>::value (const Point<dim>   &p,
-                             const unsigned int  /*component*/) const
+  RightHandSide<dim>::value(const Point<dim>& p,
+                            const unsigned int /*component*/) const
   {
     double product = 1;
-    for (unsigned int d=0; d<dim; ++d)
-      product *= (p[d]+1);
+    for(unsigned int d = 0; d < dim; ++d)
+      product *= (p[d] + 1);
     return product;
   }
-
-
-
 
   // @sect3{Implementation of the main class}
 
@@ -179,26 +179,25 @@ namespace Step27
   //
   // In order to resize fourier_coefficients Table, we use the following
   // auxiliary function
-  template <int dim,typename T>
-  void resize(Table<dim,T> &coeff, const unsigned int N)
+  template <int dim, typename T>
+  void
+  resize(Table<dim, T>& coeff, const unsigned int N)
   {
     TableIndices<dim> size;
-    for (unsigned int d=0; d<dim; d++)
+    for(unsigned int d = 0; d < dim; d++)
       size[d] = N;
     coeff.reinit(size);
   }
 
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem ()
-    :
-    dof_handler (triangulation),
-    max_degree (dim <= 2 ? 7 : 5)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : dof_handler(triangulation), max_degree(dim <= 2 ? 7 : 5)
   {
-    for (unsigned int degree=2; degree<=max_degree; ++degree)
+    for(unsigned int degree = 2; degree <= max_degree; ++degree)
       {
-        fe_collection.push_back (FE_Q<dim>(degree));
-        quadrature_collection.push_back (QGauss<dim>(degree+1));
-        face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
+        fe_collection.push_back(FE_Q<dim>(degree));
+        quadrature_collection.push_back(QGauss<dim>(degree + 1));
+        face_quadrature_collection.push_back(QGauss<dim - 1>(degree + 1));
       }
 
     // As described in the introduction, we define the Fourier vectors ${\bf
@@ -229,31 +228,28 @@ namespace Step27
     // finite element, namely that is obtained by iterating a
     // 2-point Gauss formula as many times as the maximal exponent we use for
     // the term $e^{i{\bf k}\cdot{\bf x}}$:
-    QGauss<1>            base_quadrature (2);
-    QIterated<dim>       quadrature (base_quadrature, N);
-    for (unsigned int i = 0; i < fe_collection.size(); i++)
+    QGauss<1>      base_quadrature(2);
+    QIterated<dim> quadrature(base_quadrature, N);
+    for(unsigned int i = 0; i < fe_collection.size(); i++)
       fourier_q_collection.push_back(quadrature);
 
     // Now we are ready to set-up the FESeries::Fourier object
-    fourier = std::make_shared<FESeries::Fourier<dim> >(N,
-                                                        fe_collection,
-                                                        fourier_q_collection);
+    fourier = std::make_shared<FESeries::Fourier<dim>>(
+      N, fe_collection, fourier_q_collection);
 
     // We need to resize the matrix of fourier coefficients according to the
     // number of modes N.
-    resize(fourier_coefficients,N);
+    resize(fourier_coefficients, N);
   }
-
 
   // @sect4{LaplaceProblem::~LaplaceProblem}
 
   // The destructor is unchanged from what we already did in step-6:
   template <int dim>
-  LaplaceProblem<dim>::~LaplaceProblem ()
+  LaplaceProblem<dim>::~LaplaceProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
-
 
   // @sect4{LaplaceProblem::setup_system}
   //
@@ -262,31 +258,26 @@ namespace Step27
   // the algorithms used internally are different in some aspect since the
   // dof_handler variable here is an hp object.
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system()
   {
-    dof_handler.distribute_dofs (fe_collection);
+    dof_handler.distribute_dofs(fe_collection);
 
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-                                             constraints);
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Functions::ZeroFunction<dim>(),
-                                              constraints);
-    constraints.close ();
+    constraints.clear();
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    VectorTools::interpolate_boundary_values(
+      dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+    constraints.close();
 
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
-                                dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
-    sparsity_pattern.copy_from (dsp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
+    sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
   }
-
-
 
   // @sect4{LaplaceProblem::assemble_system}
 
@@ -316,66 +307,62 @@ namespace Step27
   // since allocating memory is expensive, and doing so every time we visit a
   // new cell would take significant compute time.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void
+  LaplaceProblem<dim>::assemble_system()
   {
-    hp::FEValues<dim> hp_fe_values (fe_collection,
-                                    quadrature_collection,
-                                    update_values    |  update_gradients |
-                                    update_quadrature_points  |  update_JxW_values);
+    hp::FEValues<dim> hp_fe_values(fe_collection,
+                                   quadrature_collection,
+                                   update_values | update_gradients
+                                     | update_quadrature_points
+                                     | update_JxW_values);
 
     const RightHandSide<dim> rhs_function;
 
-    FullMatrix<double>   cell_matrix;
-    Vector<double>       cell_rhs;
+    FullMatrix<double> cell_matrix;
+    Vector<double>     cell_rhs;
 
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
-        const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 
-        cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+        cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
         cell_matrix = 0;
 
-        cell_rhs.reinit (dofs_per_cell);
+        cell_rhs.reinit(dofs_per_cell);
         cell_rhs = 0;
 
-        hp_fe_values.reinit (cell);
+        hp_fe_values.reinit(cell);
 
-        const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+        const FEValues<dim>& fe_values = hp_fe_values.get_present_fe_values();
 
-        std::vector<double>  rhs_values (fe_values.n_quadrature_points);
-        rhs_function.value_list (fe_values.get_quadrature_points(),
-                                 rhs_values);
+        std::vector<double> rhs_values(fe_values.n_quadrature_points);
+        rhs_function.value_list(fe_values.get_quadrature_points(), rhs_values);
 
-        for (unsigned int q_point=0;
-             q_point<fe_values.n_quadrature_points;
-             ++q_point)
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+        for(unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
+            ++q_point)
+          for(unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                     fe_values.shape_grad(j,q_point) *
-                                     fe_values.JxW(q_point));
+              for(unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j) += (fe_values.shape_grad(i, q_point)
+                                      * fe_values.shape_grad(j, q_point)
+                                      * fe_values.JxW(q_point));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-                              rhs_values[q_point] *
-                              fe_values.JxW(q_point));
+              cell_rhs(i) += (fe_values.shape_value(i, q_point)
+                              * rhs_values[q_point] * fe_values.JxW(q_point));
             }
 
-        local_dof_indices.resize (dofs_per_cell);
-        cell->get_dof_indices (local_dof_indices);
+        local_dof_indices.resize(dofs_per_cell);
+        cell->get_dof_indices(local_dof_indices);
 
-        constraints.distribute_local_to_global (cell_matrix, cell_rhs,
-                                                local_dof_indices,
-                                                system_matrix, system_rhs);
+        constraints.distribute_local_to_global(
+          cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
   }
-
-
 
   // @sect4{LaplaceProblem::solve}
 
@@ -383,22 +370,20 @@ namespace Step27
   // previous examples. We simply try to reduce the initial residual (which
   // equals the $l_2$ norm of the right hand side) by a certain factor:
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve()
   {
-    SolverControl           solver_control (system_rhs.size(),
-                                            1e-8*system_rhs.l2_norm());
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control(system_rhs.size(),
+                                 1e-8 * system_rhs.l2_norm());
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    constraints.distribute (solution);
+    constraints.distribute(solution);
   }
-
-
 
   // @sect4{LaplaceProblem::postprocess}
 
@@ -410,23 +395,23 @@ namespace Step27
   // function because we want the estimated error and smoothness indicators
   // not only for refinement, but also include them in the graphical output.
   template <int dim>
-  void LaplaceProblem<dim>::postprocess (const unsigned int cycle)
+  void
+  LaplaceProblem<dim>::postprocess(const unsigned int cycle)
   {
     // Let us start with computing estimated error and smoothness indicators,
     // which each are one number for each active cell of our
     // triangulation. For the error indicator, we use the KellyErrorEstimator
     // class as always. Estimating the smoothness is done in the respective
     // function of this class; that function is discussed further down below:
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        face_quadrature_collection,
-                                        typename FunctionMap<dim>::type(),
-                                        solution,
-                                        estimated_error_per_cell);
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       face_quadrature_collection,
+                                       typename FunctionMap<dim>::type(),
+                                       solution,
+                                       estimated_error_per_cell);
 
-
-    Vector<float> smoothness_indicators (triangulation.n_active_cells());
-    estimate_smoothness (smoothness_indicators);
+    Vector<float> smoothness_indicators(triangulation.n_active_cells());
+    estimate_smoothness(smoothness_indicators);
 
     // Next we want to generate graphical output. In addition to the two
     // estimated quantities derived above, we would also like to output the
@@ -443,12 +428,12 @@ namespace Step27
     // <code>float</code> or <code>double</code>, even though our values are
     // all integers, so that it what we use:
     {
-      Vector<float> fe_degrees (triangulation.n_active_cells());
+      Vector<float> fe_degrees(triangulation.n_active_cells());
       {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
+        typename hp::DoFHandler<dim>::active_cell_iterator cell
+          = dof_handler.begin_active(),
+          endc = dof_handler.end();
+        for(; cell != endc; ++cell)
           fe_degrees(cell->active_cell_index())
             = fe_collection[cell->active_fe_index()].degree;
       }
@@ -460,22 +445,21 @@ namespace Step27
       // DoFHandler@<dim@>, which is why we have never seen it in previous
       // tutorial programs) that indicates the type of DoF handler to be
       // used. Here, we have to use the hp::DoFHandler class:
-      DataOut<dim,hp::DoFHandler<dim> > data_out;
+      DataOut<dim, hp::DoFHandler<dim>> data_out;
 
-      data_out.attach_dof_handler (dof_handler);
-      data_out.add_data_vector (solution, "solution");
-      data_out.add_data_vector (estimated_error_per_cell, "error");
-      data_out.add_data_vector (smoothness_indicators, "smoothness");
-      data_out.add_data_vector (fe_degrees, "fe_degree");
-      data_out.build_patches ();
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector(solution, "solution");
+      data_out.add_data_vector(estimated_error_per_cell, "error");
+      data_out.add_data_vector(smoothness_indicators, "smoothness");
+      data_out.add_data_vector(fe_degrees, "fe_degree");
+      data_out.build_patches();
 
       // The final step in generating output is to determine a file name, open
       // the file, and write the data into it (here, we use VTK format):
-      const std::string filename = "solution-" +
-                                   Utilities::int_to_string (cycle, 2) +
-                                   ".vtk";
-      std::ofstream output (filename);
-      data_out.write_vtk (output);
+      const std::string filename
+        = "solution-" + Utilities::int_to_string(cycle, 2) + ".vtk";
+      std::ofstream output(filename);
+      data_out.write_vtk(output);
     }
 
     // After this, we would like to actually refine the mesh, in both $h$ and
@@ -483,9 +467,8 @@ namespace Step27
     // estimated error to flag those cells for refinement that have the
     // largest error. This is what we have always done:
     {
-      GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                       estimated_error_per_cell,
-                                                       0.3, 0.03);
+      GridRefinement::refine_and_coarsen_fixed_number(
+        triangulation, estimated_error_per_cell, 0.3, 0.03);
 
       // Next we would like to figure out which of the cells that have been
       // flagged for refinement should actually have $p$ increased instead of
@@ -501,21 +484,23 @@ namespace Step27
       // strategies, we will then set the threshold above which will increase
       // $p$ instead of reducing $h$ as the mean value between minimal and
       // maximal smoothness indicators on cells flagged for refinement:
-      float max_smoothness = *std::min_element (smoothness_indicators.begin(),
-                                                smoothness_indicators.end()),
-                             min_smoothness = *std::max_element (smoothness_indicators.begin(),
-                                                                 smoothness_indicators.end());
+      float max_smoothness = *std::min_element(smoothness_indicators.begin(),
+                                               smoothness_indicators.end()),
+            min_smoothness = *std::max_element(smoothness_indicators.begin(),
+                                               smoothness_indicators.end());
       {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
-          if (cell->refine_flag_set())
+        typename hp::DoFHandler<dim>::active_cell_iterator cell
+          = dof_handler.begin_active(),
+          endc = dof_handler.end();
+        for(; cell != endc; ++cell)
+          if(cell->refine_flag_set())
             {
-              max_smoothness = std::max (max_smoothness,
-                                         smoothness_indicators(cell->active_cell_index()));
-              min_smoothness = std::min (min_smoothness,
-                                         smoothness_indicators(cell->active_cell_index()));
+              max_smoothness
+                = std::max(max_smoothness,
+                           smoothness_indicators(cell->active_cell_index()));
+              min_smoothness
+                = std::min(min_smoothness,
+                           smoothness_indicators(cell->active_cell_index()));
             }
       }
       const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
@@ -529,28 +514,26 @@ namespace Step27
       // undergo bisection. For all other cells, the refinement flags remain
       // untouched:
       {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
-          if (cell->refine_flag_set()
-              &&
-              (smoothness_indicators(cell->active_cell_index()) > threshold_smoothness)
-              &&
-              (cell->active_fe_index()+1 < fe_collection.size()))
+        typename hp::DoFHandler<dim>::active_cell_iterator cell
+          = dof_handler.begin_active(),
+          endc = dof_handler.end();
+        for(; cell != endc; ++cell)
+          if(cell->refine_flag_set()
+             && (smoothness_indicators(cell->active_cell_index())
+                 > threshold_smoothness)
+             && (cell->active_fe_index() + 1 < fe_collection.size()))
             {
               cell->clear_refine_flag();
-              cell->set_active_fe_index (cell->active_fe_index() + 1);
+              cell->set_active_fe_index(cell->active_fe_index() + 1);
             }
       }
 
       // At the end of this procedure, we then refine the mesh. During this
       // process, children of cells undergoing bisection inherit their mother
       // cell's finite element index:
-      triangulation.execute_coarsening_and_refinement ();
+      triangulation.execute_coarsening_and_refinement();
     }
   }
-
 
   // @sect4{LaplaceProblem::create_coarse_grid}
 
@@ -562,79 +545,60 @@ namespace Step27
   // meaning of the different parts of this function are explained in the
   // documentation of step-14:
   template <>
-  void LaplaceProblem<2>::create_coarse_grid ()
+  void
+  LaplaceProblem<2>::create_coarse_grid()
   {
     const unsigned int dim = 2;
 
     static const Point<2> vertices_1[]
-      = {  Point<2> (-1.,   -1.),
-           Point<2> (-1./2, -1.),
-           Point<2> (0.,    -1.),
-           Point<2> (+1./2, -1.),
-           Point<2> (+1,    -1.),
+      = {Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
+         Point<2>(0., -1.),       Point<2>(+1. / 2, -1.),
+         Point<2>(+1, -1.),
 
-           Point<2> (-1.,   -1./2.),
-           Point<2> (-1./2, -1./2.),
-           Point<2> (0.,    -1./2.),
-           Point<2> (+1./2, -1./2.),
-           Point<2> (+1,    -1./2.),
+         Point<2>(-1., -1. / 2.), Point<2>(-1. / 2, -1. / 2.),
+         Point<2>(0., -1. / 2.),  Point<2>(+1. / 2, -1. / 2.),
+         Point<2>(+1, -1. / 2.),
 
-           Point<2> (-1.,   0.),
-           Point<2> (-1./2, 0.),
-           Point<2> (+1./2, 0.),
-           Point<2> (+1,    0.),
+         Point<2>(-1., 0.),       Point<2>(-1. / 2, 0.),
+         Point<2>(+1. / 2, 0.),   Point<2>(+1, 0.),
 
-           Point<2> (-1.,   1./2.),
-           Point<2> (-1./2, 1./2.),
-           Point<2> (0.,    1./2.),
-           Point<2> (+1./2, 1./2.),
-           Point<2> (+1,    1./2.),
+         Point<2>(-1., 1. / 2.),  Point<2>(-1. / 2, 1. / 2.),
+         Point<2>(0., 1. / 2.),   Point<2>(+1. / 2, 1. / 2.),
+         Point<2>(+1, 1. / 2.),
 
-           Point<2> (-1.,   1.),
-           Point<2> (-1./2, 1.),
-           Point<2> (0.,    1.),
-           Point<2> (+1./2, 1.),
-           Point<2> (+1,    1.)
-        };
-    const unsigned int
-    n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
-    const std::vector<Point<dim> > vertices (&vertices_1[0],
-                                             &vertices_1[n_vertices]);
+         Point<2>(-1., 1.),       Point<2>(-1. / 2, 1.),
+         Point<2>(0., 1.),        Point<2>(+1. / 2, 1.),
+         Point<2>(+1, 1.)};
+    const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
+    const std::vector<Point<dim>> vertices(&vertices_1[0],
+                                           &vertices_1[n_vertices]);
     static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
-    = {{0, 1, 5, 6},
-      {1, 2, 6, 7},
-      {2, 3, 7, 8},
-      {3, 4, 8, 9},
-      {5, 6, 10, 11},
-      {8, 9, 12, 13},
-      {10, 11, 14, 15},
-      {12, 13, 17, 18},
-      {14, 15, 19, 20},
-      {15, 16, 20, 21},
-      {16, 17, 21, 22},
-      {17, 18, 22, 23}
-    };
-    const unsigned int
-    n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
+      = {{0, 1, 5, 6},
+         {1, 2, 6, 7},
+         {2, 3, 7, 8},
+         {3, 4, 8, 9},
+         {5, 6, 10, 11},
+         {8, 9, 12, 13},
+         {10, 11, 14, 15},
+         {12, 13, 17, 18},
+         {14, 15, 19, 20},
+         {15, 16, 20, 21},
+         {16, 17, 21, 22},
+         {17, 18, 22, 23}};
+    const unsigned int n_cells
+      = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
-    std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
-    for (unsigned int i=0; i<n_cells; ++i)
+    std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
+    for(unsigned int i = 0; i < n_cells; ++i)
       {
-        for (unsigned int j=0;
-             j<GeometryInfo<dim>::vertices_per_cell;
-             ++j)
+        for(unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       }
 
-    triangulation.create_triangulation (vertices,
-                                        cells,
-                                        SubCellData());
-    triangulation.refine_global (3);
+    triangulation.create_triangulation(vertices, cells, SubCellData());
+    triangulation.refine_global(3);
   }
-
-
-
 
   // @sect4{LaplaceProblem::run}
 
@@ -648,33 +612,30 @@ namespace Step27
   // again. In the meantime, also output some information for those staring at
   // the screen trying to figure out what the program does:
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run()
   {
-    for (unsigned int cycle=0; cycle<6; ++cycle)
+    for(unsigned int cycle = 0; cycle < 6; ++cycle)
       {
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
-        if (cycle == 0)
-          create_coarse_grid ();
+        if(cycle == 0)
+          create_coarse_grid();
 
-        setup_system ();
+        setup_system();
 
         std::cout << "   Number of active cells:       "
-                  << triangulation.n_active_cells()
-                  << std::endl
-                  << "   Number of degrees of freedom: "
-                  << dof_handler.n_dofs()
+                  << triangulation.n_active_cells() << std::endl
+                  << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl
                   << "   Number of constraints       : "
-                  << constraints.n_constraints()
-                  << std::endl;
+                  << constraints.n_constraints() << std::endl;
 
-        assemble_system ();
-        solve ();
-        postprocess (cycle);
+        assemble_system();
+        solve();
+        postprocess(cycle);
       }
   }
-
 
   // @sect4{LaplaceProblem::estimate_smoothness}
 
@@ -691,17 +652,16 @@ namespace Step27
   // current case we are interested in coefficients which correspond to
   // $0 < i*i+j*j < N*N$ and $0 < i*i+j*j+k*k < N*N$ in 2D and 3D, respectively.
   template <int dim>
-  std::pair<bool,unsigned int>
-  LaplaceProblem<dim>::
-  predicate(const TableIndices<dim> &ind)
+  std::pair<bool, unsigned int>
+  LaplaceProblem<dim>::predicate(const TableIndices<dim>& ind)
   {
     unsigned int v = 0;
-    for (unsigned int i = 0; i <dim; i++)
-      v += ind[i]*ind[i];
-    if (v>0 && v < max_degree*max_degree)
-      return std::make_pair(true,v);
+    for(unsigned int i = 0; i < dim; i++)
+      v += ind[i] * ind[i];
+    if(v > 0 && v < max_degree * max_degree)
+      return std::make_pair(true, v);
     else
-      return std::make_pair(false,v);
+      return std::make_pair(false, v);
   }
 
   // This last function of significance implements the algorithm to estimate
@@ -710,26 +670,24 @@ namespace Step27
   // implementational importance.
   template <int dim>
   void
-  LaplaceProblem<dim>::
-  estimate_smoothness (Vector<float> &smoothness_indicators)
+  LaplaceProblem<dim>::estimate_smoothness(Vector<float>& smoothness_indicators)
   {
     // Since most of the hard work is done for us in FESeries::Fourier and
     // we set up the object of this class in the constructor, what we are left
     // to do here is apply this class to calculate coefficients and then
     // perform linear regression to fit their decay slope.
 
-
     // First thing to do is to loop over all cells and do our work there, i.e. to
     // locally do the Fourier transform and estimate the decay coefficient. We
     // will use the following array as a scratch array in the loop to store
     // local DoF values:
-    Vector<double>                     local_dof_values;
+    Vector<double> local_dof_values;
 
     // Then here is the loop:
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename hp::DoFHandler<dim>::active_cell_iterator cell
+      = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for(; cell != endc; ++cell)
       {
         // Inside the loop, we first need to get the values of the local
         // degrees of freedom (which we put into the
@@ -739,12 +697,11 @@ namespace Step27
         // element. This is done by calling FESeries::Fourier::calculate(),
         // that has to be provided with the <code>local_dof_values</code>,
         // <code>cell->active_fe_index()</code> and a Table to store coefficients.
-        local_dof_values.reinit (cell->get_fe().dofs_per_cell);
-        cell->get_dof_values (solution, local_dof_values);
+        local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+        cell->get_dof_values(solution, local_dof_values);
 
-        fourier->calculate(local_dof_values,
-                           cell->active_fe_index(),
-                           fourier_coefficients);
+        fourier->calculate(
+          local_dof_values, cell->active_fe_index(), fourier_coefficients);
 
         // The next thing, as explained in the introduction, is that we wanted
         // to only fit our exponential decay of Fourier coefficients to the
@@ -754,15 +711,14 @@ namespace Step27
         // We'll only take those Fourier
         // coefficients with the largest magnitude for a given value of $|{\bf
         // k}|$ and thereby need to use VectorTools::Linfty_norm:
-        std::pair<std::vector<unsigned int>, std::vector<double> > res =
-          FESeries::process_coefficients<dim>(fourier_coefficients,
-                                              std::bind(&LaplaceProblem<dim>::predicate,
-                                                        this,
-                                                        std::placeholders::_1),
-                                              VectorTools::Linfty_norm);
+        std::pair<std::vector<unsigned int>, std::vector<double>> res
+          = FESeries::process_coefficients<dim>(
+            fourier_coefficients,
+            std::bind(
+              &LaplaceProblem<dim>::predicate, this, std::placeholders::_1),
+            VectorTools::Linfty_norm);
 
-        Assert (res.first.size() == res.second.size(),
-                ExcInternalError());
+        Assert(res.first.size() == res.second.size(), ExcInternalError());
 
         // The first vector in the <code>std::pair</code> will store values of the predicate,
         // that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$
@@ -770,28 +726,30 @@ namespace Step27
         // vector will be the same for all the cells so we can calculate
         // logarithms of the corresponding Fourier vectors $|{\bf k}|$ only once
         // in the whole hp-refinement cycle:
-        if (ln_k.size() == 0)
+        if(ln_k.size() == 0)
           {
-            ln_k.resize(res.first.size(),0);
-            for (unsigned int f = 0; f < ln_k.size(); f++)
-              ln_k[f] = std::log (2.0*numbers::PI*std::sqrt(1.*res.first[f]));
+            ln_k.resize(res.first.size(), 0);
+            for(unsigned int f = 0; f < ln_k.size(); f++)
+              ln_k[f]
+                = std::log(2.0 * numbers::PI * std::sqrt(1. * res.first[f]));
           }
 
         // We have to calculate the logarithms of absolute
         // values of coefficients and use it in linear regression fit to
         // obtain $\mu$.
-        for (unsigned int f = 0; f < res.second.size(); f++)
+        for(unsigned int f = 0; f < res.second.size(); f++)
           res.second[f] = std::log(res.second[f]);
 
-        std::pair<double,double> fit = FESeries::linear_regression(ln_k,res.second);
+        std::pair<double, double> fit
+          = FESeries::linear_regression(ln_k, res.second);
 
         // The final step is to compute the Sobolev index $s=\mu-\frac d2$ and
         // store it in the vector of estimated values for each cell:
-        smoothness_indicators(cell->active_cell_index()) = -fit.first - 1.*dim/2;
+        smoothness_indicators(cell->active_cell_index())
+          = -fit.first - 1. * dim / 2;
       }
   }
-}
-
+} // namespace Step27
 
 // @sect3{The main function}
 
@@ -799,7 +757,8 @@ namespace Step27
 // running an object of the main class into a <code>try</code> block and catch
 // whatever exceptions are thrown, thereby producing meaningful output if
 // anything should go wrong:
-int main ()
+int
+main()
 {
   try
     {
@@ -807,11 +766,12 @@ int main ()
       using namespace Step27;
 
       LaplaceProblem<2> laplace_problem;
-      laplace_problem.run ();
+      laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -822,9 +782,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

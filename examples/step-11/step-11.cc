@@ -17,30 +17,29 @@
  * Author: Wolfgang Bangerth, University of Heidelberg, 2001
  */
 
-
 // As usual, the program starts with a rather long list of include files which
 // you are probably already used to by now:
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table_handler.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // Just this one is new: it declares a class
 // DynamicSparsityPattern, which we will use and explain
@@ -50,9 +49,9 @@
 // We will make use of the std::find algorithm of the C++ standard library, so
 // we have to include the following file for its declaration:
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
 
 // The last step is as in all previous programs:
 namespace Step11
@@ -76,48 +75,45 @@ namespace Step11
   class LaplaceProblem
   {
   public:
-    LaplaceProblem (const unsigned int mapping_degree);
-    void run ();
+    LaplaceProblem(const unsigned int mapping_degree);
+    void
+    run();
 
   private:
-    void setup_system ();
-    void assemble_and_solve ();
-    void solve ();
+    void
+    setup_system();
+    void
+    assemble_and_solve();
+    void
+    solve();
 
-    Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
-    MappingQ<dim>        mapping;
+    Triangulation<dim> triangulation;
+    FE_Q<dim>          fe;
+    DoFHandler<dim>    dof_handler;
+    MappingQ<dim>      mapping;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
     ConstraintMatrix     mean_value_constraints;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double> solution;
+    Vector<double> system_rhs;
 
-    TableHandler         output_table;
+    TableHandler output_table;
   };
-
-
 
   // Construct such an object, by initializing the variables. Here, we use
   // linear finite elements (the argument to the <code>fe</code> variable
   // denotes the polynomial degree), and mappings of given order. Print to
   // screen what we are about to do.
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
-    fe (1),
-    dof_handler (triangulation),
-    mapping (mapping_degree)
+  LaplaceProblem<dim>::LaplaceProblem(const unsigned int mapping_degree)
+    : fe(1), dof_handler(triangulation), mapping(mapping_degree)
   {
     std::cout << "Using mapping with degree " << mapping_degree << ":"
               << std::endl
-              << "============================"
-              << std::endl;
+              << "============================" << std::endl;
   }
-
-
 
   // The first task is to set up the variables for this problem. This includes
   // generating a valid <code>DoFHandler</code> object, as well as the
@@ -125,14 +121,15 @@ namespace Step11
   // constraints that the mean value of the degrees of freedom on the boundary
   // be zero.
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void
+  LaplaceProblem<dim>::setup_system()
   {
     // The first task is trivial: generate an enumeration of the degrees of
     // freedom, and initialize solution and right hand side vector to their
     // correct sizes:
-    dof_handler.distribute_dofs (fe);
-    solution.reinit (dof_handler.n_dofs());
-    system_rhs.reinit (dof_handler.n_dofs());
+    dof_handler.distribute_dofs(fe);
+    solution.reinit(dof_handler.n_dofs());
+    system_rhs.reinit(dof_handler.n_dofs());
 
     // Next task is to construct the object representing the constraint that
     // the mean value of the degrees of freedom on the boundary shall be
@@ -148,10 +145,9 @@ namespace Step11
     // has semantics that allow it to represents a mask of indefinite size
     // whose every element equals <code>true</code> when one just default
     // constructs such an object, so this is what we'll do here.
-    std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs (dof_handler,
-                                     ComponentMask(),
-                                     boundary_dofs);
+    std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
+    DoFTools::extract_boundary_dofs(
+      dof_handler, ComponentMask(), boundary_dofs);
 
     // Now first for the generation of the constraints: as mentioned in the
     // introduction, we constrain one of the nodes on the boundary by the
@@ -161,11 +157,9 @@ namespace Step11
     // <code>std::find</code> returns an iterator to this element), and
     // computing its distance to the overall first element in the array to get
     // its index:
-    const unsigned int first_boundary_dof
-      = std::distance (boundary_dofs.begin(),
-                       std::find (boundary_dofs.begin(),
-                                  boundary_dofs.end(),
-                                  true));
+    const unsigned int first_boundary_dof = std::distance(
+      boundary_dofs.begin(),
+      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -174,13 +168,12 @@ namespace Step11
     // boundary DoFs each with weight -1. Finally, close the constraints
     // object, i.e. do some internal bookkeeping on it for faster processing
     // of what is to come later:
-    mean_value_constraints.clear ();
-    mean_value_constraints.add_line (first_boundary_dof);
-    for (unsigned int i=first_boundary_dof+1; i<dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
-        mean_value_constraints.add_entry (first_boundary_dof,
-                                          i, -1);
-    mean_value_constraints.close ();
+    mean_value_constraints.clear();
+    mean_value_constraints.add_line(first_boundary_dof);
+    for(unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
+      if(boundary_dofs[i] == true)
+        mean_value_constraints.add_entry(first_boundary_dof, i, -1);
+    mean_value_constraints.close();
 
     // Next task is to generate a sparsity pattern. This is indeed a tricky
     // task here. Usually, we just call
@@ -214,10 +207,9 @@ namespace Step11
     // pattern due to the differential operator, then condense it with the
     // constraints object which adds those positions in the sparsity pattern
     // that are required for the elimination of the constraint.
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
-                                dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, dsp);
-    mean_value_constraints.condense (dsp);
+    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern(dof_handler, dsp);
+    mean_value_constraints.condense(dsp);
 
     // Finally, once we have the full pattern, we can initialize an object of
     // type <code>SparsityPattern</code> from it and in turn initialize the
@@ -235,11 +227,9 @@ namespace Step11
     // compressed object right from the start, to which you cannot add new
     // entries anymore. The <code>compress</code> call is therefore implicit
     // in the <code>copy_from</code> call.
-    sparsity_pattern.copy_from (dsp);
-    system_matrix.reinit (sparsity_pattern);
+    sparsity_pattern.copy_from(dsp);
+    system_matrix.reinit(sparsity_pattern);
   }
-
-
 
   // The next function then assembles the linear system of equations, solves
   // it, and evaluates the solution. This then makes three actions, and we
@@ -249,9 +239,9 @@ namespace Step11
   // rather powerful, and through them this function uses a good deal of the
   // whole library. But let's look at each of the steps.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_and_solve ()
+  void
+  LaplaceProblem<dim>::assemble_and_solve()
   {
-
     // First, we have to assemble the matrix and the right hand side. In all
     // previous examples, we have investigated various ways how to do this
     // manually. However, since the Laplace matrix and simple right hand sides
@@ -270,16 +260,16 @@ namespace Step11
     // side function.
     //
     // Let us look at the way the matrix and body forces are integrated:
-    const unsigned int gauss_degree
-      = std::max (static_cast<unsigned int>(std::ceil(1.*(mapping.get_degree()+1)/2)),
-                  2U);
-    MatrixTools::create_laplace_matrix (mapping, dof_handler,
+    const unsigned int gauss_degree = std::max(
+      static_cast<unsigned int>(std::ceil(1. * (mapping.get_degree() + 1) / 2)),
+      2U);
+    MatrixTools::create_laplace_matrix(
+      mapping, dof_handler, QGauss<dim>(gauss_degree), system_matrix);
+    VectorTools::create_right_hand_side(mapping,
+                                        dof_handler,
                                         QGauss<dim>(gauss_degree),
-                                        system_matrix);
-    VectorTools::create_right_hand_side (mapping, dof_handler,
-                                         QGauss<dim>(gauss_degree),
-                                         Functions::ConstantFunction<dim>(-2),
-                                         system_rhs);
+                                        Functions::ConstantFunction<dim>(-2),
+                                        system_rhs);
     // That's quite simple, right?
     //
     // Two remarks are in order, though: First, these functions are used in a
@@ -310,11 +300,13 @@ namespace Step11
     // an object from the library on the fly, and we use the same quadrature
     // formula as above, but this time of lower dimension since we integrate
     // over faces now instead of cells:
-    Vector<double> tmp (system_rhs.size());
-    VectorTools::create_boundary_right_hand_side (mapping, dof_handler,
-                                                  QGauss<dim-1>(gauss_degree),
-                                                  Functions::ConstantFunction<dim>(1),
-                                                  tmp);
+    Vector<double> tmp(system_rhs.size());
+    VectorTools::create_boundary_right_hand_side(
+      mapping,
+      dof_handler,
+      QGauss<dim - 1>(gauss_degree),
+      Functions::ConstantFunction<dim>(1),
+      tmp);
     // Then add the contributions from the boundary to those from the interior
     // of the domain:
     system_rhs += tmp;
@@ -334,11 +326,11 @@ namespace Step11
     // the system. After that, distribute the constraints again, which in this
     // case means setting the constrained degree of freedom to its proper
     // value
-    mean_value_constraints.condense (system_matrix);
-    mean_value_constraints.condense (system_rhs);
+    mean_value_constraints.condense(system_matrix);
+    mean_value_constraints.condense(system_rhs);
 
-    solve ();
-    mean_value_constraints.distribute (solution);
+    solve();
+    mean_value_constraints.distribute(solution);
 
     // Finally, evaluate what we got as solution. As stated in the
     // introduction, we are interested in the H1 semi-norm of the
@@ -357,44 +349,41 @@ namespace Step11
     // close to the exact solution at certain points (we don't know whether
     // this might be the case here, but there are cases known of this, and we
     // just want to make sure):
-    Vector<float> norm_per_cell (triangulation.n_active_cells());
-    VectorTools::integrate_difference (mapping, dof_handler,
-                                       solution,
-                                       Functions::ZeroFunction<dim>(),
-                                       norm_per_cell,
-                                       QGauss<dim>(gauss_degree+1),
-                                       VectorTools::H1_seminorm);
+    Vector<float> norm_per_cell(triangulation.n_active_cells());
+    VectorTools::integrate_difference(mapping,
+                                      dof_handler,
+                                      solution,
+                                      Functions::ZeroFunction<dim>(),
+                                      norm_per_cell,
+                                      QGauss<dim>(gauss_degree + 1),
+                                      VectorTools::H1_seminorm);
     // Then, the function just called returns its results as a vector of
     // values each of which denotes the norm on one cell. To get the global
     // norm, we do the following:
-    const double norm = VectorTools::compute_global_error(triangulation,
-                                                          norm_per_cell,
-                                                          VectorTools::H1_seminorm);
+    const double norm = VectorTools::compute_global_error(
+      triangulation, norm_per_cell, VectorTools::H1_seminorm);
 
     // Last task -- generate output:
-    output_table.add_value ("cells", triangulation.n_active_cells());
-    output_table.add_value ("|u|_1", norm);
-    output_table.add_value ("error", std::fabs(norm-std::sqrt(3.14159265358/2)));
+    output_table.add_value("cells", triangulation.n_active_cells());
+    output_table.add_value("|u|_1", norm);
+    output_table.add_value("error",
+                           std::fabs(norm - std::sqrt(3.14159265358 / 2)));
   }
-
-
 
   // The following function solving the linear system of equations is copied
   // from step-5 and is explained there in some detail:
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void
+  LaplaceProblem<dim>::solve()
   {
-    SolverControl           solver_control (1000, 1e-12);
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control(1000, 1e-12);
+    SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
   }
-
-
 
   // Finally the main function controlling the different steps to be
   // performed. Its content is rather straightforward, generating a
@@ -410,30 +399,31 @@ namespace Step11
   // loop run (or you should do it at the beginning of each run except for the
   // first one).
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void
+  LaplaceProblem<dim>::run()
   {
-    GridGenerator::hyper_ball (triangulation);
+    GridGenerator::hyper_ball(triangulation);
 
-    for (unsigned int cycle=0; cycle<6; ++cycle, triangulation.refine_global(1))
+    for(unsigned int cycle = 0; cycle < 6;
+        ++cycle, triangulation.refine_global(1))
       {
-        setup_system ();
-        assemble_and_solve ();
+        setup_system();
+        assemble_and_solve();
       };
 
     // After all the data is generated, write a table of results to the
     // screen:
     output_table.set_precision("|u|_1", 6);
     output_table.set_precision("error", 6);
-    output_table.write_text (std::cout);
+    output_table.write_text(std::cout);
     std::cout << std::endl;
   }
-}
-
-
+} // namespace Step11
 
 // Finally the main function. It's structure is the same as that used in
 // several of the previous examples, so probably needs no more explanation.
-int main ()
+int
+main()
 {
   try
     {
@@ -445,12 +435,14 @@ int main ()
       // but create an unnamed such object and call the <code>run</code>
       // function of it, subsequent to which it is immediately destroyed
       // again.
-      for (unsigned int mapping_degree=1; mapping_degree<=3; ++mapping_degree)
-        Step11::LaplaceProblem<2>(mapping_degree).run ();
+      for(unsigned int mapping_degree = 1; mapping_degree <= 3;
+          ++mapping_degree)
+        Step11::LaplaceProblem<2>(mapping_degree).run();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -460,9 +452,10 @@ int main ()
                 << std::endl;
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

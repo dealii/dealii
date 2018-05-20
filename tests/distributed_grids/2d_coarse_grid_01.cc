@@ -13,24 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test interaction with p4est with a few simple coarse grids in 2d
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-
-
+#include <deal.II/grid/tria.h>
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream& /*out*/)
 {
-  if (true)
+  if(true)
     {
       deallog << "hyper_cube" << std::endl;
 
@@ -40,8 +37,7 @@ void test(std::ostream & /*out*/)
       write_vtk(tr, "1");
     }
 
-
-  if (true)
+  if(true)
     {
       deallog << "hyper_ball" << std::endl;
 
@@ -51,7 +47,7 @@ void test(std::ostream & /*out*/)
       write_vtk(tr, "2");
     }
 
-  if (true)
+  if(true)
     {
       deallog << "half_hyper_ball" << std::endl;
 
@@ -62,10 +58,10 @@ void test(std::ostream & /*out*/)
     }
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("output");
   deallog.attach(logfile);
@@ -73,6 +69,4 @@ int main(int argc, char *argv[])
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();
-
-
 }

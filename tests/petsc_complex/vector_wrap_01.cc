@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test the constructor PETScWrappers::VectorBase(const Vec &) that takes an
 // existing PETSc vector for complex values.
 
@@ -23,52 +21,52 @@
 #include <iostream>
 #include <vector>
 
-
-void test (PETScWrappers::VectorBase &v,
-           PETScWrappers::MPI::Vector &w)
+void
+test(PETScWrappers::VectorBase& v, PETScWrappers::MPI::Vector& w)
 {
   // set the first vector
-  for (unsigned int k=0; k<v.size(); ++k)
-    v(k) = std::complex<double> (k,0.5*k);
+  for(unsigned int k = 0; k < v.size(); ++k)
+    v(k) = std::complex<double>(k, 0.5 * k);
 
   // copy elements by reference
-  for (unsigned int k=0; k<v.size(); ++k)
+  for(unsigned int k = 0; k < v.size(); ++k)
     w(k) = v(k);
 
   // check that they're equal
-  AssertThrow (v==w, ExcInternalError());
+  AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      Vec vpetsc;
-      int ierr = VecCreateSeq (PETSC_COMM_SELF, 100, &vpetsc);
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      Vec                              vpetsc;
+      int ierr = VecCreateSeq(PETSC_COMM_SELF, 100, &vpetsc);
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
       {
-        PETScWrappers::VectorBase v (vpetsc);
-        PETScWrappers::MPI::Vector w (PETSC_COMM_SELF, 100, 100);
-        test (v,w);
+        PETScWrappers::VectorBase  v(vpetsc);
+        PETScWrappers::MPI::Vector w(PETSC_COMM_SELF, 100, 100);
+        test(v, w);
       }
 
-#if DEAL_II_PETSC_VERSION_LT(3,2,0)
-      ierr = VecDestroy (vpetsc);
+#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
+      ierr = VecDestroy(vpetsc);
 #else
-      ierr = VecDestroy (&vpetsc);
+      ierr = VecDestroy(&vpetsc);
 #endif
 
-      AssertThrow (ierr == 0, ExcPETScError(ierr));
+      AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -79,9 +77,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

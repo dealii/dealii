@@ -13,44 +13,48 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check is_serial_vector type trait
 
 #include "../tests.h"
-#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
-void test ()
+void
+test()
 {
   // make sure that is_serial_vector< dealii::PETScWrappers::MPI::Vector > is working
-  Assert (is_serial_vector< dealii::PETScWrappers::MPI::Vector >::value == false,
-          ExcInternalError());
+  Assert(is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value == false,
+         ExcInternalError());
 
-  deallog << is_serial_vector< dealii::PETScWrappers::MPI::Vector >::value << std::endl;
+  deallog << is_serial_vector<dealii::PETScWrappers::MPI::Vector>::value
+          << std::endl;
 
   deallog << "OK" << std::endl << std::endl;
 
   // make sure that is_serial_vector< dealii::PETScWrappers::MPI::BlockVector > is working
-  Assert (is_serial_vector< dealii::PETScWrappers::MPI::BlockVector >::value == false,
-          ExcInternalError());
+  Assert(is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value
+           == false,
+         ExcInternalError());
 
-  deallog << is_serial_vector< dealii::PETScWrappers::MPI::BlockVector >::value << std::endl;
+  deallog << is_serial_vector<dealii::PETScWrappers::MPI::BlockVector>::value
+          << std::endl;
 
   deallog << "OK" << std::endl;
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test ();
+      test();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -61,9 +65,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -19,24 +19,24 @@
 #include <deal.II/base/config.h>
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#include <sundials/sundials_nvector.h>
-#ifdef DEAL_II_WITH_MPI
-#include <nvector/nvector_parallel.h>
-#endif
-#include <nvector/nvector_serial.h>
+#  include <sundials/sundials_nvector.h>
+#  ifdef DEAL_II_WITH_MPI
+#    include <nvector/nvector_parallel.h>
+#  endif
+#  include <nvector/nvector_serial.h>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/block_vector.h>
+#  include <deal.II/lac/vector.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#endif
+#  ifdef DEAL_II_WITH_TRILINOS
+#    include <deal.II/lac/trilinos_parallel_block_vector.h>
+#    include <deal.II/lac/trilinos_vector.h>
+#  endif
 
-#ifdef DEAL_II_WITH_PETSC
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#endif
+#  ifdef DEAL_II_WITH_PETSC
+#    include <deal.II/lac/petsc_parallel_block_vector.h>
+#    include <deal.II/lac/petsc_parallel_vector.h>
+#  endif
 
 DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
@@ -45,37 +45,46 @@ namespace SUNDIALS
   {
     // The following internal functions are used by SUNDIALS wrappers to copy
     // to and from deal.II vector types.
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
 
-#ifdef DEAL_II_WITH_TRILINOS
-    void copy(TrilinosWrappers::MPI::Vector &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::Vector &src);
-    void copy(TrilinosWrappers::MPI::BlockVector &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const TrilinosWrappers::MPI::BlockVector &src);
-#endif // DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_WITH_TRILINOS
+    void
+    copy(TrilinosWrappers::MPI::Vector& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const TrilinosWrappers::MPI::Vector& src);
+    void
+    copy(TrilinosWrappers::MPI::BlockVector& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const TrilinosWrappers::MPI::BlockVector& src);
+#    endif // DEAL_II_WITH_TRILINOS
 
-#ifdef DEAL_II_WITH_PETSC
-#ifndef PETSC_USE_COMPLEX
-    void copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const PETScWrappers::MPI::Vector &src);
-    void copy(PETScWrappers::MPI::BlockVector &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const PETScWrappers::MPI::BlockVector &src);
-#endif // PETSC_USE_COMPLEX
-#endif // DEAL_II_WITH_PETSC
+#    ifdef DEAL_II_WITH_PETSC
+#      ifndef PETSC_USE_COMPLEX
+    void
+    copy(PETScWrappers::MPI::Vector& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const PETScWrappers::MPI::Vector& src);
+    void
+    copy(PETScWrappers::MPI::BlockVector& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const PETScWrappers::MPI::BlockVector& src);
+#      endif // PETSC_USE_COMPLEX
+#    endif   // DEAL_II_WITH_PETSC
 
-#endif
+#  endif
 
-    void copy(BlockVector<double> &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const BlockVector<double> &src);
+    void
+    copy(BlockVector<double>& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const BlockVector<double>& src);
 
-    void copy(Vector<double> &dst, const N_Vector &src);
-    void copy(N_Vector &dst, const Vector<double> &src);
-  }
-}
+    void
+    copy(Vector<double>& dst, const N_Vector& src);
+    void
+    copy(N_Vector& dst, const Vector<double>& src);
+  } // namespace internal
+} // namespace SUNDIALS
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SUNDIALS
 #endif // dealii_sundials_copy_h
-
-
-

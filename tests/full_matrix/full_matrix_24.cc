@@ -13,26 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::add
-
 
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<number> m,n;
-  make_matrix (m);
-  make_matrix (n);
-  m.add (3.14159, n);
+  FullMatrix<number> m, n;
+  make_matrix(m);
+  make_matrix(n);
+  m.add(3.14159, n);
 
-  print_matrix (m);
+  print_matrix(m);
 }
-

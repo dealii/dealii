@@ -15,18 +15,19 @@
 
 // Test HDF5. Copy-paste from https://support.hdfgroup.org/HDF5/Tutor/crtfile.html
 
-#include <hdf5.h>
 #include <cstdio>
+#include <hdf5.h>
 
-int main()
+int
+main()
 {
-  hid_t       file_id;
-  herr_t      status;
+  hid_t  file_id;
+  herr_t status;
 
   /* Create a new file using default properties. */
   file_id = H5Fcreate("file.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   /* Terminate access to the file. */
   status = H5Fclose(file_id);
-  std::remove ("file.h5");
+  std::remove("file.h5");
 }

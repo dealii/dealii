@@ -13,18 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the testsuite framework. this test is supposed to run successfully
 // but to miscompare
 
 #include "../tests.h"
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   deallog << "FAIL!" << std::endl;
 }
-

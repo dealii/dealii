@@ -13,55 +13,55 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test Utilities::pack/unpack on some types. this test checks that
 // for trivially-copyable (small) types, packing is just a memcpy
 // operation
 
 #include "../tests.h"
 
-#include <deal.II/base/utilities.h>
-#include <deal.II/base/point.h>
 #include <boost/serialization/utility.hpp>
+#include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
 #include <array>
 
 struct X
 {
-  int i;
-  int k;
+  int    i;
+  int    k;
   double d;
 
-  bool operator != (const X &x) const
+  bool
+  operator!=(const X& x) const
   {
-    return i!=x.i || k!=x.k || d!=x.d;
+    return i != x.i || k != x.k || d != x.d;
   }
 
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int)
+  void
+  serialize(Archive& ar, const unsigned int)
   {
-    ar   &i &k &d;
+    ar& i& k& d;
   }
 };
 
-
-
 template <typename T>
-void check (const T &object)
+void
+check(const T& object)
 {
-  const std::vector<char> buffer = Utilities::pack (object);
-  if (buffer.size() != sizeof(object))
-    deallog << buffer.size() << " should be "
-            << sizeof(object) << "!" << std::endl;
+  const std::vector<char> buffer = Utilities::pack(object);
+  if(buffer.size() != sizeof(object))
+    deallog << buffer.size() << " should be " << sizeof(object) << "!"
+            << std::endl;
   else
     deallog << "same size!" << std::endl;
 
-  if (std::memcmp(buffer.data(), &object, buffer.size()) != 0)
+  if(std::memcmp(buffer.data(), &object, buffer.size()) != 0)
     deallog << "std::memcmp failed!" << std::endl;
   else
     deallog << "std::memcmp passed!" << std::endl;
 
-  if (Utilities::unpack<T>(buffer) != object)
+  if(Utilities::unpack<T>(buffer) != object)
     deallog << "Comparing the objects failed!" << std::endl;
   else
     deallog << "Comparing the objects passed!" << std::endl;
@@ -69,18 +69,19 @@ void check (const T &object)
   deallog << std::endl;
 }
 
-
-void test()
+void
+test()
 {
   deallog << "std::array:" << std::endl;
-  check (std::array<int,3> {{1,2,3}});
+  check(std::array<int, 3>{{1, 2, 3}});
   deallog << "struct X:" << std::endl;
-  check (X { 1, 2, 3.1415926 });
+  check(X{1, 2, 3.1415926});
   deallog << "double:" << std::endl;
-  check (1.);
+  check(1.);
 }
 
-int main()
+int
+main()
 {
   initlog();
 

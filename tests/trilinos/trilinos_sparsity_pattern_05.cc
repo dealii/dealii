@@ -13,47 +13,50 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test print functions of Trilinos sparsity pattern
 
 #include "../tests.h"
 #include <deal.II/distributed/tria.h>
-#include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-void test ()
+void
+test()
 {
   const int dim = 2;
   //setup system
-  dealii::parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+  dealii::parallel::distributed::Triangulation<dim> triangulation(
+    MPI_COMM_WORLD);
 
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
 
   triangulation.refine_global(2);
 
   const FE_Q<dim> fe_system(1);
-  DoFHandler<dim> dh (triangulation);
-  dh.distribute_dofs (fe_system);
+  DoFHandler<dim> dh(triangulation);
+  dh.distribute_dofs(fe_system);
 
-  IndexSet relevant_partitioning (dh.n_dofs());
-  DoFTools::extract_locally_relevant_dofs (dh, relevant_partitioning);
+  IndexSet relevant_partitioning(dh.n_dofs());
+  DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
 
   //generate empty constraints
   ConstraintMatrix constraints;
 
   //generate sparsity pattern
-  TrilinosWrappers::SparsityPattern sp (dh.locally_owned_dofs(),
-                                        dh.locally_owned_dofs(),
-                                        relevant_partitioning,
-                                        MPI_COMM_WORLD);
+  TrilinosWrappers::SparsityPattern sp(dh.locally_owned_dofs(),
+                                       dh.locally_owned_dofs(),
+                                       relevant_partitioning,
+                                       MPI_COMM_WORLD);
 
-  DoFTools::make_sparsity_pattern (dh, sp,
-                                   constraints,true,
-                                   Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(
+    dh,
+    sp,
+    constraints,
+    true,
+    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
   sp.compress();
 
   //output
@@ -61,9 +64,11 @@ void test ()
   sp.print(deallog.get_file_stream());
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
   MPILogInitAll log;
 
   test();

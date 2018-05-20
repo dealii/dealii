@@ -13,23 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test the results of FECollection::n_blocks(). test the case where elements
 // have the same number of components but different numbers of blocks. this
 // needs to lead to an assertion.
 
-
 #include "../tests.h"
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-
-
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/hp/fe_collection.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   // now the same with one of the elements
   // being non-primitive. the other one can
@@ -39,8 +35,8 @@ void test ()
   // block. this test tries to see what
   // happens if one doesn't do this
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back (FE_RaviartThomas<dim>(1));
-  fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
+  fe_collection.push_back(FE_RaviartThomas<dim>(1));
+  fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
 
   // we will get an assertion failure in
   // n_blocks here.
@@ -48,7 +44,7 @@ void test ()
     {
       fe_collection.n_blocks();
     }
-  catch (ExceptionBase &e)
+  catch(ExceptionBase& e)
     {
       deallog << e.get_exc_name() << std::endl;
     }
@@ -56,9 +52,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
 
@@ -67,8 +62,8 @@ int main ()
 
   deallog.attach(logfile);
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

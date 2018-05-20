@@ -13,42 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // find_active_cell_around_point should throw an exception if the
 // point is outside. Test that.
 
 #include "../tests.h"
 
-
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/mapping_q.h>
 #include <deal.II/base/function.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
-
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <iostream>
 #include <list>
-#include <string>
 #include <sstream>
+#include <string>
 #include <time.h>
 
 using namespace dealii;
 
-void test()
+void
+test()
 {
   Triangulation<2> tr;
   GridGenerator::hyper_cube(tr);
 
-  Point< 2 > p;
+  Point<2> p;
   p(0) = -0.1;
   p(1) = 0.5;
 
@@ -56,16 +53,17 @@ void test()
 
   try
     {
-      GridTools::find_active_cell_around_point (mapping, tr, p);
+      GridTools::find_active_cell_around_point(mapping, tr, p);
     }
-  catch (GridTools::ExcPointNotFound<2> &e)
+  catch(GridTools::ExcPointNotFound<2>& e)
     {
       deallog << "outside" << std::endl;
     }
   deallog << "done" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 

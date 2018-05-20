@@ -13,35 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
-
-
+#include <deal.II/grid/tria.h>
 
 template <int dim>
-void print_tria_info(const Triangulation<dim> &tria)
+void
+print_tria_info(const Triangulation<dim>& tria)
 {
-  const bool manifold_0_is_flat =
-    dynamic_cast<const FlatManifold<dim>*>(&tria.get_manifold(0)) != nullptr;
-  deallog << (tria.n_active_cells() != 0) << ", "
-          << (tria.n_active_hexs() != 0) << ", "
-          << (tria.n_active_quads() != 0) << ", "
-          << (tria.n_active_lines() != 0) << ", "
-          << (tria.n_levels() != 0) << ", "
-          << (tria.n_vertices() != 0) << ", "
+  const bool manifold_0_is_flat
+    = dynamic_cast<const FlatManifold<dim>*>(&tria.get_manifold(0)) != nullptr;
+  deallog << (tria.n_active_cells() != 0) << ", " << (tria.n_active_hexs() != 0)
+          << ", " << (tria.n_active_quads() != 0) << ", "
+          << (tria.n_active_lines() != 0) << ", " << (tria.n_levels() != 0)
+          << ", " << (tria.n_vertices() != 0) << ", "
           << (tria.get_periodic_face_map().size() != 0) << ", "
-          << manifold_0_is_flat
-          << std::endl;
+          << manifold_0_is_flat << std::endl;
 }
 
-
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   deallog << "Dimension: " << dim << std::endl;
 
@@ -60,9 +54,9 @@ void test_hyper_cube()
   print_tria_info(tria);
 }
 
-
 template <int dim>
-void test_hyper_shell()
+void
+test_hyper_shell()
 {
   deallog << "Dimension: " << dim << std::endl;
 
@@ -86,16 +80,18 @@ void test_hyper_shell()
   print_tria_info(tria);
 }
 
-
 template <int dim>
-void test_periodic_cube()
+void
+test_periodic_cube()
 {
   deallog << "Dimension: " << dim << std::endl;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1.0, 1.0, true);
 
-  typedef GridTools::PeriodicFacePair<typename Triangulation<dim>::cell_iterator> periodic_face_pair;
+  typedef GridTools::PeriodicFacePair<
+    typename Triangulation<dim>::cell_iterator>
+                                  periodic_face_pair;
   std::vector<periodic_face_pair> periodicity_vector;
   GridTools::collect_periodic_faces(tria, 0, 1, 0, periodicity_vector);
   tria.add_periodicity(periodicity_vector);
@@ -112,8 +108,8 @@ void test_periodic_cube()
   print_tria_info(tria);
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

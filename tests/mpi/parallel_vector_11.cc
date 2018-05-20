@@ -13,48 +13,48 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check that add, sadd, equ, scale work correctly on a vector where some
 // processor do not own any degrees of freedom
 
 #include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <iostream>
 #include <vector>
 
-
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
+  if(myid == 0)
+    deallog << "numproc=" << numproc << std::endl;
 
   // global size: 20, local_size: 3 as long as
   // less than 20
-  const unsigned int local_size = 3;
+  const unsigned int local_size  = 3;
   const unsigned int global_size = std::min(20U, local_size * numproc);
-  const int my_start = std::min (local_size * myid, global_size);
-  const int my_end   = std::min (local_size * (myid+1), global_size);
-  const int actual_local_size = my_end-my_start;
+  const int          my_start    = std::min(local_size * myid, global_size);
+  const int          my_end = std::min(local_size * (myid + 1), global_size);
+  const int          actual_local_size = my_end - my_start;
 
-  IndexSet local_owned (global_size);
-  if (my_end > my_start)
+  IndexSet local_owned(global_size);
+  if(my_end > my_start)
     local_owned.add_range(static_cast<unsigned int>(my_start),
                           static_cast<unsigned int>(my_end));
   IndexSet local_relevant(global_size);
   local_relevant = local_owned;
-  local_relevant.add_index (2);
+  local_relevant.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double> v(local_owned, local_relevant,
-                                               MPI_COMM_WORLD);
-  AssertDimension (static_cast<unsigned int>(actual_local_size), v.local_size());
-  LinearAlgebra::distributed::Vector<double> w (v), x(v), y(v);
+  LinearAlgebra::distributed::Vector<double> v(
+    local_owned, local_relevant, MPI_COMM_WORLD);
+  AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
+  LinearAlgebra::distributed::Vector<double> w(v), x(v), y(v);
 
   // set local elements
-  for (int i=0; i<actual_local_size; ++i)
+  for(int i = 0; i < actual_local_size; ++i)
     {
       v.local_element(i) = i + my_start;
       w.local_element(i) = 1000 + 2 * (my_start + i);
@@ -62,116 +62,153 @@ void test ()
     }
 
   y = v;
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == i+my_start, ExcInternalError());
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
 
-  if (myid==0) deallog << "Check add (scalar): ";
-  y.add (42);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == i+my_start+42, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check add (scalar): ";
+  y.add(42);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == i + my_start + 42, ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check add (vector): ";
-  y.add (1., w);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 3*(i+my_start)+1042, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check add (vector): ";
+  y.add(1., w);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 3 * (i + my_start) + 1042,
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check add (factor, vector): ";
-  y.add (-1., w);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == i+my_start+42, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check add (factor, vector): ";
+  y.add(-1., w);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == i + my_start + 42, ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check add (factor, vector, factor, vector): ";
-  y.add (2., w, -0.5, x);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 5*(i+my_start)+2042-5000,ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check add (factor, vector, factor, vector): ";
+  y.add(2., w, -0.5, x);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2042 - 5000,
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check sadd (factor, factor, vector): ";
+  if(myid == 0)
+    deallog << "Check sadd (factor, factor, vector): ";
   y = v;
-  y.sadd (-3.,2.,v);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i)==(-i-my_start), ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  y.sadd(-3., 2., v);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == (-i - my_start), ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check sadd (factor, factor, vector, factor, vector): ";
-  y.sadd (2.,3.,v, 2., w);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 5*(i+my_start)+2000, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check sadd (factor, factor, vector, factor, vector): ";
+  y.sadd(2., 3., v, 2., w);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2000,
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check sadd (factor, factor, vector, factor, vector, factor, vector): ";
-  y.sadd (-1.,1.,v, 2., w);
+  if(myid == 0)
+    deallog
+      << "Check sadd (factor, factor, vector, factor, vector, factor, vector): ";
+  y.sadd(-1., 1., v, 2., w);
   y.add(2., x);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 20000, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 20000, ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check add (factor, vector_1, factor, vector_1): ";
+  if(myid == 0)
+    deallog << "Check add (factor, vector_1, factor, vector_1): ";
   y = 0;
-  y.add (1.,v, 3., v);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 4*(i+my_start), ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  y.add(1., v, 3., v);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 4 * (i + my_start), ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check operator * (scalar): ";
+  if(myid == 0)
+    deallog << "Check operator * (scalar): ";
   x *= 2.;
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (x.local_element(i) == 20000., ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(x.local_element(i) == 20000., ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check operator / (scalar): ";
+  if(myid == 0)
+    deallog << "Check operator / (scalar): ";
   x /= 2.;
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (x.local_element(i) == 10000., ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(x.local_element(i) == 10000., ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check scale (vector): ";
-  y.scale (x);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 40000.*(i+my_start), ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check scale (vector): ";
+  y.scale(x);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 40000. * (i + my_start),
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check equ (factor, vector): ";
-  y. equ (10., x);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 100000., ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check equ (factor, vector): ";
+  y.equ(10., x);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 100000., ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check equ (factor, vector, factor, vector): ";
-  y. equ (10., v, -2., w);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 6.*(i+my_start)-2000, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check equ (factor, vector, factor, vector): ";
+  y.equ(10., v, -2., w);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 6. * (i + my_start) - 2000,
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check equ (factor, vector, factor, vector, factor, vector): ";
-  y. equ (10., v, -2., w);
-  y. add (3., x);
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == 6.*(i+my_start)+28000, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  if(myid == 0)
+    deallog << "Check equ (factor, vector, factor, vector, factor, vector): ";
+  y.equ(10., v, -2., w);
+  y.add(3., x);
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == 6. * (i + my_start) + 28000,
+                ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 
-  if (myid==0) deallog << "Check equ<float> (factor, vector): ";
+  if(myid == 0)
+    deallog << "Check equ<float> (factor, vector): ";
   LinearAlgebra::distributed::Vector<float> z;
   z = v;
   y = z;
-  for (int i=0; i<actual_local_size; ++i)
-    AssertThrow (y.local_element(i) == i+my_start, ExcInternalError());
-  if (myid==0) deallog << "OK" << std::endl;
+  for(int i = 0; i < actual_local_size; ++i)
+    AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
+  if(myid == 0)
+    deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
       deallog << std::setprecision(4);
@@ -180,5 +217,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

@@ -18,11 +18,11 @@
 // with a vanishing weight is located in the other hemisphere.
 
 #include "../tests.h"
+#include <deal.II/base/quadrature.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/manifold_lib.h>
-#include <deal.II/base/quadrature.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 using namespace dealii;
 
@@ -30,27 +30,27 @@ int
 main()
 {
   initlog();
-  Point<3> center(0.0, 0.0, 0.0);
-  const SphericalManifold<3,3> manifold(center);
+  Point<3>                      center(0.0, 0.0, 0.0);
+  const SphericalManifold<3, 3> manifold(center);
 
-  for (unsigned int i=1; i<20; ++i)
+  for(unsigned int i = 1; i < 20; ++i)
     {
-      const double eps = 1/std::pow(10,i*1.0);
+      const double eps = 1 / std::pow(10, i * 1.0);
 
-      Point<3> P1( -eps,  std::sqrt(1.-eps*eps), 0.);
-      Point<3> P2( -eps, -std::sqrt(1.-eps*eps), 0.);
-      Point<3> P3(   1.,                     0., 0.);
+      Point<3> P1(-eps, std::sqrt(1. - eps * eps), 0.);
+      Point<3> P2(-eps, -std::sqrt(1. - eps * eps), 0.);
+      Point<3> P3(1., 0., 0.);
 
-      std::vector<Point<3> > points1(3);
-      std::vector<double > weights(3);
+      std::vector<Point<3>> points1(3);
+      std::vector<double>   weights(3);
 
       points1[0] = P1;
       points1[1] = P2;
       points1[2] = P3;
 
-      weights[0] = .5-eps;
-      weights[1] = .5-eps;
-      weights[2] = 2*eps;
+      weights[0] = .5 - eps;
+      weights[1] = .5 - eps;
+      weights[2] = 2 * eps;
 
       Point<3> Q = manifold.get_new_point(make_array_view(points1),
                                           make_array_view(weights));

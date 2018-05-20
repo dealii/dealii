@@ -17,7 +17,6 @@
  * Author: Luca Heltai, Wolfgang Bangerth, 2005
  */
 
-
 // @sect4{Preliminaries}
 
 // As usual, we start with include files. This program is content with really
@@ -27,9 +26,9 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/parameter_handler.h>
 
-#include <list>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <list>
 
 // As mentioned in the first few tutorial programs, all names in deal.II are
 // declared in a namespace <code>dealii</code>. To make using these function
@@ -57,7 +56,6 @@ namespace Step19
   std::string              output_file;
   std::string              output_format;
 
-
   // All the stuff this program does can be done from here on. As described in
   // the introduction, what we have to do is declare what values the parameter
   // file can have, parse the command line, read the input files, then write
@@ -68,11 +66,10 @@ namespace Step19
   // <code>ParameterHandler</code> class has a function to do exactly this;
   // see the results section for what it prints):
   void
-  print_usage_message ()
+  print_usage_message()
   {
-    static const char *message
-      =
-        "\n"
+    static const char* message
+      = "\n"
         "Converter from deal.II intermediate format to other graphics formats.\n"
         "\n"
         "Usage:\n"
@@ -89,9 +86,8 @@ namespace Step19
         "\n";
     std::cout << message;
 
-    prm.print_parameters (std::cout, ParameterHandler::Text);
+    prm.print_parameters(std::cout, ParameterHandler::Text);
   }
-
 
   // @sect4{Declaring parameters for the input file}
 
@@ -165,13 +161,15 @@ namespace Step19
   // something that is space dimension independent, so we can just pick one
   // arbitrarily. We pick <code>1</code>, but it could have been any other
   // number as well.
-  void declare_parameters ()
+  void
+  declare_parameters()
   {
-    prm.declare_entry ("Output file", "",
-                       Patterns::Anything(),
-                       "The name of the output file to be generated");
+    prm.declare_entry("Output file",
+                      "",
+                      Patterns::Anything(),
+                      "The name of the output file to be generated");
 
-    DataOutInterface<1>::declare_parameters (prm);
+    DataOutInterface<1>::declare_parameters(prm);
 
     // Since everything that this program can usefully request in terms of
     // input parameters is already handled by now, let us nevertheless show
@@ -185,9 +183,10 @@ namespace Step19
     // assume that it will denote the number of iterations, and that useful
     // numbers of iterations that a user should be able to specify are in the
     // range 1...1000, with a default value of 42:
-    prm.declare_entry ("Dummy iterations", "42",
-                       Patterns::Integer (1,1000),
-                       "A dummy parameter asking for an integer");
+    prm.declare_entry("Dummy iterations",
+                      "42",
+                      Patterns::Integer(1, 1000),
+                      "A dummy parameter asking for an integer");
 
     // Next, let us declare a sub-section (the equivalent to a
     // subdirectory). When entered, all following parameter declarations will
@@ -197,19 +196,21 @@ namespace Step19
     // indentation. In this sub-section, we shall have two entries, one that
     // takes a Boolean parameter and one that takes a selection list of
     // values, separated by the '|' character:
-    prm.enter_subsection ("Dummy subsection");
+    prm.enter_subsection("Dummy subsection");
     {
-      prm.declare_entry ("Dummy generate output", "true",
-                         Patterns::Bool(),
-                         "A dummy parameter that can be fed with either "
-                         "'true' or 'false'");
-      prm.declare_entry ("Dummy color of output", "red",
-                         Patterns::Selection("red|black|blue"),
-                         "A dummy parameter that shows how one can define a "
-                         "parameter that can be assigned values from a finite "
-                         "set of values");
+      prm.declare_entry("Dummy generate output",
+                        "true",
+                        Patterns::Bool(),
+                        "A dummy parameter that can be fed with either "
+                        "'true' or 'false'");
+      prm.declare_entry("Dummy color of output",
+                        "red",
+                        Patterns::Selection("red|black|blue"),
+                        "A dummy parameter that shows how one can define a "
+                        "parameter that can be assigned values from a finite "
+                        "set of values");
     }
-    prm.leave_subsection ();
+    prm.leave_subsection();
     // After this, we have left the subsection again. You should have gotten
     // the idea by now how one can nest subsections to separate
     // parameters. There are a number of other possible patterns describing
@@ -219,7 +220,6 @@ namespace Step19
     // all, it does not make much sense if you had an entry that contained the
     // entry "red" for the parameter "Generate output".
   }
-
 
   // @sect4{Parsing the command line}
 
@@ -231,20 +231,19 @@ namespace Step19
   // zeroth parameter), <code>argc</code> must therefore be at least 2. If
   // this is not the case, we print an error message and exit:
   void
-  parse_command_line (const int     argc,
-                      char *const *argv)
+  parse_command_line(const int argc, char* const* argv)
   {
-    if (argc < 2)
+    if(argc < 2)
       {
-        print_usage_message ();
-        exit (1);
+        print_usage_message();
+        exit(1);
       }
 
     // Next, collect all parameters in a list that will be somewhat simpler to
     // handle than the <code>argc</code>/<code>argv</code> mechanism. We omit
     // the name of the executable at the zeroth index:
     std::list<std::string> args;
-    for (int i=1; i<argc; ++i)
+    for(int i = 1; i < argc; ++i)
       args.emplace_back(argv[i]);
 
     // Then process all these parameters. If the parameter is <code>-p</code>,
@@ -253,24 +252,23 @@ namespace Step19
     // format. Finally, for <code>-o</code> it is the name of the output
     // file. In all cases, once we've treated a parameter, we remove it from
     // the list of parameters:
-    while (args.size())
+    while(args.size())
       {
-        if (args.front() == std::string("-p"))
+        if(args.front() == std::string("-p"))
           {
-            if (args.size() == 1)
+            if(args.size() == 1)
               {
                 std::cerr << "Error: flag '-p' must be followed by the "
-                          << "name of a parameter file."
-                          << std::endl;
-                print_usage_message ();
-                exit (1);
+                          << "name of a parameter file." << std::endl;
+                print_usage_message();
+                exit(1);
               }
-            args.pop_front ();
-            const std::string parameter_file = args.front ();
-            args.pop_front ();
+            args.pop_front();
+            const std::string parameter_file = args.front();
+            args.pop_front();
 
             // Now read the input file:
-            prm.parse_input (parameter_file);
+            prm.parse_input(parameter_file);
 
             // Both the output file name as well as the format can be
             // specified on the command line. We have therefore given them
@@ -278,11 +276,11 @@ namespace Step19
             // set in the parameter file. We therefore need to extract them
             // from the parameter file here, because they may be overridden by
             // later command line parameters:
-            if (output_file == "")
-              output_file = prm.get ("Output file");
+            if(output_file == "")
+              output_file = prm.get("Output file");
 
-            if (output_format == "")
-              output_format = prm.get ("Output format");
+            if(output_format == "")
+              output_format = prm.get("Output format");
 
             // Finally, let us note that if we were interested in the values
             // of the parameters declared above in the dummy subsection, we
@@ -291,44 +289,42 @@ namespace Step19
             // value of a parameter as a string, whereas the
             // <code>prm.get_X</code> functions return a value already
             // converted to a different type):
-            prm.enter_subsection ("Dummy subsection");
+            prm.enter_subsection("Dummy subsection");
             {
-              prm.get_bool ("Dummy generate output");
+              prm.get_bool("Dummy generate output");
             }
-            prm.leave_subsection ();
+            prm.leave_subsection();
             // We would assign the result to a variable, of course, but don't
             // here in order not to generate an unused variable that the
             // compiler might warn about.
             //
             // Alas, let's move on to handling of output formats:
           }
-        else if (args.front() == std::string("-x"))
+        else if(args.front() == std::string("-x"))
           {
-            if (args.size() == 1)
+            if(args.size() == 1)
               {
                 std::cerr << "Error: flag '-x' must be followed by the "
-                          << "name of an output format."
-                          << std::endl;
-                print_usage_message ();
-                exit (1);
+                          << "name of an output format." << std::endl;
+                print_usage_message();
+                exit(1);
               }
-            args.pop_front ();
+            args.pop_front();
             output_format = args.front();
-            args.pop_front ();
+            args.pop_front();
           }
-        else if (args.front() == std::string("-o"))
+        else if(args.front() == std::string("-o"))
           {
-            if (args.size() == 1)
+            if(args.size() == 1)
               {
                 std::cerr << "Error: flag '-o' must be followed by the "
-                          << "name of an output file."
-                          << std::endl;
-                print_usage_message ();
-                exit (1);
+                          << "name of an output file." << std::endl;
+                print_usage_message();
+                exit(1);
               }
-            args.pop_front ();
+            args.pop_front();
             output_file = args.front();
-            args.pop_front ();
+            args.pop_front();
           }
 
         // Otherwise, this is not a parameter that starts with a known minus
@@ -336,21 +332,20 @@ namespace Step19
         // file. Let us therefore add this file to the list of input files:
         else
           {
-            input_file_names.push_back (args.front());
-            args.pop_front ();
+            input_file_names.push_back(args.front());
+            args.pop_front();
           }
       }
 
     // Next check a few things and create errors if the checks fail. Firstly,
     // there must be at least one input file
-    if (input_file_names.size() == 0)
+    if(input_file_names.size() == 0)
       {
         std::cerr << "Error: No input file specified." << std::endl;
-        print_usage_message ();
-        exit (1);
+        print_usage_message();
+        exit(1);
       }
   }
-
 
   // @sect4{Generating output}
 
@@ -367,27 +362,28 @@ namespace Step19
   // corresponding output will be generated from the exception handler in
   // <code>main()</code>:
   template <int dim, int spacedim>
-  void do_convert ()
+  void
+  do_convert()
   {
-    DataOutReader<dim,spacedim> merged_data;
+    DataOutReader<dim, spacedim> merged_data;
 
     {
-      std::ifstream input (input_file_names[0]);
-      AssertThrow (input, ExcIO());
+      std::ifstream input(input_file_names[0]);
+      AssertThrow(input, ExcIO());
 
-      merged_data.read (input);
+      merged_data.read(input);
     }
 
     // For all the other input files, we read their data into an intermediate
     // object, and then merge that into the first object declared above:
-    for (unsigned int i=1; i<input_file_names.size(); ++i)
+    for(unsigned int i = 1; i < input_file_names.size(); ++i)
       {
-        std::ifstream input (input_file_names[i]);
-        AssertThrow (input, ExcIO());
+        std::ifstream input(input_file_names[i]);
+        AssertThrow(input, ExcIO());
 
-        DataOutReader<dim,spacedim> additional_data;
-        additional_data.read (input);
-        merged_data.merge (additional_data);
+        DataOutReader<dim, spacedim> additional_data;
+        additional_data.read(input);
+        merged_data.merge(additional_data);
       }
 
     // Once we have this, let us open an output stream, and parse what we got
@@ -398,16 +394,15 @@ namespace Step19
     // the command line. Note that this ensures that if the library acquires
     // the ability to output in other output formats, this program will be
     // able to make use of this ability without having to be changed!
-    std::ofstream output_stream (output_file);
-    AssertThrow (output_stream, ExcIO());
+    std::ofstream output_stream(output_file);
+    AssertThrow(output_stream, ExcIO());
 
     const DataOutBase::OutputFormat format
-      = DataOutBase::parse_output_format (output_format);
+      = DataOutBase::parse_output_format(output_format);
 
     // Finally, write the merged data to the output:
     merged_data.write(output_stream, format);
   }
-
 
   // @sect4{Dispatching output generation}
 
@@ -431,62 +426,61 @@ namespace Step19
   // nothing -- except making sure that it covered the dimensions for which it
   // was called, using the <code>AssertThrow</code> macro at places in the
   // code that shouldn't be reached:
-  void convert ()
+  void
+  convert()
   {
-    AssertThrow (input_file_names.size() > 0,
-                 ExcMessage ("No input files specified."));
+    AssertThrow(input_file_names.size() > 0,
+                ExcMessage("No input files specified."));
 
     std::ifstream input(input_file_names[0]);
-    AssertThrow (input, ExcIO());
+    AssertThrow(input, ExcIO());
 
-    const std::pair<unsigned int, unsigned int>
-    dimensions = DataOutBase::determine_intermediate_format_dimensions (input);
+    const std::pair<unsigned int, unsigned int> dimensions
+      = DataOutBase::determine_intermediate_format_dimensions(input);
 
-    switch (dimensions.first)
+    switch(dimensions.first)
       {
-      case 1:
-        switch (dimensions.second)
-          {
-          case 1:
-            do_convert <1,1> ();
-            return;
+        case 1:
+          switch(dimensions.second)
+            {
+              case 1:
+                do_convert<1, 1>();
+                return;
 
-          case 2:
-            do_convert <1,2> ();
-            return;
-          }
-        AssertThrow (false, ExcNotImplemented());
-        break;
+              case 2:
+                do_convert<1, 2>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
+          break;
 
-      case 2:
-        switch (dimensions.second)
-          {
-          case 2:
-            do_convert <2,2> ();
-            return;
+        case 2:
+          switch(dimensions.second)
+            {
+              case 2:
+                do_convert<2, 2>();
+                return;
 
-          case 3:
-            do_convert <2,3> ();
-            return;
-          }
-        AssertThrow (false, ExcNotImplemented());
-        break;
+              case 3:
+                do_convert<2, 3>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
+          break;
 
-      case 3:
-        switch (dimensions.second)
-          {
-          case 3:
-            do_convert <3,3> ();
-            return;
-          }
-        AssertThrow (false, ExcNotImplemented());
+        case 3:
+          switch(dimensions.second)
+            {
+              case 3:
+                do_convert<3, 3>();
+                return;
+            }
+          AssertThrow(false, ExcNotImplemented());
       }
 
-    AssertThrow (false, ExcNotImplemented());
+    AssertThrow(false, ExcNotImplemented());
   }
-}
-
-
+} // namespace Step19
 
 // @sect4{main()}
 
@@ -496,20 +490,22 @@ namespace Step19
 // output is generated. Everything else just has to do with handling
 // exceptions and making sure that appropriate output is generated if one is
 // thrown.
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   try
     {
       using namespace Step19;
 
-      declare_parameters ();
-      parse_command_line (argc, argv);
+      declare_parameters();
+      parse_command_line(argc, argv);
 
-      convert ();
+      convert();
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -520,9 +516,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

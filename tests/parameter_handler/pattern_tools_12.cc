@@ -23,7 +23,8 @@
 using dealii::Patterns::Tools::to_string;
 using dealii::Patterns::Tools::to_value;
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -32,6 +33,5 @@ int main()
   auto s = to_string(a);
   to_value("2 : mondo", a);
 
-  deallog << "From: " << s
-          << " to " << to_string(a) << std::endl;
+  deallog << "From: " << s << " to " << to_string(a) << std::endl;
 }

@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // ParameterHandler could not deal with parameters named "value" as well as a
 // few other names. see the thread on the mailing starting with a post by
 // Denis Davydov on March 30, 2013
@@ -22,7 +20,8 @@
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check ()
+void
+check()
 {
   std::string input = "subsection bar\n"
                       "  set value = 1.0\n"
@@ -37,23 +36,23 @@ void check ()
     {
       foo.parse_input_from_string(input.c_str());
     }
-  catch (...)
+  catch(...)
     {
       deallog << "Exception caught, but none should happen here!!!"
               << std::endl;
     }
 
   foo.enter_subsection("bar");
-  deallog << foo.get ("value") << std::endl;
+  deallog << foo.get("value") << std::endl;
   foo.leave_subsection();
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  check ();
+  check();
 
   return 0;
 }

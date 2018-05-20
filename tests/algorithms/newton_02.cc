@@ -13,13 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
-#include <deal.II/algorithms/operator.h>
 #include <deal.II/algorithms/newton.h>
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/algorithms/operator.h>
 #include <deal.II/grid/grid_generator.h>
-
+#include <deal.II/numerics/vector_tools.h>
 
 // verify that all debug vectors have the correct size
 
@@ -30,17 +28,19 @@ template <typename VectorType, int dim>
 class TestOutputOperator : public OutputOperator<VectorType>
 {
 public:
-  void initialize(const DoFHandler<dim> &dof_handler)
+  void
+  initialize(const DoFHandler<dim>& dof_handler)
   {
     dof = &dof_handler;
   }
 
-  virtual OutputOperator<VectorType> &operator<<(const AnyData &vectors)
+  virtual OutputOperator<VectorType>&
+  operator<<(const AnyData& vectors)
   {
-    for (unsigned int i=0; i<vectors.size(); ++i)
+    for(unsigned int i = 0; i < vectors.size(); ++i)
       {
-        const VectorType *p = vectors.try_read_ptr<VectorType>(i);
-        if (p!=nullptr)
+        const VectorType* p = vectors.try_read_ptr<VectorType>(i);
+        if(p != nullptr)
           {
             // this should be equal to dof->n_dofs() otherwise
             // DoFOutputOperator will complain
@@ -51,18 +51,18 @@ public:
   }
 
 private:
-  SmartPointer<const DoFHandler<dim>,
-               TestOutputOperator<VectorType, dim> > dof;
+  SmartPointer<const DoFHandler<dim>, TestOutputOperator<VectorType, dim>> dof;
 };
 
 class ZeroResidual : public Algorithms::OperatorBase
 {
 public:
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator()(AnyData& out, const AnyData& in)
   {
-    const Vector<double> &in_vector = *in.entry<const Vector<double>*>(
-                                        "Newton iterate");
-    Vector<double> &out_vector = *out.entry<Vector<double>*>(0);
+    const Vector<double>& in_vector
+      = *in.entry<const Vector<double>*>("Newton iterate");
+    Vector<double>& out_vector = *out.entry<Vector<double>*>(0);
     out_vector.reinit(in_vector.size());
   }
 };
@@ -70,24 +70,25 @@ public:
 class IdentitySolver : public Algorithms::OperatorBase
 {
 public:
-  virtual void operator ()(AnyData &out, const AnyData &in)
+  virtual void
+  operator()(AnyData& out, const AnyData& in)
   {
-    const Vector<double> &in_vector = *in.entry<const Vector<double>*>(
-                                        "Newton residual");
-    Vector<double> &out_vector = *out.entry<Vector<double>*>(0);
-    out_vector = in_vector;
+    const Vector<double>& in_vector
+      = *in.entry<const Vector<double>*>("Newton residual");
+    Vector<double>& out_vector = *out.entry<Vector<double>*>(0);
+    out_vector                 = in_vector;
   }
 };
 
-
 template <int dim>
-void test()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
   tria.refine_global(1);
 
-  FE_Q<dim> fe(1);
+  FE_Q<dim>       fe(1);
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
 
@@ -95,9 +96,9 @@ void test()
   output_operator.initialize(dofh);
 
   IdentitySolver solver;
-  ZeroResidual residual;
+  ZeroResidual   residual;
 
-  Algorithms::Newton<Vector<double> > newton(residual, solver);
+  Algorithms::Newton<Vector<double>> newton(residual, solver);
   newton.initialize(output_operator);
 
   AnyData in_data;
@@ -110,10 +111,10 @@ void test()
   newton(out_data, in_data);
 }
 
-
-int main()
+int
+main()
 {
-  std::string logname = "output";
+  std::string   logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
 

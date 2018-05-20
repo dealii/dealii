@@ -16,18 +16,17 @@
 // Validate grid_tools_cache. Different construction order. Check signal.
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools_cache.h>
-
+#include <deal.II/grid/tria.h>
 
 template <int dim, int spacedim>
-void test ()
+void
+test()
 {
-  deallog << "dim = " << dim
-          << ", spacedim = " << spacedim << std::endl;
+  deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;
 
-  Triangulation<dim> tria;
+  Triangulation<dim>    tria;
   GridTools::Cache<dim> cache(tria);
 
   GridGenerator::hyper_cube(tria);
@@ -35,10 +34,10 @@ void test ()
   {
     auto m = cache.get_vertex_to_cell_map();
 
-    unsigned int i=0;
-    for (auto &v : m)
+    unsigned int i = 0;
+    for(auto& v : m)
       {
-        for (auto &c : v)
+        for(auto& c : v)
           deallog << "Vertex " << i << ", cell " << c << std::endl;
         ++i;
       }
@@ -49,22 +48,22 @@ void test ()
   {
     auto m = cache.get_vertex_to_cell_map();
 
-    unsigned int i=0;
-    for (auto &v : m)
+    unsigned int i = 0;
+    for(auto& v : m)
       {
-        for (auto &c : v)
+        for(auto& c : v)
           deallog << "Vertex " << i << ", cell " << c << std::endl;
         ++i;
       }
   }
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2,2> ();
+  test<2, 2>();
 
   return 0;
 }

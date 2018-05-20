@@ -13,25 +13,22 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // ConstraintMatrix::add_line crashes in release mode (missing compress inside ConstraintMatrix)
 
 #include "../tests.h"
-#include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
-
-
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   IndexSet local_active_together(3);
-  local_active_together.add_range(0,3);
+  local_active_together.add_range(0, 3);
   //local_active_together.compress();
 
   ConstraintMatrix cm(local_active_together);
@@ -40,11 +37,11 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
 
   test();
   return 0;

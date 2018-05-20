@@ -13,46 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test that FECollection objects are copyable without running into
 // troubles when the copy is destroyed earlier than the original
 // object
 
-
 #include "../tests.h"
-#include <deal.II/hp/fe_collection.h>
 #include <deal.II/fe/fe_q.h>
-
-
+#include <deal.II/hp/fe_collection.h>
 
 template <int dim>
-void test ()
+void
+test()
 {
   hp::FECollection<dim> fe_collection;
-  fe_collection.push_back (FE_Q<dim>(2));
-  fe_collection.push_back (FE_Q<dim>(3));
+  fe_collection.push_back(FE_Q<dim>(2));
+  fe_collection.push_back(FE_Q<dim>(3));
 
   // now create a copy and make sure
   // it goes out of scope before the
   // original
   {
-    hp::FECollection<dim> copy (fe_collection);
+    hp::FECollection<dim> copy(fe_collection);
   }
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

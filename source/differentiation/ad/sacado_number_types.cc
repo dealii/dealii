@@ -13,21 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#include <deal.II/differentiation/ad/sacado_number_types.h>
+#  include <deal.II/differentiation/ad/sacado_number_types.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
-#include "sacado_number_types.inst1"
-#ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
-#include "sacado_number_types.inst2"
-#endif
+#  include "sacado_number_types.inst1"
+#  ifdef DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+#    include "sacado_number_types.inst2"
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

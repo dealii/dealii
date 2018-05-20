@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 // check the correctness of fe_values.shape_3rd_derivative for FE_Q_Hierarchical by comparing
 // the integral of all shape third derivative components with the flux of the
 // hessian over the boundary by the divergence theorem
@@ -21,34 +20,36 @@
 #include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
-#include <deal.II/fe/fe_nedelec.h>
-#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/lac/vector.h>
 
 #include <sstream>
 
 template <int dim>
-Tensor<1,dim> ones ()
+Tensor<1, dim>
+ones()
 {
-  Tensor<1,dim> result;
-  for (unsigned int i=0; i<dim; ++i)
+  Tensor<1, dim> result;
+  for(unsigned int i = 0; i < dim; ++i)
     result[i] = 1.0;
   return result;
 }
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe,
-           const double tolerance)
+void
+test(const Triangulation<dim>& tr,
+     const FiniteElement<dim>& fe,
+     const double              tolerance)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
@@ -58,76 +59,90 @@ void test (const Triangulation<dim> &tr,
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(6);
-  FEValues<dim> fe_values (fe, quadrature, update_3rd_derivatives
-                           | update_quadrature_points
-                           | update_JxW_values);
+  FEValues<dim>     fe_values(fe,
+                          quadrature,
+                          update_3rd_derivatives | update_quadrature_points
+                            | update_JxW_values);
 
-  const QGauss<dim-1> face_quadrature(6);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature,
-                                    update_hessians
-                                    | update_quadrature_points
-                                    | update_normal_vectors
-                                    | update_JxW_values);
+  const QGauss<dim - 1> face_quadrature(6);
+  FEFaceValues<dim>     fe_face_values(fe,
+                                   face_quadrature,
+                                   update_hessians | update_quadrature_points
+                                     | update_normal_vectors
+                                     | update_JxW_values);
 
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-       cell != dof.end();
-       ++cell)
+  for(typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+      cell != dof.end();
+      ++cell)
     {
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
       deallog << "Cell nodes:" << std::endl;
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      for(unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         {
           deallog << i << ": ( ";
-          for (unsigned int d=0; d<dim; ++d)
+          for(unsigned int d = 0; d < dim; ++d)
             deallog << cell->vertex(i)[d] << " ";
           deallog << ")" << std::endl;
         }
 
       bool cell_ok = true;
 
-      for (unsigned int c=0; c<fe.n_components(); ++c)
+      for(unsigned int c = 0; c < fe.n_components(); ++c)
         {
-          FEValuesExtractors::Scalar single_component (c);
+          FEValuesExtractors::Scalar single_component(c);
 
-          for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+          for(unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
             {
-              ss << "component=" << c
-                 << ", dof=" << i
-                 << std::endl;
+              ss << "component=" << c << ", dof=" << i << std::endl;
 
-              Tensor<3,dim> bulk_integral;
-              for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+              Tensor<3, dim> bulk_integral;
+              for(unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
                 {
-                  bulk_integral += fe_values[single_component].third_derivative(i,q) * fe_values.JxW(q);
+                  bulk_integral
+                    += fe_values[single_component].third_derivative(i, q)
+                       * fe_values.JxW(q);
 
-                  Tensor<3,dim> third_derivative = fe_values[single_component].third_derivative(i,q);
+                  Tensor<3, dim> third_derivative
+                    = fe_values[single_component].third_derivative(i, q);
                 }
 
-              Tensor<3,dim> boundary_integral;
-              for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+              Tensor<3, dim> boundary_integral;
+              for(unsigned int face = 0;
+                  face < GeometryInfo<dim>::faces_per_cell;
+                  ++face)
                 {
-                  fe_face_values.reinit(cell,face);
-                  for (unsigned int q=0; q<fe_face_values.n_quadrature_points; ++q)
+                  fe_face_values.reinit(cell, face);
+                  for(unsigned int q = 0;
+                      q < fe_face_values.n_quadrature_points;
+                      ++q)
                     {
-                      Tensor<2,dim> hessian = fe_face_values[single_component].hessian (i,q);
+                      Tensor<2, dim> hessian
+                        = fe_face_values[single_component].hessian(i, q);
                       Tensor<3, dim> hessian_normal_outer_prod = outer_product(
-                                                                   hessian, fe_face_values.normal_vector(q));
-                      boundary_integral += hessian_normal_outer_prod * fe_face_values.JxW(q);
+                        hessian, fe_face_values.normal_vector(q));
+                      boundary_integral
+                        += hessian_normal_outer_prod * fe_face_values.JxW(q);
                     }
                 }
 
-              if ((bulk_integral-boundary_integral).norm_square() > tolerance * (bulk_integral.norm() + boundary_integral.norm()))
+              if((bulk_integral - boundary_integral).norm_square()
+                 > tolerance
+                     * (bulk_integral.norm() + boundary_integral.norm()))
                 {
                   deallog << "Failed:" << std::endl;
                   deallog << ss.str() << std::endl;
                   deallog << "    bulk integral=" << bulk_integral << std::endl;
-                  deallog << "boundary integral=" << boundary_integral << std::endl;
-                  deallog << "Error! difference between bulk and surface integrals is "
-                          << (bulk_integral-boundary_integral).norm_square()
-                          << " and greater than "
-                          << tolerance * (bulk_integral.norm() + boundary_integral.norm())
-                          << "!\n\n" << std::endl;
+                  deallog << "boundary integral=" << boundary_integral
+                          << std::endl;
+                  deallog
+                    << "Error! difference between bulk and surface integrals is "
+                    << (bulk_integral - boundary_integral).norm_square()
+                    << " and greater than "
+                    << tolerance
+                         * (bulk_integral.norm() + boundary_integral.norm())
+                    << "!\n\n"
+                    << std::endl;
                   cell_ok = false;
                 }
 
@@ -135,32 +150,33 @@ void test (const Triangulation<dim> &tr,
             }
         }
 
-      deallog << (cell_ok? "OK: cell bulk and boundary integrals match...\n" : "Failed divergence test...\n") << std::endl;
+      deallog << (cell_ok ? "OK: cell bulk and boundary integrals match...\n" :
+                            "Failed divergence test...\n")
+              << std::endl;
     }
 }
 
-
-
 template <int dim>
-void test_hyper_ball(const double tolerance)
+void
+test_hyper_ball(const double tolerance)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
 
   static const SphericalManifold<dim> boundary;
-  tr.set_manifold (0, boundary);
+  tr.set_manifold(0, boundary);
 
   tr.refine_global(1);
 
-  FE_Q_Hierarchical<dim>  fe(2);
+  FE_Q_Hierarchical<dim> fe(2);
   test(tr, fe, tolerance);
 }
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (8);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(8);
 
   deallog.attach(logfile);
 
@@ -169,4 +185,3 @@ int main()
 
   deallog << "done..." << std::endl;
 }
-

@@ -20,12 +20,12 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#include <deal.II/base/types.h>
+#  include <deal.II/base/types.h>
 
-#include <Epetra_BlockMap.h>
-#include <Epetra_CrsGraph.h>
-#include <Epetra_CrsMatrix.h>
-#include <Epetra_MultiVector.h>
+#  include <Epetra_BlockMap.h>
+#  include <Epetra_CrsGraph.h>
+#  include <Epetra_CrsMatrix.h>
+#  include <Epetra_MultiVector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -36,61 +36,57 @@ namespace TrilinosWrappers
    * and calls either the 32 or 64 bit function to get the number of global
    * elements in the map.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  n_global_elements(const Epetra_BlockMap &map)
+  inline TrilinosWrappers::types::int_type
+  n_global_elements(const Epetra_BlockMap& map)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return map.NumGlobalElements64();
-#else
+#  else
     return map.NumGlobalElements();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the minimum global index value on the
    * calling processor by calling either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  min_my_gid(const Epetra_BlockMap &map)
+  inline TrilinosWrappers::types::int_type
+  min_my_gid(const Epetra_BlockMap& map)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return map.MinMyGID64();
-#else
+#  else
     return map.MinMyGID();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the maximum global index value on the
    * calling processor by calling either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  max_my_gid(const Epetra_BlockMap &map)
+  inline TrilinosWrappers::types::int_type
+  max_my_gid(const Epetra_BlockMap& map)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return map.MaxMyGID64();
-#else
+#  else
     return map.MaxMyGID();
-#endif
+#  endif
   }
 
   /**
    * A helper function that converts a local index to a global one calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  global_index(const Epetra_BlockMap &map,
+  inline TrilinosWrappers::types::int_type
+  global_index(const Epetra_BlockMap&                map,
                const dealii::types::global_dof_index i)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return map.GID64(i);
-#else
+#  else
     return map.GID(i);
-#endif
+#  endif
   }
 
   /**
@@ -98,124 +94,116 @@ namespace TrilinosWrappers
    * global indices assigned to the current process by calling either the 32
    * or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type *
-  my_global_elements(const Epetra_BlockMap &map)
+  inline TrilinosWrappers::types::int_type*
+  my_global_elements(const Epetra_BlockMap& map)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return map.MyGlobalElements64();
-#else
+#  else
     return map.MyGlobalElements();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global number of rows by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  n_global_rows(const Epetra_CrsGraph &graph)
+  inline TrilinosWrappers::types::int_type
+  n_global_rows(const Epetra_CrsGraph& graph)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return graph.NumGlobalRows64();
-#else
+#  else
     return graph.NumGlobalRows();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global number of columns by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  n_global_cols(const Epetra_CrsGraph &graph)
+  inline TrilinosWrappers::types::int_type
+  n_global_cols(const Epetra_CrsGraph& graph)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return graph.NumGlobalCols64();
-#else
+#  else
     return graph.NumGlobalCols();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the number of global entries by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  n_global_entries(const Epetra_CrsGraph &graph)
+  inline TrilinosWrappers::types::int_type
+  n_global_entries(const Epetra_CrsGraph& graph)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return graph.NumGlobalEntries64();
-#else
+#  else
     return graph.NumGlobalEntries();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global row index by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  global_row_index(const Epetra_CrsMatrix &matrix,
+  inline TrilinosWrappers::types::int_type
+  global_row_index(const Epetra_CrsMatrix&               matrix,
                    const dealii::types::global_dof_index i)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return matrix.GRID64(i);
-#else
+#  else
     return matrix.GRID(i);
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global column index by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  global_column_index(const Epetra_CrsMatrix &matrix,
+  inline TrilinosWrappers::types::int_type
+  global_column_index(const Epetra_CrsMatrix&               matrix,
                       const dealii::types::global_dof_index i)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return matrix.GCID64(i);
-#else
+#  else
     return matrix.GCID(i);
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global length of a vector by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  global_length (const Epetra_MultiVector &vector)
+  inline TrilinosWrappers::types::int_type
+  global_length(const Epetra_MultiVector& vector)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return vector.GlobalLength64();
-#else
+#  else
     return vector.GlobalLength();
-#endif
+#  endif
   }
 
   /**
    * A helper function that finds the global number of rows by calling
    * either the 32 or 64 bit function.
    */
-  inline
-  TrilinosWrappers::types::int_type
-  n_global_rows(const Epetra_RowMatrix &matrix)
+  inline TrilinosWrappers::types::int_type
+  n_global_rows(const Epetra_RowMatrix& matrix)
   {
-#ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_WITH_64BIT_INDICES
     return matrix.NumGlobalRows64();
-#else
+#  else
     return matrix.NumGlobalRows();
-#endif
+#  endif
   }
-}
+} // namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 #endif // DEAL_II_WITH_TRILINOS

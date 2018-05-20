@@ -13,40 +13,34 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/grid/tria_faces.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace internal
 {
   namespace TriangulationImplementation
   {
-
     std::size_t
-    TriaFaces<1>::memory_consumption () const
+    TriaFaces<1>::memory_consumption() const
     {
       return 0;
     }
 
-
     std::size_t
-    TriaFaces<2>::memory_consumption () const
+    TriaFaces<2>::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption (lines);
+      return MemoryConsumption::memory_consumption(lines);
     }
 
-
     std::size_t
-    TriaFaces<3>::memory_consumption () const
+    TriaFaces<3>::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption (quads) +
-              MemoryConsumption::memory_consumption (lines) );
+      return (MemoryConsumption::memory_consumption(quads)
+              + MemoryConsumption::memory_consumption(lines));
     }
-  }
-}
+  } // namespace TriangulationImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
-

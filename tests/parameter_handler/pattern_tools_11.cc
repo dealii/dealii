@@ -22,24 +22,24 @@
 #include <memory>
 #include <tuple>
 
-int main()
+int
+main()
 {
   initlog();
 
-  double        a = 1e-12;
-  int           i = -1;
-  unsigned int  j = 3;
-  unsigned char c =   3;
-  signed   char c1 = -3;
+  double        a  = 1e-12;
+  int           i  = -1;
+  unsigned int  j  = 3;
+  unsigned char c  = 3;
+  signed char   c1 = -3;
   char          c2 = -3;
-  bool          b = false;
+  bool          b  = false;
 
-  auto t = std::make_tuple(a,i,j,c,c1,c2,b);
+  auto t = std::make_tuple(a, i, j, c, c1, c2, b);
 
-  auto s = Patterns::Tools::Convert<decltype(t)>::to_string(t);
+  auto s  = Patterns::Tools::Convert<decltype(t)>::to_string(t);
   auto tt = Patterns::Tools::Convert<decltype(t)>::to_value(s);
-  auto r = Patterns::Tools::Convert<decltype(t)>::to_string(tt);
+  auto r  = Patterns::Tools::Convert<decltype(t)>::to_string(tt);
 
-  deallog << "String: " << s
-          << ", roundtrip: " << r << std::endl;
+  deallog << "String: " << s << ", roundtrip: " << r << std::endl;
 }

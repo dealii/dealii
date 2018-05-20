@@ -22,7 +22,6 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/manifold_lib.h>
 
-
 int
 main()
 {
@@ -30,28 +29,27 @@ main()
 
   // Center and radius of the Ball
   Point<2> center(.5, .5);
-  double radius = center.norm();
+  double   radius = center.norm();
 
-  const PolarManifold<2,2> manifold(center);
+  const PolarManifold<2, 2> manifold(center);
 
   // Some points on the circle, that would cross the periodicity
   // boundary
-  std::vector<Point<2> > points;
+  std::vector<Point<2>> points;
 
   points.push_back(Point<2>(0.0, 0.0));
   points.push_back(Point<2>(1.0, 0.0));
 
-
   // And the weights
   std::vector<double> weights(2);
 
-  unsigned int n_intermediates=10;
+  unsigned int n_intermediates = 10;
 
   // First, use only two surrounding points. The second time around,
   // instead, use four, with additional zero weights
-  for (unsigned int test_no=0; test_no<2; ++test_no)
+  for(unsigned int test_no = 0; test_no < 2; ++test_no)
     {
-      if (test_no == 1)
+      if(test_no == 1)
         {
           // Test that we get the same result with four surrounding points
           points.push_back(Point<2>(0.0, 1.0));
@@ -61,10 +59,10 @@ main()
         }
 
       deallog << "Test " << test_no << std::endl;
-      for (unsigned int i=0; i<n_intermediates; ++i)
+      for(unsigned int i = 0; i < n_intermediates; ++i)
         {
-          weights[0] = (double)i/((double)n_intermediates-1);
-          weights[1] = 1.0-weights[0];
+          weights[0] = (double) i / ((double) n_intermediates - 1);
+          weights[1] = 1.0 - weights[0];
 
           deallog << manifold.get_new_point(make_array_view(points),
                                             make_array_view(weights))

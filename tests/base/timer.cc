@@ -13,27 +13,26 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include "../tests.h"
 #include <deal.II/base/timer.h>
 
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for(unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for(unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
@@ -42,7 +41,7 @@ int main ()
 
   double s1 = t();
 
-  if (s1 > 0.)
+  if(s1 > 0.)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s1 should be nonzero" << std::endl;
@@ -51,7 +50,7 @@ int main ()
   t.stop();
   double s2 = t();
 
-  if (s2 > s1)
+  if(s2 > s1)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s2 should be greater than s1" << std::endl;
@@ -59,7 +58,7 @@ int main ()
   burn(50);
   double s3 = t();
 
-  if (s3 == s2)
+  if(s3 == s2)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s3 should be equal to s2" << std::endl;
@@ -68,7 +67,7 @@ int main ()
   burn(50);
   double s4 = t();
 
-  if (s4 > s3)
+  if(s4 > s3)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s4 should be greater than s3" << std::endl;
@@ -78,7 +77,7 @@ int main ()
   burn(50);
   double s5 = t();
 
-  if (s5 == 0.)
+  if(s5 == 0.)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s5 should be zero" << std::endl;
@@ -89,10 +88,8 @@ int main ()
   burn(50);
   double s6 = t();
 
-  if (s6 == 0.)
+  if(s6 == 0.)
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s6 should be zero" << std::endl;
-
 }
-

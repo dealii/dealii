@@ -21,36 +21,34 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#include <deal.II/base/logstream.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/conditional_ostream.h>
-#include <deal.II/base/mpi.h>
-#ifdef DEAL_II_WITH_PETSC
-#  include <deal.II/lac/petsc_parallel_block_vector.h>
-#  include <deal.II/lac/petsc_parallel_vector.h>
-#endif
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
+#  include <deal.II/base/conditional_ostream.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/logstream.h>
+#  include <deal.II/base/mpi.h>
+#  include <deal.II/base/parameter_handler.h>
+#  ifdef DEAL_II_WITH_PETSC
+#    include <deal.II/lac/petsc_parallel_block_vector.h>
+#    include <deal.II/lac/petsc_parallel_vector.h>
+#  endif
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_memory.h>
 
+#  include <arkode/arkode.h>
+#  include <arkode/arkode_impl.h>
+#  include <nvector/nvector_serial.h>
+#  ifdef DEAL_II_WITH_MPI
+#    include <nvector/nvector_parallel.h>
+#  endif
+#  include <sundials/sundials_math.h>
+#  include <sundials/sundials_types.h>
 
-#include <arkode/arkode.h>
-#include <arkode/arkode_impl.h>
-#include <nvector/nvector_serial.h>
-#ifdef DEAL_II_WITH_MPI
-#  include <nvector/nvector_parallel.h>
-#endif
-#include <sundials/sundials_math.h>
-#include <sundials/sundials_types.h>
-
-#include <boost/signals2.hpp>
-#include <memory>
-
+#  include <boost/signals2.hpp>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for ARKODE error codes.
-#define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
+#  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
 
 /**
  * A namespace for dealing with ODE solvers through the SUNDIALS package.
@@ -306,11 +304,10 @@ namespace SUNDIALS
    *
    * @author Luca Heltai, 2017.
    */
-  template<typename VectorType=Vector<double> >
+  template <typename VectorType = Vector<double>>
   class ARKode
   {
   public:
-
     /**
      * Additional parameters that can be passed to the ARKode class.
      */
@@ -343,30 +340,31 @@ namespace SUNDIALS
        */
       AdditionalData(
         // Initial parameters
-        const double &initial_time = 0.0,
-        const double &final_time = 1.0,
-        const double &initial_step_size = 1e-2,
-        const double &output_period = 1e-1,
+        const double& initial_time      = 0.0,
+        const double& final_time        = 1.0,
+        const double& initial_step_size = 1e-2,
+        const double& output_period     = 1e-1,
         // Running parameters
-        const double &minimum_step_size = 1e-6,
-        const unsigned int &maximum_order = 5,
-        const unsigned int &maximum_non_linear_iterations = 10,
-        const bool implicit_function_is_linear = false,
-        const bool implicit_function_is_time_independent = false,
+        const double&       minimum_step_size                     = 1e-6,
+        const unsigned int& maximum_order                         = 5,
+        const unsigned int& maximum_non_linear_iterations         = 10,
+        const bool          implicit_function_is_linear           = false,
+        const bool          implicit_function_is_time_independent = false,
         // Error parameters
-        const double &absolute_tolerance = 1e-6,
-        const double &relative_tolerance = 1e-5) :
-        initial_time(initial_time),
-        final_time(final_time),
-        initial_step_size(initial_step_size),
-        minimum_step_size(minimum_step_size),
-        absolute_tolerance(absolute_tolerance),
-        relative_tolerance(relative_tolerance),
-        maximum_order(maximum_order),
-        output_period(output_period),
-        maximum_non_linear_iterations(maximum_non_linear_iterations),
-        implicit_function_is_linear(implicit_function_is_linear),
-        implicit_function_is_time_independent(implicit_function_is_time_independent)
+        const double& absolute_tolerance = 1e-6,
+        const double& relative_tolerance = 1e-5)
+        : initial_time(initial_time),
+          final_time(final_time),
+          initial_step_size(initial_step_size),
+          minimum_step_size(minimum_step_size),
+          absolute_tolerance(absolute_tolerance),
+          relative_tolerance(relative_tolerance),
+          maximum_order(maximum_order),
+          output_period(output_period),
+          maximum_non_linear_iterations(maximum_non_linear_iterations),
+          implicit_function_is_linear(implicit_function_is_linear),
+          implicit_function_is_time_independent(
+            implicit_function_is_time_independent)
       {}
 
       /**
@@ -410,19 +408,23 @@ namespace SUNDIALS
        * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
-      void add_parameters(ParameterHandler &prm)
+      void
+      add_parameters(ParameterHandler& prm)
       {
         prm.add_parameter("Initial time", initial_time);
         prm.add_parameter("Final time", final_time);
         prm.add_parameter("Time interval between each output", output_period);
 
         prm.enter_subsection("Running parameters");
-        prm.add_parameter("Initial step size",initial_step_size);
+        prm.add_parameter("Initial step size", initial_step_size);
         prm.add_parameter("Minimum step size", minimum_step_size);
         prm.add_parameter("Maximum order of ARK", maximum_order);
-        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
-        prm.add_parameter("Implicit function is linear", implicit_function_is_linear);
-        prm.add_parameter("Implicit function is time independent", implicit_function_is_time_independent);
+        prm.add_parameter("Maximum number of nonlinear iterations",
+                          maximum_non_linear_iterations);
+        prm.add_parameter("Implicit function is linear",
+                          implicit_function_is_linear);
+        prm.add_parameter("Implicit function is time independent",
+                          implicit_function_is_time_independent);
         prm.leave_subsection();
 
         prm.enter_subsection("Error control");
@@ -500,8 +502,8 @@ namespace SUNDIALS
      * @param data ARKode configuration data
      * @param mpi_comm MPI communicator
      */
-    ARKode(const AdditionalData &data=AdditionalData(),
-           const MPI_Comm mpi_comm = MPI_COMM_WORLD);
+    ARKode(const AdditionalData& data     = AdditionalData(),
+           const MPI_Comm        mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
@@ -512,7 +514,8 @@ namespace SUNDIALS
      * Integrate the initial value problem. This function returns the final
      * number of computed steps.
      */
-    unsigned int solve_ode(VectorType &solution);
+    unsigned int
+    solve_ode(VectorType& solution);
 
     /**
      * Clear internal memory and start with clean objects. This function is
@@ -528,15 +531,14 @@ namespace SUNDIALS
      * @param[in] h  The new starting time step
      * @param[in,out] y   The new initial solution
      */
-    void reset(const double &t,
-               const double &h,
-               const VectorType &y);
+    void
+    reset(const double& t, const double& h, const VectorType& y);
 
     /**
      * A function object that users need to supply and that is intended to
      * reinit the given vector.
      */
-    std::function<void(VectorType &)> reinit_vector;
+    std::function<void(VectorType&)> reinit_vector;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -554,9 +556,9 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
-    std::function<int(const double t,
-                      const VectorType &y,
-                      VectorType &explicit_f)> explicit_function;
+    std::function<
+      int(const double t, const VectorType& y, VectorType& explicit_f)>
+      explicit_function;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -574,9 +576,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
-    std::function<int(const double t,
-                      const VectorType &y,
-                      VectorType &res)> implicit_function;
+    std::function<int(const double t, const VectorType& y, VectorType& res)>
+      implicit_function;
 
     /**
      * A function object that users may supply and that is intended to
@@ -659,12 +660,13 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
-    std::function<int(const int convfail,
-                      const double t,
-                      const double gamma,
-                      const VectorType &ypred,
-                      const VectorType &fpred,
-                      bool &j_is_current)> setup_jacobian;
+    std::function<int(const int         convfail,
+                      const double      t,
+                      const double      gamma,
+                      const VectorType& ypred,
+                      const VectorType& fpred,
+                      bool&             j_is_current)>
+      setup_jacobian;
 
     /**
      * A function object that users may supply and that is intended to solve
@@ -709,13 +711,13 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
-    std::function<int(const double t,
-                      const double gamma,
-                      const VectorType &ycur,
-                      const VectorType &fcur,
-                      const VectorType &rhs,
-                      VectorType &dst)> solve_jacobian_system;
-
+    std::function<int(const double      t,
+                      const double      gamma,
+                      const VectorType& ycur,
+                      const VectorType& fcur,
+                      const VectorType& rhs,
+                      VectorType&       dst)>
+      solve_jacobian_system;
 
     /**
      * A function object that users may supply and that is intended to setup
@@ -770,7 +772,8 @@ namespace SUNDIALS
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
-    std::function<int(const VectorType &rhs, VectorType &dst)> solve_mass_system;
+    std::function<int(const VectorType& rhs, VectorType& dst)>
+      solve_mass_system;
 
     /**
      * A function object that users may supply and that is intended to
@@ -786,9 +789,10 @@ namespace SUNDIALS
      * times this function is called and how many time steps have actually been
      * computed.
      */
-    std::function<void(const double t,
-                       const VectorType &sol,
-                       const unsigned int step_number)> output_step;
+    std::function<void(const double       t,
+                       const VectorType&  sol,
+                       const unsigned int step_number)>
+      output_step;
 
     /**
      * A function object that users may supply and that is intended to evaluate
@@ -807,8 +811,7 @@ namespace SUNDIALS
      * The default implementation simply returns `false`, i.e., no restart is
      * performed during the evolution.
      */
-    std::function<bool (const double t,
-                        VectorType &sol)> solver_should_restart;
+    std::function<bool(const double t, VectorType& sol)> solver_should_restart;
 
     /**
      * A function object that users may supply and that is intended to return a
@@ -821,25 +824,28 @@ namespace SUNDIALS
     /**
      * Handle ARKode exceptions.
      */
-    DeclException1(ExcARKodeError, int, << "One of the SUNDIALS ARKode internal functions "
-                   << " returned a negative error code: "
-                   << arg1 << ". Please consult SUNDIALS manual.");
-
+    DeclException1(ExcARKodeError,
+                   int,
+                   << "One of the SUNDIALS ARKode internal functions "
+                   << " returned a negative error code: " << arg1
+                   << ". Please consult SUNDIALS manual.");
 
   private:
-
     /**
      * Throw an exception when a function with the given name is not implemented.
      */
-    DeclException1(ExcFunctionNotProvided, std::string,
-                   << "Please provide an implementation for the function \"" << arg1 << "\"");
+    DeclException1(ExcFunctionNotProvided,
+                   std::string,
+                   << "Please provide an implementation for the function \""
+                   << arg1 << "\"");
 
     /**
      * This function is executed at construction time to set the
      * std::function above to trigger an assert if they are not
      * implemented.
      */
-    void set_functions_to_trigger_an_assert();
+    void
+    set_functions_to_trigger_an_assert();
 
     /**
      * ARKode configuration data.
@@ -849,7 +855,7 @@ namespace SUNDIALS
     /**
      * ARKode memory object.
      */
-    void *arkode_mem;
+    void* arkode_mem;
 
     /**
      * ARKode solution vector.
@@ -873,23 +879,23 @@ namespace SUNDIALS
      */
     GrowingVectorMemory<VectorType> mem;
 
-#ifdef DEAL_II_WITH_PETSC
-#ifdef PETSC_USE_COMPLEX
+#  ifdef DEAL_II_WITH_PETSC
+#    ifdef PETSC_USE_COMPLEX
     static_assert(!std::is_same<VectorType, PETScWrappers::MPI::Vector>::value,
                   "Sundials does not support complex scalar types, "
                   "but PETSc is configured to use a complex scalar type!");
 
-    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
-                  "Sundials does not support complex scalar types, "
-                  "but PETSc is configured to use a complex scalar type!");
-#endif // PETSC_USE_COMPLEX
-#endif // DEAL_II_WITH_PETSC
+    static_assert(
+      !std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
+      "Sundials does not support complex scalar types, "
+      "but PETSc is configured to use a complex scalar type!");
+#    endif // PETSC_USE_COMPLEX
+#  endif   // DEAL_II_WITH_PETSC
   };
 
-}
+} // namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
 #endif
-
 
 #endif

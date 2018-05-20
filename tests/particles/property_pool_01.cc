@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check the creation, simplest usage, and destruction of a property pool
 
 #include "../tests.h"
@@ -22,17 +20,19 @@
 #include <fstream>
 #include <iomanip>
 
-
-void test ()
+void
+test()
 {
   {
     Particles::PropertyPool pool(1);
 
-    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle
+      = pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 2.5;
 
-    deallog << "Pool properties: " << pool.get_properties(handle)[0] << std::endl;
+    deallog << "Pool properties: " << pool.get_properties(handle)[0]
+            << std::endl;
 
     pool.deallocate_properties_array(handle);
   }
@@ -40,9 +40,8 @@ void test ()
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
   test();

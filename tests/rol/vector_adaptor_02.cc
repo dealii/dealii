@@ -20,9 +20,9 @@
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/optimization/rol/vector_adaptor.h>
 
-#include "ROL_Objective.hpp"
 #include "ROL_Algorithm.hpp"
 #include "ROL_LineSearchStep.hpp"
+#include "ROL_Objective.hpp"
 #include "ROL_StatusTest.hpp"
 #include "Teuchos_GlobalMPISession.hpp"
 
@@ -32,59 +32,53 @@ using namespace dealii;
 
 using VectorType = typename dealii::Vector<double>;
 
-template<class Real=double, typename Xprim=Rol::VectorAdaptor<VectorType> >
+template <class Real = double, typename Xprim = Rol::VectorAdaptor<VectorType>>
 class QuadraticObjective : public ROL::Objective<Real>
 {
-
 private:
-
   Teuchos::RCP<const VectorType>
-  get_rcp_to_VectorType (const ROL::Vector<Real> &x)
+  get_rcp_to_VectorType(const ROL::Vector<Real>& x)
   {
     return (Teuchos::dyn_cast<const Xprim>(x)).getVector();
   }
 
-  Teuchos::RCP<dealii::Vector<Real> >
-  get_rcp_to_VectorType (ROL::Vector<Real> &x)
+  Teuchos::RCP<dealii::Vector<Real>>
+  get_rcp_to_VectorType(ROL::Vector<Real>& x)
   {
     return (Teuchos::dyn_cast<Xprim>(x)).getVector();
   }
 
 public:
-
-  Real value (const ROL::Vector<Real> &x,
-              Real                    &tol)
+  Real
+  value(const ROL::Vector<Real>& x, Real& tol)
   {
-    Assert (x.dimension()==2,
-            ExcInternalError());
+    Assert(x.dimension() == 2, ExcInternalError());
 
     return x.dot(x);
   }
 
-  void gradient (ROL::Vector<Real>       &g,
-                 const ROL::Vector<Real> &x,
-                 Real                    &tol)
+  void
+  gradient(ROL::Vector<Real>& g, const ROL::Vector<Real>& x, Real& tol)
   {
     Teuchos::RCP<const VectorType> xp = this->get_rcp_to_VectorType(x);
-    Teuchos::RCP<VectorType> gp = this->get_rcp_to_VectorType(g);
+    Teuchos::RCP<VectorType>       gp = this->get_rcp_to_VectorType(g);
 
     (*gp)[0] = 2. * (*xp)[0];
     (*gp)[1] = 2. * (*xp)[1];
   }
-
 };
 
-void test (const double x,
-           const double y)
+void
+test(const double x, const double y)
 {
   typedef double RealT;
 
   QuadraticObjective<RealT> quad_objective;
 
   Teuchos::RCP<std::ostream> outStream = Teuchos::rcp(&std::cout, false);
-  Teuchos::RCP<VectorType> x_rcp       = Teuchos::rcp (new VectorType);
+  Teuchos::RCP<VectorType>   x_rcp     = Teuchos::rcp(new VectorType);
 
-  x_rcp->reinit (2);
+  x_rcp->reinit(2);
 
   (*x_rcp)[0] = x;
   (*x_rcp)[1] = y;
@@ -105,17 +99,19 @@ void test (const double x,
   std::cout << (*xg)[0] << " " << (*xg)[1] << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   try
     {
-      test(  10,  -2);
+      test(10, -2);
       test(-0.1, 0.1);
-      test( 9.1,-6.1);
+      test(9.1, -6.1);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -125,9 +121,10 @@ int main (int argc, char **argv)
                 << std::endl;
       throw;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

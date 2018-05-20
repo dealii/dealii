@@ -13,13 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test the PETSc CG solver with PETSc MatrixFree class
 
 // Note: This is (almost) a clone of the tests/petsc/solver_03_mf.cc
 
-#include "../tests.h"
 #include "../petsc/petsc_mf_testmatrix.h" // It is tempting to copy
+#include "../tests.h"
 // ../petsc/petsc_mf_testmatrix.h
 // into this directory and
 // play with it, but, by
@@ -32,18 +31,21 @@
 // numbers to a possibly
 // complex matrix where
 // petsc-scalar=complex.
-#include <iostream>
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector_memory.h>
+#include <iostream>
 #include <typeinfo>
 
 template <class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>
 void
-check_solve( SOLVER &solver, const MATRIX &A,
-             VECTOR &u, VECTOR &f, const PRECONDITION &P)
+check_solve(SOLVER&             solver,
+            const MATRIX&       A,
+            VECTOR&             u,
+            VECTOR&             f,
+            const PRECONDITION& P)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;
 
@@ -51,21 +53,21 @@ check_solve( SOLVER &solver, const MATRIX &A,
   f = 1.;
   try
     {
-      solver.solve(A,u,f,P);
+      solver.solve(A, u, f, P);
     }
-  catch (std::exception &e)
+  catch(std::exception& e)
     {
       std::cout << e.what() << std::endl;
       deallog << e.what() << std::endl;
-      abort ();
+      abort();
     }
 
   deallog << "Solver stopped after " << solver.control().last_step()
           << " iterations" << std::endl;
 }
 
-
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog << std::setprecision(4);
@@ -76,22 +78,21 @@ int main(int argc, char **argv)
     SolverControl control(100, 1.e-3);
 
     const unsigned int size = 32;
-    unsigned int dim = (size-1)*(size-1);
+    unsigned int       dim  = (size - 1) * (size - 1);
 
     deallog << "Size " << size << " Unknowns " << dim << std::endl;
 
-    PetscFDMatrix  A(size, dim);
+    PetscFDMatrix A(size, dim);
 
-    PETScWrappers::MPI::Vector  f(MPI_COMM_WORLD, dim, dim);
-    PETScWrappers::MPI::Vector  u(MPI_COMM_WORLD, dim, dim);
+    PETScWrappers::MPI::Vector f(MPI_COMM_WORLD, dim, dim);
+    PETScWrappers::MPI::Vector u(MPI_COMM_WORLD, dim, dim);
     f = 1.;
-    A.compress (VectorOperation::insert);
-    f.compress (VectorOperation::insert);
-    u.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
+    f.compress(VectorOperation::insert);
+    u.compress(VectorOperation::insert);
 
-    PETScWrappers::SolverCG solver(control);
+    PETScWrappers::SolverCG         solver(control);
     PETScWrappers::PreconditionNone preconditioner(A);
-    check_solve (solver, A,u,f, preconditioner);
+    check_solve(solver, A, u, f, preconditioner);
   }
-
 }

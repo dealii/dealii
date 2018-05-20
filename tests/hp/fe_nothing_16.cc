@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test a problem we used to have: FESystem would delete an internal object
 // after reinitialization for the first time if it determined that it was no
 // longer necessary. yet, somehow, it was still referenced. the point seems to
@@ -24,66 +22,57 @@
 //
 // an extract of this bug is fe/crash_01
 
-
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/hp/fe_collection.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 #include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-
-
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim>       triangulation;
-  GridGenerator :: hyper_cube (triangulation, -0.5, 0.5);
+  Triangulation<dim> triangulation;
+  GridGenerator ::hyper_cube(triangulation, -0.5, 0.5);
 
-  FESystem<dim> fe (FE_Q<dim>(1), 1,
-                    FE_Nothing<dim>(), 1);
-  DoFHandler<dim> dof_handler (triangulation);
-  dof_handler.distribute_dofs (fe);
+  FESystem<dim>   fe(FE_Q<dim>(1), 1, FE_Nothing<dim>(), 1);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(fe);
 
-  QGauss<dim-1> q(2);
-  FEFaceValues<dim> fe_values(fe, q, update_values);
+  QGauss<dim - 1>            q(2);
+  FEFaceValues<dim>          fe_values(fe, q, update_values);
   FEValuesExtractors::Scalar nothing(1);
-  fe_values.reinit (dof_handler.begin_active(), 0);
+  fe_values.reinit(dof_handler.begin_active(), 0);
 
   // the following (second) call to reinit
   // used to abort
-  fe_values.reinit (dof_handler.begin_active(), 1);
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
-      deallog << "i=" << i
-              << ", q=" << q
-              << ", value="
-              << fe_values[nothing].value(i,q)
-              << std::endl;
+  fe_values.reinit(dof_handler.begin_active(), 1);
+  for(unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    for(unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
+      deallog << "i=" << i << ", q=" << q
+              << ", value=" << fe_values[nothing].value(i, q) << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<2> ();
+  test<2>();
 
   deallog << "OK" << std::endl;
 }

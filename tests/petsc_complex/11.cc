@@ -13,30 +13,28 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check PETScWrappers::MPI::Vector::size()
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <iostream>
 
-
-void test (PETScWrappers::MPI::Vector &v)
+void
+test(PETScWrappers::MPI::Vector& v)
 {
   // set only certain elements of the vector
-  for (unsigned int k=0; k<v.size(); k+=1+k)
-    v(k) = std::complex<double> (k,.5*k);
+  for(unsigned int k = 0; k < v.size(); k += 1 + k)
+    v(k) = std::complex<double>(k, .5 * k);
 
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
-  AssertThrow (v.size() == 100, ExcInternalError());
+  AssertThrow(v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -46,12 +44,13 @@ int main (int argc,char **argv)
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 100, 100);
-        test (v);
+        test(v);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -62,9 +61,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

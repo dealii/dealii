@@ -13,27 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check FullMatrix::matrix_norm_square. like the full_matrix_* tests, but use
 // complex-valued matrices and vectors; this time we actually store complex values
 // in them
 
-
 #include "../tests.h"
 #include "full_matrix_common.h"
 
-
-
-
 template <typename number>
 void
-check ()
+check()
 {
-  FullMatrix<std::complex<number> > m;
-  make_complex_square_matrix (m);
-  Vector<std::complex<number> > v;
-  make_complex_range_vector (v);
+  FullMatrix<std::complex<number>> m;
+  make_complex_square_matrix(m);
+  Vector<std::complex<number>> v;
+  make_complex_range_vector(v);
 
-  deallog << m.matrix_norm_square (v) << std::endl;
+  deallog << m.matrix_norm_square(v) << std::endl;
 }

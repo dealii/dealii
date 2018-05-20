@@ -19,15 +19,15 @@
 
 #include <deal.II/base/index_set.h>
 
-int main()
+int
+main()
 {
   initlog();
 
   const unsigned int size = 100;
 
   IndexSet locally_owned(size);
-  locally_owned.add_range(0,size);
+  locally_owned.add_range(0, size);
 
-  deallog << locally_owned.nth_index_in_set(5)
-          << std::endl;
+  deallog << locally_owned.nth_index_in_set(5) << std::endl;
 }

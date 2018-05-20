@@ -13,68 +13,63 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // This test should be run on multiple processors. note that this test also
 // started to fail with the upgrade to petsc 2.2.1 which required a fix in
 // PETScWrappers::MatrixBase::operator=
 
-
 #include "../tests.h"
-#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <vector>
 
-
 template <typename MatrixType>
-void test (MatrixType &m)
+void
+test(MatrixType& m)
 {
-  m.add(0,0,1);
+  m.add(0, 0, 1);
   m.compress(VectorOperation::add);
   m = 0;
 
-  Assert(fabs(m.frobenius_norm())<1e-15, ExcInternalError());
+  Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc,char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
   try
     {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        const unsigned int n_dofs=420;
+        const unsigned int n_dofs = 420;
         // check
         // PETScWrappers::SparseMatrix
-        PETScWrappers::SparseMatrix
-        v1 (n_dofs, n_dofs, 5);
-        test (v1);
+        PETScWrappers::SparseMatrix v1(n_dofs, n_dofs, 5);
+        test(v1);
 
         // check
         // PETScWrappers::MPI::SparseMatrix
-        MPI_Comm mpi_communicator (MPI_COMM_WORLD);
-        int n_jobs=1;
-        MPI_Comm_size (mpi_communicator, &n_jobs);
-        const unsigned int n_mpi_processes=static_cast<unsigned int>(n_jobs);
-        Assert(n_dofs%n_mpi_processes==0, ExcInternalError());
-        const unsigned int n_local_dofs=n_dofs/n_mpi_processes;
-        PETScWrappers::MPI::SparseMatrix
-        v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
-        test (v2);
+        MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+        int      n_jobs = 1;
+        MPI_Comm_size(mpi_communicator, &n_jobs);
+        const unsigned int n_mpi_processes = static_cast<unsigned int>(n_jobs);
+        Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
+        const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
+        PETScWrappers::MPI::SparseMatrix v2(
+          mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
+        test(v2);
       }
-
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -85,9 +80,10 @@ int main (int argc,char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

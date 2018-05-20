@@ -13,11 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_restriction_common.h"
-
-
 
 int
 main()

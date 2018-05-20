@@ -13,33 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // SparsityPattern::copy_from used to be of quadratic complexity for
 // DynamicSparsityPattern arguments with many empty rows. Create a big
 // sparsity pattern of 10m elements and only put an entry into the last
 // row. The old code would time out.
 
 #include "../tests.h"
-#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <list>
 #include <set>
 
-
 int
-main ()
+main()
 {
   std::ofstream logfile("output");
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  DynamicSparsityPattern csp (10000000, 100);
+  DynamicSparsityPattern csp(10000000, 100);
   csp.add(9999999, 1);
 
   SparsityPattern sp;
-  sp.copy_from (csp);
+  sp.copy_from(csp);
 
   deallog << "OK" << std::endl;
 }

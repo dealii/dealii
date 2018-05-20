@@ -20,17 +20,18 @@
 #include <deal.II/base/exceptions.h>
 
 #include <array>
-#include <vector>
-#include <iostream>
 #include <cstdint>
+#include <iostream>
+#include <vector>
 
 #ifdef DEAL_II_WITH_P4EST
-#include <deal.II/distributed/p4est_wrappers.h>
+#  include <deal.II/distributed/p4est_wrappers.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int, int> class Triangulation;
+template <int, int>
+class Triangulation;
 
 /**
  * A class to represent a unique ID for a cell in a Triangulation. It is
@@ -80,8 +81,8 @@ public:
    * and the number of children of a cell in the current space dimension (i.e.,
    * GeometryInfo<dim>::max_children_per_cell).
    */
-  CellId(const unsigned int coarse_cell_id,
-         const std::vector<std::uint8_t> &child_indices);
+  CellId(const unsigned int               coarse_cell_id,
+         const std::vector<std::uint8_t>& child_indices);
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and array of
@@ -96,13 +97,13 @@ public:
    */
   CellId(const unsigned int  coarse_cell_id,
          const unsigned int  n_child_indices,
-         const std::uint8_t *child_indices);
+         const std::uint8_t* child_indices);
 
   /**
    * Construct a CellId object with a given binary representation that was
    * previously constructed by CellId::to_binary.
    */
-  CellId(const binary_type &binary_representation);
+  CellId(const binary_type& binary_representation);
 
   /**
    * Construct an invalid CellId.
@@ -112,43 +113,49 @@ public:
   /**
    * Return a human readable string representation of this CellId.
    */
-  std::string to_string() const;
+  std::string
+  to_string() const;
 
   /**
    * Return a compact and fast binary representation of this CellId.
    */
   template <int dim>
-  binary_type to_binary() const;
+  binary_type
+  to_binary() const;
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
    */
   template <int dim, int spacedim>
-  typename Triangulation<dim,spacedim>::cell_iterator
-  to_cell(const Triangulation<dim,spacedim> &tria) const;
+  typename Triangulation<dim, spacedim>::cell_iterator
+  to_cell(const Triangulation<dim, spacedim>& tria) const;
 
   /**
    * Compare two CellId objects for equality.
    */
-  bool operator== (const CellId &other) const;
+  bool
+  operator==(const CellId& other) const;
 
   /**
    * Compare two CellIds for inequality.
    */
-  bool operator!= (const CellId &other) const;
+  bool
+  operator!=(const CellId& other) const;
 
   /**
    * Compare two CellIds with regard to an ordering. The details of this
    * ordering are unspecified except that the operation provides a
    * total ordering among all cells.
    */
-  bool operator<(const CellId &other) const;
+  bool
+  operator<(const CellId& other) const;
 
   /**
    * Boost serialization function
    */
-  template<class Archive>
-  void serialize(Archive &ar, const unsigned int version );
+  template <class Archive>
+  void
+  serialize(Archive& ar, const unsigned int version);
 
 private:
   /**
@@ -173,27 +180,26 @@ private:
    * the array can be extended.
    */
 #ifdef DEAL_II_WITH_P4EST
-  std::array<std::uint8_t,internal::p4est::functions<2>::max_level> child_indices;
+  std::array<std::uint8_t, internal::p4est::functions<2>::max_level>
+    child_indices;
 #else
-  std::array<std::uint8_t,30> child_indices;
+  std::array<std::uint8_t, 30> child_indices;
 #endif
 
-  friend std::istream &operator>> (std::istream &is, CellId &cid);
-  friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
+  friend std::istream&
+  operator>>(std::istream& is, CellId& cid);
+  friend std::ostream&
+  operator<<(std::ostream& os, const CellId& cid);
 };
-
-
-
 
 /**
  * Write a CellId object into a stream.
  */
-inline
-std::ostream &operator<< (std::ostream &os,
-                          const CellId &cid)
+inline std::ostream&
+operator<<(std::ostream& os, const CellId& cid)
 {
   os << cid.coarse_cell_id << '_' << cid.n_child_indices << ':';
-  for (unsigned int i=0; i<cid.n_child_indices; ++i)
+  for(unsigned int i = 0; i < cid.n_child_indices; ++i)
     // write the child indices. because they are between 0 and 2^dim-1, they all
     // just have one digit, so we could write them as one character
     // objects. it's probably clearer to write them as one-digit characters
@@ -202,96 +208,88 @@ std::ostream &operator<< (std::ostream &os,
   return os;
 }
 
-
-
 /**
  * Serialization function
  */
-template<class Archive>
-void CellId::serialize(Archive &ar, const unsigned int /*version*/)
+template <class Archive>
+void
+CellId::serialize(Archive& ar, const unsigned int /*version*/)
 {
-  ar &coarse_cell_id;
-  ar &n_child_indices;
-  ar &child_indices;
+  ar& coarse_cell_id;
+  ar& n_child_indices;
+  ar& child_indices;
 }
 
 /**
  * Read a CellId object from a stream.
  */
-inline
-std::istream &operator>> (std::istream &is,
-                          CellId &cid)
+inline std::istream&
+operator>>(std::istream& is, CellId& cid)
 {
   unsigned int cellid;
   is >> cellid;
-  if (is.eof())
+  if(is.eof())
     return is;
 
   cid.coarse_cell_id = cellid;
   char dummy;
   is >> dummy;
-  Assert(dummy=='_', ExcMessage("invalid CellId"));
+  Assert(dummy == '_', ExcMessage("invalid CellId"));
   is >> cid.n_child_indices;
   is >> dummy;
-  Assert(dummy==':', ExcMessage("invalid CellId"));
+  Assert(dummy == ':', ExcMessage("invalid CellId"));
 
   unsigned char value;
-  for (unsigned int i=0; i<cid.n_child_indices; ++i)
+  for(unsigned int i = 0; i < cid.n_child_indices; ++i)
     {
       // read the one-digit child index (as an integer number) and
       // convert it back into unsigned integer type
       is >> value;
-      cid.child_indices[i] = value-'0';
+      cid.child_indices[i] = value - '0';
     }
   return is;
 }
 
-
-
 inline bool
-CellId::operator== (const CellId &other) const
+CellId::operator==(const CellId& other) const
 {
-  if (this->coarse_cell_id != other.coarse_cell_id)
+  if(this->coarse_cell_id != other.coarse_cell_id)
     return false;
-  if (n_child_indices != other.n_child_indices)
+  if(n_child_indices != other.n_child_indices)
     return false;
 
-  for (unsigned int i=0; i<n_child_indices; ++i)
-    if (child_indices[i] != other.child_indices[i])
+  for(unsigned int i = 0; i < n_child_indices; ++i)
+    if(child_indices[i] != other.child_indices[i])
       return false;
 
   return true;
 }
 
-
-
 inline bool
-CellId::operator!= (const CellId &other) const
+CellId::operator!=(const CellId& other) const
 {
   return !(*this == other);
 }
 
-
-
-inline
-bool CellId::operator<(const CellId &other) const
+inline bool
+CellId::operator<(const CellId& other) const
 {
-  if (this->coarse_cell_id != other.coarse_cell_id)
+  if(this->coarse_cell_id != other.coarse_cell_id)
     return this->coarse_cell_id < other.coarse_cell_id;
 
   unsigned int idx = 0;
-  while (idx < n_child_indices)
+  while(idx < n_child_indices)
     {
-      if (idx>=other.n_child_indices)
+      if(idx >= other.n_child_indices)
         return false;
 
-      if (child_indices[idx] != other.child_indices[idx])
+      if(child_indices[idx] != other.child_indices[idx])
         return child_indices[idx] < other.child_indices[idx];
 
       ++idx;
     }
 
-  if (n_child_indices == other.n_child_indices)
+  if(n_child_indices == other.n_child_indices)
     return false;
   return true; // other.id is longer
 }

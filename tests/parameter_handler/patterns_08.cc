@@ -13,24 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 
   // create a pattern and let it
   // output its description
-  std::vector<std::unique_ptr<Patterns::PatternBase> > ps;
+  std::vector<std::unique_ptr<Patterns::PatternBase>> ps;
   ps.push_back(std_cxx14::make_unique<Patterns::Integer>());
   ps.push_back(std_cxx14::make_unique<Patterns::Double>());
   ps.push_back(std_cxx14::make_unique<Patterns::Anything>());
 
-  Patterns::Tuple pattern(ps, ";");
+  Patterns::Tuple   pattern(ps, ";");
   const std::string desc = pattern.description();
 
   // now let the same class re-create
@@ -38,10 +38,10 @@ int main()
   // description and verify that the
   // result is the same as what we
   // started out with
-  std::unique_ptr<Patterns::Tuple> pattern2 = Patterns::Tuple::create (desc);
+  std::unique_ptr<Patterns::Tuple> pattern2 = Patterns::Tuple::create(desc);
 
-  AssertThrow (pattern2 != nullptr, ExcInternalError());
-  AssertThrow (desc == pattern2->description(), ExcInternalError());
+  AssertThrow(pattern2 != nullptr, ExcInternalError());
+  AssertThrow(desc == pattern2->description(), ExcInternalError());
 
   deallog << desc << std::endl;
 }

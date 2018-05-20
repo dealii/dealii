@@ -17,18 +17,15 @@
 #define dealii_transformations_h
 
 #include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
 namespace Physics
 {
-
   namespace Transformations
   {
-
     /**
      * Transformation functions and tensors that are defined in terms of
      * rotation angles and axes of rotation.
@@ -40,7 +37,7 @@ namespace Physics
       /**
        * @name Rotation matrices
        */
-//@{
+      //@{
 
       /**
        * Return the rotation matrix for 2-d Euclidean space, namely
@@ -58,9 +55,8 @@ namespace Physics
        * @param[in] angle The rotation angle (about the z-axis) in radians
        */
       template <typename Number>
-      Tensor<2,2,Number>
-      rotation_matrix_2d (const Number &angle);
-
+      Tensor<2, 2, Number>
+      rotation_matrix_2d(const Number& angle);
 
       /**
        * Return the rotation matrix for 3-d Euclidean space. Most concisely
@@ -91,13 +87,12 @@ namespace Physics
        * @param[in] angle The rotation angle in radians
        */
       template <typename Number>
-      Tensor<2,3,Number>
-      rotation_matrix_3d (const Point<3,Number> &axis,
-                          const Number          &angle);
+      Tensor<2, 3, Number>
+      rotation_matrix_3d(const Point<3, Number>& axis, const Number& angle);
 
-//@}
+      //@}
 
-    }
+    } // namespace Rotations
 
     /**
      * Transformation of tensors that are defined in terms of a set of
@@ -119,11 +114,10 @@ namespace Physics
      */
     namespace Contravariant
     {
-
       /**
        * @name Push forward operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the push forward transformation on a
@@ -139,9 +133,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{V} \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      push_forward (const Tensor<1,dim,Number> &V,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      push_forward(const Tensor<1, dim, Number>& V,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -157,9 +151,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      push_forward (const Tensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      push_forward(const Tensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -176,9 +170,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      push_forward (const SymmetricTensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      push_forward(const SymmetricTensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -194,9 +188,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      push_forward (const Tensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      push_forward(const Tensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -213,16 +207,16 @@ namespace Physics
        * @return      $\chi\left( \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      push_forward (const SymmetricTensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      push_forward(const SymmetricTensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>&          F);
 
-//@}
+      //@}
 
       /**
        * @name Pull back operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the pull back transformation on a contravariant
@@ -238,9 +232,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{v} \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      pull_back (const Tensor<1,dim,Number> &v,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      pull_back(const Tensor<1, dim, Number>& v,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -256,9 +250,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{t} \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      pull_back (const Tensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      pull_back(const Tensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -274,9 +268,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{t} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      pull_back (const SymmetricTensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      pull_back(const SymmetricTensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -292,9 +286,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{h} \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      pull_back (const Tensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      pull_back(const Tensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -310,12 +304,12 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{h} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      pull_back (const SymmetricTensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      pull_back(const SymmetricTensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>&          F);
 
-//@}
-    }
+      //@}
+    } // namespace Contravariant
 
     /**
      * Transformation of tensors that are defined in terms of a set of
@@ -338,11 +332,10 @@ namespace Physics
      */
     namespace Covariant
     {
-
       /**
        * @name Push forward operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the push forward transformation on a covariant
@@ -358,9 +351,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{V} \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      push_forward (const Tensor<1,dim,Number> &V,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      push_forward(const Tensor<1, dim, Number>& V,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -376,9 +369,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      push_forward (const Tensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      push_forward(const Tensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -395,9 +388,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      push_forward (const SymmetricTensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      push_forward(const SymmetricTensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -413,9 +406,9 @@ namespace Physics
        * @return      $\chi\left( \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      push_forward (const Tensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      push_forward(const Tensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -432,16 +425,16 @@ namespace Physics
        * @return      $\chi\left( \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      push_forward (const SymmetricTensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      push_forward(const SymmetricTensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>&          F);
 
-//@}
+      //@}
 
       /**
        * @name Pull back operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the pull back transformation on a covariant
@@ -457,9 +450,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{v} \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      pull_back (const Tensor<1,dim,Number> &v,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      pull_back(const Tensor<1, dim, Number>& v,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -475,9 +468,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{t} \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      pull_back (const Tensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      pull_back(const Tensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -493,9 +486,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{t} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      pull_back (const SymmetricTensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      pull_back(const SymmetricTensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -511,9 +504,9 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{h} \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      pull_back (const Tensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      pull_back(const Tensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -529,12 +522,12 @@ namespace Physics
        * @return      $\chi^{-1}\left( \mathbf{h} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      pull_back (const SymmetricTensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      pull_back(const SymmetricTensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>&          F);
 
-//@}
-    }
+      //@}
+    } // namespace Covariant
 
     /**
      * Transformation of tensors that are defined in terms of a set of
@@ -545,11 +538,10 @@ namespace Physics
      */
     namespace Piola
     {
-
       /**
        * @name Push forward operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the push forward transformation on a
@@ -566,9 +558,9 @@ namespace Physics
        * \mathbf{V} \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      push_forward (const Tensor<1,dim,Number> &V,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      push_forward(const Tensor<1, dim, Number>& V,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -585,9 +577,9 @@ namespace Physics
        * \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      push_forward (const Tensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      push_forward(const Tensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-2
@@ -605,9 +597,9 @@ namespace Physics
        * \mathbf{T} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      push_forward (const SymmetricTensor<2,dim,Number> &T,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      push_forward(const SymmetricTensor<2, dim, Number>& T,
+                   const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -624,9 +616,9 @@ namespace Physics
        * \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      push_forward (const Tensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      push_forward(const Tensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the push forward transformation on a rank-4
@@ -644,16 +636,16 @@ namespace Physics
        * \mathbf{H} \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      push_forward (const SymmetricTensor<4,dim,Number> &H,
-                    const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      push_forward(const SymmetricTensor<4, dim, Number>& H,
+                   const Tensor<2, dim, Number>&          F);
 
-//@}
+      //@}
 
       /**
        * @name Pull back operations
        */
-//@{
+      //@{
 
       /**
        * Return the result of the pull back transformation on a contravariant
@@ -670,9 +662,9 @@ namespace Physics
        * \right)$
        */
       template <int dim, typename Number>
-      Tensor<1,dim,Number>
-      pull_back (const Tensor<1,dim,Number> &v,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<1, dim, Number>
+      pull_back(const Tensor<1, dim, Number>& v,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -689,9 +681,9 @@ namespace Physics
        * \right)$
        */
       template <int dim, typename Number>
-      Tensor<2,dim,Number>
-      pull_back (const Tensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<2, dim, Number>
+      pull_back(const Tensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-2
@@ -708,9 +700,9 @@ namespace Physics
        * \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<2,dim,Number>
-      pull_back (const SymmetricTensor<2,dim,Number> &t,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<2, dim, Number>
+      pull_back(const SymmetricTensor<2, dim, Number>& t,
+                const Tensor<2, dim, Number>&          F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -727,9 +719,9 @@ namespace Physics
        * \right)$
        */
       template <int dim, typename Number>
-      Tensor<4,dim,Number>
-      pull_back (const Tensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number> &F);
+      Tensor<4, dim, Number>
+      pull_back(const Tensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>& F);
 
       /**
        * Return the result of the pull back transformation on a rank-4
@@ -746,17 +738,17 @@ namespace Physics
        * \right)$
        */
       template <int dim, typename Number>
-      SymmetricTensor<4,dim,Number>
-      pull_back (const SymmetricTensor<4,dim,Number> &h,
-                 const Tensor<2,dim,Number>          &F);
+      SymmetricTensor<4, dim, Number>
+      pull_back(const SymmetricTensor<4, dim, Number>& h,
+                const Tensor<2, dim, Number>&          F);
 
-//@}
-    }
+      //@}
+    } // namespace Piola
 
     /**
      * @name Special operations
      */
-//@{
+    //@{
 
     /**
      * Return the result of applying Nanson's formula for the transformation
@@ -781,15 +773,13 @@ namespace Physics
      * @dealiiHolzapfelA{75,2.55} @dealiiWriggersA{23,3.11}
      */
     template <int dim, typename Number>
-    Tensor<1,dim,Number>
-    nansons_formula (const Tensor<1,dim,Number> &N,
-                     const Tensor<2,dim,Number> &F);
+    Tensor<1, dim, Number>
+    nansons_formula(const Tensor<1, dim, Number>& N,
+                    const Tensor<2, dim, Number>& F);
 
-//@}
-  }
-}
-
-
+    //@}
+  } // namespace Transformations
+} // namespace Physics
 
 #ifndef DOXYGEN
 
@@ -802,55 +792,46 @@ namespace internal
     namespace
     {
       template <int dim, typename Number>
-      inline
-      Tensor<1,dim,Number>
-      transformation_contraction (const Tensor<1,dim,Number> &V,
-                                  const Tensor<2,dim,Number> &F)
+      inline Tensor<1, dim, Number>
+      transformation_contraction(const Tensor<1, dim, Number>& V,
+                                 const Tensor<2, dim, Number>& F)
       {
-        return contract<1,0>(F, V);
+        return contract<1, 0>(F, V);
       }
 
-
-
       template <int dim, typename Number>
-      inline
-      Tensor<2,dim,Number>
-      transformation_contraction (const Tensor<2,dim,Number> &T,
-                                  const Tensor<2,dim,Number> &F)
+      inline Tensor<2, dim, Number>
+      transformation_contraction(const Tensor<2, dim, Number>& T,
+                                 const Tensor<2, dim, Number>& F)
       {
-        return contract<1,0>(F,contract<1,1>(T, F));
+        return contract<1, 0>(F, contract<1, 1>(T, F));
       }
 
-
-
       template <int dim, typename Number>
-      inline
-      dealii::SymmetricTensor<2,dim,Number>
-      transformation_contraction (const dealii::SymmetricTensor<2,dim,Number> &T,
-                                  const Tensor<2,dim,Number>                  &F)
+      inline dealii::SymmetricTensor<2, dim, Number>
+      transformation_contraction(
+        const dealii::SymmetricTensor<2, dim, Number>& T,
+        const Tensor<2, dim, Number>&                  F)
       {
-        Tensor<2,dim,Number> tmp_1;
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int J=0; J<dim; ++J)
-            for (unsigned int I=0; I<dim; ++I)
+        Tensor<2, dim, Number> tmp_1;
+        for(unsigned int i = 0; i < dim; ++i)
+          for(unsigned int J = 0; J < dim; ++J)
+            for(unsigned int I = 0; I < dim; ++I)
               tmp_1[i][J] += F[i][I] * T[I][J];
 
-        dealii::SymmetricTensor<2,dim,Number> out;
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=i; j<dim; ++j)
-            for (unsigned int J=0; J<dim; ++J)
+        dealii::SymmetricTensor<2, dim, Number> out;
+        for(unsigned int i = 0; i < dim; ++i)
+          for(unsigned int j = i; j < dim; ++j)
+            for(unsigned int J = 0; J < dim; ++J)
               out[i][j] += F[j][J] * tmp_1[i][J];
 
         return out;
       }
 
-
-
       template <int dim, typename Number>
-      inline
-      Tensor<4,dim,Number>
-      transformation_contraction (const Tensor<4,dim,Number> &H,
-                                  const Tensor<2,dim,Number> &F)
+      inline Tensor<4, dim, Number>
+      transformation_contraction(const Tensor<4, dim, Number>& H,
+                                 const Tensor<2, dim, Number>& F)
       {
         // This contraction order and indexing might look a bit dubious, so a
         // quick explanation as to what's going on is probably in order:
@@ -871,16 +852,15 @@ namespace internal
         //
         // Note: Its significantly quicker (in 3d) to push forward
         // each index individually
-        return contract<1,1>(F,contract<1,1>(F,contract<2,1>(contract<2,1>(H,F), F)));
+        return contract<1, 1>(
+          F, contract<1, 1>(F, contract<2, 1>(contract<2, 1>(H, F), F)));
       }
 
-
-
       template <int dim, typename Number>
-      inline
-      dealii::SymmetricTensor<4,dim,Number>
-      transformation_contraction (const dealii::SymmetricTensor<4,dim,Number> &H,
-                                  const Tensor<2,dim,Number>                  &F)
+      inline dealii::SymmetricTensor<4, dim, Number>
+      transformation_contraction(
+        const dealii::SymmetricTensor<4, dim, Number>& H,
+        const Tensor<2, dim, Number>&                  F)
       {
         // The first and last transformation operations respectively
         // break and recover the symmetry properties of the tensors.
@@ -898,419 +878,331 @@ namespace internal
         // each index individually
 
         // Push forward (inner) index 1
-        Tensor<4,dim,Number> tmp;
-        for (unsigned int I=0; I<dim; ++I)
-          for (unsigned int j=0; j<dim; ++j)
-            for (unsigned int K=0; K<dim; ++K)
-              for (unsigned int L=0; L<dim; ++L)
-                for (unsigned int J=0; J<dim; ++J)
+        Tensor<4, dim, Number> tmp;
+        for(unsigned int I = 0; I < dim; ++I)
+          for(unsigned int j = 0; j < dim; ++j)
+            for(unsigned int K = 0; K < dim; ++K)
+              for(unsigned int L = 0; L < dim; ++L)
+                for(unsigned int J = 0; J < dim; ++J)
                   tmp[I][j][K][L] += F[j][J] * H[I][J][K][L];
 
         // Push forward (outer) indices 0 and 3
-        tmp = contract<1,0>(F, contract<3,1>(tmp,F));
+        tmp = contract<1, 0>(F, contract<3, 1>(tmp, F));
 
         // Push forward (inner) index 2
-        dealii::SymmetricTensor<4,dim,Number> out;
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=i; j<dim; ++j)
-            for (unsigned int k=0; k<dim; ++k)
-              for (unsigned int l=k; l<dim; ++l)
-                for (unsigned int K=0; K<dim; ++K)
+        dealii::SymmetricTensor<4, dim, Number> out;
+        for(unsigned int i = 0; i < dim; ++i)
+          for(unsigned int j = i; j < dim; ++j)
+            for(unsigned int k = 0; k < dim; ++k)
+              for(unsigned int l = k; l < dim; ++l)
+                for(unsigned int K = 0; K < dim; ++K)
                   out[i][j][k][l] += F[k][K] * tmp[i][j][K][l];
 
         return out;
       }
-    }
-  }
-}
-
-
+    } // namespace
+  }   // namespace Physics
+} // namespace internal
 
 template <typename Number>
-Tensor<2,2,Number>
-Physics::Transformations::Rotations::rotation_matrix_2d (const Number &angle)
+Tensor<2, 2, Number>
+Physics::Transformations::Rotations::rotation_matrix_2d(const Number& angle)
 {
   const double rotation[2][2]
-  = {{
-      std::cos(angle), -std::sin(angle)
-    },
-    {
-      std::sin(angle), std::cos(angle)
-    }
-  };
-  return Tensor<2,2> (rotation);
+    = {{std::cos(angle), -std::sin(angle)}, {std::sin(angle), std::cos(angle)}};
+  return Tensor<2, 2>(rotation);
 }
 
-
-
 template <typename Number>
-Tensor<2,3,Number>
-Physics::Transformations::Rotations::rotation_matrix_3d (const Point<3,Number> &axis,
-                                                         const Number          &angle)
+Tensor<2, 3, Number>
+Physics::Transformations::Rotations::rotation_matrix_3d(
+  const Point<3, Number>& axis,
+  const Number&           angle)
 {
   Assert(std::abs(axis.norm() - 1.0) < 1e-9,
          ExcMessage("The supplied axial vector is not a unit vector."));
-  const Number c = std::cos(angle);
-  const Number s = std::sin(angle);
-  const Number t = 1.-c;
-  const double rotation[3][3]
-  = {{
-      t *axis[0] *axis[0] + c,
-      t *axis[0] *axis[1] - s *axis[2],
-      t *axis[0] *axis[2] + s *axis[1]
-    },
-    {
-      t *axis[0] *axis[1] + s *axis[2],
-      t *axis[1] *axis[1] + c,
-      t *axis[1] *axis[2] - s *axis[0]
-    },
-    {
-      t *axis[0] *axis[2] - s *axis[1],
-      t *axis[1] *axis[2] + s *axis[0],
-      t *axis[2] *axis[2] + c
-    }
-  };
-  return Tensor<2,3,Number>(rotation);
+  const Number c              = std::cos(angle);
+  const Number s              = std::sin(angle);
+  const Number t              = 1. - c;
+  const double rotation[3][3] = {{t * axis[0] * axis[0] + c,
+                                  t * axis[0] * axis[1] - s * axis[2],
+                                  t * axis[0] * axis[2] + s * axis[1]},
+                                 {t * axis[0] * axis[1] + s * axis[2],
+                                  t * axis[1] * axis[1] + c,
+                                  t * axis[1] * axis[2] - s * axis[0]},
+                                 {t * axis[0] * axis[2] - s * axis[1],
+                                  t * axis[1] * axis[2] + s * axis[0],
+                                  t * axis[2] * axis[2] + c}};
+  return Tensor<2, 3, Number>(rotation);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Contravariant::push_forward (const Tensor<1,dim,Number> &V,
-                                                       const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Contravariant::push_forward(
+  const Tensor<1, dim, Number>& V,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(V,F);
+  return internal::Physics::transformation_contraction(V, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Contravariant::push_forward (const Tensor<2,dim,Number> &T,
-                                                       const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Contravariant::push_forward(
+  const Tensor<2, dim, Number>& T,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(T,F);
+  return internal::Physics::transformation_contraction(T, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Contravariant::push_forward (const SymmetricTensor<2,dim,Number> &T,
-                                                       const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Contravariant::push_forward(
+  const SymmetricTensor<2, dim, Number>& T,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(T,F);
+  return internal::Physics::transformation_contraction(T, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Contravariant::push_forward (const Tensor<4,dim,Number> &H,
-                                                       const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Contravariant::push_forward(
+  const Tensor<4, dim, Number>& H,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(H,F);
+  return internal::Physics::transformation_contraction(H, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Contravariant::push_forward (const SymmetricTensor<4,dim,Number> &H,
-                                                       const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Contravariant::push_forward(
+  const SymmetricTensor<4, dim, Number>& H,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(H,F);
+  return internal::Physics::transformation_contraction(H, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Contravariant::pull_back (const Tensor<1,dim,Number> &v,
-                                                    const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Contravariant::pull_back(
+  const Tensor<1, dim, Number>& v,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(v,invert(F));
+  return internal::Physics::transformation_contraction(v, invert(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Contravariant::pull_back (const Tensor<2,dim,Number> &t,
-                                                    const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Contravariant::pull_back(
+  const Tensor<2, dim, Number>& t,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(t,invert(F));
+  return internal::Physics::transformation_contraction(t, invert(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Contravariant::pull_back (const SymmetricTensor<2,dim,Number> &t,
-                                                    const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Contravariant::pull_back(
+  const SymmetricTensor<2, dim, Number>& t,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(t,invert(F));
+  return internal::Physics::transformation_contraction(t, invert(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Contravariant::pull_back (const Tensor<4,dim,Number> &h,
-                                                    const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Contravariant::pull_back(
+  const Tensor<4, dim, Number>& h,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(h,invert(F));
+  return internal::Physics::transformation_contraction(h, invert(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Contravariant::pull_back (const SymmetricTensor<4,dim,Number> &h,
-                                                    const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Contravariant::pull_back(
+  const SymmetricTensor<4, dim, Number>& h,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(h,invert(F));
+  return internal::Physics::transformation_contraction(h, invert(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Covariant::push_forward (const Tensor<1,dim,Number> &V,
-                                                   const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Covariant::push_forward(
+  const Tensor<1, dim, Number>& V,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(V,transpose(invert(F)));
+  return internal::Physics::transformation_contraction(V, transpose(invert(F)));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Covariant::push_forward (const Tensor<2,dim,Number> &T,
-                                                   const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Covariant::push_forward(
+  const Tensor<2, dim, Number>& T,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(T,transpose(invert(F)));
+  return internal::Physics::transformation_contraction(T, transpose(invert(F)));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Covariant::push_forward (const SymmetricTensor<2,dim,Number> &T,
-                                                   const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Covariant::push_forward(
+  const SymmetricTensor<2, dim, Number>& T,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(T,transpose(invert(F)));
+  return internal::Physics::transformation_contraction(T, transpose(invert(F)));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Covariant::push_forward (const Tensor<4,dim,Number> &H,
-                                                   const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Covariant::push_forward(
+  const Tensor<4, dim, Number>& H,
+  const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(H,transpose(invert(F)));
+  return internal::Physics::transformation_contraction(H, transpose(invert(F)));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Covariant::push_forward (const SymmetricTensor<4,dim,Number> &H,
-                                                   const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Covariant::push_forward(
+  const SymmetricTensor<4, dim, Number>& H,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(H,transpose(invert(F)));
+  return internal::Physics::transformation_contraction(H, transpose(invert(F)));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Covariant::pull_back (const Tensor<1,dim,Number> &v,
-                                                const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Covariant::pull_back(const Tensor<1, dim, Number>& v,
+                                               const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(v,transpose(F));
+  return internal::Physics::transformation_contraction(v, transpose(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Covariant::pull_back (const Tensor<2,dim,Number> &t,
-                                                const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Covariant::pull_back(const Tensor<2, dim, Number>& t,
+                                               const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(t,transpose(F));
+  return internal::Physics::transformation_contraction(t, transpose(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Covariant::pull_back (const SymmetricTensor<2,dim,Number> &t,
-                                                const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Covariant::pull_back(
+  const SymmetricTensor<2, dim, Number>& t,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(t,transpose(F));
+  return internal::Physics::transformation_contraction(t, transpose(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Covariant::pull_back (const Tensor<4,dim,Number> &h,
-                                                const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Covariant::pull_back(const Tensor<4, dim, Number>& h,
+                                               const Tensor<2, dim, Number>& F)
 {
-  return internal::Physics::transformation_contraction(h,transpose(F));
+  return internal::Physics::transformation_contraction(h, transpose(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Covariant::pull_back (const SymmetricTensor<4,dim,Number> &h,
-                                                const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Covariant::pull_back(
+  const SymmetricTensor<4, dim, Number>& h,
+  const Tensor<2, dim, Number>&          F)
 {
-  return internal::Physics::transformation_contraction(h,transpose(F));
+  return internal::Physics::transformation_contraction(h, transpose(F));
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Piola::push_forward (const Tensor<1,dim,Number> &V,
-                                               const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Piola::push_forward(const Tensor<1, dim, Number>& V,
+                                              const Tensor<2, dim, Number>& F)
 {
-  return Number(1.0/determinant(F))*Contravariant::push_forward(V,F);
+  return Number(1.0 / determinant(F)) * Contravariant::push_forward(V, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Piola::push_forward (const Tensor<2,dim,Number> &T,
-                                               const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Piola::push_forward(const Tensor<2, dim, Number>& T,
+                                              const Tensor<2, dim, Number>& F)
 {
-  return Number(1.0/determinant(F))*Contravariant::push_forward(T,F);
+  return Number(1.0 / determinant(F)) * Contravariant::push_forward(T, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Piola::push_forward (const SymmetricTensor<2,dim,Number> &T,
-                                               const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Piola::push_forward(
+  const SymmetricTensor<2, dim, Number>& T,
+  const Tensor<2, dim, Number>&          F)
 {
-  return Number(1.0/determinant(F))*Contravariant::push_forward(T,F);
+  return Number(1.0 / determinant(F)) * Contravariant::push_forward(T, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Piola::push_forward (const Tensor<4,dim,Number> &H,
-                                               const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Piola::push_forward(const Tensor<4, dim, Number>& H,
+                                              const Tensor<2, dim, Number>& F)
 {
-  return Number(1.0/determinant(F))*Contravariant::push_forward(H,F);
+  return Number(1.0 / determinant(F)) * Contravariant::push_forward(H, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Piola::push_forward (const SymmetricTensor<4,dim,Number> &H,
-                                               const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Piola::push_forward(
+  const SymmetricTensor<4, dim, Number>& H,
+  const Tensor<2, dim, Number>&          F)
 {
-  return Number(1.0/determinant(F))*Contravariant::push_forward(H,F);
+  return Number(1.0 / determinant(F)) * Contravariant::push_forward(H, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<1,dim,Number>
-Physics::Transformations::Piola::pull_back (const Tensor<1,dim,Number> &v,
-                                            const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::Piola::pull_back(const Tensor<1, dim, Number>& v,
+                                           const Tensor<2, dim, Number>& F)
 {
-  return Number(determinant(F))*Contravariant::pull_back(v,F);
+  return Number(determinant(F)) * Contravariant::pull_back(v, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<2,dim,Number>
-Physics::Transformations::Piola::pull_back (const Tensor<2,dim,Number> &t,
-                                            const Tensor<2,dim,Number> &F)
+inline Tensor<2, dim, Number>
+Physics::Transformations::Piola::pull_back(const Tensor<2, dim, Number>& t,
+                                           const Tensor<2, dim, Number>& F)
 {
-  return Number(determinant(F))*Contravariant::pull_back(t,F);
+  return Number(determinant(F)) * Contravariant::pull_back(t, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<2,dim,Number>
-Physics::Transformations::Piola::pull_back (const SymmetricTensor<2,dim,Number> &t,
-                                            const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<2, dim, Number>
+Physics::Transformations::Piola::pull_back(
+  const SymmetricTensor<2, dim, Number>& t,
+  const Tensor<2, dim, Number>&          F)
 {
-  return Number(determinant(F))*Contravariant::pull_back(t,F);
+  return Number(determinant(F)) * Contravariant::pull_back(t, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-Tensor<4,dim,Number>
-Physics::Transformations::Piola::pull_back (const Tensor<4,dim,Number> &h,
-                                            const Tensor<2,dim,Number> &F)
+inline Tensor<4, dim, Number>
+Physics::Transformations::Piola::pull_back(const Tensor<4, dim, Number>& h,
+                                           const Tensor<2, dim, Number>& F)
 {
-  return Number(determinant(F))*Contravariant::pull_back(h,F);
+  return Number(determinant(F)) * Contravariant::pull_back(h, F);
 }
 
-
-
 template <int dim, typename Number>
-inline
-SymmetricTensor<4,dim,Number>
-Physics::Transformations::Piola::pull_back (const SymmetricTensor<4,dim,Number> &h,
-                                            const Tensor<2,dim,Number>          &F)
+inline SymmetricTensor<4, dim, Number>
+Physics::Transformations::Piola::pull_back(
+  const SymmetricTensor<4, dim, Number>& h,
+  const Tensor<2, dim, Number>&          F)
 {
-  return Number(determinant(F))*Contravariant::pull_back(h,F);
+  return Number(determinant(F)) * Contravariant::pull_back(h, F);
 }
 
-
-
 template <int dim, typename Number>
-inline Tensor<1,dim,Number>
-Physics::Transformations::nansons_formula (const Tensor<1,dim,Number> &N,
-                                           const Tensor<2,dim,Number> &F)
+inline Tensor<1, dim, Number>
+Physics::Transformations::nansons_formula(const Tensor<1, dim, Number>& N,
+                                          const Tensor<2, dim, Number>& F)
 {
-  return cofactor(F)*N;
+  return cofactor(F) * N;
 }
 
 #endif // DOXYGEN

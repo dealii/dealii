@@ -16,34 +16,32 @@
 // common include file for all serialization tests
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iomanip>
-
+#include <sstream>
 
 // compare objects for equality and pointers for equality of the object
 // pointed to
 template <typename T>
-bool compare (const T &t1,
-              const T &t2)
+bool
+compare(const T& t1, const T& t2)
 {
   return t1 == t2;
 }
 
 template <typename T>
-bool compare (T *t1,
-              T *t2)
+bool
+compare(T* t1, T* t2)
 {
   return *t1 == *t2;
 }
 
-
 template <typename T>
-void verify (const T &t1,
-             T       &t2)
+void
+verify(const T& t1, T& t2)
 {
   // save data to archive
   std::ostringstream oss;
@@ -58,14 +56,11 @@ void verify (const T &t1,
   // verify correctness of the
   // serialization
   {
-    std::istringstream  iss(oss.str());
+    std::istringstream            iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);
-
 
     ia >> t2;
 
-    AssertThrow (compare (t1, t2), ExcInternalError());
+    AssertThrow(compare(t1, t2), ExcInternalError());
   }
 }
-
-

@@ -16,11 +16,9 @@
 #ifndef dealii_fe_values_extractors_h
 #define dealii_fe_values_extractors_h
 
-
 #include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * A namespace in which we declare "extractors", i.e. classes that when used
@@ -65,14 +63,13 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Scalar ();
+    Scalar();
 
     /**
      * Constructor. Take the selected vector component as argument.
      */
-    Scalar (const unsigned int component);
+    Scalar(const unsigned int component);
   };
-
 
   /**
    * Extractor for a vector of <code>spacedim</code> components of a vector-
@@ -114,15 +111,14 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Vector ();
+    Vector();
 
     /**
      * Constructor. Take the first component of the selected vector inside the
      * FEValues object as argument.
      */
-    Vector (const unsigned int first_vector_component);
+    Vector(const unsigned int first_vector_component);
   };
-
 
   /**
    * Extractor for a symmetric tensor of a rank specified by the template
@@ -157,15 +153,14 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    SymmetricTensor ();
+    SymmetricTensor();
 
     /**
      * Constructor. Take the first component of the selected tensor inside the
      * FEValues object as argument.
      */
-    SymmetricTensor (const unsigned int first_tensor_component);
+    SymmetricTensor(const unsigned int first_tensor_component);
   };
-
 
   /**
    * Extractor for a general tensor of a given rank specified by
@@ -200,85 +195,55 @@ namespace FEValuesExtractors
      * resizing the array, and then later assigning a suitable object to each
      * element of the array.
      */
-    Tensor ();
+    Tensor();
 
     /**
      * Constructor. Take the first component of the selected tensor inside the
      * FEValues object as argument.
      */
-    Tensor (const unsigned int first_tensor_component);
+    Tensor(const unsigned int first_tensor_component);
   };
-}
-
+} // namespace FEValuesExtractors
 
 /*------------------------ Inline functions: namespace FEValuesExtractors --------*/
 
 namespace FEValuesExtractors
 {
-  inline
-  Scalar::Scalar ()
-    :
-    component (numbers::invalid_unsigned_int)
+  inline Scalar::Scalar() : component(numbers::invalid_unsigned_int)
   {}
 
-
-
-  inline
-  Scalar::Scalar (const unsigned int component)
-    :
-    component (component)
+  inline Scalar::Scalar(const unsigned int component) : component(component)
   {}
 
-
-
-  inline
-  Vector::Vector ()
-    :
-    first_vector_component (numbers::invalid_unsigned_int)
+  inline Vector::Vector()
+    : first_vector_component(numbers::invalid_unsigned_int)
   {}
 
-
-  inline
-  Vector::Vector (const unsigned int first_vector_component)
-    :
-    first_vector_component (first_vector_component)
+  inline Vector::Vector(const unsigned int first_vector_component)
+    : first_vector_component(first_vector_component)
   {}
-
 
   template <int rank>
-  inline
-  SymmetricTensor<rank>::SymmetricTensor ()
-    :
-    first_tensor_component(numbers::invalid_unsigned_int)
+  inline SymmetricTensor<rank>::SymmetricTensor()
+    : first_tensor_component(numbers::invalid_unsigned_int)
   {}
-
 
   template <int rank>
-  inline
-  SymmetricTensor<rank>::SymmetricTensor (const unsigned int first_tensor_component)
-    :
-    first_tensor_component (first_tensor_component)
+  inline SymmetricTensor<rank>::SymmetricTensor(
+    const unsigned int first_tensor_component)
+    : first_tensor_component(first_tensor_component)
   {}
-
 
   template <int rank>
-  inline
-  Tensor<rank>::Tensor ()
-    :
-    first_tensor_component(numbers::invalid_unsigned_int)
+  inline Tensor<rank>::Tensor()
+    : first_tensor_component(numbers::invalid_unsigned_int)
   {}
-
 
   template <int rank>
-  inline
-  Tensor<rank>::Tensor (const unsigned int first_tensor_component)
-    :
-    first_tensor_component (first_tensor_component)
+  inline Tensor<rank>::Tensor(const unsigned int first_tensor_component)
+    : first_tensor_component(first_tensor_component)
   {}
-}
-
-
-
+} // namespace FEValuesExtractors
 
 DEAL_II_NAMESPACE_CLOSE
 

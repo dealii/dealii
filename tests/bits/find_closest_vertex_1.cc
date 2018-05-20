@@ -13,52 +13,46 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // take a 3d mesh, take all vertices, shift them a little bit and check that
 // we correctly identify the closest vertex position
 // The result should be an increasing sequence of numbers
 
 #include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 
-
-
-
-
-void check (Triangulation<3> &tria)
+void check(Triangulation<3>& tria)
 {
-  const std::vector<Point<3> > &v = tria.get_vertices();
-  for (unsigned i=0; i<v.size(); i++)
-    deallog << "[" << GridTools::find_closest_vertex(tria, v[i] + Point<3>(0.01, -0.01, 0.01)) << "] ";
+  const std::vector<Point<3>>& v = tria.get_vertices();
+  for(unsigned i = 0; i < v.size(); i++)
+    deallog << "["
+            << GridTools::find_closest_vertex(
+                 tria, v[i] + Point<3>(0.01, -0.01, 0.01))
+            << "] ";
 
   deallog << std::endl;
 }
 
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<3> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (3);
-      check (coarse_grid);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(3);
+      check(coarse_grid);
     }
-  catch (const std::exception &exc)
+  catch(const std::exception& exc)
     {
       // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
       deallog << exc.what() << std::endl;
     }
 }
-
-
-

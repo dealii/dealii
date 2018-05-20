@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_mg_transfer_internal_h
 #define dealii_mg_transfer_internal_h
 
@@ -28,7 +27,6 @@ namespace internal
 {
   namespace MGTransfer
   {
-
     /**
      * Internal function for filling the copy indices from global to level
      * indices
@@ -38,14 +36,20 @@ namespace internal
      * transferring solution vectors instead of residuals.
      */
     template <int dim, int spacedim>
-    void fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,
-                           const MGConstrainedDoFs                                                                 *mg_constrained_dofs,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine,
-                           const bool skip_interface_dofs = true);
-
-
+    void
+    fill_copy_indices(
+      const dealii::DoFHandler<dim, spacedim>& mg_dof,
+      const MGConstrainedDoFs*                 mg_constrained_dofs,
+      std::vector<std::vector<
+        std::pair<types::global_dof_index, types::global_dof_index>>>&
+        copy_indices,
+      std::vector<std::vector<
+        std::pair<types::global_dof_index, types::global_dof_index>>>&
+        copy_indices_global_mine,
+      std::vector<std::vector<
+        std::pair<types::global_dof_index, types::global_dof_index>>>&
+                 copy_indices_level_mine,
+      const bool skip_interface_dofs = true);
 
     /**
      * Given the collection of child cells in lexicographic ordering as seen
@@ -102,26 +106,30 @@ namespace internal
        * element to all the children.
        */
       std::vector<Number> prolongation_matrix_1d;
-
     };
 
     /**
      * Set up most of the internal data structures of MGTransferMatrixFree
      */
     template <int dim, typename Number>
-    void setup_transfer(const dealii::DoFHandler<dim>                                       &mg_dof,
-                        const MGConstrainedDoFs                                             *mg_constrained_dofs,
-                        ElementInfo<Number>                                                 &elem_info,
-                        std::vector<std::vector<unsigned int> >                             &level_dof_indices,
-                        std::vector<std::vector<std::pair<unsigned int,unsigned int> > >    &parent_child_connect,
-                        std::vector<unsigned int>                                           &n_owned_level_cells,
-                        std::vector<std::vector<std::vector<unsigned short> > >             &dirichlet_indices,
-                        std::vector<std::vector<Number> >                                   &weights_on_refined,
-                        std::vector<std::vector<std::pair<unsigned int, unsigned int> > >   &copy_indices_global_mine,
-                        MGLevelObject<LinearAlgebra::distributed::Vector<Number> >          &ghosted_level_vector);
+    void
+    setup_transfer(
+      const dealii::DoFHandler<dim>&          mg_dof,
+      const MGConstrainedDoFs*                mg_constrained_dofs,
+      ElementInfo<Number>&                    elem_info,
+      std::vector<std::vector<unsigned int>>& level_dof_indices,
+      std::vector<std::vector<std::pair<unsigned int, unsigned int>>>&
+                                 parent_child_connect,
+      std::vector<unsigned int>& n_owned_level_cells,
+      std::vector<std::vector<std::vector<unsigned short>>>& dirichlet_indices,
+      std::vector<std::vector<Number>>&                      weights_on_refined,
+      std::vector<std::vector<std::pair<unsigned int, unsigned int>>>&
+        copy_indices_global_mine,
+      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>&
+        ghosted_level_vector);
 
-  }
-}
+  } // namespace MGTransfer
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

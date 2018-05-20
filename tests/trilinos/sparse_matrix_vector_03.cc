@@ -13,61 +13,57 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check SparseMatrix::vmult_add
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
 #include <iostream>
 #include <vector>
 
-
-void test (TrilinosWrappers::MPI::Vector &v,
-           TrilinosWrappers::MPI::Vector &w)
+void
+test(TrilinosWrappers::MPI::Vector& v, TrilinosWrappers::MPI::Vector& w)
 {
-  TrilinosWrappers::SparseMatrix m(v.size(),v.size(),v.size());
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.m(); ++j)
-      m.set (i,j, i+2*j);
+  TrilinosWrappers::SparseMatrix m(v.size(), v.size(), v.size());
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.m(); ++j)
+      m.set(i, j, i + 2 * j);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
       w(i) = i;
     }
 
-  m.compress (VectorOperation::insert);
-  v.compress (VectorOperation::insert);
-  w.compress (VectorOperation::insert);
+  m.compress(VectorOperation::insert);
+  v.compress(VectorOperation::insert);
+  w.compress(VectorOperation::insert);
 
   // w:=Mv
-  m.vmult_add (w,v);
+  m.vmult_add(w, v);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (v(i) == i, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
 
       double result = 0;
-      for (unsigned int j=0; j<m.m(); ++j)
-        result += (i+2*j)*j;
-      AssertThrow (w(i) == i+result, ExcInternalError());
+      for(unsigned int j = 0; j < m.m(); ++j)
+        result += (i + 2 * j) * j;
+      AssertThrow(w(i) == i + result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   try
     {
@@ -76,12 +72,13 @@ int main (int argc, char **argv)
         v.reinit(complete_index_set(100), MPI_COMM_WORLD);
         TrilinosWrappers::MPI::Vector w;
         w.reinit(complete_index_set(100), MPI_COMM_WORLD);
-        test (v,w);
+        test(v, w);
       }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -92,9 +89,10 @@ int main (int argc, char **argv)
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

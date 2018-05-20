@@ -13,46 +13,41 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test that QCollection objects are copyable without running into
 // troubles when the copy is destroyed earlier than the original
 // object
-
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/hp/q_collection.h>
 
-
-
 template <int dim>
-void test ()
+void
+test()
 {
   hp::QCollection<dim> q_collection;
-  q_collection.push_back (QGauss<dim>(2));
-  q_collection.push_back (QGauss<dim>(3));
+  q_collection.push_back(QGauss<dim>(2));
+  q_collection.push_back(QGauss<dim>(3));
 
   // now create a copy and make sure
   // it goes out of scope before the
   // original
   {
-    hp::QCollection<dim> copy (q_collection);
+    hp::QCollection<dim> copy(q_collection);
   }
 }
 
-
-
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

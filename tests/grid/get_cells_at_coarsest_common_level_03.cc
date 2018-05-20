@@ -13,60 +13,52 @@
 //
 // ---------------------------------------------------------------------
 
-
-
-
 // Test GridTools::get_cells_at_coarsest_common_level()
-
-
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-
-
-
-
 
 template <int dim>
-void test()
+void
+test()
 {
-  Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> triangulation(
+    Triangulation<dim>::limit_level_difference_at_vertices);
 
   GridGenerator::hyper_cube(triangulation);
-  triangulation.refine_global (1);
+  triangulation.refine_global(1);
   // Adaptive refinement ... refine the first cell
   triangulation.begin_active()->set_refine_flag();
   triangulation.execute_coarsening_and_refinement();
 
   // now extract patches and print every fifth of them
   unsigned int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator
-       cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell, ++index)
+  for(typename Triangulation<dim>::active_cell_iterator cell
+      = triangulation.begin_active();
+      cell != triangulation.end();
+      ++cell, ++index)
     {
       std::vector<typename Triangulation<dim>::active_cell_iterator> patch_cells
-        = GridTools::get_patch_around_cell<Triangulation<dim> > (cell);
+        = GridTools::get_patch_around_cell<Triangulation<dim>>(cell);
 
       std::vector<typename Triangulation<dim>::cell_iterator> coarse_cells
-        = GridTools::get_cells_at_coarsest_common_level <Triangulation<dim> >  (patch_cells);
+        = GridTools::get_cells_at_coarsest_common_level<Triangulation<dim>>(
+          patch_cells);
 
       deallog << "coarse_ cells " << cell << ": ";
-      for (unsigned int i=0; i<coarse_cells.size(); ++i)
+      for(unsigned int i = 0; i < coarse_cells.size(); ++i)
         deallog << coarse_cells[i] << ' ';
       deallog << std::endl;
-
     }
-
-
 }
 
-
-int main()
+int
+main()
 {
   initlog();
 

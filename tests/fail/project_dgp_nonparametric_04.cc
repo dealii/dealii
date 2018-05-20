@@ -13,20 +13,17 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check that VectorTools::project works for DGPNonparametric elements
 // correctly on a uniformly refined mesh for functions of degree q
 
 char logname[] = "output";
 
-
 #include "../deal.II/project_common.h"
 
-
 template <int dim>
-void test ()
+void
+test()
 {
-  for (unsigned int p=0; p<6-dim; ++p)
-    test_with_2d_deformed_mesh (FE_DGPNonparametric<dim>(p), p);
+  for(unsigned int p = 0; p < 6 - dim; ++p)
+    test_with_2d_deformed_mesh(FE_DGPNonparametric<dim>(p), p);
 }

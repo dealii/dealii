@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // test assemble_flags.h
 
 #include "../tests.h"
@@ -24,7 +22,8 @@
 
 using namespace MeshWorker;
 
-int main()
+int
+main()
 {
   initlog();
   AssembleFlags flag = assemble_own_cells | assemble_boundary_faces;

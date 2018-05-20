@@ -13,41 +13,39 @@
 //
 // ---------------------------------------------------------------------
 
-
 /*
  * check GraphColoring::color_sparsity_pattern with 5 nodes with
  * no connections with each other. All nodes will be colored with
  * one color.
  */
 
-
 #include "../tests.h"
 #include <deal.II/base/graph_coloring.h>
 
-
-void fill_graph (DynamicSparsityPattern &graph)
+void
+fill_graph(DynamicSparsityPattern& graph)
 {
   //Edges in only one direction
-  graph.add(0,0);
-  graph.add(1,1);
-  graph.add(2,2);
-  graph.add(3,3);
-  graph.add(4,4);
+  graph.add(0, 0);
+  graph.add(1, 1);
+  graph.add(2, 2);
+  graph.add(3, 3);
+  graph.add(4, 4);
 }
 
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   //Initialize MPI and Zoltan
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-  MPILogInitAll all;
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  MPILogInitAll                    all;
 
   //Number of nodes
   unsigned int num_indices = 5;
 
   //Create temporary object to hold graph connection info.
   DynamicSparsityPattern dynamic_sparse_graph;
-  dynamic_sparse_graph.reinit(num_indices,num_indices);
+  dynamic_sparse_graph.reinit(num_indices, num_indices);
 
   //fill dynamic sparsity pattern
   fill_graph(dynamic_sparse_graph);
@@ -56,18 +54,18 @@ int main (int argc, char **argv)
   SparsityPattern sp_graph;
   sp_graph.copy_from(dynamic_sparse_graph);
 
-  Assert( num_indices == sp_graph.n_rows(), ExcInternalError() );
+  Assert(num_indices == sp_graph.n_rows(), ExcInternalError());
 
   std::vector<unsigned int> color_indices;
-  unsigned int num_colors;
+  unsigned int              num_colors;
 
   color_indices.resize(num_indices);
-  num_colors = GraphColoring::color_sparsity_pattern (sp_graph, color_indices);
+  num_colors = GraphColoring::color_sparsity_pattern(sp_graph, color_indices);
 
   //color
   deallog << "Coloring" << std::endl;
   deallog << "Number of colors used: " << num_colors << std::endl;
-  for (unsigned int i=0; i<num_indices; i++)
+  for(unsigned int i = 0; i < num_indices; i++)
     {
       deallog << i << " " << color_indices[i] << std::endl;
     }

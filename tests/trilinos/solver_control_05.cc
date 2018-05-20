@@ -13,32 +13,31 @@
 //
 // ---------------------------------------------------------------------
 
-
 // test that we can reuse a Trilinos solver in a LinearOperator
 // This tests differs from solver_control_04 in that here we have a diagonal
 // matrix, i.e. one that will converge in 1 step.
 
-
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <iostream>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_vector.h>
-#include <deal.II/lac/trilinos_solver.h>
-#include <deal.II/lac/trilinos_precondition.h>
-#include <deal.II/lac/trilinos_linear_operator.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
+#include <deal.II/lac/trilinos_linear_operator.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <iostream>
 
-int main(int argc, char **argv)
+int
+main(int argc, char** argv)
 {
   std::ofstream logfile("output");
   logfile.precision(4);
   deallog.attach(logfile);
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   {
     unsigned int dim = 10;
@@ -46,37 +45,35 @@ int main(int argc, char **argv)
     deallog << " Unknowns " << dim << std::endl;
 
     // Make matrix
-    DynamicSparsityPattern csp (dim, dim);
-    for (unsigned int row=0; row<dim; row++)
-      csp.add(row,row);
+    DynamicSparsityPattern csp(dim, dim);
+    for(unsigned int row = 0; row < dim; row++)
+      csp.add(row, row);
 
-    TrilinosWrappers::SparseMatrix  A;
+    TrilinosWrappers::SparseMatrix A;
     A.reinit(csp);
-    for (unsigned int row=0; row<dim; row++)
-      A.set(row,row, 2.0*(row+1));
+    for(unsigned int row = 0; row < dim; row++)
+      A.set(row, row, 2.0 * (row + 1));
 
     TrilinosWrappers::MPI::Vector f;
-    f.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    f.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     TrilinosWrappers::MPI::Vector u1;
-    u1.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    u1.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     TrilinosWrappers::MPI::Vector u2;
-    u2.reinit(complete_index_set(dim),MPI_COMM_WORLD);
+    u2.reinit(complete_index_set(dim), MPI_COMM_WORLD);
     f = 1.;
-    A.compress (VectorOperation::insert);
-    f.compress (VectorOperation::insert);
-    u1.compress (VectorOperation::insert);
-    u2.compress (VectorOperation::insert);
+    A.compress(VectorOperation::insert);
+    f.compress(VectorOperation::insert);
+    u1.compress(VectorOperation::insert);
+    u2.compress(VectorOperation::insert);
 
     TrilinosWrappers::PreconditionJacobi preconditioner;
     preconditioner.initialize(A);
 
-    SolverControl solver_control(2000, 1.e-3);
+    SolverControl              solver_control(2000, 1.e-3);
     TrilinosWrappers::SolverCG solver(solver_control);
 
-    const auto lo_A = linear_operator<TrilinosWrappers::MPI::Vector>(A);
-    const auto lo_A_inv = inverse_operator(lo_A,
-                                           solver,
-                                           preconditioner);
+    const auto lo_A     = linear_operator<TrilinosWrappers::MPI::Vector>(A);
+    const auto lo_A_inv = inverse_operator(lo_A, solver, preconditioner);
 
     deallog.push("First use");
     {

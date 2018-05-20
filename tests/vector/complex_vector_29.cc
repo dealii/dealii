@@ -13,38 +13,36 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<std::complex<double> >::reinit(fast)
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<std::complex<double> > &v)
+void
+test(Vector<std::complex<double>>& v)
 {
-  v.reinit (13, true);
+  v.reinit(13, true);
 
-  Assert (v.size() == 13, ExcInternalError());
+  Assert(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      test (v);
+      Vector<std::complex<double>> v(100);
+      test(v);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -55,9 +53,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -13,42 +13,40 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test constructor/reinit of BlockVector with IndexSets
 
 #include "../tests.h"
+#include <deal.II/base/index_set.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/base/index_set.h>
 #include <iostream>
 #include <vector>
 
-
 template <class BLOCKVEC>
-void test ()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  if (myid==0)
+  if(myid == 0)
     deallog << "numproc=" << numproc << std::endl;
 
   std::vector<IndexSet> local_active(2);
 
   // block 0:
   local_active[0].set_size(numproc);
-  local_active[0].add_range(myid,myid+1);
+  local_active[0].add_range(myid, myid + 1);
 
-  local_active[1].set_size(2*numproc);
-  local_active[1].add_range(myid*2,myid*2+2);
+  local_active[1].set_size(2 * numproc);
+  local_active[1].add_range(myid * 2, myid * 2 + 2);
 
   BLOCKVEC v(local_active, MPI_COMM_WORLD);
 
   v(myid) = 100.0 + myid;
 
-  v.block(1)(myid*2)=myid*2.0;
-  v.block(1)(myid*2+1)=myid*2.0+1.0;
+  v.block(1)(myid * 2)     = myid * 2.0;
+  v.block(1)(myid * 2 + 1) = myid * 2.0 + 1.0;
 
   v.compress(VectorOperation::insert);
 
@@ -59,7 +57,8 @@ void test ()
   deallog << "size[1]: " << v.block(1).size() << std::endl;
 
   {
-    std::ofstream file ((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file(
+      (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
 
     file << "**** proc " << myid << std::endl;
     v.print(file);
@@ -67,9 +66,11 @@ void test ()
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if (myid==0)
+  if(myid == 0)
     {
-      for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
+      for(unsigned int i = 0;
+          i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+          ++i)
         {
           cat_file((std::string("dat.") + Utilities::int_to_string(i)).c_str());
         }
@@ -78,8 +79,8 @@ void test ()
   // now test the constructor
 
   IndexSet id(7);
-  if (myid==0)
-    id.add_range(0,7);
+  if(myid == 0)
+    id.add_range(0, 7);
   local_active.push_back(id);
 
   BLOCKVEC xy(local_active);
@@ -90,20 +91,19 @@ void test ()
   deallog << "size[2]: " << xy.block(2).size() << std::endl;
 
   // done
-  if (myid==0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
-  if (myid == 0)
+  if(myid == 0)
     {
       initlog();
       deallog << std::setprecision(4);
@@ -116,5 +116,4 @@ int main (int argc, char **argv)
       test<PETScWrappers::MPI::BlockVector>();
       //test<TrilinosWrappers::MPI::BlockVector>();
     }
-
 }

@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include "fe_tools_common.h"
 #include <deal.II/base/quadrature_lib.h>
@@ -29,50 +28,43 @@
 // these support points as quadrature points, that the resulting
 // matrix is the unit matrix
 
-
-
-
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe,
-            const FiniteElement<dim> &/*fe2*/)
+check_this(const FiniteElement<dim>& fe, const FiniteElement<dim>& /*fe2*/)
 {
   // only check if both elements have
   // support points. otherwise,
   // interpolation doesn't really
   // work
-  if (fe.n_components() != 1)
+  if(fe.n_components() != 1)
     return;
 
   // ignore this check if this fe has already
   // been treated
   static std::set<std::string> already_checked;
-  if (already_checked.find(fe.get_name()) != already_checked.end())
+  if(already_checked.find(fe.get_name()) != already_checked.end())
     return;
-  already_checked.insert (fe.get_name());
+  already_checked.insert(fe.get_name());
 
   // only test elements with support
   // points
-  if (fe.has_support_points() == false)
+  if(fe.has_support_points() == false)
     return;
 
   // test with different quadrature formulas
-  Quadrature<dim> q_rhs(fe.get_unit_support_points(),
-                        std::vector<double> (fe.dofs_per_cell,
-                                             1./fe.dofs_per_cell));
+  Quadrature<dim> q_rhs(
+    fe.get_unit_support_points(),
+    std::vector<double>(fe.dofs_per_cell, 1. / fe.dofs_per_cell));
 
-  FullMatrix<double> X (fe.dofs_per_cell,
-                        q_rhs.size());
+  FullMatrix<double> X(fe.dofs_per_cell, q_rhs.size());
 
-  AssertThrow (X.m() == X.n(), ExcInternalError());
+  AssertThrow(X.m() == X.n(), ExcInternalError());
 
-  FETools::compute_projection_from_quadrature_points_matrix (fe,
-                                                             q_rhs, q_rhs,
-                                                             X);
+  FETools::compute_projection_from_quadrature_points_matrix(
+    fe, q_rhs, q_rhs, X);
 
-  for (unsigned int i=0; i<X.m(); ++i)
-    X(i,i) -= 1;
+  for(unsigned int i = 0; i < X.m(); ++i)
+    X(i, i) -= 1;
 
-  AssertThrow (X.frobenius_norm() < 1e-10, ExcInternalError());
+  AssertThrow(X.frobenius_norm() < 1e-10, ExcInternalError());
 }
-

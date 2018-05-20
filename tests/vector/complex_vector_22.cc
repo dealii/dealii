@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check Vector<std::complex<double> >::operator*(Vector) on two vectors that are
 // orthogonal
 
@@ -22,41 +20,40 @@
 #include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (Vector<std::complex<double> > &v,
-           Vector<std::complex<double> > &w)
+void
+test(Vector<std::complex<double>>& v, Vector<std::complex<double>>& w)
 {
   // set only certain elements of each
   // vector, but disjoint sets of elements
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = std::complex<double> (i+1., i+2.);
+  for(unsigned int i = 0; i < v.size(); ++i)
+    if(i % 3 == 0)
+      v(i) = std::complex<double>(i + 1., i + 2.);
     else
-      w(i) = std::complex<double> (i+1., i+2.);
-  v.compress ();
-  w.compress ();
+      w(i) = std::complex<double>(i + 1., i + 2.);
+  v.compress();
+  w.compress();
 
   // make sure the scalar product is zero
-  AssertThrow (v*w == std::complex<double>(0), ExcInternalError());
+  AssertThrow(v * w == std::complex<double>(0), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<std::complex<double> > v (100);
-      Vector<std::complex<double> > w (100);
-      test (v,w);
+      Vector<std::complex<double>> v(100);
+      Vector<std::complex<double>> w(100);
+      test(v, w);
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -67,9 +64,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

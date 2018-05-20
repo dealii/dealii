@@ -13,86 +13,84 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // check ChunkSparseMatrix::residual
 
 #include "../tests.h"
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/chunk_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <vector>
 
-
-void test (const unsigned int chunk_size,
-           Vector<double> &v,
-           Vector<double> &w,
-           Vector<double> &x)
+void
+test(const unsigned int chunk_size,
+     Vector<double>&    v,
+     Vector<double>&    w,
+     Vector<double>&    x)
 {
   // set some entries in the
   // matrix. actually, set them all
-  ChunkSparsityPattern sp (v.size(),v.size(),v.size(), chunk_size);
-  for (unsigned int i=0; i<v.size(); ++i)
-    for (unsigned int j=0; j<v.size(); ++j)
-      sp.add (i,j);
-  sp.compress ();
+  ChunkSparsityPattern sp(v.size(), v.size(), v.size(), chunk_size);
+  for(unsigned int i = 0; i < v.size(); ++i)
+    for(unsigned int j = 0; j < v.size(); ++j)
+      sp.add(i, j);
+  sp.compress();
 
   // then create a matrix from that
   ChunkSparseMatrix<double> m(sp);
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      m.set (i,j, i+2*j);
+  for(unsigned int i = 0; i < m.m(); ++i)
+    for(unsigned int j = 0; j < m.n(); ++j)
+      m.set(i, j, i + 2 * j);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      w(i) = i+1;
+      w(i) = i + 1;
     }
 
-  v.compress ();
-  w.compress ();
+  v.compress();
+  w.compress();
 
   // x=w-Mv
-  const double s = m.residual (x, v, w);
+  const double s = m.residual(x, v, w);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for(unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (v(i) == i, ExcInternalError());
-      AssertThrow (w(i) == i+1, ExcInternalError());
+      AssertThrow(v(i) == i, ExcInternalError());
+      AssertThrow(w(i) == i + 1, ExcInternalError());
 
-      double result = i+1;
-      for (unsigned int j=0; j<m.n(); ++j)
-        result -= (i+2*j)*j;
+      double result = i + 1;
+      for(unsigned int j = 0; j < m.n(); ++j)
+        result -= (i + 2 * j) * j;
 
-      AssertThrow (x(i) == result, ExcInternalError());
+      AssertThrow(x(i) == result, ExcInternalError());
     }
 
-  AssertThrow (std::fabs((s - x.l2_norm())/s) < 1e-14, ExcInternalError());
+  AssertThrow(std::fabs((s - x.l2_norm()) / s) < 1e-14, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      const unsigned int chunk_sizes[] = { 1, 2, 4, 7, 11 };
-      for (unsigned int i=0; i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
-           ++i)
+      const unsigned int chunk_sizes[] = {1, 2, 4, 7, 11};
+      for(unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
+          ++i)
         {
-          Vector<double> v (100);
-          Vector<double> w (100);
-          Vector<double> x (100);
-          test (chunk_sizes[i],v,w,x);
+          Vector<double> v(100);
+          Vector<double> w(100);
+          Vector<double> x(100);
+          test(chunk_sizes[i], v, w, x);
         }
     }
-  catch (std::exception &exc)
+  catch(std::exception& exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -103,9 +101,10 @@ int main ()
 
       return 1;
     }
-  catch (...)
+  catch(...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

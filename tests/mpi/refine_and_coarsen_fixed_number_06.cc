@@ -13,8 +13,6 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // document bug in parallel::distributed::GridRefinement
 // ::refine_and_coarsen_fixed_number() and fixed_fraction() with one CPU with
 // 0 cells:
@@ -27,50 +25,46 @@
 
 #include "../tests.h"
 
+#include <deal.II/base/utilities.h>
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/base/utilities.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/grid_generator.h>
 //#include <mpi.h>
 
 template <int dim>
-void test()
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
-  GridGenerator::hyper_cube (triangulation);
+  GridGenerator::hyper_cube(triangulation);
 
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-  parallel::distributed::GridRefinement::
-  refine_and_coarsen_fixed_number (triangulation,
-                                   estimated_error_per_cell,
-                                   0.3, 0.03);
-  parallel::distributed::GridRefinement::
-  refine_and_coarsen_fixed_fraction (triangulation,
-                                     estimated_error_per_cell,
-                                     0.3, 0.03);
-  triangulation.execute_coarsening_and_refinement ();
+  Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
+    triangulation, estimated_error_per_cell, 0.3, 0.03);
+  triangulation.execute_coarsening_and_refinement();
 
-  if (myid==0)
-    deallog << "n_global_active_cells="
-            << triangulation.n_global_active_cells()
+  if(myid == 0)
+    deallog << "n_global_active_cells=" << triangulation.n_global_active_cells()
             << std::endl;
 
-  if (myid==0)
+  if(myid == 0)
     deallog << "OK" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 
@@ -78,5 +72,4 @@ int main(int argc, char *argv[])
     }
   else
     test<2>();
-
 }

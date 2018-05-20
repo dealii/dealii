@@ -13,30 +13,30 @@
 //
 // ---------------------------------------------------------------------
 
-
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
-int main()
+int
+main()
 {
   initlog();
 
   // create a pattern and match a string
-  std::vector<std::unique_ptr<Patterns::PatternBase> > ps;
+  std::vector<std::unique_ptr<Patterns::PatternBase>> ps;
   ps.push_back(std_cxx14::make_unique<Patterns::Integer>());
   ps.push_back(std_cxx14::make_unique<Patterns::Double>());
   ps.push_back(std_cxx14::make_unique<Patterns::Anything>());
 
-  Patterns::Tuple pattern(ps, ";");
+  Patterns::Tuple   pattern(ps, ";");
   const std::string desc = pattern.description();
 
   deallog << desc << std::endl;
 
   std::string test = "5; 3.14; Ciao";
 
-  if (pattern.match(test))
+  if(pattern.match(test))
     deallog << "OK" << std::endl;
   else
     deallog << "Not OK" << std::endl;

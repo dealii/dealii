@@ -13,70 +13,66 @@
 //
 // ---------------------------------------------------------------------
 
-
 // verify that we can do things like cell->face() in 1d as well. here:
 // test cell->face(0)->get_dof_indices()
 
-
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/fe/fe_system.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
-
-
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 template <int spacedim>
-void test ()
+void
+test()
 {
-  Triangulation<1,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  Triangulation<1, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
 
-  FESystem<1,spacedim> fe(FE_Q<1,spacedim>(2),1,
-                          FE_Q<1,spacedim>(1),1);
-  DoFHandler<1,spacedim> dof_handler (tria);
-  dof_handler.distribute_dofs (fe);
+  FESystem<1, spacedim>   fe(FE_Q<1, spacedim>(2), 1, FE_Q<1, spacedim>(1), 1);
+  DoFHandler<1, spacedim> dof_handler(tria);
+  dof_handler.distribute_dofs(fe);
 
   std::vector<types::global_dof_index> dof_indices(fe.dofs_per_face);
 
   deallog << "Coarse mesh:" << std::endl;
-  dof_handler.begin_active()->face(0)->get_dof_indices (dof_indices);
-  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+  dof_handler.begin_active()->face(0)->get_dof_indices(dof_indices);
+  for(unsigned int i = 0; i < fe.dofs_per_face; ++i)
     deallog << "Left vertex=" << dof_indices[i] << std::endl;
-  dof_handler.begin_active()->face(1)->get_dof_indices (dof_indices);
-  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+  dof_handler.begin_active()->face(1)->get_dof_indices(dof_indices);
+  for(unsigned int i = 0; i < fe.dofs_per_face; ++i)
     deallog << "Right vertex=" << dof_indices[i] << std::endl;
 
-  tria.refine_global (2);
-  dof_handler.distribute_dofs (fe);
+  tria.refine_global(2);
+  dof_handler.distribute_dofs(fe);
 
-  for (typename DoFHandler<1,spacedim>::active_cell_iterator
-       cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
+  for(typename DoFHandler<1, spacedim>::active_cell_iterator cell
+      = dof_handler.begin_active();
+      cell != dof_handler.end();
+      ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
-      cell->face(0)->get_dof_indices (dof_indices);
-      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+      cell->face(0)->get_dof_indices(dof_indices);
+      for(unsigned int i = 0; i < fe.dofs_per_face; ++i)
         deallog << "Left vertex=" << dof_indices[i] << std::endl;
-      cell->face(1)->get_dof_indices (dof_indices);
-      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+      cell->face(1)->get_dof_indices(dof_indices);
+      for(unsigned int i = 0; i < fe.dofs_per_face; ++i)
         deallog << "Right vertex=" << dof_indices[i] << std::endl;
     }
 }
 
-
-
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
+  test<1>();
+  test<2>();
 
   return 0;
 }

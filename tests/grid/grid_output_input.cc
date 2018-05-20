@@ -13,23 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 // Test output and input of meshes, to see if the meshes are different
 // after a couple of global refinements
 
 #include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-
-
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
 template <int dim>
-void test(std::ostream &out)
+void
+test(std::ostream& out)
 {
   GridOut go;
   go.set_flags(GridOutFlags::Ucd(false, true, true));
@@ -60,7 +57,7 @@ void test(std::ostream &out)
     grid_file.close();
   }
 
-  GridTools::map_boundary_to_manifold_ids({1}, {0},tr);
+  GridTools::map_boundary_to_manifold_ids({1}, {0}, tr);
   tr.set_manifold(0, boundary);
   tr.refine_global(1);
   deallog << "Writing refined from file" << std::endl;
@@ -74,7 +71,8 @@ void test(std::ostream &out)
   tr.clear();
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
