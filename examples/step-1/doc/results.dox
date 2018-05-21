@@ -86,7 +86,8 @@ can inspect the values of variables and how they change.
 Rather than postponing learning how to use a debugger till you really can't
 see any other way to find a bug, here's the one piece of
 advice we will provide in this program: learn how to use a debugger as soon as
-possible. It will be time well invested. The deal.II Frequently Asked
+possible. It will be time well invested.
+(@dealiiVideoLectureSeeAlso{25}) The deal.II Frequently Asked 
 Questions (FAQ) page linked to from the top-level <a
 href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
 of hints on debugging deal.II programs.
