@@ -1,0 +1,2 @@
+Fixed: Step-16 was broken caused by uninitialized variables, it is now fixed.
+(Ce Qin, 2018/05/21)
