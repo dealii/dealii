@@ -771,7 +771,7 @@ namespace GridTools
    * `mapping` argument.
    *
    * In serial and parallel::shared triangulations the size of the returned map
-   * equals Triangulation::n_used_vertices(), (not Triangulation::n_vertices()).
+   * equals Triangulation::n_used_vertices() (not Triangulation::n_vertices()).
    * Note that in parallel::distributed triangulations only vertices in locally
    * owned cells and ghost cells are returned, as for all other vertices their
    * real location might not be known (e.g. for distributed computations using
