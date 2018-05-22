@@ -770,9 +770,15 @@ namespace GridTools
    * and querying for each cell where its vertices are through the (optional)
    * `mapping` argument.
    *
-   * The size of the returned map equals Triangulation::n_used_vertices(),
-   * (not Triangulation::n_vertices()). If you use the default `mapping`, the
-   * returned map satisfies the following equality:
+   * In serial and parallel::shared triangulations the size of the returned map
+   * equals Triangulation::n_used_vertices() (not Triangulation::n_vertices()).
+   * Note that in parallel::distributed triangulations only vertices in locally
+   * owned cells and ghost cells are returned, as for all other vertices their
+   * real location might not be known (e.g. for distributed computations using
+   * MappingQEulerian).
+   *
+   * If you use the default `mapping`, the returned map satisfies the following
+   * equality:
    *
    * @code
    * used_vertices = extract_used_vertices(tria);
