@@ -13,11 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-
 #ifndef dealii_vectorization_h
 #define dealii_vectorization_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 
@@ -40,10 +40,12 @@
 // present in the compilation unit but also working properly.
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 && !defined(__AVX__)
-#error "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
+#error \
+  "Mismatch in vectorization capabilities: AVX was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 3 && !defined(__AVX512F__)
-#error "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
+#error \
+  "Mismatch in vectorization capabilities: AVX-512F was detected during configuration of deal.II and switched on, but it is apparently not available for the file you are trying to compile at the moment. Check compilation flags controlling the instruction set, such as -march=native."
 #endif
 
 #if DEAL_II_COMPILER_VECTORIZATION_LEVEL >= 2 // AVX, AVX-512

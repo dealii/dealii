@@ -35,5 +35,66 @@ IndentWidth:     2
 NamespaceIndentation: All
 Standard:        Cpp11
 
+IncludeBlocks: Regroup
+IncludeCategories:
+# config.h must always be first:
+  - Regex:    "deal.II/base/config.h"
+    Priority: -1
+# deal.II folders in sorted order:
+  - Regex:    "deal.II/algorithms/.*\\.h"
+    Priority: 101
+  - Regex:    "deal.II/base/.*\\.h"
+    Priority: 102
+  - Regex:    "deal.II/differentiation/.*\\.h"
+    Priority: 103
+  - Regex:    "deal.II/distributed/.*\\.h"
+    Priority: 104
+  - Regex:    "deal.II/dofs/.*\\.h"
+    Priority: 105
+  - Regex:    "deal.II/fe/.*\\.h"
+    Priority: 106
+  - Regex:    "deal.II/gmsh/.*\\.h"
+    Priority: 107
+  - Regex:    "deal.II/grid/.*\\.h"
+    Priority: 108
+  - Regex:    "deal.II/hp/.*\\.h"
+    Priority: 109
+  - Regex:    "deal.II/integrators/.*\\.h"
+    Priority: 110
+  - Regex:    "deal.II/lac/.*\\.h"
+    Priority: 111
+  - Regex:    "deal.II/matrix_free/.*\\.h"
+    Priority: 112
+  - Regex:    "deal.II/meshworker/.*\\.h"
+    Priority: 113
+  - Regex:    "deal.II/multigrid/.*\\.h"
+    Priority: 114
+  - Regex:    "deal.II/non_matching/.*\\.h"
+    Priority: 115
+  - Regex:    "deal.II/numerics/.*\\.h"
+    Priority: 116
+  - Regex:    "deal.II/opencascade/.*\\.h"
+    Priority: 117
+  - Regex:    "deal.II/optimization/.*\\.h"
+    Priority: 118
+  - Regex:    "deal.II/particles/.*\\.h"
+    Priority: 119
+  - Regex:    "deal.II/physics/.*\\.h"
+    Priority: 120
+  - Regex:    "deal.II/sundials/.*\\.h"
+    Priority: 121
+# put boost right after deal:
+  - Regex: "<boost.*>"
+    Priority: 500
+# try to group PETSc headers:
+  - Regex: "<petsc.*\\.h>"
+    Priority: 1000
+# try to catch all third party headers and put them after deal.II but before standard headers:
+  - Regex: "<.*\\.(h|hpp|hxx)>"
+    Priority: 2000
+# a little silly, but this regular expression matches all C++ headers. Try to include them last:
+  - Regex: "<(algorithm|initializer_list|numeric|system_error|array|iomanip|ostream|thread|atomic|ios|queue|tuple|bitset|iosfwd|random|type_traits|chrono|iostream|ratio|typeindex|codecvt|istream|regex|typeinfo|complex|iterator|scoped_allocator|unordered_map|condition_variable|limits|set|unordered_set|deque|list|sstream|utility|exception|locale|stack|valarray|forward_list|map|stdexcept|vector|fstream|memory|streambuf|functional|mutex|string|future|new|strstream|cassert|cinttypes|csignal|cstdio|cwchar|ccomplex|ciso646|cstdalign|cstdlib|cwctype|cctype|climits|cstdarg|cstring|cerrno|clocale|cstdbool|ctgmath|cfenv|cmath|cstddef|ctime|cfloat|csetjmp|cstdint|cuchar)>"
+    Priority: 100000
+
 TabWidth:        4
 UseTab:          Never

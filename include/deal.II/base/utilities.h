@@ -17,39 +17,39 @@
 #define dealii_utilities_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
-#include <vector>
-#include <utility>
 #include <functional>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  include <Epetra_Comm.h>
-#  include <Epetra_Map.h>
-#  ifdef DEAL_II_WITH_MPI
-#    include <Epetra_MpiComm.h>
-#  else
-#    include <Epetra_SerialComm.h>
-#  endif
+#include <Epetra_Comm.h>
+#include <Epetra_Map.h>
+#ifdef DEAL_II_WITH_MPI
+#include <Epetra_MpiComm.h>
+#else
+#include <Epetra_SerialComm.h>
+#endif
 #endif
 
-#include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/array.hpp>
+#include <boost/serialization/vector.hpp>
 
 #ifdef DEAL_II_WITH_ZLIB
-#  include <boost/iostreams/stream.hpp>
-#  include <boost/iostreams/filtering_stream.hpp>
-#  include <boost/iostreams/device/back_inserter.hpp>
-#  include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/stream.hpp>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
-
 
 /**
  * A namespace for utility functions that are not particularly specific to

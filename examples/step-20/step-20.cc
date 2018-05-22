@@ -17,36 +17,39 @@
  * Author: Wolfgang Bangerth, Texas A&M University, 2005, 2006
  */
 
-
 // @sect3{Include files}
 
 // Since this program is only an adaptation of step-4, there is not much new
 // stuff in terms of header files. In deal.II, we usually list include files
 // in the order base-lac-grid-dofs-fe-numerics, followed by C++ standard
 // include files:
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_sparse_matrix.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
 #include <iostream>
