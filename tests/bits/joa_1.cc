@@ -419,7 +419,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 
   // After setting up all the degrees
-  // of freedoms, here are now the
+  // of freedom, here are now the
   // differences compared to step-5,
   // all of which are related to
   // constraints associated with the

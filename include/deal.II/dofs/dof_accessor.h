@@ -1749,7 +1749,7 @@ public:
    * element, independent of the cell we are presently on, but for hp DoF
    * handlers, this may change from cell to cell.
    *
-   * @note Since degrees of freedoms only exist on active cells for
+   * @note Since degrees of freedom only exist on active cells for
    * hp::DoFHandler (i.e., there is currently no implementation of multilevel
    * hp::DoFHandler objects), it does not make sense to query the finite
    * element on non-active cells since they do not have finite element spaces
@@ -1764,7 +1764,7 @@ public:
    * for this cell. This function is only useful if the DoF handler object
    * associated with the current cell is an hp::DoFHandler.
    *
-   * @note Since degrees of freedoms only exist on active cells for
+   * @note Since degrees of freedom only exist on active cells for
    * hp::DoFHandler (i.e., there is currently no implementation of multilevel
    * hp::DoFHandler objects), it does not make sense to query active FE
    * indices on non-active cells since they do not have finite element spaces
@@ -1788,7 +1788,7 @@ public:
    * if the DoF handler object associated with the current cell is an
    * hp::DoFHandler.
    *
-   * @note Since degrees of freedoms only exist on active cells for
+   * @note Since degrees of freedom only exist on active cells for
    * hp::DoFHandler (i.e., there is currently no implementation of multilevel
    * hp::DoFHandler objects), it does not make sense to assign active FE
    * indices to non-active cells since they do not have finite element spaces
