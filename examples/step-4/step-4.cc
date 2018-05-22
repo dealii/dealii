@@ -434,8 +434,8 @@ void Step4<dim>::assemble_system ()
 template <int dim>
 void Step4<dim>::solve ()
 {
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
+  SolverControl solver_control (1000, 1e-12);
+  SolverCG<>    solver (solver_control);
   solver.solve (system_matrix, solution, system_rhs,
                 PreconditionIdentity());
 
