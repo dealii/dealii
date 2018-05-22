@@ -10,7 +10,7 @@ This program was contributed by Martin Kronbichler and Scott Miller.
 This tutorial program presents the implementation of a hybridizable
 discontinuous Galkerin method for the convection-diffusion equation.
 
-<h3>  Hybridizable discontinuous Galerkin methods</h3>
+<h3> Hybridizable discontinuous Galerkin methods </h3>
 
 One common argument against the use of discontinuous Galerkin elements
 is the large number of globally coupled degrees of freedom that one
