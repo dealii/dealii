@@ -125,20 +125,11 @@ void make_grid (Triangulation<2> &triangulation)
 //
 // We first need to create an object of this class and then pass it on to the
 // <code>DoFHandler</code> object to allocate storage for the degrees of
-// freedom (in deal.II lingo: we <code>distribute degrees of
-// freedom</code>). Note that the DoFHandler object will store a reference to
-// this finite element object, so we have to make sure its lifetime is at
-// least as long as that of the <code>DoFHandler</code>; one way to make sure
-// this is so is to make it static as well, in order to prevent its preemptive
-// destruction. (However, the library would warn us if we forgot about this
-// and abort the program if that occurred. You can check this, if you want, by
-// removing the 'static' declaration.)
+// freedom (in deal.II lingo: we <i>distribute degrees of
+// freedom</i>).
 void distribute_dofs (DoFHandler<2> &dof_handler)
 {
-  // As described above, let us first create a finite element object, and then
-  // use it to allocate degrees of freedom on the triangulation with which the
-  // dof_handler object is associated:
-  static const FE_Q<2> finite_element(1);
+  const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs (finite_element);
 
   // Now that we have associated a degree of freedom with a global number to
