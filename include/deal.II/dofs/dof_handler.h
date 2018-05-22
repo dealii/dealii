@@ -371,7 +371,7 @@ public:
 
   /**
    * Go through the triangulation and "distribute" the degrees of
-   * freedoms needed for the given finite element. "Distributing"
+   * freedom needed for the given finite element. "Distributing"
    * degrees of freedom involves allocating memory to store the
    * indices on all entities on which degrees of freedom can be
    * located (e.g., vertices, edges, faces, etc.) and to then enumerate
