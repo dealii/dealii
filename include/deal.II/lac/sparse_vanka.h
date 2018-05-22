@@ -413,7 +413,7 @@ private:
  * will work on each block separately, i.e. the solutions of the local systems
  * corresponding to a degree of freedom of one block will only be used to
  * update the degrees of freedom belonging to the same block, but never to
- * update degrees of freedoms of other blocks. A block can be a consecutive
+ * update degrees of freedom of other blocks. A block can be a consecutive
  * list of indices, as in the first alternative below, or a nonconsecutive
  * list of indices. Of course, we assume that the intersection of each two
  * blocks is empty and that the union of all blocks equals the interval

@@ -229,7 +229,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  *   Id_c = project_to_constrained_linear_operator(constraint_matrix, linop);
  * @endcode
  * and <code>Id_c</code> is the projection to the subspace consisting of all
- * vector entries associated with constrained degrees of freedoms.
+ * vector entries associated with constrained degrees of freedom.
  *
  * This LinearOperator object is used together with
  * constrained_right_hand_side() to build up the following modified system of

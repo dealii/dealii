@@ -229,7 +229,7 @@ ${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
 @f}
 We note that here and in the following, the indices $k,l$ run over spatial
 directions, i.e. $0\le k,l < d$, and that indices $i,j$ run over degrees
-of freedoms.
+of freedom.
 
 The local stiffness matrix on cell $K$ therefore has the following entries:
 @f[
@@ -352,4 +352,3 @@ this is required. In addition, in step-20, @ref step_21
 revisit some vector-valued problems and show a few techniques that may make it
 simpler to actually go through all the stuff shown above, with
 FiniteElement::system_to_component_index etc.
-
