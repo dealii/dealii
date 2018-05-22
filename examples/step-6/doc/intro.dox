@@ -3,12 +3,105 @@
 
 @dealiiVideoLecture{15,16,17,17.25,17.5,17.75}
 
-The main emphasis in this example is the handling of locally refined
-grids. The approach to adaptivity chosen in deal.II is to use grids in which
-neighboring cells may be refined a different number of times. This then
+This program is finally about one of the main features of deal.II:
+the use of adaptively (locally) refined meshes. The program is still
+based on step-4 and step-5, and, as you will see, it does not actually
+take very much code to enable adaptivity. Indeed, while we do a great
+deal of explaining, adaptive meshes can be added to an existing program
+with barely a dozen lines of additional code. The program shows what
+these lines are, as well as another important ingredient of adaptive
+mesh refinement (AMR): a criterion that can be used to determine whether
+it is necessary to refine a cell because the error is large on it,
+whether the cell can be coarsened because the error is particularly
+small on it, or whether we should just leave the cell as it is. We
+will discuss all of these issues in the following.
+
+
+<h3> What adaptively refined meshes look like </h3>
+
+There are a number of ways how one can adaptively refine meshes. The
+basic structure of the overall algorithm is always the same and consists
+of a loop over the following steps:
+- Solve the PDE on the current mesh;
+- Estimate the error on each cell using some criterion that is indicative
+  of the error;
+- Mark those cells that have large errors for refinement, mark those that have
+  particularly small errors for coarsening, and leave the rest alone;
+- Refine and coarsen the cells so marked to obtain a new mesh;
+- Repeat the steps above on the new mesh until the overall error is
+  sufficiently small.
+
+For reasons that are probably lost to history (maybe that these functions
+used to be implemented in FORTRAN, a language that does not care about
+whether something is spelled in lower or UPPER case letters, with programmers
+often choosing upper case letters habitually), the loop above is often
+referenced in publications about mesh adaptivity as the 
+SOLVE-ESTIMATE-MARK-REFINE loop (with this spelling).
+
+Beyond this structure, however, there are a variety of ways to achieve
+this. Fundamentally, they differ in how exactly one generates one mesh
+from the previous one.
+
+If one were to use triangles (which deal.II does not do), then there are
+two essential possibilities:
+- Longest-edge refinement: In this strategy, a triangle marked for refinement
+  is cut into two by introducing one new edge from the midpoint of the longest
+  edge to the opposite vertex. Of course, the midpoint from the longest edge
+  has to somehow be balanced by *also* refining the cell on the other side of
+  that edge (if there is one). If the edge in question is also the longest
+  edge of the neighboring cell, then we can just run a new edge through the
+  neighbor to the opposite vertex; otherwise a slightly more involved
+  construction is necessary that adds more new vertices on at least one
+  other edge of the neighboring cell, and then may propagate to the neighbors
+  of the neighbor until the algorithm terminates. This is hard to describe 
+  in words, and because deal.II does not use triangles not worth the time here.
+  But if you're curious, you can always watch video lecture 15 at the link
+  shown at the top of this introduction.
+- Red-green refinement: An alternative is what is called "red-green refinement".
+  This strategy is even more difficult to describe (but also discussed in the
+  video lecture) and has the advantage that the refinement does not propagate
+  beyond the immediate neighbors of the cell that we want to refine. It is,
+  however, substantially more difficult to implement.
+
+There are other variations of these approaches, but the important point is
+that they always generate a mesh where the lines where two cells touch
+are entire edges of both adjacent cells. With a bit of work, this strategy
+is readily adapted to three-dimensional meshes made from tetrahedra.
+
+Neither of these methods works for quadrilaterals in 2d and hexahedra in 3d,
+or at least not easily. The reason is that the transition elements created
+out of the quadrilateral neighbors of a quadrilateral cell that is to be refined
+would be triangles, and we don't want this. Consequently,
+the approach to adaptivity chosen in deal.II is to use grids in which
+neighboring cells may differ in refinement level by one. This then
 results in nodes on the interfaces of cells which belong to one
 side, but are unbalanced on the other. The common term for these is
-&ldquo;hanging nodes&rdquo;.
+&ldquo;hanging nodes&rdquo;, and these meshes then look like this in a very
+simple situation:
+
+@image html hanging_nodes.png "A simple mesh with hanging nodes"
+
+A more complicated two-dimensional mesh would look like this (and is
+discussed in the "Results" section below):
+
+<img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+     alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
+          along the inner circle."
+     width="300" height="300">
+
+Finally, a three-dimensional mesh (from step-43) with such hanging nodes is shown here:
+
+<img src="https://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
+     width="300" height="300">
+
+The first and third mesh are of course based on a square and a cube, but as the
+second mesh shows, this is not necessary. The important point is simply that we
+can refine a mesh independently of its neighbors (subject to the constraint
+that a cell can be only refined once more than its neighbors), but that we end
+up with these &ldquo;hanging nodes&rdquo; if we do this.
+
+
+<h3> How to deal with hanging nodes </h3>
 
 To guarantee that the global solution is continuous at these nodes as well, we
 have to state some additional constraints on the values of the solution at
@@ -18,6 +111,9 @@ linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
 module that explains how these constraints can be computed and what classes in
 deal.II work on them.
+
+
+<h3> Indicators for mesh refinement and coarsening </h3>
 
 The locally refined grids are produced using an error estimator class
 which estimates the energy error with respect to the Laplace
