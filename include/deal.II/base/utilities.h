@@ -1034,6 +1034,7 @@ namespace Utilities
 #  endif
 #endif
       {
+        (void) allow_compression;
         const size_t previous_size = dest_buffer.size();
         dest_buffer.resize (previous_size + sizeof(T));
 
@@ -1107,7 +1108,8 @@ namespace Utilities
 #  endif
 #endif
       {
-        Assert (std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
+        (void) allow_compression;
+        Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
         T object;
         std::memcpy (&object, &*cbegin, sizeof(T));
         return object;
