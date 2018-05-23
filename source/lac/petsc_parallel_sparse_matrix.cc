@@ -382,7 +382,6 @@ namespace PETScWrappers
       //if (preset_nonzero_locations == true)
       if (local_rows.n_elements()>0)
         {
-          Assert(local_columns.n_elements()>0, ExcInternalError());
           // MatMPIAIJSetPreallocationCSR
           // can be used to allocate the sparsity
           // pattern of a matrix

@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check mg transfer in parallel for trilinos vectors
+// check mg transfer in parallel for PETSc vectors
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
@@ -35,7 +35,7 @@
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 #include <algorithm>
 
@@ -119,7 +119,7 @@ void check_fe(FiniteElement<dim> &fe)
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs(fe);
-  typedef TrilinosWrappers::MPI::Vector vector_t;
+  typedef PETScWrappers::MPI::Vector vector_t;
   {
 
 
