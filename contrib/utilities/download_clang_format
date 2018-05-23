@@ -67,11 +67,15 @@ mkdir -p "${tmpdir}"
 cd "${tmpdir}"
 if [ -x "$(command -v wget)" ]; then
   echo "Using wget to download..."
-  wget -q --show-progress -L "${URL}/${FILENAME}" > /dev/null
+  # set progress option if available
+  wget --help | grep -q '\--show-progress' && \
+        _PROGRESS_OPT="--show-progress" || _PROGRESS_OPT=""
+
+  wget -q $_PROGRESS_OPT -L "${URL}/${FILENAME}" > /dev/null
 else
   if [ -x "$(command -v curl)" ]; then
     echo "Using curl to download..."
-    curl -s -L "${URL}/${FILENAME}" -O > /dev/null
+    curl --progress-bar -L "${URL}/${FILENAME}" -O > /dev/null
   else
     echo "Error: Neither wget nor curl is available..."
     exit 1
