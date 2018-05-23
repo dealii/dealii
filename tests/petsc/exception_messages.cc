@@ -22,7 +22,6 @@
 
 #include <petscconf.h>
 #include <petscsys.h>
-#include <petscerror.h>
 
 #include <vector>
 
