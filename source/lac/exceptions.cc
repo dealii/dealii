@@ -18,9 +18,8 @@
 #include <deal.II/lac/exceptions.h>
 
 #ifdef DEAL_II_WITH_PETSC
-#include <petscconf.h>
-#include <petscsys.h>
-#include <petscerror.h>
+#  include <petscconf.h>
+#  include <petscsys.h>
 #endif // DEAL_II_WITH_PETSC
 
 DEAL_II_NAMESPACE_OPEN
