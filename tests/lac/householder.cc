@@ -22,11 +22,11 @@
 #include <deal.II/lac/vector.h>
 
 
-const double rect[] =
+const double rect[3][4] =
 {
-  4., 3., 2., 1.,
-  5., 8., 1., -2.,
-  11., 13., -4., -5
+  {4., 3., 2., 1.},
+  {5., 8., 1., -2.},
+  {11., 13., -4., -5}
 };
 
 
@@ -36,7 +36,7 @@ int main()
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  FullMatrix<double> A(4,3,rect);
+  FullMatrix<double> A(4,3,&rect[0][0]);
   Householder<double> H(A);
 
   Vector<double> u(4);

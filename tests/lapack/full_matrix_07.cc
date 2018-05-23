@@ -25,13 +25,12 @@
 #include <iostream>
 #include <vector>
 
-const double left[] =
+const double left[4][4] =
 {
-
-  1.75, -0.433012701892219, 0.0, 0.0,
-  -0.433012701892219, 1.25, 0.0, 0.0,
-  0.0, 0.0, 3.5, -0.5,
-  0.0, 0.0, -0.5, 3.5
+  {1.75, -0.433012701892219, 0.0, 0.0},
+  {-0.433012701892219, 1.25, 0.0, 0.0},
+  {0.0, 0.0, 3.5, -0.5},
+  {0.0, 0.0, -0.5, 3.5}
 };
 
 
@@ -43,7 +42,7 @@ int main()
   logfile.precision(1);
   deallog.attach(logfile);
 
-  FullMatrix<double> A(4,4,left);
+  FullMatrix<double> A(4,4,&left[0][0]);
   LAPACKFullMatrix<double> LA(4,4);
   LA = A;
   FullMatrix<double> eigenvectors;

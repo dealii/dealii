@@ -30,32 +30,32 @@
 
 using namespace dealii;
 
-double Adata[] =
+double Adata[4][4] =
 {
-  4., .5, .1, 0.,
-  .5, 4., .5, .1,
-  .1, .5, 4., .5,
-  0., .1, .5, 4.
+  {4., .5, .1, 0.},
+  {.5, 4., .5, .1},
+  {.1, .5, 4., .5},
+  {0., .1, .5, 4.}
 };
 
-double B1data[] =
+double B1data[4][2] =
 {
-  .5, .1,
-  .4, .2,
-  .3, .3,
-  .2, .4
+  {.5, .1},
+  {.4, .2},
+  {.3, .3},
+  {.2, .4}
 };
 
-double B2data[] =
+double B2data[2][4] =
 {
-  .3, 0., -.3, 0.,
-  -.3, 0., .3, 0.
+  {.3, 0., -.3, 0.},
+  {-.3, 0., .3, 0.}
 };
 
-double Cdata[] =
+double Cdata[2][2] =
 {
-  8., 1.,
-  1., 8.
+  {8., 1.},
+  {1., 8.}
 };
 
 int main ()
@@ -65,10 +65,10 @@ int main ()
   FullMatrix<float> B2(2,4);
   FullMatrix<float> C(2,2);
 
-  A.fill(Adata);
-  B1.fill(B1data);
-  B2.fill(B2data);
-  C.fill(Cdata);
+  A.fill(&Adata[0][0]);
+  B1.fill(&B1data[0][0]);
+  B2.fill(&B2data[0][0]);
+  C.fill(&Cdata[0][0]);
 
   BlockMatrixArray<double> matrix(2, 2);
 

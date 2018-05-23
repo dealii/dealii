@@ -24,20 +24,20 @@
 #include <iostream>
 #include <vector>
 
-const double left[] =
+const double left[4][4] =
 {
-  4., -1., -1., -1.,
-  -1., 4., -1., -1.,
-  -1., -1., 4., -1.,
-  -1., -1., -1., 4.
+  {4., -1., -1., -1.},
+  {-1., 4., -1., -1.},
+  {-1., -1., 4., -1.},
+  {-1., -1., -1., 4.}
 };
 
-const double right[] =
+const double right[4][4] =
 {
-  4., -1., -1., -1.,
-  -1., 5., -1., -1.,
-  -1., -1., 6., -1.,
-  -1., -1., -1., 7.
+  {4., -1., -1., -1.},
+  {-1., 5., -1., -1.},
+  {-1., -1., 6., -1.},
+  {-1., -1., -1., 7.}
 };
 
 
@@ -49,8 +49,8 @@ int main()
   logfile.precision(1);
   deallog.attach(logfile);
 
-  FullMatrix<double> A(4,4,left),
-             B(4,4,right);
+  FullMatrix<double> A(4,4,&left[0][0]),
+             B(4,4,&right[0][0]);
   LAPACKFullMatrix<double> LA(4,4),
                    LB(4,4);
   for (unsigned int itype=1; itype<=3; ++itype)
