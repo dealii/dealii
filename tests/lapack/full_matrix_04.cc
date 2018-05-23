@@ -30,19 +30,19 @@
  * lambda = 5     v = (0, 1,-1, 0)
  * lambda = 5     v = (0, 0, 1,-1)
  */
-const double symm[] =
+const double symm[4][4] =
 {
-  4., -1., -1., -1.,
-  -1., 4., -1., -1.,
-  -1., -1., 4., -1.,
-  -1., -1., -1., 4.
+  {4., -1., -1., -1.},
+  {-1., 4., -1., -1.},
+  {-1., -1., 4., -1.},
+  {-1., -1., -1., 4.}
 };
 
-const double rect[] =
+const double rect[3][4] =
 {
-  4., 3., 2., 1.,
-  5., 8., 1., -2.,
-  11., 13., -4., -5
+  {4., 3., 2., 1.},
+  {5., 8., 1., -2.},
+  {11., 13., -4., -5}
 };
 
 
@@ -118,7 +118,7 @@ int main()
   logfile.precision(3);
   deallog.attach(logfile);
 
-  test_rect(4,4,symm);
-  test_rect(4,3,rect);
-  test_rect(3,4,rect);
+  test_rect(4,4,&symm[0][0]);
+  test_rect(4,3,&rect[0][0]);
+  test_rect(3,4,&rect[0][0]);
 }
