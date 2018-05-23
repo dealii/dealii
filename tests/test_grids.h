@@ -18,7 +18,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 
-using namespace dealii;
+#include "tests.h"
 
 /**
  * A set of test meshes for the deal.II test suite.
