@@ -216,36 +216,26 @@ ENDIF()
 
 
 #
-# OpenMP 4.0 can be used for vectorization (supported by gcc-4.9.1 and
-# later). Only the vectorization instructions
-# are allowed, the threading must be done through TBB.
+# OpenMP 4.0 can be used for vectorization. Only the vectorization
+# instructions are allowed, the threading must be done through TBB.
 #
 
-# Pick up the correct candidate keyword for the current compiler:
-SET(_keyword "")
+#
+# Choosing the right compiler flag is a bit of a mess:
+#
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15" )
+  IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "15" )
     SET(_keyword "qopenmp")
-  ELSEIF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "14" )
+  ELSEIF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "14" )
     SET(_keyword "openmp")
   ENDIF()
-
 ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # clang-3.6.1 or newer, or XCode version 6.3, or newer.
-  IF( ( CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "3.6"
-        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
-      OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "6.2")
-    SET(_keyword "openmp")
-  ENDIF()
-
+  SET(_keyword "openmp")
 ELSE()
   SET(_keyword "fopenmp")
-
 ENDIF()
 
-IF(NOT "${_keyword}" STREQUAL "")
-  CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
-ENDIF()
+CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
 
 SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 IF(DEAL_II_HAVE_OPENMP_SIMD)
