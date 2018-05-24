@@ -27,6 +27,8 @@
 
 #include "../tests.h"
 
+#include <numeric>
+
 
 int main (int argc,char **argv)
 {
