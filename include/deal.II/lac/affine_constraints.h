@@ -1091,7 +1091,7 @@ public:
     const std::vector<size_type> &local_dof_indices,
     SparsityPatternType &         sparsity_pattern,
     const bool                    keep_constrained_entries = true,
-    const Table<2, bool> &        dof_mask = default_empty_table) const;
+    const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
 
   /**
    * Similar to the other function, but for non-quadratic sparsity patterns.
@@ -1103,7 +1103,7 @@ public:
     const std::vector<size_type> &col_indices,
     SparsityPatternType &         sparsity_pattern,
     const bool                    keep_constrained_entries = true,
-    const Table<2, bool> &        dof_mask = default_empty_table) const;
+    const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
 
   /**
    * This function imports values from a global vector (@p global_vector) by
@@ -1464,12 +1464,6 @@ private:
    */
   static bool
   check_zero_weight(const std::pair<size_type, number> &p);
-
-  /**
-   * Dummy table that serves as default argument for function
-   * <tt>add_entries_local_to_global()</tt>.
-   */
-  static const Table<2, bool> default_empty_table;
 
   /**
    * This function actually implements the local_to_global function for

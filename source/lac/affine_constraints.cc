@@ -48,11 +48,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-// Static member variable
-const Table<2,bool> AffineConstraints::default_empty_table = Table<2,bool>();
-
-
-
 void
 AffineConstraints::copy_from (const AffineConstraints &other)
 {
