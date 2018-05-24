@@ -103,10 +103,42 @@ up with these &ldquo;hanging nodes&rdquo; if we do this.
 
 <h3> How to deal with hanging nodes </h3>
 
+The methods using triangular meshes mentioned above go to great
+lengths to make sure that each vertex is a vertex of all adjacent
+cells -- i.e., that there are no hanging nodes. This then
+automatically makes sure that we can define shape functions in such a
+way that they are globally continuous (if we use the common $Q_p$
+Lagrange finite element methods we have been using so far in the
+tutorial programs, as represented by the FE_Q class).
+
+On the other hand, if we define shape functions on meshes with hanging
+nodes, we may end up with shape functions that are not continuous. To
+see this, think about the situation above where the top right cell is
+not refined, and consider for a moment the use of a bilinear finite
+element. In that case, the shape functions associated with the hanging
+nodes are defined in the obvious way on the two small cells adjacent
+to each of the hanging nodes. But how do we extend them to the big
+adjacent cells? Clearly, the function's extension to the big cell
+cannot be bilinear because then it needs to be linear along each edge
+of the large cell, and that means that it needs to be zero on the
+entire edge because it needs to be zero on the two vertices of the
+large cell on that edge. But it is not zero at the hanging node itself
+when seen from the small cells' side -- so it is not continuous.
+
+But we do want the finite element solution to be continuous so that we
+have a &ldquo;conforming finite element method&rdquo; where the
+discrete finite element space is a proper subset of the $H^1$ function
+space in which we seek the solution of the Laplace equation.
 To guarantee that the global solution is continuous at these nodes as well, we
 have to state some additional constraints on the values of the solution at
-these nodes. In the program below, we will show how we can get these
-constraints from the library, and how to use them in the solution of the
+these nodes. How these constraints have to look is relatively easy to
+understand conceptually, but the implementation in software is
+complicated and takes several thousand lines of code. On the other
+hand, in user code, it is only about half a dozen lines you have to
+add when dealing with hanging nodes.
+
+In the program below, we will show how we can get these
+constraints from deal.II, and how to use them in the solution of the
 linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
 module that explains how these constraints can be computed and what classes in
