@@ -2919,6 +2919,88 @@ namespace internal
 
 
 
+  // if the input vector did not have ghosts imported, clear them here again
+  // in order to avoid subsequent operations e.g. in linear solvers to work
+  // with ghosts all the time
+  template <int dim, typename VectorStruct, typename Number>
+  inline
+  void reset_ghost_values (const VectorStruct &vec,
+                           VectorDataExchange<dim,Number> &exchanger)
+  {
+    reset_ghost_values_block(vec,
+                             std::integral_constant<bool,
+                             IsBlockVector<VectorStruct>::value>(),
+                             exchanger);
+  }
+
+
+
+  template <int dim, typename Number, typename Number2>
+  inline
+  void reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
+                           VectorDataExchange<dim,Number2> &exchanger)
+  {
+    exchanger.reset_ghost_values(vec);
+  }
+
+
+
+  template <int dim, typename VectorStruct, typename Number>
+  inline
+  void reset_ghost_values (const std::vector<VectorStruct> &vec,
+                           VectorDataExchange<dim,Number> &exchanger)
+  {
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      reset_ghost_values(vec[comp], exchanger);
+  }
+
+
+
+  template <int dim, typename VectorStruct, typename Number>
+  inline
+  void reset_ghost_values (const std::vector<VectorStruct *> &vec,
+                           VectorDataExchange<dim,Number> &exchanger)
+  {
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      reset_ghost_values(*vec[comp], exchanger);
+  }
+
+
+
+  template <int dim, typename VectorStruct, typename Number>
+  inline
+  void reset_ghost_values_block (const VectorStruct &vec,
+                                 std::integral_constant<bool,true>,
+                                 VectorDataExchange<dim,Number> &exchanger)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      reset_ghost_values(vec.block(i), exchanger);
+  }
+
+
+
+  // A helper function to identify block vectors with many components where we
+  // should not try to overlap computations and communcation because there
+  // would be too many outstanding communcation requests. This is the base case
+  // for generic vectors
+  template <typename VectorStruct>
+  constexpr unsigned int get_communication_block_size(const VectorStruct &)
+  {
+    return numbers::invalid_unsigned_int;
+  }
+
+
+
+  // Specialized case for the block vector which as the additional member
+  // variable
+  template <typename Number>
+  constexpr unsigned int get_communication_block_size(const LinearAlgebra::distributed::BlockVector<Number> &)
+  {
+    return LinearAlgebra::distributed::BlockVector<Number>::communication_block_size;
+  }
+
+
+
   template <int dim, typename VectorStruct, typename Number>
   inline
   void update_ghost_values_start (const VectorStruct &vec,
@@ -2981,68 +3063,11 @@ namespace internal
                                         std::integral_constant<bool,true>,
                                         VectorDataExchange<dim,Number> &exchanger)
   {
-    for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      update_ghost_values_start(vec.block(i), exchanger, channel+i);
-  }
-
-
-
-  // if the input vector did not have ghosts imported, clear them here again
-  // in order to avoid subsequent operations e.g. in linear solvers to work
-  // with ghosts all the time
-  template <int dim, typename VectorStruct, typename Number>
-  inline
-  void reset_ghost_values (const VectorStruct &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
-  {
-    reset_ghost_values_block(vec,
-                             std::integral_constant<bool,
-                             IsBlockVector<VectorStruct>::value>(),
-                             exchanger);
-  }
-
-
-
-  template <int dim, typename Number, typename Number2>
-  inline
-  void reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
-                           VectorDataExchange<dim,Number2> &exchanger)
-  {
-    exchanger.reset_ghost_values(vec);
-  }
-
-
-
-  template <int dim, typename VectorStruct, typename Number>
-  inline
-  void reset_ghost_values (const std::vector<VectorStruct> &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
-  {
-    for (unsigned int comp=0; comp<vec.size(); comp++)
-      reset_ghost_values(vec[comp], exchanger);
-  }
-
-
-
-  template <int dim, typename VectorStruct, typename Number>
-  inline
-  void reset_ghost_values (const std::vector<VectorStruct *> &vec,
-                           VectorDataExchange<dim,Number> &exchanger)
-  {
-    for (unsigned int comp=0; comp<vec.size(); comp++)
-      reset_ghost_values(*vec[comp], exchanger);
-  }
-
-
-
-  template <int dim, typename VectorStruct, typename Number>
-  inline
-  void reset_ghost_values_block (const VectorStruct &vec,
-                                 std::integral_constant<bool,true>,
-                                 VectorDataExchange<dim,Number> &exchanger)
-  {
-    for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      reset_ghost_values(vec.block(i), exchanger);
+    if (get_communication_block_size(vec) < vec.n_blocks())
+      vec.update_ghost_values();
+    else
+      for (unsigned int i=0; i<vec.n_blocks(); ++i)
+        update_ghost_values_start(vec.block(i), exchanger, channel+i);
   }
 
 
@@ -3109,8 +3134,14 @@ namespace internal
                                          std::integral_constant<bool,true>,
                                          VectorDataExchange<dim,Number> &exchanger)
   {
-    for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      update_ghost_values_finish(vec.block(i), exchanger, channel+i);
+    if (get_communication_block_size(vec) < vec.n_blocks())
+      {
+        // do nothing, everything has already been completed in the _start()
+        // call
+      }
+    else
+      for (unsigned int i=0; i<vec.n_blocks(); ++i)
+        update_ghost_values_finish(vec.block(i), exchanger, channel+i);
   }
 
 
@@ -3177,8 +3208,11 @@ namespace internal
                              std::integral_constant<bool,true>,
                              VectorDataExchange<dim, Number> &exchanger)
   {
-    for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      compress_start(vec.block(i), exchanger, channel+i);
+    if (get_communication_block_size(vec) < vec.n_blocks())
+      vec.compress(dealii::VectorOperation::add);
+    else
+      for (unsigned int i=0; i<vec.n_blocks(); ++i)
+        compress_start(vec.block(i), exchanger, channel+i);
   }
 
 
@@ -3245,8 +3279,14 @@ namespace internal
                               std::integral_constant<bool,true>,
                               VectorDataExchange<dim, Number> &exchanger)
   {
-    for (unsigned int i=0; i<vec.n_blocks(); ++i)
-      compress_finish(vec.block(i), exchanger, channel+i);
+    if (get_communication_block_size(vec) < vec.n_blocks())
+      {
+        // do nothing, everything has already been completed in the _start()
+        // call
+      }
+    else
+      for (unsigned int i=0; i<vec.n_blocks(); ++i)
+        compress_finish(vec.block(i), exchanger, channel+i);
   }
 
 
