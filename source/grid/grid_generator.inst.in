@@ -75,7 +75,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &triangulation_1,
         const Triangulation<deal_II_dimension, deal_II_space_dimension>
           &triangulation_2,
-        Triangulation<deal_II_dimension, deal_II_space_dimension> &result);
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &result,
+        const double duplicated_vertex_tolerance);
 
       template void
       create_union_triangulation(
