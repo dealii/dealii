@@ -81,6 +81,7 @@ namespace LinearAlgebra
     class BlockVector : public BlockVectorBase<Vector<Number> >,
       public VectorSpaceVector<Number>
     {
+    public:
       /**
        * The chunks size to split communication in update_ghost_values()
        * and compress() calls.
@@ -93,7 +94,6 @@ namespace LinearAlgebra
        * so we should arrive at the bandwidth dominated regime then which is good enough.
        */
       static constexpr unsigned int communication_block_size = 20;
-    public:
 
       /**
        * Typedef the base class for simpler access to its own typedefs.
