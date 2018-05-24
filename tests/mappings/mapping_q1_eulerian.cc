@@ -30,7 +30,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 show_values(FiniteElement<dim> &fe,
             const char *name)
 {

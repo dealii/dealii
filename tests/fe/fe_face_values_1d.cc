@@ -41,7 +41,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 plot_faces(Mapping<dim> &mapping,
            FiniteElement<dim> &fe,
            typename DoFHandler<dim>::cell_iterator &cell)
@@ -86,7 +87,8 @@ plot_faces(Mapping<dim> &mapping,
 
 
 template <int dim>
-inline void
+inline
+void
 plot_subfaces(Mapping<dim> &mapping,
               FiniteElement<dim> &fe,
               typename DoFHandler<dim>::cell_iterator &cell)

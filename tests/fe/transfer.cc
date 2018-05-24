@@ -37,7 +37,8 @@
     print_matrix(tr ## dim, l, fe, #el); }
 
 template <int dim>
-inline void
+inline
+void
 print_matrix(Triangulation<dim> &tr,
              unsigned int level,
              const FiniteElement<dim> &finel,

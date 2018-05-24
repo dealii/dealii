@@ -27,7 +27,8 @@ char fname[50];
 // x (y) (z) value[0]+1 value[1]+1 ...
 ////////////////////////////////////////////////////////////////////////////
 template <int dim>
-inline void
+inline
+void
 plot_shape_functions(Mapping<dim> &mapping,
                      FiniteElement<dim> &finel,
                      const char *name)
@@ -99,7 +100,8 @@ plot_shape_functions(Mapping<dim> &mapping,
 
 
 template <int dim>
-inline void
+inline
+void
 plot_face_shape_functions(
   Mapping<dim> &mapping,
   FiniteElement<dim> &finel,

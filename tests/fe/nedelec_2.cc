@@ -174,7 +174,8 @@ plot (const Triangulation<dim> &tr, const unsigned int p)
 
 
 template <int dim>
-inline void
+inline
+void
 check (const unsigned int p)
 {
   Triangulation<dim> tr;

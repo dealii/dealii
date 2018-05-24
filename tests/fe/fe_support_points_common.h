@@ -42,7 +42,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 check_support (const FiniteElement<dim> &finel, const char *name)
 {
   Triangulation<dim> tr;

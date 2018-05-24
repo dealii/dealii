@@ -36,7 +36,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 check (const unsigned int p)
 {
   deallog << dim << "-D" << std::endl;

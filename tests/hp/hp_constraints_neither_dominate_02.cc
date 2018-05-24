@@ -78,7 +78,8 @@ using namespace dealii;
 template <int dim>
 struct less_than_key
 {
-  inline bool operator() (const std::pair<Point<dim>,Vector<double> > &pair1, const std::pair<Point<dim>,Vector<double> > &pair2)
+  inline
+  bool operator() (const std::pair<Point<dim>,Vector<double> > &pair1, const std::pair<Point<dim>,Vector<double> > &pair2)
   {
     const double precision = 1e-3;
     const Point<dim> &p1 = pair1.first;

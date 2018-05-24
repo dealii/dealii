@@ -44,8 +44,10 @@ namespace std
    * Make a unary function with one name available under a different name
    */
 #define DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION_COPY(func_to, func_from) \
-  inline adouble func_to(const adouble &x) {return func_from(static_cast<const badouble &>(x));} \
-  inline adtl::adouble func_to(const adtl::adouble &x) {return adtl::func_from(x);}
+  inline \
+  adouble func_to(const adouble &x) {return func_from(static_cast<const badouble &>(x));} \
+  inline \
+  adtl::adouble func_to(const adtl::adouble &x) {return adtl::func_from(x);}
 
   /**
    * Expose a unary function
@@ -57,12 +59,18 @@ namespace std
    * Make a binary function with one name available under a different name
    */
 #define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_COPY(func_to,func_from) \
-  inline adouble func_to(const adouble &x, const adouble &y) {return func_from(static_cast<const badouble &>(x),static_cast<const badouble &>(y));} \
-  inline adouble func_to(const double &x,  const adouble &y) {return func_from(x,static_cast<const badouble &>(y));} \
-  inline adouble func_to(const adouble &x, const double  &y) {return func_from(static_cast<const badouble &>(x),y);} \
-  inline adtl::adouble func_to(const adtl::adouble &x, const adtl::adouble &y) {return adtl::func_from(x,y);} \
-  inline adtl::adouble func_to(const double &x, const adtl::adouble &y) {return adtl::func_from(x,y);} \
-  inline adtl::adouble func_to(const adtl::adouble &x, const double &y) {return adtl::func_from(x,y);}
+  inline \
+  adouble func_to(const adouble &x, const adouble &y) {return func_from(static_cast<const badouble &>(x),static_cast<const badouble &>(y));} \
+  inline \
+  adouble func_to(const double &x,  const adouble &y) {return func_from(x,static_cast<const badouble &>(y));} \
+  inline \
+  adouble func_to(const adouble &x, const double  &y) {return func_from(static_cast<const badouble &>(x),y);} \
+  inline \
+  adtl::adouble func_to(const adtl::adouble &x, const adtl::adouble &y) {return adtl::func_from(x,y);} \
+  inline \
+  adtl::adouble func_to(const double &x, const adtl::adouble &y) {return adtl::func_from(x,y);} \
+  inline \
+  adtl::adouble func_to(const adtl::adouble &x, const double &y) {return adtl::func_from(x,y);}
 
   /**
    * Expose a binary function
@@ -74,8 +82,10 @@ namespace std
    * Expose a binary function
    */
 #define DEAL_II_EXPOSE_ADOLC_BINARY_MATH_FUNCTION_2(func) \
-  inline adouble func(const adouble &x, const adouble &y) {return func(static_cast<const badouble &>(x),static_cast<const badouble &>(y));} \
-  inline adtl::adouble func(const adtl::adouble &x, const adtl::adouble &y) {return adtl::func(x,y);}
+  inline \
+  adouble func(const adouble &x, const adouble &y) {return func(static_cast<const badouble &>(x),static_cast<const badouble &>(y));} \
+  inline \
+  adtl::adouble func(const adtl::adouble &x, const adtl::adouble &y) {return adtl::func(x,y);}
 
   // See
   // https://gitlab.com/adol-c/adol-c/blob/master/ADOL-C/include/adolc/adouble.h
@@ -93,11 +103,13 @@ namespace std
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(sqrt)
 #if defined(DEAL_II_ADOLC_WITH_ATRIG_ERF)
   DEAL_II_EXPOSE_ADOLC_UNARY_MATH_FUNCTION(erf)
-  inline adouble erfc(const adouble &x)
+  inline
+  adouble erfc(const adouble &x)
   {
     return 1.0 - std::erf(x);
   } \
-  inline adtl::adouble erfc(const adtl::adouble &x)
+  inline
+  adtl::adouble erfc(const adtl::adouble &x)
   {
     return 1.0 - std::erf(x);
   }
