@@ -64,7 +64,7 @@ public:
 
   MatrixFreeTest(const MatrixFree<dim,Number> &data_in):
     data (data_in)
-  {};
+  {}
 
   void vmult (VectorType       &dst,
               const VectorType &src) const
@@ -76,7 +76,7 @@ public:
                              const std::pair<unsigned int,unsigned int> &)>
     wrap = helmholtz_operator<dim,fe_degree,VectorType,n_q_points_1d>;
     data.cell_loop (wrap, dst, src);
-  };
+  }
 
 private:
   const MatrixFree<dim,Number> &data;
