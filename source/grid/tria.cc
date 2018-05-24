@@ -2129,8 +2129,9 @@ namespace internal
        */
       struct QuadComparator
       {
-        inline bool operator () (const internal::TriangulationImplementation::TriaObject<2> &q1,
-                                 const internal::TriangulationImplementation::TriaObject<2> &q2) const
+        inline
+        bool operator () (const internal::TriangulationImplementation::TriaObject<2> &q1,
+                          const internal::TriangulationImplementation::TriaObject<2> &q2) const
         {
           // here is room to
           // optimize the repeated

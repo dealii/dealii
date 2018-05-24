@@ -238,8 +238,9 @@ T random_value(const T &min=static_cast<T>(0),
 // Construct a uniformly distributed random point, with each coordinate
 // between min and max
 template<int dim>
-inline Point<dim> random_point(const double &min=0.0,
-                               const double &max=1.0)
+inline
+Point<dim> random_point(const double &min=0.0,
+                        const double &max=1.0)
 {
   Assert(max >= min, ExcMessage("Make sure max>=min"));
   Point<dim> p;
@@ -385,7 +386,8 @@ Number filter_out_small_numbers (const Number number, const double tolerance)
  * Limit concurrency to a fixed (small) number of threads, independent
  * of the core count.
  */
-inline unsigned int testing_max_num_threads()
+inline
+unsigned int testing_max_num_threads()
 {
   return 3;
 }

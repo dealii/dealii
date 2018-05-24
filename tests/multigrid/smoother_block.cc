@@ -83,7 +83,8 @@ ScalingMatrix<number>::ScalingMatrix(number factor)
 
 template <typename number>
 template <typename VectorType>
-inline void
+inline
+void
 ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
@@ -91,7 +92,8 @@ ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
 
 template <typename number>
 template <typename VectorType>
-inline void
+inline
+void
 ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
@@ -99,7 +101,8 @@ ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
 
 template <typename number>
 template <typename VectorType>
-inline void
+inline
+void
 ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);
@@ -109,7 +112,8 @@ ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 
 template <typename number>
 template <typename VectorType>
-inline void
+inline
+void
 ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
   dst.add(factor, src);

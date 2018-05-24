@@ -316,7 +316,8 @@ namespace internal
     }
 
     // Transform the ghost indices to local index space for the vector
-    inline void
+    inline
+    void
     copy_indices_to_mpi_local_numbers(const Utilities::MPI::Partitioner &part,
                                       const std::vector<types::global_dof_index> &mine,
                                       const std::vector<types::global_dof_index> &remote,

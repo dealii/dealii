@@ -34,34 +34,40 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_WITH_HDF5
 
 template<typename number>
-inline hid_t hdf5_type_id (const number *)
+inline
+hid_t hdf5_type_id (const number *)
 {
   Assert (false, dealii::ExcNotImplemented());
   //don't know what to put here; it does not matter
   return -1;
 }
 
-inline hid_t hdf5_type_id (const double *)
+inline
+hid_t hdf5_type_id (const double *)
 {
   return H5T_NATIVE_DOUBLE;
 }
 
-inline hid_t hdf5_type_id (const float *)
+inline
+hid_t hdf5_type_id (const float *)
 {
   return H5T_NATIVE_FLOAT;
 }
 
-inline hid_t hdf5_type_id (const int *)
+inline
+hid_t hdf5_type_id (const int *)
 {
   return H5T_NATIVE_INT;
 }
 
-inline hid_t hdf5_type_id (const unsigned int *)
+inline
+hid_t hdf5_type_id (const unsigned int *)
 {
   return H5T_NATIVE_UINT;
 }
 
-inline hid_t hdf5_type_id (const char *)
+inline
+hid_t hdf5_type_id (const char *)
 {
   return H5T_NATIVE_CHAR;
 }

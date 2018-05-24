@@ -30,7 +30,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 plot_shape_functions(const unsigned int degree)
 {
   std::ostringstream prefix;

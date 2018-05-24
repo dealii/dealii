@@ -58,7 +58,8 @@ void print_formatted (const FullMatrix<number> &A,
 
 
 template <int dim>
-inline void
+inline
+void
 check_restriction (FiniteElement<dim> &fe, const char *name)
 {
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;

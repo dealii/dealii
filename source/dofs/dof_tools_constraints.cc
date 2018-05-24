@@ -53,7 +53,8 @@ namespace DoFTools
   {
     namespace
     {
-      inline bool
+      inline
+      bool
       check_master_dof_list (const FullMatrix<double> &face_interpolation_matrix,
                              const std::vector<types::global_dof_index> &master_dof_list)
       {

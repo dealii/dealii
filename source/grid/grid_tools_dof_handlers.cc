@@ -1852,11 +1852,12 @@ next_cell:
    * is parallel to the unit vector in <direction>
    */
   template <int spacedim>
-  inline bool orthogonal_equality (const Point<spacedim>    &point1,
-                                   const Point<spacedim>    &point2,
-                                   const int                 direction,
-                                   const Tensor<1,spacedim> &offset,
-                                   const FullMatrix<double> &matrix)
+  inline
+  bool orthogonal_equality (const Point<spacedim>    &point1,
+                            const Point<spacedim>    &point2,
+                            const int                 direction,
+                            const Tensor<1,spacedim> &offset,
+                            const FullMatrix<double> &matrix)
   {
     Assert (0<=direction && direction<spacedim,
             ExcIndexRange (direction, 0, spacedim));
@@ -1967,7 +1968,8 @@ next_cell:
 
 
   template <typename FaceIterator>
-  inline bool
+  inline
+  bool
   orthogonal_equality (std::bitset<3>     &orientation,
                        const FaceIterator &face1,
                        const FaceIterator &face2,
@@ -2015,7 +2017,8 @@ next_cell:
 
 
   template <typename FaceIterator>
-  inline bool
+  inline
+  bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,

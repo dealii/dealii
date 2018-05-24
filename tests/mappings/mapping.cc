@@ -40,7 +40,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 plot_transformation(Mapping<dim> &mapping,
                     FiniteElement<dim> &fe,
                     typename DoFHandler<dim>::cell_iterator &cell,
@@ -80,7 +81,8 @@ plot_transformation(Mapping<dim> &mapping,
 
 
 template <int dim>
-inline void
+inline
+void
 plot_faces(Mapping<dim> &mapping,
            FiniteElement<dim> &fe,
            typename DoFHandler<dim>::cell_iterator &cell,
@@ -124,7 +126,8 @@ plot_faces(Mapping<dim> &mapping,
 
 
 template <int dim>
-inline void
+inline
+void
 plot_subfaces(Mapping<dim> &mapping,
               FiniteElement<dim> &fe,
               typename DoFHandler<dim>::cell_iterator &cell,
@@ -170,7 +173,8 @@ plot_subfaces(Mapping<dim> &mapping,
 
 
 template <>
-inline void
+inline
+void
 plot_faces(Mapping<1> &,
            FiniteElement<1> &,
            DoFHandler<1>::cell_iterator &,
@@ -180,7 +184,8 @@ plot_faces(Mapping<1> &,
 
 
 template <>
-inline void
+inline
+void
 plot_subfaces(Mapping<1> &,
               FiniteElement<1> &,
               DoFHandler<1>::cell_iterator &,
@@ -190,7 +195,8 @@ plot_subfaces(Mapping<1> &,
 
 
 template <int dim>
-inline void
+inline
+void
 compute_area(Mapping<dim> &mapping,
              FiniteElement<dim> &fe,
              typename DoFHandler<dim>::cell_iterator &cell)

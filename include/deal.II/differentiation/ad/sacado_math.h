@@ -40,7 +40,8 @@ namespace std
              dealii::Differentiation::AD::is_sacado_number<ADNumberType>::value &&
              dealii::Differentiation::AD::is_real_valued_ad_number<ADNumberType>::value
              >::type>
-  inline ADNumberType erf(ADNumberType x)
+  inline
+  ADNumberType erf(ADNumberType x)
   {
     // Reference:
     // Handbook of Mathematical Functions: with Formulas, Graphs, and Mathematical Tables
@@ -82,7 +83,8 @@ namespace std
   template<typename ADNumberType, typename = typename std::enable_if<
              dealii::Differentiation::AD::is_sacado_number<ADNumberType>::value
              >::type>
-  inline ADNumberType erfc(const ADNumberType &x)
+  inline
+  ADNumberType erfc(const ADNumberType &x)
   {
     return 1.0 - std::erf(x);
   }

@@ -31,7 +31,8 @@
 
 
 template <int dim>
-inline void
+inline
+void
 plot_derivatives(Mapping<dim> &mapping,
                  FiniteElement<dim> &finel,
                  const char *name)
