@@ -234,26 +234,78 @@ namespace GridOutFlags
     bool write_cell_numbers;
 
     /**
+     * Number of points, <em>excluding</em> the vertices, to plot on curved
+     * lines. Since GNUPLOT can only plot straight lines, setting this number
+     * to a value greater than zero (4 or 5 is usually enough for refined
+     * grids) makes the plot look curved even though it is not.
+     */
+    unsigned int n_extra_curved_line_points;
+
+    /**
      * Based on the vertices of the face and #n_boundary_face_points
      * additional points a tensor product mesh (transformed to the real space)
      * of (#n_boundary_face_points+2)<sup>dim-1</sup> points is plotted on
      * each boundary face.
+     *
+     * @deprecated Use n_extra_curved_line_points instead, which has
+     * a more precise name. For compatibility this is implemented as a
+     * reference to n_extra_curved_line_points.
      */
-    unsigned int n_boundary_face_points;
+    DEAL_II_DEPRECATED unsigned int &n_boundary_face_points;
 
     /**
-     * Flag. If true also inner cells are plotted with curved boundaries. This
-     * is useful when for e.g.  MappingQEulerian with
-     * #n_boundary_face_points&gt;.
+     * Boolean indicating whether or not interior lines should be plotted with
+     * <tt>n_extra_curved_line_points</tt> line segments.
      */
     bool curved_inner_cells;
+
+    /**
+     * Flag. If true then, when writing <tt>spacedim = 3</tt> output, write
+     * <tt>2*n_extra_curved_line_points</tt> extra lines on boundary faces.
+     *
+     * Setting this option has no effect when <tt>spacedim = 2</tt> since, in
+     * that case, boundary faces are lines and outputting additional lines
+     * does not make sense.
+     *
+     * @note This is not yet implemented for the <tt>dim = 2</tt> case. For
+     * backwards compatibility, however, this will not raise a runtime error.
+     */
+    bool write_additional_boundary_lines;
 
     /**
      * Constructor.
      */
     Gnuplot (const bool         write_cell_number = false,
-             const unsigned int n_boundary_face_points = 2,
-             const bool         curved_inner_cells = false);
+             const unsigned int n_extra_curved_line_points = 2,
+             const bool         curved_inner_cells = false,
+             const bool         write_additional_boundary_lines = true);
+
+    /**
+     * Copy constructor. Needed since this class (for backwards compatibility)
+     * has a reference member variable.
+     */
+    Gnuplot (const Gnuplot &flags);
+
+    /**
+     * Move constructor. Needed since this class (for backwards compatibility)
+     * has a reference member variable.
+     */
+    Gnuplot (Gnuplot &&flags);
+
+    /**
+     * Copy operator. Needed since this class (for backwards compatibility)
+     * has a reference member variable.
+     */
+    Gnuplot &
+    operator= (const Gnuplot &flags);
+
+    /**
+     * Move assignment operator. Needed since this class (for backwards
+     * compatibility) has a reference member variable.
+     */
+    Gnuplot &
+    operator= (Gnuplot &&flags);
+
     /**
      * Declare parameters in ParameterHandler.
      */
@@ -912,9 +964,8 @@ public:
    * at the boundary. If zero, then use standard Q1 mapping.
    *
    * Names and values of additional flags controlling the output can be found
-   * in the documentation of the GridOutFlags::Gnuplot() class.
-   *
-   * Not implemented for the codimension one case.
+   * in the documentation of the GridOutFlags::Gnuplot class, which also
+   * describes some caveats for the codimension one case.
    */
   template <int dim, int spacedim>
   void write_gnuplot (const Triangulation<dim,spacedim> &tria,

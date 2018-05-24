@@ -126,13 +126,54 @@ namespace GridOutFlags
   }
 
 
-  Gnuplot::Gnuplot (const bool write_cell_numbers,
-                    const unsigned int n_boundary_face_points,
-                    const bool         curved_inner_cells) :
+
+  Gnuplot::Gnuplot (const bool         write_cell_numbers,
+                    const unsigned int n_extra_curved_line_points,
+                    const bool         curved_inner_cells,
+                    const bool         write_additional_boundary_lines) :
     write_cell_numbers (write_cell_numbers),
-    n_boundary_face_points(n_boundary_face_points),
-    curved_inner_cells(curved_inner_cells)
+    n_extra_curved_line_points(n_extra_curved_line_points),
+    n_boundary_face_points(this->n_extra_curved_line_points),
+    curved_inner_cells(curved_inner_cells),
+    write_additional_boundary_lines(write_additional_boundary_lines)
   {}
+
+
+  // TODO we can get rid of these extra constructors and assignment operators
+  // once we remove the reference member variable.
+  Gnuplot::Gnuplot(const Gnuplot &flags) :
+    Gnuplot(flags.write_cell_numbers,
+            flags.n_extra_curved_line_points,
+            flags.curved_inner_cells,
+            flags.write_additional_boundary_lines)
+  {}
+
+
+
+  Gnuplot::Gnuplot(Gnuplot &&flags) :
+    Gnuplot(static_cast<const Gnuplot &>(flags))
+  {}
+
+
+
+  Gnuplot &
+  Gnuplot::operator=(const Gnuplot &flags)
+  {
+    write_cell_numbers = flags.write_cell_numbers;
+    n_extra_curved_line_points = flags.n_extra_curved_line_points;
+    curved_inner_cells = flags.curved_inner_cells;
+    write_additional_boundary_lines = flags.write_additional_boundary_lines;
+
+    return *this;
+  }
+
+
+
+  Gnuplot &
+  Gnuplot::operator=(Gnuplot &&flags)
+  {
+    return operator=(static_cast<const Gnuplot &>(flags));
+  }
 
 
 
@@ -3116,6 +3157,34 @@ namespace internal
 {
   namespace
   {
+    /**
+     * GNUPlot output can, optionally, output multiple line segments on each
+     * grid line to make curved lines look curved. However, this is very
+     * wasteful when the line itself is straight since we do not need multiple
+     * line segments to draw a straight line. This function tries to identify
+     * whether or not the collection of points corresponds to a straight line:
+     * if it does then all but the first and last points can be removed.
+     */
+    template <int spacedim>
+    void
+    remove_colinear_points(std::vector<Point<spacedim>> &points)
+    {
+      while (points.size() > 2)
+        {
+          Tensor<1, spacedim> first_difference = points[1] - points[0];
+          first_difference /= first_difference.norm();
+          Tensor<1, spacedim> second_difference = points[2] - points[1];
+          second_difference /= second_difference.norm();
+          // If the three points are colinear then remove the middle one.
+          if ((first_difference - second_difference).norm() < 1e-10)
+            points.erase(points.begin() + 1);
+          else
+            break;
+        }
+    }
+
+
+
     template <int spacedim>
     void write_gnuplot (const dealii::Triangulation<1,spacedim> &tria,
                         std::ostream             &out,
@@ -3172,11 +3241,8 @@ namespace internal
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
       endc=tria.end();
 
-      // if we are to treat curved
-      // boundaries, then generate a
-      // quadrature formula which will be
-      // used to probe boundary points at
-      // curved faces
+      // If we need to plot curved lines then generate a quadrature formula to
+      // place points via the mapping
       Quadrature<dim> *q_projector=nullptr;
       std::vector<Point<dim-1> > boundary_points;
       if (mapping!=nullptr)
@@ -3198,16 +3264,15 @@ namespace internal
           if (gnuplot_flags.write_cell_numbers)
             out << "# cell " << cell << '\n';
 
-          if (mapping==nullptr ||
-              (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells))
+          if (mapping == nullptr ||
+              (dim == spacedim ? (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells) :
+               // ignore checking for boundary or interior cells in the codim
+               // 1 case: 'or false' is a no-op
+               false))
             {
-              // write out the four sides
-              // of this cell by putting
-              // the four points (+ the
-              // initial point again) in
-              // a row and lifting the
-              // drawing pencil at the
-              // end
+              // write out the four sides of this cell by putting the four
+              // points (+ the initial point again) in a row and lifting the
+              // drawing pencil at the end
               for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
                 out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i])
                     << ' ' << cell->level()
@@ -3219,28 +3284,34 @@ namespace internal
                   << '\n';
             }
           else
-            // cell is at boundary and we
-            // are to treat curved
-            // boundaries. so loop over
-            // all faces and draw them as
-            // small pieces of lines
+            // cell is at boundary and we are to treat curved boundaries. so
+            // loop over all faces and draw them as small pieces of lines
             {
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                 {
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
-                  if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
+                  if (dim != spacedim || face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
-                      // compute offset
-                      // of quadrature
-                      // points within
-                      // set of projected
-                      // points
+                      // Save the points on each face to a vector and then try
+                      // to remove colinear points that won't show up in the
+                      // generated plot.
+                      std::vector<Point<spacedim>> line_points;
+                      // compute offset of quadrature points within set of
+                      // projected points
                       const unsigned int offset=face_no*n_points;
-                      for (unsigned int i=0; i<n_points; ++i)
-                        out << (mapping->transform_unit_to_real_cell
-                                (cell, q_projector->point(offset+i)))
+                      // we don't need to transform the vertices: they are
+                      // already in physical space.
+                      line_points.push_back(face->vertex(0));
+                      for (unsigned int i=1; i<n_points - 1; ++i)
+                        line_points.push_back(mapping->transform_unit_to_real_cell
+                                              (cell, q_projector->point(offset+i)));
+                      line_points.push_back(face->vertex(1));
+                      internal::remove_colinear_points(line_points);
+
+                      for (const Point<spacedim> &point : line_points)
+                        out << point
                             << ' ' << cell->level()
                             << ' ' << static_cast<unsigned int>(cell->material_id())
                             << '\n';
@@ -3250,11 +3321,8 @@ namespace internal
                     }
                   else
                     {
-                      // if, however, the
-                      // face is not at
-                      // the boundary,
-                      // then draw it as
-                      // usual
+                      // if, however, the face is not at the boundary and we
+                      // don't want to curve anything, then draw it as usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
@@ -3273,8 +3341,7 @@ namespace internal
       if (q_projector != nullptr)
         delete q_projector;
 
-      // make sure everything now gets to
-      // disk
+      // make sure everything now gets to disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -3301,11 +3368,8 @@ namespace internal
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
       endc=tria.end();
 
-      // if we are to treat curved
-      // boundaries, then generate a
-      // quadrature formula which will be
-      // used to probe boundary points at
-      // curved faces
+      // If we need to plot curved lines then generate a quadrature formula to
+      // place points via the mapping
       Quadrature<dim> *q_projector=nullptr;
       std::vector<Point<1> > boundary_points;
       if (mapping!=nullptr)
@@ -3319,8 +3383,7 @@ namespace internal
           std::vector<double> dummy_weights(n_points, 1./n_points);
           Quadrature<1> quadrature1d(boundary_points, dummy_weights);
 
-          // tensor product of points,
-          // only one copy
+          // tensor product of points, only one copy
           QIterated<dim-1> quadrature(quadrature1d, 1);
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
@@ -3405,7 +3468,7 @@ namespace internal
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
                   face = cell->face(face_no);
 
-                  if (face->at_boundary())
+                  if (face->at_boundary() && gnuplot_flags.write_additional_boundary_lines)
                     {
                       const unsigned int offset=face_no*n_points*n_points;
                       for (unsigned int i=0; i<n_points-1; ++i)
@@ -3428,10 +3491,7 @@ namespace internal
                                       cell, q_projector->point(offset+i*n_points+j+1)))
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
-                            // and the
-                            // first
-                            // point
-                            // again
+                            // and the first point again
                             out << p0
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
@@ -3445,24 +3505,30 @@ namespace internal
                           const typename dealii::Triangulation<dim,spacedim>::line_iterator
                           line=face->line(l);
 
-                          const Point<spacedim> &v0=line->vertex(0),
-                                                 &v1=line->vertex(1);
+                          const Point<spacedim> &v0=line->vertex(0), &v1=line->vertex(1);
                           if (line->at_boundary() || gnuplot_flags.curved_inner_cells)
                             {
-                              // transform_real_to_unit_cell
-                              // could be
-                              // replaced
-                              // by using
-                              // QProjector<dim>::project_to_line
-                              // which is
-                              // not yet
-                              // implemented
+                              // Save the points on each face to a vector and
+                              // then try to remove colinear points that won't
+                              // show up in the generated plot.
+                              std::vector<Point<spacedim>> line_points;
+                              // transform_real_to_unit_cell could be replaced
+                              // by using QProjector<dim>::project_to_line
+                              // which is not yet implemented
                               const Point<spacedim> u0=mapping->transform_real_to_unit_cell(cell, v0),
                                                     u1=mapping->transform_real_to_unit_cell(cell, v1);
 
-                              for (unsigned int i=0; i<n_points; ++i)
-                                out << (mapping->transform_unit_to_real_cell
-                                        (cell, (1-boundary_points[i][0])*u0+boundary_points[i][0]*u1))
+                              const Point<spacedim> center;
+                              // we don't need to transform the vertices: they
+                              // are already in physical space.
+                              line_points.push_back(v0);
+                              for (unsigned int i=1; i<n_points - 1; ++i)
+                                line_points.push_back(mapping->transform_unit_to_real_cell
+                                                      (cell, (1-boundary_points[i][0])*u0 + boundary_points[i][0]*u1));
+                              line_points.push_back(v1);
+                              internal::remove_colinear_points(line_points);
+                              for (const Point<spacedim> &point : line_points)
+                                out << point
                                     << ' ' << cell->level()
                                     << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
                             }
@@ -3485,8 +3551,7 @@ namespace internal
         delete q_projector;
 
 
-      // make sure everything now gets to
-      // disk
+      // make sure everything now gets to disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -3935,10 +4000,6 @@ namespace internal
       for (LineList::const_iterator line=line_list.begin();
            line!=line_list.end(); ++line)
         if (eps_flags_base.color_lines_level && (line->level > 0))
-          // lines colored according to
-          // refinement level,
-          // contributed by J�rg
-          // R. Weimar
           out << line->level
               << " l "
               << (line->first  - offset) * scale << " m "
