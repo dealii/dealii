@@ -187,8 +187,8 @@ VectorSlice<VectorType>::VectorSlice(VectorType   &v,
   :
   v(v), start(start), length(length)
 {
-  Assert((start+length<=v.size()),
-         ExcIndexRange(length, 0, v.size()-start+1));
+  Assert((start + length <= v.size()),
+         ExcIndexRange(length, 0, v.size() - start + 1));
 }
 
 
