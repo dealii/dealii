@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2017 by the deal.II authors
+// Copyright (C) 2013 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,102 +13,304 @@
 //
 // ---------------------------------------------------------------------
 
-for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
-{
-    template void AffineConstraints::condense<T<S> >(const T<S> &, T<S> &) const;
-    template void AffineConstraints::condense<T<S> >(T<S> &vec) const;
-    template void AffineConstraints::distribute_local_to_global<T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&) const;
-    template void AffineConstraints::distribute_local_to_global<T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<S>&, bool) const;
-    template void AffineConstraints::set_zero<T<S> >(T<S> &) const;
-}
+
+for (S : REAL_AND_COMPLEX_SCALARS)
+  {
+    template class AffineConstraints<S>;
+  }
 
 
-for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
-{
-    template void AffineConstraints::condense<LinearAlgebra::distributed::T<S> >(const LinearAlgebra::distributed::T<S> &, LinearAlgebra::distributed::T<S> &) const;
-    template void AffineConstraints::condense<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &vec) const;
-
-    template
-    void
-    AffineConstraints::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
-    (const Vector<S>&,
-     const std::vector<types::global_dof_index> &,
-     LinearAlgebra::distributed::T<S> &,
-     const FullMatrix<S>&) const;
-
-    template
-    void
-    AffineConstraints::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
-    (const Vector<S>&,
-     const std::vector<types::global_dof_index> &,
-     const std::vector<types::global_dof_index> &,
-     LinearAlgebra::distributed::T<S> &,
-     const FullMatrix<S>&,
-     bool) const;
-
-    template
-    void
-    AffineConstraints::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> > >
-    (const FullMatrix<S> &,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &) const;
-
-    template
-    void
-    AffineConstraints::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, LinearAlgebra::distributed::T<S> >
-    (const FullMatrix<S> &,
-     const Vector<S>&,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
-     LinearAlgebra::distributed::T<S>&,
-     bool,
-     std::integral_constant<bool, false>) const;
-
-    template
-    void
-    AffineConstraints::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, T<S> >
-    (const FullMatrix<S> &,
-     const Vector<S>&,
-     const std::vector< size_type > &,
-     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
-     T<S>&,
-     bool,
-     std::integral_constant<bool, false>) const;
-
-    template
-    void
-    AffineConstraints::set_zero<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &) const;
-}
+// ---------------------------------------------------------------------
+//
+// Instantiate AffineConstraints<S>::condense variants
+//
+// ---------------------------------------------------------------------
 
 
-for (V: EXTERNAL_PARALLEL_VECTORS)
-{
-    template void AffineConstraints::set_zero<V >(V&) const;
-}
+for (S : REAL_AND_COMPLEX_SCALARS)
+  {
+    template void AffineConstraints<S>::condense<Vector<S>>(SparseMatrix<S> &,
+                                                            Vector<S> &) const;
+
+    template void AffineConstraints<S>::condense<BlockVector<S>>(
+      BlockSparseMatrix<S> &, BlockVector<S> &) const;
+  }
+
+for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void AffineConstraints<S>::condense<T<S>>(const T<S> &, T<S> &)
+      const;
+
+    template void
+    AffineConstraints<S>::condense<LinearAlgebra::distributed::T<S>>(
+      const LinearAlgebra::distributed::T<S> &,
+      LinearAlgebra::distributed::T<S> &) const;
+
+    template void AffineConstraints<S>::condense<T<S>>(T<S> & vec) const;
+
+    template void
+      AffineConstraints<S>::condense<LinearAlgebra::distributed::T<S>>(
+        LinearAlgebra::distributed::T<S> & vec) const;
+  }
 
 
-for (S : REAL_SCALARS)
-{
-    template void AffineConstraints::condense<S>(SparseMatrix<S>&) const;
-    template void AffineConstraints::condense<S>(BlockSparseMatrix<S>&) const;
-}
+// ---------------------------------------------------------------------
+//
+// Instantiate AffineConstraints<S>::distribute_local_to_global variants
+//
+// ---------------------------------------------------------------------
 
 
-for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
-{
-    template void AffineConstraints::condense<S1,Vector<S2> >(SparseMatrix<S1>&, Vector<S2>&) const;
-    template void AffineConstraints::condense<S1,BlockVector<S2> >(BlockSparseMatrix<S1>&, BlockVector<S2>&) const;
-}
+// Pure vector variants:
 
-for (S1 : COMPLEX_SCALARS)
-{
-    template void AffineConstraints::condense<S1,Vector<S1> >(SparseMatrix<S1>&, Vector<S1>&) const;
-}
+for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void AffineConstraints<S>::distribute_local_to_global<T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      T<S> &,
+      const FullMatrix<S> &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::distributed::T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      LinearAlgebra::distributed::T<S> &,
+      const FullMatrix<S> &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      const std::vector<types::global_dof_index> &,
+      T<S> &,
+      const FullMatrix<S> &,
+      bool) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::distributed::T<S>>(
+      const Vector<S> &,
+      const std::vector<types::global_dof_index> &,
+      const std::vector<types::global_dof_index> &,
+      LinearAlgebra::distributed::T<S> &,
+      const FullMatrix<S> &,
+      bool) const;
+  }
+
+// Almost all matrix/vector variants:
+
+for (S : REAL_AND_COMPLEX_SCALARS; M : AFFINE_CONSTRAINTS_MATRIX_TEMPL)
+  {
+    template void
+    AffineConstraints<S>::distribute_local_to_global<M<S>, Vector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      M<S> &,
+      Vector<S> &,
+      bool,
+      std::integral_constant<bool, false>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<M<S>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      M<S> &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<M<S>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      M<S> &) const;
+  }
+
+// DiagonalMatrix:
+
+for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void
+    AffineConstraints<S>::distribute_local_to_global<DiagonalMatrix<T<S>>>(
+      const FullMatrix<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<T<S>> &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>>(
+      const FullMatrix<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>> &) const;
+
+    template void
+    AffineConstraints<S>::distribute_local_to_global<DiagonalMatrix<T<S>>,
+                                                     T<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<T<S>> &,
+      T<S> &,
+      bool,
+      std::integral_constant<bool, false>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
+      LinearAlgebra::distributed::T<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<size_type> &,
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
+      LinearAlgebra::distributed::T<S> &,
+      bool,
+      std::integral_constant<bool, false>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
+      T<S>>(const FullMatrix<S> &,
+            const Vector<S> &,
+            const std::vector<size_type> &,
+            DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
+            T<S> &,
+            bool,
+            std::integral_constant<bool, false>) const;
+  }
+
+// BlockSparseMatrix:
+
+for (S : REAL_AND_COMPLEX_SCALARS)
+  {
+    template void
+    AffineConstraints<S>::distribute_local_to_global<BlockSparseMatrix<S>,
+                                                     Vector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      BlockSparseMatrix<S> &,
+      Vector<S> &,
+      bool,
+      std::integral_constant<bool, true>) const;
+
+    template void
+    AffineConstraints<S>::distribute_local_to_global<BlockSparseMatrix<S>,
+                                                     BlockVector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      BlockSparseMatrix<S> &,
+      BlockVector<S> &,
+      bool,
+      std::integral_constant<bool, true>) const;
+
+    template void
+    AffineConstraints<S>::distribute_local_to_global<BlockSparseMatrix<S>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      BlockSparseMatrix<S> &) const;
+
+    template void
+    AffineConstraints<S>::distribute_local_to_global<BlockSparseMatrix<S>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      BlockSparseMatrix<S> &) const;
+  }
+
+// MatrixBlock
+
+for (S : REAL_AND_COMPLEX_SCALARS)
+  {
+    template void AffineConstraints<S>::distribute_local_to_global<
+      MatrixBlock<SparseMatrix<S>>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      MatrixBlock<SparseMatrix<S>> &) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      MatrixBlock<SparseMatrix<S>>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      MatrixBlock<SparseMatrix<S>> &) const;
+  }
 
 
-for (Vec : VECTOR_TYPES)
-{
-    template void AffineConstraints::distribute<Vec>(Vec &) const;
-}
+// ---------------------------------------------------------------------
+//
+// Instantiate AffineConstraints<S>::add_entries_local_to_global variants
+//
+// ---------------------------------------------------------------------
+
+
+for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP)
+  {
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &,
+      std::integral_constant<bool, false>) const;
+
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &) const;
+  }
+
+for (S : REAL_AND_COMPLEX_SCALARS; SP : AFFINE_CONSTRAINTS_SP_BLOCK)
+  {
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &,
+      std::integral_constant<bool, true>) const;
+
+    template void AffineConstraints<S>::add_entries_local_to_global<SP>(
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      SP &,
+      const bool,
+      const Table<2, bool> &) const;
+  }
+
+
+// ---------------------------------------------------------------------
+//
+// Rest:
+//
+// ---------------------------------------------------------------------
+
+
+for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void AffineConstraints<S>::distribute<T<S>>(T<S> &) const;
+
+    template void
+    AffineConstraints<S>::distribute<LinearAlgebra::distributed::T<S>>(
+      LinearAlgebra::distributed::T<S> &) const;
+
+    template void AffineConstraints<S>::set_zero<T<S>>(T<S> &) const;
+
+    template void
+    AffineConstraints<S>::set_zero<LinearAlgebra::distributed::T<S>>(
+      LinearAlgebra::distributed::T<S> &) const;
+  }
+
+
+for (S : REAL_AND_COMPLEX_SCALARS)
+  {
+    template void
+    AffineConstraints<S>::distribute<LinearAlgebra::Vector<S>>(
+      LinearAlgebra::Vector<S> &) const;
+  }
+
+for (V : EXTERNAL_PARALLEL_VECTORS)
+  {
+    template void AffineConstraints<V::value_type>::distribute<V>(V &) const;
+
+    template void AffineConstraints<V::value_type>::set_zero<V>(V &) const;
+  }
