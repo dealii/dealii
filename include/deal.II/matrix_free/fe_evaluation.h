@@ -151,13 +151,13 @@ public:
    * the current cell, and store them internally. Similar functionality as the
    * function DoFAccessor::get_interpolated_dof_values when no constraints are
    * present, but it also includes constraints from hanging nodes, so one can
-   * see it as a similar function to ConstraintMatrix::read_dof_values as
+   * see it as a similar function to AffineConstraints::read_dof_values as
    * well. Note that if vectorization is enabled, the DoF values for several
    * cells are set.
    *
    * If some constraints on the vector are inhomogeneous, use the function
    * read_dof_values_plain instead and provide the vector with useful data
-   * also in constrained positions by calling ConstraintMatrix::distribute.
+   * also in constrained positions by calling AffineConstraints::distribute.
    * When accessing vector entries during the solution of linear systems, the
    * temporary solution should always have homogeneous constraints and this
    * method is the correct one.
@@ -189,7 +189,7 @@ public:
    * read_dof_values function, this function reads out the plain entries from
    * vectors, without taking stored constraints into account. This way of
    * access is appropriate when the constraints have been distributed on the
-   * vector by a call to ConstraintMatrix::distribute previously. This
+   * vector by a call to AffineConstraints::distribute previously. This
    * function is also necessary when inhomogeneous constraints are to be used,
    * as MatrixFree can only handle homogeneous constraints. Note that if
    * vectorization is enabled, the DoF values for several cells are set.
@@ -219,7 +219,7 @@ public:
    * Takes the values stored internally on dof values of the current cell and
    * sums them into the vector @p dst. The function also applies constraints
    * during the write operation. The functionality is hence similar to the
-   * function ConstraintMatrix::distribute_local_to_global. If vectorization
+   * function AffineConstraints::distribute_local_to_global. If vectorization
    * is enabled, the DoF values for several cells are used.
    *
    * If this class was constructed without a MatrixFree object and the
@@ -1694,7 +1694,7 @@ protected:
  *
  * Note that the two vector accesses through FEEvaluation::read_dof_values and
  * FEEvaluation::distribute_local_to_global resolve constraints on the fly,
- * based on the ConstraintMatrix object specified at the MatrixFree::reinit()
+ * based on the AffineConstraints object specified at the MatrixFree::reinit()
  * call. In case the values in the degrees of freedom are of interest (usually
  * only the values in quadrature points are necessary), these can be accessed
  * through FEEvaluation::get_dof_value(i), where i is the index of the basis
@@ -2102,7 +2102,7 @@ protected:
  * vectors that come from different time steps, it is mandatory that all
  * FEEvaluation objects share the same MatrixFree object. This is because the
  * way cells are looped by MatrixFree::cell_loop() can be different for
- * different DoFHandler or ConstraintMatrix arguments. More precisely, even
+ * different DoFHandler or AffineConstraints arguments. More precisely, even
  * though the layout is going to be the same in serial, there is no guarantee
  * about the ordering for different DoFHandler/Constraints in the MPI
  * case. The reason is that the algorithm detects cells that need data
@@ -2110,7 +2110,7 @@ protected:
  * with hanging node constraints connects to more neighbors than a FE_DGQ
  * element, for instance, and cells which need data exchange are put in
  * different positions inside the cell loop. Of course, if the exact same
- * DoFHandler, ConstraintMatrix, and options (such as the setting for thread
+ * DoFHandler, AffineConstraints, and options (such as the setting for thread
  * parallelism) are set, then the order is going to be the same because the
  * algorithm is deterministic.
  *
@@ -2228,7 +2228,7 @@ public:
    * @param matrix_free Data object that contains all data
    *
    * @param dof_no If matrix_free was set up with multiple DoFHandler
-   * objects, this parameter selects to which DoFHandler/ConstraintMatrix pair
+   * objects, this parameter selects to which DoFHandler/AffineConstraints pair
    * the given evaluator should be attached to.
    *
    * @param quad_no If matrix_free was set up with multiple Quadrature
@@ -2645,7 +2645,7 @@ public:
    * desired, it must be multiplied by -1.
    *
    * @param dof_no If matrix_free was set up with multiple DoFHandler
-   * objects, this parameter selects to which DoFHandler/ConstraintMatrix pair
+   * objects, this parameter selects to which DoFHandler/AffineConstraints pair
    * the given evaluator should be attached to.
    *
    * @param quad_no If matrix_free was set up with multiple Quadrature

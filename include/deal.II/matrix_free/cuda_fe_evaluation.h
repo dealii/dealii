@@ -103,7 +103,7 @@ namespace CUDAWrappers
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
      * nodes, so once can see it as a similar function to
-     * ConstraintMatrix::read_dof_valuess as well.
+     * AffineConstraints::read_dof_valuess as well.
      */
     __device__ void
     read_dof_values(const Number *src);
@@ -112,7 +112,7 @@ namespace CUDAWrappers
      * Take the value stored internally on dof values of the current cell and
      * sum them into the vector @p dst. The function also applies constraints
      * during the write operation. The functionality is hence similar to the
-     * function ConstraintMatrix::distribute_local_to_global.
+     * function AffineConstraints::distribute_local_to_global.
      */
     __device__ void
     distribute_local_to_global(Number *dst) const;
