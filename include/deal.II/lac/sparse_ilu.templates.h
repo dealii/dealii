@@ -305,13 +305,7 @@ SparseILU<number>::memory_consumption() const
   return SparseLUDecomposition<number>::memory_consumption();
 }
 
-
-
-/*----------------------------   sparse_ilu.templates.h
- * ---------------------------*/
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------   sparse_ilu.templates.h
- * ---------------------------*/
+/*-------------------------- sparse_ilu.templates.h -------------------------*/

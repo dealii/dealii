@@ -438,8 +438,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_OPENCASCADE
 
-/*------------------------------ occ_utilities.h
- * ------------------------------*/
-#endif
-/*------------------------------ occ_utilities.h
- * ------------------------------*/
+#endif // dealii_occ_utilities_h
+/*----------------------------- occ_utilities.h -----------------------------*/

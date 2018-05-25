@@ -71,8 +71,7 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   return unit_face_pt;
 }
 
-/*------------------------------ InternalDataBase
- * ------------------------------*/
+/* ---------------------------- InternalDataBase --------------------------- */
 
 
 template <int dim, int spacedim>

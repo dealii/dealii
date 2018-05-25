@@ -2753,8 +2753,7 @@ public:
                               Vector<IndexSet::value_type> &out) const = 0;
 };
 
-/* ---------------- classes derived from
- * FEValuesBase<dim,spacedim>::CellIteratorBase --------- */
+/* --- classes derived from FEValuesBase<dim,spacedim>::CellIteratorBase --- */
 
 
 /**
@@ -4907,8 +4906,7 @@ FEFaceValues<dim, spacedim>::do_reinit(const unsigned int face_no)
 }
 
 
-/*------------------------------- FESubFaceValues
- * -------------------------------*/
+/* ---------------------------- FESubFaceValues ---------------------------- */
 
 
 template <int dim, int spacedim>

@@ -1424,8 +1424,7 @@ namespace
 
 
 
-/*------------------------ Static variables: TriaAccessorBase
- * ---------------------------*/
+/*-------------------- Static variables: TriaAccessorBase -------------------*/
 
 template <int structdim, int dim, int spacedim>
 const unsigned int TriaAccessorBase<structdim, dim, spacedim>::dimension;
@@ -1900,8 +1899,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
 
 
 
-/*------------------------ Functions: CellAccessor<dim,spacedim>
- * -----------------------*/
+/*------------------- Functions: CellAccessor<dim,spacedim> -----------------*/
 
 // For codim>0 we proceed as follows:
 // 1) project point onto manifold and

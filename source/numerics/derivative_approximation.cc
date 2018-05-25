@@ -60,8 +60,7 @@ namespace
   }
 } // namespace
 
-// --------------- First the classes and functions that describe individual
-// --------------- derivatives
+// --- First the classes and functions that describe individual derivatives ---
 
 namespace DerivativeApproximation
 {
@@ -727,8 +726,7 @@ namespace DerivativeApproximation
   }   // namespace internal
 } // namespace DerivativeApproximation
 
-// ------------------------------- now for the functions that do the
-// ------------------------------- actual work
+// --------------- now for the functions that do the actual work --------------
 
 namespace DerivativeApproximation
 {

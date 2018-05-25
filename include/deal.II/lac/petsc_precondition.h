@@ -970,9 +970,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_PETSC
 
-/*----------------------------   petsc_precondition.h
- * ---------------------------*/
-
 #endif
-/*----------------------------   petsc_precondition.h
- * ---------------------------*/
+/*--------------------------- petsc_precondition.h --------------------------*/

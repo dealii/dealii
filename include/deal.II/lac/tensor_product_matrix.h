@@ -613,8 +613,7 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
 }
 
 
-// ------------------------------   TensorProductMatrixSymmetricSum
-// ------------------------------
+//---------------------- TensorProductMatrixSymmetricSum ----------------------
 
 template <int dim, typename Number, int size>
 inline TensorProductMatrixSymmetricSum<dim, Number, size>::
@@ -740,8 +739,7 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit(
 
 
 
-// ------------------------------ vectorized spec.:
-// TensorProductMatrixSymmetricSum   ------------------------------
+//------------- vectorized spec.: TensorProductMatrixSymmetricSum -------------
 
 template <int dim, typename Number, int size>
 inline TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::

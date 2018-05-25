@@ -225,11 +225,7 @@ private:
 };
 
 /*@}*/
-/*----------------------------   swappable_vector.h
- * ---------------------------*/
-/* end of #ifndef dealii_swappable_vector_h */
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
-/*----------------------------   swappable_vector.h
- * ---------------------------*/
+#endif // dealii_swappable_vector_h
+/*---------------------------   swappable_vector.h --------------------------*/

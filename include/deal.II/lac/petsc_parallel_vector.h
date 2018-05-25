@@ -569,9 +569,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_PETSC
 
-/*----------------------------   petsc_parallel_vector.h
- * ---------------------------*/
-
 #endif
-/*----------------------------   petsc_parallel_vector.h
- * ---------------------------*/
+/*------------------------- petsc_parallel_vector.h -------------------------*/

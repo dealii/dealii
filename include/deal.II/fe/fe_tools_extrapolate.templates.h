@@ -1802,7 +1802,5 @@ namespace FETools
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*----------------------------   fe_tools_extrapolate_templates.h
- * ---------------------------*/
-/* end of #ifndef dealii_fe_tools_extrapolate_templates_H */
-#endif
+/*--------------------   fe_tools_extrapolate_templates.h -------------------*/
+#endif // dealii_fe_tools_extrapolate_templates_H

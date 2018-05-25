@@ -42,8 +42,7 @@ namespace parallel
 }
 
 
-/*------------------------ Functions: TriaAccessorBase
- * ---------------------------*/
+/*--------------------- Functions: TriaAccessorBase -------------------------*/
 
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
@@ -393,8 +392,7 @@ TriaAccessorBase<structdim, dim, spacedim>::objects() const
 
 
 
-/*------------------------ Functions: InvalidAccessor
- * ---------------------------*/
+/*---------------------- Functions: InvalidAccessor -------------------------*/
 
 template <int structdim, int dim, int spacedim>
 InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
@@ -2236,8 +2234,7 @@ TriaAccessor<structdim, dim, spacedim>::is_translation_of(
 }
 
 
-/*------------------------ Functions: TriaAccessor<0,dim,spacedim>
- * -----------------------*/
+/*----------------- Functions: TriaAccessor<0,dim,spacedim> -----------------*/
 
 template <int dim, int spacedim>
 inline TriaAccessor<0, dim, spacedim>::TriaAccessor(
@@ -2595,8 +2592,7 @@ TriaAccessor<0, dim, spacedim>::used() const
 
 
 
-/*------------------------ Functions: TriaAccessor<0,1,spacedim>
- * -----------------------*/
+/*------------------- Functions: TriaAccessor<0,1,spacedim> -----------------*/
 
 template <int spacedim>
 inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
@@ -3022,8 +3018,7 @@ TriaAccessor<0, 1, spacedim>::used() const
   return tria->vertex_used(global_vertex_index);
 }
 
-/*------------------------ Functions: CellAccessor<dim,spacedim>
- * -----------------------*/
+/*------------------ Functions: CellAccessor<dim,spacedim> ------------------*/
 
 
 template <int dim, int spacedim>

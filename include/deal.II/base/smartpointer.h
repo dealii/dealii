@@ -201,8 +201,7 @@ private:
 };
 
 
-/* --------------------------- inline Template functions
- * ------------------------------*/
+/* --------------------- inline Template functions ------------------------- */
 
 
 template <typename T, typename P>

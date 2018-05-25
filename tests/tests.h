@@ -68,8 +68,7 @@ struct DisableWindowsDebugRuntimeDialog
 using namespace dealii;
 
 
-// ------------------------------ Utility functions used in tests
-// -----------------------
+// ------------------------- Utility functions used in tests ------------------
 
 /**
  * Go through the input stream @p in and filter out binary data for the key @p key .
@@ -394,8 +393,7 @@ filter_out_small_numbers(const Number number, const double tolerance)
     return number;
 }
 
-// ------------------------------ Functions used in initializing subsystems
-// -------------------
+// ---------------- Functions used in initializing subsystems -----------------
 
 
 /*
@@ -631,8 +629,7 @@ struct SetTBBAssertionHandler
 #endif /*TBB_DO_ASSERT*/
 
 
-// ------------------------------ Adjust global variables in deal.II
-// -----------------------
+// ---------------------- Adjust global variables in deal.II ------------------
 
 
 DEAL_II_NAMESPACE_OPEN

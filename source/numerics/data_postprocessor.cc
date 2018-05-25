@@ -54,8 +54,7 @@ DataPostprocessor<dim>::get_data_component_interpretation() const
 }
 
 
-// -------------------------- DataPostprocessorScalar
-// ---------------------------
+// -------------------------- DataPostprocessorScalar -------------------------
 
 template <int dim>
 DataPostprocessorScalar<dim>::DataPostprocessorScalar(
@@ -94,8 +93,7 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorVector
-// ---------------------------
+// -------------------------- DataPostprocessorVector -------------------------
 
 template <int dim>
 DataPostprocessorVector<dim>::DataPostprocessorVector(
@@ -134,8 +132,7 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorTensor
-// ---------------------------
+// -------------------------- DataPostprocessorTensor -------------------------
 
 template <int dim>
 DataPostprocessorTensor<dim>::DataPostprocessorTensor(

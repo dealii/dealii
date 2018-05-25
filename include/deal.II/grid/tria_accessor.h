@@ -3524,8 +3524,7 @@ private:
 
 
 
-/* -------------- declaration of explicit
-   specializations and general templates ------------- */
+/* ----- declaration of explicit specializations and general templates ----- */
 
 
 template <int structdim, int dim, int spacedim>

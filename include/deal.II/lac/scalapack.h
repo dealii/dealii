@@ -249,7 +249,8 @@ public:
   copy_transposed(const ScaLAPACKMatrix<NumberType> &B);
 
   /**
-   * The operations based on the input parameter @p transpose_B and the alignment conditions are summarized in the following table:
+   * The operations based on the input parameter @p transpose_B and the
+   * alignment conditions are summarized in the following table:
    *
    * | transpose_B |          Block Sizes         |                    Operation
    * | | :---------: | :--------------------------: |

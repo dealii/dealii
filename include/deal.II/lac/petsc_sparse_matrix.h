@@ -290,9 +290,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_PETSC
 
-/*----------------------------   petsc_sparse_matrix.h
- * ---------------------------*/
-
 #endif
-/*----------------------------   petsc_sparse_matrix.h
- * ---------------------------*/
+/*--------------------------- petsc_sparse_matrix.h -------------------------*/

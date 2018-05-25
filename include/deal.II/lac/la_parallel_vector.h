@@ -1308,8 +1308,7 @@ namespace LinearAlgebra
     /*@}*/
 
 
-    /*----------------------- Inline functions
-     * ----------------------------------*/
+    /*-------------------- Inline functions ---------------------------------*/
 
 #ifndef DOXYGEN
 

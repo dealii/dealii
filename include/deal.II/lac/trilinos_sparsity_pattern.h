@@ -1232,8 +1232,7 @@ namespace TrilinosWrappers
 
 
 
-  // -------------------------- inline and template functions
-  // ----------------------
+  // ----------------------- inline and template functions --------------------
 
 
 #    ifndef DOXYGEN

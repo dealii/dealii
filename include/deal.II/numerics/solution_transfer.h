@@ -536,9 +536,5 @@ private:
 
 DEAL_II_NAMESPACE_CLOSE
 
-
-/*----------------------------   solutiontransfer.h
- * ---------------------------*/
-#endif
-/*----------------------------   solutiontransfer.h
- * ---------------------------*/
+#endif // dealii_solutiontransfer_h
+/*---------------------------- solutiontransfer.h ---------------------------*/
