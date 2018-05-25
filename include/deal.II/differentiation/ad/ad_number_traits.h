@@ -296,8 +296,7 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-/* --------------------------- inline and template functions and specializations
- * ------------------------- */
+/* ----------- inline and template functions and specializations ----------- */
 
 
 #ifndef DOXYGEN

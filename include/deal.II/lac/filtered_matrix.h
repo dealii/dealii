@@ -679,8 +679,7 @@ operator!=(const const_iterator &other) const
 
 
 
-//------------------------------- FilteredMatrix
-//---------------------------------------//
+//------------------------- FilteredMatrix ----------------------------------//
 
 template <typename number>
 inline typename FilteredMatrix<number>::const_iterator

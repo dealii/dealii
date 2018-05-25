@@ -758,8 +758,7 @@ namespace TrilinosWrappers
 
 #endif
 
-/*---------------------- Template functions
- * -----------------------------------*/
+/*--------------------- Template functions ----------------------------------*/
 
 
 

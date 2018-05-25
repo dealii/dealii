@@ -1940,8 +1940,7 @@ namespace TrilinosWrappers
 
 
 
-  // -------------------------- inline and template functions
-  // ----------------------
+  // ----------------------- inline and template functions --------------------
 
 
 #    ifndef DOXYGEN
@@ -2105,9 +2104,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_TRILINOS
 
-/*----------------------------   trilinos_precondition.h
- * ---------------------------*/
-
-#endif
-/*----------------------------   trilinos_precondition.h
- * ---------------------------*/
+#endif // trilinos_precondition_h
+/*------------------------- trilinos_precondition.h -------------------------*/

@@ -4764,8 +4764,7 @@ namespace FEValuesViews
 
 
 
-/*------------------------ Inline functions: FEValuesBase
- * ------------------------*/
+/*---------------------- Inline functions: FEValuesBase ---------------------*/
 
 
 
@@ -5422,8 +5421,7 @@ FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
 
 
 
-/*------------------------ Inline functions: FEValues
- * ----------------------------*/
+/*--------------------- Inline functions: FEValues --------------------------*/
 
 
 template <int dim, int spacedim>
@@ -5443,8 +5441,7 @@ FEValues<dim, spacedim>::get_present_fe_values() const
 }
 
 
-/*------------------------ Inline functions: FEFaceValuesBase
- * --------------------*/
+/*---------------------- Inline functions: FEFaceValuesBase -----------------*/
 
 
 template <int dim, int spacedim>
@@ -5455,8 +5452,7 @@ FEFaceValuesBase<dim, spacedim>::get_face_index() const
 }
 
 
-/*------------------------ Inline functions: FE*FaceValues
- * --------------------*/
+/*----------------------- Inline functions: FE*FaceValues -------------------*/
 
 template <int dim, int spacedim>
 inline const Quadrature<dim - 1> &

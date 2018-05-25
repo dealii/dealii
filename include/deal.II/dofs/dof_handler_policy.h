@@ -261,8 +261,5 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*----------------------------   dof_handler_policy.h
- * ---------------------------*/
 #endif
-/*----------------------------   dof_handler_policy.h
- * ---------------------------*/
+/*--------------------------   dof_handler_policy.h -------------------------*/

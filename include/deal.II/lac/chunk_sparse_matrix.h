@@ -2051,12 +2051,7 @@ ChunkSparseMatrix<number>::end(const unsigned int r)
 
 #  endif // DOXYGEN
 
-
-/*----------------------------   chunk_sparse_matrix.h
- * ---------------------------*/
-
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-/*----------------------------   chunk_sparse_matrix.h
- * ---------------------------*/
+/*--------------------------- chunk_sparse_matrix.h -------------------------*/

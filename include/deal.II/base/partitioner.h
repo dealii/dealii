@@ -673,8 +673,7 @@ namespace Utilities
 
 
 
-    /*----------------------- Inline functions
-     * ----------------------------------*/
+    /*--------------------- Inline functions --------------------------------*/
 
 #ifndef DOXYGEN
 

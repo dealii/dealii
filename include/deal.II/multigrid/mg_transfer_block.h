@@ -486,8 +486,7 @@ private:
 
 /*@}*/
 
-//----------inline function
-// definition--------------------------------------------------
+//------------------------- inline function definition ------------------------
 template <typename number>
 inline void
 MGTransferBlockSelect<number>::select(const unsigned int block)

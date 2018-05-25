@@ -1333,8 +1333,7 @@ namespace parallel
 {
   namespace distributed
   {
-    /* ---------------------- class Triangulation<dim,spacedim>
-     * ------------------------------ */
+    /* ----------------- class Triangulation<dim,spacedim> ----------------- */
 
 
     template <int dim, int spacedim>

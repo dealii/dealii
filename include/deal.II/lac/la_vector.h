@@ -393,8 +393,7 @@ namespace LinearAlgebra
   };
 
   /*@}*/
-  /*----------------------- Inline functions
-   * ----------------------------------*/
+  /*--------------------------- Inline functions ----------------------------*/
 
   template <typename Number>
   inline Vector<Number>::Vector(const Vector<Number> &V) :

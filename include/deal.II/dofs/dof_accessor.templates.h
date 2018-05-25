@@ -2253,8 +2253,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
 }
 
 
-/*------------------------- Functions: DoFAccessor<0,1,spacedim>
- * ---------------------------*/
+/*----------------- Functions: DoFAccessor<0,1,spacedim> --------------------*/
 
 
 template <template <int, int> class DoFHandlerType,

@@ -310,8 +310,7 @@ namespace TrilinosWrappers
 
 
 
-    /*----------------------- Inline functions
-     * ----------------------------------*/
+    /*-------------------------- Inline functions ---------------------------*/
     inline BlockVector::BlockVector(
       const std::vector<IndexSet> &parallel_partitioning,
       const MPI_Comm &             communicator)

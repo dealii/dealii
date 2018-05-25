@@ -5840,8 +5840,7 @@ FEEvaluationAccess<dim, dim, Number, is_face>::submit_curl(
 }
 
 
-/*-------------------- FEEvaluationAccess scalar for 1d
- * ----------------------------*/
+/*-------------------- FEEvaluationAccess scalar for 1d ---------------------*/
 
 
 template <typename Number, bool is_face>

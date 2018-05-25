@@ -1078,8 +1078,7 @@ namespace PETScWrappers
 
 
 #    ifndef DOXYGEN
-  // -------------------------- inline and template functions
-  // ----------------------
+  // ---------------------- inline and template functions ---------------------
 
 
   namespace MatrixIterators
@@ -1607,10 +1606,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_PETSC
 
-
-/*----------------------------   petsc_matrix_base.h
- * ---------------------------*/
-
 #endif
-/*----------------------------   petsc_matrix_base.h
- * ---------------------------*/
+/*---------------------------- petsc_matrix_base.h --------------------------*/

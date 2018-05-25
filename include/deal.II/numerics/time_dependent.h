@@ -1515,8 +1515,7 @@ private:
 
 
 
-/*----------------------------- template functions
- * ------------------------------*/
+/*--------------------------- template functions ----------------------------*/
 
 template <typename InitFunctionObject, typename LoopFunctionObject>
 void

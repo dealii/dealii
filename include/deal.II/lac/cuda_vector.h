@@ -308,8 +308,7 @@ namespace LinearAlgebra
 
 
 
-    // ------------------------------ Inline functions
-    // -----------------------------
+    // ---------------------------- Inline functions --------------------------
     template <typename Number>
     inline Number *
     Vector<Number>::get_values() const

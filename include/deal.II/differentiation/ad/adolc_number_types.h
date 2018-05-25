@@ -97,8 +97,7 @@ DeclExceptionMsg(ExcADOLCAdvancedBranching,
                  "numbers when the advanced branching feature is activated.");
 
 
-/* --------------------------- inline and template functions and specializations
- * ------------------------- */
+/* ----------- inline and template functions and specializations ----------- */
 
 
 #  ifndef DOXYGEN

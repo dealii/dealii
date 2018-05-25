@@ -325,8 +325,7 @@ namespace Particles
     PropertyPool::Handle properties;
   };
 
-  /* -------------------------- inline and template functions
-   * ---------------------- */
+  /* ---------------------- inline and template functions ------------------ */
 
   template <int dim, int spacedim>
   template <class Archive>

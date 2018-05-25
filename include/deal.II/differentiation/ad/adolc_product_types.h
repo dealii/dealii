@@ -28,8 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-/* -------------- Adol-C taped (Differentiation::AD::NumberTypes::adolc_taped)
- * -------------- */
+/* ------ Adol-C taped (Differentiation::AD::NumberTypes::adolc_taped) ----- */
 
 
 namespace internal
@@ -183,8 +182,7 @@ struct EnableIfScalar<std::complex<adub>>
 };
 
 
-/* -------------- Adol-C tapeless
- * (Differentiation::AD::NumberTypes::adolc_tapeless) -------------- */
+/* -- Adol-C tapeless (Differentiation::AD::NumberTypes::adolc_tapeless) -- */
 
 
 namespace internal

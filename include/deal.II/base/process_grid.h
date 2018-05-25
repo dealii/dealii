@@ -198,8 +198,7 @@ namespace Utilities
       bool mpi_process_is_active;
     };
 
-    /*----------------------- Inline functions
-     * ----------------------------------*/
+    /*--------------------- Inline functions --------------------------------*/
 
 #  ifndef DOXYGEN
 

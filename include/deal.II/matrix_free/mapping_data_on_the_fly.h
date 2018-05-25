@@ -154,8 +154,7 @@ namespace internal
     };
 
 
-    /*----------------------- Inline functions
-     * ----------------------------------*/
+    /*-------------------------- Inline functions ---------------------------*/
 
     template <int dim, typename Number>
     inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(

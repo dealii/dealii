@@ -189,8 +189,5 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_OPENCASCADE
 
-/*------------------------------ occ_boundary_lib.h
- * ------------------------------*/
-#endif
-/*------------------------------ occ_boundary_lib.h
- * ------------------------------*/
+#endif // dealii_occ_boundary_lib_h
+/*---------------------------- occ_boundary_lib.h ---------------------------*/

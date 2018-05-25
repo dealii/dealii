@@ -3643,8 +3643,7 @@ namespace VectorTools
   }
 
 
-  // ----- implementation for project_boundary_values with ConstraintMatrix
-  // -----
+  // ---- implementation for project_boundary_values with ConstraintMatrix ----
 
 
 
