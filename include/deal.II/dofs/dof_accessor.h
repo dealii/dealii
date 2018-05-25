@@ -33,7 +33,8 @@ template <typename number>
 class FullMatrix;
 template <typename number>
 class Vector;
-class ConstraintMatrix;
+template <typename number>
+class AffineConstraints;
 
 template <typename Accessor>
 class TriaRawIterator;
@@ -1555,16 +1556,18 @@ public:
    * or a BlockVector<double>, or a PETSc or Trilinos vector if deal.II is
    * compiled to support these libraries. It is in the responsibility of the
    * caller to assure that the types of the numbers stored in input and output
-   * vectors are compatible and with similar accuracy. The ConstraintMatrix
-   * passed as an argument to this function makes sure that constraints are
-   * correctly distributed when the dof values are calculated.
+   * vectors are compatible and with similar accuracy. The
+   * AffineConstraints object passed as an argument to this function makes
+   * sure that constraints are correctly distributed when the dof values
+   * are calculated.
    */
   template <class InputVector, typename ForwardIterator>
   void
-  get_dof_values(const ConstraintMatrix &constraints,
-                 const InputVector &     values,
-                 ForwardIterator         local_values_begin,
-                 ForwardIterator         local_values_end) const;
+  get_dof_values(
+    const AffineConstraints<typename InputVector::value_type> &constraints,
+    const InputVector &                                        values,
+    ForwardIterator local_values_begin,
+    ForwardIterator local_values_end) const;
 
   /**
    * This function is the counterpart to get_dof_values(): it takes a vector
@@ -1723,15 +1726,16 @@ public:
    *
    * The elements are <em>added</em> up to the elements in the global vector,
    * rather than just set, since this is usually what one wants. Moreover, the
-   * ConstraintMatrix passed to this function makes sure that also constraints
-   * are eliminated in this process.
+   * AffineConstraints object passed to this function makes sure that also
+   * constraints are eliminated in this process.
    */
   template <typename ForwardIterator, typename OutputVector>
   void
-  distribute_local_to_global(const ConstraintMatrix &constraints,
-                             ForwardIterator         local_source_begin,
-                             ForwardIterator         local_source_end,
-                             OutputVector &          global_destination) const;
+  distribute_local_to_global(
+    const AffineConstraints<typename OutputVector::value_type> &constraints,
+    ForwardIterator local_source_begin,
+    ForwardIterator local_source_end,
+    OutputVector &  global_destination) const;
 
   /**
    * This function does much the same as the

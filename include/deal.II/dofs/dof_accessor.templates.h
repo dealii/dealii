@@ -31,7 +31,7 @@
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/hp/dof_level.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/read_write_vector.h>
 
 #include <limits>
@@ -3096,11 +3096,11 @@ namespace internal
       static void
       distribute_local_to_global(
         const DoFCellAccessor<dealii::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor,
-        const ConstraintMatrix &                 constraints,
-        ForwardIterator                          local_source_begin,
-        ForwardIterator                          local_source_end,
-        OutputVector &                           global_destination)
+                              level_dof_access> &                   accessor,
+        const AffineConstraints<typename OutputVector::value_type> &constraints,
+        ForwardIterator local_source_begin,
+        ForwardIterator local_source_end,
+        OutputVector &  global_destination)
       {
         Assert(
           accessor.dof_handler != nullptr,
@@ -3136,11 +3136,11 @@ namespace internal
       static void
       distribute_local_to_global(
         const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor,
-        const ConstraintMatrix &                 constraints,
-        ForwardIterator                          local_source_begin,
-        ForwardIterator                          local_source_end,
-        OutputVector &                           global_destination)
+                              level_dof_access> &                   accessor,
+        const AffineConstraints<typename OutputVector::value_type> &constraints,
+        ForwardIterator local_source_begin,
+        ForwardIterator local_source_end,
+        OutputVector &  global_destination)
       {
         Assert(
           accessor.dof_handler != nullptr,
@@ -3352,10 +3352,10 @@ namespace internal
 
         const unsigned int n_dofs = local_matrix.size();
 
-        // TODO[WB/MK]: This function could me made more efficient because it
-        // allocates memory, which could be avoided by passing in another
-        // argument as a scratch array. Comment(GK) Do not bother and leave this
-        // to ConstraintMatrix or MeshWorker::Assembler
+        // TODO[WB/MK]: This function could me made more efficient because
+        // it allocates memory, which could be avoided by passing in
+        // another argument as a scratch array. Comment(GK) Do not bother
+        // and leave this to AffineConstraints or MeshWorker::Assembler
 
         // get indices of dofs
         std::vector<types::global_dof_index> dofs(n_dofs);
@@ -3627,10 +3627,10 @@ template <typename DoFHandlerType, bool level_dof_access>
 template <class InputVector, typename ForwardIterator>
 inline void
 DoFCellAccessor<DoFHandlerType, level_dof_access>::get_dof_values(
-  const ConstraintMatrix &constraints,
-  const InputVector &     values,
-  ForwardIterator         local_values_begin,
-  ForwardIterator         local_values_end) const
+  const AffineConstraints<typename InputVector::value_type> &constraints,
+  const InputVector &                                        values,
+  ForwardIterator                                            local_values_begin,
+  ForwardIterator local_values_end) const
 {
   Assert(this->is_artificial() == false,
          ExcMessage("Can't ask for DoF indices on artificial cells."));
@@ -3793,10 +3793,10 @@ template <typename DoFHandlerType, bool level_dof_access>
 template <typename ForwardIterator, typename OutputVector>
 inline void
 DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
-  const ConstraintMatrix &constraints,
-  ForwardIterator         local_source_begin,
-  ForwardIterator         local_source_end,
-  OutputVector &          global_destination) const
+  const AffineConstraints<typename OutputVector::value_type> &constraints,
+  ForwardIterator local_source_begin,
+  ForwardIterator local_source_end,
+  OutputVector &  global_destination) const
 {
   dealii::internal::DoFCellAccessorImplementation::Implementation::
     distribute_local_to_global(*this,
