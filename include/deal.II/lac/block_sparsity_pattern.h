@@ -484,7 +484,7 @@ public:
  *
  * @dontinclude block_dynamic_sparsity_pattern.cc
  *
- * After the DoFHandler <tt>dof</tt> and the ConstraintMatrix
+ * After the DoFHandler <tt>dof</tt> and the AffineConstraints
  * <tt>constraints</tt> have been set up with a system element, we must count
  * the degrees of freedom in each matrix block:
  *

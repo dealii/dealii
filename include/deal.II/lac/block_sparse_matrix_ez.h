@@ -17,10 +17,10 @@
 #define dealii_block_sparse_matrix_ez_h
 
 
-// TODO: Derive BlockSparseMatrixEZ from BlockMatrixBase, like all the other
-// block matrices as well; this would allow to instantiate a few functions with
-// this template argument as well (in particular
-// ConstraintMatrix::distribute_local_to_global)
+// TODO: Derive BlockSparseMatrixEZ from BlockMatrixBase, like all the
+// other block matrices as well; this would allow to instantiate a few
+// functions with this template argument as well (in particular
+// AffineConstraints::distribute_local_to_global)
 
 #include <deal.II/base/config.h>
 
