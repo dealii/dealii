@@ -81,6 +81,28 @@ ELSE()
 ENDIF()
 
 
+# Collect where the build system will write the .inst files after
+# expansion from the .inst.in files. We need this because we let
+# doxygen read the .cc files and they #include the .inst files.
+#
+# To get at this, find all of the .inst.in files, strip all but the
+# directory name under $CMAKE_SOURCE_DIR/source, and then prepend
+# the build directory to it
+FILE(GLOB _inst_in_files
+     "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
+STRING(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
+STRING(REGEX REPLACE "/[a-zA-Z0-9_\\.]*.inst.in" "/" _inst_in_dirs_y "${_inst_in_dirs_x}")
+LIST(REMOVE_DUPLICATES _inst_in_dirs_y)
+SET(_inst_in_dirs "")
+FOREACH (_dir ${_inst_in_dirs_y})
+  SET(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
+ENDFOREACH()
+
+MESSAGE(STATUS "translated this into")
+MESSAGE(STATUS "found ${_inst_in_dirs}")
+
+# Generate the input files for doxygen using template .in files in which
+# we have to substitute some CMake variables
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
@@ -245,6 +267,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter
     ${_doxygen_depend}
+    expand_all_instantiations
   COMMENT "Generating documentation via doxygen."
   VERBATIM
   )
