@@ -29,7 +29,7 @@
 
 #include <deal.II/hp/dof_handler.h>
 
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 #include <map>
 #include <ostream>
@@ -492,23 +492,24 @@ namespace DoFTools
    * entries.
    *
    * @param[in] constraints The process for generating entries described above
-   * is purely local to each cell. Consequently, the sparsity pattern does not
-   * provide for matrix entries that will only be written into during the
-   * elimination of hanging nodes or other constraints. They have to be taken
-   * care of by a subsequent call to ConstraintMatrix::condense().
-   * Alternatively, the constraints on degrees of freedom can already be taken
-   * into account at the time of creating the sparsity pattern. For this, pass
-   * the ConstraintMatrix object as the third argument to the current
-   * function. No call to ConstraintMatrix::condense() is then necessary. This
-   * process is explained in step-6, step-27, and other tutorial programs.
+   * is purely local to each cell. Consequently, the sparsity pattern does
+   * not provide for matrix entries that will only be written into during
+   * the elimination of hanging nodes or other constraints. They have to be
+   * taken care of by a subsequent call to AffineConstraints::condense().
+   * Alternatively, the constraints on degrees of freedom can already be
+   * taken into account at the time of creating the sparsity pattern. For
+   * this, pass the AffineConstraints object as the third argument to the
+   * current function. No call to AffineConstraints::condense() is then
+   * necessary. This process is explained in step-6, step-27, and other
+   * tutorial programs.
    *
    * @param[in] keep_constrained_dofs In case the constraints are already
-   * taken care of in this function by passing in a ConstraintMatrix object,
+   * taken care of in this function by passing in a AffineConstraints object,
    * it is possible to abandon some off-diagonal entries in the sparsity
    * pattern if these entries will also not be written into during the actual
    * assembly of the matrix this sparsity pattern later serves. Specifically,
    * when using an assembly method that uses
-   * ConstraintMatrix::distribute_local_to_global(), no entries will ever be
+   * AffineConstraints::distribute_local_to_global(), no entries will ever be
    * written into those matrix rows or columns that correspond to constrained
    * degrees of freedom. In such cases, you can set the argument @p
    * keep_constrained_dofs to @p false to avoid allocating these entries in
@@ -548,13 +549,15 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number = double>
   void
   make_sparsity_pattern(
-    const DoFHandlerType &    dof_handler,
-    SparsityPatternType &     sparsity_pattern,
-    const ConstraintMatrix &  constraints           = ConstraintMatrix(),
-    const bool                keep_constrained_dofs = true,
+    const DoFHandlerType &           dof_handler,
+    SparsityPatternType &            sparsity_pattern,
+    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
@@ -622,14 +625,16 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
   make_sparsity_pattern(
-    const DoFHandlerType &    dof_handler,
-    const Table<2, Coupling> &coupling,
-    SparsityPatternType &     sparsity_pattern,
-    const ConstraintMatrix &  constraints           = ConstraintMatrix(),
-    const bool                keep_constrained_dofs = true,
+    const DoFHandlerType &           dof_handler,
+    const Table<2, Coupling> &       coupling,
+    SparsityPatternType &            sparsity_pattern,
+    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
@@ -716,14 +721,17 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
   make_flux_sparsity_pattern(
-    const DoFHandlerType &    dof_handler,
-    SparsityPatternType &     sparsity_pattern,
-    const ConstraintMatrix &  constraints,
-    const bool                keep_constrained_dofs = true,
+    const DoFHandlerType &           dof_handler,
+    SparsityPatternType &            sparsity_pattern,
+    const AffineConstraints<number> &constraints,
+    const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
+
 
   /**
    * This function does essentially the same as the other
@@ -752,6 +760,8 @@ namespace DoFTools
     const Table<2, Coupling> &cell_integrals_mask,
     const Table<2, Coupling> &face_integrals_mask,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
+
+
   /**
    * This function does essentially the same as the previous
    * make_flux_sparsity_pattern() function but allows the application of
@@ -760,11 +770,13 @@ namespace DoFTools
    * constraints to be imposed on the continuous part while also building
    * the flux terms needed for the discontinuous part.
    */
-  template <typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType,
+            typename SparsityPatternType,
+            typename number>
   void
-  make_flux_sparsity_pattern(const DoFHandlerType &    dof,
-                             SparsityPatternType &     sparsity,
-                             const ConstraintMatrix &  constraints,
+  make_flux_sparsity_pattern(const DoFHandlerType &           dof,
+                             SparsityPatternType &            sparsity,
+                             const AffineConstraints<number> &constraints,
                              const bool                keep_constrained_dofs,
                              const Table<2, Coupling> &couplings,
                              const Table<2, Coupling> &face_couplings,
@@ -846,7 +858,7 @@ namespace DoFTools
    * This function does not clear the constraint matrix object before use, in
    * order to allow adding constraints from different sources to the same
    * object. You therefore need to make sure it contains only constraints you
-   * still want; otherwise call the ConstraintMatrix::clear() function.
+   * still want; otherwise call the AffineConstraints::clear() function.
    * Since this function does not check if it would add cycles in
    * @p constraints, it is recommended to call this function prior to other
    * functions that constrain DoFs with respect to others such as
@@ -865,10 +877,10 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   void
-  make_hanging_node_constraints(const DoFHandlerType &dof_handler,
-                                ConstraintMatrix &    constraints);
+  make_hanging_node_constraints(const DoFHandlerType &     dof_handler,
+                                AffineConstraints<number> &constraints);
 
   /**
    * This function is used when different variables in a problem are
@@ -891,7 +903,7 @@ namespace DoFTools
    * functions $v\in {\cal V}_1$. In other words, every function $v_h=\sum_j
    * V_j \varphi_j^{(1)} \in {\cal V}_1$ that also satisfies $v_h\in {\cal
    * V}_0$ automatically satisfies $CV=0$. This function computes the matrix
-   * $C$ in the form of a ConstraintMatrix object.
+   * $C$ in the form of a AffineConstraints object.
    *
    * The construction of these constraints is done as follows: for each of the
    * degrees of freedom (i.e. shape functions) on the coarse grid, we compute
@@ -935,7 +947,7 @@ namespace DoFTools
    * it as an argument.
    *
    * The computed constraints are entered into a variable of type
-   * ConstraintMatrix; previous contents are not deleted.
+   * AffineConstraints; previous contents are not deleted.
    */
   template <int dim, int spacedim>
   void
@@ -945,7 +957,7 @@ namespace DoFTools
     const DoFHandler<dim, spacedim> &              fine_grid,
     const unsigned int                             fine_component,
     const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
-    ConstraintMatrix &                             constraints);
+    AffineConstraints<double> &                    constraints);
 
 
   /**
@@ -987,7 +999,7 @@ namespace DoFTools
 
   /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
-   * into a ConstraintMatrix @p constraint_matrix.
+   * into an AffineConstraints object @p constraints.
    *
    * Given a pair of not necessarily active boundary faces @p face_1 and @p
    * face_2, this functions constrains all DoFs associated with the boundary
@@ -995,7 +1007,7 @@ namespace DoFTools
    * by @p face_2. More precisely:
    *
    * If @p face_1 and @p face_2 are both active faces it adds the DoFs of @p
-   * face_1 to the list of constrained DoFs in @p constraint_matrix and adds
+   * face_1 to the list of constrained DoFs in @p constraints and adds
    * entries to constrain them to the corresponding values of the DoFs on @p
    * face_2. This happens on a purely algebraic level, meaning, the global DoF
    * with (local face) index <tt>i</tt> on @p face_1 gets constraint to the
@@ -1130,7 +1142,7 @@ namespace DoFTools
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
    *
    * This function makes sure that identity constraints don't create cycles
-   * in @p constraint_matrix.
+   * in @p constraints.
    *
    * Detailed information can be found in the see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
@@ -1142,7 +1154,7 @@ namespace DoFTools
   make_periodicity_constraints(
     const FaceIterator &                         face_1,
     const typename identity<FaceIterator>::type &face_2,
-    dealii::ConstraintMatrix &                   constraint_matrix,
+    AffineConstraints<double> &                  constraints,
     const ComponentMask &            component_mask   = ComponentMask(),
     const bool                       face_orientation = true,
     const bool                       face_flip        = false,
@@ -1155,7 +1167,7 @@ namespace DoFTools
 
   /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
-   * into a ConstraintMatrix @p constraint_matrix.
+   * into an AffineConstraints object @p constraints.
    *
    * This is the main high level interface for above low level variant of
    * make_periodicity_constraints(). It takes a std::vector @p periodic_faces
@@ -1180,7 +1192,7 @@ namespace DoFTools
     const std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
       &                              periodic_faces,
-    dealii::ConstraintMatrix &       constraint_matrix,
+    AffineConstraints<double> &      constraints,
     const ComponentMask &            component_mask = ComponentMask(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>());
@@ -1189,7 +1201,7 @@ namespace DoFTools
 
   /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
-   * into a ConstraintMatrix @p constraint_matrix.
+   * into a AffineConstraints @p constraints.
    *
    * This function serves as a high level interface for the
    * make_periodicity_constraints() function.
@@ -1220,12 +1232,12 @@ namespace DoFTools
   template <typename DoFHandlerType>
   void
   make_periodicity_constraints(
-    const DoFHandlerType &    dof_handler,
-    const types::boundary_id  b_id1,
-    const types::boundary_id  b_id2,
-    const int                 direction,
-    dealii::ConstraintMatrix &constraint_matrix,
-    const ComponentMask &     component_mask = ComponentMask());
+    const DoFHandlerType &     dof_handler,
+    const types::boundary_id   b_id1,
+    const types::boundary_id   b_id2,
+    const int                  direction,
+    AffineConstraints<double> &constraints,
+    const ComponentMask &      component_mask = ComponentMask());
 
 
 
@@ -1256,11 +1268,11 @@ namespace DoFTools
   template <typename DoFHandlerType>
   void
   make_periodicity_constraints(
-    const DoFHandlerType &    dof_handler,
-    const types::boundary_id  b_id,
-    const int                 direction,
-    dealii::ConstraintMatrix &constraint_matrix,
-    const ComponentMask &     component_mask = ComponentMask());
+    const DoFHandlerType &     dof_handler,
+    const types::boundary_id   b_id,
+    const int                  direction,
+    AffineConstraints<double> &constraints,
+    const ComponentMask &      component_mask = ComponentMask());
 
   /**
    * @}
@@ -1549,22 +1561,22 @@ namespace DoFTools
    * Essentially, the question this functions answers is the following:
    * Given a subdomain with associated DoFs, what is the largest subset of
    * these DoFs that are allowed to be non-zero such that after calling
-   * ConstraintMatrix::distribute() the resulting solution vector will have
-   * support only within the given domain. Here @p cm is the ConstraintMatrix
-   * containing hanging nodes constraints.
+   * AffineConstraints::distribute() the resulting solution vector will have
+   * support only within the given domain. Here, @p constraints is the
+   * AffineConstraints container containing hanging nodes constraints.
    *
    * In case of parallel::distributed::Triangulation @p predicate will be called
    * only for locally owned and ghost cells. The resulting index set may contain
    * DoFs that are associated with the locally owned or ghost cells, but are not
    * owned by the current MPI core.
    */
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   IndexSet
   extract_dofs_with_support_contained_within(
     const DoFHandlerType &dof_handler,
     const std::function<
       bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
-    const ConstraintMatrix &cm = ConstraintMatrix());
+    const AffineConstraints<number> &constraints = AffineConstraints<number>());
 
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for
@@ -2389,7 +2401,7 @@ namespace DoFTools
    * results, which can then be further processed, e.g. for output. You should
    * note that the resulting field will not be continuous at hanging nodes.
    * This can, however, easily be arranged by calling the appropriate @p
-   * distribute function of a ConstraintMatrix object created for this
+   * distribute function of an AffineConstraints object created for this
    * DoFHandler object, after the vector has been fully assembled.
    *
    * It is assumed that the number of elements in @p cell_data equals the
@@ -2539,12 +2551,15 @@ namespace DoFTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim,
+            int spacedim,
+            template <int, int> class DoFHandlerType,
+            typename number>
   void
   make_zero_boundary_constraints(
     const DoFHandlerType<dim, spacedim> &dof,
     const types::boundary_id             boundary_id,
-    ConstraintMatrix &                   zero_boundary_constraints,
+    AffineConstraints<number> &          zero_boundary_constraints,
     const ComponentMask &                component_mask = ComponentMask());
 
   /**
@@ -2557,11 +2572,14 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template <int dim, int spacedim, template <int, int> class DoFHandlerType>
+  template <int dim,
+            int spacedim,
+            template <int, int> class DoFHandlerType,
+            typename number>
   void
   make_zero_boundary_constraints(
     const DoFHandlerType<dim, spacedim> &dof,
-    ConstraintMatrix &                   zero_boundary_constraints,
+    AffineConstraints<number> &          zero_boundary_constraints,
     const ComponentMask &                component_mask = ComponentMask());
 
   /**

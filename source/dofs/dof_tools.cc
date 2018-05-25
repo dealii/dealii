@@ -42,8 +42,8 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -810,13 +810,13 @@ namespace DoFTools
 
 
 
-  template <typename DoFHandlerType>
+  template <typename DoFHandlerType, typename number>
   IndexSet
   extract_dofs_with_support_contained_within(
     const DoFHandlerType &dof_handler,
     const std::function<
       bool(const typename DoFHandlerType::active_cell_iterator &)> &predicate,
-    const ConstraintMatrix &                                        cm)
+    const AffineConstraints<number> &                               cm)
   {
     const std::function<bool(
       const typename DoFHandlerType::active_cell_iterator &)>
@@ -888,8 +888,7 @@ namespace DoFTools
           // if halo DoF is constrained, add all DoFs to which it's constrained
           // because after resolving constraints, the support of the DoFs that
           // constrain the current DoF will extend to the halo cells.
-          if (const std::vector<std::pair<types::global_dof_index, double>>
-                *line_ptr = cm.get_constraint_entries(*it))
+          if (const auto *line_ptr = cm.get_constraint_entries(*it))
             {
               const unsigned int line_size = line_ptr->size();
               for (unsigned int j = 0; j < line_size; ++j)
